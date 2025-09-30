@@ -1,0 +1,66 @@
+PODS:
+  - AtomicX/Chat (1.0.0):
+    - AtomicXCore
+    - Kingfisher (~> 7.0)
+    - Masonry
+    - SnapKit
+  - AtomicXCore (3.0.5):
+    - RTCRoomEngine/Professional
+  - ChatUIKit (1.0.0):
+    - AtomicX/Chat
+    - AtomicXCore
+    - Kingfisher
+    - Masonry
+  - Kingfisher (7.12.0)
+  - Masonry (1.1.0)
+  - RTCRoomEngine (3.4.0):
+    - RTCRoomEngine/Professional (= 3.4.0)
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional (>= 11.7.15304)
+  - RTCRoomEngine/Professional (3.4.0):
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional (>= 11.7.15304)
+  - SnapKit (5.7.1)
+  - TXIMSDK_Plus_iOS_XCFramework (8.6.7040)
+  - TXLiteAVSDK_Professional (12.7.19272):
+    - TXLiteAVSDK_Professional/Professional (= 12.7.19272)
+  - TXLiteAVSDK_Professional/Professional (12.7.19272)
+
+DEPENDENCIES:
+  - AtomicX/Chat (from `../../atomic-x/AtomicX.podspec`)
+  - AtomicXCore (from `../../../../../tuikit_engine/atomicx/swift/AtomicXCore`)
+  - ChatUIKit (from `../uikit/ChatUIKit.podspec`)
+  - RTCRoomEngine (from `../../../../../tuikit_engine/RTCRoomEngine.podspec`)
+
+SPEC REPOS:
+  trunk:
+    - Kingfisher
+    - Masonry
+    - SnapKit
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+
+EXTERNAL SOURCES:
+  AtomicX:
+    :path: "../../atomic-x/AtomicX.podspec"
+  AtomicXCore:
+    :path: "../../../../../tuikit_engine/atomicx/swift/AtomicXCore"
+  ChatUIKit:
+    :path: "../uikit/ChatUIKit.podspec"
+  RTCRoomEngine:
+    :path: "../../../../../tuikit_engine/RTCRoomEngine.podspec"
+
+SPEC CHECKSUMS:
+  AtomicX: c8b90d3121840f11479fb4761e0d7bb8cfc036a5
+  AtomicXCore: b028201ff3bc52eb51afa55abef8dea55888a2cb
+  ChatUIKit: 484854eb3b8cdc27e2d59c897c4203643b1cf171
+  Kingfisher: 53a10ea35051a436b5fb626ca2dd8f3144d755e9
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  RTCRoomEngine: a44ed189a2a603835986014d8765c2268a9df6fb
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  TXIMSDK_Plus_iOS_XCFramework: 36ea2cdb544315d79e520cd54d0bbb1fbb1110bc
+  TXLiteAVSDK_Professional: 11c510bf9fd5bb24c8065f913ab61284bdcdf4c6
+
+PODFILE CHECKSUM: 284af0cc8798a64bce46b577905f747da3dd4b5a
+
+COCOAPODS: 1.16.2
