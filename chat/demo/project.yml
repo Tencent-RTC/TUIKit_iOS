@@ -1,0 +1,26 @@
+name: TUIKitDemo
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: 14.0
+targets:
+  TUIKitDemo:
+    type: application
+    platform: iOS
+    sources:
+      - TUIKitDemo
+    info:
+      path: TUIKitDemo/Info.plist
+      properties:
+        CFBundleDisplayName: TUIKitDemo
+        UILaunchStoryboardName: LaunchScreen
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+          UISceneConfigurations:
+            UIWindowSceneSessionRoleApplication:
+              - UISceneConfigurationName: Default Configuration
+                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+    settings:
+      base:
+        INFOPLIST_FILE: TUIKitDemo/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.TUIKitDemo 
