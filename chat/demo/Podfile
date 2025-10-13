@@ -4,7 +4,7 @@ target 'ChatDemo' do
   use_frameworks! :linkage => :static
   
   pod 'AtomicXCore', :path => '../../../../../tuikit_engine/atomicx/swift/AtomicXCore'
-  pod 'AtomicX/Chat', :path => '../../atomic-x/AtomicX.podspec'
+  pod 'AtomicX/Chat', :path => '../../../ios_swiftui/AtomicX.podspec'
   pod 'ChatUIKit', :path => '../uikit/ChatUIKit.podspec'
   pod 'RTCRoomEngine', :path => '../../../../../tuikit_engine/RTCRoomEngine.podspec'
 #  pod 'MessageList', :path => '../../atomic-x/Sources/MessageList'

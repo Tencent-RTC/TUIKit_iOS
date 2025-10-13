@@ -7,6 +7,7 @@ public struct ContactsPage: View {
     @State private var showAddContactMenu = false
     @State private var showAddFriend = false
     @State private var showJoinGroup = false
+    private let contactStore: ContactListStore
     let onShowMessage: ((ConversationInfo) -> Void)?
     let onContactClick: ((AZOrderedListItem) -> Void)?
     let onGroupClick: ((AZOrderedListItem) -> Void)?
@@ -16,6 +17,7 @@ public struct ContactsPage: View {
     let onBlackListClick: (() -> Void)?
 
     public init(
+        contactStore: ContactListStore = ContactListStore.create(),
         onShowMessage: ((ConversationInfo) -> Void)? = nil,
         onContactClick: ((AZOrderedListItem) -> Void)? = nil,
         onGroupClick: ((AZOrderedListItem) -> Void)? = nil,
@@ -24,6 +26,7 @@ public struct ContactsPage: View {
         onGroupListClick: (() -> Void)? = nil,
         onBlackListClick: (() -> Void)? = nil
     ) {
+        self.contactStore = contactStore
         self.onShowMessage = onShowMessage
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
@@ -36,7 +39,8 @@ public struct ContactsPage: View {
     public var body: some View {
         VStack(spacing: 0) {
             headerView
-            ContactListWithNavigation(
+            ContactList(
+                contactStore: contactStore,
                 onShowMessage: onShowMessage,
                 onContactClick: onContactClick,
                 onGroupClick: onGroupClick,
@@ -80,13 +84,13 @@ public struct ContactsPage: View {
             }
         )
         .sheet(isPresented: $showAddFriend) {
-            AddFriendView()
+            AddFriendView(contactStore: contactStore)
         }
         .sheet(isPresented: $showJoinGroup) {
-            JoinGroupView()
+            JoinGroupView(contactStore: contactStore)
         }
     }
-    
+
     private var headerView: some View {
         HStack {
             Text(LocalizedChatString("TabContacts"))
