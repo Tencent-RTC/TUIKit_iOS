@@ -7,6 +7,7 @@
 
 import UIKit
 import RTCRoomEngine
+import AtomicXCore
 
 class VRSeatControlCell: UITableViewCell {
     let avatarImageView: UIImageView = {
@@ -73,8 +74,8 @@ class VRSeatControlCell: UITableViewCell {
 
 class VRTheSeatCell: VRSeatControlCell {
     static let identifier = "VRTheSeatCell"
-    var kickoffEventClosure: ((TUISeatInfo) -> Void)?
-    var seatInfo: TUISeatInfo?
+    var kickoffEventClosure: ((SeatInfo) -> Void)?
+    var seatInfo: SeatInfo?
     
     let seatIndexLabel: UILabel = {
         let label = UILabel(frame: .zero)
@@ -90,9 +91,9 @@ class VRTheSeatCell: VRSeatControlCell {
         let button = UIButton()
         button.layer.cornerRadius = 12.scale375()
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.redColor.cgColor
+        button.layer.borderColor = UIColor.warningTextColor.cgColor
         button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(UIColor.redColor, for: .normal)
+        button.setTitleColor(.warningTextColor, for: .normal)
         button.backgroundColor = .clear
         button.setTitle(.endTitleText, for: .normal)
         return button
@@ -136,10 +137,10 @@ class VRTheSeatCell: VRSeatControlCell {
         kickoffSeatButton.addTarget(self, action: #selector(kickoffSeatButtonClick(sender:)), for: .touchUpInside)
     }
     
-    func updateSeatInfo(seatInfo: TUISeatInfo) {
+    func updateSeatInfo(seatInfo: SeatInfo) {
         self.seatInfo = seatInfo
-        avatarImageView.kf.setImage(with: URL(string: seatInfo.avatarUrl ?? ""), placeholder: UIImage.avatarPlaceholderImage)
-        userNameLabel.text = seatInfo.userName
+        avatarImageView.kf.setImage(with: URL(string: seatInfo.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        userNameLabel.text = seatInfo.userInfo.userName
         seatIndexLabel.text = "\(seatInfo.index + 1)"
     }
     
@@ -153,9 +154,9 @@ class VRTheSeatCell: VRSeatControlCell {
 
 class VRApplyTakeSeatCell: VRSeatControlCell {
     static let identifier = "VRApplyTakeSeatCell"
-    var approveEventClosure: ((VRSeatApplication) -> Void)?
-    var rejectEventClosure: ((VRSeatApplication) -> Void)?
-    var seatApplication: VRSeatApplication?
+    var approveEventClosure: ((LiveUserInfo) -> Void)?
+    var rejectEventClosure: ((LiveUserInfo) -> Void)?
+    var seatApplication: LiveUserInfo?
     
     let approveButton: UIButton = {
         let button = UIButton()
@@ -221,9 +222,9 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
         rejectButton.addTarget(self, action: #selector(rejectButtonClick(sender:)), for: .touchUpInside)
     }
     
-    func updateSeatApplication(seatApplication: VRSeatApplication) {
+    func updateSeatApplication(seatApplication: LiveUserInfo) {
         self.seatApplication = seatApplication
-        avatarImageView.kf.setImage(with: URL(string: seatApplication.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        avatarImageView.kf.setImage(with: URL(string: seatApplication.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
         userNameLabel.text = seatApplication.userName
     }
     
@@ -244,9 +245,9 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
 
 class VRInviteTakeSeatCell: VRSeatControlCell {
     static let identifier = "VRInviteTakeSeatCell"
-    var inviteEventClosure: ((TUIUserInfo) -> Void)?
-    var cancelEventClosure: ((TUIUserInfo) -> Void)?
-    var user: TUIUserInfo?
+    var inviteEventClosure: ((LiveUserInfo) -> Void)?
+    var cancelEventClosure: ((LiveUserInfo) -> Void)?
+    var user: LiveUserInfo?
     var lastClickTime: Date?
     let clickInterval = 0.5
     
@@ -257,7 +258,7 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
         button.setTitleColor(.white, for: .normal)
         button.setTitle(.inviteText, for: .normal)
         button.setTitle(.cancelText, for: .selected)
-        button.setTitleColor(UIColor.redColor, for: .selected)
+        button.setTitleColor(.warningTextColor, for: .selected)
         button.backgroundColor = .b1
         return button
     }()
@@ -289,16 +290,16 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
         inviteButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
     }
     
-    func updateUser(user: TUIUserInfo) {
+    func updateUser(user: LiveUserInfo) {
         self.user = user
-        avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        avatarImageView.kf.setImage(with: URL(string: user.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
         userNameLabel.text = user.userName
     }
     
     func updateButtonView(isSelected: Bool) {
         inviteButton.isSelected = isSelected
         inviteButton.layer.borderWidth = isSelected ? 1 : 0
-        inviteButton.layer.borderColor = isSelected ? UIColor.red.cgColor : UIColor.clear.cgColor
+        inviteButton.layer.borderColor = isSelected ? UIColor.warningTextColor.cgColor : UIColor.clear.cgColor
         inviteButton.backgroundColor = isSelected ? .clear : .b1
     }
     
@@ -308,12 +309,10 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
         
         if sender.isSelected {
             if let cancelEventClosure = cancelEventClosure, let user = user {
-                updateButtonView(isSelected: false)
                 cancelEventClosure(user)
             }
         } else {
             if let inviteEventClosure = inviteEventClosure, let user = user {
-                updateButtonView(isSelected: true)
                 inviteEventClosure(user)
             }
         }

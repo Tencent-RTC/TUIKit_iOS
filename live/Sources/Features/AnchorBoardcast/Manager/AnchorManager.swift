@@ -9,365 +9,332 @@ import AtomicXCore
 import Combine
 import Foundation
 import RTCCommon
-import RTCRoomEngine
-
-typealias AnchorRoomStateUpdateClosure = (inout AnchorRoomState) -> Void
-typealias AnchorUserStateUpdateClosure = (inout AnchorUserState) -> Void
-typealias AnchorMediaStateUpdateClosure = (inout AnchorMediaState) -> Void
-typealias AnchorCoGuestStateUpdateClosure = (inout AnchorCoGuestState) -> Void
 
 public typealias InternalErrorBlock = (_ error: InternalError) -> Void
 
-public typealias StateSelector = RTCCommon.StateSelector
-public typealias CoHostState = AtomicXCore.CoHostState
-public typealias CoGuestState = AtomicXCore.CoGuestState
-
-protocol AnchorManagerProvider: NSObject {
-    func getCoreViewState<T: CoreViewState>() -> T
-    func subscribeCoreViewState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never>
-}
-
 class AnchorManager {
-    
-    public let toastSubject = PassthroughSubject<String, Never>()
-    public let floatWindowSubject = PassthroughSubject<Void, Never>()
-    public let kickedOutSubject = PassthroughSubject<Bool, Never>() // bool value for room is dismissed
-    public let onEndLivingSubject = PassthroughSubject<AnchorState, Never>()
-    
     class Context {
-        let service = AnchorService()
-        let coHostService = AnchorCoHostServiceImpl()
-        weak var provider: AnchorManagerProvider?
-        
-        private(set) lazy var roomManager = AnchorRoomManager(context: self)
-        private(set) lazy var userManager = AnchorUserManager(context: self)
-        private(set) lazy var mediaManager = AnchorMediaManager(context: self)
-        private(set) lazy var coGuestManager = AnchorCoGuestManager(context: self)
-        
-        private(set) lazy var coHostManager = AnchorCoHostManager(context: self)
-        private(set) lazy var battleManager = AnchorBattleManager(context: self)
-        
-        private(set) lazy var engineObserver = AnchorRoomEngineObserver(context: self)
-        private(set) lazy var liveListObserver = AnchorLiveListObserver(context: self)
-        private(set) lazy var coHostObserver = AnchorCoHostObserver(context: self)
-        
-        let toastSubject: PassthroughSubject<String, Never>
-        let kickedOutSubject: PassthroughSubject<Bool, Never>
-        
-        init(provider: AnchorManagerProvider, toastSubject: PassthroughSubject<String, Never>, kickedOutSubject: PassthroughSubject<Bool, Never>) {
-            self.toastSubject = toastSubject
-            self.kickedOutSubject = kickedOutSubject
-            self.provider = provider
-            service.addEngineObserver(engineObserver)
-            service.addLiveListManagerObserver(liveListObserver)
-            coHostService.addConnectionObserver(coHostObserver)
+        let liveID: String
+
+        let toastSubject = PassthroughSubject<String, Never>()
+        let floatWindowSubject = PassthroughSubject<Void, Never>()
+        let kickedOutSubject = PassthroughSubject<Bool, Never>() // bool value for room is dismissed
+        let onEndLivingSubject = PassthroughSubject<AnchorState, Never>()
+
+        var coGuestStore: CoGuestStore {
+            CoGuestStore.create(liveID: liveID)
         }
-        
-        deinit {
-            service.removeEngineObserver(engineObserver)
-            service.removeLiveListManagerObserver(liveListObserver)
-            coHostService.removeConnectionObserver(coHostObserver)
+
+        var battleStore: BattleStore {
+            BattleStore.create(liveID: liveID)
         }
+
+        let deviceStore: DeviceStore = .shared
+        let liveListStore: LiveListStore = .shared
+        var coHostStore: CoHostStore {
+            CoHostStore.create(liveID: liveID)
+        }
+
+        let loginStore: LoginStore = .shared
+        var seatStore: LiveSeatStore {
+            LiveSeatStore.create(liveID: liveID)
+        }
+
+        var barrageStore: BarrageStore {
+            BarrageStore.create(liveID: liveID)
+        }
+
+        var audienceStore: LiveAudienceStore {
+            LiveAudienceStore.create(liveID: liveID)
+        }
+
+        private(set) lazy var anchorMediaManager = AnchorMediaManager(context: self)
+        private(set) lazy var anchorCoHostManager = AnchorCoHostManager(context: self)
+
+        let anchorBattleObservableState = ObservableState(initialState: AnchorBattleState())
+
+        init(liveID: String) {
+            self.liveID = liveID
+        }
+
+        deinit {}
     }
-    
+
     private let context: Context
     private var cancellableSet: Set<AnyCancellable> = []
-    
-    init(provider: AnchorManagerProvider) {
-        self.context = Context(provider: provider, toastSubject: toastSubject, kickedOutSubject: kickedOutSubject)
+
+    init(liveID: String) {
+        context = Context(liveID: liveID)
+    }
+
+    var liveID: String {
+        context.liveID
+    }
+
+    var selfUserID: String {
+        loginState.loginUserInfo?.userID ?? ""
+    }
+
+    private(set) var pkTemplateMode: LiveTemplateMode = .verticalGridDynamic
+
+    func prepareLiveInfoBeforeEnterRoom(pkTemplateMode: LiveTemplateMode) {
+        self.pkTemplateMode = pkTemplateMode
+        context.anchorMediaManager.prepareLiveInfoBeforeEnterRoom()
+    }
+
+    func willApplyingHost() {
+        context.anchorCoHostManager.observableState.update { state in
+            state.isApplying = true
+        }
+    }
+
+    func stopApplyingHost() {
+        context.anchorCoHostManager.observableState.update { state in
+            state.isApplying = false
+        }
+    }
+
+    func willApplyingBattle() {
+        context.anchorBattleObservableState.update { state in
+            state.isInWaiting = true
+        }
+    }
+
+    func stopApplyingBattle() {
+        context.anchorBattleObservableState.update { state in
+            state.isInWaiting = false
+            state.requestBattleID = ""
+        }
+    }
+
+    func startShowBattleResult() {
+        context.anchorBattleObservableState.update { state in
+            state.isOnDisplayResult = true
+        }
+    }
+
+    func stopShowBattleResult() {
+        context.anchorBattleObservableState.update { state in
+            state.isOnDisplayResult = false
+        }
+    }
+
+    func updateBattleDurationCountDown(_ value: Int) {
+        context.anchorBattleObservableState.update { state in
+            state.durationCountDown = value
+        }
+    }
+
+    func setRequestBattleID(_ battleID: String) {
+        context.anchorBattleObservableState.update { state in
+            state.requestBattleID = battleID
+        }
     }
 }
 
 // MARK: - Common
+
 extension AnchorManager {
     func onError(_ error: InternalError) {
         toastSubject.send(error.localizedMessage)
     }
-    
-    func onCameraOpened(localVideoView: UIView) {
-        context.mediaManager.onCameraOpened()
-        context.mediaManager.setLocalVideoView(view: localVideoView)
+}
+
+// MARK: - Subject
+
+extension AnchorManager {
+    var toastSubject: PassthroughSubject<String, Never> {
+        context.toastSubject
+    }
+
+    var kickedOutSubject: PassthroughSubject<Bool, Never> {
+        context.kickedOutSubject
+    }
+
+    var floatWindowSubject: PassthroughSubject<Void, Never> {
+        context.floatWindowSubject
+    }
+
+    var onEndLivingSubject: PassthroughSubject<AnchorState, Never> {
+        context.onEndLivingSubject
     }
 }
 
-// MARK: - Anchor
+// MARK: - Store
+
 extension AnchorManager {
-    func prepareLiveInfoBeforeEnterRoom(liveInfo: LiveInfo) {
-        context.mediaManager.prepareLiveInfoBeforeEnterRoom(liveInfo: liveInfo)
-        context.roomManager.prepareLiveInfoBeforeEnterRoom(liveInfo: liveInfo)
+    var coGuestStore: CoGuestStore {
+        context.coGuestStore
     }
-    
-    func onSetRoomName(_ name: String) {
-        context.roomManager.onSetRoomName(name)
+
+    var barrageStore: BarrageStore {
+        context.barrageStore
     }
-    
-    func onSetRoomPrivacy(_ mode: LiveStreamPrivacyStatus) {
-        context.roomManager.onSetRoomPrivacy(mode)
+
+    var battleStore: BattleStore {
+        context.battleStore
     }
-    
-    func onSetRoomCoverUrl(_ url: String) {
-        context.roomManager.onSetRoomCoverUrl(url)
+
+    var seatStore: LiveSeatStore {
+        context.seatStore
     }
-    
-    func onStartLive(isJoinSelf: Bool, liveInfo: TUILiveInfo) {
-        context.roomManager.onStartLive(isJoinSelf: isJoinSelf, liveInfo: liveInfo)
-        context.userManager.onStartLive()
+
+    var deviceStore: DeviceStore {
+        context.deviceStore
     }
-    
-    func onStopLive() {
-        context.roomManager.onStopLive()
+
+    var liveListStore: LiveListStore {
+        context.liveListStore
     }
-    
-    // Cross room
-    func onCrossRoomConnectionTerminated() {
-        context.coHostManager.onCrossRoomConnectionTerminated()
+
+    var coHostStore: CoHostStore {
+        context.coHostStore
     }
-    
-    // Battle
-    func onRequestBattle(battleId: String, battleUserList: [TUIBattleUser]) {
-        context.battleManager.onRequestBattle(battleId: battleId, battleUserList: battleUserList)
+
+    var loginStore: LoginStore {
+        context.loginStore
     }
-    
-    func onResponseBattle() {
-        context.battleManager.onResponseBattle()
-    }
-    
-    func onBattleExited() {
-        context.battleManager.onBattleExited()
-    }
-    
-    // Other
-    func fetchLiveInfo(roomId: String, onSuccess: @escaping ((_ liveInfo: TUILiveInfo)->()), onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                let liveInfo = try await context.roomManager.fetchLiveInfo(roomId: roomId)
-                DispatchQueue.main.async {
-                    onSuccess(liveInfo)
-                }
-            } catch let err as InternalError {
-                DispatchQueue.main.async {
-                    onError(err)
-                }
-            }
-        }
-    }
-    
-    func fetchGiftCount(roomId: String, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.roomManager.fetchGiftCount(roomId: roomId)
-                onSuccess()
-            } catch let error as InternalError {
-                onError(error)
-            }
-        }
-    }
-    
-    func fetchLikeCount(roomId: String, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.roomManager.fetchLikeCount(roomId: roomId)
-                onSuccess()
-            } catch let error as InternalError {
-                onError(error)
-            }
-        }
-    }
-    
-    func fetchViewCount(roomId: String, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.roomManager.fetchViewCount(roomId: roomId)
-                onSuccess()
-            } catch let error as InternalError {
-                onError(error)
-            }
-        }
-    }
-    
-    func getUserInfo(userId: String) async throws -> TUIUserInfo {
-        try await context.userManager.getUserInfo(userId: userId)
-    }
-    
-    func onDisableSendingMessageBtnClicked(userId: String, isDisable: Bool, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.userManager.onDisableSendingMessageBtnClicked(userId: userId, isDisable: isDisable)
-                DispatchQueue.main.async {
-                    onSuccess()
-                }
-            } catch let err as InternalError {
-                DispatchQueue.main.async {
-                    onError(err)
-                }
-            }
-        }
-    }
-    
-    func onKickedOutBtnClicked(userId: String, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.userManager.onKicedOutBtnClicked(userId: userId)
-                DispatchQueue.main.async {
-                    onSuccess()
-                }
-            } catch let err as InternalError {
-                DispatchQueue.main.async {
-                    onError(err)
-                }
-            }
-        }
-    }
-    
-    func onLockMediaStatusBtnClicked(userId: String, lockParams: TUISeatLockParams, onSuccess: @escaping TUISuccessBlock, onError: @escaping InternalErrorBlock) {
-        Task {
-            do {
-                try await context.coGuestManager.onLockMediaStatusBtnClicked(userId: userId, lockParams: lockParams)
-                DispatchQueue.main.async {
-                    onSuccess()
-                }
-            } catch let err as InternalError {
-                DispatchQueue.main.async {
-                    onError(err)
-                }
-            }
-        }
+
+    var audienceStore: LiveAudienceStore {
+        context.audienceStore
     }
 }
 
-// MARK: - Observer
-extension AnchorManager {
-    func onUserConnectionRejected(userId: String) {
-        toastSubject.send(.takeSeatApplicationRejected)
-        context.coGuestManager.onUserConnectionRejected(userId: userId)
-    }
-    
-    func onUserConnectionTimeout(userId: String) {
-        toastSubject.send(.takeSeatApplicationTimeout)
-        context.coGuestManager.onUserConnectionTimeout(userId: userId)
-    }
-    
-    func onKickedOffSeat() {
-        toastSubject.send(.kickedOutOfSeat)
-        context.coGuestManager.onKickedOffSeat()
-    }
-    
-    func onConnectionUserListChanged(list: [TUIConnectionUser]) {
-        context.coHostManager.onConnectionUserListChanged(list: list)
-    }
-}
+// MARK: - State and subscribe
 
-// MARK: - Tools
 extension AnchorManager {
-    // State
-    var roomState: AnchorRoomState {
-        context.roomManager.roomState
+    var anchorCoHostState: AnchorCoHostState {
+        context.anchorCoHostState
     }
-    var mediaState: AnchorMediaState {
-        context.mediaManager.mediaState
+
+    var anchorBattleState: AnchorBattleState {
+        context.anchorBattleState
     }
-    var userState: AnchorUserState {
-        context.userManager.userState
+
+    var anchorMediaState: AnchorMediaState {
+        context.anchorMediaManager.mediaState
     }
-    var coGuestState: AnchorCoGuestState {
-        context.coGuestManager.coGuestState
+
+    var seatState: LiveSeatState {
+        context.seatState
     }
-    var battleState: AnchorBattleState {
-        context.battleManager.state
+
+    var coGuestState: CoGuestState {
+        context.coGuestState
     }
-    var coHostState: AnchorCoHostState {
-        context.coHostManager.state
+
+    var battleState: BattleState {
+        context.battleState
     }
-    
-    // Manager
-    var coHostManager: AnchorCoHostManager {
-        context.coHostManager
+
+    var deviceState: DeviceState {
+        context.deviceState
     }
-    var battleManager: AnchorBattleManager {
-        context.battleManager
+
+    var liveListState: LiveListState {
+        context.liveListState
     }
-    var mediaManager: AnchorMediaManager {
-        context.mediaManager
+
+    var coHostState: CoHostState {
+        context.coHostState
     }
-    
-    // Other
-    func getDefaultRoomName() -> String {
-        return context.roomManager.getDefaultRoomName()
+
+    var loginState: LoginState {
+        context.loginState
     }
-    
+
+    var audienceState: LiveAudienceState {
+        context.audienceState
+    }
+
+    func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        context.subscribeState(selector)
+    }
+
     func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        if let sel = selector as? StateSelector<AnchorUserState, Value> {
-            return context.userManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AnchorRoomState, Value> {
-            return context.roomManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AnchorBattleState, Value> {
-            return context.battleManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AnchorCoHostState, Value> {
-            return context.coHostManager.subscribeCoHostState(sel)
-        } else if let sel = selector as? StateSelector<AnchorMediaState, Value> {
-            return context.mediaManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AnchorCoGuestState, Value> {
-            return context.coGuestManager.subscribeState(sel)
-        }
-        assertionFailure("Not impl")
-        return Empty<Value, Never>().eraseToAnyPublisher()
-    }
-    
-    func subscribeCoreViewState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        guard let provider = context.provider else { return Empty<Value, Never>().eraseToAnyPublisher() }
-        return provider.subscribeCoreViewState(selector)
-    }
-}
-
-extension AnchorManager {
-    var coreRoomState: RoomState {
-        context.coreRoomState
-    }
-    var coreUserState: UserState {
-        context.coreUserState
-    }
-    var coreMediaState: MediaState {
-        context.coreMediaState
-    }
-    var coreCoHostState: CoHostState {
-        context.coreCoHostState
-    }
-    var coreCoGuestState: CoGuestState {
-        context.coreCoGuestState
-    }
-    var coreBattleState: BattleState {
-        context.coreBattleState
+        context.subscribeState(selector)
     }
 }
 
 extension AnchorManager.Context {
-    var coreRoomState: RoomState {
-        guard let provider = provider else { return RoomState() }
-        return provider.getCoreViewState()
+    var anchorCoHostState: AnchorCoHostState {
+        anchorCoHostManager.observableState.state
     }
-    var coreUserState: UserState {
-        guard let provider = provider else { return UserState() }
-        return provider.getCoreViewState()
+
+    var anchorBattleState: AnchorBattleState {
+        anchorBattleObservableState.state
     }
-    var coreMediaState: MediaState {
-        guard let provider = provider else { return MediaState() }
-        return provider.getCoreViewState()
+
+    var seatState: LiveSeatState {
+        seatStore.state.value
     }
-    var coreCoHostState: CoHostState {
-        guard let provider = provider else { return CoHostState() }
-        return provider.getCoreViewState()
+
+    var coGuestState: CoGuestState {
+        coGuestStore.state.value
     }
-    var coreCoGuestState: CoGuestState {
-        guard let provider = provider else { return CoGuestState() }
-        return provider.getCoreViewState()
+
+    var battleState: BattleState {
+        battleStore.state.value
     }
-    var coreBattleState: BattleState {
-        guard let provider = provider else { return BattleState() }
-        return provider.getCoreViewState()
+
+    var deviceState: DeviceState {
+        deviceStore.state.value
+    }
+
+    var liveListState: LiveListState {
+        liveListStore.state.value
+    }
+
+    var coHostState: CoHostState {
+        coHostStore.state.value
+    }
+
+    var loginState: LoginState {
+        loginStore.state.value
+    }
+
+    var audienceState: LiveAudienceState {
+        audienceStore.state.value
+    }
+
+    func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        if let sel = selector as? StatePublisherSelector<CoGuestState, Value> {
+            return coGuestStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<BattleState, Value> {
+            return battleStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<DeviceState, Value> {
+            return deviceStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LiveListState, Value> {
+            return liveListStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<CoHostState, Value> {
+            return coHostStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LoginState, Value> {
+            return loginStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LiveSeatState, Value> {
+            return seatStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LiveAudienceState, Value> {
+            return audienceStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<BarrageState, Value> {
+            return barrageStore.state.subscribe(sel)
+        }
+        assertionFailure("Input failed State class")
+        return Empty<Value, Never>().eraseToAnyPublisher()
+    }
+
+    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        if let sel = selector as? StateSelector<AnchorMediaState, Value> {
+            return anchorMediaManager.subscribeState(sel)
+        } else if let sel = selector as? StateSelector<AnchorBattleState, Value> {
+            return anchorBattleObservableState.subscribe(sel)
+        } else if let sel = selector as? StateSelector<AnchorCoHostState, Value> {
+            return anchorCoHostManager.subscribeCoHostState(sel)
+        }
+        assertionFailure("Input failed State class")
+        return Empty<Value, Never>().eraseToAnyPublisher()
     }
 }
 
-fileprivate extension String {
+private extension String {
     static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
     static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
     static let kickedOutOfSeat = internalLocalized("Kicked out of seat by room owner")

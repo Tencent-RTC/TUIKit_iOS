@@ -8,7 +8,6 @@
 import Foundation
 import TUICore
 import Combine
-import RTCRoomEngine
 import RTCCommon
 import AtomicXCore
 
@@ -17,13 +16,13 @@ class AudienceUserStatusView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
     private var muteAudio: Bool = true
     private var isViewReady: Bool = false
-    private var userInfo: TUIUserInfo
+    private var seatInfo: SeatInfo
     
-    init(userInfo: TUIUserInfo, manager: AudienceManager) {
-        self.userInfo = userInfo
+    init(seatInfo: SeatInfo, manager: AudienceManager) {
+        self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)
-        self.muteAudio = !userInfo.hasAudioStream
+        muteAudio = seatInfo.userInfo.microphoneStatus == .off
     }
     
     required init?(coder: NSCoder) {
@@ -81,7 +80,7 @@ class AudienceUserStatusView: UIView {
         backgroundColor = .g2.withAlphaComponent(0.4)
         layer.cornerRadius = 9
         layer.masksToBounds = true
-        userNameLabel.text = userInfo.userName.isEmpty ? userInfo.userId : userInfo.userName
+        userNameLabel.text = seatInfo.userInfo.userName.isEmpty ? (seatInfo.userInfo.userID) : seatInfo.userInfo.userName
     }
     
     private func updateAudioStatus() {

@@ -10,6 +10,7 @@ import Combine
 import Kingfisher
 import RTCCommon
 import RTCRoomEngine
+import AtomicXCore
 
 public class LiveInfoView: UIView {
     private let service = LiveInfoService()
@@ -54,7 +55,7 @@ public class LiveInfoView: UIView {
         return button
     }()
     
-    public func initialize(liveInfo: TUILiveInfo) {
+    public func initialize(liveInfo: AtomicXCore.LiveInfo) {
         service.initLiveInfo(liveInfo: liveInfo)
     }
     

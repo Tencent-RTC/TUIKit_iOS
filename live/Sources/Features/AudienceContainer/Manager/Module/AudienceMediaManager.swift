@@ -5,11 +5,12 @@
 //  Created by jeremiawang on 2024/11/19.
 //
 
+import AtomicXCore
+import Combine
 import Foundation
 import RTCCommon
-import RTCRoomEngine
-import Combine
 import TUICore
+import RTCRoomEngine
 
 class AudienceMediaManager: NSObject {
     private let observerState = ObservableState<AudienceMediaState>(initialState: AudienceMediaState())
@@ -19,63 +20,78 @@ class AudienceMediaManager: NSObject {
     
     private typealias Context = AudienceManager.Context
     private weak var context: Context?
-    private let toastSubject: PassthroughSubject<String, Never>
-    private let service: AudienceService
-    private var localVideoViewObservation: NSKeyValueObservation? = nil
+    private let service = AudienceService()
+    private var localVideoViewObservation: NSKeyValueObservation?
+    private var cancellableSet: Set<AnyCancellable> = []
 
     init(context: AudienceManager.Context) {
         self.context = context
-        self.service = context.service
-        self.toastSubject = context.toastSubject
         super.init()
         initVideoAdvanceSettings()
+        subscribeCurrentLive()
+        TUIRoomEngine.sharedInstance().addObserver(self)
     }
     
     deinit {
+        TUIRoomEngine.sharedInstance().removeObserver(self)
         unInitVideoAdvanceSettings()
+    }
+    
+    func subscribeCurrentLive() {
+        context?.liveListStore.state.subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
+                guard let self = self else { return }
+                if currentLive.isEmpty {
+                    onLeaveLive()
+                } else {
+                    onJoinLive(liveInfo: currentLive)
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        context?.deviceStore.state.subscribe(StatePublisherSelector(keyPath: \DeviceState.cameraStatus))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] cameraStatus in
+                guard let self = self else { return }
+                if cameraStatus == .on {
+                    onCameraOpened()
+                }
+            }
+            .store(in: &cancellableSet)
     }
 }
 
 // MARK: - Interface
+
 extension AudienceMediaManager {
     func setLocalVideoView(view: UIView) {
         service.setLocalVideoView(view: view)
     }
     
-    func onCameraOpened() {
+    private func onCameraOpened() {
         service.enableGravitySensor(enable: true)
         service.setVideoResolutionMode(.portrait)
     }
     
-    func updateVideoQuality(quality: TUIVideoQuality) {
+    func updateVideoQuality(quality: VideoQuality) {
         service.updateVideoQuality(quality)
         update { state in
             state.videoQuality = quality
         }
     }
     
-    func onJoinLive(liveInfo: TUILiveInfo) {
-        getMultiPlaybackQuality(roomId: liveInfo.roomId)
+    private func onJoinLive(liveInfo: LiveInfo) {
+        getMultiPlaybackQuality(roomId: liveInfo.liveID)
     }
     
-    func onLeaveLive() {
+    private func onLeaveLive() {
         unInitVideoAdvanceSettings()
         observerState.update(isPublished: false) { state in
             state = AudienceMediaState()
-        }
-    }
-    
-    func onSelfMediaDeviceStateChanged(seatInfo: TUISeatInfo) {
-        update { state in
-            state.isAudioLocked = seatInfo.isAudioLocked
-            state.isVideoLocked = seatInfo.isVideoLocked
-        }
-    }
-    
-    func onSelfLeaveSeat() {
-        update { state in
-            state.isAudioLocked = false
-            state.isVideoLocked = false
         }
     }
     
@@ -85,6 +101,7 @@ extension AudienceMediaManager {
 }
 
 // MARK: - Video Setting
+
 extension AudienceMediaManager {
     func enableAdvancedVisible(_ visible: Bool) {
         observerState.update { state in
@@ -102,9 +119,9 @@ extension AudienceMediaManager {
 }
 
 // MARK: - Multi Playback Quality
+
 extension AudienceMediaManager {
-    
-    func switchPlaybackQuality(quality: TUIVideoQuality) {
+    func switchPlaybackQuality(quality: VideoQuality) {
         service.switchPlaybackQuality(quality)
     }
     
@@ -121,14 +138,31 @@ extension AudienceMediaManager {
     func enableSwitchPlaybackQuality(_ enable: Bool) {
         TUICore.callService(.TUICore_VideoAdvanceService,
                             method: .TUICore_VideoAdvanceService_EnableSwitchMultiPlayback,
-                            param: ["enable" : NSNumber(value: enable)])
+                            param: ["enable": NSNumber(value: enable)])
     }
     
-    func onUserVideoSizeChanged(roomId: String,
-                                userId: String,
-                                streamType: TUIVideoStreamType,
-                                width: Int32,
-                                height: Int32) {
+    private func getVideoQuality(width: Int32, height: Int32) -> VideoQuality {
+        if (width * height) <= (360 * 640) {
+            return .quality360P
+        }
+        if (width * height) <= (540 * 960) {
+            return .quality540P
+        }
+        if (width * height) <= (720 * 1280) {
+            return .quality720P
+        }
+        return .quality1080P
+    }
+}
+
+extension AudienceMediaManager {
+    private func update(mediaState: (inout AudienceMediaState) -> ()) {
+        observerState.update(reduce: mediaState)
+    }
+}
+
+extension AudienceMediaManager: TUIRoomObserver {
+    func onUserVideoSizeChanged(roomId: String, userId: String, streamType: TUIVideoStreamType, width: Int32, height: Int32) {
         guard let context = context else {
             return
         }
@@ -139,37 +173,18 @@ extension AudienceMediaManager {
         guard mediaState.playbackQualityList.count > 1, mediaState.playbackQualityList.contains(playbackQuality) else {
             return
         }
-        guard context.coGuestManager.coGuestState.coGuestStatus == .none else {
+        guard !context.audienceState.isApplying, !context.coGuestState.connected.isOnSeat() else {
             return
         }
         observerState.update { mediaState in
             mediaState.playbackQuality = playbackQuality
         }
     }
-    
-    private func getVideoQuality(width: Int32, height: Int32) -> TUIVideoQuality {
-        if (width * height) <= (360 * 640) {
-            return TUIVideoQuality.quality360P
-        }
-        if (width * height) <= (540 * 960){
-            return TUIVideoQuality.quality540P
-        }
-        if (width * height) <= (720 * 1280) {
-            return TUIVideoQuality.quality720P
-        }
-        return TUIVideoQuality.quality1080P
-    }
-}
-
-extension AudienceMediaManager {
-    private func update(mediaState: AudienceMediaStateUpdateClosure) {
-        observerState.update(reduce: mediaState)
-    }
 }
 
 // MARK: - Video Advance API Extension
-fileprivate extension String {
-    
+
+private extension String {
     static let TUICore_VideoAdvanceService = "TUICore_VideoAdvanceService"
     
     static let TUICore_VideoAdvanceService_EnableSwitchMultiPlayback = "TUICore_VideoAdvanceService_EnableSwitchMultiPlayback"

@@ -12,13 +12,17 @@ import RTCRoomEngine
 import AtomicXCore
 
 class VRUserManagerPanel: RTCBaseView {
-    private let manager: VoiceRoomManager
+    private let liveID: String
+    private let toastService: VRToastService
+    private let imStore: VoiceRoomIMStore
     private let routerManager: VRRouterManager
-    private weak var coreView: SeatGridView?
     private var cancellableSet: Set<AnyCancellable> = []
     private var seatInfo: TUISeatInfo
     private var isOwner: Bool {
-        manager.userState.selfInfo.userId == manager.coreLiveState.liveOwner.userID
+        guard !currentLive.isEmpty else {
+            return false
+        }
+        return currentLive.liveOwner.userID == TUIRoomEngine.getSelfInfo().userId
     }
     
     private let avatarImageView: UIImageView = {
@@ -92,10 +96,15 @@ class VRUserManagerPanel: RTCBaseView {
         return featureClickPanel
     }()
     
-    init(manager: VoiceRoomManager, routerMangear: VRRouterManager, coreView: SeatGridView, seatInfo: TUISeatInfo) {
-        self.manager = manager
-        self.routerManager = routerMangear
-        self.coreView = coreView
+    init(liveID: String,
+         imStore: VoiceRoomIMStore,
+         toastService:VRToastService,
+         routerManager: VRRouterManager,
+         seatInfo: TUISeatInfo) {
+        self.liveID = liveID
+        self.imStore = imStore
+        self.toastService = toastService
+        self.routerManager = routerManager
         self.seatInfo = seatInfo
         super.init(frame: .zero)
         backgroundColor = .g2
@@ -174,7 +183,7 @@ class VRUserManagerPanel: RTCBaseView {
 
 extension VRUserManagerPanel {
     private func subscribeMyFollowListState() {
-        manager.subscribeState(StateSelector(keyPath: \VRUserState.myFollowingUserList))
+        imStore.subscribeState(StateSelector(keyPath: \VoiceRoomIMState.myFollowingUserList))
             .receive(on: RunLoop.main)
             .sink { [weak self] followUserList in
                 guard let self = self else { return }
@@ -193,16 +202,20 @@ extension VRUserManagerPanel {
                 }
             }
             .store(in: &cancellableSet)
-        
     }
     
     private func subscribeSeatInfoState() {
-        manager.subscribeCoreState(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
+        seatStore.state
+            .subscribe(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] seatInfoList in
                 guard let self = self else { return }
-                self.seatInfo =   TUISeatInfo(from: seatInfoList[seatInfo.index])
+                guard seatInfo.index >= 0 && seatInfo.index < seatInfoList.count else {
+                    routerManager.router(action: .dismiss())
+                    return
+                }
+                self.seatInfo = TUISeatInfo(from: seatInfoList[seatInfo.index])
                 if (seatInfo.userId ?? "").isEmpty {
                     routerManager.router(action: .dismiss())
                 }
@@ -214,7 +227,11 @@ extension VRUserManagerPanel {
 extension VRUserManagerPanel {
     @objc
     private func followButtonClick(sender: UIButton) {
-        manager.followUser(TUIUserInfo(seatInfo: seatInfo), isFollow: !sender.isSelected)
+        if sender.isSelected {
+            imStore.unfollowUser(TUIUserInfo(seatInfo: seatInfo), completion: nil)
+        } else {
+            imStore.followUser(TUIUserInfo(seatInfo: seatInfo), completion: nil)
+        }
     }
     
     @objc
@@ -227,24 +244,34 @@ extension VRUserManagerPanel {
         lockSeat.lockVideo = seatInfo.isVideoLocked
         lockSeat.lockSeat = seatInfo.isLocked
         
-        coreView?.lockSeat(index: seatInfo.index, lockMode: lockSeat) {
-            
-        } onError: { [weak self] code, message in
+        TUIRoomEngine.sharedInstance().lockSeatByAdmin(seatInfo.index, lockMode: lockSeat) {
+        } onError: { [weak self] error, message in
             guard let self = self else { return }
-            let error = InternalError(code: code, message: message)
-            self.manager.onError(error.localizedMessage)
+            let err = InternalError(code: error.rawValue, message: message)
+            toastService.showToast(err.localizedMessage)
         }
     }
     
     @objc
     private func kickoffClick() {
-        coreView?.kickUserOffSeatByAdmin(userId: seatInfo.userId ?? "") {
-        } onError: { [weak self] code, message in
+        seatStore.kickUserOutOfSeat(userID:  seatInfo.userId ?? "") { [weak self] result in
             guard let self = self else { return }
-            let error = InternalError(code: code, message: message)
-            self.manager.onError(error.localizedMessage)
+            if case .failure(let error) = result {
+                let err = InternalError(errorInfo: error)
+                toastService.showToast(err.localizedMessage)
+            }
         }
         routerManager.router(action: .dismiss())
+    }
+}
+
+extension VRUserManagerPanel {
+    var currentLive: AtomicLiveInfo {
+        return LiveListStore.shared.state.value.currentLive
+    }
+    
+    var seatStore: LiveSeatStore {
+        return LiveSeatStore.create(liveID: liveID)
     }
 }
 

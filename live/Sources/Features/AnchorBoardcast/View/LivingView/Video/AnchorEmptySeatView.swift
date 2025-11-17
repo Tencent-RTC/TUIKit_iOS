@@ -5,14 +5,14 @@
 //  Created by gg on 2025/7/22.
 //
 
-import RTCRoomEngine
+import AtomicXCore
 import SnapKit
 import Combine
 
 class AnchorEmptySeatView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
 
-    init(seatInfo: TUISeatFullInfo) {
+    init(seatInfo: SeatInfo) {
         super.init(frame: .zero)
         
         backgroundColor = .bgOperateColor
@@ -22,7 +22,7 @@ class AnchorEmptySeatView: UIView {
         let indexLabel = UILabel(frame: .zero)
         indexLabel.font = .customFont(ofSize: 22, weight: .semibold)
         indexLabel.textColor = .white.withAlphaComponent(0.55)
-        indexLabel.text = "\(seatInfo.seatIndex)"
+        indexLabel.text = "\(seatInfo.index)"
         addSubview(indexLabel)
         indexLabel.snp.makeConstraints { make in
             make.bottom.equalTo(snp.centerY).offset(-4)

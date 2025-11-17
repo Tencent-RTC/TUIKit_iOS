@@ -5,17 +5,16 @@
 //  Created by krabyu on 2023/11/2.
 //
 
-import UIKit
-import TUICore
-import Combine
-import RTCCommon
-import RTCRoomEngine
 import AtomicXCore
+import Combine
+import Kingfisher
+import RTCCommon
+import TUICore
 
-class UserImageCell: UICollectionViewCell {
-    var user: TUIUserInfo? {
+class AudienceUserImageCell: UICollectionViewCell {
+    var user: UserProfile? {
         didSet {
-            if let url = URL(string: user?.avatarUrl ?? "") {
+            if let url = URL(string: user?.avatarURL ?? "") {
                 avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
             } else {
                 avatarImageView.image = .avatarPlaceholderImage
@@ -43,26 +42,20 @@ class UserImageCell: UICollectionViewCell {
             make.edges.equalToSuperview()
         }
     }
-    
+
     func setImage(image: UIImage?) {
         avatarImageView.kf.cancelDownloadTask()
         avatarImageView.image = image
     }
 }
 
-protocol LinkMicAudienceFloatViewDelegate: AnyObject {
-    func cancelApplication()
-}
-
 class LinkMicAudienceFloatView: UIView {
-    weak var delegate: LinkMicAudienceFloatViewDelegate?
-    
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
-    
+
     private var cancellableSet = Set<AnyCancellable>()
-    
-    private var dotsTimer: Timer = Timer()
+
+    private var dotsTimer: Timer = .init()
     private var isViewReady: Bool = false
     init(manager: AudienceManager, routerManager: AudienceRouterManager) {
         self.manager = manager
@@ -72,19 +65,23 @@ class LinkMicAudienceFloatView: UIView {
         subscribeViewState()
     }
 
+    private lazy var audienceStore: LiveAudienceStore = .create(liveID: manager.liveID)
+
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func subscribeViewState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.coGuestStatus))
+        manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying))
             .receive(on: RunLoop.main)
-            .sink { [weak self] status in
-                self?.isHidden = status != .applying
+            .sink { [weak self] isApplying in
+                guard let self = self else { return }
+                isHidden = !isApplying
             }
             .store(in: &cancellableSet)
     }
-    
+
     override func didMoveToWindow() {
         super.didMoveToWindow()
         guard !isViewReady else { return }
@@ -93,7 +90,7 @@ class LinkMicAudienceFloatView: UIView {
         constructViewHierarchy()
         activateConstraints()
         updateView()
-        manager.subscribeState(StateSelector(keyPath: \AudienceUserState.userList))
+        audienceStore.state.subscribe(StatePublisherSelector(keyPath: \LiveAudienceState.audienceList))
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
@@ -128,7 +125,7 @@ class LinkMicAudienceFloatView: UIView {
         collectionView.isUserInteractionEnabled = true
         collectionView.contentMode = .scaleToFill
         collectionView.dataSource = self
-        collectionView.register(UserImageCell.self, forCellWithReuseIdentifier: UserImageCell.cellReuseIdentifier)
+        collectionView.register(AudienceUserImageCell.self, forCellWithReuseIdentifier: AudienceUserImageCell.cellReuseIdentifier)
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
         collectionView.addGestureRecognizer(tap)
         return collectionView
@@ -144,7 +141,7 @@ class LinkMicAudienceFloatView: UIView {
             guard let self = self else { return }
             if dots.count == 3 {
                 dots.removeAll()
-            }else {
+            } else {
                 dots.append(".")
             }
             self.tipsLabel.text? = .localizedReplace(.toBePassedText, replace: dots)
@@ -166,7 +163,7 @@ extension LinkMicAudienceFloatView {
         layer.masksToBounds = true
         layer.borderWidth = 1
         layer.borderColor = UIColor.flowKitWhite.withAlphaComponent(0.2).cgColor
-        
+
         addSubview(tipsLabel)
         addSubview(collectionView)
     }
@@ -199,9 +196,10 @@ extension LinkMicAudienceFloatView: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserImageCell.cellReuseIdentifier,
-                                                      for: indexPath) as! UserImageCell
-        cell.user = manager.coreUserState.selfInfo
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AudienceUserImageCell.cellReuseIdentifier, for: indexPath)
+        if let cell = cell as? AudienceUserImageCell {
+            cell.user = manager.loginState.loginUserInfo
+        }
         return cell
     }
 }
@@ -209,8 +207,7 @@ extension LinkMicAudienceFloatView: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 
 extension LinkMicAudienceFloatView: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout:
-                        UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let width = collectionView.frame.width
         let margin = width * 0.3
         return UIEdgeInsets(top: 10, left: margin / 2, bottom: 10, right: margin / 2)
@@ -223,19 +220,28 @@ extension LinkMicAudienceFloatView {
     @objc func tapAction() {
         showCancelLinkMicPanel()
     }
-    
+
     private func showCancelLinkMicPanel() {
         var items: [ActionItem] = []
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
+        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
+        designConfig.backgroundColor = .bgOperateColor
+        designConfig.lineColor = .g3.withAlphaComponent(0.3)
         let item = ActionItem(title: .cancelLinkMicRequestText, designConfig: designConfig) { [weak self] _ in
             guard let self = self else { return }
-            delegate?.cancelApplication()
-            self.routerManager.router(action: .dismiss())
+            manager.stopApplying()
+            manager.coGuestStore.cancelApplication { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .failure(let err):
+                    let error = InternalError(code: err.code, message: err.message)
+                    manager.onError(error)
+                default: break
+                }
+            }
+            routerManager.router(action: .dismiss())
         }
         items.append(item)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText))))
+        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
     }
 }
 
@@ -243,10 +249,8 @@ private extension String {
     static var toBePassedText: String {
         internalLocalized("Waitingxxx")
     }
-    static var cancelLinkMicRequestText = {
-        internalLocalized("Cancel application for link mic")
-    }()
-    static var cancelText = {
-        internalLocalized("Cancel")
-    }()
+
+    static var cancelLinkMicRequestText = internalLocalized("Cancel application for link mic")
+
+    static var cancelText = internalLocalized("Cancel")
 }

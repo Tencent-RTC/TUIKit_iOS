@@ -43,7 +43,7 @@ public class TUILiveRoomAudienceViewController: UIViewController {
         unregisterApplicationObserver()
     }
     
-    public func leaveLive(onSuccess: TUISuccessBlock?, onError: TUIErrorBlock?) {
+    public func leaveLive(onSuccess: (() -> Void)?, onError: ((ErrorInfo) -> Void)?) {
         audienceContainerView.leaveLive(onSuccess: onSuccess, onError: onError)
     }
     

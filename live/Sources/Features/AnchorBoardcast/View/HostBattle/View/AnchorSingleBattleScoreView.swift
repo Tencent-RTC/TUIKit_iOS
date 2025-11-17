@@ -63,6 +63,17 @@ class AnchorSingleBattleScoreView: UIView {
         self.leftScoreLabel.text = leftScore
         self.rightScoreLabel.text = rightScore
     }
+    
+    func getResult() -> AnchorBattleResultType {
+        if leftScore > rightScore {
+            return .victory
+        } else if leftScore == rightScore {
+            return .draw
+        } else {
+            return .defeat
+        }
+    }
+    
 }
 
 // MARK: - Layout

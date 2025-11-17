@@ -5,16 +5,14 @@
 //  Created by WesleyLei on 2023/10/19.
 //
 
-import Foundation
-import TUICore
-import RTCCommon
-import Combine
 import AtomicXCore
+import Combine
+import Foundation
+import RTCCommon
 import RTCRoomEngine
+import TUICore
 
 class AnchorLivingView: UIView {
-    
-    private let roomId: String
     private let manager: AnchorManager
     private let routerManager: AnchorRouterManager
     private let coreView: LiveCoreView
@@ -24,9 +22,8 @@ class AnchorLivingView: UIView {
         )
     )
     private var cancellableSet: Set<AnyCancellable> = []
-    private var isPortrait: Bool = {
-        return WindowUtils.isPortrait
-    }()
+    private var isPortrait: Bool = WindowUtils.isPortrait
+
     private let giftCacheService = GiftManager.shared.giftCacheService
     
     private let liveInfoView: LiveInfoView = {
@@ -49,7 +46,7 @@ class AnchorLivingView: UIView {
         let view = AudienceListView()
         view.onUserManageButtonClicked = { [weak self] user in
             guard let self = self else { return }
-            routerManager.router(action: .present(.userManagement(TUIUserInfo(from: user), type: .messageAndKickOut)))
+            routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .messageAndKickOut)))
         }
         return view
     }()
@@ -66,20 +63,19 @@ class AnchorLivingView: UIView {
     }()
     
     private lazy var barrageDisplayView: BarrageStreamView = {
-        let ownerId = manager.coreRoomState.ownerInfo.userId
-        let view = BarrageStreamView(liveId: roomId)
+        let view = BarrageStreamView(liveID: manager.liveID)
         view.delegate = self
         return view
     }()
     
     private lazy var giftDisplayView: GiftPlayView = {
-        let view = GiftPlayView(roomId: roomId)
+        let view = GiftPlayView(roomId: manager.liveID)
         view.delegate = self
         return view
     }()
     
     private lazy var barrageSendView: BarrageInputView = {
-        var view = BarrageInputView(roomId: roomId)
+        var view = BarrageInputView(roomId: manager.liveID)
         view.layer.cornerRadius = 20.scale375Height()
         view.layer.masksToBounds = true
         return view
@@ -94,10 +90,10 @@ class AnchorLivingView: UIView {
     }()
     
     private lazy var netWorkInfoButton: NetworkInfoButton = {
-        let button = NetworkInfoButton(liveId: roomId, manager: netWorkInfoManager)
+        let button = NetworkInfoButton(liveId: manager.liveID, manager: netWorkInfoManager)
         button.onNetWorkInfoButtonClicked = { [weak self] in
             guard let self = self else { return }
-            routerManager.router(action: .present(.netWorkInfo(netWorkInfoManager,isAudience: !manager.roomState.liveInfo.keepOwnerOnSeat)))
+            routerManager.router(action: .present(.netWorkInfo(netWorkInfoManager, isAudience: !manager.liveListState.currentLive.keepOwnerOnSeat)))
         }
         return button
     }()
@@ -115,23 +111,21 @@ class AnchorLivingView: UIView {
     
     private var anchorObserverState = ObservableState<AnchorState>(initialState: AnchorState())
     
-    init(roomId: String, manager: AnchorManager, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
-        self.roomId = roomId
+    init(manager: AnchorManager, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
         self.manager = manager
         self.routerManager = routerManager
         self.coreView = coreView
         super.init(frame: .zero)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     deinit {
-        if manager.roomState.liveStatus == .pushing {
-            coreView.leaveLiveStream {
-            } onError: { _, _ in
-            }
+        if manager.coGuestState.connected.isOnSeat() {
+            manager.liveListStore.leaveLive(completion: nil)
         }
         print("deinit \(type(of: self))")
     }
@@ -153,43 +147,33 @@ class AnchorLivingView: UIView {
     }
     
     private func subscribeState() {
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoGuestState.applicantList))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
             .receive(on: RunLoop.main)
             .removeDuplicates()
-            .sink { [weak self] seatApplicationList in
+            .sink { [weak self] applicants in
                 guard let self = self else { return }
-                if manager.coreCoHostState.receivedConnectionRequest != nil
-                    || !manager.coreCoHostState.sentConnectionRequestList.isEmpty
-                    || !manager.coreCoHostState.connectedUserList.isEmpty
+                if manager.coHostState.applicant != nil
+                    || !manager.coHostState.invitees.isEmpty
+                    || !manager.coHostState.connected.isEmpty
                 {
                     // If received connection request first, reject all linkmic auto.
-                    for seatApplication in seatApplicationList {
-                        coreView.respondIntraRoomConnection(userId: seatApplication.userId, isAccepted: false) {} onError: { _, _ in }
+                    for applicant in applicants {
+                        manager.coGuestStore.rejectApplication(userID: applicant.userID, completion: nil)
                     }
                     return
                 }
-                self.showLinkMicFloatView(isPresent: seatApplicationList.count > 0)
+                showLinkMicFloatView(isPresent: applicants.count > 0)
             }
             .store(in: &cancellableSet)
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \RoomState.ownerInfo))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] ownerInfo in
-                guard let self = self else { return }
-                self.barrageDisplayView.setOwnerId(ownerInfo.userId)
-            }
-            .store(in: &cancellableSet)
-        
-        manager.subscribeState(StateSelector(keyPath: \AnchorRoomState.liveStatus))
-            .receive(on: RunLoop.main)
+        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
             .removeDuplicates()
-            .sink { [weak self] status in
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
                 guard let self = self else { return }
-                switch status {
-                    case .pushing:
-                        self.didEnterRoom()
-                        self.initComponentView()
-                    default:
-                        break
+                if !currentLive.isEmpty {
+                    didEnterRoom()
+                    initComponentView(liveInfo: currentLive)
+                    barrageDisplayView.setOwnerId(currentLive.liveOwner.userID)
                 }
             }
             .store(in: &cancellableSet)
@@ -206,7 +190,31 @@ class AnchorLivingView: UIView {
                 }
             }
             .store(in: &cancellableSet)
-
+        
+        manager.subscribeState(StatePublisherSelector(keyPath: \LoginState.loginStatus))
+            .dropFirst()
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] loginStatus in
+                switch loginStatus {
+                case .unlogin:
+                    if FloatWindow.shared.isShowingFloatWindow() {
+                        FloatWindow.shared.releaseFloatWindow()
+                    } else {
+                        guard let self = self else { return }
+                        LiveListStore.shared.leaveLive { [weak self] result in
+                            guard let self = self else { return }
+                            switch result {
+                            case .success(()):
+                                routerManager.router(action: .exit)
+                            default: break
+                            }
+                        }
+                    }
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
     }
     
     private func subscribeSubject() {
@@ -218,9 +226,9 @@ class AnchorLivingView: UIView {
                 coreView.isUserInteractionEnabled = false
                 routerManager.router(action: .dismiss())
                 if isDismissed {
-                    makeToast(.roomDismissText)
+                    makeToast(message: .roomDismissText)
                 } else {
-                    makeToast(.kickedOutText)
+                    makeToast(message: .kickedOutText)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     guard let self = self else { return }
@@ -238,17 +246,9 @@ class AnchorLivingView: UIView {
                             param: nil)
     }
     
-    func initComponentView() {
-        initAudienceListView()
-        initLiveInfoView()
-    }
-    
-    func initAudienceListView() {
-        audienceListView.initialize(liveId: manager.roomState.liveInfo.roomId)
-    }
-    
-    func initLiveInfoView() {
-        liveInfoView.initialize(liveInfo: manager.roomState.liveInfo)
+    func initComponentView(liveInfo: LiveInfo) {
+        audienceListView.initialize(liveId: liveInfo.liveID)
+        liveInfoView.initialize(liveInfo: liveInfo)
     }
     
     @objc func onFloatWindowButtonClick() {
@@ -383,16 +383,16 @@ extension AnchorLivingView {
 extension AnchorLivingView {
     @objc
     func closeButtonClick() {
-        var title: String = ""
+        var title = ""
         var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .redColor)
-        lineConfig.backgroundColor = .white
-        lineConfig.lineColor = .g8
-        
-        let selfUserId = manager.coreUserState.selfInfo.userId
-        let isSelfInCoGuestConnection = manager.coreCoGuestState.connectedUserList.count > 1
-        let isSelfInCoHostConnection = manager.coHostState.connectedUsers.count > 1
-        let isSelfInBattle = manager.battleState.battleUsers.contains(where: { $0.userId == selfUserId }) && isSelfInCoHostConnection
+        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
+        lineConfig.backgroundColor = .bgOperateColor
+        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
+
+        let selfUserId = manager.selfUserID
+        let isSelfInCoGuestConnection = manager.coGuestState.connected.count > 1
+        let isSelfInCoHostConnection = manager.coHostState.connected.count > 1
+        let isSelfInBattle = manager.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) && isSelfInCoHostConnection
         
         if isSelfInBattle {
             title = .endLiveOnBattleText
@@ -406,19 +406,32 @@ extension AnchorLivingView {
             title = .endLiveOnConnectionText
             let endConnectionItem = ActionItem(title: .endLiveDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
                 guard let self = self else { return }
-                coreView.terminateCrossRoomConnection()
-                manager.onCrossRoomConnectionTerminated()
-                self.routerManager.router(action: .dismiss())
+                manager.coHostStore.exitHostConnection()
+                routerManager.router(action: .dismiss())
             })
             items.append(endConnectionItem)
         } else if isSelfInCoGuestConnection {
             title = .endLiveOnLinkMicText
+        } else {
+            let alertInfo = AnchorAlertInfo(description: .confirmEndLiveText,
+                                            imagePath: nil,
+                                            cancelButtonInfo: (String.cancelText, .cancelTextColor),
+                                            defaultButtonInfo: (String.confirmCloseText, .warningTextColor))
+            { _ in
+                self.routerManager.router(action: .dismiss(.alert))
+            } defaultClosure: { [weak self] _ in
+                guard let self = self else { return }
+                self.stopLiveStream()
+                routerManager.router(action: .dismiss(.alert, completion: nil))
+            }
+            routerManager.router(action: .present(.alert(info: alertInfo)))
+            return
         }
-        
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
-        let text: String = manager.roomState.liveInfo.keepOwnerOnSeat == false ? .confirmExitText : .confirmCloseText
+
+        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: title == .endLiveOnLinkMicText ? .warningTextColor : .defaultTextColor)
+        designConfig.backgroundColor = .bgOperateColor
+        designConfig.lineColor = .g3.withAlphaComponent(0.3)
+        let text: String = manager.liveListState.currentLive.keepOwnerOnSeat ? .confirmCloseText : .confirmExitText
         let endLiveItem = ActionItem(title: text, designConfig: designConfig, actionClosure: { [weak self] _ in
             guard let self = self else { return }
             self.exitBattle()
@@ -426,41 +439,43 @@ extension AnchorLivingView {
             self.routerManager.router(action: .dismiss())
         })
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText))))
+        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
+                                                                        cancelTitleColor: .defaultTextColor), .center)))
     }
     
     private func exitBattle() {
-        coreView.terminateBattle(battleId: manager.battleState.battleId) {
-        } onError: { _, _ in
-        }
+        manager.battleStore.exitBattle(battleID: manager.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
     }
     
     func stopLiveStream() {
-        if manager.roomState.liveInfo.keepOwnerOnSeat == false {
-            coreView.leaveLiveStream() { [weak self] in
+        if manager.liveListState.currentLive.keepOwnerOnSeat {
+            manager.liveListStore.endLive { [weak self] result in
                 guard let self = self else { return }
-                routerManager.router(action: .exit)
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                let error = InternalError(code: code.rawValue, message: message)
-                manager.onError(error)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                    guard let self = self else { return }
-                    routerManager.router(action: .exit)
+                switch result {
+                case .success(let statisticsData):
+                    showEndView(with: statisticsData)
+                case .failure(let err):
+                    let error = InternalError(code: err.code, message: err.message)
+                    manager.onError(error)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                        guard let self = self else { return }
+                        routerManager.router(action: .exit)
+                    }
                 }
             }
         } else {
-            coreView.stopLiveStream() { [weak self] statisticsData in
+            manager.liveListStore.leaveLive { [weak self] result in
                 guard let self = self else { return }
-                manager.onStopLive()
-                showEndView(with: statisticsData)
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                let error = InternalError(code: code.rawValue, message: message)
-                manager.onError(error)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                    guard let self = self else { return }
+                switch result {
+                case .success(()):
                     routerManager.router(action: .exit)
+                case .failure(let err):
+                    let error = InternalError(code: err.code, message: err.message)
+                    manager.onError(error)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                        guard let self = self else { return }
+                        routerManager.router(action: .exit)
+                    }
                 }
             }
         }
@@ -469,7 +484,7 @@ extension AnchorLivingView {
     func showEndView(with statisticsData: TUILiveStatisticsData) {
         anchorObserverState.update { [weak self] state in
             guard let self = self else { return }
-            state.duration = abs(Int(Date().timeIntervalSince1970 - Double(manager.roomState.createTime / 1_000)))
+            state.duration = statisticsData.liveDuration / 1000
             state.viewCount = statisticsData.totalViewers
             state.giftTotalCoins = statisticsData.totalGiftCoins
             state.giftTotalUniqueSender = statisticsData.totalUniqueGiftSenders
@@ -494,23 +509,24 @@ extension AnchorLivingView: BarrageStreamViewDelegate {
     func barrageDisplayView(_ barrageDisplayView: BarrageStreamView, createCustomCell barrage: Barrage) -> UIView? {
         guard let extensionInfo = barrage.extensionInfo,
               let typeValue = extensionInfo["TYPE"],
-                  typeValue == "GIFTMESSAGE" else {
-                return nil
-            }
+              typeValue == "GIFTMESSAGE"
+        else {
+            return nil
+        }
         return GiftBarrageCell(barrage: barrage)
     }
 
     func onBarrageClicked(user: LiveUserInfo) {
-        if user.userID == manager.coreUserState.selfInfo.userId { return }
-        routerManager.router(action: .present(.userManagement(TUIUserInfo(from: user), type: .messageAndKickOut)))
+        if user.userID == manager.selfUserID { return }
+        routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .messageAndKickOut)))
     }
 }
 
 extension AnchorLivingView: GiftPlayViewDelegate {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        let receiver = manager.coreRoomState.ownerInfo
-        if receiver.userId == TUILogin.getUserID() {
-            receiver.userName = .meText
+        var userName = manager.liveListState.currentLive.liveOwner.userName
+        if manager.liveListState.currentLive.liveOwner.userID == manager.selfUserID {
+            userName = .meText
         }
         var barrage = Barrage()
         barrage.textContent = "gift"
@@ -520,9 +536,9 @@ extension AnchorLivingView: GiftPlayViewDelegate {
             "gift_name": gift.name,
             "gift_count": "\(giftCount)",
             "gift_icon_url": gift.iconURL,
-            "gift_receiver_username": receiver.userName
+            "gift_receiver_username": userName
         ]
-        barrageStore.appendLocalTip(message: barrage)
+        manager.barrageStore.appendLocalTip(message: barrage)
     }
     
     func giftPlayView(_ giftPlayView: GiftPlayView, onPlayGiftAnimation gift: Gift) {
@@ -537,15 +553,11 @@ extension AnchorLivingView: GiftPlayViewDelegate {
     }
 }
 
-extension AnchorLivingView {
-    var barrageStore: BarrageStore {
-        return BarrageStore.create(liveID: roomId)
-    }
-}
-
-fileprivate extension String {
+private extension String {
     static let confirmCloseText = internalLocalized("End Live")
+    static let confirmEndLiveText = internalLocalized("Are you sure you want to End Live?")
     static let confirmExitText = internalLocalized("Exit Live")
+    static let confirmExitLiveText = internalLocalized("Are you sure you want ro Exit Live?")
     static let meText = internalLocalized("Me")
     
     static let endLiveOnConnectionText = internalLocalized("You are currently co-hosting with other streamers. Would you like to [End Co-host] or [End Live] ?")

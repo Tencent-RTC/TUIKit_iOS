@@ -20,7 +20,7 @@ protocol VoiceRoomPrepareViewDelegate: AnyObject {
 class VoiceRoomPrepareView: RTCBaseView {
     weak var delegate: VoiceRoomPrepareViewDelegate?
     
-    private let manager: VoiceRoomManager
+    private let prepareStore: VoiceRoomPrepareStore
     private let routerManager: VRRouterManager
     private var cancellableSet = Set<AnyCancellable>()
     private let backgroundImageView: UIImageView = {
@@ -58,7 +58,7 @@ class VoiceRoomPrepareView: RTCBaseView {
     }()
     
     private lazy var editView: VRLiveInfoEditView = {
-        let view = VRLiveInfoEditView(manager: manager, routerManager: routerManager)
+        let view = VRLiveInfoEditView(routerManager: routerManager, store: prepareStore)
         return view
     }()
     
@@ -76,7 +76,7 @@ class VoiceRoomPrepareView: RTCBaseView {
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.systemImageSelection(.background)))
+            self.routerManager.router(action: .present(.systemImageSelection(.background, .prepare(self.prepareStore))))
         }))
         model.items.append(VRFeatureItem(normalTitle: .audioEffectsText,
                                        normalImage: internalImage("live_prepare_audio_icon"),
@@ -90,16 +90,17 @@ class VoiceRoomPrepareView: RTCBaseView {
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.prepareSetting))
+            self.routerManager.router(action: .present(.prepareSetting(prepareStore)))
         }))
-
+#if !RTCube_APPSTORE
         model.items.append(VRFeatureItem(normalTitle: .layoutText,
                                          normalImage: internalImage("ktv_layout"),
                                          designConfig: designConfig,
                                          actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.layout))
+            self.routerManager.router(action: .present(.layout(prepareStore)))
         }))
+#endif
         let featureClickPanel = VRFeatureClickPanel(model: model)
         return featureClickPanel
     }()
@@ -114,8 +115,8 @@ class VoiceRoomPrepareView: RTCBaseView {
         return button
     }()
     
-    init(frame: CGRect, manager: VoiceRoomManager, routerManager: VRRouterManager) {
-        self.manager = manager
+    init(frame: CGRect, routerManager: VRRouterManager, prepareStore: VoiceRoomPrepareStore) {
+        self.prepareStore = prepareStore
         self.routerManager = routerManager
         super.init(frame: frame)
         registerObserver()
@@ -211,7 +212,8 @@ class VoiceRoomPrepareView: RTCBaseView {
 // MARK: - subscribe view state.
 extension VoiceRoomPrepareView {
     private func subscribeRoomBackgroundState() {
-        manager.subscribeState(StateSelector(keyPath: \VRRoomState.backgroundURL))
+        prepareStore.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.backgroundURL))
+            .filter { !$0.isEmpty }
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
                 guard let self = self else { return }
@@ -221,7 +223,7 @@ extension VoiceRoomPrepareView {
     }
 
     private func subscribeRoomLayoutState() {
-        manager.subscribeState(StateSelector(keyPath: \VRRoomState.layoutType))
+        prepareStore.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.layoutType))
             .receive(on: RunLoop.main)
             .dropFirst()
             .sink { [weak self] layoutType in
@@ -284,7 +286,7 @@ extension VoiceRoomPrepareView {
                 make.top.equalTo(editView.snp.bottom).offset(26.scale375())
                 make.width.equalTo(343.scale375())
                 make.centerX.equalToSuperview()
-                make.height.equalTo(120.scale375())
+                make.height.equalTo(131.scale375())
             }
         }else {
             ktvView.isHidden = true

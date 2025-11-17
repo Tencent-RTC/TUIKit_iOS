@@ -5,13 +5,10 @@
 //  Created by jeremiawang on 2024/11/19.
 //
 
-import RTCRoomEngine
+import AtomicXCore
 
 struct AnchorMediaState {
-    var audioQuality: TUIAudioQuality = .default
-    var videoQuality: TUIVideoQuality = .quality1080P
-    var isAudioLocked: Bool = false
-    var isVideoLocked: Bool = false
+    var videoQuality: VideoQuality = .quality1080P
     
     var videoAdvanceSettings: AnchorVideoAdvanceSetting = AnchorVideoAdvanceSetting()
 }

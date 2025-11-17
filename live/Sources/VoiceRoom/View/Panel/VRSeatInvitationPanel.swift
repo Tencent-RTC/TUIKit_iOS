@@ -13,11 +13,11 @@ import RTCRoomEngine
 import AtomicXCore
 
 class VRSeatInvitationPanel: RTCBaseView {
-    private let manager: VoiceRoomManager
+    private let liveID: String
+    private let toastService: VRToastService
     private let routerManager: VRRouterManager
-    private weak var coreView: SeatGridView?
     private var cancellableSet: Set<AnyCancellable> = []
-    private var audienceTupleList: [(audienceInfo: TUIUserInfo, isInvited: Bool)] = []
+    private var audienceTupleList: [(audienceInfo: LiveUserInfo, isInvited: Bool)] = []
     private let seatIndex: Int
     
     private let titleLabel: UILabel = {
@@ -45,10 +45,10 @@ class VRSeatInvitationPanel: RTCBaseView {
         return tableView
     }()
     
-    init(manager: VoiceRoomManager, routerManager: VRRouterManager, coreView: SeatGridView, seatIndex: Int) {
-        self.manager = manager
+    init(liveID: String, toastService: VRToastService, routerManager: VRRouterManager, seatIndex: Int) {
+        self.liveID = liveID
         self.routerManager = routerManager
-        self.coreView = coreView
+        self.toastService = toastService
         self.seatIndex = seatIndex
         super.init(frame: .zero)
         backgroundColor = .g2
@@ -85,6 +85,7 @@ class VRSeatInvitationPanel: RTCBaseView {
     override func bindInteraction() {
         tableView.delegate = self
         tableView.dataSource = self
+        subscribeHostEventListener()
         subscribeUserListState()
         subscribeToastState()
     }
@@ -92,22 +93,25 @@ class VRSeatInvitationPanel: RTCBaseView {
 
 extension VRSeatInvitationPanel {
     private func subscribeUserListState() {
-        let userListPublisher = manager.subscribeState(StateSelector(keyPath: \VRUserState.userList))
-        let seatListPublisher = manager.subscribeCoreState(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
-        let invitedUserIdsPublisher = manager.subscribeState(StateSelector(keyPath: \VRSeatState.invitedUserIds))
-        userListPublisher
-            .combineLatest(seatListPublisher, invitedUserIdsPublisher)
+        let userListPublisher = audienceStore.state.subscribe(StatePublisherSelector(keyPath: \LiveAudienceState.audienceList))
+        let seatListPublisher = seatStore.state.subscribe(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
+        let invitedUserIdsPublisher = coGuestStore.state.subscribe(StatePublisherSelector(keyPath: \CoGuestState.invitees))
+        
+        let combinedPublisher = Publishers.CombineLatest3(
+            userListPublisher,
+            seatListPublisher,
+            invitedUserIdsPublisher
+        )
+        
+        combinedPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] userList, seatList, invitedUsers in
+            .sink { [weak self] audienceList, seatList, invitedUsers in
                 guard let self = self else { return }
-                let audienceList = userList.filter { [weak self] user in
-                    guard let self = self else { return false }
-                    return user.userId != self.manager.userState.selfInfo.userId
-                }
                 self.audienceTupleList = audienceList.filter { user in
-                    !seatList.contains { $0.userInfo.userID == user.userId }
-                }.map { audience in
-                    (audience, self.manager.seatState.invitedUserIds.contains(where: {$0 == audience.userId}))
+                    !seatList.contains { $0.userInfo.userID == user.userID }
+                }
+                .map { audience in
+                    (audience, self.coGuestStore.state.value.invitees.contains(where: {$0.userID == audience.userID}))
                 }
                 self.tableView.reloadData()
             }
@@ -115,11 +119,29 @@ extension VRSeatInvitationPanel {
     }
     
     private func subscribeToastState() {
-        manager.toastSubject
+        toastService.subscribeToast({ [weak self] message in
+            guard let self = self else { return }
+            self.makeToast(message: message)
+        })
+    }
+    
+    private func subscribeHostEventListener() {
+        coGuestStore.hostEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] event in
                 guard let self = self else { return }
-                self.makeToast(message)
+                switch event {
+                case .onHostInvitationResponded(isAccept: let isAccept, guestUser: let guestUser):
+                    if !isAccept {
+                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: guestUser.userName.isEmpty ? guestUser.userID : guestUser.userName))
+                    }
+                case .onHostInvitationNoResponse(guestUser: _, reason: let reason):
+                    if reason == .timeout {
+                        toastService.showToast(.requestTimeoutText)
+                    }
+                default:
+                    break
+                }
             }
             .store(in: &cancellableSet)
     }
@@ -147,30 +169,22 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
             inviteTakeSeatCell.updateUser(user: audienceTuple.audienceInfo)
             inviteTakeSeatCell.updateButtonView(isSelected: audienceTuple.isInvited)
             inviteTakeSeatCell.inviteEventClosure = { [weak self] user in
-                guard let self = self, !self.manager.seatState.invitedUserIds.contains(where: { $0 == user.userId}) else { return }
-                self.manager.onSentSeatInvitation(to: user.userId)
-                self.coreView?.takeUserOnSeatByAdmin(index: self.seatIndex,
-                                                     timeout: kSGDefaultTimeout,
-                                                     userId: user.userId) { [weak self] userInfo in
+                guard let self = self, !self.coGuestStore.state.value.invitees.contains(where: { $0.userID == user.userID}) else { return }
+                let seatAllTokenInConnect = seatStore.state.value.seatList.prefix(KSGConnectMaxSeatCount).allSatisfy({ $0.isLocked || $0.userInfo.userID != "" })
+
+                if seatAllTokenInConnect && coHostStore.state.value.connected.count != 0 {
+                    toastService.showToast(.seatAllTokenText)
+                    return
+                }
+                self.coGuestStore.inviteToSeat(userID: user.userID, seatIndex: self.seatIndex, timeout: kSGDefaultTimeout, extraInfo: nil) { [weak self] result in
                     guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                } onRejected: { [weak self] userInfo in
-                    guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                    self.manager.onError(.inviteSeatCancelText)
-                } onCancelled: { [weak self] userInfo in
-                    guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                } onTimeout: { [weak self] userInfo in
-                    guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                    self.manager.onError(.inviteSeatCancelText)
-                } onError: { [weak self] userInfo, code, message in
-                    guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                    guard let err = TUIError(rawValue: code) else { return }
-                    let error = InternalError(code: err.rawValue, message: message)
-                    self.manager.onError(error.localizedMessage)
+                    switch result {
+                    case .success(()):
+                        inviteTakeSeatCell.updateButtonView(isSelected: true)
+                    case .failure(let error):
+                        let err = InternalError(errorInfo: error)
+                        toastService.showToast(err.localizedMessage)
+                    }
                 }
                 
                 if self.seatIndex != -1 {
@@ -179,13 +193,16 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
             }
             inviteTakeSeatCell.cancelEventClosure = { [weak self] user in
                 guard let self = self else { return }
-                coreView?.cancelRequest(userId: user.userId) { [weak self] in
+                coGuestStore.cancelInvitation(inviteeID:  user.userID) { [weak self] result in
                     guard let self = self else { return }
-                    self.manager.onRespondedSeatInvitation(of: user.userId)
-                } onError: { [weak self] code, message in
-                    guard let self = self, let err = TUIError(rawValue: code) else { return }
-                    let error = InternalError(code: err.rawValue, message: message)
-                    self.manager.onError(error.localizedMessage)
+                    switch result {
+                    case .success(()):
+                        toastService.showToast(.inviteSeatCancelText)
+                        inviteTakeSeatCell.updateButtonView(isSelected: false)
+                    case .failure(let error):
+                        let err = InternalError(errorInfo: error)
+                        toastService.showToast(err.localizedMessage)
+                    }
                 }
             }
         }
@@ -193,8 +210,30 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
     }
 }
 
+extension VRSeatInvitationPanel {
+    var coGuestStore: CoGuestStore {
+        return CoGuestStore.create(liveID: liveID)
+    }
+
+    var coHostStore: CoHostStore {
+        return CoHostStore.create(liveID: liveID)
+    }
+
+    var audienceStore: LiveAudienceStore {
+        return LiveAudienceStore.create(liveID: liveID)
+    }
+    
+    var seatStore: LiveSeatStore {
+        return LiveSeatStore.create(liveID: liveID)
+    }
+    
+}
+
 fileprivate extension String {
     static let inviteText = internalLocalized("Invite")
     static let onlineAudienceText = internalLocalized("Online audience")
     static let inviteSeatCancelText = internalLocalized("Seat invitation has been canceled")
+    static let seatAllTokenText = internalLocalized("The seats are all taken.")
+    static let requestRejectedText = internalLocalized("xxx rejected")
+    static let requestTimeoutText = internalLocalized("Invitation has timed out")
 }

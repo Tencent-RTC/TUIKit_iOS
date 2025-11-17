@@ -5,27 +5,25 @@
 //  Created by krabyu on 2024/9/2.
 //
 
-import UIKit
+import AtomicXCore
 import Combine
 import RTCCommon
-import AtomicXCore
-import RTCRoomEngine
+import UIKit
 
 class AnchorBattleCountDownView: UIView {
-    private weak var coreView: LiveCoreView?
     var countdownTime: TimeInterval = 5
-    var timeEndClosure: (()->Void)?
-    var cancelClosure: (()->Void)?
-    private var dotsTimer: Timer = Timer()
-    private let manager: AnchorBattleManager
+    var timeEndClosure: (() -> Void)?
+    var cancelClosure: (() -> Void)?
+    private var dotsTimer: Timer = .init()
+    private let manager: AnchorManager
     
-    init(countdownTime: TimeInterval, manager: AnchorBattleManager, coreView: LiveCoreView) {
+    init(countdownTime: TimeInterval, manager: AnchorManager) {
         self.manager = manager
         self.countdownTime = countdownTime
-        self.coreView = coreView
         super.init(frame: .zero)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -76,7 +74,7 @@ class AnchorBattleCountDownView: UIView {
     private let cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle(.cancelText, for: .normal)
-        button.setTitleColor(.redColor, for: .normal)
+        button.setTitleColor(.warningTextColor, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = .customFont(ofSize: 12, weight: .medium)
         return button
@@ -137,17 +135,16 @@ class AnchorBattleCountDownView: UIView {
     }
     
     @objc private func cancelButtonClick() {
-        guard let coreView = coreView else { return }
-        let coHostState: CoHostState = coreView.getState()
-        let userState: UserState = coreView.getState()
-        let selfUserId = userState.selfInfo.userId
-        let inviteeIdList = coHostState.connectedUserList.map { $0.userId }.filter({ $0 != selfUserId })
-        coreView.cancelBattle(battleId: manager.state.battleId, userIdList: inviteeIdList, onSuccess: { [weak self] in
+        manager.battleStore.cancelBattleRequest(battleId: manager.anchorBattleState.requestBattleID,
+                                                userIdList: manager.coHostState.connected.map { $0.userID }.filter { $0 != manager.selfUserID })
+        { [weak self] result in
             guard let self = self else { return }
-            self.manager.onCanceledBattle()
-        }, onError: { _, _ in
-            
-        })
+            switch result {
+            case .success(()):
+                manager.stopApplyingBattle()
+            default: break
+            }
+        }
         cancelClosure?()
         countdownTimer.stop()
         if dotsTimer.isValid {
@@ -155,10 +152,10 @@ class AnchorBattleCountDownView: UIView {
         }
     }
     
-    private func convertSecondsToMinutes(seconds time: TimeInterval) -> String{
+    private func convertSecondsToMinutes(seconds time: TimeInterval) -> String {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
-        return String(format: "%02d:%02d", minutes,seconds)
+        return String(format: "%02d:%02d", minutes, seconds)
     }
     
     private func updateTipsLabelText() {
@@ -167,7 +164,7 @@ class AnchorBattleCountDownView: UIView {
             guard let self = self else { return }
             if dots.count == 3 {
                 dots.removeAll()
-            }else {
+            } else {
                 dots.append(".")
             }
             self.tipsLabel.text? = .localizedReplace(.waitForBattleText, replace: dots)

@@ -22,6 +22,8 @@ Pod::Spec.new do |s|
   s.dependency 'TXLiteAVSDK_Professional','>= 12.8'
   s.dependency 'TUICore'
   s.dependency 'Kingfisher'
+  s.dependency 'AtomicXCore'
+  
   s.static_framework = true
 
   s.source_files     = [

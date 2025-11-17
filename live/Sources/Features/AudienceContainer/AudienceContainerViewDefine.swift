@@ -5,7 +5,7 @@
 //  Created by jeremiawang on 2025/6/20.
 //
 
-import RTCRoomEngine
+import AtomicXCore
 
 public protocol AudienceContainerViewDelegate: AnyObject {
     func onClickFloatWindow()
@@ -13,7 +13,7 @@ public protocol AudienceContainerViewDelegate: AnyObject {
 }
 
 public protocol AudienceContainerViewDataSource: AnyObject {
-    typealias LiveListSuccessBlock = (String, [TUILiveInfo]) -> Void
+    typealias LiveListSuccessBlock = (String, [LiveInfo]) -> Void
     typealias LiveListErrorBlock = (Int, String) -> Void
     func fetchLiveList(cursor: String, onSuccess: @escaping LiveListSuccessBlock, onError: @escaping LiveListErrorBlock)
 }

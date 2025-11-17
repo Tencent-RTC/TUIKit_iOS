@@ -5,7 +5,6 @@
 //  Created by gg on 2025/7/22.
 //
 
-import RTCRoomEngine
 import SnapKit
 import AtomicXCore
 import Combine
@@ -15,10 +14,10 @@ class AudienceEmptySeatView: UIView {
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
     private let creator: AudienceRootMenuDataCreator
-    private let seatInfo: TUISeatFullInfo
+    private let seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
 
-    init(seatInfo: TUISeatFullInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    init(seatInfo: SeatInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.seatInfo = seatInfo
         self.manager = manager
         self.routerManager = routerManager
@@ -63,10 +62,10 @@ class AudienceEmptySeatView: UIView {
     }
     
     @objc private func onTap(_ tap: UITapGestureRecognizer) {
-        if manager.coGuestState.coGuestStatus != .none {
+        if manager.coGuestState.connected.isOnSeat() {
             return
         }
-        let data = creator.generateLinkTypeMenuData(seatIndex: seatInfo.seatIndex)
+        let data = creator.generateLinkTypeMenuData(seatIndex: seatInfo.index)
         routerManager.router(action: .present(.linkType(data)))
     }
     

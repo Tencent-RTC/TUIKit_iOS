@@ -10,7 +10,7 @@ import SnapKit
 
 class VRLayoutPanel: UIView {
     // MARK: - UI Components
-    private let manager: VoiceRoomManager
+    private let prepareStore: VoiceRoomPrepareStore
     private let routerManager: VRRouterManager
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -63,8 +63,8 @@ class VRLayoutPanel: UIView {
     private var isViewReady: Bool = false
 
     // MARK: - Life Cycle
-    init(manager: VoiceRoomManager,routerManager: VRRouterManager) {
-        self.manager = manager
+    init(prepareStore: VoiceRoomPrepareStore, routerManager: VRRouterManager) {
+        self.prepareStore = prepareStore
         self.routerManager = routerManager
         super.init(frame: .zero)
     }
@@ -117,10 +117,10 @@ class VRLayoutPanel: UIView {
         updateSelection(selectedView: tappedView)
 
         if tappedView == chatBackgroundView {
-            manager.onSetlayoutType(layoutType: .chatRoom)
+            prepareStore.onSetlayoutType(layoutType: .chatRoom)
             routerManager.router(action: .dismiss())
         } else if tappedView == ktvBackgroundView {
-            manager.onSetlayoutType(layoutType: .KTVRoom)
+            prepareStore.onSetlayoutType(layoutType: .KTVRoom)
             routerManager.router(action: .dismiss())
         }
     }

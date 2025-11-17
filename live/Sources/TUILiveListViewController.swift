@@ -9,7 +9,7 @@ import UIKit
 import RTCCommon
 import TUICore
 import Combine
-import RTCRoomEngine
+import AtomicXCore
 import SwiftUI
 
 public class TUILiveListViewController: UIViewController {
@@ -120,24 +120,24 @@ extension TUILiveListViewController {
 extension TUILiveListViewController: OnItemClickDelegate {
     public func onItemClick(liveInfo: LiveInfo, frame: CGRect) {
         if FloatWindow.shared.isShowingFloatWindow() {
-            if FloatWindow.shared.getCurrentRoomId() == liveInfo.roomId {
+            if FloatWindow.shared.getCurrentRoomId() == liveInfo.liveID {
                 FloatWindow.shared.resumeLive(atViewController: self.navigationController ?? self)
                 return
-            } else if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == TUILogin.getUserID() {
-                view.makeToast(.pushingToReturnText)
+            } else if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == LoginStore.shared.state.value.loginUserInfo?.userID {
+                view.makeToast(message: .pushingToReturnText)
                 return
             } else if FloatWindow.shared.getIsLinking() {
-                view.makeToast(.pushingToReturnText)
+                view.makeToast(message: .pushingToReturnText)
                 return
             } else {
                 FloatWindow.shared.releaseFloatWindow()
             }
         }
-        let roomType = LiveIdentityGenerator.shared.getIDType(liveInfo.roomId)
-        let isOwner = liveInfo.ownerId == TUILogin.getUserID()
+        let roomType = LiveIdentityGenerator.shared.getIDType(liveInfo.liveID)
+        let isOwner = liveInfo.liveOwner.userID == (LoginStore.shared.state.value.loginUserInfo?.userID ?? "")
         switch roomType {
         case .voice:
-            let vc = TUIVoiceRoomViewController(roomId: liveInfo.roomId, behavior: isOwner ? .autoCreate : .join)
+            let vc = TUIVoiceRoomViewController(roomId: liveInfo.liveID, behavior: isOwner ? .autoCreate : .join)
             vc.modalPresentationStyle = .custom
             let transitionDelegate = LiveTransitioningDelegate(originFrame: frame)
             vc.transitioningDelegate = transitionDelegate
@@ -151,7 +151,7 @@ extension TUILiveListViewController: OnItemClickDelegate {
                 vc.transitioningDelegate = transitionDelegate
                 present(vc, animated: true)
             } else {
-                let vc = TUILiveRoomAudienceViewController(roomId: liveInfo.roomId)
+                let vc = TUILiveRoomAudienceViewController(roomId: liveInfo.liveID)
                 vc.modalPresentationStyle = .custom
                 let transitionDelegate = LiveTransitioningDelegate(originFrame: frame)
                 vc.transitioningDelegate = transitionDelegate

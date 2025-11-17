@@ -29,7 +29,7 @@ public class TUIGiftData {
 
 extension LiveUserInfo {
     var isSelf: Bool {
-        userID == TUILogin.getUserID()
+        userID == LoginStore.shared.state.value.loginUserInfo?.userID
     }
 }
 

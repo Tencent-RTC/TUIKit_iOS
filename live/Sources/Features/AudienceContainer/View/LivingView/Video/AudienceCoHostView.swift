@@ -8,17 +8,16 @@
 import Foundation
 import RTCCommon
 import Combine
-import RTCRoomEngine
 import AtomicXCore
 
 class AudienceCoHostView: UIView {
     private let manager: AudienceManager
     private var isViewReady: Bool = false
-    private var coHostUser: CoHostUser
+    private var seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(connectionUser: CoHostUser, manager: AudienceManager) {
-        self.coHostUser = connectionUser
+    init(seatInfo: SeatInfo, manager: AudienceManager) {
+        self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)
     }
@@ -40,7 +39,7 @@ class AudienceCoHostView: UIView {
         self.isUserInteractionEnabled = false
     }
     
-    private lazy var userInfoView = AudienceUserStatusView(userInfo: TUIUserInfo(coHostUser: coHostUser), manager: manager)
+    private lazy var userInfoView = AudienceUserStatusView(seatInfo: seatInfo, manager: manager)
     
     private func constructViewHierarchy() {
         addSubview(userInfoView)
@@ -56,7 +55,7 @@ class AudienceCoHostView: UIView {
     }
     
     private func initViewState() {
-        if manager.coreCoHostState.connectedUserList.count > 1 || manager.coreCoGuestState.connectedUserList.count > 1 {
+        if manager.coHostState.connected.count > 1 || manager.coGuestState.connected.count > 1 {
             userInfoView.isHidden = false
         } else {
             userInfoView.isHidden = true
@@ -66,7 +65,7 @@ class AudienceCoHostView: UIView {
 
 extension AudienceCoHostView {
     func subscribeState() {
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoHostState.connectedUserList))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] connectedUsers in

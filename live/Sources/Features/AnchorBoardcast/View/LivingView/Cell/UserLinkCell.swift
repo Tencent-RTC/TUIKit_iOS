@@ -6,23 +6,23 @@
 //
 
 import Foundation
-import RTCRoomEngine
+import AtomicXCore
 
 class UserLinkCell: LinkMicBaseCell {
-    var kickoffEventClosure: ((TUISeatInfo) -> Void)?
+    var kickoffEventClosure: ((SeatUserInfo) -> Void)?
     
     private lazy var hangUpButton: UIButton = {
         let view = UIButton(type: .system)
         view.showsTouchWhenHighlighted = false
         view.backgroundColor = .clear
-        view.setTitleColor(.redColor, for: .normal)
+        view.setTitleColor(.warningTextColor, for: .normal)
         view.titleLabel?.font = .customFont(ofSize: 12)
         view.setTitle(.anchorHangUpTitle, for: .normal)
         view.mm_w = 64.scale375()
         view.mm_h = 24.scale375()
         view.layer.masksToBounds = true
         view.layer.cornerRadius = view.mm_h * 0.5
-        view.layer.borderColor = UIColor.redColor.cgColor
+        view.layer.borderColor = UIColor.warningTextColor.cgColor
         view.layer.borderWidth = 1
         view.addTarget(self, action: #selector(hangUpButtonClick), for: .touchUpInside)
         return view

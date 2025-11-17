@@ -5,12 +5,12 @@
 //  Created by krabyu on 2023/10/19.
 //
 
+import AtomicXCore
+import Combine
 import Foundation
 import RTCCommon
-import Combine
-import TUICore
-import AtomicXCore
 import RTCRoomEngine
+import TUICore
 
 public protocol RotateScreenDelegate: AnyObject {
     func rotateScreen(isPortrait: Bool)
@@ -22,14 +22,14 @@ class AudienceView: RTCBaseView {
     weak var rotateScreenDelegate: RotateScreenDelegate?
     
     // MARK: - private property
+
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     
     // MARK: - property: view
+
     private let videoView: LiveCoreView
-    private lazy var liveStreamObserver = AudienceConnectionObserver(manager: manager)
-    private lazy var battleObserver = AudienceBattleManagerObserver(battleManager: manager.battleManager)
     
     private var panDirection: PanDirection = .none
     enum PanDirection {
@@ -66,6 +66,7 @@ class AudienceView: RTCBaseView {
         blurView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        imageView.image = internalImage("live_edit_info_default_cover_image")
         return imageView
     }()
     
@@ -88,20 +89,16 @@ class AudienceView: RTCBaseView {
         self.videoView = coreView
         super.init(frame: .zero)
         videoView.setLiveID(roomId)
-        self.videoView.videoViewDelegate = self
-        self.videoView.registerConnectionObserver(observer: liveStreamObserver)
-        self.videoView.registerBattleObserver(observer: battleObserver)
-        self.manager.prepareRoomIdBeforeEnterRoom(roomId: roomId)
+        videoView.videoViewDelegate = self
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        videoView.unregisterConnectionObserver(observer: liveStreamObserver)
-        videoView.unregisterBattleObserver(observer: battleObserver)
         LiveKitLog.info("\(#file)", "\(#line)", "deinit AudienceView \(self)")
     }
     
@@ -173,7 +170,7 @@ class AudienceView: RTCBaseView {
         subscribeOrientationChange()
         subscribeRoomState()
         subscribeMediaState()
-        subscribeSubject()
+        subscribeEvent()
         setupSlideToClear()
         leaveButton.addTarget(self, action: #selector(leaveButtonClick), for: .touchUpInside)
         restoreClearButton.addTarget(self, action: #selector(restoreLivingView), for: .touchUpInside)
@@ -187,9 +184,9 @@ class AudienceView: RTCBaseView {
     
     func relayoutCoreView() {
         addSubview(videoView)
-        videoView.snp.makeConstraints({ make in
+        videoView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        })
+        }
         sendSubviewToBack(videoView)
         sendSubviewToBack(coverBgView)
     }
@@ -206,60 +203,145 @@ extension AudienceView {
     }
 
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceRoomState.liveStatus))
+        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
             .removeDuplicates()
+            .dropFirst()
             .receive(on: RunLoop.main)
-            .sink { [weak self] status in
+            .sink { [weak self] currentLive in
                 guard let self = self else { return }
-                switch status {
-                    case .finished:
-                        routeToAudienceView()
-                    default: break
+                if currentLive.isEmpty {
+                    routeToAudienceView()
+                } else if !currentLive.backgroundURL.isEmpty {
+                    coverBgView.kf.setImage(with: URL(string: currentLive.backgroundURL), placeholder: internalImage("live_edit_info_default_cover_image"))
+                } else if !currentLive.coverURL.isEmpty {
+                    coverBgView.kf.setImage(with: URL(string: currentLive.coverURL), placeholder: internalImage("live_edit_info_default_cover_image"))
                 }
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StateSelector(keyPath: \AudienceRoomState.backgroundUrl))
-            .receive(on: RunLoop.main)
+        manager.subscribeState(StatePublisherSelector(keyPath: \LiveSeatState.canvas))
             .removeDuplicates()
-            .sink { [weak self] url in
+            .receive(on: RunLoop.main)
+            .sink { [weak self] canvas in
                 guard let self = self else { return }
-                coverBgView.kf.setImage(with: URL(string: url), placeholder: internalImage("live_edit_info_default_cover_image"))
+                guard canvas.w * canvas.h > 0 else { return }
+                manager.updateVideoStreamIsLandscape(canvas.w >= canvas.h)
             }
             .store(in: &cancellableSet)
     }
     
     private func subscribeMediaState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.isAudioLocked))
-            .removeDuplicates()
-            .dropFirst()
+        manager.seatStore.liveSeatEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] isAudioLocked in
-                guard let self = self, manager.coGuestState.coGuestStatus == .linking else { return }
-                manager.toastSubject.send(isAudioLocked ? .mutedAudioText : .unmutedAudioText)
-            }
-            .store(in: &cancellableSet)
-        
-        
-        manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.isVideoLocked))
-            .removeDuplicates()
-            .dropFirst()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] isVideoLocked in
-                guard let self = self, manager.coGuestState.coGuestStatus == .linking else { return }
-                manager.toastSubject.send(isVideoLocked ? .mutedVideoText : .unmutedVideoText)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                let text: String
+                switch event {
+                case .onLocalCameraClosedByAdmin:
+                    text = .mutedVideoText
+                case .onLocalCameraOpenedByAdmin(policy: _):
+                    text = .unmutedVideoText
+                case .onLocalMicrophoneClosedByAdmin:
+                    text = .mutedAudioText
+                case .onLocalMicrophoneOpenedByAdmin(policy: _):
+                    text = .unmutedAudioText
+                }
+                manager.toastSubject.send(text)
             }
             .store(in: &cancellableSet)
     }
     
-    private func subscribeSubject() {
-        manager.kickedOutSubject
+    private func subscribeEvent() {
+        manager.liveListStore.liveListEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] in
+            .sink { [weak self] event in
                 guard let self = self else { return }
-                routeToAudienceView()
-                onKickedByAdmin()
-            }.store(in: &cancellableSet)
+                switch event {
+                case .onLiveEnded:
+                    routeToAudienceView()
+                case .onKickedOutOfLive:
+                    routeToAudienceView()
+                    onKickedByAdmin()
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        manager.coGuestStore.guestEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
+                    if !isAccept {
+                        makeToast(message: .takeSeatApplicationRejected)
+                    }
+                case .onGuestApplicationNoResponse(reason: let reason):
+                    switch reason {
+                    case .timeout:
+                        makeToast(message: .takeSeatApplicationTimeout)
+                    default: break
+                    }
+                case .onKickedOffSeat(seatIndex: _, hostUser: _):
+                    makeToast(message: .kickedOutOfSeat)
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        manager.liveAudienceStore.liveAudienceEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onAudienceMessageDisabled(audience: let user, isDisable: let isDisable):
+                    guard user.userID == manager.selfUserID else { break }
+                    if isDisable {
+                        makeToast(message: .disableChatText)
+                    } else {
+                        makeToast(message: .enableChatText)
+                    }
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        manager.coGuestStore.guestEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onKickedOffSeat(seatIndex: _, hostUser: _):
+                    manager.deviceStore.closeLocalCamera()
+                    manager.deviceStore.closeLocalMicrophone()
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        manager.subscribeState(StatePublisherSelector(keyPath: \LoginState.loginStatus))
+            .dropFirst()
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] loginStatus in
+                switch loginStatus {
+                case .unlogin:
+                    if FloatWindow.shared.isShowingFloatWindow() {
+                        FloatWindow.shared.releaseFloatWindow()
+                    } else {
+                        guard let self = self else { return }
+                        LiveListStore.shared.leaveLive { [weak self] result in
+                            guard let self = self else { return }
+                            switch result {
+                            case .success(()):
+                                routerManager.router(action: .exit)
+                            default: break
+                            }
+                        }
+                    }
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
     }
     
     private func routeToAudienceView() {
@@ -283,42 +365,47 @@ extension AudienceView {
     @objc func leaveButtonClick() {
         rotateScreenDelegate?.rotateScreen(isPortrait: true)
 
-        let selfUserId = manager.coreUserState.selfInfo.userId
-        if !manager.coreCoGuestState.seatList.contains(where: { $0.userId == selfUserId }) {
+        if !manager.coGuestState.connected.isOnSeat() {
             leaveRoom()
             return
         }
         var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .redColor)
-        lineConfig.backgroundColor = .white
-        lineConfig.lineColor = .g8
-        
+        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
+        lineConfig.backgroundColor = .bgOperateColor
+        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
+
         let title: String = .endLiveOnLinkMicText
         let endLinkMicItem = ActionItem(title: .endLiveLinkMicDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            videoView.terminateIntraRoomConnection()
+            manager.coGuestStore.disConnect { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(()):
+                    manager.deviceStore.closeLocalCamera()
+                    manager.deviceStore.closeLocalMicrophone()
+                default: break
+                }
+            }
             routerManager.router(action: .dismiss())
         })
         items.append(endLinkMicItem)
         
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
+        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .defaultTextColor)
+        designConfig.backgroundColor = .bgOperateColor
+        designConfig.lineColor = .g3.withAlphaComponent(0.3)
         let endLiveItem = ActionItem(title: .confirmCloseText, designConfig: designConfig, actionClosure: { [weak self] _ in
             guard let self = self else { return }
             routerManager.router(action: .dismiss())
             leaveRoom()
         })
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText))))
+        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
+                                                                        cancelTitleColor: .defaultTextColor), .center)))
     }
     
     func leaveRoom() {
-        videoView.leaveLiveStream() { [weak self] in
-            guard let self = self else { return }
-            manager.onLeaveLive()
-        } onError: { _, _ in
-        }
+        videoView.stopPreviewLiveStream(roomId: roomId)
+        manager.liveListStore.leaveLive(completion: nil)
         routerManager.router(action: .exit)
         TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
                             subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
@@ -328,6 +415,7 @@ extension AudienceView {
 }
 
 // MARK: - Slide to clear
+
 extension AudienceView {
     private func setupSlideToClear() {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
@@ -370,15 +458,16 @@ extension AudienceView {
     private func hideLivingView() {
         UIView.animate(withDuration: 0.3, animations: { [weak self] in
             guard let self = self else { return }
-            livingView.transform = CGAffineTransform(translationX: UIScreen.main.bounds.width, y: 0)
+            livingView.transform = CGAffineTransform(translationX: max(UIScreen.main.bounds.width, UIScreen.main.bounds.height), y: 0)
         })
         restoreClearButton.isHidden = false
         livingView.setGiftPureMode(true)
     }
     
     @objc private func restoreLivingView() {
-        UIView.animate(withDuration: 0.3) {
-            self.livingView.transform = CGAffineTransform(translationX: 0, y: 0)
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self = self else { return }
+            livingView.transform = .identity
         }
         restoreClearButton.isHidden = true
         livingView.setGiftPureMode(false)
@@ -390,7 +479,7 @@ extension AudienceView {
             if panDirection == .right {
                 livingView.transform = .identity
             } else {
-                livingView.transform = CGAffineTransform(translationX: bounds.width, y: 0)
+                livingView.transform = CGAffineTransform(translationX: max(bounds.width, bounds.height), y: 0)
             }
         }
     }
@@ -405,24 +494,25 @@ extension AudienceView {
         let imageName = TUIGlobalization.getPreferredLanguage() == "en" ? "live_muteImage_en" : "live_muteImage"
         videoView
             .setLocalVideoMuteImage(
-                bigImage:internalImage(imageName) ?? UIImage(),
-                smallImage:internalImage("live_muteImage_small") ?? UIImage()
+                bigImage: internalImage(imageName) ?? UIImage(),
+                smallImage: internalImage("live_muteImage_small") ?? UIImage()
             )
-        videoView.joinLiveStream(roomId: roomId) { [weak self] liveInfo in
+        LiveListStore.shared.joinLive(liveID: roomId) { [weak self] result in
             guard let self = self else { return }
-            manager.onJoinLive(liveInfo: liveInfo)
-            livingView.initComponentView()
-            livingView.isHidden = false
-            onComplete(.success(()))
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            let error = InternalError(code: code.rawValue, message: message)
-            manager.onError(error)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                guard let self = self else { return }
-                routerManager.router(action: .exit)
+            switch result {
+            case .success(let liveInfo):
+                livingView.initComponentView(liveInfo: liveInfo)
+                livingView.isHidden = false
+                onComplete(.success(()))
+            case .failure(let err):
+                let error = InternalError(code: err.code, message: err.message)
+                manager.onError(error)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                    guard let self = self else { return }
+                    routerManager.router(action: .exit)
+                }
+                onComplete(.failure(error))
             }
-            onComplete(.failure(error))
         }
     }
 }
@@ -432,10 +522,9 @@ extension AudienceView: VideoViewDelegate {
         switch viewLayer {
         case .foreground:
             if let userId = seatInfo.userId, !userId.isEmpty {
-                let userInfo = seatFullInfoToUserInfo(seatInfo: seatInfo)
-                return AudienceCoGuestView(userInfo: userInfo, manager: manager, routerManager: routerManager)
+                return AudienceCoGuestView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager)
             }
-            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager, coreView: videoView)
         case .background:
             if let userId = seatInfo.userId, !userId.isEmpty {
                 return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
@@ -448,10 +537,9 @@ extension AudienceView: VideoViewDelegate {
         switch viewLayer {
         case .foreground:
             if let userId = seatInfo.userId, !userId.isEmpty {
-                let coHostUser = seatFullInfoToCoHostUser(seatInfo: seatInfo)
-                return AudienceCoHostView(connectionUser: coHostUser, manager: manager)
+                return AudienceCoHostView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager)
             }
-            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager, coreView: videoView)
         case .background:
             if let userId = seatInfo.userId, !userId.isEmpty {
                 return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
@@ -466,37 +554,6 @@ extension AudienceView: VideoViewDelegate {
     
     func createBattleContainerView() -> UIView? {
         return AudienceBattleInfoView(manager: manager, routerManager: routerManager, isOwner: true, coreView: videoView)
-    }
-    
-    func updateBattleContainerView(battleContainerView: UIView, userInfos: [AtomicXCore.BattleUserViewModel]) {
-        if let battleInfoView = battleContainerView as? AudienceBattleInfoView {
-            battleInfoView.updateView(userInfos: userInfos)
-        }
-    }
-    
-    private func seatFullInfoToUserInfo(seatInfo: TUISeatFullInfo) -> TUIUserInfo {
-        let userInfo = TUIUserInfo()
-        userInfo.userId = seatInfo.userId ?? ""
-        userInfo.userName = seatInfo.userName ?? ""
-        userInfo.avatarUrl = seatInfo.userAvatar ?? ""
-        userInfo.userRole = .generalUser
-        userInfo.hasVideoStream = seatInfo.userCameraStatus == .opened
-        userInfo.hasAudioStream = seatInfo.userMicrophoneStatus == .opened
-        return userInfo
-    }
-    
-    private func seatFullInfoToCoHostUser(seatInfo: TUISeatFullInfo) -> CoHostUser {
-        let user = TUIConnectionUser()
-        user.userId = seatInfo.userId ?? ""
-        user.userName = seatInfo.userName ?? ""
-        user.avatarUrl = seatInfo.userAvatar ?? ""
-        user.roomId = seatInfo.roomId
-        
-        let coHostUser = CoHostUser()
-        coHostUser.connectionUser = user
-        coHostUser.hasVideoStream = seatInfo.userCameraStatus == .opened
-        coHostUser.hasAudioStream = seatInfo.userMicrophoneStatus == .opened
-        return coHostUser
     }
 }
 
@@ -514,7 +571,7 @@ extension AudienceView: RotateScreenDelegate {
     }
 }
 
-fileprivate extension String {
+private extension String {
     static let kickedOutText = internalLocalized("You have been kicked out of the room")
     static let mutedAudioText = internalLocalized("The anchor has muted you")
     static let unmutedAudioText = internalLocalized("The anchor has unmuted you")
@@ -524,4 +581,9 @@ fileprivate extension String {
     static let endLiveLinkMicDisconnectText = internalLocalized("End Co-guest")
     static let confirmCloseText = internalLocalized("Exit Live")
     static let cancelText = internalLocalized("Cancel")
+    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
+    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
+    static let disableChatText = internalLocalized("You have been muted in the current room")
+    static let enableChatText = internalLocalized("You have been unmuted in the current room")
+    static let kickedOutOfSeat = internalLocalized("Kicked out of seat by room owner")
 }

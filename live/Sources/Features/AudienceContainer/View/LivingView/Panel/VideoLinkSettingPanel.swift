@@ -5,24 +5,22 @@
 //  Created by krabyu on 2023/10/25.
 //
 
+import AtomicXCore
 import Combine
 import Foundation
-import RTCRoomEngine
 import RTCCommon
 import TUICore
-import AtomicXCore
 
 class VideoLinkSettingPanel: RTCBaseView {
     private weak var coreView: LiveCoreView?
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
-    private let requestTimeOutValue = 60
+    private let requestTimeOutValue: TimeInterval = 60
     
     private var cancellableSet = Set<AnyCancellable>()
     private var needCloseCameraWhenViewDisappear: Bool = false
-    private var isPortrait: Bool = {
-        WindowUtils.isPortrait
-    }()
+    private var isPortrait: Bool = WindowUtils.isPortrait
+    private var lastApplyHashValue: Int?
     
     private let titleLabel: UILabel = {
         let view = UILabel()
@@ -48,22 +46,22 @@ class VideoLinkSettingPanel: RTCBaseView {
         designConfig.cornerRadius = 10.scale375Width()
         designConfig.type = .imageAboveTitle
         items.append(AudienceFeatureItem(normalTitle: .beautyText,
-                                 normalImage: internalImage("live_video_setting_beauty"),
-                                 designConfig: designConfig,
-                                 actionClosure: { [weak self] _ in
-            guard let self = self else { return }
-            self.routerManager.router(action: .present(.beauty))
-            let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
-            DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
-                                            Constants.DataReport.kDataReportPanelShowLiveRoomBeauty)
-        }))
+                                         normalImage: internalImage("live_video_setting_beauty"),
+                                         designConfig: designConfig,
+                                         actionClosure: { [weak self] _ in
+                                             guard let self = self else { return }
+                                             self.routerManager.router(action: .present(.beauty))
+                                             let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
+                                             DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
+                                                 Constants.DataReport.kDataReportPanelShowLiveRoomBeauty)
+                                         }))
         items.append(AudienceFeatureItem(normalTitle: .flipText,
-                                 normalImage: internalImage("live_video_setting_flip"),
-                                 designConfig: designConfig,
-                                 actionClosure: { [weak self] _ in
-            guard let self = self else { return }
-            coreView?.switchCamera(isFront: !manager.coreMediaState.isFrontCamera)
-        }))
+                                         normalImage: internalImage("live_video_setting_flip"),
+                                         designConfig: designConfig,
+                                         actionClosure: { [weak self] _ in
+                                             guard let self = self else { return }
+                                             manager.deviceStore.switchCamera(isFront: !manager.deviceState.isFrontCamera)
+                                         }))
         return items
     }()
     
@@ -158,42 +156,65 @@ class VideoLinkSettingPanel: RTCBaseView {
 }
 
 // MARK: Action
+
 extension VideoLinkSettingPanel {
     @objc func requestLinkMicButtonClick(_ sender: AudienceFeatureItemButton) {
-        manager.onStartRequestIntraRoomConnection()
-        coreView?.requestIntraRoomConnection(userId: "", timeOut: requestTimeOutValue, openCamera: true) { [weak self] in
+        manager.willApplying()
+        manager.toastSubject.send(.waitToLinkText)
+        manager.coGuestStore.applyForSeat(timeout: requestTimeOutValue, extraInfo: nil) { [weak self] result in
             guard let self = self else { return }
-            manager.toastSubject.send(.waitToLinkText)
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            manager.onRequestIntraRoomConnectionFailed()
-            let error = InternalError(code: code.rawValue, message: message)
-            manager.onError(error)
+            manager.stopApplying()
+            switch result {
+            case .failure(let err):
+                let error = InternalError(code: err.code, message: err.message)
+                manager.onError(error)
+            default: break
+            }
         }
+        
+        for item in cancellableSet.filter({ $0.hashValue == lastApplyHashValue }) {
+            item.cancel()
+            cancellableSet.remove(item)
+        }
+        
+        let cancelable = manager.coGuestStore.guestEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
+                    guard isAccept else { break }
+                    manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera, completion: nil)
+                    manager.deviceStore.openLocalMicrophone(completion: nil)
+                default: break
+                }
+            }
+        cancelable.store(in: &cancellableSet)
+        lastApplyHashValue = cancelable.hashValue
         routerManager.router(action: .routeTo(.audience))
     }
     
     private func subscribeCurrentRoute() {
         routerManager.subscribeRouterState(StateSelector(keyPath: \AudienceRouterState.routeStack))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] routeStack in
                 guard let self = self else { return }
                 if routeStack.last == .linkSetting {
-                    guard let coreView = coreView else { return }
-                    if !manager.coreMediaState.isCameraOpened {
-                        coreView.startCamera(useFrontCamera: manager.coreMediaState.isFrontCamera) { [weak self] in
-                            guard let self = self else { return }
-                            manager.onCameraOpened(localVideoView: previewView)
+                    manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera) { [weak self] result in
+                        guard let self = self else { return }
+                        switch result {
+                        case .success(()):
+                            manager.audienceMediaManager.setLocalVideoView(view: previewView)
                             needCloseCameraWhenViewDisappear = true
-                        } onError: { [weak self] code, msg in
-                            guard let self = self else { return }
-                            let error = InternalError(code: code.rawValue, message: msg)
+                        case .failure(let err):
+                            let error = InternalError(code: err.code, message: err.message)
                             manager.onError(error)
                         }
                     }
                 } else if !routeStack.contains(.linkSetting) {
                     if needCloseCameraWhenViewDisappear {
-                        coreView?.stopCamera()
+                        manager.deviceStore.closeLocalCamera()
                         needCloseCameraWhenViewDisappear = false
                     }
                 }

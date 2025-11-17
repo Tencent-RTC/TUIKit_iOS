@@ -91,17 +91,8 @@ extension TUILiveRoomAnchorPrepareViewController : AnchorPrepareViewDelegate {
         dismiss(animated: false) { [weak self, weak tmpView, weak rootVC] in
             guard let self = self, let tmpView = tmpView, let rootVC = rootVC else { return }
             
-            var liveInfo = LiveInfo()
-            liveInfo.roomId = roomId
-            liveInfo.name = state.roomName
-            liveInfo.coverUrl = state.coverUrl
-            liveInfo.isPublicVisible = state.privacyMode == .public
-            liveInfo.seatLayoutTemplateId = state.templateMode.rawValue
-            // 背景图默认为封面
-            liveInfo.backgroundUrl = state.coverUrl
-            liveInfo.pkTemplateId = state.pkTemplateMode.rawValue
-            
-            let anchorVC = TUILiveRoomAnchorViewController(liveInfo: liveInfo, coreView: coreView, behavior: .createRoom)
+            let param = LiveParams(liveID: roomId, prepareState: state)
+            let anchorVC = TUILiveRoomAnchorViewController(liveParams: param, coreView: coreView, behavior: .createRoom)
             anchorVC.modalPresentationStyle = .fullScreen
 
             willStartLive?(anchorVC)

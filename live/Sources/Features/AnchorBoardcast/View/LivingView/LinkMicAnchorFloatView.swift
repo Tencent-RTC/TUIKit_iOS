@@ -5,20 +5,56 @@
 //  Created by krabyu on 2023/11/4.
 //
 
-import SnapKit
-import UIKit
+import AtomicXCore
 import Combine
 import RTCCommon
-import RTCRoomEngine
-import AtomicXCore
+import SnapKit
+import UIKit
+
+class AnchorUserImageCell: UICollectionViewCell {
+    var user: LiveUserInfo? {
+        didSet {
+            if let url = URL(string: user?.avatarURL ?? "") {
+                avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
+            } else {
+                avatarImageView.image = .avatarPlaceholderImage
+            }
+        }
+    }
+
+    lazy var avatarImageView: UIImageView = {
+        let imageView = UIImageView(frame: .zero)
+        imageView.layer.cornerRadius = 40.scale375() * 0.5
+        imageView.layer.masksToBounds = true
+        contentView.addSubview(imageView)
+        return imageView
+    }()
+
+    private var isViewReady = false
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard !isViewReady else {
+            return
+        }
+        isViewReady = true
+        contentView.backgroundColor = .clear
+        avatarImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    func setImage(image: UIImage?) {
+        avatarImageView.kf.cancelDownloadTask()
+        avatarImageView.image = image
+    }
+}
 
 class LinkMicAnchorFloatView: UIView {
     private let manager: AnchorManager
     private let routerManager: AnchorRouterManager
     private var cancellableSet = Set<AnyCancellable>()
-    
 
-    private var applyList: [TUIUserInfo] = []
+    private var applyList: [LiveUserInfo] = []
     lazy var tipsLabel: UILabel = {
         let label = UILabel()
         label.textColor = .flowKitWhite
@@ -40,19 +76,19 @@ class LinkMicAnchorFloatView: UIView {
         collectionView.isUserInteractionEnabled = true
         collectionView.contentMode = .scaleToFill
         collectionView.dataSource = self
-        collectionView.register(UserImageCell.self, forCellWithReuseIdentifier: UserImageCell.cellReuseIdentifier)
+        collectionView.register(AnchorUserImageCell.self, forCellWithReuseIdentifier: AnchorUserImageCell.cellReuseIdentifier)
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
         collectionView.addGestureRecognizer(tap)
         return collectionView
     }()
-    
-    
+
     init(manager: AnchorManager, routerManager: AnchorRouterManager) {
         self.manager = manager
         self.routerManager = routerManager
         super.init(frame: .zero)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -68,17 +104,18 @@ class LinkMicAnchorFloatView: UIView {
     }
 
     private func subscribeSeatState() {
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoGuestState.applicantList))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] applyList in
                 guard let self = self else { return }
-                self.applyList = Array(applyList)
+                self.applyList = applyList
                 self.tipsLabel.text = .localizedReplace(.applyLinkMicCount, replace: String(applyList.count))
                 self.updateView()
             }
             .store(in: &cancellableSet)
     }
-    
+
     private func updateView() {
         collectionView.reloadData()
         collectionView.snp.updateConstraints { make in
@@ -103,7 +140,7 @@ extension LinkMicAnchorFloatView {
         layer.masksToBounds = true
         layer.borderWidth = 1
         layer.borderColor = UIColor.flowKitWhite.withAlphaComponent(0.2).cgColor
-        
+
         addSubview(tipsLabel)
         addSubview(collectionView)
     }
@@ -137,14 +174,15 @@ extension LinkMicAnchorFloatView: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: UserImageCell.cellReuseIdentifier, for: indexPath) as! UserImageCell
-        
-        if indexPath.row < 2 {
-            cell.user = applyList[indexPath.row]
-        } else {
-            let user = TUIUserInfo()
-            cell.user = user
-            cell.setImage(image: internalImage("live_more_audience_icon"))
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AnchorUserImageCell.cellReuseIdentifier, for: indexPath)
+        if let cell = cell as? AnchorUserImageCell {
+            if indexPath.row < 2 {
+                cell.user = applyList[indexPath.row]
+            } else {
+                let user = LiveUserInfo()
+                cell.user = user
+                cell.setImage(image: internalImage("live_more_audience_icon"))
+            }
         }
         return cell
     }

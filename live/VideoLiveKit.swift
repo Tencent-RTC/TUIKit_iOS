@@ -5,16 +5,16 @@
 //  Created by jack on 2024/9/29.
 //
 
+import AtomicXCore
 import Foundation
-import TUICore
 import RTCRoomEngine
+import TUICore
 
 @objcMembers
 public class VideoLiveKit: NSObject {
-    
     private static let sharedInstance = VideoLiveKit()
     
-    private override init() {}
+    override private init() {}
     
     private weak var viewController: UIViewController?
     
@@ -29,33 +29,31 @@ public class VideoLiveKit: NSObject {
     
     @MainActor
     public func startLive(roomId: String) {
-        
         if FloatWindow.shared.isShowingFloatWindow() {
-            if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == TUILogin.getUserID() {
-                getRootController()?.view.makeToast(.pushingToReturnText)
+            if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == LoginStore.shared.state.value.loginUserInfo?.userID {
+                getRootController()?.view.makeToast(message: .pushingToReturnText)
                 return
             } else if FloatWindow.shared.getIsLinking() {
-                getRootController()?.view.makeToast(.pushingToReturnText)
+                getRootController()?.view.makeToast(message: .pushingToReturnText)
                 return
             }
         }
-        let listManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .liveListManager)as? TUILiveListManager
-        guard let listManager = listManager else {return}
-        listManager.getLiveInfo(roomId){[weak self] liveInfo in
+        guard let listManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .liveListManager) as? TUILiveListManager else { return }
+        listManager.getLiveInfo(roomId) { [weak self] liveInfo in
             guard let self = self else { return }
-            if liveInfo.keepOwnerOnSeat == true {
-                self.showPrepareViewController(roomId: roomId)
+            if liveInfo.keepOwnerOnSeat {
+                showPrepareViewController(roomId: roomId)
             } else {
-                self.showAnchorViewController(roomId: roomId)
+                showAnchorViewController(roomId: roomId)
             }
-        } onError: { [weak self] error, message in
+        } onError: { [weak self] _, _ in
             guard let self = self else { return }
-            self.showPrepareViewController(roomId: roomId)
+            showPrepareViewController(roomId: roomId)
         }
     }
     
     @MainActor
-    public func stopLive(onSuccess: TUISuccessBlock?, onError: TUIErrorBlock?) {
+    public func stopLive(onSuccess: (() -> Void)?, onError: ((ErrorInfo) -> Void)?) {
         guard let vc = viewController as? TUILiveRoomAnchorViewController else {
             onSuccess?()
             return
@@ -65,13 +63,12 @@ public class VideoLiveKit: NSObject {
             onSuccess?()
             self.viewController = nil
         } onError: { code, message in
-            onError?(code, message)
+            onError?(ErrorInfo(code: code.rawValue, message: message))
         }
     }
     
     @MainActor
     public func joinLive(roomId: String) {
-        
         let viewController = TUILiveRoomAudienceViewController(roomId: roomId)
         viewController.modalPresentationStyle = .fullScreen
         
@@ -80,7 +77,7 @@ public class VideoLiveKit: NSObject {
     }
     
     @MainActor
-    public func leaveLive(onSuccess: TUISuccessBlock?, onError: TUIErrorBlock?) {
+    public func leaveLive(onSuccess: (() -> Void)?, onError: ((ErrorInfo) -> Void)?) {
         if FloatWindow.shared.isShowingFloatWindow() {
             FloatWindow.shared.releaseFloatWindow()
             onSuccess?()
@@ -90,17 +87,20 @@ public class VideoLiveKit: NSObject {
                 self.viewController?.dismiss(animated: true)
                 self.viewController = nil
                 onSuccess?()
-            } onError: { code, message in
-                onError?(code, message)
+            } onError: { err in
+                onError?(err)
             }
-        } else if let vc = viewController as? TUILiveRoomAnchorViewController  {
-            vc.getCoreView().leaveLiveStream { [weak self] in
+        } else if let vc = viewController as? TUILiveRoomAnchorViewController {
+            LiveListStore.shared.leaveLive { [weak self] result in
                 guard let self = self else { return }
-                self.viewController?.dismiss(animated: true)
-                self.viewController = nil
-                onSuccess?()
-            } onError: { error, message in
-                onError?(error, message)
+                switch result {
+                case .success():
+                    self.viewController?.dismiss(animated: true)
+                    self.viewController = nil
+                    onSuccess?()
+                case .failure(let err):
+                    onError?(err)
+                }
             }
         } else {
             onSuccess?()
@@ -111,8 +111,8 @@ public class VideoLiveKit: NSObject {
 }
 
 // MARK: - Private
+
 extension VideoLiveKit {
-    
     private func getRootController() -> UIViewController? {
         return TUITool.applicationKeywindow().rootViewController
     }
@@ -129,13 +129,13 @@ extension VideoLiveKit {
 
     private func showAnchorViewController(roomId: String) {
         var liveInfo = LiveInfo()
-        liveInfo.roomId = roomId
+        liveInfo.liveID = roomId
         let anchorVC = TUILiveRoomAnchorViewController(liveInfo: liveInfo, behavior: .enterRoom)
         anchorVC.modalPresentationStyle = .fullScreen
         getRootController()?.present(anchorVC, animated: true)
     }
 }
 
-extension String {
-    fileprivate static let pushingToReturnText = internalLocalized("Live streaming in progress. Please try again later.")
+private extension String {
+    static let pushingToReturnText = internalLocalized("Live streaming in progress. Please try again later.")
 }

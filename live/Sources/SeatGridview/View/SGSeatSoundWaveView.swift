@@ -8,67 +8,91 @@
 import UIKit
 
 class SGSeatSoundWaveView: UIView {
-    
-    private var isPlaying: Bool = false
-    private var needStopPlay: Bool = false
-    
-    private lazy var replicatorLayer: CAReplicatorLayer = {
-        let replicatorLayer = CAReplicatorLayer()
-        replicatorLayer.instanceCount = 3
-        replicatorLayer.instanceDelay = 0.5
-        return replicatorLayer
-    }()
-    
-    private lazy var waveLayer: CAShapeLayer = {
-        let shapeLayer = CAShapeLayer()
-        shapeLayer.backgroundColor = backgroundColor?.cgColor
-        shapeLayer.frame = bounds
-        shapeLayer.cornerRadius = layer.cornerRadius
-        return shapeLayer
-    }()
-    
-    func startWave() {
-        if isPlaying { return }
-        isPlaying = true
-        needStopPlay = false
-        let animation1 = CABasicAnimation(keyPath: "transform")
-        animation1.toValue = NSValue(caTransform3D: CATransform3DMakeScale(1.4, 1.4, 1))
-        animation1.duration = 2
-        animation1.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-        
-        let animation2 = CABasicAnimation(keyPath: "opacity")
-        animation2.fromValue = 1
-        animation2.toValue = 0
-        animation2.duration = 2
-        
-        let group = CAAnimationGroup()
-        group.animations = [animation1, animation2]
-        group.duration = 3
-        group.repeatCount = 1
-        group.delegate = self
-        group.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        waveLayer.add(group, forKey: "replicator.wave.animation")
-        
-        replicatorLayer.addSublayer(waveLayer)
-        layer.addSublayer(replicatorLayer)
-    }
-    
-    func stopWave() {
-        needStopPlay = true
-    }
-}
+    private var isAnimating = false
+    private let rippleDuration: CFTimeInterval = 2
 
-extension SGSeatSoundWaveView: CAAnimationDelegate {
-    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-        if flag {
-            isPlaying = false
-            if needStopPlay {
-                waveLayer.removeAllAnimations()
-                replicatorLayer.removeFromSuperlayer()
-                waveLayer.removeFromSuperlayer()
-            } else {
-                startWave()
-            }
+    private func setupRippleLayers() {
+        self.layer.sublayers?.forEach { $0.removeFromSuperlayer() }
+
+        let layers = [
+            createRippleLayer(color: .seatWaveColor, lineWidth: 5.0),
+            createRippleLayer(color: .seatWaveColor, lineWidth: 5.0)
+        ]
+        layers.forEach {
+            $0.opacity = 0
+            self.layer.addSublayer($0)
+        }
+    }
+
+    private func createRippleLayer(color: UIColor, lineWidth: CGFloat) -> CAShapeLayer {
+        let layer = CAShapeLayer()
+        layer.frame = self.bounds
+        layer.path = UIBezierPath(roundedRect: self.bounds,
+                                  cornerRadius: self.bounds.width/2).cgPath
+        layer.fillColor = UIColor.clear.cgColor
+        layer.strokeColor = color.cgColor
+        layer.lineWidth = lineWidth
+
+        return layer
+    }
+
+    func startRippleAnimation() {
+        guard !isAnimating else { return }
+        isAnimating = true
+
+        layoutIfNeeded()
+        setupRippleLayers()
+
+        guard let layers = self.layer.sublayers, layers.count >= 2 else { return }
+
+        let innerScaleAnimation = CABasicAnimation(keyPath: "transform.scale")
+        innerScaleAnimation.fromValue = 0.2
+        innerScaleAnimation.toValue = 1.0
+        innerScaleAnimation.duration = rippleDuration
+
+        let innerFadeInAnimation = CABasicAnimation(keyPath: "opacity")
+        innerFadeInAnimation.fromValue = 0
+        innerFadeInAnimation.toValue = 1
+        innerFadeInAnimation.duration = rippleDuration * 0.2
+
+        let innerLineWidthAnimation = CABasicAnimation(keyPath: "lineWidth")
+        innerLineWidthAnimation.fromValue = 20
+        innerLineWidthAnimation.toValue = 2
+        innerLineWidthAnimation.duration = rippleDuration
+
+        let innerFadeOutAnimation = CABasicAnimation(keyPath: "opacity")
+        innerFadeOutAnimation.fromValue = 1
+        innerFadeOutAnimation.toValue = 0.2
+        innerFadeOutAnimation.duration = rippleDuration * 0.6
+        innerFadeOutAnimation.beginTime = rippleDuration * 0.4
+
+        let firstInnerGroup = CAAnimationGroup()
+        firstInnerGroup.animations = [innerScaleAnimation, innerFadeInAnimation, innerLineWidthAnimation, innerFadeOutAnimation]
+        firstInnerGroup.duration = rippleDuration
+        firstInnerGroup.repeatCount = .infinity
+        firstInnerGroup.timingFunction = CAMediaTimingFunction(name: .easeOut)
+
+        let secondInnerGroup = firstInnerGroup.copy() as? CAAnimationGroup
+        secondInnerGroup?.beginTime = CACurrentMediaTime() + rippleDuration * 0.4
+
+        layers[0].add(firstInnerGroup, forKey: "innerRipple1")
+        layers[1].add(secondInnerGroup ?? firstInnerGroup, forKey: "innerRipple2")
+    }
+
+    private func createRippleAnimation(fromScale: CGFloat, toScale: CGFloat, duration: CFTimeInterval) -> CABasicAnimation {
+        let anim = CABasicAnimation(keyPath: "transform.scale")
+        anim.fromValue = fromScale
+        anim.toValue = toScale
+        anim.duration = duration
+        anim.repeatCount = .infinity
+        anim.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        return anim
+    }
+
+    func stopRippleAnimation() {
+        isAnimating = false
+        self.layer.sublayers?.forEach {
+            $0.removeAllAnimations()
         }
     }
 }

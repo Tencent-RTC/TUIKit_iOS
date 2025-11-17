@@ -76,7 +76,7 @@ class LiveListViewCell: UICollectionViewCell {
     }
     
     func updateView(liveInfo: LiveInfo) {
-        imageBgView.sd_setImage(with: URL(string: liveInfo.coverUrl),
+        imageBgView.sd_setImage(with: URL(string: liveInfo.coverURL),
                                 placeholderImage: internalImage("live_edit_info_default_cover_image"))
     }
     
@@ -108,7 +108,7 @@ class LiveListViewCell: UICollectionViewCell {
     
     func unmutePreviewVideoStream() {
         guard let roomId = roomId else { return }
-        if FloatWindow.shared.isShowingFloatWindow(), let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == TUILogin.getUserID() {
+        if FloatWindow.shared.isShowingFloatWindow(), let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == LoginStore.shared.state.value.loginUserInfo?.userID {
             LiveKitLog.info("\(#file)","\(#line)", "Anchor FloatWindow is showing, unmutePreviewVideoStream ignore, roomId:\(roomId)")
             return
         }

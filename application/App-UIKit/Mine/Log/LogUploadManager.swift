@@ -101,6 +101,17 @@ extension LogUploadManager {
         fileArray += liteAVSDKXlogFiles
         let imXlogFiles = getFilesFromDirectory(atPath: cachePath, withExtension: ".xlog")
         fileArray += imXlogFiles
+        
+        // 按文件修改时间排序（最新的在前）
+        fileArray.sort { file1, file2 in
+            let fileManager = FileManager.default
+            guard let date1 = try? fileManager.attributesOfItem(atPath: file1.filePath)[.modificationDate] as? Date,
+                  let date2 = try? fileManager.attributesOfItem(atPath: file2.filePath)[.modificationDate] as? Date else {
+                return false
+            }
+            return date1 > date2
+        }
+        
         fileModelArray = fileArray
         logUploadView.reloadAllComponents()
         logUploadView.alpha = 0.1

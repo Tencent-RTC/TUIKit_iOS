@@ -9,16 +9,17 @@ import Foundation
 import RTCRoomEngine
 import ImSDK_Plus
 import TUICore
+import AtomicXCore
 
 class LiveInfoService: NSObject {
     let state = LiveInfoState()
 
-    func initLiveInfo(liveInfo: TUILiveInfo) {
-        state.roomId = liveInfo.roomId
-        state.selfUserId = TUILogin.getUserID() ?? ""
-        state.ownerId = liveInfo.ownerId
-        state.ownerName = liveInfo.ownerName.isEmpty ? liveInfo.ownerId : liveInfo.ownerName
-        state.ownerAvatarUrl = liveInfo.ownerAvatarUrl
+    func initLiveInfo(liveInfo: AtomicLiveInfo) {
+        state.roomId = liveInfo.liveID
+        state.selfUserId = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
+        state.ownerId = liveInfo.liveOwner.userID
+        state.ownerName = liveInfo.liveOwner.userName.isEmpty ? liveInfo.liveOwner.userID : liveInfo.liveOwner.userName
+        state.ownerAvatarUrl = liveInfo.liveOwner.avatarURL
         V2TIMManager.sharedInstance().addFriendListener(listener: self)
         TUIRoomEngine.sharedInstance().addObserver(self)
     }
@@ -68,6 +69,7 @@ class LiveInfoService: NSObject {
             guard let self = self, let result = followResultList?.first else { return }
             if result.resultCode == 0 {
                 self.state.followingList = state.followingList.filter { $0.userId != userId}
+                self.getFansNumber()
             }
         } fail: { code, message in
             debugPrint("[RoomInfo] unfollowUser failed, error:\(code), message:\(String(describing: message))")

@@ -208,6 +208,7 @@ extension LSLiveInfoEditView {
             let item = PrepareActionItem(title: mode.getString(), designConfig: config, actionClosure: { [weak self] _ in
                 guard let self = self else { return }
                 state.privacyMode = mode
+                self.popupViewController?.dismiss(animated: true)
             })
             items.append(item)
         }
@@ -256,7 +257,7 @@ extension LSLiveInfoEditView: UITextFieldDelegate {
     }
 
     func textFieldDidEndEditing(_ textField: UITextField) {
-        var roomName: String = TUILogin.getNickName() ?? ""
+        var roomName: String = LoginStore.shared.state.value.loginUserInfo?.nickname ?? ""
         if let name = textField.text, !name.isEmpty {
             roomName = name
         }

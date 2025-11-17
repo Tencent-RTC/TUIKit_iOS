@@ -5,28 +5,15 @@
 //  Created by krabyu on 2024/9/4.
 //
 
-import UIKit
-import RTCCommon
+import AtomicXCore
 import Combine
-import RTCRoomEngine
+import RTCCommon
+import UIKit
 
 class AnchorBattleMemberInfoView: RTCBaseView {
-    private lazy var battleIdPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.battleId))
-    private lazy var connectedUserPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorCoHostState.connectedUsers))
-    private lazy var isBattleRunningPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.isBattleRunning))
-    private lazy var battleUsersPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.battleUsers))
-    private lazy var isOnDisplayResultPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
-    
     private let manager: AnchorManager
     private var userId: String
     private var cancellableSet: Set<AnyCancellable> = []
-    
-    private var battleState: AnchorBattleState {
-        manager.battleState
-    }
-    private var coHostState: AnchorCoHostState {
-        manager.coHostState
-    }
     
     private let maxRankingValue = 9
     
@@ -135,90 +122,39 @@ class AnchorBattleMemberInfoView: RTCBaseView {
     }
     
     private func subscribeBattleState() {
-        battleIdPublisher
-            .removeDuplicates()
+        manager.battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] battleId in
+            .sink { [weak self] event in
                 guard let self = self else { return }
-                if battleId.isEmpty {
-                    self.reset()
+                switch event {
+                case .onBattleEnded(battleInfo: _, reason: _):
+                    onBattleEnd()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + anchorBattleEndInfoDuration) { [weak self] in
+                        guard let self = self else { return }
+                        reset()
+                    }
+                default: break
                 }
             }
             .store(in: &cancellableSet)
         
-        connectedUserPublisher
+        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
             .removeDuplicates()
+            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore)).removeDuplicates())
             .receive(on: RunLoop.main)
-            .sink { [weak self] connectedUsers in
+            .sink { [weak self] battleUsers, battleScore in
                 guard let self = self else { return }
-                onConnectedListChanged(connectionUsers: connectedUsers)
-            }
-            .store(in: &cancellableSet)
-        
-        isBattleRunningPublisher
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] start in
-                guard let self = self else { return }
-                self.onBattleStartChanged(start: start)
-            }
-            .store(in: &cancellableSet)
-        
-        battleUsersPublisher
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] battleUsers in
-                guard let self = self else { return }
-                self.onBattleScoreChanged(battleUsers: battleUsers)
-            }
-            .store(in: &cancellableSet)
-        
-        
-        isOnDisplayResultPublisher
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .dropFirst()
-            .sink { [weak self] display in
-                guard let self = self else { return }
-                self.onBattleResultDisplay(display: display)
+                onBattleScoreChanged(battleUsers: battleUsers, score: battleScore)
             }
             .store(in: &cancellableSet)
     }
     
-    private func onConnectedListChanged(connectionUsers: [TUIConnectionUser]) {
-        onBattleScoreChanged(battleUsers: battleState.battleUsers)
-    }
-    
-    private func onBattleScoreChanged(battleUsers: [AnchorBattleUser]) {
-        guard !battleUsers.isEmpty && !coHostState.connectedUsers.isEmpty else {
-            manager.onBattleExited()
+    private func onBattleScoreChanged(battleUsers: [SeatUserInfo], score: [String: UInt]) {
+        guard manager.coHostState.connected.count > 2 else {
+            reset()
             return
         }
-        var battleUserMap: [String: AnchorBattleUser] = [:]
-        for battleUser in battleUsers {
-            battleUserMap[battleUser.userId] = battleUser
-        }
-        
-        // single battle: only 2 users in connecting and battling (1v1 battle)
-        var singleBattleUserMap: [String: AnchorBattleUser] = [:]
-        if coHostState.connectedUsers.count == 2 {
-            for connectedUser in coHostState.connectedUsers {
-                if let battleUser = battleUserMap[connectedUser.userId] {
-                    singleBattleUserMap[battleUser.userId] = battleUser
-                }
-            }
-        }
-        
-        let isSingleBattle = singleBattleUserMap.count == 2
-        isSingleBattle ? reset() : setData(user: battleUserMap[userId])
-    }
-    
-    private func isInBattle(battleUsers: [AnchorBattleUser]) -> Bool {
-        !battleUsers.isEmpty && !coHostState.connectedUsers.isEmpty
-    }
-
-    private func onBattleStartChanged(start: Bool) {
-        start ? onBattleStart() : onBattleEnd()
+        setData(user: battleUsers.filter { $0.userID == userId }.first, scoreMap: score)
     }
     
     private func onBattleResultDisplay(display: Bool) {
@@ -227,19 +163,45 @@ class AnchorBattleMemberInfoView: RTCBaseView {
         }
     }
     
-    private func setData(user: AnchorBattleUser?) {
+    private func setData(user: SeatUserInfo?, scoreMap: [String: UInt]) {
         isHidden = false
         if let user = user {
             showBattleView(show: true)
-            scoreLabel.text = "\(user.score)"
-            if user.ranking > 0 && user.ranking <= maxRankingValue {
-                rankImageView.image = internalImage("live_battle_ranking_\(user.ranking)_icon")
+            scoreLabel.text = "\(scoreMap[user.userID] ?? 0)"
+            let ranking = getRankingFromMap(user: user, scoreMap: scoreMap)
+            if ranking > 0, ranking <= maxRankingValue {
+                rankImageView.image = internalImage("live_battle_ranking_\(ranking)_icon")
             }
         } else {
             showBattleView(show: false)
         }
     }
     
+    private func getRankingFromMap(user: SeatUserInfo, scoreMap: [String: UInt]) -> Int {
+        struct TmpUser {
+            let userID: String
+            let score: UInt
+        }
+        var list: [TmpUser] = []
+        scoreMap.forEach { list.append(TmpUser(userID: $0.key, score: $0.value)) }
+        list.sort { lhs, rhs in
+            lhs.score > rhs.score
+        }
+        var rankMap: [String: Int] = [:]
+        for (index, tmpUser) in list.enumerated() {
+            let rank: Int
+            if index > 0 && tmpUser.score == list[index - 1].score {
+                // 当前分数和前一个相同，排名与前一个一致
+                rank = rankMap[list[index - 1].userID] ?? index
+            } else {
+                // 分数不同，排名为当前索引+1
+                rank = index + 1
+            }
+            rankMap[tmpUser.userID] = rank
+        }
+        return rankMap[user.userID] ?? 0
+    }
+
     private func reset() {
         isHidden = true
         scoreView.isHidden = true
@@ -252,31 +214,8 @@ class AnchorBattleMemberInfoView: RTCBaseView {
         connectionView.isHidden = show
     }
     
-    private func onBattleStart() {
-//        reset()
-    }
-    
     private func onBattleEnd() {
-        guard !battleState.battleUsers.isEmpty && !coHostState.connectedUsers.isEmpty else { return }
-        var battleUserMap: [String: AnchorBattleUser] = [:]
-        for battleUser in battleState.battleUsers {
-            battleUserMap[battleUser.userId] = battleUser
-        }
-        
-        // single battle: only 2 users in connecting and battling (1v1 battle)
-        var singleBattleUserMap: [String: AnchorBattleUser] = [:]
-        if coHostState.connectedUsers.count == 2 {
-            for connectedUser in coHostState.connectedUsers {
-                if let battleUser = battleUserMap[connectedUser.userId] {
-                    singleBattleUserMap[battleUser.userId] = battleUser
-                }
-            }
-        }
-        
-        let isSingleBattle = singleBattleUserMap.count == 2
-        if !isSingleBattle {
-            setData(user: battleUserMap[userId])
-        }
+        onBattleScoreChanged(battleUsers: manager.battleState.battleUsers, score: manager.battleState.battleScore)
     }
 }
 

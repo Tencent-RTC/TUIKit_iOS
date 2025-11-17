@@ -10,7 +10,7 @@ import UIKit
 class VRAlertContainerView: UIView {
     private var isViewReady: Bool = false
     private let contentView: UIView
-    
+    public var blackAreaClickClosure: (()->Void)?
     private let container: UIView = {
         let view = UIView(frame: .zero)
         view.layer.cornerRadius = 16
@@ -40,7 +40,15 @@ class VRAlertContainerView: UIView {
         activeViewConstraint()
         showContentViewWithAnimation()
     }
-    
+
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        guard let touch = touches.first else { return }
+        let point = touch.location(in: contentView)
+        guard !contentView.layer.contains(point) else { return }
+        blackAreaClickClosure?()
+    }
+
     private func showContentViewWithAnimation() {
         contentView.alpha = 0
         DispatchQueue.main.async { [weak self] in

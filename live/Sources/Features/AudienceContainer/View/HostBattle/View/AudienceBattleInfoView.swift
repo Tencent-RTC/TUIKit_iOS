@@ -5,42 +5,22 @@
 //  Created by krabyu /on 2024/9/4.
 //
 
-import UIKit
+import AtomicXCore
 import Combine
 import RTCCommon
-import RTCRoomEngine
-import AtomicXCore
-
-public enum AudienceBattleResultType {
-    case draw
-    case victory
-    case defeat
-}
+import UIKit
 
 class AudienceBattleInfoView: RTCBaseView {
-    private lazy var battleIdPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.battleId))
-    private lazy var connectedUsersPublisher = manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoHostState.connectedUserList))
-    private lazy var battleUsersPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.battleUsers))
-    private lazy var isBattleRunningPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.isBattleRunning))
-    private lazy var durationCountDownPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.durationCountDown))
-    private lazy var isOnDisplayResultPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.isOnDisplayResult))
-    
-    private var battleState: AudienceBattleState {
-        manager.battleState
-    }
-    private var coHostState: CoHostState {
-        manager.coreCoHostState
-    }
-    
     private weak var coreView: LiveCoreView?
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
     private let isOwner: Bool
     private var cancellableSet: Set<AnyCancellable> = []
     private var isBattleStarted = false
-    
+    private var timer: DispatchSourceTimer?
+
     private var ownerId: String {
-        manager.coreRoomState.ownerInfo.userId
+        manager.liveListState.currentLive.liveOwner.userID
     }
     
     init(manager: AudienceManager, routerManager: AudienceRouterManager, isOwner: Bool, coreView: LiveCoreView) {
@@ -138,77 +118,79 @@ class AudienceBattleInfoView: RTCBaseView {
             }
         }
     }
-
-    func updateView(userInfos: [AtomicXCore.BattleUserViewModel]) {
-        userInfos.forEach { battleUserViewModel in
-            for (index, battleUser) in manager.battleManager.state.battleUsers.enumerated() {
-                if battleUser.userId == battleUserViewModel.battleUser.userId {
-                    manager.battleManager.updateBattleUserRectFromIndex(rect: battleUserViewModel.rect, index: index)
-                    break
-                }
-            }
-        }
-        onBattleScoreChanged()
-    }
     
     private func subscribeBattleState() {
-        battleIdPublisher
-            .removeDuplicates()
+        manager.battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] battleId in
+            .sink { [weak self] event in
                 guard let self = self else { return }
-                if battleId.isEmpty {
-                    self.stopDisplayBattleResult()
+                switch event {
+                case .onBattleEnded(battleInfo: _, reason: _):
+                    onBattleEnd()
+                    manager.updateBattleDurationCountDown(0)
+                    timer?.cancel()
+                    timer = nil
+                    onResultDisplay(display: true)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + audienceBattleEndInfoDuration) { [weak self] in
+                        guard let self = self else { return }
+                        onResultDisplay(display: false)
+                    }
+                default: break
                 }
             }
             .store(in: &cancellableSet)
         
-        connectedUsersPublisher
+        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.currentBattleInfo))
             .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { [weak self] connectedUsers in
+            .sink { [weak self] battleInfo in
                 guard let self = self else { return }
-                self.onConnectedUsersChanged(connectionUsers: connectedUsers)
+                if let battleInfo = battleInfo {
+                    stopDisplayBattleResult()
+                    manager.updateBattleDurationCountDown(Int(battleInfo.config.duration + Double(battleInfo.startTime) - Date().timeIntervalSince1970))
+                    startCountDown()
+                    onBattleStart()
+                }
             }
             .store(in: &cancellableSet)
         
-        isBattleRunningPublisher
-            .dropFirst()
+        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore))
             .removeDuplicates()
+            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates())
             .receive(on: RunLoop.main)
-            .sink { [weak self] start in
+            .sink { [weak self] battleScore, battleUsers in
                 guard let self = self else { return }
-                self.onBattleStartChanged(start: start)
+                onBattleScoreChanged(battleUsers: battleUsers, score: battleScore)
             }
             .store(in: &cancellableSet)
         
-        battleUsersPublisher
-            .dropFirst()
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] battleUsers in
-                guard let self = self else { return }
-                self.onBattleScoreChanged(battleUsers: battleUsers)
-            }
-            .store(in: &cancellableSet)
-        
-        durationCountDownPublisher
+        manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.durationCountDown))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] duration in
                 guard let self = self else { return }
-                self.onDurationCountDown(duration: duration)
+                onDurationCountDown(duration: duration)
             }
             .store(in: &cancellableSet)
-        
-        isOnDisplayResultPublisher
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] display in
-                guard let self = self else { return }
-                self.onResultDisplay(display: display)
+    }
+    
+    private func startCountDown() {
+        if let timer = timer {
+            timer.cancel()
+        }
+        timer = DispatchSource.makeTimerSource(queue: DispatchQueue.main)
+        timer?.schedule(deadline: .now() + 1, repeating: 1)
+        timer?.setEventHandler { [weak self] in
+            guard let self = self else { return }
+            let t = manager.audienceBattleState.durationCountDown
+            if t > 0 {
+                manager.updateBattleDurationCountDown(t - 1)
+            } else {
+                timer?.cancel()
+                timer = nil
             }
-            .store(in: &cancellableSet)
+        }
+        timer?.resume()
     }
     
     private func subscribeFloatWindowState() {
@@ -222,85 +204,39 @@ class AudienceBattleInfoView: RTCBaseView {
             .store(in: &cancellableSet)
     }
     
-    private func onConnectedUsersChanged(connectionUsers: [TUIConnectionUser]) {
-        onBattleScoreChanged(battleUsers: battleState.battleUsers)
-    }
-    
-    private func onBattleScoreChanged(battleUsers: [AudienceBattleUser]) {
-        guard !battleState.battleUsers.isEmpty && !coHostState.connectedUserList.isEmpty else {
-            manager.onBattleExited()
-            return
-        }
-        onBattleScoreChanged()
-    }
-    
-    private func onBattleStartChanged(start: Bool) {
-        start ? onBattleStart() : onBattleEnd()
-    }
-    
     private func onDurationCountDown(duration: Int) {
         updateTime(duration)
     }
     
     private func onResultDisplay(display: Bool) {
         if display {
-            if let owner = battleState.battleUsers.first(where: { $0.userId == ownerId }) {
-                let type: AnchorBattleResultType = manager.battleManager.isBattleDraw() ? .draw :
-                    (owner.ranking == 1 ? .victory : .defeat)
-                showBattleResult(type: type)
-            }
+            showBattleResult(type: singleBattleScoreView.getResult())
         } else {
             stopDisplayBattleResult()
         }
     }
     
-    private func onBattleScoreChanged() {
-        let battleUsers = battleState.battleUsers
-        guard !battleUsers.isEmpty else { return }
+    private func onBattleScoreChanged(battleUsers: [SeatUserInfo], score: [String: UInt]) {
+        guard battleUsers.count == 2 else { return }
         
-        var battleUserMap: [String: AudienceBattleUser] = [:]
-        for battleUser in battleState.battleUsers {
-            battleUserMap[battleUser.userId] = battleUser
-        }
-        
-        // single battle: only 2 users in connecting and battling (1v1 battle)
-        var singleBattleUserMap: [String: AudienceBattleUser] = [:]
-        if coHostState.connectedUserList.count == 2 {
-            for connectedUser in coHostState.connectedUserList {
-                if let battleUser = battleUserMap[connectedUser.userId] {
-                    singleBattleUserMap[battleUser.userId] = battleUser
-                }
-            }
-        }
-        
-        let isSingleBattle = singleBattleUserMap.count == 2
-        if isSingleBattle {
-            let userList = Array(singleBattleUserMap.values)
-            // owner on left
-            let firstUser = userList[0]
-            let secondUser = userList[1]
-            if firstUser.rect.origin.x < secondUser.rect.origin.x {
-                updateData(leftUser: firstUser, rightUser: secondUser)
-            } else {
-                updateData(leftUser: secondUser, rightUser: firstUser)
-            }
-        }
+        let currentLiveID = manager.liveID
+        guard let leftUser = battleUsers.filter({ $0.liveID == currentLiveID }).first,
+              let rightUser = battleUsers.filter({ $0.liveID != currentLiveID }).first else { return }
+        let leftScore = score[leftUser.userID] ?? 0
+        let rightScore = score[rightUser.userID] ?? 0
+        singleBattleScoreView.isHidden = false
+        singleBattleScoreView.updateScores(leftScore: Int(leftScore), rightScore: Int(rightScore))
     }
     
-    private func updateData(leftUser: AudienceBattleUser, rightUser: AudienceBattleUser) {
-        singleBattleScoreView.isHidden = false
-        singleBattleScoreView.updateScores(leftScore: Int(leftUser.score), rightScore: Int(rightUser.score))
-//        singleBattleScoreView.updateScores(leftScore: leftUser.userId, rightScore: rightUser.userId)
-    }
-        
     private func onBattleStart() {
         isBattleStarted = true
         isHidden = false
         battleTimeView.isHidden = false
-        if isOwner && battleState.isShowingStartView {
+        if isOwner {
             startBattleImageView.isHidden = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.startBattleImageView.isHidden = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                guard let self = self else { return }
+                startBattleImageView.isHidden = true
             }
         }
     }
@@ -310,20 +246,20 @@ class AudienceBattleInfoView: RTCBaseView {
         battleClockButton.setTitle(.battleEndText, for: .normal)
     }
     
-    private func updateTime(_ time: Int){
-        let title = time == 0 ? String.battleEndText : String(format: "%d:%02d", time / 60 ,time % 60)
+    private func updateTime(_ time: Int) {
+        let title = time == 0 ? String.battleEndText : String(format: "%d:%02d", time / 60, time % 60)
         battleClockButton.setTitle(title, for: .normal)
     }
     
     private func showBattleResult(type: AnchorBattleResultType) {
         var imageName = ""
         switch type {
-            case .draw:
-                imageName = "live_battle_result_draw_icon"
-            case .victory:
-                imageName = "live_battle_result_win_icon"
-            case .defeat:
-                imageName = "live_battle_result_lose_icon"
+        case .draw:
+            imageName = "live_battle_result_draw_icon"
+        case .victory:
+            imageName = "live_battle_result_win_icon"
+        case .defeat:
+            imageName = "live_battle_result_lose_icon"
         }
         
         battleResultImageView.isHidden = false
@@ -339,4 +275,4 @@ class AudienceBattleInfoView: RTCBaseView {
 
 private extension String {
     static let battleEndText = internalLocalized("PK End")
-    }
+}

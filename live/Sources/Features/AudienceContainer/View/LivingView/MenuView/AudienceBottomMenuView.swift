@@ -32,7 +32,7 @@ class AudienceBottomMenuView: RTCBaseView {
     private var menus = [AudienceButtonMenuInfo]()
     
     private lazy var likeButton: LikeButton = {
-        let likeButton = LikeButton(roomId: manager.roomState.roomId)
+        let likeButton = LikeButton(roomId: manager.liveID)
         return likeButton
     }()
     
