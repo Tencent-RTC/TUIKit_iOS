@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import RTCCommon
-import RTCRoomEngine
 import AtomicXCore
 
 class AudienceSettingPanel: UIView {
@@ -89,20 +88,18 @@ class AudienceSettingPanel: UIView {
     }
     
     private func subscribeCoGuestState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.coGuestStatus))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .receive(on: RunLoop.main)
             .removeDuplicates()
-            .sink { [weak self] coGuestStatus in
-                guard let self = self else {
-                    return
-                }
-                self.reloadItems()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                reloadItems()
             }
             .store(in: &cancellableSet)
     }
     
     private func reloadItems() {
-        let enableMultiQuality = manager.mediaState.playbackQualityList.count > 1 && manager.coGuestState.coGuestStatus == .none
+        let enableMultiQuality = manager.audienceMediaState.playbackQualityList.count > 1 && !manager.coGuestState.connected.isOnSeat()
         let containsResolution = items.contains { $0 == .resolution }
         if enableMultiQuality {
             if !containsResolution {
@@ -147,10 +144,10 @@ extension AudienceSettingPanel {
             guard let self = self else { return }
             self.routerManager.router(
                 action: .present(.videoQualitySelection(
-                    resolutions: manager.mediaState.playbackQualityList,
+                    resolutions: manager.audienceMediaState.playbackQualityList,
                     selectedClosure: { [weak self] (quality) in
                         guard let self = self else { return }
-                        self.manager.mediaManager.switchPlaybackQuality(quality: quality)
+                        self.manager.audienceMediaManager.switchPlaybackQuality(quality: quality)
                         self.routerManager.router(action: .dismiss())
                     })))
         }))

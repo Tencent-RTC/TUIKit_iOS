@@ -6,7 +6,7 @@
 //
 
 import Kingfisher
-import TUICore
+import AtomicXCore
 import UIKit
 
 typealias TUIGiftAnimationCompletionBlock = (Bool) -> Void
@@ -67,7 +67,7 @@ class TUIGiftBulletView: UIView {
         let userID = giftData.sender.userID
         var nickName = giftData.sender.userName.isEmpty ? userID : giftData.sender.userName
         let avatarUrl = giftData.sender.avatarURL
-        if userID == (TUILogin.getUserID() ?? "") {
+        if userID == (LoginStore.shared.state.value.loginUserInfo?.userID ?? "") {
             nickName = .meText
         } else {
             if nickName.count == 0 {

@@ -14,18 +14,24 @@ class VRRouterControlCenter {
     
     private var rootRoute: VRRoute
     private var routerManager: VRRouterManager
-    private let manager: VoiceRoomManager
+    private let liveID: String
+    private var toastService: VRToastService
     
     private weak var rootViewController: UIViewController?
     private var cancellableSet = Set<AnyCancellable>()
     private var presentedRouteStack: [VRRoute] = []
     private var presentedViewControllerMap: [VRRoute: UIViewController] = [:]
     
-    init(rootViewController: UIViewController, rootRoute: VRRoute, routerManager: VRRouterManager, manager: VoiceRoomManager) {
+    init(liveID: String,
+         rootViewController: UIViewController,
+         rootRoute: VRRoute,
+         routerManager: VRRouterManager,
+         toastService: VRToastService) {
+        self.liveID = liveID
         self.rootViewController = rootViewController
         self.rootRoute = rootRoute
         self.routerManager = routerManager
-        self.manager = manager
+        self.toastService = toastService
         routerManager.setRootRoute(route: rootRoute)
     }
     
@@ -104,8 +110,14 @@ extension VRRouterControlCenter {
         if let view = getRouteDefaultView(route: route) {
             var presentedViewController: UIViewController = UIViewController()
             switch route {
-            case .alert(_):
+            case .alert(_, _):
                 presentedViewController = presentAlert(alertView: view)
+            case .listMenu(_, let layout):
+                if layout == .center {
+                    presentedViewController = presentPopup(view: view, route: route, portraitPosition: .center(horizontalPadding: 47.scale375()))
+                } else {
+                    presentedViewController = presentPopup(view: view, route: route)
+                }
             default:
                 presentedViewController = presentPopup(view: view, route: route)
             }
@@ -171,12 +183,12 @@ extension VRRouterControlCenter {
     private func getRouteDefaultView(route: VRRoute) -> UIView? {
         var view: UIView?
         switch route {
-        case .voiceLinkControl(let coreView):
-            view = VRSeatManagerPanel(manager: manager, routerManager: routerManager, coreView: coreView)
-        case .linkInviteControl(let coreView, let index):
-            view = VRSeatInvitationPanel(manager: manager, routerManager: routerManager, coreView: coreView, seatIndex: index)
-        case .userControl(let coreView, let seatInfo):
-            view = VRUserManagerPanel(manager: manager, routerMangear: routerManager, coreView: coreView, seatInfo: seatInfo)
+        case .voiceLinkControl:
+            view = VRSeatManagerPanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
+        case .linkInviteControl(let index):
+            view = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: index)
+        case .userControl(let imStore, let seatInfo):
+            view = VRUserManagerPanel(liveID: liveID, imStore: imStore, toastService: toastService, routerManager: routerManager, seatInfo: seatInfo)
         case .featureSetting(let settingPanelModel):
             view = VRSettingPanel(settingPanelModel: settingPanelModel)
         case .audioEffect:
@@ -186,32 +198,41 @@ extension VRRouterControlCenter {
                 self.routerManager.router(action: .dismiss())
             }
             view = audioEffect
-        case .listMenu(let data):
+        case .listMenu(let data, _):
             let actionPanel = ActionPanel(panelData: data)
             actionPanel.cancelActionClosure = { [weak self] in
                 guard let self = self else { return }
                 self.routerManager.router(action: .dismiss())
             }
             view = actionPanel
-        case .systemImageSelection(let imageType, let isSetToService):
+        case .systemImageSelection(let imageType, let sceneType):
             let imageConfig = VRSystemImageFactory.getImageAssets(imageType: imageType)
             let systemImageSelectionPanel = VRImageSelectionPanel(configs: imageConfig,
                                                                   panelMode: imageType == .cover ? .cover : .background,
-                                                                  isSetToService: isSetToService,
-                                                                  manager: manager)
+                                                                  sceneType: sceneType)
             systemImageSelectionPanel.backButtonClickClosure = { [weak self] in
                 guard let self = self else { return }
                 self.routerManager.router(action: .dismiss())
             }
             view = systemImageSelectionPanel
-        case .prepareSetting:
-            view = VRPrepareSettingPanel(manager: manager, routerManager: routerManager)
-        case .alert(let info):
-            view = VRAlertPanel(alertInfo: info)
+        case .prepareSetting(let prepareStore):
+            view = VRPrepareSettingPanel(prepareStore: prepareStore, routerManager: routerManager)
+        case .alert(let info,let second):
+                view = VRAlertPanel(alertInfo: info,autoDismissAfter: second)
         case .giftView:
-            view = GiftListPanel(roomId: manager.roomState.roomId)
-        case .layout:
-            view = VRLayoutPanel(manager: manager,routerManager: routerManager)
+            view = GiftListPanel(roomId: liveID)
+        case .layout(let prepareStore):
+            view = VRLayoutPanel(prepareStore: prepareStore, routerManager: routerManager)
+        case .connectionControl:
+                let panel = VRCoHostManagerPanel(liveID: liveID,toastService: toastService,routerManager: routerManager)
+            panel.onClickBack = { [weak self] in
+                guard let self = self else { return }
+                routerManager.router(action: .dismiss())
+            }
+            view = panel
+        case .coHostUserControl(let seatInfo,let type):
+            let panel = VRCoHostUserManagerPanel(liveID: liveID,seatInfo: seatInfo, routerManager: routerManager, type: type, toastService: toastService)
+            view = panel
         default:
             break
         }
@@ -223,7 +244,7 @@ extension VRRouterControlCenter {
 extension VRRouterControlCenter {
     private func isTempPanel(route: VRRoute) -> Bool {
         switch route {
-        case .alert(_), .userControl(_, _):
+            case .alert, .userControl, .coHostUserControl:
             return true
         default:
             return false
@@ -236,6 +257,8 @@ extension VRRouterControlCenter {
             return false
         case .layout:
             return false
+        case .listMenu(_, let layout):
+            return layout == .center
         default:
             return true
         }
@@ -243,8 +266,6 @@ extension VRRouterControlCenter {
     
     private func supportAnimation(route: VRRoute) -> Bool{
         switch route {
-        case .alert(_):
-            return false
         default:
             return true
         }
@@ -253,9 +274,9 @@ extension VRRouterControlCenter {
     private func getSafeBottomViewBackgroundColor(route: VRRoute) -> UIColor {
         var safeBottomViewBackgroundColor = UIColor.g2
         switch route {
-        case .listMenu(_):
+        case .listMenu(_, _):
             safeBottomViewBackgroundColor = .white
-        case .featureSetting(_), .giftView:
+        case .featureSetting(_), .giftView, .connectionControl:
             safeBottomViewBackgroundColor = .bgOperateColor
         default:
             break
@@ -266,19 +287,28 @@ extension VRRouterControlCenter {
 
 // MARK: - Popup
 extension VRRouterControlCenter {
-    private func presentPopup(view: UIView, route: VRRoute) -> UIViewController {
+    private func presentPopup(view: UIView, route: VRRoute, portraitPosition: MenuContainerViewPosition = .bottom) -> UIViewController {
         let safeBottomViewBackgroundColor = getSafeBottomViewBackgroundColor(route: route)
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: safeBottomViewBackgroundColor)
-        let popupViewController = PopupViewController(contentView: menuContainerView,
-                                                 supportBlurView: supportBlurView(route: route))
+        let menuContainerView = MenuContainerView(contentView: view,
+                                                  safeBottomViewBackgroundColor: safeBottomViewBackgroundColor,
+                                                  portraitPosition: portraitPosition)
         menuContainerView.blackAreaClickClosure = { [weak self] in
             guard let self = self else { return }
             self.routerManager.router(action: .dismiss())
         }
-        guard let rootViewController = rootViewController else { return UIViewController()}
+        guard let rootViewController = rootViewController else { return UIViewController() }
         let presentingViewController = getPresentingViewController(rootViewController)
-        presentingViewController.present(popupViewController, animated: true)
-        return popupViewController
+        let alertTransitionAnimator = AlertTransitionAnimator(duration: 0.5,transitionStyle: .present,transitionPosition: .fade)
+        if portraitPosition != .bottom {
+            let popupViewController = PopupViewController(contentView: menuContainerView,
+                                                          supportBlurView: supportBlurView(route: route),alertTransitionAnimator: alertTransitionAnimator)
+            presentingViewController.present(popupViewController, animated: true)
+            return popupViewController
+        } else  {
+            let popupViewController = PopupViewController(contentView: menuContainerView,supportBlurView: supportBlurView(route: route))
+            presentingViewController.present(popupViewController, animated: true)
+            return popupViewController
+        }
     }
 }
 
@@ -286,12 +316,13 @@ extension VRRouterControlCenter {
 extension VRRouterControlCenter {
     private func presentAlert(alertView: UIView) -> UIViewController {
         let alertContainerView = VRAlertContainerView(contentView: alertView)
-        let alerViewController = PopupViewController(contentView: alertContainerView,
-                                                 supportBlurView: false)
+        let alertTransitionAnimator = AlertTransitionAnimator(duration: 0.2,transitionStyle: .present,transitionPosition: .fade)
+        let popupViewController = PopupViewController(contentView: alertContainerView,
+                                                      supportBlurView: true,alertTransitionAnimator: alertTransitionAnimator)
         guard let rootViewController = rootViewController else { return UIViewController()}
         let presentingViewController = getPresentingViewController(rootViewController)
-        presentingViewController.present(alerViewController, animated: false)
-        
-        return alerViewController
+        presentingViewController.present(popupViewController, animated: true)
+
+        return popupViewController
     }
 }

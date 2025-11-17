@@ -20,9 +20,27 @@ private struct RequestCallback {
 }
 
 public class SeatGridView: UIView {
+    private var isConnection: Bool = false {
+        didSet {
+            updateLayoutForCurrentMode()
+        }
+    }
+
+    private lazy var coHostContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.isHidden = true
+        return view
+    }()
+
+    private var battleContainerView: UIView?
+
+    private var coHostViews: [UIView] = []
+
     // MARK: - public property.
     public weak var delegate: SGSeatViewDelegate?
-    
+    public weak var sgDelegate: SGHostAndBattleViewDelegate?
+
     public init() {
         super.init(frame: .zero)
         SGDataReporter.reportEventData(event: .panelShowSeatGridView)
@@ -50,12 +68,7 @@ public class SeatGridView: UIView {
     private var observers: SGSeatGridObserverList = SGSeatGridObserverList()
     private var cancellableSet: Set<AnyCancellable> = []
     private var isViewReady = false
-    private var liveId = ""
-    
-    private var applyCallback: RequestCallback?
-    private var inviteCallbacks: [String: RequestCallback] = [:]
-    
-    private var invitation: LiveUserInfo?
+    private var liveID = ""
     
     // MARK: - Private calculate property.
     
@@ -72,13 +85,8 @@ public class SeatGridView: UIView {
         return view
     }()
     
-    private var selfInfo: TUIUserInfo {
-        let selfId = TUIRoomEngine.getSelfInfo().userId
-        return TUIUserInfo(userId: selfId)
-    }
-    
     private var isSelfOwner: Bool {
-        let selfId = TUIRoomEngine.getSelfInfo().userId
+        let selfId = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
         let ownerId = liveListStore.state.value.currentLive.liveOwner.userID
         if selfId.isEmpty || ownerId.isEmpty {
             return false
@@ -90,7 +98,7 @@ public class SeatGridView: UIView {
 // MARK: - public API
 extension SeatGridView {
     public func setLiveId(_ liveId: String) {
-        self.liveId = liveId
+        self.liveID = liveId
     }
     
     public func setLayoutMode(layoutMode: SGLayoutMode, layoutConfig: SGSeatViewLayoutConfig? = nil) {
@@ -155,8 +163,7 @@ extension SeatGridView {
     }
 }
 
-// MARK: - deprecated public API
-@available(*, deprecated)
+// MARK: - public API
 extension SeatGridView {
     public func addObserver(observer: SeatGridViewObserver) {
         observers.addObserver(observer)
@@ -165,302 +172,7 @@ extension SeatGridView {
     public func removeObserver(observer: SeatGridViewObserver) {
         observers.removeObserver(observer)
     }
-    
-    public func startVoiceRoom(liveInfo: TUILiveInfo, onSuccess: @escaping TUILiveInfoBlock, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewStartRoom)
-        
-        let liveInfo = AtomicXCore.LiveInfo.init(from: liveInfo)
-        liveListStore.createLive(liveInfo) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let liveInfo):
-                let tuiLiveInfo = TUILiveInfo.init(from: liveInfo)
-                notifyEnterRoom()
-                onSuccess(tuiLiveInfo)
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-
-    public func stopVoiceRoom(onSuccess: @escaping TUIStopLiveBlock, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewStopRoom)
-        
-        liveListStore.endLive { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let data):
-                notifyExitRoom()
-                onSuccess(data)
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-
-    public func joinVoiceRoom(roomId: String, onSuccess: @escaping TUILiveInfoBlock, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewJoinRoom)
-
-        liveListStore.joinLive(liveID: roomId) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let liveInfo):
-                let tuiLiveInfo = TUILiveInfo.init(from: liveInfo)
-                notifyEnterRoom()
-                onSuccess(tuiLiveInfo)
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-
-    public func leaveVoiceRoom(onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewLeaveRoom)
-
-        liveListStore.leaveLive {[weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success():
-                notifyExitRoom()
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-    
-    public func updateRoomSeatMode(seatMode: TUISeatMode, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewUpdateSeatMode)
-        
-        var currentLive = liveListStore.state.value.currentLive
-        guard !currentLive.isEmpty else {
-            onError(TUIError.failed.rawValue, "Not in room")
-            return
-        }
-        currentLive.seatMode = TakeSeatMode.init(from: seatMode)
-        let modifyFlag = AtomicLiveInfo.ModifyFlag.seatMode
-        liveListStore.updateLiveInfo(currentLive, modifyFlag: modifyFlag) { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
 }
-
-@available(*, deprecated)
-extension SeatGridView {
-    public func takeSeat(index: Int,
-                  timeout: Int,
-                  onAccepted: @escaping SGOnRequestAccepted,
-                  onRejected: @escaping SGOnRequestRejected,
-                  onCancelled: @escaping SGOnRequestCancelled,
-                  onTimeout: @escaping SGOnRequestTimeout,
-                  onError: @escaping SGOnRequestError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewTakeSeat)
-        
-        if isAutoOnSeat() {
-            seatStore.takeSeat(seatIndex: index) { [weak self] result in
-                guard let self = self else { return }
-                
-                switch result {
-                case .success():
-                    onAccepted(selfInfo)
-                case .failure(let error):
-                    onError(selfInfo, error.code, error.message)
-                }
-            }
-            return
-        }
-        
-        applyCallback = RequestCallback(onAccepted: onAccepted,
-                                        onRejected: onRejected,
-                                        onCancelled: onCancelled,
-                                        onTimeout: onTimeout,
-                                        onError: onError)
-        coGuestStore.applyForSeat(seatIndex: index,
-                                  timeout: TimeInterval(timeout),
-                                  extraInfo: nil) { [weak self] result in
-            guard let self = self else { return }
-
-            switch result {
-            case .failure(let error):
-                onError(selfInfo, error.code, error.message)
-            default: break
-            }
-        }
-    }
-    
-    public func cancelRequest(userId: String, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewCancelRequest)
-        
-        if !isSelfOwner {
-            coGuestStore.cancelApplication { [weak self] result in
-                guard let self = self else { return }
-                
-                switch result {
-                case .success():
-                    applyCallback?.onCancelled(selfInfo)
-                    applyCallback = nil
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-        } else {
-            coGuestStore.cancelInvitation(inviteeID: userId) { [weak self] result in
-                guard let self = self else { return }
-            
-                switch result {
-                case .success():
-                    inviteCallbacks[userId]?.onCancelled(selfInfo)
-                    inviteCallbacks.removeValue(forKey: userId)
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-        }
-    }
-    
-    public func responseRemoteRequest(userId: String, agree: Bool, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewResponseRequest)
-        
-        if agree {
-            acceptRemoteRequest(userId: userId, onSuccess: onSuccess, onError: onError)
-        } else {
-            rejectRemoteRequest(userId: userId, onSuccess: onSuccess, onError: onError)
-        }
-    }
-    
-    public func moveToSeat(index: Int, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewMoveToSeat)
-        
-        seatStore.moveUserToSeat(userID: selfInfo.userId, targetIndex: index, policy: .abortWhenOccupied) { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-    
-    public func leaveSeat(onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewLeaveSeat)
-        
-        coGuestStore.disConnect { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-        
-    }
-    
-    public func lockSeat(index: Int, lockMode: TUISeatLockParams, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewLockSeat)
-        // TOOD: 暂时调用engine接口，之后需要调整接口和seatStore形式保持一致
-        TUIRoomEngine.sharedInstance().lockSeatByAdmin(index, lockMode: lockMode) {
-            onSuccess()
-        } onError: { error, message in
-            onError(error.rawValue, message)
-        }
-    }
-    
-    public func takeUserOnSeatByAdmin(index: Int,
-                                      timeout: Int,
-                                      userId: String,
-                                      onAccepted: @escaping SGOnRequestAccepted,
-                                      onRejected: @escaping SGOnRequestRejected,
-                                      onCancelled: @escaping SGOnRequestCancelled,
-                                      onTimeout: @escaping SGOnRequestTimeout,
-                                      onError: @escaping SGOnRequestError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewTakeUserOnSeat)
-        
-        inviteCallbacks[userId] = RequestCallback(onAccepted: onAccepted,
-                                                  onRejected: onRejected,
-                                                  onCancelled: onCancelled,
-                                                  onTimeout: onTimeout,
-                                                  onError: onError)
-        
-        coGuestStore.inviteToSeat(userID: userId,
-                                  seatIndex: index,
-                                  timeout: TimeInterval(timeout),
-                                  extraInfo: nil) { [weak self] result in
-            guard let self = self else { return }
-
-            switch result {
-            case .failure(let error):
-                onError(selfInfo, error.code, error.message)
-            default: break
-            }
-        }
-    }
-    
-    public func kickUserOffSeatByAdmin(userId: String, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewKickUserOffSeat)
-        
-        seatStore.kickUserOutOfSeat(userID: userId) { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-}
-
-@available(*, deprecated)
-extension SeatGridView {
-    public func startMicrophone(onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewStartMicrophone)
-        
-        deviceStore.openLocalMicrophone { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-    
-    public func stopMicrophone() {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewStopMicrophone)
-       
-        deviceStore.closeLocalMicrophone()
-    }
-    
-    public func muteMicrophone() {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewMuteMicrophone)
-       
-        seatStore.muteMicrophone()
-    }
-    
-    public func unmuteMicrophone(onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        SGDataReporter.reportEventData(event: .methodCallSeatGridViewUnmuteMicrophone)
-
-        seatStore.unmuteMicrophone { result in
-            switch result {
-            case .success():
-                onSuccess()
-            case .failure(let error):
-                onError(error.code, error.message)
-            }
-        }
-    }
-}
-
 extension SeatGridView: SGViewManagerDataProvider {
     var deviceStore: DeviceStore {
         return DeviceStore.shared
@@ -471,168 +183,42 @@ extension SeatGridView: SGViewManagerDataProvider {
     }
     
     var coGuestStore: CoGuestStore {
-        return CoGuestStore.create(liveID: liveId)
+        return CoGuestStore.create(liveID: liveID)
     }
     
     var seatStore: LiveSeatStore {
-        return LiveSeatStore.create(liveID: liveId)
+        return LiveSeatStore.create(liveID: liveID)
     }
-    
+
+    var coHostStore: CoHostStore {
+        return CoHostStore.create(liveID: liveID)
+    }
+
+    var battleStore: BattleStore {
+        return BattleStore.create(liveID: liveID)
+    }
+
     var seatListCount: Int {
         return seatStore.state.value.seatList.count
     }
 }
 
 extension SeatGridView {
-    private func setupliveEventListener() {
-        liveListStore.liveListEventPublisher
+
+    private func subscribeBattleState() {
+        battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
-                
+
                 switch event {
-                case .onLiveEnded(liveID: let liveId, reason: _, message: _):
-                    guard self.liveId == liveId else { return }
-                    notifyObserverEvent { observer in
-                        observer.onRoomDismissed(roomId: liveId)
-                    }
-                case  .onKickedOutOfLive(liveID: let liveId, reason: let reason, message: let message):
-                    notifyObserverEvent { observer in
-                        observer.onKickedOutOfRoom(roomId: liveId, reason: .init(from: reason), message: message)
-                    }
+                    case .onBattleStarted(_, _, _):
+                        createBattleContainerView()
+                    default:
+                        break
                 }
             }
             .store(in: &cancellableSet)
-    }
-    
-    private func setupGuestEventListener() {
-        coGuestStore.guestEventPublisher
-            .receive(on: RunLoop.main)
-             .sink { [weak self] event in
-                 guard let self = self else { return }
-                 
-                 switch event {
-                 case .onHostInvitationReceived(hostUser: let hostUser):
-                     invitation = hostUser
-                     notifyObserverEvent{ observer in
-                         observer.onSeatRequestReceived(type: .inviteToTakeSeat, userInfo: TUIUserInfo(from: hostUser))
-                     }
-                 case .onHostInvitationCancelled(hostUser: let hostUser):
-                     invitation = nil
-                     notifyObserverEvent { observer in
-                         observer.onSeatRequestCancelled(type: .inviteToTakeSeat, userInfo: TUIUserInfo(from: hostUser))
-                     }
-                 case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: let handleUser):
-                     if isAccept {
-                         applyCallback?.onAccepted(.init(from: handleUser))
-                     } else {
-                         applyCallback?.onRejected(.init(from: handleUser))
-                     }
-                     applyCallback = nil
-                 case .onGuestApplicationNoResponse(reason: let reason):
-                     if reason == .timeout {
-                         applyCallback?.onTimeout(TUIUserInfo(userId: selfInfo.userId))
-                     }
-                     applyCallback = nil
-                 case .onKickedOffSeat(seatIndex: _, hostUser: let handleUser):
-                     notifyObserverEvent { observer in
-                         observer.onKickedOffSeat(userInfo: TUIUserInfo(from: handleUser))
-                     }
-                 }
-             }
-             .store(in: &cancellableSet)
-     }
-    
-    private func setupHostEventListener() {
-        coGuestStore.hostEventPublisher
-            .receive(on: RunLoop.main)
-            .sink { [weak self] event in
-                guard let self = self else { return }
-                
-                switch event {
-                case .onGuestApplicationReceived(guestUser: let guestUser):
-                    notifyObserverEvent { observer in
-                        observer.onSeatRequestReceived(type: .applyToTakeSeat, userInfo: TUIUserInfo(from: guestUser))
-                    }
-                case .onGuestApplicationCancelled(guestUser: let guestUser):
-                    notifyObserverEvent { observer in
-                        observer.onSeatRequestCancelled(type: .applyToTakeSeat, userInfo: TUIUserInfo(from: guestUser))
-                    }
-                case .onGuestApplicationProcessedByOtherHost(guestUser: _, hostUser: _):
-                    break
-                case .onHostInvitationResponded(isAccept: let isAccept, guestUser: let guestUser):
-                    if isAccept {
-                        inviteCallbacks[guestUser.userID]?.onAccepted(.init(from: guestUser))
-                    } else {
-                        inviteCallbacks[guestUser.userID]?.onRejected(.init(from: guestUser))
-                    }
-                    inviteCallbacks.removeValue(forKey: guestUser.userID)
-                case .onHostInvitationNoResponse(guestUser: let guestUser, reason: let reason):
-                    if reason == .timeout {
-                        inviteCallbacks[guestUser.userID]?.onTimeout(.init(from: guestUser))
-                    }
-                    inviteCallbacks.removeValue(forKey: guestUser.userID)
-                }
-            }
-            .store(in: &cancellableSet)
-    }
-    
-    func acceptRemoteRequest(userId: String, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        if let receivedInvitation = invitation, receivedInvitation.userID == userId {
-            coGuestStore.acceptInvitation(inviterID: userId) { [weak self] result in
-                guard let self = self else { return }
-                
-                switch result {
-                case .success():
-                    invitation = nil
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-            return
-        }
-        
-        if coGuestStore.state.value.applicants.contains(where: { $0.userID == userId }) {
-            coGuestStore.acceptApplication(userID: userId) { result in
-                switch result {
-                case .success():
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-            return
-        }
-    }
-    
-    func rejectRemoteRequest(userId: String, onSuccess: @escaping SGOnSuccess, onError: @escaping SGOnError) {
-        if let receivedInvitation = invitation, receivedInvitation.userID == userId {
-            coGuestStore.rejectInvitation(inviterID: userId) { [weak self] result in
-                guard let self = self else { return }
-                
-                switch result {
-                case .success():
-                    invitation = nil
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-            return
-        }
-        
-        if coGuestStore.state.value.applicants.contains(where: { $0.userID == userId }) {
-            coGuestStore.rejectApplication(userID: userId) { result in
-                switch result {
-                case .success():
-                    onSuccess()
-                case .failure(let error):
-                    onError(error.code, error.message)
-                }
-            }
-            return
-        }
     }
 }
 
@@ -741,10 +327,16 @@ private extension SeatGridView {
     
     private func constructViewHierarchy() {
         addSubview(seatContainerView)
+        addSubview(coHostContainerView)
+        bringSubviewToFront(coHostContainerView)
     }
     
     private func activateConstraints() {
         seatContainerView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        coHostContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -752,13 +344,12 @@ private extension SeatGridView {
     func subscribeState() {
         subscribeViewState()
         subscribeSeatState()
-        setupliveEventListener()
-        setupHostEventListener()
-        setupGuestEventListener()
+        subscribeBattleState()
     }
     
     private func subscribeViewState() {
         subscribeViewState(StateSelector(projector: {  $0 }))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
@@ -775,10 +366,42 @@ private extension SeatGridView {
             .receive(on: RunLoop.main)
             .sink { [weak self] seatCount in
                 guard let self = self else { return }
-                self.viewManager.onSeatCountChanged(seatCount: seatCount)
-                self.seatContainerView.reloadData()
+                if !self.isConnection {
+                    self.viewManager.onSeatCountChanged(seatCount: seatCount)
+                    self.seatContainerView.reloadData()
+                }
             }
             .store(in: &cancellableSet)
+
+        seatStore.state.subscribe(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] seatList in
+                guard let self = self else { return }
+
+                guard !liveListStore.state.value.currentLive.isEmpty else { return }
+                if seatList.contains(where: { $0.userInfo.liveID != self.liveListStore.state.value.currentLive.liveID}) {
+                    self.isConnection = true
+                    createCoHostView(seatList: seatList)
+                }
+            }
+            .store(in: &cancellableSet)
+
+        coHostStore.state
+            .subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink{ [weak self] connected in
+                guard let self = self else { return }
+                guard !liveListStore.state.value.currentLive.isEmpty else { return }
+                if connected.contains(where: { $0.liveID == self.liveListStore.state.value.currentLive.liveID}) {
+                    self.isConnection = true
+                    KickUsersInConnect()
+                } else {
+                    self.isConnection = false
+                }
+            }.store(in: &cancellableSet)
+
     }
     
     private func updateSeatGridLayout(layoutConfig: SGSeatViewLayoutConfig) {
@@ -794,27 +417,211 @@ private extension SeatGridView {
         return selfId == liveInfo.liveOwner.userID ||
                liveInfo.seatMode == .free
     }
-    
-    private func notifyObserverEvent(notifyAction: @escaping (_ observer: SeatGridViewObserver) -> Void) {
-        Task {
-            await observers.notifyObservers(callback: notifyAction)
+
+    private func KickUsersInConnect() {
+        if !isSelfOwner {
+            return
         }
+        let seatList = seatStore.state.value.seatList
+        let currentLiveID = liveListStore.state.value.currentLive.liveID
+        let removeCount = liveListStore.state.value.currentLive.maxSeatCount - KSGConnectMaxSeatCount
+        guard let firstConnectIndex = seatList.firstIndex(where: {
+            let userLiveID = $0.userInfo.liveID
+            return !userLiveID.isEmpty && userLiveID != currentLiveID
+        }) else {
+            return
+        }
+
+        let startIndex = max(0, firstConnectIndex - removeCount)
+        let endIndex = firstConnectIndex - 1
+        if startIndex > endIndex {
+            return
+        }
+        let targetSeats = Array(seatList[startIndex...endIndex])
+
+        for seatInfo in targetSeats {
+            let userID = seatInfo.userInfo.userID
+            guard !userID.isEmpty else { continue }
+            makeToast(message: .kickOutByConnectTex,duration: 3.5)
+            seatStore.kickUserOutOfSeat(userID: seatInfo.userInfo.userID) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                    case .success():
+                        break
+                    case .failure(let error):
+                        let err = InternalError(errorInfo: error)
+                        makeToast(message: err.localizedMessage)
+                        break
+                }
+            }
+        }
+    }
+
+    private func notifyObserverEvent(notifyAction: @escaping (_ observer: SeatGridViewObserver) -> Void) {
+        observers.notifyObservers(callback: notifyAction)
     }
     
     private func subscribeViewState<Value>(_ selector: StateSelector<SGViewState, Value>) -> AnyPublisher<Value, Never> {
        return viewManager.observerState.subscribe(selector)
    }
     
+}
 
-    private func notifyEnterRoom() {
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(Notification(name: SeatGridViewOnEnterRoomNotifyName))
+// MARK: - Connection func
+extension SeatGridView {
+
+    private func createCoHostView(seatList: [SeatInfo]) {
+        coHostContainerView.subviews.forEach {
+            $0.snp.removeConstraints()
+            $0.subviews.forEach { $0.snp.removeConstraints() }
+            $0.removeFromSuperview()
+        }
+        coHostViews.removeAll()
+        coHostViews.removeAll()
+
+        let viewSize = CGSize(width: 94.scale375(), height: 92.scale375())
+        let columnSpacing = 0.scale375()
+        let rowSpacing = 0.scale375()
+        let columnCount = 4
+        let maxViewsPerColumn = 3
+
+        let columns = (0..<columnCount).map { _ in UIView() }
+        columns.forEach { coHostContainerView.addSubview($0) }
+
+        let currentOwnerId = liveListStore.state.value.currentLive.liveOwner.userID
+        let currentliveID = liveListStore.state.value.currentLive.liveID
+        guard let startIndex = seatList.firstIndex(where: { $0.userInfo.userID == currentOwnerId }) else {
+            return
+        }
+        let leftSeats = seatList[startIndex..<min(startIndex + 6, seatList.count)].enumerated()
+
+        guard let rightStartIndex = seatList.firstIndex(where: { $0.userInfo.userID != currentOwnerId && $0.userInfo.liveID != currentliveID}) else {
+            return
+        }
+        let rightSeats = seatList[rightStartIndex..<min(rightStartIndex + 6, seatList.count)].enumerated()
+
+        for (index, seatInfo) in leftSeats {
+            guard let cohostView = sgDelegate?.createCoHostView(seatInfo: seatInfo, isInvite: true) else { continue }
+            coHostViews.append(cohostView)
+            
+            let columnIndex = index % 2 == 0 ? 0 : 1
+            columns[columnIndex].addSubview(cohostView)
+        }
+
+        for (index, seatInfo) in rightSeats {
+            guard let cohostView = sgDelegate?.createCoHostView(seatInfo: seatInfo, isInvite: false) else { continue }
+            coHostViews.append(cohostView)
+            
+            let columnIndex = index % 2 == 0 ? 2 : 3
+            columns[columnIndex].addSubview(cohostView)
+        }
+
+        for (index, column) in columns.enumerated() {
+            column.snp.makeConstraints { make in
+                make.top.bottom.equalToSuperview()
+                make.width.equalTo(viewSize.width)
+                
+                if index == 0 {
+                    make.leading.equalToSuperview()
+                } else {
+                    make.leading.equalTo(columns[index-1].snp.trailing).offset(columnSpacing - 0.5)
+                }
+            }
+        }
+
+        for column in columns {
+            for (rowIndex, view) in column.subviews.enumerated() {
+                view.snp.makeConstraints { make in
+                    make.size.equalTo(viewSize)
+                    make.centerX.equalToSuperview()
+                    
+                    if rowIndex == 0 {
+                        make.top.equalToSuperview()
+                    } else {
+                        make.top.equalTo(column.subviews[rowIndex-1].snp.bottom).offset(rowSpacing - 0.5)
+                    }
+                }
+            }
+        }
+
+        coHostContainerView.snp.makeConstraints { make in
+            make.width.equalTo(372.scale375())
+            make.height.equalTo(282.scale375Height())
+            make.top.equalToSuperview()
         }
     }
-    private func notifyExitRoom() {
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(Notification(name: SeatGridViewOnExitRoomNotifyName))
+
+    private func updateLayoutForCurrentMode() {
+        seatContainerView.isHidden = isConnection
+        coHostContainerView.isHidden = !isConnection
+        
+        if isConnection {
+            layoutcoHostViews()
+        } else {
+            seatContainerView.reloadData()
         }
     }
-    
+
+    private func layoutcoHostViews() {
+        let viewSize = CGSize(width: 94.scale375(), height: 92.scale375())
+        let containerSize = CGSize(width: 372.scale375(), height: 282.scale375Height())
+        let columnSpacing = 0.scale375()
+        let rowSpacing = 0.scale375()
+
+        coHostContainerView.snp.remakeConstraints { make in
+            make.size.equalTo(containerSize)
+            make.top.equalToSuperview()
+        }
+
+        for (columnIndex, column) in coHostContainerView.subviews.enumerated() {
+            column.snp.remakeConstraints { make in
+                make.top.bottom.equalToSuperview()
+                make.width.equalTo(viewSize.width)
+
+                if columnIndex == 0 {
+                    make.leading.equalToSuperview()
+                } else {
+                    make.leading.equalTo(coHostContainerView.subviews[columnIndex-1].snp.trailing).offset(columnSpacing - 0.5)
+                }
+            }
+
+            for (rowIndex, view) in column.subviews.enumerated() {
+                view.snp.remakeConstraints { make in
+                    make.size.equalTo(viewSize)
+                    make.centerX.equalToSuperview()
+
+                    if rowIndex == 0 {
+                        make.top.equalToSuperview()
+                    } else {
+                        make.top.equalTo(column.subviews[rowIndex-1].snp.bottom).offset(rowSpacing - 0.5)
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+// MARK: - Battle func
+extension SeatGridView {
+    private func createBattleContainerView() {
+        removeBattleContainerView()
+        battleContainerView = sgDelegate?.createBattleContainerView()
+        guard let battleContainerView = battleContainerView else { return }
+        addSubview(battleContainerView)
+        battleContainerView.snp.makeConstraints { make in
+            make.edges.equalTo(coHostContainerView)
+        }
+    }
+
+    private func removeBattleContainerView() {
+        guard let battleContainerView = battleContainerView else {return }
+        battleContainerView.subviews.forEach { $0.removeFromSuperview() }
+        battleContainerView.removeFromSuperview()
+        battleContainerView.snp.removeConstraints()
+    }
+}
+
+fileprivate extension String {
+    static let kickOutByConnectTex = internalLocalized("The connection is successful. Users beyond the first 6 seats have been removed.")
 }

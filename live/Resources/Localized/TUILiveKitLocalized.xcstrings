@@ -378,6 +378,122 @@
         }
       }
     },
+    "xxx rejected battle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx rejected battle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx拒绝了 PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx拒絕了 PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxPKを拒否しました"
+          }
+        }
+      }
+    },
+    "xxx rejected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx rejected"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx拒绝了邀请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx拒絕了邀請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx张绝了邀请"
+          }
+        }
+      }
+    },
+    "xxx canceled battle, please try to initiate it again": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx canceled battle, please try to initiate it again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx取消了PK，请尝试再次发起"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx 取消了 PK，請嘗試再次發起"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx PKはキャンセルされました。もう一度開始してみてください"
+          }
+        }
+      }
+    },
+    "xxx invite you to battle together": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx invite you to battle together"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx向你发来PK邀请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx向你發來PK邀請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxPK招待状を送信します"
+          }
+        }
+      }
+    },
     "PK End": {
       "extractionState": "manual",
       "localizations": {
@@ -494,31 +610,31 @@
         }
       }
     },
-    "Connection application has been rejected": {
+    "xxx invite you to host together": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Connection application has been rejected"
+            "value": "xxx invite you to host together"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "连线申请被拒绝"
+            "value": "xxx向你发来连线邀请"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "連線申請被拒絕"
+            "value": "xxx向你發來連線邀請"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "オンラインアプリケーションは拒否されました"
+            "value": "xxx接続への招待状を送ってください"
           }
         }
       }
@@ -1028,19 +1144,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "禁言"
+            "value": "禁止发言"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "禁言"
+            "value": "禁止發言"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "禁断"
+            "value": "チャット禁止"
           }
         }
       }
@@ -1335,31 +1451,31 @@
         }
       }
     },
-    "Remove": {
+    "Kick Out": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remove"
+            "value": "Kick Out"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "移除"
+            "value": "踢出房间"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "移除"
+            "value": "踢出房間"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "取り除く"
+            "value": "キックアウト"
           }
         }
       }
@@ -3017,35 +3133,6 @@
         }
       }
     },
-    "Remove Out": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove Out"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移出房间"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移出房間"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "部屋から出ます"
-          }
-        }
-      }
-    },
     "turn off": {
       "extractionState": "manual",
       "localizations": {
@@ -3191,35 +3278,6 @@
         }
       }
     },
-    "xxx canceled battle, please try to initiate it again": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx canceled battle, please try to initiate it again"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 取消了 PK，请尝试再次发起"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 取消了 PK，請嘗試再次發起"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "XXXはPKをキャンセルしました、もう一度開始してみてください"
-          }
-        }
-      }
-    },
     "xxx Fans": {
       "extractionState": "manual",
       "localizations": {
@@ -3245,93 +3303,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "xxxファン"
-          }
-        }
-      }
-    },
-    "xxx invite you to battle together": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx invite you to battle together"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 向你发来PK邀请"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 向你發來PK邀請"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "XXXはPK招待状を送信します"
-          }
-        }
-      }
-    },
-    "xxx invite you to host together": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx invite you to host together"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 向你发来连线邀请"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 向你發來連線邀請"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "XXXは、接続への招待状をお送りします"
-          }
-        }
-      }
-    },
-    "xxx rejected battle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx rejected battle"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 拒绝了 PK"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxx 拒絕了 PK"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "XXXはPKを拒否しました"
           }
         }
       }
@@ -5697,19 +5668,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "关闭直播间"
+            "value": "结束直播"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "關閉直播間"
+            "value": "結束直播"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ライブブロードキャストルームを閉じます"
+            "value": "ライブブロードキャストを終了します"
           }
         }
       }
@@ -6990,31 +6961,31 @@
         }
       }
     },
-    "You do not have permission to perform this operation": {
+    "You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You do not have permission to perform this operation"
+            "value": "You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您无权执行此操作"
+            "value": "您当前无法执行此操作（可能是无权限，或受场景限制等原因）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "您無權執行此操作"
+            "value": "您當前無法執行此操作（可能是無權限，或受場景限制等原因）"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "これを行う許可はありません"
+            "value": "現在この操作を実行できません（権限がない、またはシナリオの制限などの理由による可能性があります）"
           }
         }
       }
@@ -10611,6 +10582,615 @@
           "stringUnit": {
             "state": "translated",
             "value": "このレイアウトテンプレートは、一部の機種で正常に表示されない場合があります。別のレイアウトテンプレートに変更することをお勧めします。"
+          }
+        }
+      }
+    },
+    "Locked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locked"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已锁定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已鎖定"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロックされています"
+          }
+        }
+      }
+    },
+    "UnLock Seat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UnLock Seat"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解锁麦位"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解鎖麦位"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロックを解除します"
+          }
+        }
+      }
+    },
+    "No guests": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No guests"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无嘉宾"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無嘉賓"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まだゲストはいません"
+          }
+        }
+      }
+    },
+    "In Battle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Battle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戦闘中"
+          }
+        }
+      }
+    },
+    "Cancel invite": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel invite"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消邀请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消邀請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "招待をキャンセルします"
+          }
+        }
+      }
+    },
+    "Request Battle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request Battle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发起PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "發起PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戦闘を開始します"
+          }
+        }
+      }
+    },
+    "Invite Host": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite Host"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀请连线"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀請連線"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストを招待します"
+          }
+        }
+      }
+    },
+    "Invite Battle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite Battle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀请PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀請PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戦闘を開始します"
+          }
+        }
+      }
+    },
+    "Inviting others you can withdraw the invitation and send a new one": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inviting others you can withdraw the invitation and send a new one"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在邀请他人，可撤回申请后再发起邀请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在邀請他人，可撤回申請後再發起邀請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": ""
+          }
+        }
+      }
+    },
+    "End Battle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End Battle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結束PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戦闘を終了します"
+          }
+        }
+      }
+    },
+    "In PK": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In PK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PK中"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PK中"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PK中"
+          }
+        }
+      }
+    },
+    "Are you sure you want to End Live?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to End Live?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定要结束直播吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定要結束直播嗎？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終了することを確認しますか？"
+          }
+        }
+      }
+    },
+    "Are you sure you want to Exit Live?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to Exit Live?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定要退出直播间吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定要退出直播間嗎？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出することを確認しますか？"
+          }
+        }
+      }
+    },
+    "xxx canceled request": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx canceled request"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx 取消了申请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消了申請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": ""
+          }
+        }
+      }
+    },
+    "Auto": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動"
+          }
+        }
+      }
+    },
+    "Enable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開啟"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効"
+          }
+        }
+      }
+    },
+    "Disable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無効"
+          }
+        }
+      }
+    },
+    "Change to xxx": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change to xxx"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换为xxx"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切換為xxx"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxに変更します"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取り除く"
+          }
+        }
+      }
+    },
+    "The connection is successful. Users beyond the first 6 seats have been removed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The connection is successful. Users beyond the first 6 seats have been removed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连线成功。前 6 个麦位以外的用户已被移除。如需互动，请重新邀请。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線成功。前 6 個麥位以外的使用者已被移除。如需互動，請重新邀請。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続に成功しました。先着6席以外のユーザーはマイクを降りました。"
+          }
+        }
+      }
+    },
+    "The connection only displays the first 6 seats. You have been removed.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The connection only displays the first 6 seats. You have been removed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连线仅显示前 6 个麦位。您已被移除，如有需要请重新申请上麦。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線僅顯示前 6 個麥位。您已被移除，如有需要請重新申請上麥。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続は先着6席のみ表示されます。あなたはマイクから降ろされました。"
           }
         }
       }

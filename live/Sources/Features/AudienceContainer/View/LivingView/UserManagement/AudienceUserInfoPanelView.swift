@@ -8,8 +8,8 @@
 import Foundation
 import Combine
 import RTCCommon
-import RTCRoomEngine
 import ImSDK_Plus
+import AtomicXCore
 
 enum AudienceUserManagePanelType {
     case mediaAndSeat
@@ -19,7 +19,7 @@ enum AudienceUserManagePanelType {
 class AudienceUserInfoPanelView: RTCBaseView {
     private let manager: AudienceManager
     
-    private var user: TUIUserInfo
+    private var user: SeatInfo
     @Published private var isFollow = false
     @Published private var fansNumber = 0
     
@@ -45,7 +45,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 16)
-        label.text = user.userName
+        label.text = user.userInfo.userName
         label.textColor = .g7
         label.textAlignment = .center
         return label
@@ -54,7 +54,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
     private lazy var userIdLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12)
-        label.text = "UserId: " + user.userId
+        label.text = "UserId: " + user.userInfo.userID
         label.textColor = .greyColor
         label.textAlignment = .center
         return label
@@ -78,7 +78,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
         return button
     }()
     
-    init(user: TUIUserInfo, manager: AudienceManager) {
+    init(user: SeatInfo, manager: AudienceManager) {
         self.user = user
         self.manager = manager
         super.init(frame: .zero)
@@ -140,13 +140,13 @@ class AudienceUserInfoPanelView: RTCBaseView {
     }
     
     override func setupViewStyle() {
-        avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
         initFansView()
         checkFollowType()
     }
     
     private func initFansView() {
-        V2TIMManager.sharedInstance().getUserFollowInfo(userIDList: [user.userId]) { [weak self] followInfoList in
+        V2TIMManager.sharedInstance().getUserFollowInfo(userIDList: [user.userInfo.userID]) { [weak self] followInfoList in
             guard let self = self, let followInfo = followInfoList?.first else { return }
             fansNumber = Int(followInfo.followersCount)
         } fail: { code, message in
@@ -155,7 +155,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
     }
     
     private func checkFollowType() {
-        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userId]) { [weak self] checkResultList in
+        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userInfo.userID]) { [weak self] checkResultList in
             guard let self = self, let result = checkResultList?.first else { return }
             if result.followType == .FOLLOW_TYPE_IN_BOTH_FOLLOWERS_LIST || result.followType == .FOLLOW_TYPE_IN_MY_FOLLOWING_LIST {
                 self.isFollow = true
@@ -197,7 +197,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
 extension AudienceUserInfoPanelView {
     @objc private func followButtonClick() {
         if isFollow {
-            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = false
@@ -210,7 +210,7 @@ extension AudienceUserInfoPanelView {
                 manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
             }
         } else {
-            V2TIMManager.sharedInstance().followUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().followUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = true

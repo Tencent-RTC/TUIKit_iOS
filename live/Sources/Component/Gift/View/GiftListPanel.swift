@@ -34,15 +34,6 @@ class GiftListPanel: UIView {
         isViewReady = true
     }
 
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.contentMode = .center
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .textPrimaryColor
-        label.text = .giftTitle
-        label.sizeToFit()
-        return label
-    }()
     
     deinit {
         debugPrint("\(type(of: self)) deinit")
@@ -56,22 +47,14 @@ extension GiftListPanel {
         backgroundColor = .bgOperateColor
         layer.cornerRadius = 16
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        addSubview(titleLabel)
         addSubview(giftListView)
     }
 
     private func activateConstraints() {
-        titleLabel.snp.remakeConstraints { make in
-            make.top.equalToSuperview().offset(20.scale375Height())
-            make.centerX.equalToSuperview()
-            make.height.equalTo(24.scale375Width())
-            make.width.equalTo(titleLabel.mm_w)
-        }
-
         giftListView.snp.remakeConstraints { make in
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(256)
-            make.top.equalTo(titleLabel.snp.bottom).offset(20.scale375Height())
+            make.top.equalToSuperview().offset(20.scale375Height())
             make.bottom.equalToSuperview()
         }
     }

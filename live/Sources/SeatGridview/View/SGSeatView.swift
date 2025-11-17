@@ -34,8 +34,6 @@ class SGSeatView: UIView {
     
     let soundWaveView: SGSeatSoundWaveView = {
         let view = SGSeatSoundWaveView()
-        view.backgroundColor = UIColor.seatWaveColor.withAlphaComponent(0.5)
-        view.isHidden = true
         return view
     }()
     
@@ -114,21 +112,23 @@ class SGSeatView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(soundWaveView)
         addSubview(mainImageView)
         addSubview(seatContentView)
         addSubview(muteImageView)
         addSubview(nameContentView)
+        insertSubview(soundWaveView, belowSubview: mainImageView)
         seatContentView.addSubview(seatImageView)
         nameContentView.addSubview(ownerImageView)
         nameContentView.addSubview(nameLabel)
     }
     
     func activateConstraints() {
-        soundWaveView.snp.makeConstraints { (make) in
-            make.center.equalTo(mainImageView.snp.center)
-            make.size.equalTo(CGSizeMake(50, 50))
+        soundWaveView.snp.makeConstraints { make in
+            make.center.equalTo(seatContentView)
+            make.width.equalTo(seatContentView).multipliedBy(1.3)
+            make.height.equalTo(seatContentView).multipliedBy(1.3)
         }
+
         mainImageView.snp.makeConstraints { (make) in
             make.top.equalToSuperview().offset(10.scale375())
             make.size.equalTo(CGSizeMake(50, 50))
@@ -198,7 +198,7 @@ class SGSeatView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] isSpeaking, seatInfo in
                 guard let self = self, let userId = seatInfo.userId, !userId.isEmpty else { return }
-                isSpeaking ? self.soundWaveView.startWave() : self.soundWaveView.stopWave()
+                isSpeaking ? self.soundWaveView.startRippleAnimation() : self.soundWaveView.stopRippleAnimation()
             }
             .store(in: &cancellableSet)
     }

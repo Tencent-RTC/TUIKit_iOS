@@ -7,29 +7,29 @@
 
 import UIKit
 import Combine
-import RTCRoomEngine
+import AtomicXCore
 
 class LinkMicBaseCell: UITableViewCell {
     var cancellableSet: Set<AnyCancellable> = []
-    var seatInfo: TUISeatInfo? {
+    var seatInfo: SeatUserInfo? {
         didSet {
             guard let seatInfo = seatInfo else {
                 return
             }
-            if let avatarUrl = seatInfo.avatarUrl, let url = URL(string: avatarUrl) {
-                avatarImageView.kf.setImage(with: url,placeholder: UIImage.avatarPlaceholderImage)
+            if let url = URL(string: seatInfo.avatarURL) {
+                avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
             } else {
                 avatarImageView.image = .avatarPlaceholderImage
             }
             nameLabel.text = seatInfo.userName
         }
     }
-    var seatApplication: TUIUserInfo? {
+    var seatApplication: LiveUserInfo? {
         didSet {
             guard let seatApplication = seatApplication else {
                 return
             }
-            if let url = URL(string: seatApplication.avatarUrl) {
+            if let url = URL(string: seatApplication.avatarURL) {
                 avatarImageView.kf.setImage(with: url,placeholder: UIImage.avatarPlaceholderImage)
             } else {
                 avatarImageView.image = .avatarPlaceholderImage

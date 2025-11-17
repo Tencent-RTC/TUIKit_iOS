@@ -6,13 +6,13 @@
 //
 
 import Foundation
-import RTCRoomEngine
+import AtomicXCore
 
 class AnchorCoHostUserCell: UITableViewCell {
     static let identifier = "AnchorCoHostUserCell"
 
-    private var connectionUser:TUIConnectionUser?
-    var inviteEventClosure: ((TUIConnectionUser) -> Void)?
+    private var connectionUser:AnchorCoHostUserInfo?
+    var inviteEventClosure: ((AnchorCoHostUserInfo) -> Void)?
     
     let avatarImageView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
@@ -93,13 +93,13 @@ class AnchorCoHostUserCell: UITableViewCell {
         inviteButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
     }
     
-    func updateUser(_ user: TUIConnectionUser) {
+    func updateUser(_ user: AnchorCoHostUserInfo) {
         self.connectionUser = user
-        avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
-        userNameLabel.text = user.userName.isEmpty ? user.userId : user.userName
+        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        userNameLabel.text = user.userInfo.userName.isEmpty ? user.userInfo.userID : user.userInfo.userName
         
-        inviteButton.isHidden = user.anchorConnectionStatus == .connected
-        updateButtonView(isEnabled: user.anchorConnectionStatus == .none)
+        inviteButton.isHidden = user.connectionStatus == .connected
+        updateButtonView(isEnabled: user.connectionStatus == .none)
     }
     
     func updateButtonView(isEnabled: Bool) {

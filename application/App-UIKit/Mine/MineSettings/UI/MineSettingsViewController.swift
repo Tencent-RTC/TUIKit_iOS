@@ -9,8 +9,6 @@ import UIKit
 import SnapKit
 import RTCCommon
 import TUICore
-import TIMCommon
-import TUIContact
 
 class MineSettingsViewController: UIViewController{
     
@@ -92,11 +90,11 @@ class MineSettingsViewController: UIViewController{
     
     var currentUserInfo: V2TIMUserFullInfo?
     @objc func didSelectChangeHead() {
-        let avatarVC = TUISelectAvatarController()
+        let avatarVC = AvatarSelectorViewController()
         avatarVC.selectAvatarType = .userAvatar
-        avatarVC.profilFaceURL = TUILogin.getFaceUrl() ?? ""
+        avatarVC.profileFaceURL = TUILogin.getFaceUrl() ?? ""
         self.navigationController?.pushViewController(avatarVC, animated: true)
-        avatarVC.selectCallBack = { [weak self] urlString in
+        avatarVC.selectCallback = { [weak self] urlString in
             guard let self = self, let userID = TUILogin.getUserID() else { return }
             let info = V2TIMUserFullInfo()
             info.faceURL = urlString

@@ -5,7 +5,7 @@
 //  Created by jeremiawang on 2025/4/29.
 //
 
-import RTCRoomEngine
+import AtomicXCore
  
 public enum LiveListViewStyle {
     case singleColumn
@@ -19,57 +19,10 @@ public protocol LiveListViewAdapter: AnyObject {
 
 public protocol LiveListDataSource: AnyObject {
     typealias LiveListBlock = (String, [LiveInfo]) -> Void
-    func fetchLiveList(cursor: String, onSuccess: @escaping LiveListBlock, onError: @escaping TUIErrorBlock)
+    typealias LiveListErrorBlock = (ErrorInfo) -> Void
+    func fetchLiveList(cursor: String, onSuccess: @escaping LiveListBlock, onError: @escaping LiveListErrorBlock)
 }
 
 public protocol OnItemClickDelegate: AnyObject {
     func onItemClick(liveInfo: LiveInfo, frame: CGRect)
 }
-
-public struct LiveInfo {
-
-    var coverUrl = ""
-    
-    var backgroundUrl = ""
-    
-    var categoryList: [NSNumber] = []
-    
-    var isPublicVisible = true
-    
-    var activityStatus: Int = 0
-    
-    var viewCount: Int = 0
-    
-    var roomId = ""
-    
-    var ownerId = ""
-    
-    var ownerName = ""
-    
-    var ownerAvatarUrl = ""
-    
-    var name = ""
-    
-    var seatLayoutTemplateId: Int = 0
-    
-    var pkTemplateId: Int = 0
-    
-    init(tuiLiveInfo: TUILiveInfo) {
-        self.coverUrl = tuiLiveInfo.coverUrl
-        self.backgroundUrl = tuiLiveInfo.backgroundUrl
-        self.categoryList = tuiLiveInfo.categoryList
-        self.isPublicVisible = tuiLiveInfo.isPublicVisible
-        self.activityStatus = tuiLiveInfo.activityStatus
-        self.viewCount = tuiLiveInfo.viewCount
-        self.roomId = tuiLiveInfo.roomInfo.roomId
-        self.ownerId = tuiLiveInfo.roomInfo.ownerId
-        self.ownerName = tuiLiveInfo.roomInfo.ownerName
-        self.ownerAvatarUrl = tuiLiveInfo.roomInfo.ownerAvatarUrl
-        self.name = tuiLiveInfo.roomInfo.name
-        self.seatLayoutTemplateId = Int(tuiLiveInfo.seatLayoutTemplateId)
-    }
-    
-    init() {}
-}
-
-extension LiveInfo: Equatable {}

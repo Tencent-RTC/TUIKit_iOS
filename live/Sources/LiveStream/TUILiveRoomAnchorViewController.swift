@@ -49,6 +49,35 @@ public class TUILiveRoomAnchorViewController: UIViewController {
         }
         self.anchorView = AnchorView(liveInfo: liveInfo, coreView: self.coreView, behavior: behavior)
         super.init(nibName: nil, bundle: nil)
+        initialize()
+    }
+    
+    public init(liveParams: LiveParams, coreView: LiveCoreView? = nil, behavior: RoomBehavior = .createRoom) {
+        self.liveInfo = liveParams.liveInfo
+        self.behavior = behavior
+        if let coreView = coreView {
+            self.coreView = coreView
+        } else {
+            do {
+                let jsonObject: [String: Any] = [
+                    "api": "component",
+                    "component": 21
+                ]
+                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
+                if let jsonString = String(data: jsonData, encoding: .utf8) {
+                    LiveCoreView.callExperimentalAPI(jsonString)
+                }
+            } catch {
+                LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
+            }
+            self.coreView = LiveCoreView(viewType: .pushView)
+        }
+        self.anchorView = AnchorView(liveParams: liveParams, coreView: self.coreView, behavior: behavior)
+        super.init(nibName: nil, bundle: nil)
+        initialize()
+    }
+    
+    private func initialize() {
         if FloatWindow.shared.isShowingFloatWindow() {
             FloatWindow.shared.releaseFloatWindow()
         }
@@ -139,7 +168,7 @@ extension TUILiveRoomAnchorViewController: AnchorViewDelegate {
     }
     
     public func onEndLiving(state: AnchorState) {
-        let liveDataModel = AnchorEndStatisticsViewInfo(roomId: liveInfo.roomId,
+        let liveDataModel = AnchorEndStatisticsViewInfo(roomId: liveInfo.liveID,
                                                         liveDuration: state.duration,
                                                         viewCount: state.viewCount,
                                                         messageCount: state.messageCount,
@@ -157,7 +186,7 @@ extension TUILiveRoomAnchorViewController: AnchorViewDelegate {
 
 extension TUILiveRoomAnchorViewController: FloatWindowProvider {
     public func getRoomId() -> String {
-        liveInfo.roomId
+        liveInfo.liveID
     }
     
     public func getOwnerId() -> String {

@@ -8,6 +8,7 @@
 import Foundation
 import AtomicXCore
 import RTCRoomEngine
+import ImSDK_Plus
 
 typealias AtomicLiveInfo = AtomicXCore.LiveInfo
 
@@ -28,6 +29,7 @@ extension AtomicLiveInfo {
         backgroundURL = tuiLiveInfo.backgroundUrl
         categoryList = tuiLiveInfo.categoryList
         activityStatus = tuiLiveInfo.activityStatus
+        totalViewerCount = tuiLiveInfo.viewCount
     }
 }
 
@@ -89,6 +91,21 @@ extension TUIUserInfo {
     convenience init(userId: String) {
         self.init()
         self.userId = userId
+    }
+    
+    convenience init(userFullInfo: V2TIMUserFullInfo) {
+        self.init()
+        userId = userFullInfo.userID ?? ""
+        userName = userFullInfo.nickName ?? ""
+        avatarUrl = userFullInfo.faceURL ?? ""
+        userRole = TUIRole(rawValue: UInt(userFullInfo.role)) ?? .generalUser
+    }
+    
+    convenience init(seatInfo: TUISeatInfo) {
+        self.init()
+        userId = seatInfo.userId ?? ""
+        userName = seatInfo.userName ?? ""
+        avatarUrl = seatInfo.avatarUrl ?? ""
     }
 }
 

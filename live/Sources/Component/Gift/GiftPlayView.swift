@@ -131,7 +131,7 @@ public class GiftPlayView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] message in
                 guard let self = self else { return }
-                makeToast(message)
+                makeToast(message: message)
             }
             .store(in: &cancellableSet)
     }
@@ -157,7 +157,7 @@ public extension GiftPlayView {
         animationView.playAnimation(playUrl: playUrl) { [weak self] code in
             guard let self = self else { return }
             if code != 0 {
-                makeToast(.playFailedText)
+                makeToast(message: .playFailedText)
             }
             self.advancedAnimationManager.finishPlay()
         }

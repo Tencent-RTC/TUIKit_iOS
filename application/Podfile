@@ -9,8 +9,6 @@ target 'App-UIKit' do
   pod 'SnapKit'
   pod 'RTCCommon'
   
-  pod 'TIMCommon'
-  pod 'TUIContact'
   pod 'TUICallKit_Swift', :path=>'../call/TUICallKit_Swift.podspec'
   pod 'TUIRoomKit/Professional', :path=>'../conference/TUIRoomKit.podspec'
 

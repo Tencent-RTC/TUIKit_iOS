@@ -11,6 +11,7 @@ import UIKit
 import ImSDK_Plus
 import RTCCommon
 import TUICore
+import AtomicXCore
 
 @objc class MineViewController: UIViewController {
     private lazy var rootView: MineView = {
@@ -70,16 +71,19 @@ extension MineViewController: MineViewDelegate {
         let cancelAction = UIAlertAction(title: ("Cancel").localized, style: .cancel, handler: nil)
         let sureAction = UIAlertAction(title: ("Yes").localized, style: .default) { _ in
             UserDefaults.standard.removeObject(forKey: "UserIdKey")
-            TUILogin.logout {
-                DispatchQueue.main.async {
-                    if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-                        appDelegate.showLoginViewController()
+            LoginStore.shared.logout { result in
+                switch result {
+                case .success(()):
+                    DispatchQueue.main.async {
+                        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+                            appDelegate.showLoginViewController()
+                        }
                     }
-                }
-            } fail: { _, _ in
-                DispatchQueue.main.async {
-                    if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-                        appDelegate.showLoginViewController()
+                case .failure(_):
+                    DispatchQueue.main.async {
+                        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+                            appDelegate.showLoginViewController()
+                        }
                     }
                 }
             }

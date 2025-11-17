@@ -8,6 +8,7 @@
 import Combine
 import RTCRoomEngine
 import RTCCommon
+import AtomicXCore
 
 class VRImageSelectionPanel: UIView {
     
@@ -16,12 +17,27 @@ class VRImageSelectionPanel: UIView {
         case background = 352
     }
     
+    enum SceneType: Equatable {
+        case prepare(VoiceRoomPrepareStore)
+        case voice(LiveListStore)
+        
+        static func == (lhs: SceneType, rhs: SceneType) -> Bool {
+            switch (lhs, rhs) {
+            case (.prepare, .prepare):
+                return true
+            case (.voice, .voice):
+                return true
+            default:
+                return false
+            }
+        }
+    }
+    
     var backButtonClickClosure: (()->Void)?
    
     private var configs: [VRSystemImageModel]
     private var panelMode: PanelMode = .cover
-    private let isSetToService: Bool
-    private let manager: VoiceRoomManager
+    private let sceneType: SceneType
     private var currentSelectModel: VRSystemImageModel?
     private var cancellableSet = Set<AnyCancellable>()
     
@@ -80,11 +96,28 @@ class VRImageSelectionPanel: UIView {
         return view
     }()
     
-    init(configs:[VRSystemImageModel], panelMode: PanelMode = .cover, isSetToService: Bool = false, manager: VoiceRoomManager) {
+    private var currentCoverUrl: String {
+        switch sceneType {
+        case .prepare(let prepareStore):
+            return prepareStore.state.liveInfo.coverURL
+        case .voice(let liveStore):
+            return liveStore.state.value.currentLive.coverURL
+        }
+    }
+    
+    private var currentBackgroundUrl: String {
+        switch sceneType {
+        case .prepare(let prepareStore):
+            return prepareStore.state.liveInfo.backgroundURL
+        case .voice(let liveStore):
+            return liveStore.state.value.currentLive.backgroundURL
+        }
+    }
+    
+    init(configs:[VRSystemImageModel], panelMode: PanelMode = .cover, sceneType: SceneType) {
         self.configs = configs
         self.panelMode = panelMode
-        self.isSetToService = isSetToService
-        self.manager = manager
+        self.sceneType = sceneType
         super.init(frame: .zero)
     }
     
@@ -167,9 +200,9 @@ extension VRImageSelectionPanel {
     private func defaultSelectItem() {
         var imageUrlPath: String = ""
         if panelMode == .cover {
-            imageUrlPath = manager.roomState.coverURL
+            imageUrlPath = currentCoverUrl
         } else {
-            imageUrlPath = manager.roomState.backgroundURL
+            imageUrlPath = currentBackgroundUrl
         }
         if let index = configs.firstIndex(where: { imageUrlPath.contains($0.imagePath) }) {
             collectionView.selectItem(at: IndexPath(item: index, section: 0), animated: false, scrollPosition: .top)
@@ -192,12 +225,38 @@ extension VRImageSelectionPanel {
         }
         switch panelMode {
         case .cover:
-            manager.onSetRoomCoverUrl(newImageUrlString)
+            setupCover(newImageUrlString)
         case .background:
-            manager.onSetRoomBackgroundUrl(newImageUrlString, isSetToService: isSetToService)
+            setupbackground(newImageUrlString)
         }
         
         backButtonClickClosure?()
+    }
+    
+    func setupCover(_ url: String) {
+        switch sceneType {
+        case .prepare(let prepareStore):
+            prepareStore.onSetRoomCoverUrl(url)
+        case .voice(let liveStore):
+            var currentLive = liveStore.state.value.currentLive
+            guard !currentLive.isEmpty else { return }
+            currentLive.coverURL = url
+            let modifyFlag = AtomicLiveInfo.ModifyFlag.coverURL
+            liveStore.updateLiveInfo(currentLive, modifyFlag: modifyFlag, completion: nil)
+        }
+    }
+    
+    func setupbackground(_ url: String) {
+        switch sceneType {
+        case .prepare(let prepareStore):
+            prepareStore.onSetRoomBackgroundUrl(url)
+        case .voice(let liveStore):
+            var currentLive = liveStore.state.value.currentLive
+            guard !currentLive.isEmpty else { return }
+            currentLive.backgroundURL = url
+            let modifyFlag = AtomicLiveInfo.ModifyFlag.backgroundURL
+            liveStore.updateLiveInfo(currentLive, modifyFlag: modifyFlag, completion: nil)
+        }
     }
 }
 

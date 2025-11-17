@@ -291,7 +291,7 @@ enum SelectionMode: CaseIterable {
     func toTempalateModeDataSource() -> [LiveTemplateMode] {
         switch self {
         case .pk:
-            return [.verticalGridDynamic, .verticalFloatDynamic]
+            return [.verticalGridDynamic]
         case .seat:
             return LiveTemplateMode.allCases
         }
@@ -299,9 +299,9 @@ enum SelectionMode: CaseIterable {
     func toString() -> String {
         switch self {
         case .pk:
-            return "主播PK布局"
+            return .pkLayoutText
         case .seat:
-            return "连观众布局"
+            return .layoutText
         }
     }
 }
@@ -310,4 +310,6 @@ private extension String {
     static let titleText = internalLocalized("Layout settings")
     static let anchorPkText = internalLocalized("Layout co-host")
     static let anchorLinkText = internalLocalized("Layout co-guest")
+    static let pkLayoutText = internalLocalized("Layout co-host")
+    static let layoutText = internalLocalized("Layout co-guest")
 }

@@ -102,6 +102,12 @@ extension AnchorRouterControlCenter {
             switch route {
             case .alert(_):
                 presentedViewController = presentAlert(alertView: view)
+            case .listMenu(_, let layout):
+                if layout == .center {
+                    presentedViewController = presentPopup(view: view, route: route, portraitPosition: .center(horizontalPadding: 47.scale375()))
+                } else {
+                    presentedViewController = presentPopup(view: view, route: route)
+                }
             default:
                 presentedViewController = presentPopup(view: view, route: route)
             }
@@ -170,7 +176,7 @@ extension AnchorRouterControlCenter {
         case .liveLinkControl:
             view = AnchorLinkControlPanel(manager: manager, routerManager: routerManager, coreView: coreView)
         case .connectionControl:
-            let panel = AnchorCoHostManagerPanel(manager: manager.coHostManager, coreView: coreView, pkTemplateId: manager.roomState.pkTemplateId)
+            let panel = AnchorCoHostManagerPanel(manager: manager)
             panel.onClickBack = { [weak self] in
                 guard let self = self else { return }
                 routerManager.router(action: .dismiss())
@@ -185,7 +191,7 @@ extension AnchorRouterControlCenter {
                 self.routerManager.router(action: .dismiss())
             }
             view = audioEffect
-        case .listMenu(let data):
+        case .listMenu(let data,let layout):
             let actionPanel = ActionPanel(panelData: data)
             actionPanel.cancelActionClosure = { [weak self] in
                 guard let self = self else { return }
@@ -193,7 +199,7 @@ extension AnchorRouterControlCenter {
             }
             view = actionPanel
         case .battleCountdown(let countdownTime):
-            let countdownView = AnchorBattleCountDownView(countdownTime: countdownTime, manager: manager.battleManager, coreView: coreView)
+            let countdownView = AnchorBattleCountDownView(countdownTime: countdownTime, manager: manager)
             countdownView.timeEndClosure = { [weak self] in
                 guard let self = self else { return }
                 self.routerManager.router(action: .dismiss())
@@ -206,7 +212,7 @@ extension AnchorRouterControlCenter {
         case .alert(let info):
             view = AnchorAlertPanel(alertInfo: info)
         case .streamDashboard:
-            view = StreamDashboardPanel(roomId: manager.roomState.roomId,
+            view = StreamDashboardPanel(roomId: manager.liveID,
                                         roomEngine: TUIRoomEngine.sharedInstance())
         case .beauty:
             if BeautyView.checkIsNeedDownloadResource() {
@@ -219,12 +225,12 @@ extension AnchorRouterControlCenter {
             }
             view = beautyView
         case .giftView:
-            view = GiftListPanel(roomId: manager.roomState.roomId)
+            view = GiftListPanel(roomId: manager.liveID)
         case .userManagement(let user, let type):
             if type == .userInfo {
-                view = AnchorUserInfoPanelView(user: user, manager: manager)
+                view = AnchorUserInfoPanelView(user: LiveUserInfo(seatUserInfo: user.userInfo), manager: manager)
             } else {
-                view = AnchorUserManagePanelView(user: user, manager: manager, routerManager: routerManager, coreView: coreView, type: type)
+                view = AnchorUserManagePanelView(user: LiveUserInfo(seatUserInfo: user.userInfo), manager: manager, routerManager: routerManager, type: type)
             }
         case .netWorkInfo(let manager,let isAudience):
             let netWorkInfoView = NetWorkInfoView(
@@ -232,6 +238,19 @@ extension AnchorRouterControlCenter {
                 isAudience: isAudience
             )
             view = netWorkInfoView
+        case .mirror:
+            let dataSource: [MirrorType] = [.auto, .enable, .disable]
+            let panel = BaseSelectionPanel(dataSource: dataSource.map { $0.toString() })
+            panel.selectedClosure = { [weak self] index in
+                guard let self = self else { return }
+                DeviceStore.shared.switchMirror(mirrorType: dataSource[index])
+                routerManager.router(action: .dismiss())
+            }
+            panel.cancelClosure = { [weak self] in
+                guard let self = self else { return }
+                routerManager.router(action: .dismiss())
+            }
+            view = panel
         default:
             break
         }
@@ -260,7 +279,7 @@ extension AnchorRouterControlCenter {
                 .featureSetting(_), .alert(_),
                 .streamDashboard,
                 .giftView,
-                .listMenu(_),
+                .listMenu(_, _),
                 .userManagement(_, _),
                 .netWorkInfo(_, _):
             return false
@@ -273,16 +292,18 @@ extension AnchorRouterControlCenter {
         switch route {
         case .alert(_):
             return false
+        case .listMenu(_, let layout):
+            return layout != .center
         default:
             return true
         }
     }
     
     private func getSafeBottomViewBackgroundColor(route: AnchorRoute) -> UIColor {
-        var safeBottomViewBackgroundColor = UIColor.g2
+        var safeBottomViewBackgroundColor = UIColor.bgOperateColor
         switch route {
-        case .listMenu(_):
-            safeBottomViewBackgroundColor = .white
+        case .listMenu(_, _):
+            safeBottomViewBackgroundColor = .bgOperateColor
         case .battleCountdown(_):
             safeBottomViewBackgroundColor = .clear
         case .streamDashboard, .featureSetting(_), .giftView, .beauty:
@@ -296,18 +317,28 @@ extension AnchorRouterControlCenter {
 
 // MARK: - Popup
 extension AnchorRouterControlCenter {
-    private func presentPopup(view: UIView, route: AnchorRoute) -> UIViewController {
+    private func presentPopup(view: UIView, route: AnchorRoute, portraitPosition: MenuContainerViewPosition = .bottom) -> UIViewController {
         let safeBottomViewBackgroundColor = getSafeBottomViewBackgroundColor(route: route)
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: safeBottomViewBackgroundColor)
+        let menuContainerView = MenuContainerView(
+            contentView: view,
+            safeBottomViewBackgroundColor: safeBottomViewBackgroundColor,
+            portraitPosition: portraitPosition
+        )
         let popupViewController = PopupViewController(contentView: menuContainerView,
-                                                  supportBlurView: supportBlurView(route: route))
+                                                      supportBlurView: supportBlurView(route: route))
         menuContainerView.blackAreaClickClosure = { [weak self] in
             guard let self = self else { return }
             self.routerManager.router(action: .dismiss())
         }
         guard let rootViewController = rootViewController else { return UIViewController()}
         let presentingViewController = getPresentingViewController(rootViewController)
-        presentingViewController.present(popupViewController, animated: true)
+        if portraitPosition != .bottom {
+            popupViewController.modalPresentationStyle = .overFullScreen
+            popupViewController.modalTransitionStyle = .crossDissolve
+            presentingViewController.present(popupViewController, animated: false)
+        } else {
+            presentingViewController.present(popupViewController, animated: true)
+        }
         return popupViewController
     }
 }
@@ -325,5 +356,3 @@ extension AnchorRouterControlCenter {
         return alerViewController
     }
 }
-
-

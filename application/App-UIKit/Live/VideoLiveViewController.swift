@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import TUICore
+import AtomicXCore
 import TUILiveKit
 
 class VideoLiveViewController: UIViewController {
@@ -122,7 +122,7 @@ extension VideoLiveViewController {
     }
     
     @objc private func goLiveClick() {
-        let liveRoomId = LiveIdentityGenerator.shared.generateId(TUILogin.getUserID() ?? "", type: .live)
+        let liveRoomId = LiveIdentityGenerator.shared.generateId(LoginStore.shared.state.value.loginUserInfo?.userID ?? "", type: .live)
         VideoLiveKit.createInstance().startLive(roomId: liveRoomId)
     }
 }

@@ -5,76 +5,277 @@
 //  Created by jeremiawang on 2024/11/18.
 //
 
-import Foundation
-import Combine
-import RTCCommon
-import RTCRoomEngine
 import AtomicXCore
-
-typealias AudienceRoomStateUpdateClosure = (inout AudienceRoomState) -> Void
-typealias AudienceUserStateUpdateClosure = (inout AudienceUserState) -> Void
-typealias AudienceMediaStateUpdateClosure = (inout AudienceMediaState) -> Void
-typealias AudienceCoGuestStateUpdateClosure = (inout AudienceCoGuestState) -> Void
-
-protocol AudienceManagerProvider: NSObject {
-    func getCoreViewState<T: CoreViewState>() -> T
-    func subscribeCoreViewState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never>
-}
+import Combine
+import Foundation
+import RTCCommon
 
 class AudienceManager {
-    
-    public let toastSubject = PassthroughSubject<String, Never>()
-    public let floatWindowSubject = PassthroughSubject<Void, Never>()
-    public let kickedOutSubject = PassthroughSubject<Void, Never>()
-    
-    static private let observerAudienceConfig = ObservableState<AudienceContainerConfig>(initialState: AudienceContainerConfig())
+    class Context {
+        let liveID: String
+
+        let deviceStore: DeviceStore = .shared
+        let liveListStore: LiveListStore = .shared
+        let loginStore: LoginStore = .shared
+
+        var coGuestStore: CoGuestStore {
+            CoGuestStore.create(liveID: liveID)
+        }
+
+        var battleStore: BattleStore {
+            BattleStore.create(liveID: liveID)
+        }
+
+        var coHostStore: CoHostStore {
+            CoHostStore.create(liveID: liveID)
+        }
+
+        var seatStore: LiveSeatStore {
+            LiveSeatStore.create(liveID: liveID)
+        }
+
+        var liveAudienceStore: LiveAudienceStore {
+            LiveAudienceStore.create(liveID: liveID)
+        }
+
+        lazy var audienceMediaManager = AudienceMediaManager(context: self)
+
+        let audienceObservableState = ObservableState(initialState: AudienceState())
+        let audienceBattleObservableState = ObservableState(initialState: AudienceBattleState())
+
+        let toastSubject = PassthroughSubject<String, Never>()
+        let kickedOutSubject = PassthroughSubject<Void, Never>()
+        let floatWindowSubject = PassthroughSubject<Void, Never>()
+
+        init(liveID: String) {
+            self.liveID = liveID
+        }
+    }
+
+    private let context: Context
+
+    private static let observerAudienceConfig = ObservableState<AudienceContainerConfig>(initialState: AudienceContainerConfig())
     static var audienceContainerConfig: AudienceContainerConfig {
         observerAudienceConfig.state
     }
-    
-    class Context {
-        let service = AudienceService()
-        weak var provider: AudienceManagerProvider?
-        
-        private(set) lazy var roomManager = AudienceRoomManager(context: self)
-        private(set) lazy var userManager = AudienceUserManager(context: self)
-        private(set) lazy var mediaManager = AudienceMediaManager(context: self)
-        private(set) lazy var coGuestManager = AudienceCoGuestManager(context: self)
-        
-        private(set) lazy var battleManager = AudienceBattleManager(context: self)
-        
-        private(set) lazy var engineObserver = AudienceRoomEngineObserver(context: self)
-        private(set) lazy var liveListObserver = AudienceLiveListObserver(context: self)
-        private(set) lazy var liveLayoutObserver = AudienceLiveLayoutObserver(context: self)
 
-        let toastSubject: PassthroughSubject<String, Never>
-        let kickedOutSubject: PassthroughSubject<Void, Never>
-        
-        init(provider: AudienceManagerProvider, toastSubject: PassthroughSubject<String, Never>, kickedOutSubject: PassthroughSubject<Void, Never>) {
-            self.toastSubject = toastSubject
-            self.kickedOutSubject = kickedOutSubject
-            self.provider = provider
-            service.addEngineObserver(engineObserver)
-            service.addLiveListManagerObserver(liveListObserver)
-            service.addLiveLayoutObserver(liveLayoutObserver)
+    init(liveID: String) {
+        context = Context(liveID: liveID)
+    }
+
+    func willApplying() {
+        context.audienceObservableState.update { state in
+            state.isApplying = true
         }
-        
-        deinit {
-            service.removeEngineObserver(engineObserver)
-            service.removeLiveListManagerObserver(liveListObserver)
-            service.removeLiveLayoutObserver(liveLayoutObserver)
+    }
+
+    func stopApplying() {
+        context.audienceObservableState.update { state in
+            state.isApplying = false
+        }
+    }
+
+    var liveID: String {
+        context.liveID
+    }
+
+    var selfUserID: String {
+        loginState.loginUserInfo?.userID ?? ""
+    }
+
+    var audienceMediaManager: AudienceMediaManager {
+        context.audienceMediaManager
+    }
+
+    func updateBattleDurationCountDown(_ value: Int) {
+        context.audienceBattleObservableState.update { state in
+            state.durationCountDown = value
         }
     }
     
-    private let context: Context
-    private var cancellableSet: Set<AnyCancellable> = []
-    
-    init(provider: AudienceManagerProvider) {
-        self.context = Context(provider: provider, toastSubject: toastSubject, kickedOutSubject: kickedOutSubject)
+    func updateVideoStreamIsLandscape(_ isLandscape: Bool) {
+        context.audienceObservableState.update { state in
+            state.roomVideoStreamIsLandscape = isLandscape
+        }
+    }
+}
+
+// MARK: - Subject
+
+extension AudienceManager {
+    var toastSubject: PassthroughSubject<String, Never> {
+        context.toastSubject
+    }
+
+    var kickedOutSubject: PassthroughSubject<Void, Never> {
+        context.kickedOutSubject
+    }
+
+    var floatWindowSubject: PassthroughSubject<Void, Never> {
+        context.floatWindowSubject
+    }
+}
+
+// MARK: - Store
+
+extension AudienceManager {
+    var coGuestStore: CoGuestStore {
+        context.coGuestStore
+    }
+
+    var battleStore: BattleStore {
+        context.battleStore
+    }
+
+    var seatStore: LiveSeatStore {
+        context.seatStore
+    }
+
+    var deviceStore: DeviceStore {
+        context.deviceStore
+    }
+
+    var liveListStore: LiveListStore {
+        context.liveListStore
+    }
+
+    var coHostStore: CoHostStore {
+        context.coHostStore
+    }
+
+    var loginStore: LoginStore {
+        context.loginStore
+    }
+
+    var liveAudienceStore: LiveAudienceStore {
+        context.liveAudienceStore
+    }
+}
+
+// MARK: - State and subscribe
+
+extension AudienceManager {
+    var audienceState: AudienceState {
+        context.audienceState
+    }
+
+    var audienceBattleState: AudienceBattleState {
+        context.audienceBattleState
+    }
+
+    var audienceMediaState: AudienceMediaState {
+        context.audienceMediaManager.mediaState
+    }
+
+    var seatState: LiveSeatState {
+        context.seatState
+    }
+
+    var coGuestState: CoGuestState {
+        context.coGuestState
+    }
+
+    var battleState: BattleState {
+        context.battleState
+    }
+
+    var deviceState: DeviceState {
+        context.deviceState
+    }
+
+    var liveListState: LiveListState {
+        context.liveListState
+    }
+
+    var coHostState: CoHostState {
+        context.coHostState
+    }
+
+    var loginState: LoginState {
+        context.loginState
+    }
+
+    func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        context.subscribeState(selector)
+    }
+
+    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        context.subscribeState(selector)
+    }
+}
+
+extension AudienceManager.Context {
+    var audienceState: AudienceState {
+        audienceObservableState.state
+    }
+
+    var audienceBattleState: AudienceBattleState {
+        audienceBattleObservableState.state
+    }
+
+    var seatState: LiveSeatState {
+        seatStore.state.value
+    }
+
+    var coGuestState: CoGuestState {
+        coGuestStore.state.value
+    }
+
+    var battleState: BattleState {
+        battleStore.state.value
+    }
+
+    var deviceState: DeviceState {
+        deviceStore.state.value
+    }
+
+    var liveListState: LiveListState {
+        liveListStore.state.value
+    }
+
+    var coHostState: CoHostState {
+        coHostStore.state.value
+    }
+
+    var loginState: LoginState {
+        loginStore.state.value
+    }
+
+    func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        if let sel = selector as? StatePublisherSelector<CoGuestState, Value> {
+            return coGuestStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<BattleState, Value> {
+            return battleStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<DeviceState, Value> {
+            return deviceStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LiveListState, Value> {
+            return liveListStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<CoHostState, Value> {
+            return coHostStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LoginState, Value> {
+            return loginStore.state.subscribe(sel)
+        } else if let sel = selector as? StatePublisherSelector<LiveSeatState, Value> {
+            return seatStore.state.subscribe(sel)
+        }
+        assertionFailure("Input failed State class")
+        return Empty<Value, Never>().eraseToAnyPublisher()
+    }
+
+    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
+        if let sel = selector as? StateSelector<AudienceMediaState, Value> {
+            return audienceMediaManager.subscribeState(sel)
+        } else if let sel = selector as? StateSelector<AudienceState, Value> {
+            return audienceObservableState.subscribe(sel)
+        } else if let sel = selector as? StateSelector<AudienceBattleState, Value> {
+            return audienceBattleObservableState.subscribe(sel)
+        }
+        assertionFailure("Input failed State class")
+        return Empty<Value, Never>().eraseToAnyPublisher()
     }
 }
 
 // MARK: - AudienceConfig
+
 extension AudienceManager {
     static func disableFeature(_ feature: AudienceViewFeature, isDisable: Bool) {
         observerAudienceConfig.update { config in
@@ -92,192 +293,21 @@ extension AudienceManager {
             }
         }
     }
-    
+
     static func subscribeAudienceConfig<Value>(_ selector: StateSelector<AudienceContainerConfig, Value>) -> AnyPublisher<Value, Never> {
         return observerAudienceConfig.subscribe(selector)
     }
 }
 
 // MARK: - Common
+
 extension AudienceManager {
     func onError(_ error: InternalError) {
-        toastSubject.send(error.localizedMessage)
-    }
-    
-    func onCameraOpened(localVideoView: UIView) {
-        context.mediaManager.onCameraOpened()
-        context.mediaManager.setLocalVideoView(view: localVideoView)
-    }
-    
-    func onReceiveGift(price: Int, senderUserId: String) {
-        context.roomManager.onReceiveGift(price: price, senderUserId: senderUserId)
+        context.toastSubject.send(error.localizedMessage)
     }
 }
 
-// MARK: - Audience
-extension AudienceManager {
-    func prepareRoomIdBeforeEnterRoom(roomId: String) {
-        context.roomManager.prepareRoomIdBeforeEnterRoom(roomId: roomId)
-    }
-    
-    func onJoinLive(liveInfo: TUILiveInfo) {
-        context.roomManager.onJoinLive(liveInfo: liveInfo)
-        context.mediaManager.onJoinLive(liveInfo: liveInfo)
-    }
-    
-    func onLeaveLive() {
-        context.roomManager.onLeaveLive()
-        context.userManager.onLeaveLive()
-        context.mediaManager.onLeaveLive()
-    }
-    
-    func onAudienceSliderCellInit(liveInfo: LiveInfo) {
-        context.roomManager.onAudienceSliderCellInit(liveInfo: liveInfo)
-    }
-    
-    func onStartRequestIntraRoomConnection() {
-        context.coGuestManager.onStartRequestIntraRoomConnection()
-    }
-    
-    func onRequestIntraRoomConnectionFailed() {
-        context.coGuestManager.onRequestIntraRoomConnectionFailed()
-    }
-    
-    func onStartCancelIntraRoomConnection() {
-        context.coGuestManager.onStartCancelIntraRoomConnection()
-    }
-    
-    func onCancelIntraRoomConnection() {
-        context.coGuestManager.onCancelIntraRoomConnection()
-    }
-    
-    func getUserInfo(userId: String) async throws -> TUIUserInfo {
-        try await context.userManager.getUserInfo(userId: userId)
-    }
-    
-    func onBattleExited() {
-        context.battleManager.onBattleExited()
-    }
-}
-
-// MARK: - Observer
-extension AudienceManager {
-    func onUserConnectionRejected(userId: String) {
-        toastSubject.send(.takeSeatApplicationRejected)
-        context.coGuestManager.onUserConnectionRejected(userId: userId)
-    }
-    
-    func onUserConnectionTimeout(userId: String) {
-        toastSubject.send(.takeSeatApplicationTimeout)
-        context.coGuestManager.onUserConnectionTimeout(userId: userId)
-    }
-    
-    func onKickedOffSeat() {
-        toastSubject.send(.kickedOutOfSeat)
-        context.coGuestManager.onKickedOffSeat()
-    }
-}
-
-// MARK: - Tools
-extension AudienceManager {
-    // State
-    var roomState: AudienceRoomState {
-        context.roomManager.roomState
-    }
-    var mediaState: AudienceMediaState {
-        context.mediaManager.mediaState
-    }
-    var userState: AudienceUserState {
-        context.userManager.userState
-    }
-    var coGuestState: AudienceCoGuestState {
-        context.coGuestManager.coGuestState
-    }
-    var battleState: AudienceBattleState {
-        context.battleManager.state
-    }
-    
-    // Manager
-    var battleManager: AudienceBattleManager {
-        context.battleManager
-    }
-    var mediaManager: AudienceMediaManager {
-        context.mediaManager
-    }
-    
-    // Other
-    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        if let sel = selector as? StateSelector<AudienceUserState, Value> {
-            return context.userManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AudienceRoomState, Value> {
-            return context.roomManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AudienceBattleState, Value> {
-            return context.battleManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AudienceMediaState, Value> {
-            return context.mediaManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AudienceCoGuestState, Value> {
-            return context.coGuestManager.subscribeState(sel)
-        }
-        assert(false, "Not impl")
-        return Empty<Value, Never>().eraseToAnyPublisher()
-    }
-    
-    func subscribeCoreViewState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        guard let provider = context.provider else { return Empty<Value, Never>().eraseToAnyPublisher() }
-        return provider.subscribeCoreViewState(selector)
-    }
-}
-
-extension AudienceManager {
-    var coreRoomState: RoomState {
-        context.coreRoomState
-    }
-    var coreUserState: UserState {
-        context.coreUserState
-    }
-    var coreMediaState: MediaState {
-        context.coreMediaState
-    }
-    var coreCoHostState: CoHostState {
-        context.coreCoHostState
-    }
-    var coreCoGuestState: CoGuestState {
-        context.coreCoGuestState
-    }
-    var coreBattleState: BattleState {
-        context.coreBattleState
-    }
-}
-
-extension AudienceManager.Context {
-    var coreRoomState: RoomState {
-        guard let provider = provider else { return RoomState() }
-        return provider.getCoreViewState()
-    }
-    var coreUserState: UserState {
-        guard let provider = provider else { return UserState() }
-        return provider.getCoreViewState()
-    }
-    var coreMediaState: MediaState {
-        guard let provider = provider else { return MediaState() }
-        return provider.getCoreViewState()
-    }
-    var coreCoHostState: CoHostState {
-        guard let provider = provider else { return CoHostState() }
-        return provider.getCoreViewState()
-    }
-    var coreCoGuestState: CoGuestState {
-        guard let provider = provider else { return CoGuestState() }
-        return provider.getCoreViewState()
-    }
-    var coreBattleState: BattleState {
-        guard let provider = provider else { return BattleState() }
-        return provider.getCoreViewState()
-    }
-}
-
-fileprivate extension String {
+private extension String {
     static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
     static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
-    static let kickedOutOfSeat = internalLocalized("Kicked out of seat by room owner")
 }

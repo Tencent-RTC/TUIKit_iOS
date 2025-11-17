@@ -28,17 +28,19 @@ enum VRRoute {
     case audience
     case roomInfo
     case recentViewer
-    case voiceLinkControl(_ coreView: SeatGridView)
-    case linkInviteControl(_ coreView: SeatGridView, _ index: Int)
-    case userControl(_ coreView: SeatGridView, _ user: TUISeatInfo)
+    case voiceLinkControl
+    case linkInviteControl(_ index: Int)
+    case userControl(_ imStore: VoiceRoomIMStore, _ user: TUISeatInfo)
     case featureSetting(_ settingModel: VRFeatureClickPanelModel)
-    case listMenu(_ data: ActionPanelData)
+    case listMenu(_ data: ActionPanelData,_ layout: ActionPanelLayoutMode = .stickToBottom)
     case audioEffect
     case giftView
-    case systemImageSelection(_ imageType: VRImageType, isSetToService: Bool = false)
-    case prepareSetting
-    case alert(info: VRAlertInfo)
-    case layout
+    case systemImageSelection(_ imageType: VRImageType, _ sceneType: VRImageSelectionPanel.SceneType)
+    case prepareSetting(_ prepareStore: VoiceRoomPrepareStore)
+    case alert(info: VRAlertInfo,_ second: Int = 0)
+    case layout(_ prepareStore: VoiceRoomPrepareStore)
+    case connectionControl
+    case coHostUserControl(_ seatInfo: SeatInfo,_ type: VRCoHostUserManagerPanelType)
 }
 
 extension VRRoute: Equatable {
@@ -52,19 +54,23 @@ extension VRRoute: Equatable {
                 (.audioEffect,.audioEffect),
                 (.giftView, .giftView),
                 (.prepareSetting, .prepareSetting),
-                (.alert, .alert),
-                (.layout, .layout):
+                (.layout, .layout),
+                (.connectionControl, .connectionControl):
                 return true
             case let (.featureSetting(l), .featureSetting(r)):
                 return l == r
-            case let (.listMenu(l), .listMenu(r)):
-                return l == r
+            case let (.listMenu(l1,l2), .listMenu(r1,r2)):
+                return l1 == r1 && l2 == r2
             case let (.systemImageSelection(l1, l2), .systemImageSelection(r1, r2)):
                 return l1 == r1 && l2 == r2
             case let (.linkInviteControl(l), .linkInviteControl(r)):
                 return l == r
-            case let (.userControl(l), .userControl(r)):
-                return l == r
+            case let (.userControl(l1,l2), .userControl(r1,r2)):
+                return l1 == r1 && l2 == r2
+            case let (.coHostUserControl(l1,l2), .coHostUserControl(r1,r2)):
+                return l1 == r1 && l2 == r2
+            case let (.alert(l1,l2), .alert(r1, r2)):
+                return l1 == r1 && l2 == r2
             case (.anchor, _),
                 (.audience, _),
                 (.roomInfo, _),
@@ -79,7 +85,9 @@ extension VRRoute: Equatable {
                 (.systemImageSelection, _),
                 (.prepareSetting, _),
                 (.alert, _),
-                (.layout,_):
+                (.layout,_),
+                (.coHostUserControl,_),
+                (.connectionControl,_):
                 return false
             default:
                 break
@@ -102,11 +110,11 @@ extension VRRoute: Hashable {
                 return "voiceLinkControl"
             case .linkInviteControl(let index):
                 return "linkInviteControl \(index)"
-            case .userControl(let coreView, let seatInfo):
-                return "linkInviteControl \(coreView) \(seatInfo.userId)"
+            case .userControl(let imStore, let seatInfo):
+                return "linkInviteControl \(seatInfo.userId ?? "")"
             case .featureSetting(let settingModel):
                 return "featureSetting" + settingModel.id.uuidString
-            case .listMenu(let data):
+            case .listMenu(let data,_):
                 var result = "listMenu"
                 data.items.forEach { item in
                     result += item.id.uuidString
@@ -116,14 +124,18 @@ extension VRRoute: Hashable {
                 return "audioEffect"
             case .giftView:
                 return "giftView"
-            case .systemImageSelection(let imageType, let isSetToService):
-                return "systemImageSelection \(imageType.rawValue) \(isSetToService)"
+            case .systemImageSelection(let imageType, let sceneType):
+                return "systemImageSelection \(imageType.rawValue) \(sceneType)"
             case .prepareSetting:
                 return "prepareSetting"
-            case .alert(let alertInfo):
+            case .alert(let alertInfo,_):
                 return "alert \(alertInfo.description)"
             case .layout:
                 return "VoiceRoomlayout"
+            case .connectionControl:
+                return "connectionControl"
+            case .coHostUserControl(let seatInfo,_):
+                return "coHostUserControl \(seatInfo.userInfo.userID)"
         }
     }
     

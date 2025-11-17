@@ -5,29 +5,25 @@
 //  Created by jeremiawang on 2024/11/19.
 //
 
-import RTCRoomEngine
+import AtomicXCore
 
 struct AudienceMediaState {
-    var audioQuality: TUIAudioQuality = .default
-    var videoQuality: TUIVideoQuality = .quality1080P
-    var isAudioLocked: Bool = false
-    var isVideoLocked: Bool = false
-   
-    var playbackQuality: TUIVideoQuality? = nil
-    var playbackQualityList: [TUIVideoQuality] = []
-    var videoAdvanceSettings: AudienceVideoAdvanceSetting = AudienceVideoAdvanceSetting()
+    var videoQuality: VideoQuality = .quality1080P
+
+    var playbackQuality: VideoQuality? = nil
+    var playbackQualityList: [VideoQuality] = []
+    var videoAdvanceSettings: AudienceVideoAdvanceSetting = .init()
 }
 
 struct AudienceVideoAdvanceSetting {
-    
     var isVisible: Bool = false
-    
+
     var isUltimateEnabled: Bool = false
-    
+
     var isBFrameEnabled: Bool = false
-    
+
     var isH265Enabled: Bool = false
-    
+
     var hdrRenderType: AudienceHDRRenderType = .none
 }
 

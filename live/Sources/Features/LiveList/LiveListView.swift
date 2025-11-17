@@ -5,10 +5,10 @@
 //  Created by jeremiawang on 2025/4/15.
 //
 
-import UIKit
+import AtomicXCore
 import MJRefresh
 import RTCCommon
-import RTCRoomEngine
+import UIKit
 
 public class LiveListView: UIView {
     public weak var adapter: LiveListViewAdapter?
@@ -22,13 +22,14 @@ public class LiveListView: UIView {
         self.dataSource = self
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     public func setColumnStyle(style: LiveListViewStyle) {
         guard currentStyle != style else { return }
-        LiveKitLog.info("\(#file)","\(#line)", "setColumnStyle style: \(style)")
+        LiveKitLog.info("\(#file)", "\(#line)", "setColumnStyle style: \(style)")
         currentStyle = style
         collectionView.contentInsetAdjustmentBehavior = currentStyle == .doubleColumn ? .automatic : .never
         activateConstraints()
@@ -48,7 +49,7 @@ public class LiveListView: UIView {
                 collectionView.scrollToItem(at: targetIndexPath, at: .top, animated: true)
                 currentPageInSingleStyle = targetIndexPath.item
                 if let newLiveView = collectionView.cellForItem(at: targetIndexPath) as? LiveListViewCell {
-                    newLiveView.startPreload(roomId: liveList[targetIndexPath.item].roomId, isMuteAudio: false)
+                    newLiveView.startPreload(roomId: liveList[targetIndexPath.item].liveID, isMuteAudio: false)
                 }
             }
             doublePlayingIndexPaths.removeAll()
@@ -79,7 +80,7 @@ public class LiveListView: UIView {
     public func refreshLiveList() {
         let now = Date().timeIntervalSince1970
         guard !isFetchingLiveList, now - lastRefreshTime >= 2 else { return }
-        LiveKitLog.info("\(#file)","\(#line)", "refreshLiveList")
+        LiveKitLog.info("\(#file)", "\(#line)", "refreshLiveList")
         lastRefreshTime = now
         isFirstFetch = true
         isFetchingLiveList = true
@@ -87,14 +88,15 @@ public class LiveListView: UIView {
             guard let self = self else { return }
             isFetchingLiveList = false
             onFetchLiveListSuccess(cursor: cursor, liveList: liveList)
-        } onError: { [weak self] _, _ in
+        } onError: { [weak self] _ in
             guard let self = self else { return }
             isFetchingLiveList = false
             preloadTopFullyVisibleRow()
         }
         if FloatWindow.shared.isShowingFloatWindow(),
            let floatRoomId = FloatWindow.shared.getCurrentRoomId(),
-           let item = liveList.firstIndex(where: { $0.roomId == floatRoomId }) {
+           let item = liveList.firstIndex(where: { $0.liveID == floatRoomId })
+        {
             willEnterRoomIndexPath = IndexPath(item: item, section: 0)
         } else {
             willEnterRoomIndexPath = nil
@@ -103,7 +105,7 @@ public class LiveListView: UIView {
     }
     
     public func onRouteToNextPage() {
-        LiveKitLog.info("\(#file)","\(#line)", "onRouteToNextPage")
+        LiveKitLog.info("\(#file)", "\(#line)", "onRouteToNextPage")
         for indexPath in doublePlayingIndexPaths {
             guard indexPath.item < liveList.count,
                   let cell = collectionView.cellForItem(at: indexPath) as? LiveListViewCell,
@@ -131,7 +133,7 @@ public class LiveListView: UIView {
     private let fetchCount = 20
     
     private var isViewReady = false
-    public override func didMoveToWindow() {
+    override public func didMoveToWindow() {
         super.didMoveToWindow()
         guard !isViewReady else { return }
         constructViewHierarchy()
@@ -177,6 +179,7 @@ public class LiveListView: UIView {
 }
 
 // MARK: - Private
+
 extension LiveListView {
     private func constructViewHierarchy() {
         addSubview(collectionView)
@@ -205,14 +208,14 @@ extension LiveListView {
             guard let self = self else { return }
             isFetchingLiveList = false
             onFetchLiveListSuccess(cursor: cursor, liveList: liveList)
-        } onError: { [weak self] _, _ in
+        } onError: { [weak self] _ in
             guard let self = self else { return }
             isFetchingLiveList = false
         }
     }
     
     private func onFetchLiveListSuccess(cursor: String, liveList: [LiveInfo]) {
-        LiveKitLog.info("\(#file)","\(#line)", "onFetchLiveListSuccess")
+        LiveKitLog.info("\(#file)", "\(#line)", "onFetchLiveListSuccess")
         if cursor == "" {
             collectionView.mj_footer?.endRefreshingWithNoMoreData()
         } else {
@@ -233,7 +236,7 @@ extension LiveListView {
     private func preloadTopFullyVisibleRow() {
         guard currentStyle == .doubleColumn, isOnCurrentView else { return }
         
-        LiveKitLog.info("\(#file)","\(#line)", "preloadTopFullyVisibleRow")
+        LiveKitLog.info("\(#file)", "\(#line)", "preloadTopFullyVisibleRow")
         let visibleIndexPaths = collectionView.indexPathsForVisibleItems
         guard !visibleIndexPaths.isEmpty else { return }
         let topFullyVisibleRowIndexPaths = getTopFullyVisibleRowIndexPaths()
@@ -259,7 +262,7 @@ extension LiveListView {
                           self.collectionView.cellForItem(at: indexPath) === cell,
                           self.getTopFullyVisibleRowIndexPaths().contains(indexPath)
                     else { return }
-                    cell.startPreload(roomId: self.liveList[indexPath.item].roomId)
+                    cell.startPreload(roomId: self.liveList[indexPath.item].liveID)
                     doublePlayingIndexPaths.insert(indexPath)
                 }
             } else {
@@ -332,7 +335,7 @@ extension LiveListView: UICollectionViewDelegate {
         guard let cell = cell as? LiveListViewCell, isOnCurrentView else { return }
         if currentStyle == .singleColumn {
             let isMute = currentPageInSingleStyle != indexPath.item
-            cell.startPreload(roomId: liveList[indexPath.item].roomId, isMuteAudio: isMute)
+            cell.startPreload(roomId: liveList[indexPath.item].liveID, isMuteAudio: isMute)
         }
     }
 
@@ -415,7 +418,7 @@ extension LiveListView: UIScrollViewDelegate {
         if newPage != currentPageInSingleStyle {
             let newIndexPath = IndexPath(item: newPage, section: 0)
             if let newLiveView = collectionView.cellForItem(at: newIndexPath) as? LiveListViewCell {
-                newLiveView.startPreload(roomId: liveList[newPage].roomId, isMuteAudio: false)
+                newLiveView.startPreload(roomId: liveList[newPage].liveID, isMuteAudio: false)
             }
         }
         
@@ -430,19 +433,19 @@ extension LiveListView: UIScrollViewDelegate {
 }
 
 extension LiveListView: LiveListDataSource {
-    public func fetchLiveList(cursor: String, onSuccess: @escaping LiveListBlock, onError: @escaping TUIErrorBlock) {
-        let liveListManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .liveListManager) as? TUILiveListManager
-        liveListManager?.fetchLiveList(cursor: cursor, count: fetchCount) { cursor, list in
-            let liveInfoList = list.map { tuiLiveInfo in
-                LiveInfo(tuiLiveInfo: tuiLiveInfo)
+    public func fetchLiveList(cursor: String, onSuccess: @escaping LiveListBlock, onError: @escaping LiveListErrorBlock) {
+        LiveListStore.shared.fetchLiveList(cursor: cursor, count: fetchCount) { [weak self] result in
+            switch result {
+            case .success():
+                onSuccess(LiveListStore.shared.state.value.liveListCursor, LiveListStore.shared.state.value.liveList)
+            case .failure(let err):
+                if let self = self {
+                    let error = InternalError(code: err.code, message: err.message)
+                    makeToast(message: error.localizedMessage)
+                }
+                LiveKitLog.error("\(#file)", "\(#line)", "fetchLiveList:[onError:[code:\(err.code),message:\(err.message)]]")
+                onError(err)
             }
-            onSuccess(cursor, liveInfoList)
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            let error = InternalError(code: code.rawValue, message: message)
-            makeToast(error.localizedMessage)
-            LiveKitLog.error("\(#file)","\(#line)","fetchLiveList:[onError:[code:\(code),message:\(message)]]")
-            onError(code, message)
         }
     }
 }
@@ -450,7 +453,7 @@ extension LiveListView: LiveListDataSource {
 extension LiveListView: LiveListViewAdapter {
     public func createLiveInfoView(info: LiveInfo) -> UIView {
         return currentStyle == .singleColumn ? SingleColumnWidgetView(liveInfo: info)
-                                             : DoubleColumnWidgetView(liveInfo: info)
+            : DoubleColumnWidgetView(liveInfo: info)
     }
     
     public func updateLiveInfoView(view: UIView, info: LiveInfo) {

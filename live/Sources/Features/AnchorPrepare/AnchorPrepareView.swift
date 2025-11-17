@@ -160,36 +160,40 @@ public class AnchorPrepareView: UIView {
     }
     
     private func startCameraAndMicrophone() {
-        coreView.startCamera(useFrontCamera: true) { [weak self] in
+        DeviceStore.shared.openLocalCamera(isFront: true) { [weak self] result in
             guard let self = self else { return }
-            coreView.startMicrophone() {
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                let error = InternalError(code: code.rawValue, message: message)
-                makeToast(error.localizedMessage)
-                coreView.stopCamera()
+            switch result {
+            case .success():
+                DeviceStore.shared.openLocalMicrophone { [weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .failure(let err):
+                        let error = InternalError(code: err.code, message: err.message)
+                        makeToast(message: error.localizedMessage)
+                        DeviceStore.shared.closeLocalCamera()
+                        startButton.isEnabled = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                            guard let self = self else { return }
+                            delegate?.onClickBackButton()
+                        }
+                    default: break
+                    }
+                }
+            case .failure(let err):
+                let error = InternalError(code: err.code, message: err.message)
+                makeToast(message: error.localizedMessage)
                 startButton.isEnabled = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     guard let self = self else { return }
                     delegate?.onClickBackButton()
                 }
             }
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            let error = InternalError(code: code.rawValue, message: message)
-            makeToast(error.localizedMessage)
-            startButton.isEnabled = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                guard let self = self else { return }
-                delegate?.onClickBackButton()
-            }
         }
     }
     
     private func getDefaultRoomName() -> String {
-        let userState: UserState = coreView.getState()
-        let selfInfo = userState.selfInfo
-        return selfInfo.userName.isEmpty ? selfInfo.userId : selfInfo.userName
+        guard let selfInfo = LoginStore.shared.state.value.loginUserInfo else { return "" }
+        return (selfInfo.nickname ?? "").isEmpty ? selfInfo.userID : (selfInfo.nickname ?? "")
     }
     
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -430,8 +434,7 @@ extension AnchorPrepareView {
             guard let self = self else { return }
             isUserInteractionEnabled = true
         }
-        coreView.stopCamera()
-        coreView.stopMicrophone()
+        DeviceStore.shared.reset()
         delegate?.onClickBackButton()
     }
     
@@ -526,8 +529,7 @@ extension AnchorPrepareView {
     }
     
     private func flipClick() {
-        let mediaState: MediaState = coreView.getState()
-        coreView.switchCamera(isFront: !mediaState.isFrontCamera)
+        DeviceStore.shared.switchCamera(isFront: !DeviceStore.shared.state.value.isFrontCamera)
     }
     
     private func layoutClick() {
@@ -563,7 +565,7 @@ extension AnchorPrepareView {
         let viewRatio = coreView.bounds.width / coreView.bounds.height
         let canvasRatio: CGFloat = 9.0 / 16.0
         if mode == .verticalFloatDynamic && viewRatio > canvasRatio {
-            view.makeToast(.template601ExceptionText)
+            view.makeToast(message: .template601ExceptionText)
         }
     }
     

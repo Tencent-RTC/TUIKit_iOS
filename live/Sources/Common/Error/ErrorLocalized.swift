@@ -391,7 +391,7 @@ extension LiveError: LocalizedError {
         case .userNotEntered:   // 100005
             return internalLocalized("Not a room member")
         case .insufficientOperationPermissions: // 100006
-            return internalLocalized("You do not have permission to perform this operation")
+            return internalLocalized("You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)")
         case .noPaymentInformation: // 100007
             return internalLocalized("No payment information, you need to purchase a package in the console")
         case .roomIsFull:   // 100008

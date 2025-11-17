@@ -19,7 +19,7 @@ public protocol BarrageStreamViewDelegate: AnyObject {
 public class BarrageStreamView: UIView {
     public weak var delegate: BarrageStreamViewDelegate?
     
-    private let liveId: String
+    private let liveID: String
     private var ownerId: String = ""
     private var lastReloadDate: Date?
     
@@ -43,8 +43,8 @@ public class BarrageStreamView: UIView {
         return view
     }()
 
-    public init(liveId: String) {
-        self.liveId = liveId
+    public init(liveID: String) {
+        self.liveID = liveID
         super.init(frame: .zero)
         initEmotions()
         
@@ -52,7 +52,7 @@ public class BarrageStreamView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] msg in
                 guard let self = self else { return }
-                superview?.makeToast(msg)
+                superview?.makeToast(message: msg)
             }
             .store(in: &cancellableSet)
     }
@@ -155,11 +155,11 @@ extension BarrageStreamView {
     }
     
     var barrageStore: BarrageStore {
-        return BarrageStore.create(liveID: liveId)
+        return BarrageStore.create(liveID: liveID)
     }
     
     var liveAudienceStore: LiveAudienceStore {
-        return LiveAudienceStore.create(liveID: liveId)
+        return LiveAudienceStore.create(liveID: liveID)
     }
 }
 
@@ -184,13 +184,12 @@ extension BarrageStreamView {
                 switch event {
                 case .onAudienceJoined(audience: let audience):
                     var barrage = Barrage()
-                    barrage.liveID = liveId
+                    barrage.liveID = liveID
                     barrage.sender = audience
                     barrage.textContent = " \(String.comingText)"
                     barrage.timestampInSecond = Date().timeIntervalSince1970
                     barrageStore.appendLocalTip(message: barrage)
-                case .onAudienceLeft(audience: _):
-                    break
+                default: break
                 }
             }
             .store(in: &cancellableSet)

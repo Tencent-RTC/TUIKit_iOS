@@ -30,16 +30,16 @@ public class LiveKitLog {
         case info = 0
     }
 
-    public static func error(_ file: String, _ line: String, _ messages: String...) {
-        log(level: .error, file: file, line: line, messages)
+    public static func error(file: String = #file, line: Int = #line, _ messages: String...) {
+        log(level: .error, file: file, line: String(line), messages)
     }
 
-    public static func warn(_ file: String, _ line: String, _ messages: String...) {
-        log(level: .warn, file: file, line: line, messages)
+    public static func warn(file: String = #file, line: Int = #line, _ messages: String...) {
+        log(level: .warn, file: file, line: String(line), messages)
     }
 
-    public static func info(_ file: String, _ line: String, _ messages: String...) {
-        log(level: .info, file: file, line: line, messages)
+    public static func info(file: String = #file, line: Int = #line, _ messages: String...) {
+        log(level: .info, file: file, line: String(line), messages)
     }
 
     private static func log(level: LiveKitLogLevel = .info, file: String, line: String, _ messages: [String]) {

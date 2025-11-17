@@ -40,7 +40,7 @@ public class SongListViewController: UIViewController {
 
     private let songListButton: UIButton = {
         let button = UIButton()
-        button.setTitle(.orderedText, for: .normal)
+        button.setTitle(.songText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(UIColor(white: 1, alpha: 0.9), for: .normal)
         return button
@@ -322,6 +322,7 @@ extension SongListViewController: UITableViewDataSource, UITableViewDelegate{
 
 fileprivate extension String {
     static var orderedText: String = ("Ordered").localized
+    static var songText: String = ("Song").localized
     static var orderedCountText: String = ("Ordered(xxx)").localized
     static var exitOrder: String = ("Exit Order").localized
 }

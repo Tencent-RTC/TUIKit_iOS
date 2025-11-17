@@ -10,14 +10,14 @@ import Combine
 import RTCCommon
 
 class VRPrepareSettingPanel: UIView {
-    private let manager: VoiceRoomManager
     private let routerManager: VRRouterManager
+    private let prepareStore: VoiceRoomPrepareStore
     private var cancellableSet = Set<AnyCancellable>()
     private lazy var menus: [SwitchItem] = {
-        var item = SwitchItem(title: .needRequestText, isOn: manager.coreLiveState.seatMode == .apply)
+        var item = SwitchItem(title: .needRequestText, isOn: prepareStore.state.liveInfo.seatMode == .apply)
         item.action = { [weak self] isNeedToApply in
             guard let self = self else { return }
-            manager.onChangedSeatMode(isNeedToApply ? .applyToTake : .freeToTake)
+            prepareStore.onChangedSeatMode(isNeedToApply ? .applyToTake : .freeToTake)
         }
         let menus = [item]
         return menus
@@ -54,8 +54,8 @@ class VRPrepareSettingPanel: UIView {
         return tableView
     }()
     
-    init(manager: VoiceRoomManager, routerManager: VRRouterManager) {
-        self.manager = manager
+    init(prepareStore: VoiceRoomPrepareStore, routerManager: VRRouterManager) {
+        self.prepareStore = prepareStore
         self.routerManager = routerManager
         super.init(frame: .zero)
     }

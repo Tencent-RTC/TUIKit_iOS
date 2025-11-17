@@ -5,44 +5,56 @@
 //  Created by jeremiawang on 2025/2/17.
 //
 
-import RTCRoomEngine
 import AtomicXCore
-import RTCCommon
 import Combine
 import ImSDK_Plus
+import RTCCommon
 
 class AudienceUserManagePanelView: RTCBaseView {
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
     private weak var coreView: LiveCoreView?
     private let userManagePanelType: AudienceUserManagePanelType
-    private var user: TUIUserInfo
+    private var user: SeatInfo
     @Published private var isFollow: Bool = false
     
     private var isSelf: Bool {
-        user.userId == manager.coreUserState.selfInfo.userId
+        user.userInfo.userID == manager.loginState.loginUserInfo?.userID
     }
+
     private var isOwner: Bool {
-        user.userId == manager.coreRoomState.ownerInfo.userId
+        user.userInfo.userID == manager.liveListState.currentLive.liveOwner.userID
     }
+
     private var isSelfMuted: Bool {
-        manager.coreMediaState.isMicrophoneMuted
+        if let selfInfo = manager.seatState.seatList.filter({ $0.userInfo.userID == manager.selfUserID }).first {
+            return selfInfo.userInfo.microphoneStatus == .off
+        }
+        return true
     }
+
     private var isSelfCameraOpened: Bool {
-        manager.coreMediaState.isCameraOpened
+        if let selfInfo = manager.seatState.seatList.filter({ $0.userInfo.userID == manager.selfUserID }).first {
+            return selfInfo.userInfo.cameraStatus == .on
+        }
+        return false
     }
+
     private var isSelfOnSeat: Bool {
-        manager.coGuestState.coGuestStatus == .linking
+        manager.coGuestState.connected.isOnSeat()
     }
+
     private var isAudioLocked: Bool {
-        return manager.coGuestState.lockAudioUserList.contains(user.userId)
+        !(manager.coGuestState.connected.filter { $0.userID == user.userInfo.userID }.first?.allowOpenMicrophone ?? true)
     }
+
     private var isCameraLocked: Bool {
-        return manager.coGuestState.lockVideoUserList.contains(user.userId)
+        !(manager.coGuestState.connected.filter { $0.userID == user.userInfo.userID }.first?.allowOpenCamera ?? true)
     }
+
     private var cancellableSet = Set<AnyCancellable>()
     
-    public init(user: TUIUserInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView, type: AudienceUserManagePanelType) {
+    init(user: SeatInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView, type: AudienceUserManagePanelType) {
         self.user = user
         self.manager = manager
         self.routerManager = routerManager
@@ -51,6 +63,7 @@ class AudienceUserManagePanelView: RTCBaseView {
         super.init(frame: .zero)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -73,7 +86,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
-        label.text = user.userName.isEmpty ? user.userId : user.userName
+        label.text = user.userInfo.userName.isEmpty ? user.userInfo.userID : user.userInfo.userName
         label.font = .customFont(ofSize: 16)
         label.textColor = .g7
         return label
@@ -82,7 +95,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     private lazy var idLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12)
-        label.text = "ID: " + user.userId
+        label.text = "ID: " + user.userInfo.userID
         label.textColor = .greyColor
         return label
     }()
@@ -106,7 +119,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     }()
 
     override func constructViewHierarchy() {
-        self.layer.masksToBounds = true
+        layer.masksToBounds = true
         addSubview(userInfoView)
         userInfoView.addSubview(avatarImageView)
         userInfoView.addSubview(userNameLabel)
@@ -136,12 +149,12 @@ class AudienceUserManagePanelView: RTCBaseView {
             make.height.equalTo(17.scale375())
             make.width.lessThanOrEqualTo(200.scale375())
         }
-        followButton.snp.makeConstraints{ make in
+        followButton.snp.makeConstraints { make in
             make.trailing.centerY.equalToSuperview()
             make.width.equalTo(67.scale375())
             make.height.equalTo(32.scale375())
         }
-        featureClickPanel.snp.makeConstraints{ make in
+        featureClickPanel.snp.makeConstraints { make in
             make.top.equalTo(userInfoView.snp.bottom).offset(21.scale375())
             make.leading.equalTo(userInfoView)
             make.bottom.equalToSuperview()
@@ -157,7 +170,7 @@ class AudienceUserManagePanelView: RTCBaseView {
         backgroundColor = .g2
         layer.cornerRadius = 12
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
         checkFollowStatus()
     }
     
@@ -178,40 +191,26 @@ class AudienceUserManagePanelView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        let isCameraOpenedPublisher = manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \MediaState.isCameraOpened))
-        let isMicrophoneMutedPublisher = manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \MediaState.isMicrophoneMuted))
-        let isAudioLockedPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.isAudioLocked))
-        let isVideoLockedPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.isVideoLocked))
-        let lockAudioUserListPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.lockAudioUserList))
-        let lockVideoUserListPublisher = manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.lockVideoUserList))
-        
+        let isCameraOpenedPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \DeviceState.cameraStatus))
+        let isMicrophoneMutedPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \DeviceState.microphoneStatus))
         isCameraOpenedPublisher.removeDuplicates()
-            .combineLatest(isMicrophoneMutedPublisher.removeDuplicates(),
-                           isAudioLockedPublisher.removeDuplicates(),
-                           isVideoLockedPublisher.removeDuplicates())
+            .combineLatest(isMicrophoneMutedPublisher.removeDuplicates())
             .receive(on: RunLoop.main)
-            .sink { [weak self] isCameraOpened in
-                guard let self = self, isSelf else { return }
-                updateFeatureItems()
-            }
-            .store(in: &cancellableSet)
-        
-        lockAudioUserListPublisher.removeDuplicates()
-            .combineLatest(lockVideoUserListPublisher.removeDuplicates())
-            .receive(on: RunLoop.main)
-            .sink { [weak self] isCameraOpened in
+            .sink { [weak self] _ in
                 guard let self = self else { return }
                 updateFeatureItems()
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoGuestState.connectedUserList))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] seatList in
-                guard let self = self, userManagePanelType == .mediaAndSeat,
-                      user.userId != manager.coreRoomState.ownerInfo.userId else { return }
-                if !seatList.contains(where: { $0.userId == self.user.userId }) {
+                guard let self = self else { return }
+                updateFeatureItems()
+                guard userManagePanelType == .mediaAndSeat,
+                      user.userInfo.userID != manager.liveListState.currentLive.liveOwner.userID else { return }
+                if !seatList.contains(where: { $0.userID == self.user.userInfo.userID }) {
                     routerManager.router(action: .dismiss())
                 }
             }
@@ -219,7 +218,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     }
     
     private func checkFollowStatus() {
-        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userId]) { [weak self] checkResultList in
+        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userInfo.userID]) { [weak self] checkResultList in
             guard let self = self, let result = checkResultList?.first else { return }
             if result.followType == .FOLLOW_TYPE_IN_BOTH_FOLLOWERS_LIST || result.followType == .FOLLOW_TYPE_IN_MY_FOLLOWING_LIST {
                 self.isFollow = true
@@ -246,7 +245,6 @@ class AudienceUserManagePanelView: RTCBaseView {
                     model.items.append(leaveSeatItem)
                 }
             }
-            break
         case .userInfo:
             break
         }
@@ -278,60 +276,53 @@ class AudienceUserManagePanelView: RTCBaseView {
         return designConfig
     }()
     
-    private lazy var muteSelfAudioItem: AudienceFeatureItem = {
-        AudienceFeatureItem(normalTitle: .muteAudioText,
-                      normalImage: internalImage("live_anchor_unmute_icon"),
-                      selectedTitle: .unmuteAudioText,
-                      selectedImage: internalImage("live_anchor_mute_icon"),
-                      isSelected: isSelfMuted,
-                      isDisabled: isAudioLocked,
-                      designConfig: designConfig,
-                      actionClosure: { [weak self] sender in
-            guard let self = self else { return }
-            self.muteSelfAudioClick(sender)
-        })
-    }()
+    private lazy var muteSelfAudioItem: AudienceFeatureItem = .init(normalTitle: .muteAudioText,
+                                                                    normalImage: internalImage("live_anchor_unmute_icon"),
+                                                                    selectedTitle: .unmuteAudioText,
+                                                                    selectedImage: internalImage("live_anchor_mute_icon"),
+                                                                    isSelected: isSelfMuted,
+                                                                    isDisabled: isAudioLocked,
+                                                                    designConfig: designConfig,
+                                                                    actionClosure: { [weak self] sender in
+                                                                        guard let self = self else { return }
+                                                                        self.muteSelfAudioClick(sender)
+                                                                    })
     
-    private lazy var closeSelfCameraItem: AudienceFeatureItem = {
-        AudienceFeatureItem(normalTitle: .closeCameraText,
-                      normalImage: internalImage("live_open_camera_icon"),
-                      selectedTitle: .opneCameraText,
-                      selectedImage: internalImage("live_close_camera_icon"),
-                      isSelected: !isSelfCameraOpened,
-                      isDisabled: isCameraLocked,
-                      designConfig: designConfig,
-                      actionClosure: { [weak self] sender in
-            guard let self = self else { return }
-            self.closeSelfCameraClick(sender)
-        })
-    }()
+    private lazy var closeSelfCameraItem: AudienceFeatureItem = .init(normalTitle: .closeCameraText,
+                                                                      normalImage: internalImage("live_open_camera_icon"),
+                                                                      selectedTitle: .opneCameraText,
+                                                                      selectedImage: internalImage("live_close_camera_icon"),
+                                                                      isSelected: !isSelfCameraOpened,
+                                                                      isDisabled: isCameraLocked,
+                                                                      designConfig: designConfig,
+                                                                      actionClosure: { [weak self] sender in
+                                                                          guard let self = self else { return }
+                                                                          self.closeSelfCameraClick(sender)
+                                                                      })
     
-    private lazy var flipItem: AudienceFeatureItem = {
-        AudienceFeatureItem(normalTitle: .filpText,
-                      normalImage: internalImage("live_video_setting_flip"),
-                      designConfig: designConfig,
-                      actionClosure: { [weak self] _ in
-            guard let self = self else { return }
-            self.flipClick()
-        })
-    }()
+    private lazy var flipItem: AudienceFeatureItem = .init(normalTitle: .filpText,
+                                                           normalImage: internalImage("live_video_setting_flip"),
+                                                           designConfig: designConfig,
+                                                           actionClosure: { [weak self] _ in
+                                                               guard let self = self else { return }
+                                                               self.flipClick()
+                                                           })
     
-    private lazy var leaveSeatItem: AudienceFeatureItem = {
-        AudienceFeatureItem(normalTitle: .disconnectText,
-                      normalImage: internalImage("live_leave_seat_icon"),
-                      designConfig: designConfig,
-                      actionClosure: { [weak self] _ in
-            guard let self = self else { return }
-            self.leaveSeatClick()
-        })
-    }()
+    private lazy var leaveSeatItem: AudienceFeatureItem = .init(normalTitle: .disconnectText,
+                                                                normalImage: internalImage("live_leave_seat_icon"),
+                                                                designConfig: designConfig,
+                                                                actionClosure: { [weak self] _ in
+                                                                    guard let self = self else { return }
+                                                                    self.leaveSeatClick()
+                                                                })
 }
 
 // MARK: - Action
+
 extension AudienceUserManagePanelView {
     @objc private func followButtonClick() {
         if isFollow {
-            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = false
@@ -343,7 +334,7 @@ extension AudienceUserManagePanelView {
                 manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
             }
         } else {
-            V2TIMManager.sharedInstance().followUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().followUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = true
@@ -359,16 +350,19 @@ extension AudienceUserManagePanelView {
     
     private func muteSelfAudioClick(_ sender: AudienceFeatureItemButton) {
         if isSelfMuted {
-            coreView?.unmuteMicrophone { [weak sender, weak self] in
-                guard let self = self, let sender = sender else { return }
-                sender.isSelected = isSelfMuted
-            } onError: { [weak self] code, message in
+            manager.seatStore.unmuteMicrophone { [weak sender, weak self] result in
                 guard let self = self else { return }
-                let err = InternalError(code: code.rawValue, message: message)
-                manager.toastSubject.send(err.localizedMessage)
+                switch result {
+                case .success(()):
+                    guard let sender = sender else { break }
+                    sender.isSelected = isSelfMuted
+                case .failure(let err):
+                    let err = InternalError(code: err.code, message: err.message)
+                    manager.toastSubject.send(err.localizedMessage)
+                }
             }
         } else {
-            coreView?.muteMicrophone()
+            manager.seatStore.muteMicrophone()
             sender.isSelected = !sender.isSelected
         }
         routerManager.router(action: .dismiss())
@@ -376,34 +370,38 @@ extension AudienceUserManagePanelView {
     
     private func closeSelfCameraClick(_ sender: AudienceFeatureItemButton) {
         if isSelfCameraOpened {
-            coreView?.stopCamera()
+            manager.deviceStore.closeLocalCamera()
             sender.isSelected = !sender.isSelected
         } else {
-            coreView?.startCamera(useFrontCamera: manager.coreMediaState.isFrontCamera) { [weak sender, weak self] in
-                guard let self = self, let sender = sender else { return }
-                sender.isSelected = !isSelfCameraOpened
-            } onError: { [weak self] code, message in
+            manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera) { [weak sender, weak self] result in
                 guard let self = self else { return }
-                let err = InternalError(code: code.rawValue, message: message)
-                manager.toastSubject.send(err.localizedMessage)
+                switch result {
+                case .success(()):
+                    guard let sender = sender else { break }
+                    sender.isSelected = !isSelfCameraOpened
+                case .failure(let err):
+                    let err = InternalError(code: err.code, message: err.message)
+                    manager.toastSubject.send(err.localizedMessage)
+                }
             }
         }
         routerManager.router(action: .dismiss())
     }
     
     private func flipClick() {
-        coreView?.switchCamera(isFront: !manager.coreMediaState.isFrontCamera)
+        manager.deviceStore.switchCamera(isFront: !manager.deviceState.isFrontCamera)
         routerManager.router(action: .dismiss())
     }
     
     private func leaveSeatClick() {
         let alertInfo = AudienceAlertInfo(description: .leaveSeatAlertText, imagePath: nil,
-                                    cancelButtonInfo: (.cancelText, .g3),
-                                    defaultButtonInfo: (.disconnectText, .redColor)) { alertPanel in
+                                          cancelButtonInfo: (.cancelText, .cancelTextColor),
+                                          defaultButtonInfo: (.disconnectText, .warningTextColor))
+        { alertPanel in
             alertPanel.dismiss()
         } defaultClosure: { [weak self] alertPanel in
             guard let self = self else { return }
-            coreView?.terminateIntraRoomConnection()
+            manager.coGuestStore.disConnect(completion: nil)
             alertPanel.dismiss()
             routerManager.router(action: .dismiss())
         }
@@ -412,11 +410,9 @@ extension AudienceUserManagePanelView {
     }
 }
 
-fileprivate extension String {
+private extension String {
     static let followText = internalLocalized("Follow")
-    static let disableChatText = internalLocalized("Disable Chat")
-    static let enableChatText = internalLocalized("Enable Chat")
-    static let kickOutOfRoomText = internalLocalized("Remove Out")
+    static let kickOutOfRoomText = internalLocalized("Kick Out")
     static let kickOutOfRoomConfirmText = internalLocalized("Remove")
     static let kickOutAlertText = internalLocalized("Are you sure you want to remove xxx?")
     static let muteAudioText = internalLocalized("Mute")

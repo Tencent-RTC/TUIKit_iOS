@@ -84,10 +84,6 @@ class RoomInfoPanelView: RTCBaseView {
         print("deinit \(type(of: self))")
     }
     
-    func initialize(liveInfo: TUILiveInfo) {
-        service.initLiveInfo(liveInfo: liveInfo);
-    }
-    
     override func constructViewHierarchy() {
         addSubview(backgroundView)
         addSubview(titleLabel)

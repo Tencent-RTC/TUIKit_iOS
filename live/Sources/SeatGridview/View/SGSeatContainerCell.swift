@@ -43,8 +43,22 @@ class SGSeatContainerCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         contentContainerView.subviews.forEach { $0.safeRemoveFromSuperview() }
+        cancellableSet.forEach { $0.cancel() }
+        cancellableSet.removeAll()
+        resetState()
     }
-    
+
+    private func resetState() {
+        seatInfo = nil
+        isSpeaking = false
+        volume = 0
+        isAudioMuted = true
+        isDefaultSeatView = true
+
+        volumeClosure = nil
+        seatInfoClosure = nil
+    }
+
     private func setupDisplayView() {
         contentContainerView.frame = contentView.frame
         contentContainerView.autoresizingMask = [.flexibleWidth, .flexibleHeight]

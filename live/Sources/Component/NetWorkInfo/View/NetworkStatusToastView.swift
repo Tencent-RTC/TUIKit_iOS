@@ -27,7 +27,7 @@ class NetworkStatusToastView: UIView {
 
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = internalImage("live_networkinfo_tips")
+        imageView.image = internalImage("live_tips")
         return imageView
     }()
 

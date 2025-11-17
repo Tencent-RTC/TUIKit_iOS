@@ -8,7 +8,6 @@
 import Foundation
 import Kingfisher
 import Combine
-import RTCRoomEngine
 import RTCCommon
 import AtomicXCore
 
@@ -17,10 +16,10 @@ class AnchorCoGuestView: UIView {
     private let routerManager: AnchorRouterManager
     private var cancellableSet = Set<AnyCancellable>()
     private var isViewReady: Bool = false
-    private var userInfo: TUIUserInfo
+    private var seatInfo: SeatInfo
     
-    init(userInfo: TUIUserInfo, manager: AnchorManager, routerManager: AnchorRouterManager) {
-        self.userInfo = userInfo
+    init(seatInfo: SeatInfo, manager: AnchorManager, routerManager: AnchorRouterManager) {
+        self.seatInfo = seatInfo
         self.manager = manager
         self.routerManager = routerManager
         super.init(frame: .zero)
@@ -44,7 +43,7 @@ class AnchorCoGuestView: UIView {
         initViewState()
     }
     
-    private lazy var userInfoView = AnchorUserStatusView(userInfo: userInfo, manager: manager)
+    private lazy var userInfoView = AnchorUserStatusView(seatInfo: seatInfo, manager: manager)
     
     private func constructViewHierarchy() {
         addSubview(userInfoView)
@@ -60,7 +59,7 @@ class AnchorCoGuestView: UIView {
     }
     
     private func initViewState() {
-        if manager.coreCoHostState.connectedUserList.count > 1 || manager.coreCoGuestState.connectedUserList.count > 1 {
+        if manager.coHostState.connected.count > 1 || manager.coGuestState.connected.count > 1 {
             userInfoView.isHidden = false
         } else {
             userInfoView.isHidden = true
@@ -68,12 +67,12 @@ class AnchorCoGuestView: UIView {
     }
     
     @objc private func handleTap() {
-        let isSelfOwner = manager.coreUserState.selfInfo.userRole == .roomOwner
-        let isSelfView = userInfo.userId == manager.coreUserState.selfInfo.userId
-        let isOnlyUserOnSeat = manager.coreCoGuestState.connectedUserList.count == 1
+        let isSelfOwner = manager.selfUserID == manager.liveListState.currentLive.liveOwner.userID
+        let isSelfView = manager.selfUserID == seatInfo.userInfo.userID
+        let isOnlyUserOnSeat = manager.coGuestState.connected.count == 1
         if !isSelfOwner && isOnlyUserOnSeat && !isSelfView { return }
         let type: AnchorUserManagePanelType = !isSelfOwner && !isSelfView ? .userInfo : .mediaAndSeat
-        routerManager.router(action: .present(.userManagement(userInfo, type: type)))
+        routerManager.router(action: .present(.userManagement(seatInfo, type: type)))
     }
 }
 

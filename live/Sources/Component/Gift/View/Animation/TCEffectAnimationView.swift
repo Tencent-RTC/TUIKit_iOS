@@ -72,7 +72,7 @@ extension TCEffectAnimationView: AnimationView {
         finishClosure = onFinished
         reportGiftData()
         if !isMp4File(url: playUrl) {
-            makeToast(.isNotMp4FileText)
+            makeToast(message: .isNotMp4FileText)
             onFinished(-1)
             return
         }

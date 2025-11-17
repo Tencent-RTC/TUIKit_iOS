@@ -17,9 +17,10 @@ class VRBottomMenuView: UIView {
     var cancellableSet = Set<AnyCancellable>()
     var songListButtonAction: (() -> Void)?
     
-    private let manager: VoiceRoomManager
+    private let liveID: String
     private let routerManager: VRRouterManager
-    private let coreView: SeatGridView
+    private let viewStore: VoiceRoomViewStore
+    private let toastService: VRToastService
     private let isOwner: Bool
     
     private let buttonSliceIndex: Int = 1
@@ -48,14 +49,19 @@ class VRBottomMenuView: UIView {
     private var buttons: [UIButton] = []
     
     private lazy var likeButton: LikeButton = {
-        let likeButton = LikeButton(roomId: manager.roomState.roomId)
+        let likeButton = LikeButton(roomId: liveID)
         return likeButton
     }()
     
-    init(manager: VoiceRoomManager, routerManager: VRRouterManager, coreView: SeatGridView, isOwner: Bool) {
-        self.manager = manager
+    init(liveID: String,
+         routerManager: VRRouterManager,
+         viewStore: VoiceRoomViewStore,
+         toastService: VRToastService,
+         isOwner: Bool) {
+        self.liveID = liveID
         self.routerManager = routerManager
-        self.coreView = coreView
+        self.viewStore = viewStore
+        self.toastService = toastService
         self.isOwner = isOwner
         super.init(frame: .zero)
     }
@@ -74,8 +80,10 @@ class VRBottomMenuView: UIView {
         guard !isViewReady else { return }
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
         setupViewStyle()
         setupMenuButtons()
+        setupGuestEventListener()
         isViewReady = true
     }
     
@@ -92,6 +100,28 @@ class VRBottomMenuView: UIView {
             make.leading.equalToSuperview()
         }
     }
+    
+    private func setupGuestEventListener() {
+        coGuestStore.guestEventPublisher
+            .receive(on: RunLoop.main)
+             .sink { [weak self] event in
+                 guard let self = self else { return }
+                 
+                 switch event {
+                 case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
+                     if !isAccept {
+                         toastService.showToast(.takeSeatApplicationRejected)
+                     }
+                 case .onGuestApplicationNoResponse(reason: let reason):
+                     if reason == .timeout {
+                         toastService.showToast(.takeSeatApplicationTimeout)
+                     }
+                 default:
+                     break
+                 }
+             }
+             .store(in: &cancellableSet)
+     }
     
     private func setupViewStyle() {
         stackView.spacing = buttonSpacing
@@ -137,6 +167,18 @@ class VRBottomMenuView: UIView {
         button.tag = index + 1_000
         item.bindStateClosure?(button, &cancellableSet)
         return button
+    }
+
+    private func bindInteraction() {
+        coHostStore.state.subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] connected in
+                guard let self = self else { return }
+                let battleUsers = battleStore.state.value.battleUsers
+                setupMenuButtons()
+            }
+            .store(in: &cancellableSet)
     }
 }
 
@@ -232,7 +274,30 @@ extension VRBottomMenuView {
     
     private func ownerBottomMenu() -> [VRButtonMenuInfo] {
         var menus: [VRButtonMenuInfo] = []
-        
+
+        var connectionControl = VRButtonMenuInfo(normalIcon: "seat_battle")
+        connectionControl.tapAction = { [weak self] sender in
+            guard let self = self else { return }
+            let settingItems = self.generateOwnerSettingModel()
+            self.routerManager.router(action: .present(.connectionControl))
+        }
+
+        connectionControl.bindStateClosure = { [weak self] button, cancellableSet in
+            guard let self = self else { return }
+            coHostStore.state.subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
+                .receive(on: RunLoop.main)
+                .sink { [weak self] connected in
+                    guard let self = self else { return }
+                    if !connected.isEmpty {
+                        button.setImage(internalImage("seat_in_battle"), for: .normal)
+                    } else {
+                        button.setImage(internalImage("seat_battle"), for: .normal)
+                    }
+                }
+                .store(in: &cancellableSet)
+        }
+        menus.append(connectionControl)
+
         var setting = VRButtonMenuInfo(normalIcon: "live_anchor_setting_icon")
         setting.tapAction = { [weak self] sender in
             guard let self = self else { return }
@@ -240,23 +305,26 @@ extension VRBottomMenuView {
             self.routerManager.router(action: .present(.featureSetting(settingItems)))
         }
         menus.append(setting)
-
+#if !RTCube_APPSTORE
         var songListButton = VRButtonMenuInfo(normalIcon: "ktv_songList")
         songListButton.tapAction = { [weak self] sender in
             guard let self = self else { return }
             self.songListButtonAction?()
         }
-        menus.append(songListButton)
+        if coHostStore.state.value.connected.count == 0 {
+            menus.append(songListButton)
+        }
+#endif
 
         var linkMic = VRButtonMenuInfo(normalIcon: "live_link_voice_room", normalTitle: "")
         linkMic.tapAction = { [weak self] sender in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.voiceLinkControl(self.coreView)))
+            self.routerManager.router(action: .present(.voiceLinkControl))
         }
         
-        linkMic.bindStateClosure = { [weak manager] button, cancellableSet in
-            guard let manager = manager else { return }
-            manager.subscribeState(StateSelector(keyPath: \VRSeatState.seatApplicationList))
+        linkMic.bindStateClosure = { [weak self] button, cancellableSet in
+            guard let self = self else { return }
+            coGuestStore.state.subscribe(StatePublisherSelector(keyPath: \CoGuestState.applicants))
                 .receive(on: RunLoop.main)
                 .sink(receiveValue: { list in
                     button.updateDotCount(count: list.count)
@@ -281,7 +349,7 @@ extension VRBottomMenuView {
                                        designConfig: designConfig,
                                          actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.systemImageSelection(.background, isSetToService: true)))
+            self.routerManager.router(action: .present(.systemImageSelection(.background,.voice(liveListStore))))
         }))
         model.items.append(VRFeatureItem(normalTitle: .audioEffectsText,
                                        normalImage: internalImage("live_setting_audio_effects"),
@@ -305,59 +373,48 @@ extension VRBottomMenuView {
         var linkMic = VRButtonMenuInfo(normalIcon: "live_voice_room_link_icon", selectIcon: "live_voice_room_linking_icon")
         linkMic.tapAction = { [weak self] sender in
             guard let self = self, !isPending else { return }
-            let selfUserId = manager.userState.selfInfo.userId
-            let isApplying = manager.seatState.isApplyingToTakeSeat
+            let isApplying = viewStore.state.isApplyingToTakeSeat
             if isApplying {
                 isPending = true
-                coreView.cancelRequest(userId: selfUserId) { [weak self] in
+                coGuestStore.cancelApplication { [weak self] result in
                     guard let self = self else { return }
                     isPending = false
-                    manager.onRespondedTakeSeatRequest()
-                } onError: { [weak self] code, message in
-                    guard let self = self else { return }
-                    isPending = false
-                    let error = InternalError(code: code, message: message)
-                    self.manager.onError(error.localizedMessage)
+                    switch result {
+                    case .success(()):
+                        viewStore.onRespondedTakeSeatRequest()
+                    case .failure(let error):
+                        let err = InternalError(errorInfo: error)
+                        toastService.showToast(err.localizedMessage)
+                    }
                 }
             } else {
-                let isOnSeat = manager.coreSeatState.seatList.contains(where: { $0.userInfo.userID == selfUserId })
+                let isOnSeat = seatStore.state.value.seatList.contains(where: { $0.userInfo.userID == self.selfId })
                 if isOnSeat {
-                    coreView.leaveSeat {
-                    } onError: { [weak self] code, message in
+                    coGuestStore.disConnect { [weak self] result in
                         guard let self = self else { return }
-                        let error = InternalError(code: code, message: message)
-                        self.manager.onError(error.localizedMessage)
+                        if case .failure(let error) = result {
+                            let err = InternalError(errorInfo: error)
+                            toastService.showToast(err.localizedMessage)
+                        }
                     }
-
                 } else {
                     // request
-                    if manager.seatState.isApplyingToTakeSeat {
-                        manager.onError(.repeatRequest)
+                    if viewStore.state.isApplyingToTakeSeat {
+                        toastService.showToast(.repeatRequest)
                         return
                     }
-                    let kTimeoutValue = 60
-                    manager.onSentTakeSeatRequest()
-                    coreView.takeSeat(index: -1, timeout: kTimeoutValue) { [weak self] userInfo in
+                    let seatAllToken = seatStore.state.value.seatList.prefix(KSGConnectMaxSeatCount).allSatisfy({ $0.isLocked || $0.userInfo.userID != "" })
+
+                    if seatAllToken && coHostStore.state.value.connected.count != 0 {
+                        toastService.showToast(.seatAllTokenCancelText)
+                        return
+                    }
+                    let kTimeoutValue = 60.0
+                    viewStore.onSentTakeSeatRequest()
+                    
+                    coGuestStore.applyForSeat(seatIndex: -1, timeout: kTimeoutValue, extraInfo: nil) { [weak self] result in
                         guard let self = self else { return }
-                        manager.onRespondedTakeSeatRequest()
-                    } onRejected: { [weak self] userInfo in
-                        guard let self = self else { return }
-                        manager.onRespondedTakeSeatRequest()
-                        manager.onError(.takeSeatApplicationRejected)
-                    } onCancelled: { [weak self] userInfo in
-                        guard let self = self else { return }
-                        manager.onRespondedTakeSeatRequest()
-                    } onTimeout: { [weak self] userInfo in
-                        guard let self = self else { return }
-                        manager.onRespondedTakeSeatRequest()
-                        manager.onError(.takeSeatApplicationTimeout)
-                    } onError: { [weak self] userInfo, code, message in
-                        guard let self = self else { return }
-                        if code != LiveError.requestIdRepeat.rawValue && code != LiveError.alreadyOnTheSeatQueue.rawValue {
-                            manager.onRespondedTakeSeatRequest()
-                        }
-                        let error = InternalError(code: code, message: message)
-                        self.manager.onError(error.localizedMessage)
+                        handleApplyForSeatResult(result)
                     }
                 }
             }
@@ -365,7 +422,7 @@ extension VRBottomMenuView {
         linkMic.bindStateClosure = { [weak self] button, cancellableSet in
             guard let self = self else { return }
             
-            manager.subscribeState(StateSelector(keyPath: \VRSeatState.isApplyingToTakeSeat))
+            viewStore.subscribeState(StateSelector(keyPath: \VRViewState.isApplyingToTakeSeat))
                 .sink { isApplying in
                     DispatchQueue.main.async {
                         button.isSelected = isApplying
@@ -374,25 +431,72 @@ extension VRBottomMenuView {
                 }
                 .store(in: &cancellableSet)
             
-            
-            manager.subscribeCoreState(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
+            seatStore.state.subscribe(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
                 .receive(on: RunLoop.main)
                 .sink { [weak self] seatInfoList in
                     guard let self = self else { return }
-                    let isOnSeat = seatInfoList.contains(where: { $0.userInfo.userID == self.manager.userState.selfInfo.userId })
+                    let isOnSeat = seatInfoList.contains(where: { $0.userInfo.userID == self.selfId })
                     let imageName = isOnSeat ? "live_linked_icon" : "live_voice_room_link_icon"
                     button.setImage(internalImage(imageName), for: .normal)
                 }
                 .store(in: &cancellableSet)
         }
         menus.append(linkMic)
+#if !RTCube_APPSTORE
         var songListButton = VRButtonMenuInfo(normalIcon: "ktv_songList")
         songListButton.tapAction = { [weak self] sender in
             guard let self = self else { return }
             self.songListButtonAction?()
         }
-        menus.append(songListButton)
+        if coHostStore.state.value.connected.count == 0 {
+            menus.append(songListButton)
+        }
+#endif
         return menus
+    }
+    
+    private func handleApplyForSeatResult(_ result: Result<Void, ErrorInfo>) {
+        switch result {
+        case .success():
+            viewStore.onRespondedTakeSeatRequest()
+        case .failure(let error):
+            if error.code != LiveError.requestIdRepeat.rawValue
+                && error.code != LiveError.alreadyOnTheSeatQueue.rawValue {
+                viewStore.onRespondedTakeSeatRequest()
+            }
+            let err = InternalError(errorInfo: error)
+            toastService.showToast(err.localizedMessage)
+        }
+    }
+}
+
+extension VRBottomMenuView {
+    private var selfId: String {
+        TUIRoomEngine.getSelfInfo().userId
+    }
+    
+    var deviceStore: DeviceStore {
+        return DeviceStore.shared
+    }
+    
+    var liveListStore: LiveListStore {
+        return LiveListStore.shared
+    }
+    
+    var coGuestStore: CoGuestStore {
+        return CoGuestStore.create(liveID: liveID)
+    }
+    
+    var seatStore: LiveSeatStore {
+        return LiveSeatStore.create(liveID: liveID)
+    }
+
+    var battleStore: BattleStore {
+        return BattleStore.create(liveID: liveID)
+    }
+
+    var coHostStore: CoHostStore {
+        return CoHostStore.create(liveID: liveID)
     }
 }
 
@@ -400,7 +504,8 @@ private extension String {
     static let backgroundText = internalLocalized("Background")
     static let audioEffectsText = internalLocalized("Audio")
     static let songText = internalLocalized("Song")
-    static let repeatRequest = internalLocalized("Signal request repetition")
+    static let repeatRequest = internalLocalized("Already on the seat queue")
     static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
     static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
+    static let seatAllTokenCancelText = internalLocalized("The seats are all taken.")
 }

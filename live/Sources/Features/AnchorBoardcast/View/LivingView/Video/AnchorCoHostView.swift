@@ -14,11 +14,11 @@ import AtomicXCore
 class AnchorCoHostView: UIView {
     private let manager: AnchorManager
     private var isViewReady: Bool = false
-    private var coHostUser: CoHostUser
+    private var seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(connectionUser: CoHostUser, manager: AnchorManager) {
-        self.coHostUser = connectionUser
+    init(seatInfo: SeatInfo, manager: AnchorManager) {
+        self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)
     }
@@ -38,8 +38,9 @@ class AnchorCoHostView: UIView {
         subscribeState()
         self.isUserInteractionEnabled = false
         
-        manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoHostState.connectedUserList))
-            .combineLatest(manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoGuestState.connectedUserList)))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+            .removeDuplicates()
+            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] coHostList, coGuestList in
                 guard let self = self else { return }
@@ -48,7 +49,7 @@ class AnchorCoHostView: UIView {
             .store(in: &cancellableSet)
     }
     
-    private lazy var userInfoView = AnchorUserStatusView(userInfo: TUIUserInfo(coHostUser: coHostUser), manager: manager)
+    private lazy var userInfoView = AnchorUserStatusView(seatInfo: seatInfo, manager: manager)
     
     private func constructViewHierarchy() {
         addSubview(userInfoView)

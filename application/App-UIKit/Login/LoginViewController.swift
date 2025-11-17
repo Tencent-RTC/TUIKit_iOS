@@ -10,8 +10,9 @@ import SnapKit
 import TUICore
 import RTCRoomEngine
 import RTCCommon
-import TIMCommon
 import TUICallKit_Swift
+import AtomicXCore
+import Combine
 
 class LoginViewController: UIViewController {
     private let userIdKey = "UserIdKey"
@@ -19,6 +20,8 @@ class LoginViewController: UIViewController {
     private let rootView = LoginView()
     private var isTestEnvironment = false
     private var nickName: String = ""
+    private var cancelableSet: Set<AnyCancellable> = []
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
     }
@@ -45,32 +48,33 @@ class LoginViewController: UIViewController {
     
     private func login(userId: String) {
         loading.startAnimating()
-        TUILogin.login(Int32(SDKAPPID),
-                       userID: userId,
-                       userSig: GenerateTestUserSig.genTestUserSig(identifier: userId)) { [weak self] in
+        LoginStore.shared.login(sdkAppID: Int32(SDKAPPID), userID: userId, userSig: GenerateTestUserSig.genTestUserSig(identifier: userId)) { [weak self] result in
             guard let self = self else { return }
-            UserDefaults.standard.set(userId, forKey: self.userIdKey)
-            V2TIMManager.sharedInstance()?.getUsersInfo([userId], succ: { [weak self] (infos) in
-                guard let self = self else { return }
-                if let info = infos?.first {
-                    nickName = info.nickName ?? ""
-                    let avatar = info.faceURL ?? DEFAULT_AVATAR
-                    TUICallKit.createInstance().setSelfInfo(nickname: nickName,avatar: avatar,
-                               succ: {},
-                               fail: { _, _ in })
-                }
-                self.loading.stopAnimating()
-                self.loginSucc()
-            }, fail: { [weak self] (code, error) in
-                guard let self = self else { return }
-                self.loading.stopAnimating()
-                self.loginSucc()
-            })
-            
-        } fail: { [weak self] code, errorDes in
-            guard let self = self else { return }
-            self.loading.stopAnimating()
-            TUITool.makeToast("Login failed, code: \(code), error: \(errorDes ?? "nil")")
+            loading.stopAnimating()
+            switch result {
+            case .success():
+                UserDefaults.standard.set(userId, forKey: self.userIdKey)
+                LoginStore.shared.state.subscribe(StatePublisherSelector(keyPath: \LoginState.loginUserInfo))
+                    .receive(on: RunLoop.main)
+                    .dropFirst()
+                    .sink { [weak self] user in
+                        guard let self = self, let user = user else {
+                            TUITool.makeToast("Login failed, user is null")
+                            if let self = self {
+                                cancelableSet.forEach { $0.cancel() }
+                                cancelableSet.removeAll()
+                            }
+                            return
+                        }
+                        nickName = user.nickname ?? ""
+                        loginSucc()
+                        cancelableSet.forEach { $0.cancel() }
+                        cancelableSet.removeAll()
+                    }
+                    .store(in: &cancelableSet)
+            case .failure(let err):
+                TUITool.makeToast("Login failed, code: \(err.code), error: \(err.message)")
+            }
         }
     }
     

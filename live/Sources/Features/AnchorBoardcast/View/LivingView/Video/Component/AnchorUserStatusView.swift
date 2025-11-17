@@ -17,13 +17,13 @@ class AnchorUserStatusView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
     private var muteAudio: Bool = true
     private var isViewReady: Bool = false
-    private var userInfo: TUIUserInfo
+    private let seatInfo: SeatInfo
     
-    init(userInfo: TUIUserInfo, manager: AnchorManager) {
-        self.userInfo = userInfo
+    init(seatInfo: SeatInfo, manager: AnchorManager) {
+        self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)
-        self.muteAudio = !userInfo.hasAudioStream
+        muteAudio = seatInfo.userInfo.microphoneStatus == .off
     }
     
     required init?(coder: NSCoder) {
@@ -81,7 +81,7 @@ class AnchorUserStatusView: UIView {
         backgroundColor = .g2.withAlphaComponent(0.4)
         layer.cornerRadius = 9
         layer.masksToBounds = true
-        userNameLabel.text = userInfo.userName.isEmpty ? userInfo.userId : userInfo.userName
+        userNameLabel.text = seatInfo.userInfo.userName.isEmpty ? seatInfo.userInfo.userID : seatInfo.userInfo.userName
     }
     
     private func updateAudioStatus() {

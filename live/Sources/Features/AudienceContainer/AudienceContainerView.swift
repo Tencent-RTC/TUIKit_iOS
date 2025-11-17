@@ -5,10 +5,9 @@
 //  Created by jeremiawang on 2025/6/11.
 //
 
-import TUICore
-import RTCCommon
-import RTCRoomEngine
 import AtomicXCore
+import RTCCommon
+import TUICore
 
 public enum AudienceViewFeature {
     case sliding
@@ -19,29 +18,29 @@ public enum AudienceViewFeature {
 }
 
 public class AudienceContainerView: UIView {
-    
     public weak var delegate: AudienceContainerViewDelegate?
     public weak var dataSource: AudienceContainerViewDataSource?
     public weak var rotateScreenDelegate: RotateScreenDelegate?
     
     public init(roomId: String) {
-        self.roomId = roomId
+        self.liveID = roomId
         super.init(frame: .zero)
     }
     
-    public init(liveInfo: TUILiveInfo) {
+    public init(liveInfo: LiveInfo) {
         self.liveInfo = liveInfo
-        self.roomId = liveInfo.roomInfo.roomId
+        self.liveID = liveInfo.liveID
         super.init(frame: .zero)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     private weak var coreView: LiveCoreView?
-    private var roomId: String
-    private var liveInfo: TUILiveInfo?
+    private var liveID: String
+    private var liveInfo: LiveInfo?
     private var ownerId = ""
     private var relayoutCoreViewClosure: () -> Void = {}
     private var cursor = ""
@@ -63,7 +62,7 @@ public class AudienceContainerView: UIView {
     }()
     
     private var isViewReady = false
-    public override func didMoveToWindow() {
+    override public func didMoveToWindow() {
         super.didMoveToWindow()
         guard !isViewReady else { return }
         isViewReady = true
@@ -77,38 +76,41 @@ public class AudienceContainerView: UIView {
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
         BaseBeautyStore.shared.reset()
-        LiveKitLog.info("\(#file)","\(#line)","deinit AudienceContainerView: \(self)")
+        LiveKitLog.info("\(#file)", "\(#line)", "deinit AudienceContainerView: \(self)")
     }
     
-    func leaveLive(onSuccess: TUISuccessBlock?, onError: TUIErrorBlock?) {
-        coreView?.leaveLiveStream {
-            onSuccess?()
-        } onError: { code, message in
-            onError?(code, message)
+    func leaveLive(onSuccess: (() -> Void)?, onError: ((ErrorInfo) -> Void)?) {
+        LiveListStore.shared.leaveLive { result in
+            switch result {
+            case .success(()):
+                onSuccess?()
+            case .failure(let err):
+                onError?(err)
+            }
         }
     }
 }
 
-
 // MARK: - Public
-extension AudienceContainerView {
-    public func disableSliding(_ isDisable: Bool) {
+
+public extension AudienceContainerView {
+    func disableSliding(_ isDisable: Bool) {
         disableFeature(.sliding, isDisable: isDisable)
     }
     
-    public func disableHeaderFloatWin(_ isDisable: Bool) {
+    func disableHeaderFloatWin(_ isDisable: Bool) {
         disableFeature(.floatWin, isDisable: isDisable)
     }
     
-    public func disableHeaderLiveData(_ isDisable: Bool) {
+    func disableHeaderLiveData(_ isDisable: Bool) {
         disableFeature(.liveData, isDisable: isDisable)
     }
     
-    public func disableHeaderVisitorCnt(_ isDisable: Bool) {
+    func disableHeaderVisitorCnt(_ isDisable: Bool) {
         disableFeature(.visitorCnt, isDisable: isDisable)
     }
     
-    public func disableFooterCoGuest(_ isDisable: Bool) {
+    func disableFooterCoGuest(_ isDisable: Bool) {
         disableFeature(.coGuest, isDisable: isDisable)
     }
 }
@@ -137,6 +139,7 @@ extension AudienceContainerView {
 }
 
 // MARK: - Private
+
 extension AudienceContainerView {
     private func subscribeRouter() {
         routerCenter.subscribeRouter()
@@ -170,33 +173,32 @@ extension AudienceContainerView: LiveListViewDataSource {
                 onFetchLiveListError(code: code, message: message, completionHandler: completionHandler)
             }
         } else {
-            let liveListManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .liveListManager) as? TUILiveListManager
-            liveListManager?.fetchLiveList(cursor: cursor, count: fetchCount) { [weak self] cursor, list in
+            LiveListStore.shared.fetchLiveList(cursor: cursor, count: fetchCount) { [weak self] result in
                 guard let self = self else { return }
-                onFetchLiveListSuccess(cursor: cursor, list: list, completionHandler: completionHandler)
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                onFetchLiveListError(code: code.rawValue, message: message, completionHandler: completionHandler)
+                switch result {
+                case .success(()):
+                    onFetchLiveListSuccess(cursor: LiveListStore.shared.state.value.liveListCursor, list: LiveListStore.shared.state.value.liveList, completionHandler: completionHandler)
+                case .failure(let err):
+                    onFetchLiveListError(code: err.code, message: err.message, completionHandler: completionHandler)
+                }
             }
         }
     }
     
-    private func onFetchLiveListSuccess(cursor: String, list: [TUILiveInfo], completionHandler: @escaping LiveListCallback) {
+    private func onFetchLiveListSuccess(cursor: String, list: [LiveInfo], completionHandler: @escaping LiveListCallback) {
         var resultList: [LiveInfo] = []
         self.cursor = cursor
         if isFirstRoom {
             resultList.append(getFirstLiveInfo())
             isFirstRoom = false
         }
-        let filteredList = list
-            .filter { $0.roomInfo.roomId != self.roomId }
-            .map { LiveInfo(tuiLiveInfo: $0) }
+        let filteredList = list.filter { $0.liveID != liveID }
         resultList.append(contentsOf: filteredList)
         completionHandler(resultList)
     }
     
     private func onFetchLiveListError(code: Int, message: String, completionHandler: @escaping LiveListCallback) {
-        LiveKitLog.error("\(#file)","\(#line)","fetchLiveList:[onError:[code:\(code),message:\(message)]]")
+        LiveKitLog.error("\(#file)", "\(#line)", "fetchLiveList:[onError:[code:\(code),message:\(message)]]")
         var resultList: [LiveInfo] = []
         let firstLiveInfo = getFirstLiveInfo()
         resultList.append(firstLiveInfo)
@@ -205,10 +207,10 @@ extension AudienceContainerView: LiveListViewDataSource {
     
     private func getFirstLiveInfo() -> LiveInfo {
         if let liveInfo = liveInfo {
-            return LiveInfo(tuiLiveInfo: liveInfo)
+            return liveInfo
         } else {
             var firstLiveInfo = LiveInfo()
-            firstLiveInfo.roomId = roomId
+            firstLiveInfo.liveID = liveID
             return firstLiveInfo
         }
     }
@@ -216,7 +218,7 @@ extension AudienceContainerView: LiveListViewDataSource {
 
 extension AudienceContainerView: LiveListViewDelegate {
     public func onCreateView(liveInfo: LiveInfo) -> UIView {
-        let audienceCell: AudienceSliderCell = AudienceSliderCell(liveInfo: liveInfo, routerManager: routerManager, routerCenter: routerCenter)
+        let audienceCell = AudienceSliderCell(liveInfo: liveInfo, routerManager: routerManager, routerCenter: routerCenter)
         audienceCell.delegate = self
         audienceCell.rotateScreenDelegate = self
         return audienceCell
@@ -262,9 +264,10 @@ extension AudienceContainerView: LiveListViewDelegate {
 extension AudienceContainerView: AudienceListCellDelegate {
     func handleScrollToNewRoom(roomId: String, ownerId: String, manager: AudienceManager,
                                coreView: LiveCoreView,
-                               relayoutCoreViewClosure: @escaping () -> Void) {
+                               relayoutCoreViewClosure: @escaping () -> Void)
+    {
         routerCenter.handleScrollToNewRoom(manager: manager, coreView: coreView)
-        self.roomId = roomId
+        liveID = roomId
         self.ownerId = ownerId
         self.coreView = coreView
         self.relayoutCoreViewClosure = relayoutCoreViewClosure
@@ -275,7 +278,7 @@ extension AudienceContainerView: AudienceListCellDelegate {
     }
     
     func showToast(message: String) {
-        makeToast(message)
+        makeToast(message: message)
     }
     
     func disableScrolling() {
@@ -293,12 +296,11 @@ extension AudienceContainerView: AudienceListCellDelegate {
     func onRoomDismissed(roomId: String, avatarUrl: String, userName: String) {
         delegate?.onLiveEnded(roomId: roomId, avatarUrl: avatarUrl, userName: userName)
     }
-    
 }
 
 extension AudienceContainerView: FloatWindowProvider {
     public func getRoomId() -> String {
-        roomId
+        liveID
     }
     
     public func getOwnerId() -> String {
@@ -314,9 +316,7 @@ extension AudienceContainerView: FloatWindowProvider {
     }
     
     public func getIsLinking() -> Bool {
-        guard let coGuestState: CoGuestState = coreView?.getState(),
-              let userState: UserState = coreView?.getState() else { return false }
-        return !coGuestState.seatList.filter({ $0.userId == userState.selfInfo.userId }).isEmpty
+        CoGuestStore.create(liveID: liveID).state.value.connected.isOnSeat()
     }
 }
 
@@ -327,4 +327,3 @@ extension AudienceContainerView: RotateScreenDelegate {
         rotateScreenDelegate?.rotateScreen(isPortrait: isPortrait)
     }
 }
-

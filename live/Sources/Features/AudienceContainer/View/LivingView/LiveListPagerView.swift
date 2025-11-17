@@ -6,7 +6,7 @@
 //
 
 import SnapKit
-import RTCRoomEngine
+import AtomicXCore
 import RTCCommon
 import Combine
 

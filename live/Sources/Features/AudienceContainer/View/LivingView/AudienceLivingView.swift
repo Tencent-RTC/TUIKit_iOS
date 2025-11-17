@@ -5,20 +5,23 @@
 //  Created by krabyu on 2023/12/15.
 //
 
+import AtomicXCore
+import Combine
+import RTCCommon
+import RTCRoomEngine
 import TUICore
 import UIKit
-import RTCCommon
-import Combine
-import AtomicXCore
-import RTCRoomEngine
 
 class AudienceLivingView: RTCBaseView {
     weak var rotateScreenDelegate: RotateScreenDelegate?
-    
+
     // MARK: - private property.
+
+    lazy var barrageStore: BarrageStore = .create(liveID: manager.liveID)
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
     private let coreView: LiveCoreView
+    private let audiencePipManager = AudiencePipManager()
     private let netWorkInfoManager = NetWorkInfoManager(
         service: NetWorkInfoService(
             trtcCloud: TUIRoomEngine.sharedInstance().getTRTCCloud()
@@ -26,7 +29,6 @@ class AudienceLivingView: RTCBaseView {
     )
     private var cancellableSet = Set<AnyCancellable>()
     private let giftCacheService = GiftManager.shared.giftCacheService
-    private lazy var ownerInfoPublisher  = manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \RoomState.ownerInfo))
     private let liveInfoView: LiveInfoView = {
         let view = LiveInfoView(enableFollow: VideoLiveKit.createInstance().enableFollow)
         view.mm_h = 40.scale375()
@@ -42,14 +44,14 @@ class AudienceLivingView: RTCBaseView {
         return view
     }()
 
-    private lazy var reportBtn: UIButton  = {
+    private lazy var reportBtn: UIButton = {
         let btn = UIButton(type: .custom)
         btn.setImage(internalImage("live_report"), for: .normal)
         btn.imageView?.contentMode = .scaleAspectFill
         btn.addTarget(self, action: #selector(clickReport), for: .touchUpInside)
         return btn
     }()
-    
+
     private lazy var floatWindowButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(internalImage("live_floatwindow_open_icon"), for: .normal)
@@ -58,19 +60,18 @@ class AudienceLivingView: RTCBaseView {
         button.isHidden = AudienceManager.audienceContainerConfig.disableHeaderFloatWin
         return button
     }()
-    
+
     private lazy var rotateScreenButton: UIButton = {
-         let button = UIButton()
-         button.setImage(internalImage("live_rotate_screen"), for: .normal)
-         button.addTarget(self, action: #selector(rotateScreenClick), for: .touchUpInside)
-         button.imageEdgeInsets = UIEdgeInsets(top: 2.scale375(), left: 2.scale375(), bottom: 2.scale375(), right: 2.scale375())
-         button.isHidden = true
-         return button
-     }()
+        let button = UIButton()
+        button.setImage(internalImage("live_rotate_screen"), for: .normal)
+        button.addTarget(self, action: #selector(rotateScreenClick), for: .touchUpInside)
+        button.imageEdgeInsets = UIEdgeInsets(top: 2.scale375(), left: 2.scale375(), bottom: 2.scale375(), right: 2.scale375())
+        button.isHidden = true
+        return button
+    }()
 
     private lazy var barrageSendView: BarrageInputView = {
-        let roomId = manager.roomState.roomId
-        var view = BarrageInputView(roomId: roomId)
+        var view = BarrageInputView(roomId: manager.liveID)
         view.layer.cornerRadius = 20.scale375Height()
         view.layer.masksToBounds = true
         return view
@@ -83,32 +84,27 @@ class AudienceLivingView: RTCBaseView {
 
     private lazy var floatView: LinkMicAudienceFloatView = {
         let view = LinkMicAudienceFloatView(manager: manager, routerManager: routerManager)
-        view.delegate = self
         view.isHidden = true
         return view
     }()
 
     private lazy var barrageDisplayView: BarrageStreamView = {
-        let roomId = manager.roomState.roomId
-        let ownerId = manager.coreRoomState.ownerInfo.userId
-        let view = BarrageStreamView(liveId: roomId)
+        let view = BarrageStreamView(liveID: manager.liveID)
         view.delegate = self
         return view
     }()
 
     private lazy var giftDisplayView: GiftPlayView = {
-        let view = GiftPlayView(roomId: manager.roomState.roomId)
+        let view = GiftPlayView(roomId: manager.liveID)
         view.delegate = self
         return view
     }()
-    
+
     private lazy var netWorkInfoButton: NetworkInfoButton = {
-        let button = NetworkInfoButton(liveId: manager.roomState.roomId, manager: netWorkInfoManager)
+        let button = NetworkInfoButton(liveId: manager.liveID, manager: netWorkInfoManager)
         button.onNetWorkInfoButtonClicked = { [weak self] in
-            guard let self = self else { return }
-            if !WindowUtils.isPortrait { return }
-            let isOnSeat = manager.coGuestState.coGuestStatus == .linking
-            routerManager.router(action: .present(AudienceRoute.netWorkInfo(netWorkInfoManager,isAudience: !isOnSeat)))
+            guard let self = self, WindowUtils.isPortrait else { return }
+            routerManager.router(action: .present(AudienceRoute.netWorkInfo(netWorkInfoManager, isAudience: !manager.coGuestState.connected.isOnSeat())))
         }
         return button
     }()
@@ -124,15 +120,15 @@ class AudienceLivingView: RTCBaseView {
         return view
     }()
 
-    private var playbackQuality: TUIVideoQuality? = nil
-    
+    private var playbackQuality: VideoQuality?
+
     init(manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.manager = manager
         self.routerManager = routerManager
         self.coreView = coreView
         super.init(frame: .zero)
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -143,9 +139,9 @@ class AudienceLivingView: RTCBaseView {
         addSubview(giftDisplayView)
         addSubview(liveInfoView)
         addSubview(audienceListView)
-#if RTCube_APPSTORE
-        addSubview(reportBtn)
-#endif
+        #if RTCube_APPSTORE
+            addSubview(reportBtn)
+        #endif
         addSubview(floatWindowButton)
         addSubview(bottomMenu)
         addSubview(floatView)
@@ -174,40 +170,40 @@ class AudienceLivingView: RTCBaseView {
                 make.leading.equalToSuperview().inset(16.scale375())
                 make.width.lessThanOrEqualTo(200.scale375())
             }
-            
+
             floatWindowButton.snp.remakeConstraints { make in
                 make.trailing.equalToSuperview().offset(-48.scale375Width())
                 make.top.equalToSuperview().offset(70.scale375Height())
                 make.width.equalTo(24.scale375Width())
                 make.height.equalTo(24.scale375Width())
             }
-            
+
             rotateScreenButton.snp.remakeConstraints { make in
                 make.trailing.equalToSuperview().offset(-10.scale375Width())
                 make.top.equalToSuperview().offset(475.scale375Height())
                 make.width.equalTo(32.scale375Width())
                 make.height.equalTo(32.scale375Width())
             }
-            
-    #if RTCube_APPSTORE
-            reportBtn.snp.remakeConstraints({ make in
-                make.centerY.equalTo(floatWindowButton)
-                make.right.equalTo(floatWindowButton.snp.left).offset(-8)
-                make.width.height.equalTo(24.scale375Width())
-            })
-            audienceListView.snp.remakeConstraints { make in
-                make.trailing.equalTo(reportBtn.snp.leading).offset(-4.scale375Width())
-                make.centerY.equalTo(floatWindowButton)
-                make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
-            }
-    #else
-            audienceListView.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview()
-                    .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
-                make.centerY.equalTo(floatWindowButton)
-                make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
-            }
-    #endif
+
+            #if RTCube_APPSTORE
+                reportBtn.snp.remakeConstraints { make in
+                    make.centerY.equalTo(floatWindowButton)
+                    make.right.equalTo(floatWindowButton.snp.left).offset(-8)
+                    make.width.height.equalTo(24.scale375Width())
+                }
+                audienceListView.snp.remakeConstraints { make in
+                    make.trailing.equalTo(reportBtn.snp.leading).offset(-4.scale375Width())
+                    make.centerY.equalTo(floatWindowButton)
+                    make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
+                }
+            #else
+                audienceListView.snp.remakeConstraints { make in
+                    make.trailing.equalToSuperview()
+                        .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
+                    make.centerY.equalTo(floatWindowButton)
+                    make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
+                }
+            #endif
 
             barrageSendView.snp.remakeConstraints { make in
                 make.leading.equalToSuperview().offset(12.scale375())
@@ -221,7 +217,7 @@ class AudienceLivingView: RTCBaseView {
                 make.height.equalTo(36.scale375Height())
                 make.centerY.equalTo(barrageSendView)
             }
-            
+
             floatView.snp.remakeConstraints { make in
                 make.top.equalTo(audienceListView.snp.bottom).offset(34.scale375Width())
                 make.height.width.equalTo(86.scale375())
@@ -243,7 +239,7 @@ class AudienceLivingView: RTCBaseView {
             }
         } else {
             barrageDisplayView.snp.remakeConstraints { make in
-                make.leading.equalToSuperview().offset(12.scale375())
+                make.leading.equalToSuperview().offset(12.scale375() + kDeviceSafeTopHeight)
                 make.bottom.equalTo(barrageSendView.snp.top).offset(-12.scale375Height())
                 make.width.equalTo(305.scale375Width())
                 make.height.equalTo(212.scale375Height())
@@ -255,40 +251,40 @@ class AudienceLivingView: RTCBaseView {
                 make.leading.equalToSuperview().inset(16.scale375())
                 make.width.lessThanOrEqualTo(200.scale375())
             }
-            
+
             floatWindowButton.snp.remakeConstraints { make in
                 make.trailing.equalToSuperview().offset(-48.scale375Width())
                 make.top.equalToSuperview().offset(20.scale375Height())
                 make.width.equalTo(24.scale375Width())
                 make.height.equalTo(24.scale375Width())
             }
-            
+
             rotateScreenButton.snp.remakeConstraints { make in
                 make.trailing.equalToSuperview().offset(-20.scale375Width())
                 make.top.equalToSuperview().offset(185.scale375Height())
                 make.width.equalTo(32.scale375Width())
                 make.height.equalTo(32.scale375Width())
             }
-            
-    #if RTCube_APPSTORE
-            reportBtn.snp.remakeConstraints({ make in
-                make.centerY.equalTo(floatWindowButton)
-                make.right.equalTo(floatWindowButton.snp.left).offset(-8)
-                make.width.height.equalTo(24.scale375Width())
-            })
-            audienceListView.snp.remakeConstraints { make in
-                make.trailing.equalTo(reportBtn.snp.leading).offset(-4.scale375Width())
-                make.centerY.equalTo(floatWindowButton)
-                make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
-            }
-    #else
-            audienceListView.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview()
-                    .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
-                make.centerY.equalTo(floatWindowButton)
-                make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
-            }
-    #endif
+
+            #if RTCube_APPSTORE
+                reportBtn.snp.remakeConstraints { make in
+                    make.centerY.equalTo(floatWindowButton)
+                    make.right.equalTo(floatWindowButton.snp.left).offset(-8)
+                    make.width.height.equalTo(24.scale375Width())
+                }
+                audienceListView.snp.remakeConstraints { make in
+                    make.trailing.equalTo(reportBtn.snp.leading).offset(-4.scale375Width())
+                    make.centerY.equalTo(floatWindowButton)
+                    make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
+                }
+            #else
+                audienceListView.snp.remakeConstraints { make in
+                    make.trailing.equalToSuperview()
+                        .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
+                    make.centerY.equalTo(floatWindowButton)
+                    make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
+                }
+            #endif
 
             barrageSendView.snp.remakeConstraints { make in
                 make.leading.equalToSuperview().offset(12.scale375())
@@ -302,7 +298,7 @@ class AudienceLivingView: RTCBaseView {
                 make.height.equalTo(36.scale375Height())
                 make.centerY.equalTo(barrageSendView)
             }
-            
+
             floatView.snp.remakeConstraints { make in
                 make.top.equalTo(audienceListView.snp.bottom).offset(34.scale375Width())
                 make.height.width.equalTo(86.scale375())
@@ -322,10 +318,9 @@ class AudienceLivingView: RTCBaseView {
                 make.width.equalTo(262.scale375())
                 make.height.equalTo(40.scale375())
             }
-
         }
     }
-    
+
     override func bindInteraction() {
         subscribeOrientationChange()
         subscribeRoomState()
@@ -334,20 +329,20 @@ class AudienceLivingView: RTCBaseView {
         subscribeNetWorkInfoSubject()
         subscribeAudienceConfig()
     }
-    
-    func initComponentView() {
-        initAudienceListView()
-        initLiveInfoView()
+
+    func initComponentView(liveInfo: LiveInfo) {
+        initAudienceListView(liveID: liveInfo.liveID)
+        initLiveInfoView(liveInfo: liveInfo)
     }
-    
-    func initAudienceListView() {
-        audienceListView.initialize(liveId: manager.roomState.liveInfo.roomId)
+
+    func initAudienceListView(liveID: String) {
+        audienceListView.initialize(liveId: manager.liveID)
     }
-    
-    func initLiveInfoView() {
-        liveInfoView.initialize(liveInfo: manager.roomState.liveInfo)
+
+    func initLiveInfoView(liveInfo: LiveInfo) {
+        liveInfoView.initialize(liveInfo: liveInfo)
     }
-    
+
     func setGiftPureMode(_ isPureMode: Bool) {
         giftDisplayView.onPureModeSet(isPureMode: isPureMode)
     }
@@ -364,7 +359,7 @@ extension AudienceLivingView {
     }
 
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceRoomState.roomVideoStreamIsLandscape))
+        manager.subscribeState(StateSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] videoStreamIsLandscape in
@@ -381,7 +376,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
     }
-    
+
     private func subscribeMediaState() {
         manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.playbackQuality))
             .receive(on: RunLoop.main)
@@ -391,19 +386,19 @@ extension AudienceLivingView {
                     return
                 }
                 if let quality = playbackQuality, self.playbackQuality != nil {
-                    self.makeToast(.resolutionChangedText + .videoQualityToString(quality: quality))
+                    makeToast(message: .resolutionChangedText + .videoQualityToString(quality: quality))
                 }
                 self.playbackQuality = playbackQuality
             }
             .store(in: &cancellableSet)
     }
-    
+
     private func subscribeSeatSubject() {
-        ownerInfoPublisher
+        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
             .receive(on: RunLoop.main)
-            .sink { [weak self] ownerInfo in
-                guard let self = self else { return }
-                self.barrageDisplayView.setOwnerId(ownerInfo.userId)
+            .sink { [weak self] currentLive in
+                guard let self = self, !currentLive.isEmpty else { return }
+                barrageDisplayView.setOwnerId(currentLive.liveOwner.userID)
             }
             .store(in: &cancellableSet)
     }
@@ -422,76 +417,76 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
     }
-    
+
     private func subscribeAudienceConfig() {
         AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
-                                                                \AudienceContainerConfig.disableHeaderFloatWin))
-        .receive(on: RunLoop.main)
-        .removeDuplicates()
-        .dropFirst()
-        .sink { [weak self] disableHeaderFloatWin in
-            guard let self = self else { return }
-            floatWindowButton.isHidden = disableHeaderFloatWin
-            audienceListView.snp.remakeConstraints { make in
-                make.trailing
-                    .equalToSuperview()
-                    .offset(disableHeaderFloatWin ? -48.scale375() : -80.scale375())
-                make.centerY.equalTo(self.floatWindowButton)
-                make.leading.greaterThanOrEqualTo(self.liveInfoView.snp.trailing).offset(20.scale375())
+            \AudienceContainerConfig.disableHeaderFloatWin))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] disableHeaderFloatWin in
+                guard let self = self else { return }
+                floatWindowButton.isHidden = disableHeaderFloatWin
+                audienceListView.snp.remakeConstraints { make in
+                    make.trailing
+                        .equalToSuperview()
+                        .offset(disableHeaderFloatWin ? -48.scale375() : -80.scale375())
+                    make.centerY.equalTo(self.floatWindowButton)
+                    make.leading.greaterThanOrEqualTo(self.liveInfoView.snp.trailing).offset(20.scale375())
+                }
             }
-        }
-        .store(in: &cancellableSet)
-        
+            .store(in: &cancellableSet)
+
         AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
-                                                                \AudienceContainerConfig.disableHeaderLiveData))
-        .receive(on: RunLoop.main)
-        .removeDuplicates()
-        .dropFirst()
-        .sink { [weak self] disableHeaderLiveData in
-            guard let self = self else { return }
-            liveInfoView.isHidden = disableHeaderLiveData
-        }
-        .store(in: &cancellableSet)
-        
+            \AudienceContainerConfig.disableHeaderLiveData))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] disableHeaderLiveData in
+                guard let self = self else { return }
+                liveInfoView.isHidden = disableHeaderLiveData
+            }
+            .store(in: &cancellableSet)
+
         AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
-                                                                \AudienceContainerConfig.disableHeaderVisitorCnt))
-        .receive(on: RunLoop.main)
-        .removeDuplicates()
-        .dropFirst()
-        .sink { [weak self] disableHeaderVisitorCnt in
-            guard let self = self else { return }
-            audienceListView.isHidden = disableHeaderVisitorCnt
-        }
-        .store(in: &cancellableSet)
-        
+            \AudienceContainerConfig.disableHeaderVisitorCnt))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] disableHeaderVisitorCnt in
+                guard let self = self else { return }
+                audienceListView.isHidden = disableHeaderVisitorCnt
+            }
+            .store(in: &cancellableSet)
+
         AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
-                                                                \AudienceContainerConfig.disableFooterCoGuest))
-        .receive(on: RunLoop.main)
-        .removeDuplicates()
-        .dropFirst()
-        .sink { [weak self] disableFooterCoGuest in
-            guard let self = self else { return }
-            if self.manager.roomState.roomVideoStreamIsLandscape { return }
-            bottomMenu.disableFooterCoGuest(disableFooterCoGuest)
-        }
-        .store(in: &cancellableSet)
+            \AudienceContainerConfig.disableFooterCoGuest))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] disableFooterCoGuest in
+                guard let self = self else { return }
+                if manager.audienceState.roomVideoStreamIsLandscape { return }
+                bottomMenu.disableFooterCoGuest(disableFooterCoGuest)
+            }
+            .store(in: &cancellableSet)
     }
 }
 
 // MARK: - View Action.
+
 extension AudienceLivingView {
-    
     @objc
     private func clickReport() {
         let selector = NSSelectorFromString("showReportAlertWithRoomId:ownerId:")
         if responds(to: selector) {
-            perform(selector, with: manager.roomState.roomId, with: manager.coreRoomState.ownerInfo.userId)
+            perform(selector, with: manager.liveID, with: manager.liveListState.currentLive.liveOwner.userID)
         }
     }
-    
+
     @objc func onFloatWindowButtonClick() {
         rotateScreenDelegate?.rotateScreen(isPortrait: true)
-        
+
         if !WindowUtils.isPortrait {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 guard let self = self else { return }
@@ -501,16 +496,16 @@ extension AudienceLivingView {
         }
         manager.floatWindowSubject.send()
     }
-    
+
     @objc private func rotateScreenClick() {
         rotateScreenDelegate?.rotateScreen(isPortrait: !WindowUtils.isPortrait)
     }
-    
+
     @objc func handleOrientationChange() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             activateConstraints()
-            
+
             if WindowUtils.isPortrait {
                 bottomMenu.isHidden = false
                 barrageSendView.isHidden = false
@@ -520,7 +515,7 @@ extension AudienceLivingView {
             }
         }
     }
-        
+
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
         return view == self ? nil : view
@@ -534,20 +529,20 @@ extension AudienceLivingView: BarrageStreamViewDelegate {
         }
         return GiftBarrageCell(barrage: barrage)
     }
-    
+
     func onBarrageClicked(user: LiveUserInfo) {
-        if user.userID == manager.coreUserState.selfInfo.userId { return }
-        routerManager.router(action: .present(.userManagement(TUIUserInfo(from: user), type: .userInfo)))
+        if user.userID == manager.loginState.loginUserInfo?.userID { return }
+        routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .userInfo)))
     }
 }
 
 extension AudienceLivingView: GiftPlayViewDelegate {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        let receiver = manager.coreRoomState.ownerInfo
-        if receiver.userId == TUILogin.getUserID() {
-            receiver.userName = .meText
+        var receiverUserName = manager.liveListState.currentLive.liveOwner.userName
+        if manager.liveListState.currentLive.liveOwner.userID == manager.loginState.loginUserInfo?.userID {
+            receiverUserName = .meText
         }
-        
+
         var barrage = Barrage()
         barrage.textContent = "gift"
         barrage.sender = sender
@@ -556,11 +551,11 @@ extension AudienceLivingView: GiftPlayViewDelegate {
             "gift_name": gift.name,
             "gift_count": "\(giftCount)",
             "gift_icon_url": gift.iconURL,
-            "gift_receiver_username": receiver.userName
+            "gift_receiver_username": receiverUserName
         ]
         barrageStore.appendLocalTip(message: barrage)
     }
-    
+
     func giftPlayView(_ giftPlayView: GiftPlayView, onPlayGiftAnimation gift: Gift) {
         guard let url = URL(string: gift.resourceURL) else { return }
         giftCacheService.request(withURL: url) { error, fileUrl in
@@ -573,32 +568,11 @@ extension AudienceLivingView: GiftPlayViewDelegate {
     }
 }
 
-extension AudienceLivingView {
-    var barrageStore: BarrageStore {
-        return BarrageStore.create(liveID: manager.roomState.roomId)
-    }
-}
-
-extension AudienceLivingView: LinkMicAudienceFloatViewDelegate {
-    func cancelApplication() {
-        manager.onStartCancelIntraRoomConnection()
-        coreView.cancelIntraRoomConnection(userId: "") { [weak self] in
-            guard let self = self else { return }
-            manager.onCancelIntraRoomConnection()
-        } onError: { [weak self] code, message in
-            guard let self = self else { return }
-            manager.onCancelIntraRoomConnection()
-            let error = InternalError(code: code.rawValue, message: message)
-            manager.onError(error)
-        }
-    }
-}
-
 private extension String {
     static let meText = internalLocalized("Me")
     static let resolutionChangedText = internalLocalized("resolution changed to")
-    
-    static func videoQualityToString(quality: TUIVideoQuality) -> String {
+
+    static func videoQualityToString(quality: VideoQuality) -> String {
         switch quality {
         case .quality1080P:
             return "1080P"

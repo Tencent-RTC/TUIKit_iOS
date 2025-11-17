@@ -5,18 +5,19 @@
 //  Created by aby on 2024/5/31.
 //
 
-import Foundation
-import RTCRoomEngine
-import TUICore
-import RTCCommon
 import AtomicXCore
+import Combine
+import Foundation
+import RTCCommon
+import TUICore
 
 class AudienceRootMenuDataCreator {
-    
     private weak var coreView: LiveCoreView?
     private let manager: AudienceManager
     private let routerManager: AudienceRouterManager
-    
+    private var cancellableSet: Set<AnyCancellable> = []
+    private var lastApplyHashValue: Int?
+
     init(coreView: LiveCoreView, manager: AudienceManager, routerManager: AudienceRouterManager) {
         self.coreView = coreView
         self.manager = manager
@@ -29,38 +30,57 @@ class AudienceRootMenuDataCreator {
     
     func generateLinkTypeMenuData(seatIndex: Int = -1) -> [LinkMicTypeCellData] {
         var data = [LinkMicTypeCellData]()
-        let timeOutValue = 60
-        data.append(LinkMicTypeCellData(image: internalImage("live_link_video"),
-                                        text: .videoLinkRequestText,
-                                        action: { [weak self] in
-            guard let self = self else { return }
-            manager.onStartRequestIntraRoomConnection()
-            coreView?.requestIntraRoomConnection(userId: "", timeOut: timeOutValue, openCamera: true, seatIndex: seatIndex) { [weak self] in
+        let timeOutValue: TimeInterval = 60
+        
+        func applyForSeat(seatIndex: Int, openCamera: Bool) {
+            manager.willApplying()
+            manager.toastSubject.send(.waitToLinkText)
+            manager.coGuestStore.applyForSeat(seatIndex: seatIndex, timeout: timeOutValue, extraInfo: nil) { [weak self] result in
                 guard let self = self else { return }
-                manager.toastSubject.send(.waitToLinkText)
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                let error = InternalError(code: code.rawValue, message: message)
-                manager.toastSubject.send(error.localizedMessage)
-                manager.onRequestIntraRoomConnectionFailed()
+                manager.stopApplying()
+                switch result {
+                case .failure(let err):
+                    let error = InternalError(code: err.code, message: err.message)
+                    manager.toastSubject.send(error.localizedMessage)
+                default: break
+                }
             }
+            
+            for item in cancellableSet.filter({ $0.hashValue == lastApplyHashValue }) {
+                item.cancel()
+                cancellableSet.remove(item)
+            }
+            
+            let cancelable = manager.coGuestStore.guestEventPublisher
+                .receive(on: RunLoop.main)
+                .sink { [weak self] event in
+                    guard let self = self else { return }
+                    switch event {
+                    case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
+                        manager.stopApplying()
+                        guard isAccept else { break }
+                        if openCamera {
+                            manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera, completion: nil)
+                        }
+                        manager.deviceStore.openLocalMicrophone(completion: nil)
+                    case .onGuestApplicationNoResponse(reason: _):
+                        manager.stopApplying()
+                    default: break
+                    }
+                }
+            cancelable.store(in: &cancellableSet)
+            lastApplyHashValue = cancelable.hashValue
+        }
+        
+        data.append(LinkMicTypeCellData(image: internalImage("live_link_video"), text: .videoLinkRequestText, action: { [weak self] in
+            guard let self = self else { return }
+            applyForSeat(seatIndex: seatIndex, openCamera: true)
             routerManager.router(action: .dismiss())
         }))
         
-        data.append(LinkMicTypeCellData(image: internalImage("live_link_audio"),
-                                        text: .audioLinkRequestText,
-                                        action: { [weak self] in
+        data.append(LinkMicTypeCellData(image: internalImage("live_link_audio"), text: .audioLinkRequestText, action: { [weak self] in
             guard let self = self else { return }
-            manager.onStartRequestIntraRoomConnection()
-            coreView?.requestIntraRoomConnection(userId: "", timeOut: timeOutValue, openCamera: false, seatIndex: seatIndex) { [weak self] in
-                guard let self = self else { return }
-                manager.toastSubject.send(.waitToLinkText)
-            } onError: { [weak self] code, message in
-                guard let self = self else { return }
-                let error = InternalError(code: code.rawValue, message: message)
-                manager.toastSubject.send(error.localizedMessage)
-                manager.onRequestIntraRoomConnectionFailed()
-            }
+            applyForSeat(seatIndex: seatIndex, openCamera: false)
             routerManager.router(action: .dismiss())
         }))
         return data
@@ -75,7 +95,7 @@ extension AudienceRootMenuDataCreator {
     func memberBottomMenu(isDisableCoGuest: Bool = false) -> [AudienceButtonMenuInfo] {
         var menus: [AudienceButtonMenuInfo] = []
         var gift = AudienceButtonMenuInfo(normalIcon: "live_gift_icon", normalTitle: "")
-        gift.tapAction = { [weak self] sender in
+        gift.tapAction = { [weak self] _ in
             guard let self = self else { return }
             routerManager.router(action: .present(.giftView))
         }
@@ -84,32 +104,30 @@ extension AudienceRootMenuDataCreator {
             var linkMic = AudienceButtonMenuInfo(normalIcon: "live_link_icon", selectIcon: "live_linking_icon")
             linkMic.tapAction = { [weak self] sender in
                 guard let self = self else { return }
-                if !manager.coreCoHostState.connectedUserList.isEmpty {
+                if !manager.coHostState.connected.isEmpty {
                     return
                 }
                 if sender.isSelected {
-                    let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .g2)
-                    designConfig.backgroundColor = .white
-                    designConfig.lineColor = .g8
+                    let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
+                    designConfig.backgroundColor = .bgOperateColor
+                    designConfig.lineColor = .g3.withAlphaComponent(0.3)
                     let item = ActionItem(title: .cancelLinkMicRequestText, designConfig: designConfig) { [weak self] _ in
                         guard let self = self else { return }
                         routerManager.router(action: .dismiss())
-                        manager.onStartCancelIntraRoomConnection()
-                        coreView?.cancelIntraRoomConnection(userId: "") { [weak self] in
+                        manager.stopApplying()
+                        manager.coGuestStore.cancelApplication { [weak self] result in
                             guard let self = self else { return }
-                            manager.onCancelIntraRoomConnection()
-                        } onError: { [weak self] code, message in
-                            guard let self = self else { return }
-                            let error = InternalError(code: code.rawValue, message: message)
-                            manager.onCancelIntraRoomConnection()
-                            manager.toastSubject.send(error.localizedMessage)
+                            switch result {
+                            case .failure(let err):
+                                let error = InternalError(code: err.code, message: err.message)
+                                manager.toastSubject.send(error.localizedMessage)
+                            default: break
+                            }
                         }
                     }
-                    routerManager.router(action: .present(.listMenu(ActionPanelData(items: [item], cancelText: .cancelText))))
+                    routerManager.router(action: .present(.listMenu(ActionPanelData(items: [item], cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
                 } else {
-                    let selfUserId = manager.coreUserState.selfInfo.userId
-                    let isOnSeat = manager.coreCoGuestState.seatList.contains(where: { $0.userId == selfUserId })
-                    if isOnSeat {
+                    if manager.coGuestState.connected.isOnSeat() {
                         confirmToTerminateCoGuest()
                     } else {
                         let data = generateLinkTypeMenuData()
@@ -119,62 +137,57 @@ extension AudienceRootMenuDataCreator {
             }
             linkMic.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
-                manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.coGuestStatus))
+                manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
                     .removeDuplicates()
+                    .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates(),
+                                   manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
                     .receive(on: RunLoop.main)
-                    .sink { [weak self] coGuestStatus in
+                    .sink { [weak self] connected, users, isApplying in
                         guard let self = self else { return }
-                        onCoGuestStatusChanged(button: button, enable: true, coGuestStatus: coGuestStatus)
+                        onCoGuestStatusChanged(button: button, enable: users.isEmpty, isOnSeat: connected.isOnSeat(), isApplying: isApplying)
                     }
                     .store(in: &cancellableSet)
-                
-                manager.subscribeCoreViewState(StatePublisherSelector(keyPath: \CoHostState.connectedUserList))
-                    .removeDuplicates()
-                    .receive(on: RunLoop.main)
-                    .sink { [weak self] users in
-                        guard let self = self else { return }
-                        let isConnecting = users.count > 0
-                        onCoGuestStatusChanged(button: button, enable: !isConnecting, coGuestStatus: manager.coGuestState.coGuestStatus)
-                    }
-                    .store(in: &cancellableSet)
-                
             }
             menus.append(linkMic)
         }
         return menus
     }
     
-    private func onCoGuestStatusChanged(button: UIButton, enable: Bool, coGuestStatus: AudienceCoGuestState.CoGuestStatus) {
+    private func onCoGuestStatusChanged(button: UIButton, enable: Bool, isOnSeat: Bool, isApplying: Bool) {
         let imageName: String
-        var isSelected = false
-        
+        let isSelected: Bool
         if enable {
-            isSelected = (coGuestStatus == .applying)
-            imageName = (coGuestStatus == .linking)
-                        ? "live_linked_icon"
-                        : "live_link_icon"
+            isSelected = isApplying
+            imageName = isOnSeat ? "live_linked_icon" : "live_link_icon"
         } else {
             isSelected = false
             imageName = "live_link_disable_icon"
         }
-        
         button.isSelected = isSelected
         button.setImage(internalImage(imageName), for: .normal)
     }
     
     private func confirmToTerminateCoGuest() {
         var items: [ActionItem] = []
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .redColor)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
-        
-        let terminteGoGuestItem = ActionItem(title: .confirmTerminateCoGuestText, designConfig: designConfig, actionClosure: { [weak self] _ in
+        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
+        designConfig.backgroundColor = .bgOperateColor
+        designConfig.lineColor = .g3.withAlphaComponent(0.3)
+
+        let terminateGoGuestItem = ActionItem(title: .confirmTerminateCoGuestText, designConfig: designConfig, actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            coreView?.terminateIntraRoomConnection()
+            manager.coGuestStore.disConnect { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(()):
+                    manager.deviceStore.closeLocalCamera()
+                    manager.deviceStore.closeLocalMicrophone()
+                default: break
+                }
+            }
             routerManager.router(action: .routeTo(.audience))
         })
-        items.append(terminteGoGuestItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText))))
+        items.append(terminateGoGuestItem)
+        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
     }
 }
 

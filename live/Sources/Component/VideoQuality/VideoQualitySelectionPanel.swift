@@ -8,17 +8,17 @@
 import Foundation
 import Combine
 import RTCCommon
-import RTCRoomEngine
+import AtomicXCore
 
 class VideoQualitySelectionPanel: UIView {
     
-    private var resolutions: [TUIVideoQuality] = []
+    private var resolutions: [VideoQuality] = []
     
     public var cancelClosure: (()->Void)?
-    public var selectedClosure: ((TUIVideoQuality)->Void)?
+    public var selectedClosure: ((VideoQuality)->Void)?
     
-    public init(resolutions: [TUIVideoQuality],
-                selectedClosure: ((TUIVideoQuality) -> Void)? = nil) {
+    public init(resolutions: [VideoQuality],
+                selectedClosure: ((VideoQuality) -> Void)? = nil) {
         self.resolutions = resolutions
         super.init(frame: .zero)
         self.selectedClosure = selectedClosure
@@ -181,7 +181,7 @@ class VideoQualityCell: UITableViewCell {
 fileprivate extension String {
     static let cancelText: String = internalLocalized("Cancel")
     
-    static func videoQualityToString(quality: TUIVideoQuality) -> String {
+    static func videoQualityToString(quality: VideoQuality) -> String {
         switch quality {
         case .quality1080P:
             return "1080P"

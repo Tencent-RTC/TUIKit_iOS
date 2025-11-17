@@ -34,7 +34,9 @@ public extension UIColor {
     static let flowKitPurple = themColor("#7B61FF")
     static let flowKitCharcoal = themColor("#222222")
     static let transparent = themColor("#00000000")
-
+    static let cancelTextColor = UIColor.white.withAlphaComponent(0.55)
+    static let defaultTextColor = UIColor.white.withAlphaComponent(0.9)
+    static let warningTextColor = themColor("#E6594C")
     
     /// colors in non-interactive specifications
     static let gray60Transparency = themColor("#9922262E")

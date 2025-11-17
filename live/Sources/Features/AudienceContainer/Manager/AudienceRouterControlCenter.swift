@@ -102,6 +102,12 @@ extension AudienceRouterControlCenter {
             switch route {
             case .alert(_):
                 presentedViewController = presentAlert(alertView: view)
+            case .listMenu(_, let layout):
+                if layout == .center {
+                    presentedViewController = presentPopup(view: view, route: route, portraitPosition: .center(horizontalPadding: 47.scale375()))
+                } else {
+                    presentedViewController = presentPopup(view: view, route: route)
+                }
             default:
                 presentedViewController = presentPopup(view: view, route: route)
             }
@@ -192,7 +198,7 @@ extension AudienceRouterControlCenter {
             view = audioEffect
         case .linkType(let data):
             view = LinkMicTypePanel(data: data, routerManager: routerManager, manager: manager)
-        case .listMenu(let data):
+        case .listMenu(let data, _):
             let actionPanel = ActionPanel(panelData: data)
             actionPanel.cancelActionClosure = { [weak self] in
                 guard let self = self else { return }
@@ -213,7 +219,7 @@ extension AudienceRouterControlCenter {
         case .alert(let info):
             view = AudienceAlertPanel(alertInfo: info)
         case .streamDashboard:
-            view = StreamDashboardPanel(roomId: manager.roomState.roomId,
+            view = StreamDashboardPanel(roomId: manager.liveID,
                                         roomEngine: TUIRoomEngine.sharedInstance())
         case .beauty:
             if BeautyView.checkIsNeedDownloadResource() {
@@ -226,7 +232,7 @@ extension AudienceRouterControlCenter {
             }
             view = beautyView
         case .giftView:
-            view = GiftListPanel(roomId: manager.roomState.roomId)
+            view = GiftListPanel(roomId: manager.liveID)
         case .userManagement(let user, let type):
             if type == .userInfo {
                 view = AudienceUserInfoPanelView(user: user, manager: manager)
@@ -264,7 +270,7 @@ extension AudienceRouterControlCenter {
              .alert(_),
              .streamDashboard,
              .giftView,
-             .listMenu(_),
+             .listMenu(_, _),
              .userManagement(_, _),
              .netWorkInfo(_, _),
              .videoQualitySelection(_, _):
@@ -278,39 +284,38 @@ extension AudienceRouterControlCenter {
         switch route {
         case .alert(_):
             return false
+        case .listMenu(_, let layout):
+            return layout != .center
         default:
             return true
         }
     }
     
     private func getSafeBottomViewBackgroundColor(route: AudienceRoute) -> UIColor {
-        var safeBottomViewBackgroundColor = UIColor.g2
-        switch route {
-        case .listMenu(_):
-            safeBottomViewBackgroundColor = .white
-        case .streamDashboard, .giftView, .beauty, .featureSetting, .videoQualitySelection:
-            safeBottomViewBackgroundColor = .bgOperateColor
-        default:
-            break
-        }
-        return safeBottomViewBackgroundColor
+        .bgOperateColor
     }
 }
 
 // MARK: - Popup
 extension AudienceRouterControlCenter {
-    private func presentPopup(view: UIView, route: AudienceRoute) -> UIViewController {
+    private func presentPopup(view: UIView, route: AudienceRoute, portraitPosition: MenuContainerViewPosition = .bottom) -> UIViewController {
         let safeBottomViewBackgroundColor = getSafeBottomViewBackgroundColor(route: route)
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: safeBottomViewBackgroundColor)
+        let menuContainerView = MenuContainerView(contentView: view,safeBottomViewBackgroundColor: safeBottomViewBackgroundColor,portraitPosition: portraitPosition)
         let popupViewController = PopupViewController(contentView: menuContainerView,
-                                                  supportBlurView: supportBlurView(route: route))
+                                                      supportBlurView: supportBlurView(route: route))
         menuContainerView.blackAreaClickClosure = { [weak self] in
             guard let self = self else { return }
             self.routerManager.router(action: .dismiss())
         }
         guard let rootViewController = rootViewController else { return UIViewController()}
         let presentingViewController = getPresentingViewController(rootViewController)
-        presentingViewController.present(popupViewController, animated: true)
+        if portraitPosition != .bottom {
+            popupViewController.modalPresentationStyle = .overFullScreen
+            popupViewController.modalTransitionStyle = .crossDissolve
+            presentingViewController.present(popupViewController, animated: false)
+        } else {
+            presentingViewController.present(popupViewController, animated: true)
+        }
         return popupViewController
     }
 }

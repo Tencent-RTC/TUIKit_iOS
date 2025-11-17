@@ -7,6 +7,7 @@
 
 import Foundation
 import RTCRoomEngine
+import AtomicXCore
 
 // MARK: - Enum define.
 @objc public enum SGRequestType: Int {
@@ -70,10 +71,12 @@ public typealias SGOnRequestRejected = (_ userInfo: TUIUserInfo) -> Void
 public typealias SGOnRequestCancelled = (_ userInfo: TUIUserInfo) -> Void
 public typealias SGOnRequestTimeout = (_ userInfo: TUIUserInfo) -> Void
 public typealias SGOnRequestError = (_ userInfo: TUIUserInfo, _ code: Int, _ message: String) -> Void
+public typealias TUIBattleRequestBlock = (String, [TUIBattleUser]) -> Void
 
 // MARK: - Constants define.
 public let kSGDefaultMaxSeatCount = 10
-public let kSGDefaultTimeout = 30
+public let kSGDefaultTimeout: TimeInterval = 10.0
+public let KSGConnectMaxSeatCount = 6
 
 // MARK: - Delegate define.
 @objc public protocol SGSeatViewDelegate {
@@ -82,22 +85,17 @@ public let kSGDefaultTimeout = 30
     func seatGridView(_ view: SeatGridView, updateUserVolume volume: Int, seatView: UIView)
 }
 
+public protocol SGHostAndBattleViewDelegate: AnyObject{
+    func createCoHostView(seatInfo: SeatInfo,isInvite: Bool) -> UIView?
+    func createBattleContainerView() -> UIView?
+}
+
 // MARK: - Observer define.
 @objc public protocol SeatGridViewObserver {
-    func onRoomDismissed(roomId: String)
-    func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String)
-    func onSeatRequestReceived(type: SGRequestType, userInfo: TUIUserInfo)
-    func onSeatRequestCancelled(type: SGRequestType, userInfo: TUIUserInfo)
-    func onKickedOffSeat(userInfo: TUIUserInfo)
     func onSeatViewClicked(seatView: UIView, seatInfo: TUISeatInfo)
 }
 
 extension SeatGridViewObserver {
-    func onRoomDismissed(roomId: String) {}
-    func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {}
-    func onSeatRequestReceived(type: SGRequestType, userInfo: TUIUserInfo) {}
-    func onSeatRequestCancelled(type: SGRequestType, userInfo: TUIUserInfo) {}
-    func onKickedOffSeat(userInfo: TUIUserInfo) {}
     func onSeatViewClicked(seatView: UIView, seatInfo: TUISeatInfo) {}
 }
 

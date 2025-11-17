@@ -8,6 +8,7 @@
 import UIKit
 import TUICore
 import TUILiveKit
+import AtomicXCore
 
 class VoiceRoomViewController: UIViewController {
 
@@ -117,7 +118,8 @@ extension VoiceRoomViewController {
     }
 
     @objc private func goLiveClick() {
-        let voiceRoomId = LiveIdentityGenerator.shared.generateId(TUILogin.getUserID() ?? "", type: .voice)
+        let userId = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
+        let voiceRoomId = LiveIdentityGenerator.shared.generateId(userId, type: .voice)
         let params = CreateRoomParams()
         VoiceRoomKit.createInstance().createRoom(roomId: voiceRoomId, params: params)
     }

@@ -42,15 +42,16 @@ public class TUIVoiceRoomViewController: UIViewController {
     // MARK: - Private property.
    
     private let roomId: String
-    private lazy var manager = VoiceRoomManager(liveId: roomId)
     private let routerManager: VRRouterManager = VRRouterManager()
+    private let prepareStore = VoiceRoomPrepareStore()
+    private let toastService: VRToastService = VRToastServiceImpl()
     private var needRestoreNavigationBarHiddenState: Bool = false
     private var cancellableSet = Set<AnyCancellable>()
     private var isShowingRootView = false
     
     private lazy var routerCenter: VRRouterControlCenter = {
         let rootRoute: VRRoute = behavior == .join ? .audience : .anchor
-        let routerCenter = VRRouterControlCenter(rootViewController: self, rootRoute: rootRoute, routerManager: routerManager, manager: manager)
+        let routerCenter = VRRouterControlCenter(liveID: roomId, rootViewController: self, rootRoute: rootRoute, routerManager: routerManager, toastService: toastService)
         return routerCenter
     }()
     
@@ -77,18 +78,20 @@ public class TUIVoiceRoomViewController: UIViewController {
     
     private lazy var voicePrepareView: VoiceRoomPrepareView = {
         let view = VoiceRoomPrepareView(frame: UIScreen.main.bounds,
-                                        manager: manager,
-                                        routerManager: routerManager)
+                                        routerManager: routerManager,
+                                        prepareStore: prepareStore)
         view.delegate = self
         return view
     }()
     
     private lazy var voiceRootView: VoiceRoomRootView = {
         let view = VoiceRoomRootView(frame: UIScreen.main.bounds,
-                                     roomId: roomId,
+                                     liveID: roomId,
+                                     backgroundURL: prepareStore.state.liveInfo.backgroundURL,
                                      seatGridView: seatGridView,
-                                     manager: manager,
+                                     prepareStore: prepareStore,
                                      routerManager: routerManager,
+                                     toastService: toastService,
                                      isCreate: behavior != .join)
         view.delegate = self
         return view
@@ -100,7 +103,7 @@ public class TUIVoiceRoomViewController: UIViewController {
         self.behavior = behavior
         super.init(nibName: nil, bundle: nil)
         subscribeToast()
-        manager.prepareRoomIdBeforeEnterRoom(roomId: roomId, roomParams: roomParams)
+        prepareStore.prepareLiveIdBeforeEnterRoom(liveId: roomId, roomParams: roomParams)
         UIApplication.shared.isIdleTimerDisabled = true
     }
     
@@ -208,12 +211,10 @@ extension TUIVoiceRoomViewController {
 // MARK: - Subscribe state
 extension TUIVoiceRoomViewController {
     private func subscribeToast() {
-        manager.toastSubject
-            .receive(on: RunLoop.main)
-            .sink { [weak self] message in
-                guard let self = self else { return }
-                view.makeToast(message)
-            }.store(in: &cancellableSet)
+        toastService.subscribeToast { [weak self] message in
+            guard let self = self else { return }
+            view.makeToast(message: message)
+        }
     }
     
     private func subscribeRouter() {

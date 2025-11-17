@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 import Kingfisher
 import Combine
+import AtomicXCore
+import RTCRoomEngine
 
 private let containerHeight = 36.0
 private let componentHeight = 32.0
@@ -25,9 +27,9 @@ class VRTopView: UIView {
         case roomInfo
     }
     
-    private let manager: VoiceRoomManager
     private var routerManager: VRRouterManager
-    
+    private let isOwner: Bool
+    private var liveId: String?
     var cancellableSet: Set<AnyCancellable> = []
     
     weak var delegate: VRTopViewDelegate?
@@ -53,20 +55,22 @@ class VRTopView: UIView {
         return btn
     }()
     
-    let stopButton: UIButton = {
+    private lazy var stopButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setBackgroundImage(internalImage( "live_leave_icon"), for: .normal)
+        button.setBackgroundImage(internalImage( self.isOwner ? "live_end_live_icon" : "live_leave_icon"), for: .normal)
         return button
     }()
     
-    init(manager: VoiceRoomManager, routerManager: VRRouterManager) {
-        self.manager = manager
+    init(routerManager: VRRouterManager,isOwner: Bool) {
         self.routerManager = routerManager
+        self.isOwner = isOwner
         super.init(frame: .zero)
     }
     
     func initialize(roomId: String) {
-        liveInfoView.initialize(liveInfo: manager.roomState.liveInfo)
+        liveId = roomId
+        let liveInfo = LiveListStore.shared.state.value.currentLive
+        liveInfoView.initialize(liveInfo: liveInfo)
         audienceListView.initialize(liveId: roomId)
     }
     
@@ -152,7 +156,7 @@ extension VRTopView {
     private func clickReport() {
         let selector = NSSelectorFromString("showReportAlertWithRoomId:ownerId:")
         if responds(to: selector) {
-            perform(selector, with: manager.roomState.roomId, with: manager.coreLiveState.liveOwner.userID)
+            perform(selector, with: liveId ?? "", with: LiveListStore.shared.state.value.currentLive.liveOwner.userID)
         }
     }
 }

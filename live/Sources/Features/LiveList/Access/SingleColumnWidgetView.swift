@@ -6,6 +6,7 @@
 //
 
 import RTCCommon
+import AtomicXCore
 
 class SingleColumnWidgetView: RTCBaseView {
     private var liveInfo: LiveInfo
@@ -126,9 +127,9 @@ class SingleColumnWidgetView: RTCBaseView {
     
     func updateView(liveInfo: LiveInfo) {
         self.liveInfo = liveInfo
-        roomNameLabel.text = !liveInfo.name.isEmpty ? liveInfo.name : liveInfo.roomId
-        ownerNameLabel.text = liveInfo.ownerName.isEmpty ? liveInfo.ownerId : liveInfo.ownerName
-        ownerAvatarView.sd_setImage(with: URL(string: liveInfo.ownerAvatarUrl), placeholderImage: .avatarPlaceholderImage)
+        roomNameLabel.text = !liveInfo.liveName.isEmpty ? liveInfo.liveName : liveInfo.liveID
+        ownerNameLabel.text = liveInfo.liveOwner.userName.isEmpty ? liveInfo.liveOwner.userID : liveInfo.liveOwner.userName
+        ownerAvatarView.sd_setImage(with: URL(string: liveInfo.liveOwner.avatarURL), placeholderImage: .avatarPlaceholderImage)
     }
 }
 

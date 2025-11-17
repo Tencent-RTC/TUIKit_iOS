@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import RTCRoomEngine
+import AtomicXCore
 
 class UserRequestLinkCell: LinkMicBaseCell {
-    var respondEventClosure: ((TUIUserInfo, Bool, @escaping () -> Void) -> Void)?
+    var respondEventClosure: ((LiveUserInfo, Bool, @escaping () -> Void) -> Void)?
     private var isPending = false
     
     private lazy var acceptButton: UIButton = {

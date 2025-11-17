@@ -7,7 +7,6 @@
 
 import Foundation
 import AtomicXCore
-import RTCRoomEngine
 import RTCCommon
 
 struct AudienceRouterState {
@@ -31,16 +30,16 @@ enum AudienceRoute {
     case audience
     case linkType(_ data: [LinkMicTypeCellData])
     case linkSetting
-    case listMenu(_ data: ActionPanelData)
+    case listMenu(_ data: ActionPanelData,_ layout: ActionPanelLayoutMode = .center)
     case audioEffect
     case beauty
     case giftView
     case alert(info: AudienceAlertInfo)
     case streamDashboard
-    case userManagement(_ user: TUIUserInfo, type: AudienceUserManagePanelType)
+    case userManagement(_ seatInfo: SeatInfo, type: AudienceUserManagePanelType)
     case netWorkInfo(_ manager: NetWorkInfoManager, isAudience: Bool)
     case featureSetting
-    case videoQualitySelection(resolutions: [TUIVideoQuality], selectedClosure: ((TUIVideoQuality) -> Void))
+    case videoQualitySelection(resolutions: [VideoQuality], selectedClosure: ((VideoQuality) -> Void))
 }
 
 extension AudienceRoute: Equatable {
@@ -57,8 +56,8 @@ extension AudienceRoute: Equatable {
                 (.alert, .alert),
                 (.streamDashboard, .streamDashboard):
                 return true
-            case let (.listMenu(l), .listMenu(r)):
-                return l == r
+            case let (.listMenu(l1,l2), .listMenu(r1,r2)):
+                return l1 == r1 && l2 == r2
             case let (.userManagement(l1, l2), .userManagement(r1, r2)):
                 return l1 == r1 && l2 == r2
             case let (.netWorkInfo(l1, l2), .netWorkInfo(r1, r2)):
@@ -92,7 +91,7 @@ extension AudienceRoute: Hashable {
                 return "linkType"
             case .linkSetting:
                 return "linkSetting"
-            case .listMenu(let data):
+            case .listMenu(let data,let layout):
                 var result = "listMenu"
                 data.items.forEach { item in
                     result += item.id.uuidString
@@ -109,7 +108,7 @@ extension AudienceRoute: Hashable {
             case .streamDashboard:
                 return "streamDashboard"
             case .userManagement(let user, let type):
-                return "userManagement \(user.userId) type: \(type)"
+                return "userManagement \(user.userInfo.userID) type: \(type)"
             case .netWorkInfo:
                 return "netWorkInfo"
             case .featureSetting:

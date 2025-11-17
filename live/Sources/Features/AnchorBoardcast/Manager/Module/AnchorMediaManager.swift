@@ -5,10 +5,11 @@
 //  Created by jeremiawang on 2024/11/19.
 //
 
+import AtomicXCore
+import Combine
 import Foundation
 import RTCCommon
 import RTCRoomEngine
-import Combine
 import TUICore
 
 class AnchorMediaManager {
@@ -20,31 +21,53 @@ class AnchorMediaManager {
     private typealias Context = AnchorManager.Context
     private weak var context: Context?
     private let toastSubject: PassthroughSubject<String, Never>
-    private let service: AnchorService
-    private var localVideoViewObservation: NSKeyValueObservation? = nil
+    private let service: AnchorService = .init()
+    private var localVideoViewObservation: NSKeyValueObservation?
+    private var cancellableSet: Set<AnyCancellable> = []
 
     init(context: AnchorManager.Context) {
         self.context = context
-        self.service = context.service
         self.toastSubject = context.toastSubject
         initVideoAdvanceSettings()
+        subscribeCurrentLive()
     }
     
     deinit {
         enableMultiPlaybackQuality(false)
         unInitVideoAdvanceSettings()
     }
+    
+    func subscribeCurrentLive() {
+        context?.liveListStore.state.subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
+                guard let self = self else { return }
+                if currentLive.isEmpty {
+                    onLeaveLive()
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        context?.deviceStore.state.subscribe(StatePublisherSelector(keyPath: \DeviceState.cameraStatus))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] cameraStatus in
+                guard let self = self else { return }
+                if cameraStatus == .on {
+                    onCameraOpened()
+                }
+            }
+            .store(in: &cancellableSet)
+    }
 }
 
 // MARK: - Interface
-extension AnchorMediaManager {
 
-    func prepareLiveInfoBeforeEnterRoom(liveInfo: LiveInfo) {
+extension AnchorMediaManager {
+    func prepareLiveInfoBeforeEnterRoom() {
         enableMultiPlaybackQuality(true)
-    }
-    
-    func setLocalVideoView(view: UIView) {
-        service.setLocalVideoView(view: view)
     }
     
     func onCameraOpened() {
@@ -52,9 +75,9 @@ extension AnchorMediaManager {
         service.setVideoResolutionMode(.portrait)
     }
     
-    func updateVideoQuality(quality: TUIVideoQuality) {
+    func updateVideoQuality(quality: VideoQuality) {
         service.updateVideoQuality(quality)
-        update { state in
+        observerState.update { state in
             state.videoQuality = quality
         }
     }
@@ -67,26 +90,13 @@ extension AnchorMediaManager {
         }
     }
     
-    func onSelfMediaDeviceStateChanged(seatInfo: TUISeatInfo) {
-        update { state in
-            state.isAudioLocked = seatInfo.isAudioLocked
-            state.isVideoLocked = seatInfo.isVideoLocked
-        }
-    }
-    
-    func onSelfLeaveSeat() {
-        update { state in
-            state.isAudioLocked = false
-            state.isVideoLocked = false
-        }
-    }
-    
     func subscribeState<Value>(_ selector: StateSelector<AnchorMediaState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
 }
 
 // MARK: - Video Setting
+
 extension AnchorMediaManager {
     func enableAdvancedVisible(_ visible: Bool) {
         observerState.update { state in
@@ -97,7 +107,7 @@ extension AnchorMediaManager {
     func enableMultiPlaybackQuality(_ enable: Bool) {
         TUICore.callService(.TUICore_VideoAdvanceService,
                             method: .TUICore_VideoAdvanceService_EnableMultiPlaybackQuality,
-                            param: ["enable" : NSNumber(value: enable)])
+                            param: ["enable": NSNumber(value: enable)])
     }
     
     private func initVideoAdvanceSettings() {
@@ -109,15 +119,9 @@ extension AnchorMediaManager {
     }
 }
 
-extension AnchorMediaManager {
-    private func update(mediaState: AnchorMediaStateUpdateClosure) {
-        observerState.update(reduce: mediaState)
-    }
-}
-
 // MARK: - Video Advance API Extension
-fileprivate extension String {
-    
+
+private extension String {
     static let TUICore_VideoAdvanceService = "TUICore_VideoAdvanceService"
     
     static let TUICore_VideoAdvanceService_EnableMultiPlaybackQuality = "TUICore_VideoAdvanceService_EnableMultiPlaybackQuality"

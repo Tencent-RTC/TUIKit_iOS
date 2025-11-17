@@ -10,16 +10,18 @@ import SnapKit
 import TUICore
 import Combine
 import RTCCommon
+import AtomicXCore
 
 class VRLiveInfoEditView: UIView {
-    private let manager: VoiceRoomManager
+    private let store: VoiceRoomPrepareStore
     private let routerManager: VRRouterManager
     private var cancellableSet = Set<AnyCancellable>()
 
     lazy var modeSelectionModel: VRPrepareSelectionModel = {
         let model = VRPrepareSelectionModel()
         model.leftIcon = internalImage("live_mode_icon")
-        model.midText = .localizedReplace(.modeText, replace: manager.roomState.liveExtraInfo.liveMode.getString())
+        let mode: LiveStreamPrivacyStatus = store.state.liveInfo.isPublicVisible ? .public : .privacy
+        model.midText = .localizedReplace(.modeText, replace:mode.getString())
         model.rightIcon = internalImage("live_selection_arrow_icon")
         return model
     }()
@@ -31,7 +33,7 @@ class VRLiveInfoEditView: UIView {
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         view.addTarget(self, action: #selector(coverButtonClick), for: .touchUpInside)
-        view.kf.setImage(with: URL(string: manager.roomState.coverURL), for: .normal, placeholder: UIImage.placeholderImage)
+        view.kf.setImage(with: URL(string: store.state.liveInfo.coverURL), for: .normal, placeholder: UIImage.placeholderImage)
         let label = UILabel(frame: .zero)
         label.backgroundColor = .pureBlackColor.withAlphaComponent(0.5)
         label.font = .customFont(ofSize: 14)
@@ -101,8 +103,8 @@ class VRLiveInfoEditView: UIView {
         return view
     }()
     
-    init(manager: VoiceRoomManager, routerManager: VRRouterManager) {
-        self.manager = manager
+    init(routerManager: VRRouterManager, store: VoiceRoomPrepareStore) {
+        self.store = store
         self.routerManager = routerManager
         super.init(frame: .zero)
     }
@@ -123,9 +125,9 @@ class VRLiveInfoEditView: UIView {
     }
     
     private func initialize() {
-        let roomName = TUILogin.getNickName() ?? ""
+        let roomName = LoginStore.shared.state.value.loginUserInfo?.nickname ?? ""
         inputTextField.text = roomName
-        manager.onSetRoomName(roomName)
+        store.onSetRoomName(roomName)
     }
 }
 
@@ -167,7 +169,7 @@ extension VRLiveInfoEditView {
 extension VRLiveInfoEditView {
     @objc func coverButtonClick() {
         inputTextField.resignFirstResponder()
-        routerManager.router(action: .present(.systemImageSelection(.cover)))
+        routerManager.router(action: .present(.systemImageSelection(.cover, .prepare(store))))
     }
 
     @objc func editIconClick() {
@@ -186,7 +188,7 @@ extension VRLiveInfoEditView {
             let item = ActionItem(title: mode.getString(), designConfig: config, actionClosure: { [weak self] value in
                 guard let self = self else { return }
                 guard let privacy = LiveStreamPrivacyStatus(rawValue: value) else { return }
-                self.manager.onSetRoomPrivacy(privacy)
+                self.store.onSetRoomPrivacy(privacy)
                 self.routerManager.router(action: .dismiss())
             })
             items.append(item)
@@ -223,28 +225,29 @@ extension VRLiveInfoEditView: UITextFieldDelegate {
     }
 
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        manager.onSetRoomName(textField.text ?? "")
+        store.onSetRoomName(textField.text ?? "")
     }
 }
 
 // MARK: - subscribeRoomState
 extension VRLiveInfoEditView {
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \VRRoomState.coverURL))
+        store.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.coverURL))
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
                 guard let self = self else { return }
-                self.coverButtonView.kf.setImage(with: URL(string: manager.roomState.coverURL),
+                self.coverButtonView.kf.setImage(with: URL(string: url),
                                                  for: .normal,
                                                  placeholder: UIImage.placeholderImage)
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StateSelector(keyPath: \VRRoomState.liveExtraInfo.liveMode))
+        store.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.isPublicVisible))
             .receive(on: RunLoop.main)
-            .sink { [weak self] mode in
+            .sink { [weak self] isPublicVisible in
                 guard let self = self else { return }
-                let value = String.localizedReplace(.modeText, replace: self.manager.roomState.liveExtraInfo.liveMode.getString())
+                let mode: LiveStreamPrivacyStatus = isPublicVisible ? .public : .privacy
+                let value = String.localizedReplace(.modeText, replace: mode.getString())
                 self.modeSelectionModel.midText = value
             }
             .store(in: &cancellableSet)

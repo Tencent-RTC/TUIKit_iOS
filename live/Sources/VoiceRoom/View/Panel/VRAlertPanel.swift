@@ -19,29 +19,59 @@ struct VRAlertInfo {
     
     let cancelClosure: VRAlertButtonClickClosure?
     let defaultClosure: VRAlertButtonClickClosure
-    
+    let timeoutClosure: VRAlertButtonClickClosure?
+
     init(description: String, 
          imagePath: String?,
          cancelButtonInfo: (title: String, titleColor: UIColor)? = nil,
          defaultButtonInfo: (title: String, titleColor: UIColor) = (.confirmText, .b1),
          cancelClosure: VRAlertButtonClickClosure?,
-         defaultClosure: @escaping VRAlertButtonClickClosure) {
+         defaultClosure: @escaping VRAlertButtonClickClosure,
+         timeoutClosure: VRAlertButtonClickClosure? = nil) {
         self.description = description
         self.imagePath = imagePath
         self.cancelButtonInfo = cancelButtonInfo
         self.defaultButtonInfo = defaultButtonInfo
         self.cancelClosure = cancelClosure
         self.defaultClosure = defaultClosure
+        self.timeoutClosure = timeoutClosure
     }
     
+}
+
+extension VRAlertInfo {
+    static func == (lhs: VRAlertInfo, rhs: VRAlertInfo) -> Bool {
+        let cancelButtonInfoEqual: Bool = {
+            switch (lhs.cancelButtonInfo, rhs.cancelButtonInfo) {
+                case (nil, nil):
+                    return true
+                case (let l?, let r?):
+                    return l.title == r.title && l.titleColor.isEqual(r.titleColor)
+                default:
+                    return false
+            }
+        }()
+
+        let defaultButtonInfoEqual = lhs.defaultButtonInfo.title == rhs.defaultButtonInfo.title
+        && lhs.defaultButtonInfo.titleColor.isEqual(rhs.defaultButtonInfo.titleColor)
+
+        return lhs.description == rhs.description &&
+        lhs.imagePath == rhs.imagePath &&
+        cancelButtonInfoEqual &&
+        defaultButtonInfoEqual
+    }
 }
 
 class VRAlertPanel: UIView {
     private let alertInfo: VRAlertInfo
     
+    private var alertButtonAction: (() -> Void)?
+    private var countdownTimer: Timer?
+    private var remainingSeconds: Int = 0
+    
     let alertContentView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor("1F2024")
         view.layer.cornerRadius = 10
         return view
     }()
@@ -60,7 +90,7 @@ class VRAlertPanel: UIView {
     
     let descriptionLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.textColor = .g1
+        label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = .customFont(ofSize: 16, weight: .semibold)
@@ -69,13 +99,13 @@ class VRAlertPanel: UIView {
     
     let horizontalSeparator: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = .g7
+        view.backgroundColor = .g3.withAlphaComponent(0.3)
         return view
     }()
     
     let verticalSeparator: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = .g7
+        view.backgroundColor = .g3.withAlphaComponent(0.3)
         return view
     }()
     
@@ -91,13 +121,15 @@ class VRAlertPanel: UIView {
         return button
     }()
     
-    init(alertInfo: VRAlertInfo) {
+    init(alertInfo: VRAlertInfo, autoDismissAfter seconds: Int = 0) {
         self.alertInfo = alertInfo
+        self.remainingSeconds = max(0, seconds)
         super.init(frame: UIScreen.main.bounds)
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
         setupStyle()
+        startCountdownIfNeeded()
     }
     
     required init?(coder: NSCoder) {
@@ -110,6 +142,7 @@ class VRAlertPanel: UIView {
     
     func dismiss() {
         safeRemoveFromSuperview()
+        countdownTimer?.invalidate()
     }
 }
 
@@ -231,6 +264,31 @@ extension VRAlertPanel {
     @objc
     private func defaultButtonClick(sender: UIButton) {
         alertInfo.defaultClosure(self)
+    }
+    
+    private func startCountdownIfNeeded() {
+        guard remainingSeconds > 0, alertInfo.cancelButtonInfo != nil else { return }
+        updateCancelButtonTitle()
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0,
+                                              repeats: true) { [weak self] _ in
+            guard let self else { return }
+            self.remainingSeconds -= 1
+            if self.remainingSeconds <= 0 {
+                self.countdownTimer?.invalidate()
+                self.countdownTimer = nil
+                if let timeoutClosure = alertInfo.timeoutClosure {
+                    timeoutClosure(self)
+                }
+            } else {
+                self.updateCancelButtonTitle()
+            }
+        }
+    }
+    
+    private func updateCancelButtonTitle() {
+        let suffix = remainingSeconds > 0 ? " (\(remainingSeconds))" : ""
+        let original = alertInfo.cancelButtonInfo?.title ?? ""
+        cancelButton.setTitle(original + suffix, for: .normal)
     }
 }
 

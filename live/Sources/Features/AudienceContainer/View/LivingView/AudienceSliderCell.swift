@@ -6,9 +6,8 @@
 //
 
 import AtomicXCore
-import RTCRoomEngine
-import RTCCommon
 import Combine
+import RTCCommon
 import TUICore
 
 protocol AudienceListCellDelegate: AnyObject {
@@ -25,7 +24,7 @@ class AudienceSliderCell: UIView {
     weak var delegate: AudienceListCellDelegate?
     weak var rotateScreenDelegate: RotateScreenDelegate?
 
-    private let roomId: String
+    private let liveID: String
     private var isViewReady = false
     private var isCurrentShowCell = false
     private weak var routerCenter: AudienceRouterControlCenter?
@@ -42,35 +41,37 @@ class AudienceSliderCell: UIView {
                     LiveCoreView.callExperimentalAPI(jsonString)
                 }
             } catch {
-                LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
+                LiveKitLog.error("\(#file)", "\(#line)", "dataReport: \(error.localizedDescription)")
             }
         }
         setComponent()
         let view = LiveCoreView(viewType: .playView)
-        view.setLiveID(roomId)
+        view.setLiveID(liveID)
         return view
     }()
 
-    private lazy var manager = AudienceManager(provider: self)
+    private lazy var manager = AudienceManager(liveID: liveID)
     private let routerManager: AudienceRouterManager
     private var cancellableSet = Set<AnyCancellable>()
     private var isStartedPreload = false
     
     init(liveInfo: LiveInfo, routerManager: AudienceRouterManager, routerCenter: AudienceRouterControlCenter) {
-        self.roomId = liveInfo.roomId
+        self.liveID = liveInfo.liveID
         self.routerManager = routerManager
         self.routerCenter = routerCenter
         super.init(frame: .zero)
-        manager.onAudienceSliderCellInit(liveInfo: liveInfo)
+        // TODO: gg check this
+//        manager.onAudienceSliderCellInit(liveInfo: liveInfo)
         debugPrint("init:\(self)")
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     private lazy var audienceView: AudienceView = {
-        let view = AudienceView(roomId: roomId, manager: manager, routerManager: routerManager, coreView: coreView)
+        let view = AudienceView(roomId: liveID, manager: manager, routerManager: routerManager, coreView: coreView)
         view.rotateScreenDelegate = self
         return view
     }()
@@ -87,57 +88,56 @@ class AudienceSliderCell: UIView {
     }
     
     func onViewWillSlideIn() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewWillSlideIn roomId: \(roomId)")
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewWillSlideIn roomId: \(liveID)")
         audienceView.livingView.isHidden = true
-        coreView.startPreviewLiveStream(roomId: roomId, isMuteAudio: true)
+        coreView.startPreviewLiveStream(roomId: liveID, isMuteAudio: true)
         isStartedPreload = true
     }
 
     func onViewDidSlideIn() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewDidSlideIn roomId: \(roomId)")
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewDidSlideIn roomId: \(liveID)")
         enterRoom()
         isCurrentShowCell = true
     }
     
     func onViewSlideInCancelled() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewSlideInCancelled roomId: \(roomId)")
-        coreView.stopPreviewLiveStream(roomId: roomId)
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewSlideInCancelled roomId: \(liveID)")
+        coreView.stopPreviewLiveStream(roomId: liveID)
     }
     
     func onViewWillSlideOut() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewWillSlideOut roomId: \(roomId)")
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewWillSlideOut roomId: \(liveID)")
     }
     
     func onViewDidSlideOut() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewDidSlideOut roomId: \(roomId)")
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewDidSlideOut roomId: \(liveID)")
         if !FloatWindow.shared.isShowingFloatWindow() {
-            coreView.stopPreviewLiveStream(roomId: roomId)
-            coreView.leaveLiveStream() { [weak self] in
-                guard let self = self else { return }
-                manager.onLeaveLive()
-            } onError: { _, _ in
+            coreView.stopPreviewLiveStream(roomId: liveID)
+            if isCurrentShowCell {
+                manager.liveListStore.leaveLive(completion: nil)
+                TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
+                                    subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
+                                    object: nil,
+                                    param: nil)
             }
             isStartedPreload = false
-            TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
-                                subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
-                                object: nil,
-                                param: nil)
         }
         isCurrentShowCell = false
     }
     
     func onViewSlideOutCancelled() {
-        LiveKitLog.info("\(#file)","\(#line)", "onViewSlideOutCancelled roomId: \(roomId)")
+        LiveKitLog.info("\(#file)", "\(#line)", "onViewSlideOutCancelled roomId: \(liveID)")
     }
     
     func enterRoom() {
-        delegate?.handleScrollToNewRoom(roomId: roomId, ownerId: manager.coreRoomState.ownerInfo.userId,
-                                        manager: manager, coreView: coreView) { [weak self] in
+        delegate?.handleScrollToNewRoom(roomId: liveID, ownerId: manager.liveListState.currentLive.liveOwner.userID,
+                                        manager: manager, coreView: coreView)
+        { [weak self] in
             guard let self = self else { return }
             audienceView.relayoutCoreView()
         }
         delegate?.disableScrolling()
-        audienceView.joinLiveStream() { [weak self] result in
+        audienceView.joinLiveStream { [weak self] result in
             guard let self = self else { return }
             if case .success = result {
                 delegate?.enableScrolling()
@@ -148,19 +148,20 @@ class AudienceSliderCell: UIView {
     deinit {
         debugPrint("deinit:\(self)")
         if isStartedPreload {
-            coreView.stopPreviewLiveStream(roomId: roomId)
+            coreView.stopPreviewLiveStream(roomId: liveID)
         }
     }
 }
 
 // MARK: - private func
+
 extension AudienceSliderCell {
     private func constructViewHierarchy() {
         addSubview(audienceView)
     }
     
     private func activateConstraints() {
-        audienceView.snp.makeConstraints{ make in
+        audienceView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -183,13 +184,14 @@ extension AudienceSliderCell {
     }
     
     private func subscribeState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceCoGuestState.coGuestStatus))
+        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .removeDuplicates()
+            .combineLatest(manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
             .receive(on: RunLoop.main)
             .dropFirst()
-            .sink { [weak self] coGuestStatus in
+            .sink { [weak self] connected, isApplying in
                 guard let self = self, let delegate = delegate else { return }
-                if coGuestStatus == .applying || coGuestStatus == .linking {
+                if isApplying || connected.isOnSeat() {
                     delegate.disableScrolling()
                 } else {
                     delegate.enableScrolling()
@@ -197,43 +199,31 @@ extension AudienceSliderCell {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StateSelector(keyPath: \AudienceRoomState.liveStatus))
-            .removeDuplicates()
+        manager.liveListStore.liveListEventPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] status in
+            .sink { [weak self] event in
                 guard let self = self else { return }
-                switch status {
-                    case .finished:
-                    let avaUrl = manager.roomState.liveInfo.ownerAvatarUrl
-                    let userName = manager.roomState.liveInfo.ownerName
-                    delegate?.onRoomDismissed(roomId: manager.roomState.roomId, avatarUrl: avaUrl, userName: userName)
-                    default: break
+                switch event {
+                case .onLiveEnded(liveID: let liveID, reason: _, message: _):
+                    let currentLive = manager.liveListState.currentLive
+                    delegate?.onRoomDismissed(roomId: currentLive.liveID, avatarUrl: currentLive.liveOwner.avatarURL, userName: currentLive.liveOwner.userName)
+                default: break
                 }
             }
             .store(in: &cancellableSet)
     }
     
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceRoomState.roomVideoStreamIsLandscape))
+        manager.subscribeState(StateSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] videoStreamIsLandscape in
                 guard let self = self else { return }
-                if !videoStreamIsLandscape && isCurrentShowCell {
+                if !videoStreamIsLandscape, isCurrentShowCell {
                     self.rotateScreen(isPortrait: true)
                 }
             }
             .store(in: &cancellableSet)
-    }
-}
-
-extension AudienceSliderCell: AudienceManagerProvider {
-    func subscribeCoreViewState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        coreView.subscribeState(selector)
-    }
-    
-    func getCoreViewState<T: CoreViewState>() -> T {
-        coreView.getState()
     }
 }
 
