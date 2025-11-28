@@ -1,3 +1,6 @@
 
 application/Pods
 application/App-UIKit.xcworkspace/xcuserdata
+build_docs_direct.sh
+build_docs.sh
+local_preview.sh
