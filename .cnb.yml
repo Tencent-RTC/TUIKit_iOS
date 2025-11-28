@@ -1,0 +1,14 @@
+# .cnb.yml
+main:
+  push:
+    - stages:
+        - name: sync to github with rebase
+          image: tencentcom/git-sync
+          imports:
+            - https://cnb.cool/tencent/cloud/trtc/github-access-tokens/-/blob/main/env.access_token.yml
+          settings:
+            target_url: git@github.com:Tencent-RTC/TUIKit_iOS.git
+            auth_type: ssh
+            username: ${GITHUB_USER_NAME}
+            password: ${GITHUB_ACCESS_TOKEN}
+            sync_mode: rebase
