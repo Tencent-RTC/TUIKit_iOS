@@ -28,18 +28,18 @@ enum AudienceRouterAction {
 
 enum AudienceRoute {
     case audience
-    case linkType(_ data: [LinkMicTypeCellData])
-    case linkSetting
-    case listMenu(_ data: ActionPanelData,_ layout: ActionPanelLayoutMode = .center)
+    case linkType(_ data: [LinkMicTypeCellData], seatIndex: Int)
+    case linkSetting(seatIndex: Int)
     case audioEffect
     case beauty
     case giftView
-    case alert(info: AudienceAlertInfo)
     case streamDashboard
     case userManagement(_ seatInfo: SeatInfo, type: AudienceUserManagePanelType)
     case netWorkInfo(_ manager: NetWorkInfoManager, isAudience: Bool)
     case featureSetting
     case videoQualitySelection(resolutions: [VideoQuality], selectedClosure: ((VideoQuality) -> Void))
+    case pip
+    case custom(_ item: RouteItem)
 }
 
 extension AudienceRoute: Equatable {
@@ -53,28 +53,28 @@ extension AudienceRoute: Equatable {
                 (.audioEffect,.audioEffect),
                 (.beauty, .beauty),
                 (.giftView, .giftView),
-                (.alert, .alert),
+                (.pip, .pip),
                 (.streamDashboard, .streamDashboard):
                 return true
-            case let (.listMenu(l1,l2), .listMenu(r1,r2)):
-                return l1 == r1 && l2 == r2
             case let (.userManagement(l1, l2), .userManagement(r1, r2)):
                 return l1 == r1 && l2 == r2
             case let (.netWorkInfo(l1, l2), .netWorkInfo(r1, r2)):
                 return l1 == r1 && l2 == r2
+            case let (.custom(l), .custom(r)):
+                return l == r
             case (.audience, _),
                 (.linkType, _),
                 (.linkSetting, _),
                 (.featureSetting, _),
                 (.videoQualitySelection, _),
-                (.listMenu, _),
                 (.audioEffect, _),
                 (.beauty, _),
                 (.giftView, _),
-                (.alert, _),
                 (.streamDashboard, _),
+                (.pip, _),
                 (.userManagement, _),
-                (.netWorkInfo, _):
+                (.netWorkInfo, _),
+                (.custom, _):
                 return false
             default:
                 break
@@ -91,20 +91,12 @@ extension AudienceRoute: Hashable {
                 return "linkType"
             case .linkSetting:
                 return "linkSetting"
-            case .listMenu(let data,let layout):
-                var result = "listMenu"
-                data.items.forEach { item in
-                    result += item.id.uuidString
-                }
-                return result
             case .audioEffect:
                 return "audioEffect"
             case .beauty:
                 return "beauty"
             case .giftView:
                 return "giftView"
-            case .alert(let alertInfo):
-                return "alert \(alertInfo.description)"
             case .streamDashboard:
                 return "streamDashboard"
             case .userManagement(let user, let type):
@@ -115,6 +107,10 @@ extension AudienceRoute: Hashable {
                 return "featureSetting"
             case .videoQualitySelection:
                 return "videoQualitySelection"
+            case .pip:
+                return "pip"
+            case let .custom(item):
+                return "custom_\(item.id)"
         }
     }
     

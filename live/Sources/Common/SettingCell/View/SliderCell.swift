@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import SnapKit
+import AtomicX
 
 public class SliderCell: UITableViewCell {
     public static let identifier = "SliderCell"
@@ -23,21 +24,21 @@ public class SliderCell: UITableViewCell {
         }
     }
     
-    let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
+    let titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = .g7
         return label
     }()
     
-    public let valueLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0)
-        label.textColor = .whiteColor
+    public let valueLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         label.textAlignment = .right
-        label.backgroundColor = .clear
         return label
     }()
     

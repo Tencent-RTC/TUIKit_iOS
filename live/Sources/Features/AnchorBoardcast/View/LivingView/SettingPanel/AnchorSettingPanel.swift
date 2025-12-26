@@ -8,15 +8,16 @@
 import Combine
 import Foundation
 import RTCCommon
+import AtomicX
 
 class AnchorSettingPanel: UIView {
     private let settingPanelModel: AnchorFeatureClickPanelModel
     
-    private let titleLabel: UILabel = {
-        let view = UILabel()
-        view.text = .settingTitleText
-        view.textColor = .textPrimaryColor
-        view.font = .customFont(ofSize: 16, weight: .medium)
+    private let titleLabel: AtomicLabel = {
+        let view = AtomicLabel(.settingTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         view.textAlignment = .center
         return view
     }()

@@ -58,7 +58,7 @@ class RoomViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        ConferenceSession.sharedInstance.addObserver(observer: self)
+//        ConferenceSession.sharedInstance.addObserver(observer: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -73,7 +73,7 @@ class RoomViewController: UIViewController {
     }
     
     deinit {
-        ConferenceSession.sharedInstance.removeObserver(observer: self)
+//        ConferenceSession.sharedInstance.removeObserver(observer: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -148,33 +148,33 @@ extension RoomViewController {
     }
     
     private func joinConference(roomId: String) {
-        let vc =  ConferenceMainViewController()
-        let params = JoinConferenceParams(roomId: roomId)
-        params.isOpenMicrophone = enableLocalAudio
-        params.isOpenCamera = enableLocalVideo
-        params.isOpenSpeaker = isSoundOnSpeaker
-        vc.setJoinConferenceParams(params: params)
-        navigationController?.pushViewController(vc, animated: true)
+//        let vc =  ConferenceMainViewController()
+//        let params = JoinConferenceParams(roomId: roomId)
+//        params.isOpenMicrophone = enableLocalAudio
+//        params.isOpenCamera = enableLocalVideo
+//        params.isOpenSpeaker = isSoundOnSpeaker
+//        vc.setJoinConferenceParams(params: params)
+//        navigationController?.pushViewController(vc, animated: true)
     }
     
 }
 
-extension RoomViewController: ConferenceObserver {
-    func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        guard error != .success else { return }
-        navigationController?.popViewController(animated: true)
-        guard !message.isEmpty else { return }
-        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
-    }
-    
-    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
-        debugPrint("onConferenceFinished")
-    }
-    
-    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
-        debugPrint("onConferenceExited")
-    }
-}
+//extension RoomViewController: ConferenceObserver {
+//    func onConferenceJoined(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
+//        guard error != .success else { return }
+//        navigationController?.popViewController(animated: true)
+//        guard !message.isEmpty else { return }
+//        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
+//    }
+//    
+//    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
+//        debugPrint("onConferenceFinished")
+//    }
+//    
+//    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
+//        debugPrint("onConferenceExited")
+//    }
+//}
 
 private extension String {
     static var enterRoomIdErrorToast: String {

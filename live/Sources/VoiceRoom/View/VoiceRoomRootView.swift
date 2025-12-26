@@ -36,6 +36,8 @@ class VoiceRoomRootView: RTCBaseView {
     private let defaultTemplateId: UInt = 70
     private let summaryStore: LiveSummaryStore
     
+    private var currentLiveOwner: LiveUserInfo?
+    
     @Published private var isLinked: Bool = false
     
     private let backgroundImageView: UIImageView = {
@@ -328,12 +330,13 @@ extension VoiceRoomRootView {
                                 subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_START,
                                 object: nil,
                                 param: nil)
+        } else {
+            currentLiveOwner = liveListStore.state.value.currentLive.liveOwner
         }
         initComponentView()
         karaokeManager.synchronizeMetadata(isOwner: isOwner)
-#if !RTCube_APPSTORE
+        subscribeKaraokeState()
         handleRoomLayoutType()
-#endif
     }
 
     func handleRoomLayoutType() {
@@ -464,8 +467,8 @@ extension VoiceRoomRootView {
         if !isOwner {
             let info: [String: Any] = [
                 "roomId": liveID,
-                "avatarUrl": liveListStore.state.value.currentLive.liveOwner.avatarURL,
-                "userName": selfInfo.nickname ?? ""
+                "avatarUrl": currentLiveOwner?.avatarURL ?? "",
+                "userName": currentLiveOwner?.userName ?? ""
             ]
             delegate?.rootView(self, showEndView: info, isAnchor: false)
         }
@@ -484,6 +487,16 @@ extension VoiceRoomRootView {
         subscribeUserIsOnSeatState()
         subscribeLinkStatus()
         subscribeAudienceState()
+    }
+
+    private func subscribeKaraokeState() {
+        karaokeManager.errorSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] message in
+                guard let self = self else { return }
+                toastService.showToast(message,toastStyle: .error)
+            }
+            .store(in: &cancellableSet)
     }
 }
 
@@ -536,9 +549,9 @@ extension VoiceRoomRootView {
                 guard let self = self else { return }
                 switch event {
                     case .onLocalMicrophoneClosedByAdmin:
-                        toastService.showToast( .mutedAudioText)
+                        toastService.showToast(.mutedAudioText, toastStyle: .info)
                     case .onLocalMicrophoneOpenedByAdmin(policy: _):
-                        toastService.showToast(.unmutedAudioText)
+                        toastService.showToast(.unmutedAudioText, toastStyle: .info)
                     default:
                         break
                 }
@@ -592,10 +605,7 @@ extension VoiceRoomRootView {
                 switch event {
                     case .onCoHostRequestReceived(let inviter, let extensionInfo):
                         let titleText = extensionInfo == "needRequestBattle" ? String.battleInvitationText : String.connectionInviteText
-                        let alertInfo = VRAlertInfo(description: String.localizedReplace(titleText, replace: inviter.userName),
-                                                    imagePath: inviter.avatarURL,
-                                                    cancelButtonInfo: (String.rejectText, .cancelTextColor),
-                                                    defaultButtonInfo: (String.acceptText, .defaultTextColor)) { [weak self] alertPanel in
+                        let cancelButton = AlertButtonConfig(text: String.rejectText, type: .grey) { [weak self] _ in
                             guard let self = self else { return }
                             coHostStore.rejectHostConnection(fromHostLiveID: inviter.liveID) { [weak self] result in
                                 guard let self = self else { return }
@@ -607,51 +617,78 @@ extension VoiceRoomRootView {
                                         handleErrorMessage(err.localizedMessage)
                                 }
                             }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
-                        } defaultClosure: { [weak self] alertPanel in
+                            self.routerManager.dismiss(dismissType: .alert)
+                        }
+                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
                             guard let self = self else { return }
+                            
+                            let seatList = seatStore.state.value.seatList
+                            let hasBackSeatsOccupied = seatList.indices.contains(where: { index in
+                                index >= KSGConnectMaxSeatCount && !seatList[index].userInfo.userID.isEmpty
+                            })
+                            
+                            if hasBackSeatsOccupied {
+                                coHostStore.rejectHostConnection(fromHostLiveID: inviter.liveID) { [weak self] result in
+                                    guard let self = self else { return }
+                                    switch result {
+                                        case .success():
+                                            break
+                                        case .failure(let error):
+                                            let err = InternalError(errorInfo: error)
+                                            handleErrorMessage(err.localizedMessage)
+                                    }
+                                }
+                                self.routerManager.dismiss(dismissType: .alert)
+                                toastService.showToast(.cannotConnectionWithBackSeatsOccupiedText, toastStyle: .warning)
+                                return
+                            }
+                            
                             coHostStore.acceptHostConnection(fromHostLiveID: inviter.liveID) { [weak self] result in
                                 guard let self = self else { return }
                                 switch result {
                                     case .success():
                                         if extensionInfo == "needRequestBattle" {
-                                            var userIdList: [String] = [inviter.userID]
+                                            let userIdList: [String] = [inviter.userID]
                                             requestBattle(userIdList: userIdList)
                                         }
-                                        routerManager.router(action: .dismiss(.alert, completion: nil))
+                                        self.routerManager.dismiss(dismissType: .alert)
                                         break
                                     case .failure(let error):
                                         let err = InternalError(errorInfo: error)
                                         handleErrorMessage(err.localizedMessage)
                                 }
                             }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
-                        } timeoutClosure: { [weak self] alertPanel in
-                            guard let self = self else { return }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
+                            self.routerManager.dismiss(dismissType: .alert)
                         }
-                        routerManager.router(action: .present(.alert(info: alertInfo,10)))
+                        let alertConfig = AlertViewConfig(title: String.localizedReplace(titleText, replace: inviter.userName),
+                                                          iconUrl: inviter.avatarURL,
+                                                          cancelButton: cancelButton,
+                                                          confirmButton: confirmButton,
+                                                          countdownDuration: 10) { [weak self] _ in
+                            guard let self = self else { return }
+                            self.routerManager.dismiss(dismissType: .alert)
+                        }
+                        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
                     case .onCoHostRequestRejected(let invitee):
-                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: invitee.userName.isEmpty ? invitee.userID : invitee.userName))
-                    case .onCoHostRequestTimeout(let inviter,let invitee):
+                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: invitee.userName.isEmpty ? invitee.userID : invitee.userName), toastStyle: .info)
+                    case .onCoHostRequestTimeout(let inviter,_):
                         if inviter.userID == TUIRoomEngine.getSelfInfo().userId {
-                            toastService.showToast(.requestTimeoutText)
+                            toastService.showToast(.requestTimeoutText, toastStyle: .info)
                         }
                     case .onCoHostRequestCancelled(let inviter,let invitee):
                         if invitee?.userID == TUIRoomEngine.getSelfInfo().userId {
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
+                            routerManager.dismiss(dismissType: .alert, completion: nil)
                             let message = String.localizedReplace(.coHostcanceledText, replace: inviter.userName)
-                            toastService.showToast(message)
+                            toastService.showToast(message, toastStyle: .info)
                         }
-                    case .onCoHostRequestAccepted(let invitee):
-                        routerManager.router(action: .dismiss(.alert, completion: nil))
+                    case .onCoHostRequestAccepted(_):
+                        routerManager.dismiss(dismissType: .alert, completion: nil)
                     default:
                         break
                 }
             }
             .store(in: &cancellableSet)
 
-#if !RTCube_APPSTORE
         coHostStore.state.subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
             .receive(on: RunLoop.main)
             .dropFirst()
@@ -696,7 +733,6 @@ extension VoiceRoomRootView {
                 }
             }
             .store(in: &cancellableSet)
-#endif
     }
 
     private func subscribeBattleState() {
@@ -706,10 +742,7 @@ extension VoiceRoomRootView {
                 guard let self = self else { return }
                 switch event {
                     case .onBattleRequestReceived( let battleID, let inviter, _):
-                        let alertInfo = VRAlertInfo(description: .localizedReplace(.battleInvitationText, replace: inviter.userName),
-                                                    imagePath: inviter.avatarURL,
-                                                    cancelButtonInfo: (String.rejectText, .cancelTextColor),
-                                                    defaultButtonInfo: (String.acceptText, .defaultTextColor)) { [weak self] alertPanel in
+                        let cancelButton = AlertButtonConfig(text: String.rejectText, type: .grey) { [weak self] _ in
                             guard let self = self else { return }
                             battleStore.rejectBattle(battleID: battleID) { [weak self] result in
                                 guard let self = self else { return }
@@ -721,8 +754,9 @@ extension VoiceRoomRootView {
                                         handleErrorMessage(err.localizedMessage)
                                 }
                             }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
-                        } defaultClosure: { [weak self] alertPanel in
+                            self.routerManager.dismiss(dismissType: .alert)
+                        }
+                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
                             guard let self = self else { return }
                             battleStore.acceptBattle(battleID: battleID) { [weak self] result in
                                 guard let self = self else { return }
@@ -734,29 +768,34 @@ extension VoiceRoomRootView {
                                         handleErrorMessage(err.localizedMessage)
                                 }
                             }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
-                        } timeoutClosure: { [weak self] alertPanel in
-                            guard let self = self else { return }
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
+                            self.routerManager.dismiss(dismissType: .alert)
                         }
-                        routerManager.router(action: .present(.alert(info: alertInfo,10)))
-                    case .onBattleRequestReject(battleID: let battleID, let inviter, let invitee):
+                        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.userName),
+                                                          iconUrl: inviter.avatarURL,
+                                                          cancelButton: cancelButton,
+                                                          confirmButton: confirmButton,
+                                                          countdownDuration: 10) { [weak self] _ in
+                            guard let self = self else { return }
+                            self.routerManager.dismiss(dismissType: .alert)
+                        }
+                        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
+                    case .onBattleRequestReject(battleID: _, let inviter, let invitee):
                         if inviter.userID == selfId {
                             let message = String.localizedReplace(.battleInvitationRejectText, replace: invitee.userName)
-                            toastService.showToast(message)
+                            toastService.showToast(message, toastStyle: .info)
                         }
-                    case .onBattleRequestTimeout(let battleID, let inviter, let invitee):
+                    case .onBattleRequestTimeout(_, let inviter, _):
                         if inviter.userID == selfId {
-                            toastService.showToast(.battleInvitationTimeoutText)
+                            toastService.showToast(.battleInvitationTimeoutText, toastStyle: .info)
                         }
-                    case .onBattleRequestCancelled(let battleID, let inviter, let invitee):
+                    case .onBattleRequestCancelled(_, let inviter, let invitee):
                         if invitee.userID == selfId {
-                            toastService.showToast(.localizedReplace(.battleInviterCancelledText, replace: "\(inviter.userName)"))
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
+                            toastService.showToast(.localizedReplace(.battleInviterCancelledText, replace: "\(inviter.userName)"), toastStyle: .info)
+                            routerManager.dismiss(dismissType: .alert, completion: nil)
                         }
-                    case .onBattleStarted(let battleInfo,let inviter,let invitees):
+                    case .onBattleStarted(_,let inviter,_):
                         if inviter.userID == selfId {
-                            routerManager.router(action: .dismiss(.alert, completion: nil))
+                            routerManager.dismiss(dismissType: .alert, completion: nil)
                         }
                     default:
                         break
@@ -776,9 +815,9 @@ extension VoiceRoomRootView {
                     case .onAudienceMessageDisabled(audience: let user, isDisable: let isDisable):
                         guard user.userID == selfInfo.userID else { break }
                         if isDisable {
-                            toastService.showToast(.disableChatText)
+                            toastService.showToast(.disableChatText, toastStyle: .info)
                         } else {
-                            toastService.showToast(.enableChatText)
+                            toastService.showToast(.enableChatText, toastStyle: .info)
                         }
                     default: break
                 }
@@ -808,18 +847,14 @@ extension VoiceRoomRootView: VRTopViewDelegate {
     
     private func anchorStopButtonClick() {
         var title: String = ""
-        var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
-        lineConfig.backgroundColor = .bgOperateColor
-        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
+        var items: [AlertButtonConfig] = []
 
-        let selfUserId = TUIRoomEngine.getSelfInfo().userId
         let isSelfInCoHostConnection = coHostStore.state.value.coHostStatus == .connected
         let isSelfInBattle = battleStore.state.value.currentBattleInfo?.battleID != nil
 
         if isSelfInBattle {
             title = .endLiveOnBattleText
-            let endBattleItem = ActionItem(title: .endLiveBattleText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+            let endBattleItem = AlertButtonConfig(text: .endLiveBattleText, type: .red) { [weak self] _ in
                 guard let self = self ,let battleID = battleStore.state.value.currentBattleInfo?.battleID else { return }
                 battleStore.exitBattle(battleID: battleID, completion: { [weak self] result in
                     guard let self = self else { return }
@@ -831,37 +866,36 @@ extension VoiceRoomRootView: VRTopViewDelegate {
                             handleErrorMessage(err.localizedMessage)
                     }
                 })
-                self.routerManager.router(action: .dismiss())
-            })
+                self.routerManager.dismiss()
+            }
             items.append(endBattleItem)
         } else if isSelfInCoHostConnection {
             title = .endLiveOnConnectionText
-            let endConnectionItem = ActionItem(title: .endLiveDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+            let endConnectionItem = AlertButtonConfig(text: .endLiveDisconnectText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
                 coHostStore.exitHostConnection()
-                self.routerManager.router(action: .dismiss())
-            })
+                self.routerManager.dismiss()
+            }
             items.append(endConnectionItem)
         } else {
-            let alertInfo = VRAlertInfo(description: .confirmEndLiveText,
-                                        imagePath: nil,
-                                        cancelButtonInfo: (String.cancelText, .cancelTextColor),
-                                        defaultButtonInfo: (String.confirmCloseText, .warningTextColor)) { alertPanel in
-                self.routerManager.router(action: .dismiss(.alert))
-            } defaultClosure: { [weak self] alertPanel in
+            let cancelButton = AlertButtonConfig(text: String.cancelText, type: .grey) { [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.dismiss(dismissType: .alert)
+            }
+            let confirmButton = AlertButtonConfig(text: String.confirmCloseText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
                 self.stopVoiceRoom()
-                routerManager.router(action: .dismiss(.alert, completion: nil))
+                self.routerManager.dismiss(dismissType: .alert)
             }
-            routerManager.router(action: .present(.alert(info: alertInfo)))
+            let alertConfig = AlertViewConfig(title: .confirmEndLiveText,
+                                              cancelButton: cancelButton,
+                                              confirmButton: confirmButton)
+            routerManager.present(view: AtomicAlertView(config: alertConfig))
             return
         }
 
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .defaultTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
         let text: String = liveListStore.state.value.currentLive.keepOwnerOnSeat == false ? .confirmExitText : .confirmCloseText
-        let endLiveItem = ActionItem(title: text, designConfig: designConfig, actionClosure: { [weak self] _ in
+        let endLiveItem = AlertButtonConfig(text: text, type: .primary) { [weak self] _ in
             guard let self = self else { return }
             battleStore.exitBattle(battleID: battleStore.state.value.currentBattleInfo?.battleID ?? "",completion: { [weak self] result in
                 guard let self = self else { return }
@@ -874,11 +908,18 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             })
 
             self.stopVoiceRoom()
-            self.routerManager.router(action: .dismiss())
-        })
+            self.routerManager.dismiss()
+        }
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
-                                                                        cancelTitleColor: .defaultTextColor),.center)))
+        
+        let cancelItem = AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss()
+        }
+        items.append(cancelItem)
+    
+        let alertConfig = AlertViewConfig(title: title, items: items)
+        routerManager.present(view: AtomicAlertView(config: alertConfig))
     }
 
 
@@ -889,13 +930,9 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             routerManager.router(action: .exit)
             return
         }
-        var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
-        lineConfig.backgroundColor = .bgOperateColor
-        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
-
+        var items: [AlertButtonConfig] = []
         let title: String = .exitLiveOnLinkMicText
-        let endLinkMicItem = ActionItem(title: .exitLiveLinkMicDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+        let endLinkMicItem = AlertButtonConfig(text: .exitLiveLinkMicDisconnectText, type: .red) { [weak self] _ in
             guard let self = self else { return }
             seatStore.leaveSeat { [weak self] result in
                 guard let self = self else { return }
@@ -904,23 +941,27 @@ extension VoiceRoomRootView: VRTopViewDelegate {
                     handleErrorMessage(err.localizedMessage)
                 }
             }
-
-            routerManager.router(action: .dismiss())
-        })
+            routerManager.dismiss()
+        }
         items.append(endLinkMicItem)
         
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .defaultTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-        let endLiveItem = ActionItem(title: .confirmExitText, designConfig: designConfig, actionClosure: { [weak self] _ in
+        let endLiveItem = AlertButtonConfig(text: .confirmExitText, type: .primary) { [weak self] _ in
             guard let self = self else { return }
             leaveRoom()
-            routerManager.router(action: .dismiss())
-            routerManager.router(action: .exit)
-        })
+            routerManager.dismiss {
+                self.routerManager.router(action: .exit)
+            }
+        }
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
-                                                                        cancelTitleColor: .defaultTextColor),.center)))
+        
+        let cancelItem = AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss()
+        }
+        items.append(cancelItem)
+        
+        let alertConfig = AlertViewConfig(title: title, items: items)
+        routerManager.present(view: AtomicAlertView(config: alertConfig))
     }
     
     private func leaveRoom() {
@@ -942,7 +983,7 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             guard let self else { return }
             switch result {
                 case .success:
-                    routerManager.router(action: .dismiss(.alert, completion: nil))
+                    routerManager.dismiss(dismissType: .alert, completion: nil)
                     break
                 case .failure(let error):
                     let err = InternalError(errorInfo: error)
@@ -1038,11 +1079,11 @@ extension VoiceRoomRootView {
                      onSeatRequestCancelled(type: .inviteToTakeSeat, userInfo: hostUser)
                  case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
                      if !isAccept {
-                         toastService.showToast(.takeSeatApplicationRejected)
+                         toastService.showToast(.takeSeatApplicationRejected, toastStyle: .info)
                      }
                  case .onGuestApplicationNoResponse(reason: let reason):
                      if reason == .timeout {
-                         toastService.showToast(.takeSeatApplicationTimeout)
+                         toastService.showToast(.takeSeatApplicationTimeout, toastStyle: .info)
                      }
                  case .onKickedOffSeat(seatIndex: let seatIndex, hostUser: let handleUser):
                      onKickedOffSeat(seatIndex: seatIndex, userInfo: handleUser)
@@ -1057,45 +1098,50 @@ extension VoiceRoomRootView {
         let liveOwner = liveListStore.state.value.currentLive.liveOwner
         guard !userInfo.userID.isEmpty else { return }
         guard !liveOwner.userID.isEmpty else { return }
-        let alertInfo = VRAlertInfo(description: String.localizedReplace(.inviteLinkText, replace: "\(liveOwner.userName)"),
-                                    imagePath: liveOwner.avatarURL,
-                                    cancelButtonInfo: (String.rejectText, .cancelTextColor),
-                                    defaultButtonInfo: (String.acceptText, .defaultTextColor)) { [weak self] _ in
+        
+        let cancelButton = AlertButtonConfig(text: String.rejectText, type: .grey) { [weak self] _ in
             guard let self = self else { return }
             coGuestStore.rejectInvitation(inviterID: userInfo.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
-                    self.routerManager.router(action: .dismiss(.alert))
+                    self.routerManager.dismiss(dismissType: .alert, completion: nil)
                 case .failure(let error):
-                    self.routerManager.router(action: .dismiss(.alert))
+                    self.routerManager.dismiss(dismissType: .alert, completion: nil)
                     let err = InternalError(errorInfo: error)
                     handleErrorMessage(err.localizedMessage)
                 }
             }
-        } defaultClosure: { [weak self] _ in
+        }
+        
+        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
             guard let self = self else { return }
             coGuestStore.acceptInvitation(inviterID: userInfo.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
-                    self.routerManager.router(action: .dismiss(.alert))
+                    self.routerManager.dismiss(dismissType: .alert, completion: nil)
                 case .failure(let error):
-                    self.routerManager.router(action: .dismiss(.alert))
+                    self.routerManager.dismiss(dismissType: .alert, completion: nil)
                     let err = InternalError(errorInfo: error)
                     handleErrorMessage(err.localizedMessage)
                 }
             }
-        } timeoutClosure: { [weak self] alertPanel in
-            guard let self = self else { return }
-            routerManager.router(action: .dismiss(.alert, completion: nil))
         }
-        routerManager.router(action: .present(.alert(info: alertInfo,10)))
+        let alertConfig = AlertViewConfig(title: String.localizedReplace(.inviteLinkText, replace: "\(liveOwner.userName)"),
+                                          iconUrl: liveOwner.avatarURL,
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton,
+                                          countdownDuration: 10) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss(dismissType: .alert, completion: nil)
+        }
+        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
     }
     
     func onSeatRequestCancelled(type: SGRequestType, userInfo: LiveUserInfo) {
         guard type == .inviteToTakeSeat else { return }
-        routerManager.router(action: .dismiss(.alert))
+        routerManager.dismiss(dismissType: .alert, completion: nil)
     }
     
     private func onKickedOffSeat(seatIndex: Int, userInfo: LiveUserInfo) {
@@ -1109,63 +1155,72 @@ extension VoiceRoomRootView {
 
 extension VoiceRoomRootView: SeatGridViewObserver {
     func onSeatViewClicked(seatView: UIView, seatInfo: TUISeatInfo) {
-        let menus = generateOperateSeatMenuData(seat: seatInfo)
-        if menus.isEmpty {
+        let alertItems = generateSeatAlertItems(seat: seatInfo)
+        if alertItems.isEmpty {
             return
         }
-        let data = ActionPanelData(items: menus, cancelText: .cancelText)
-        routerManager.router(action: .present(.listMenu(data)))
+        
+        let alertConfig = AlertViewConfig(items: alertItems)
+        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
     }
 }
 
-// MARK: - Invite/Lock seat
+// MARK: - Seat Alert Items
 extension VoiceRoomRootView {
-    private func generateOperateSeatMenuData(seat: TUISeatInfo) -> [ActionItem] {
+    private func generateSeatAlertItems(seat: TUISeatInfo) -> [AlertButtonConfig] {
         if isOwner {
-            return generateRoomOwnerOperateSeatMenuData(seat: seat)
+            return generateRoomOwnerSeatAlertItems(seat: seat)
         } else {
-            return generateNormalUserOperateSeatMenuData(seat: seat)
+            return generateNormalUserSeatAlertItems(seat: seat)
         }
     }
     
-    private func generateRoomOwnerOperateSeatMenuData(seat: TUISeatInfo) -> [ActionItem] {
-        var menus: [ActionItem] = []
+    private func generateRoomOwnerSeatAlertItems(seat: TUISeatInfo) -> [AlertButtonConfig] {
+        var items: [AlertButtonConfig] = []
+        
         if (seat.userId ?? "").isEmpty {
             if !seat.isLocked {
-                let inviteTakeSeat = ActionItem(title: String.inviteText, designConfig: designConfig())
-                inviteTakeSeat.actionClosure = { [weak self] _ in
+                let inviteItem = AlertButtonConfig(text: String.inviteText, type: .primary) { [weak self] _ in
                     guard let self = self else { return }
                     routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                         guard let self = self else { return }
                         routerManager.router(action: .present(.linkInviteControl(seat.index)))
                     }))
                 }
-                menus.append(inviteTakeSeat)
+                items.append(inviteItem)
             }
             
-            let lockSeatItem = ActionItem(title: seat.isLocked ? String.unLockSeat : String.lockSeat, designConfig: designConfig())
-            lockSeatItem.actionClosure = { [weak self] _ in
+            let lockText = seat.isLocked ? String.unLockSeat : String.lockSeat
+            let lockItem = AlertButtonConfig(text: lockText, type: .primary) { [weak self] _ in
                 guard let self = self else { return }
                 lockSeat(seat: seat)
                 routerManager.router(action: .dismiss())
             }
-            menus.append(lockSeatItem)
-            return menus
+            items.append(lockItem)
+        } else {
+            let isSelf = seat.userId == selfInfo.userID
+            if !isSelf {
+                routerManager.router(action: .present(.userControl(imStore, seat)))
+            }
         }
         
-        let isSelf = seat.userId == selfInfo.userID
-        if !isSelf {
-            routerManager.router(action: .present(.userControl(imStore, seat)))
+        if !items.isEmpty {
+            let cancelItem = AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.dismiss()
+            }
+            items.append(cancelItem)
         }
-        return menus
+        
+        return items
     }
     
-    private func generateNormalUserOperateSeatMenuData(seat: TUISeatInfo) -> [ActionItem] {
-        var menus: [ActionItem] = []
-        let isOnSeat = seatStore.state.value.seatList.contains { $0.userInfo.userID == selfInfo.userID}
+    private func generateNormalUserSeatAlertItems(seat: TUISeatInfo) -> [AlertButtonConfig] {
+        var items: [AlertButtonConfig] = []
+        let isOnSeat = seatStore.state.value.seatList.contains { $0.userInfo.userID == selfInfo.userID }
+        
         if (seat.userId ?? "").isEmpty && !seat.isLocked {
-            let takeSeatItem = ActionItem(title: .takeSeat, designConfig: designConfig())
-            takeSeatItem.actionClosure = { [weak self] _ in
+            let takeSeatItem = AlertButtonConfig(text: .takeSeat, type: .primary) { [weak self] _ in
                 guard let self = self else { return }
                 if isOnSeat {
                     moveToSeat(index: seat.index)
@@ -1174,21 +1229,18 @@ extension VoiceRoomRootView {
                 }
                 routerManager.router(action: .dismiss())
             }
-            menus.append(takeSeatItem)
-            return menus
-        }
-        
-        if !(seat.userId ?? "").isEmpty && seat.userId != selfInfo.userID {
+            items.append(takeSeatItem)
+            
+            let cancelItem = AlertButtonConfig(text: .cancelText, type: .grey){ [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.dismiss()
+            }
+            items.append(cancelItem)
+        } else if !(seat.userId ?? "").isEmpty && seat.userId != selfInfo.userID {
             routerManager.router(action: .present(.userControl(imStore, seat)))
         }
-        return menus
-    }
-    
-    private func designConfig() -> ActionItemDesignConfig {
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
-        return designConfig
+        
+        return items
     }
     
     private func lockSeat(seat: TUISeatInfo) {
@@ -1208,9 +1260,18 @@ extension VoiceRoomRootView {
     
     private func takeSeat(index: Int) {
         if viewStore.state.isApplyingToTakeSeat {
-            toastService.showToast(.repeatRequest)
+            toastService.showToast(.repeatRequest, toastStyle: .warning)
             return
         }
+        
+        let isInConnection = !coHostStore.state.value.connected.isEmpty
+        let isInBattle = battleStore.state.value.currentBattleInfo?.battleID != nil
+        
+        if (isInConnection || isInBattle) && index >= KSGConnectMaxSeatCount {
+            toastService.showToast(.seatAllTokenCancelText, toastStyle: .warning)
+            return
+        }
+        
         viewStore.onSentTakeSeatRequest()
         coGuestStore.applyForSeat(seatIndex: index, timeout: kSGDefaultTimeout, extraInfo: nil) { [weak self] result in
             guard let self = self else { return }
@@ -1234,7 +1295,7 @@ extension VoiceRoomRootView {
     }
     
     private func handleErrorMessage(_ message: String) {
-        toastService.showToast(message)
+        toastService.showToast(message, toastStyle: .error)
     }
 }
 
@@ -1305,7 +1366,7 @@ extension VoiceRoomRootView: TUIRoomObserver {
 }
 
 extension VoiceRoomRootView: SGHostAndBattleViewDelegate {
-    func onClickCoHostView(seatInfo: SeatInfo,type: VRCoHostUserManagerPanelType) {
+    func onClickCoHostView(seatInfo: SeatInfo,type: CoHostViewManagerPanelType) {
         routerManager.router(action: .present(.coHostUserControl(seatInfo,type)))
     }
 
@@ -1315,23 +1376,26 @@ extension VoiceRoomRootView: SGHostAndBattleViewDelegate {
         let isSelfOnSeat = seatInfo.userInfo.userID == TUIRoomEngine.getSelfInfo().userId
 
         if seatInfo.userInfo.userID == "" && isInvite{
-            let view = VRCoHostInviteView(seatInfo: seatInfo)
+            let view = LocalCoHostEmptyView(seatInfo: seatInfo)
             view.didTap = { [weak self] in
                 guard let self = self else {return}
                 if isOwner {
                     self.onClickCoHostView(seatInfo: seatInfo,type: .inviteAndLockSeat)
                 } else if !seatInfo.isLocked{
-                    let menu = generateNormalUserOperateSeatMenuData(seat: TUISeatInfo(from: seatInfo))
-                    let data = ActionPanelData(items: menu, cancelText: .cancelText)
-                    routerManager.router(action: .present(.listMenu(data)))
+                    let alertItems = generateNormalUserSeatAlertItems(seat: TUISeatInfo(from: seatInfo))
+                    
+                    guard !alertItems.isEmpty else { return }
+                    
+                    let alertConfig = AlertViewConfig(items: alertItems)
+                    routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
                 }
             }
             return view
         } else if seatInfo.userInfo.userID == ""{
-            let view = VRCoHostEmptyView(seatInfo: seatInfo)
+            let view = RemoteCoHostEmptyView(seatInfo: seatInfo)
             return view
         } else {
-            let view = VRCoHostView(seatInfo: seatInfo, routerManager: routerManager)
+            let view = CoHostView(seatInfo: seatInfo, routerManager: routerManager)
             view.didTap = { [weak self] in
                 guard let self = self else {return}
                 if isOwner && seatInfo.userInfo.liveID == liveID{
@@ -1350,7 +1414,7 @@ extension VoiceRoomRootView: SGHostAndBattleViewDelegate {
     }
 
     func createBattleContainerView() -> UIView? {
-        let battleView = VRBattleInfoView(liveID: liveID, routerManager: routerManager)
+        let battleView = BattleInfoView(liveID: liveID, routerManager: routerManager)
         battleView.isUserInteractionEnabled = false
         return battleView
     }
@@ -1406,4 +1470,6 @@ fileprivate extension String {
     static let onKickOutByConnectText = internalLocalized("The connection only displays the first 6 seats. You have been removed.")
     static let mutedAudioText = internalLocalized("The anchor has muted you")
     static let unmutedAudioText = internalLocalized("The anchor has unmuted you")
+    static let seatAllTokenCancelText = internalLocalized("The seats are all taken.")
+    static let cannotConnectionWithBackSeatsOccupiedText = internalLocalized("Cannot connect when back 4 seats occupied")
 }

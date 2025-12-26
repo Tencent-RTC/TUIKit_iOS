@@ -163,6 +163,8 @@ extension TUIConnectionCode: LocalizedError {
             return internalLocalized("The number of co-hosting has exceeded the maximum limit.")
         case .retry:
             return internalLocalized("Internal error, it is recommended to try again.")
+        case .roomMismatch:
+            return internalLocalized("The room types do not match; connections can only be initiated in rooms of the same type.")
         default:
             return internalLocalized("Temporarily Unclassified General Error")
         }

@@ -7,6 +7,7 @@
 
 import Foundation
 import RTCCommon
+import AtomicX
 
 class LinkMicTypePanel: UIView {
     
@@ -16,12 +17,14 @@ class LinkMicTypePanel: UIView {
 
     let data: [LinkMicTypeCellData]
     let routerManager: AudienceRouterManager
-    let manager: AudienceManager
+    let manager: AudienceStore
+    let seatIndex: Int
     
-    init(data: [LinkMicTypeCellData], routerManager: AudienceRouterManager, manager: AudienceManager) {
+    init(data: [LinkMicTypeCellData], routerManager: AudienceRouterManager, manager: AudienceStore, seatIndex: Int) {
         self.data = data
         self.routerManager = routerManager
         self.manager = manager
+        self.seatIndex = seatIndex
         super.init(frame: .zero)
     }
     
@@ -39,20 +42,21 @@ class LinkMicTypePanel: UIView {
         isViewReady = true
     }
 
-    private let titleLabel: UILabel = {
-        let view = UILabel()
-        view.text = .linkTypeTitleText
-        view.textColor = .g7
-        view.font = .customFont(ofSize: 16)
+    private let titleLabel: AtomicLabel = {
+        let view = AtomicLabel(.linkTypeTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         view.textAlignment = .center
         return view
     }()
 
-    private let tipsLabel: UILabel = {
-        let view = UILabel()
-        view.text = .linkTypeTipsText
-        view.textColor = .greyColor
-        view.font = .customFont(ofSize: 12)
+    private let tipsLabel: AtomicLabel = {
+        let view = AtomicLabel(.linkTypeTipsText) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
+        
         view.textAlignment = .center
         view.numberOfLines = 0
         view.lineBreakMode = .byWordWrapping
@@ -126,7 +130,7 @@ extension LinkMicTypePanel {
 
 extension LinkMicTypePanel {
     @objc func videoSettingImageViewAction() {
-        routerManager.router(action: .present(.linkSetting))
+        routerManager.router(action: .present(.linkSetting(seatIndex: seatIndex)))
     }
 }
 

@@ -18,7 +18,7 @@ protocol AudienceBottomMenuViewDelegate: NSObjectProtocol {
 class AudienceBottomMenuView: RTCBaseView {
     var cancellableSet = Set<AnyCancellable>()
     
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private let coreView: LiveCoreView
     private let buttonSliceIndex: Int = 1
@@ -46,7 +46,7 @@ class AudienceBottomMenuView: RTCBaseView {
     
     var buttons: [UIButton] = []
     
-    init(mananger: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView, isOwner: Bool) {
+    init(mananger: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView, isOwner: Bool) {
         self.manager = mananger
         self.routerManager = routerManager
         self.coreView = coreView
@@ -78,7 +78,7 @@ class AudienceBottomMenuView: RTCBaseView {
     
     override func setupViewStyle() {
         stackView.spacing = buttonSpacing
-        setupButtons(isDisableCoGuest: AudienceManager.audienceContainerConfig.disableFooterCoGuest)
+        setupButtons(isDisableCoGuest: AudienceStore.audienceContainerConfig.disableFooterCoGuest)
     }
     
     func disableFooterCoGuest(_ disable: Bool) {

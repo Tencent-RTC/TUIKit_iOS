@@ -11,16 +11,13 @@ import Foundation
 import RTCCommon
 import RTCRoomEngine
 import TUICore
+import AtomicX
 
 class AnchorLivingView: UIView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private let coreView: LiveCoreView
-    private let netWorkInfoManager = NetWorkInfoManager(
-        service: NetWorkInfoService(
-            trtcCloud: TUIRoomEngine.sharedInstance().getTRTCCloud()
-        )
-    )
+    private lazy var netWorkInfoManager = NetWorkInfoManager(liveID: store.liveID)
     private var cancellableSet: Set<AnyCancellable> = []
     private var isPortrait: Bool = WindowUtils.isPortrait
 
@@ -52,30 +49,30 @@ class AnchorLivingView: UIView {
     }()
     
     private lazy var bottomMenu: AnchorBottomMenuView = {
-        let view = AnchorBottomMenuView(manager: manager, routerManager: routerManager, coreView: coreView)
+        let view = AnchorBottomMenuView(store: store, routerManager: routerManager, coreView: coreView)
         return view
     }()
     
     private lazy var floatView: LinkMicAnchorFloatView = {
-        let view = LinkMicAnchorFloatView(manager: manager, routerManager: routerManager)
+        let view = LinkMicAnchorFloatView(store: store, routerManager: routerManager)
         view.isHidden = true
         return view
     }()
     
     private lazy var barrageDisplayView: BarrageStreamView = {
-        let view = BarrageStreamView(liveID: manager.liveID)
+        let view = BarrageStreamView(liveID: store.liveID)
         view.delegate = self
         return view
     }()
     
     private lazy var giftDisplayView: GiftPlayView = {
-        let view = GiftPlayView(roomId: manager.liveID)
+        let view = GiftPlayView(roomId: store.liveID)
         view.delegate = self
         return view
     }()
     
     private lazy var barrageSendView: BarrageInputView = {
-        var view = BarrageInputView(roomId: manager.liveID)
+        var view = BarrageInputView(roomId: store.liveID)
         view.layer.cornerRadius = 20.scale375Height()
         view.layer.masksToBounds = true
         return view
@@ -90,10 +87,10 @@ class AnchorLivingView: UIView {
     }()
     
     private lazy var netWorkInfoButton: NetworkInfoButton = {
-        let button = NetworkInfoButton(liveId: manager.liveID, manager: netWorkInfoManager)
+        let button = NetworkInfoButton(liveId: store.liveID)
         button.onNetWorkInfoButtonClicked = { [weak self] in
             guard let self = self else { return }
-            routerManager.router(action: .present(.netWorkInfo(netWorkInfoManager, isAudience: !manager.liveListState.currentLive.keepOwnerOnSeat)))
+            routerManager.router(action: .present(.netWorkInfo(netWorkInfoManager, isAudience: !store.liveListState.currentLive.keepOwnerOnSeat)))
         }
         return button
     }()
@@ -111,8 +108,8 @@ class AnchorLivingView: UIView {
     
     private var anchorObserverState = ObservableState<AnchorState>(initialState: AnchorState())
     
-    init(manager: AnchorManager, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
-        self.manager = manager
+    init(store: AnchorStore, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
+        self.store = store
         self.routerManager = routerManager
         self.coreView = coreView
         super.init(frame: .zero)
@@ -124,8 +121,8 @@ class AnchorLivingView: UIView {
     }
     
     deinit {
-        if manager.coGuestState.connected.isOnSeat() {
-            manager.liveListStore.leaveLive(completion: nil)
+        if store.coGuestState.connected.isOnSeat() {
+            store.liveListStore.leaveLive(completion: nil)
         }
         print("deinit \(type(of: self))")
     }
@@ -147,25 +144,25 @@ class AnchorLivingView: UIView {
     }
     
     private func subscribeState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] applicants in
                 guard let self = self else { return }
-                if manager.coHostState.applicant != nil
-                    || !manager.coHostState.invitees.isEmpty
-                    || !manager.coHostState.connected.isEmpty
+                if store.coHostState.applicant != nil
+                    || !store.coHostState.invitees.isEmpty
+                    || !store.coHostState.connected.isEmpty
                 {
                     // If received connection request first, reject all linkmic auto.
                     for applicant in applicants {
-                        manager.coGuestStore.rejectApplication(userID: applicant.userID, completion: nil)
+                        store.coGuestStore.rejectApplication(userID: applicant.userID, completion: nil)
                     }
                     return
                 }
                 showLinkMicFloatView(isPresent: applicants.count > 0)
             }
             .store(in: &cancellableSet)
-        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+        store.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] currentLive in
@@ -191,7 +188,7 @@ class AnchorLivingView: UIView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \LoginState.loginStatus))
+        store.subscribeState(StatePublisherSelector(keyPath: \LoginState.loginStatus))
             .dropFirst()
             .removeDuplicates()
             .receive(on: RunLoop.main)
@@ -218,7 +215,7 @@ class AnchorLivingView: UIView {
     }
     
     private func subscribeSubject() {
-        manager.kickedOutSubject
+        store.kickedOutSubject
             .receive(on: RunLoop.main)
             .sink { [weak self] isDismissed in
                 guard let self = self else { return }
@@ -226,9 +223,9 @@ class AnchorLivingView: UIView {
                 coreView.isUserInteractionEnabled = false
                 routerManager.router(action: .dismiss())
                 if isDismissed {
-                    makeToast(message: .roomDismissText)
+                    showAtomicToast(text: .roomDismissText, style: .warning)
                 } else {
-                    makeToast(message: .kickedOutText)
+                    showAtomicToast(text: .kickedOutText, style: .warning)
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     guard let self = self else { return }
@@ -252,7 +249,7 @@ class AnchorLivingView: UIView {
     }
     
     @objc func onFloatWindowButtonClick() {
-        manager.floatWindowSubject.send()
+        store.floatWindowSubject.send()
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -384,79 +381,82 @@ extension AnchorLivingView {
     @objc
     func closeButtonClick() {
         var title = ""
-        var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
-        lineConfig.backgroundColor = .bgOperateColor
-        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
+        var items: [AlertButtonConfig] = []
 
-        let selfUserId = manager.selfUserID
-        let isSelfInCoGuestConnection = manager.coGuestState.connected.count > 1
-        let isSelfInCoHostConnection = manager.coHostState.connected.count > 1
-        let isSelfInBattle = manager.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) && isSelfInCoHostConnection
+        let selfUserId = store.selfUserID
+        let isSelfInCoGuestConnection = store.coGuestState.connected.count > 1
+        let isSelfInCoHostConnection = store.coHostState.connected.count > 1
+        let isSelfInBattle = store.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) && isSelfInCoHostConnection
         
         if isSelfInBattle {
             title = .endLiveOnBattleText
-            let endBattleItem = ActionItem(title: .endLiveBattleText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+            let endBattleItem = AlertButtonConfig(text: .endLiveBattleText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
                 exitBattle()
-                self.routerManager.router(action: .dismiss())
-            })
+                routerManager.dismiss()
+            }
             items.append(endBattleItem)
         } else if isSelfInCoHostConnection {
             title = .endLiveOnConnectionText
-            let endConnectionItem = ActionItem(title: .endLiveDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+            let endConnectionItem = AlertButtonConfig(text: .endLiveDisconnectText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
-                manager.coHostStore.exitHostConnection()
-                routerManager.router(action: .dismiss())
-            })
+                store.coHostStore.exitHostConnection()
+                routerManager.dismiss()
+            }
             items.append(endConnectionItem)
         } else if isSelfInCoGuestConnection {
             title = .endLiveOnLinkMicText
         } else {
-            let alertInfo = AnchorAlertInfo(description: .confirmEndLiveText,
-                                            imagePath: nil,
-                                            cancelButtonInfo: (String.cancelText, .cancelTextColor),
-                                            defaultButtonInfo: (String.confirmCloseText, .warningTextColor))
-            { _ in
-                self.routerManager.router(action: .dismiss(.alert))
-            } defaultClosure: { [weak self] _ in
+            let cancelButton = AlertButtonConfig(text: String.cancelText, type: .grey) { [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.dismiss(dismissType: .alert)
+            }
+            let confirmButton = AlertButtonConfig(text: String.confirmCloseText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
                 self.stopLiveStream()
-                routerManager.router(action: .dismiss(.alert, completion: nil))
+                self.routerManager.dismiss(dismissType: .alert)
             }
-            routerManager.router(action: .present(.alert(info: alertInfo)))
+            let alertConfig = AlertViewConfig(title: .confirmEndLiveText,
+                                              cancelButton: cancelButton,
+                                              confirmButton: confirmButton)
+            routerManager.present(view: AtomicAlertView(config: alertConfig))
             return
         }
-
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: title == .endLiveOnLinkMicText ? .warningTextColor : .defaultTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-        let text: String = manager.liveListState.currentLive.keepOwnerOnSeat ? .confirmCloseText : .confirmExitText
-        let endLiveItem = ActionItem(title: text, designConfig: designConfig, actionClosure: { [weak self] _ in
+        
+        let text: String = store.liveListState.currentLive.keepOwnerOnSeat ? .confirmCloseText : .confirmExitText
+        let colorType: TextColorPreset = title == .endLiveOnLinkMicText ? .red : .primary
+        let endLiveItem = AlertButtonConfig(text: text, type: colorType) { [weak self] _ in
             guard let self = self else { return }
             self.exitBattle()
             self.stopLiveStream()
-            self.routerManager.router(action: .dismiss())
-        })
+            self.routerManager.dismiss()
+        }
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
-                                                                        cancelTitleColor: .defaultTextColor), .center)))
+        
+        let cancelItem = AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss()
+        }
+        items.append(cancelItem)
+
+        let alertConfig = AlertViewConfig(title: title, items: items)
+        routerManager.present(view: AtomicAlertView(config: alertConfig))
     }
     
     private func exitBattle() {
-        manager.battleStore.exitBattle(battleID: manager.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
+        store.battleStore.exitBattle(battleID: store.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
     }
     
     func stopLiveStream() {
-        if manager.liveListState.currentLive.keepOwnerOnSeat {
-            manager.liveListStore.endLive { [weak self] result in
+        if store.liveListState.currentLive.keepOwnerOnSeat {
+            store.liveListStore.endLive { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(let statisticsData):
                     showEndView(with: statisticsData)
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
+                    store.onError(error)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                         guard let self = self else { return }
                         routerManager.router(action: .exit)
@@ -464,14 +464,14 @@ extension AnchorLivingView {
                 }
             }
         } else {
-            manager.liveListStore.leaveLive { [weak self] result in
+            store.liveListStore.leaveLive { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
                     routerManager.router(action: .exit)
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
+                    store.onError(error)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                         guard let self = self else { return }
                         routerManager.router(action: .exit)
@@ -490,7 +490,7 @@ extension AnchorLivingView {
             state.giftTotalUniqueSender = statisticsData.totalUniqueGiftSenders
             state.likeTotalUniqueSender = statisticsData.totalLikesReceived
             state.messageCount = barrageDisplayView.getBarrageCount()
-            manager.onEndLivingSubject.send(state)
+            store.onEndLivingSubject.send(state)
         }
     }
 }
@@ -517,15 +517,15 @@ extension AnchorLivingView: BarrageStreamViewDelegate {
     }
 
     func onBarrageClicked(user: LiveUserInfo) {
-        if user.userID == manager.selfUserID { return }
+        if user.userID == store.selfUserID { return }
         routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .messageAndKickOut)))
     }
 }
 
 extension AnchorLivingView: GiftPlayViewDelegate {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        var userName = manager.liveListState.currentLive.liveOwner.userName
-        if manager.liveListState.currentLive.liveOwner.userID == manager.selfUserID {
+        var userName = store.liveListState.currentLive.liveOwner.userName
+        if store.liveListState.currentLive.liveOwner.userID == store.selfUserID {
             userName = .meText
         }
         var barrage = Barrage()
@@ -538,7 +538,7 @@ extension AnchorLivingView: GiftPlayViewDelegate {
             "gift_icon_url": gift.iconURL,
             "gift_receiver_username": userName
         ]
-        manager.barrageStore.appendLocalTip(message: barrage)
+        store.barrageStore.appendLocalTip(message: barrage)
     }
     
     func giftPlayView(_ giftPlayView: GiftPlayView, onPlayGiftAnimation gift: Gift) {

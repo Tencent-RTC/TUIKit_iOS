@@ -9,22 +9,22 @@ import Foundation
 import UIKit
 import RTCRoomEngine
 import RTCCommon
+import Combine
+import AtomicXCore
 
 class RecentCallsCell: UITableViewCell {
     
-    private let faceURLObserver = Observer()
-    private let titleObserver = Observer()
-    private let avatarImageObserver = Observer()
+    private var cancellables = Set<AnyCancellable>()
 
     typealias TUICallRecordCallsCellMoreBtnClickedHandler = () -> Void
     var moreBtnClickedHandler: TUICallRecordCallsCellMoreBtnClickedHandler = {}
     
     private var isViewReady = false
-    private var viewModel: RecentCallsCellViewModel = RecentCallsCellViewModel(TUICallRecords())
+    private var viewModel: RecentCallsCellViewModel = RecentCallsCellViewModel(CallInfo())
     
     private let avatarImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 20
         imageView.clipsToBounds = true
         return imageView
@@ -80,7 +80,8 @@ class RecentCallsCell: UITableViewCell {
     }
     
     deinit {
-        unregisterObserve()
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
     }
     
     override func didMoveToWindow() {
@@ -96,6 +97,10 @@ class RecentCallsCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+        avatarImageView.sd_cancelCurrentImageLoad()
+        avatarImageView.image = nil
     }
     
     private func constructViewHierarchy() {
@@ -160,43 +165,46 @@ class RecentCallsCell: UITableViewCell {
     
     func configViewModel(_ viewModel: RecentCallsCellViewModel) {
         self.viewModel = viewModel
-        registerObserve()
         
-        titleLabel.text = viewModel.titleLabelStr.value
-        avatarImageView.sd_setImage(with: URL(string: viewModel.faceURL.value), placeholderImage: viewModel.avatarImage.value)
+        titleLabel.text = viewModel.titleLabelStr
+        avatarImageView.sd_setImage(with: URL(string: viewModel.faceURL), placeholderImage: viewModel.avatarImage)
         resultLabel.text = viewModel.resultLabelStr
         timeLabel.text = viewModel.timeLabelStr
         mediaTypeImageView.image = CallKitBundle.getBundleImage(name: viewModel.mediaTypeImageStr)
         
-        if viewModel.callRecord.result == .missed {
+        if viewModel.callInfo.result == .missed {
             titleLabel.textColor = UIColor.red
         } else {
             titleLabel.textColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_recents_cell_title_color",
                                                                                   defaultHex: "#000000")
         }
+        
+        subscribeViewModel()
     }
     
-    func registerObserve() {
-        viewModel.faceURL.addObserver(faceURLObserver) { [weak self] _, _ in
-            guard let self = self else { return }
-            self.avatarImageView.sd_setImage(with: URL(string: self.viewModel.faceURL.value),
-                                             placeholderImage: self.viewModel.avatarImage.value)
-        }
-        
-        viewModel.titleLabelStr.addObserver(titleObserver) { [weak self] _, _ in
-            guard let self = self else { return }
-            self.titleLabel.text = self.viewModel.titleLabelStr.value
-        }
-        
-        viewModel.avatarImage.addObserver(avatarImageObserver) { [weak self] new, _ in
-            guard let self = self else { return }
-            self.avatarImageView.image = new
-        }
-    }
-    
-    func unregisterObserve() {
-        viewModel.faceURL.removeObserver(faceURLObserver)
-        viewModel.titleLabelStr.removeObserver(titleObserver)
+    func subscribeViewModel() {
+        viewModel.$faceURL
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newFaceURL in
+                self?.avatarImageView.sd_setImage(with: URL(string: newFaceURL), placeholderImage: self?.viewModel.avatarImage)
+            }
+            .store(in: &cancellables)
+
+        viewModel.$titleLabelStr
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newTitle in
+                self?.titleLabel.text = newTitle
+            }
+            .store(in: &cancellables)
+
+        viewModel.$avatarImage
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newImage in
+                if self?.viewModel.faceURL.isEmpty ?? true {
+                    self?.avatarImageView.image = newImage
+                }
+            }
+            .store(in: &cancellables)
     }
     
     @objc private func moreButtonClick(_ button: UIButton) {

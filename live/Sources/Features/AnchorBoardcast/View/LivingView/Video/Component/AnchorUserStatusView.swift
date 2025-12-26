@@ -13,15 +13,15 @@ import RTCCommon
 import AtomicXCore
 
 class AnchorUserStatusView: UIView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private var cancellableSet = Set<AnyCancellable>()
     private var muteAudio: Bool = true
     private var isViewReady: Bool = false
     private let seatInfo: SeatInfo
     
-    init(seatInfo: SeatInfo, manager: AnchorManager) {
+    init(seatInfo: SeatInfo, store: AnchorStore) {
         self.seatInfo = seatInfo
-        self.manager = manager
+        self.store = store
         super.init(frame: .zero)
         muteAudio = seatInfo.userInfo.microphoneStatus == .off
     }

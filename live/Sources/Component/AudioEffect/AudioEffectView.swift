@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import RTCCommon
+import AtomicX
 #if canImport(TXLiteAVSDK_TRTC)
     import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
@@ -28,12 +29,12 @@ public class AudioEffectView: UIView {
         return button
     }()
     
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.audioEffectTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.contentMode = .center
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .g7
-        label.text = .audioEffectTitleText
         label.sizeToFit()
         return label
     }()
@@ -99,7 +100,6 @@ extension AudioEffectView {
             make.centerY.equalTo(doneButton)
             make.centerX.equalToSuperview()
             make.height.equalTo(24.scale375())
-            make.width.equalTo(titleLabel.mm_w)
         }
         tableView.snp.remakeConstraints { make in
             make.bottom.equalToSuperview()
@@ -131,11 +131,10 @@ extension AudioEffectView: UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let label = UILabel(frame: .zero)
-        label.textAlignment = .center
-        label.font = .customFont(ofSize: 16)
-        label.textColor = .whiteColor
-        label.textAlignment = .left
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Medium16)
+        }
         label.text = titles[section]
         return label
     }

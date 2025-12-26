@@ -775,12 +775,14 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     @objc private func screenModeSegmentClick(_ sender: UISegmentedControl) {
         let orientation = sender.selectedSegmentIndex
         SettingsConfig.share.screenOrientation = orientation
-        let tuiCallKit = TUICallKit()
-        tuiCallKit.setScreenOrientation(orientation: orientation, succ: {
-            print("Screen orientation changed successfully")
-        }, fail: { error, arg in
-            print("Failed to change screen orientation")
-        })
+        TUICallKit.createInstance().setScreenOrientation(orientation: orientation) { result in
+            switch result {
+            case .success:
+                print("Screen orientation changed successfully")
+            case .failure(let error):
+                print("Failed to change screen orientation: \(error.message)")
+            }
+        }
     }
     
     @objc private func backButtonClick() {

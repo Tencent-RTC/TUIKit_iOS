@@ -21,7 +21,7 @@ public class KtvView: UIView {
     private var isFirstEnterRoom: Bool = true
     private let karaokeManager: KaraokeManager
     private weak var popupViewController: UIViewController?
-    private var averageScore: Int32 = 100
+    private var averageScore: Int32 = -1
 
     private lazy var musicControlView: MusicControlView = {
         let view = MusicControlView(isOwner: isOwner,isKTV: isKTV)
@@ -33,14 +33,14 @@ public class KtvView: UIView {
         return view
     }()
 
-    private lazy var pitchView: KaraokePitchView = {
-        let view = KaraokePitchView(manager: self.karaokeManager,isKTV: isKTV)
+    private lazy var pitchView: PitchView = {
+        let view = PitchView(manager: self.karaokeManager,isKTV: isKTV)
         view.isHidden = true
         return view
     }()
 
-    private lazy var karaokeLyricsView: KaraokeLyricsView = {
-        let view = KaraokeLyricsView(isKTV: isKTV)
+    private lazy var LyricsView: LyricsView = {
+        let view = AtomicX.LyricsView(isKTV: isKTV)
         return view
     }()
 
@@ -65,7 +65,7 @@ public class KtvView: UIView {
     }()
 
     private var cancellables = Set<AnyCancellable>()
-    
+
     public init(karaokeManager: KaraokeManager, isOwner: Bool, isKTV: Bool) {
         self.karaokeManager = karaokeManager
         self.isOwner = isOwner
@@ -101,27 +101,35 @@ public class KtvView: UIView {
         let role: TXChorusRole = isOwner ? .leadSinger : .audience
         karaokeManager.setChorusRole(chorusRole: role)
     }
-    
-    private func loadCurrentSongResources(musicId: String) {
-        guard let song = karaokeManager.karaokeState.songLibrary.first(where: { $0.musicId == musicId }) else {
-            return
-        }
 
-        let fileURL = URL(fileURLWithPath: song.lyricUrl)
-        generateStandardPitchModels(KaraokeLyricParser.parserLocalLyricFile(fileURL: fileURL))
-        karaokeLyricsView.loadLyrics(fileURL: fileURL)
+    private func loadCurrentSongResources(musicId: String) {
+        let isLocalMusic = musicId.hasPrefix("local_demo")
+
+        if isLocalMusic {
+            guard let song = karaokeManager.karaokeState.songLibrary.first(where: { $0.musicId == musicId }) else {
+                return
+            }
+            let fileURL = URL(fileURLWithPath: song.lyricUrl)
+            let lyricsInfo = LyricParser.parserLocalLyricFile(fileURL: fileURL)
+            generateStandardPitchModels(lyricsInfo)
+            LyricsView.loadLyrics(fileURL: fileURL)
+        } else {
+            let state = karaokeManager.karaokeState
+            generateStandardPitchModelsFromOnline(state.currentPitchList)
+            LyricsView.loadOnlineLyrics(lyricList: state.currentLyricList)
+        }
     }
-    
+
     private func updateLyricsAndPitch(progress: Int) {
-        karaokeLyricsView.updateLyrics(progress: progress)
+        LyricsView.updateLyrics(progress: progress)
         pitchView.isHidden = false
         pitchView.setCurrentSongProgress(progress: progress)
-     }
+    }
 
     private func handlePlaybackStateChange(_ state: PlaybackState) {
         switch state {
             case .stop:
-                karaokeLyricsView.isHidden = true
+                LyricsView.isHidden = true
                 scoreBoardView.isHidden = true
                 pitchView.hidden()
                 pitchView.stopButterflyEffect()
@@ -137,10 +145,10 @@ public class KtvView: UIView {
                 pitchView.hidden()
                 pitchView.stopButterflyEffect()
                 tipsLabel.isHidden = true
-                karaokeLyricsView.isHidden = true
+                LyricsView.isHidden = true
                 showScoreBoard()
             default:
-                karaokeLyricsView.isHidden = false
+                LyricsView.isHidden = false
                 tipsLabel.isHidden = true
                 scoreBoardView.isHidden = true
                 pitchView.show()
@@ -152,16 +160,16 @@ public class KtvView: UIView {
         pitchView.setCurrentSongProgress(progress: progress)
     }
 
-    private func generateStandardPitchModels(_ info: KaraokeLyricsInfo?) {
-        var newModels: [KaraokePitchModel] = []
+    private func generateStandardPitchModels(_ info: LyricsInfo?) {
+        var newModels: [PitchModel] = []
 
         if let info = info {
-            for lineInfo in info.KaraokeLyricLineInfos {
+            for lineInfo in info.LyricLineInfos {
                 let lineStartTime = lineInfo.startTime
                 let linePitch = Int.random(in: 20...80)
 
                 for charStr in lineInfo.charStrArray {
-                    let model = KaraokePitchModel(
+                    let model = PitchModel(
                         startTime: charStr.startTime + Int(lineStartTime * 1000),
                         duration: charStr.duration,
                         pitch: linePitch + Int.random(in: -5...5)
@@ -173,20 +181,36 @@ public class KtvView: UIView {
         pitchView.setStandardPitchModels(standardPitchModels: newModels)
     }
 
+    private func generateStandardPitchModelsFromOnline(_ pitchList: [TXReferencePitch]) {
+        var newModels: [PitchModel] = []
+
+        for pitch in pitchList {
+            let model = PitchModel(
+                startTime: Int(pitch.startTimeMs),
+                duration: Int(pitch.durationMs),
+                pitch: Int(pitch.referencePitch)
+            )
+            newModels.append(model)
+        }
+
+        pitchView.setStandardPitchModels(standardPitchModels: newModels)
+    }
+
     private func showScoreBoard() {
         guard let songs = karaokeManager.karaokeState.selectedSongs.first else { return }
-        let imageURL = songs.avatarUrl
-        let username = songs.userName == "" ? songs.userId : songs.userName
+        let imageURL = songs.requester.avatarUrl
+        let username = songs.requester.userName == "" ? songs.requester.userId : songs.requester.userName
         if karaokeManager.karaokeState.enableScore && isKTV{
             scoreBoardView.isHidden = false
-            scoreBoardView.showScoreBoard(imageURl: imageURL,username: username, score: Float.random(in: 95.0...100.0))
+            scoreBoardView.showScoreBoard(imageURl: imageURL,username: username,
+                                          score: self.averageScore == -1 ? Int32.random(in: 95...100) : self.averageScore)
         } else {
             scoreBoardView.isHidden = true
         }
     }
 
     private func setupPitchView() {
-        let config = KaraokePitchViewConfig()
+        let config = PitchViewConfig()
         config.timeElapsedOnScreen = 2000
         config.timeToPlayOnScreen = 3000
         pitchView.setConfig(config: config)
@@ -213,7 +237,7 @@ extension KtvView: UIGestureRecognizerDelegate {
 extension KtvView {
     private func constructViewHierarchy() {
         addSubview(pitchView)
-        addSubview(karaokeLyricsView)
+        addSubview(LyricsView)
         addSubview(musicControlView)
         addSubview(songListButton)
         addSubview(scoreBoardView)
@@ -255,7 +279,7 @@ extension KtvView {
                 make.left.right.equalToSuperview()
             }
 
-            karaokeLyricsView.snp.makeConstraints { make in
+            LyricsView.snp.makeConstraints { make in
                 make.height.equalTo(50.scale375())
                 make.bottom.equalToSuperview()
                 make.left.right.equalToSuperview()
@@ -275,7 +299,7 @@ extension KtvView {
                 make.left.right.equalToSuperview()
             }
 
-            karaokeLyricsView.snp.makeConstraints { make in
+            LyricsView.snp.makeConstraints { make in
                 make.height.equalTo(40.scale375())
                 make.top.equalTo(pitchView.snp.bottom).offset(5.scale375())
                 make.left.right.equalToSuperview()
@@ -283,7 +307,7 @@ extension KtvView {
 
             musicControlView.snp.makeConstraints { make in
                 make.height.equalTo(40.scale375())
-                make.top.equalTo(karaokeLyricsView.snp.bottom).offset(5.scale375())
+                make.top.equalTo(LyricsView.snp.bottom).offset(5.scale375())
                 make.left.right.equalToSuperview()
             }
         }
@@ -292,7 +316,7 @@ extension KtvView {
 
 // MARK: Action
 extension KtvView {
-    
+
     @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
         guard let view = gesture.view, let superview = superview else { return }
 
@@ -321,8 +345,8 @@ extension KtvView {
                 
                 var newCenter = view.center
                 newCenter.y = min(max(newCenter.y,
-                                    topMargin + view.bounds.height / 2),
-                                safeFrame.maxY - bottomMargin - view.bounds.height / 2)
+                                      topMargin + view.bounds.height / 2),
+                                  safeFrame.maxY - bottomMargin - view.bounds.height / 2)
 
                 UIView.animate(withDuration: 0.3) {
                     view.center = newCenter
@@ -358,12 +382,29 @@ extension KtvView {
             .store(in: &cancellables)
 
         karaokeManager.subscribe(StateSelector(keyPath: \.currentMusicId))
-            .dropFirst()
             .removeDuplicates()
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] musicId in
                 guard let self = self else {return}
-                self.loadCurrentSongResources(musicId: musicId)
+                if musicId != "" {
+                    self.loadCurrentSongResources(musicId: musicId)
+                }
+            }
+            .store(in: &cancellables)
+
+        karaokeManager.subscribe(StateSelector(keyPath: \.currentPitchList))
+            .removeDuplicates { $0.count == $1.count }
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] pitchList in
+                guard let self = self else { return }
+                if !pitchList.isEmpty {
+                    let musicId = self.karaokeManager.karaokeState.currentMusicId
+                    if musicId != "" {
+                        self.loadCurrentSongResources(musicId: musicId)
+                    }
+                }
             }
             .store(in: &cancellables)
 
@@ -375,6 +416,17 @@ extension KtvView {
                 guard let self = self else {return}
                 let progressMs = Int(progress * 1000)
                 self.updateLyricsAndPitch(progress: progressMs)
+            }
+            .store(in: &cancellables)
+
+        karaokeManager.subscribe(StateSelector(keyPath: \.pitch))
+            .receive(on: DispatchQueue.main)
+            .dropFirst()
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] pitch in
+                guard let self = self else {return}
+                self.updatePitch(pitch: Int(pitch), progress: Int(karaokeManager.karaokeState.progressMs))
             }
             .store(in: &cancellables)
 
@@ -399,7 +451,7 @@ extension KtvView {
 
                 let state = karaokeManager.karaokeState
                 let hasSelectedSong = !state.selectedSongs.isEmpty
-                let isSongMismatch = state.currentMusicId != state.selectedSongs.first?.musicId && selectedSongs.count != 0
+                let isSongMismatch = state.currentMusicId != state.selectedSongs.first?.songId && selectedSongs.count != 0
 
                 if isKTV && !isOwner &&
                     hasSelectedSong &&

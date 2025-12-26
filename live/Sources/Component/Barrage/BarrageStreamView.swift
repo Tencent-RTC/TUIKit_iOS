@@ -50,16 +50,18 @@ public class BarrageStreamView: UIView {
         
         BarrageManager.shared.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] msg in
+            .sink { [weak self] msg,style in
                 guard let self = self else { return }
-                superview?.makeToast(message: msg)
+                superview?.showAtomicToast(text: msg, style: style)
             }
             .store(in: &cancellableSet)
     }
     
     public func setOwnerId(_ ownerId: String) {
         self.ownerId = ownerId
+        dataSource.removeAll()
         barrageTableView.reloadData()
+        resetStateListener()
     }
     
     public func clearAllMessage() {
@@ -106,6 +108,20 @@ public class BarrageStreamView: UIView {
         setupAudienceEvent()
     }
     
+    private func resetStateListener() {
+        cancellableSet.forEach { $0.cancel() }
+        cancellableSet.removeAll()
+        
+        BarrageManager.shared.toastSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] msg,style in
+                guard let self = self else { return }
+                superview?.showAtomicToast(text: msg, style: style)
+            }
+            .store(in: &cancellableSet)
+        
+        bindInteraction()
+    }
 }
 
 extension BarrageStreamView: UITableViewDataSource {

@@ -14,7 +14,6 @@ import UIKit
 class NetworkInfoButton: UIView {
     var onNetWorkInfoButtonClicked: (() -> Void)?
 
-    private weak var manager: NetWorkInfoManager?
     private var cancellableSet = Set<AnyCancellable>()
     private var durationTimestamp: TimeInterval = 0
     private var durationTimer: Timer?
@@ -51,9 +50,8 @@ class NetworkInfoButton: UIView {
 
     private let liveId: String
 
-    init(liveId: String, manager: NetWorkInfoManager) {
+    init(liveId: String) {
         self.liveId = liveId
-        self.manager = manager
         super.init(frame: .zero)
     }
 
@@ -90,12 +88,12 @@ class NetworkInfoButton: UIView {
 
     private func bindInteraction() {
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
-
-        manager?.subscribe(StateSelector(keyPath: \NetWorkInfoState.netWorkQuality))
+        DeviceStore.shared.state.subscribe(StatePublisherSelector(keyPath: \DeviceState.networkInfo.quality))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { [weak self] netWorkQuality in
+            .sink { [weak self] quality in
                 guard let self = self else { return }
-                onNetWorkQualityChanged(netWorkQuality)
+                onNetWorkQualityChanged(quality)
             }
             .store(in: &cancellableSet)
 
@@ -106,7 +104,7 @@ class NetworkInfoButton: UIView {
         onNetWorkInfoButtonClicked?()
     }
 
-    private func onNetWorkQualityChanged(_ netWorkQuality: TUINetworkQuality) {
+    private func onNetWorkQualityChanged(_ netWorkQuality: NetworkQuality) {
         switch netWorkQuality {
             case .excellent:
                 wifiImageView.image = internalImage("live_networkinfo_wifi")

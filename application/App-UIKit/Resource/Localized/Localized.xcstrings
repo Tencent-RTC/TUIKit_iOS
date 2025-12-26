@@ -1575,6 +1575,23 @@
         }
       }
     },
+    "Auto Login" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Login"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自动登录"
+          }
+        }
+      }
+    },
     "Timeout" : {
       "extractionState" : "manual",
       "localizations" : {

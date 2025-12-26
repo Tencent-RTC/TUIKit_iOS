@@ -6,70 +6,58 @@
 //
 
 import TUICore
+import AtomicXCore
 
 class UserManager: NSObject {
     static let shared = UserManager()
     private override init() {}
     
-    func setUserViewIndex(user: User, index: Int) {
-        user.multiCallCellViewIndex = index
-    }
-    
-    static func convertUserFromImFullInfo(user: V2TIMGroupMemberFullInfo) -> User {
-        let dstUser = User()
-        dstUser.nickname.value = user.nickName ?? ""
-        dstUser.avatar.value = user.faceURL ?? ""
-        dstUser.id.value = user.userID ?? ""
+    static func convertUser(user: V2TIMUserInfo) -> CallParticipantInfo {
+        var dstUser = CallParticipantInfo()
+        dstUser.id = user.userID ?? ""
+        dstUser.name = user.nickName ?? ""
+        dstUser.avatarURL = user.faceURL ?? ""
         return dstUser
     }
     
-    static func convertUser(user: V2TIMUserInfo) -> User {
-        return self.convertUser(user: user, volume: 0)
-    }
-    
-    static func convertUser(user: V2TIMUserInfo, volume: Float) -> User {
-        let dstUser = User()
-        dstUser.nickname.value = user.nickName ?? ""
-        dstUser.avatar.value = user.faceURL ?? ""
-        dstUser.id.value = user.userID ?? ""
-        dstUser.playoutVolume.value = volume
-        return dstUser
-    }
-    
-    static func getUserInfosFromIM(userIDs: [String], response: @escaping ([User]) -> Void ) {
+    static func getUserInfosFromIM(userIDs: [String], response: @escaping ([CallParticipantInfo]) -> Void ) {
         V2TIMManager.sharedInstance().getFriendsInfo(userIDs) { friendInfosOptional in
-            guard let friendInfos = friendInfosOptional else { return }
-            var userModels: [User] = Array()
+            guard let friendInfos = friendInfosOptional else {
+                response([])
+                return
+            }
+            
+            var userModels: [CallParticipantInfo] = []
             for friendInfo in friendInfos {
-                let userModel = convertUser(user: friendInfo.friendInfo.userFullInfo)
-                userModel.remark.value = friendInfo.friendInfo.friendRemark ?? ""
+                var userModel = convertUser(user: friendInfo.friendInfo.userFullInfo)
+                userModel.remark = friendInfo.friendInfo.friendRemark ?? userModel.remark
                 userModels.append(userModel)
             }
             response(userModels)
         } fail: { code, message in
-            print("getUsersInfo file code:\(code) message:\(message ?? "")  ")
+            print("getUsersInfo file code:\(code) message:\(message ?? "")")
+            response([])
         }
     }
-    
-    static func getSelfUserInfo(response: @escaping (User) -> Void ){
-        guard let selfId = TUILogin.getUserID() else { return }
-        var selfInfo = User()
-        UserManager.getUserInfosFromIM(userIDs: [selfId]) { users in
-            if let user = users.first {
-                selfInfo = user
-                response(selfInfo)
-            }
-        }
-    }
-    
-    static func getUserDisplayName(user: User) -> String {
-        if !user.remark.value.isEmpty {
-            return user.remark.value
+
+    static func getSelfUserInfo(response: @escaping (CallParticipantInfo) -> Void ){
+        guard let selfId = TUILogin.getUserID() else {
+            response(CallParticipantInfo())
+            return
         }
         
-        if !user.nickname.value.isEmpty {
-            return user.nickname.value
+        getUserInfosFromIM(userIDs: [selfId]) { users in
+            response(users.first ?? CallParticipantInfo())
         }
-        return user.id.value
+    }
+
+    static func getUserDisplayName(user: CallParticipantInfo) -> String {
+        if !user.remark.isEmpty {
+            return user.remark
+        }
+        if !user.name.isEmpty {
+            return user.name
+        }
+        return user.id
     }
 }

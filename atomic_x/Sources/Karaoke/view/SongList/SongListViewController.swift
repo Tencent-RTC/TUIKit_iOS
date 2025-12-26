@@ -304,7 +304,7 @@ extension SongListViewController: UITableViewDataSource, UITableViewDelegate{
             let cell = tableView.dequeueReusableCell(withIdentifier: "SelectedSongCell", for: indexPath) as! SelectedSongCell
             cell.karaokeManager = karaokeManager
             cell.isOwner = isOwner
-            let musicId = karaokeManager.karaokeState.selectedSongs[indexPath.row].musicId
+            let musicId = karaokeManager.karaokeState.selectedSongs[indexPath.row].songId
             if let song = songs.first(where: { $0.musicId == musicId }) {
                 cell.configure(with: song, at: indexPath.row)
             }

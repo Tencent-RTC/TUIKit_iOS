@@ -10,6 +10,7 @@ import Combine
 import RTCCommon
 import ImSDK_Plus
 import AtomicXCore
+import AtomicX
 
 enum AudienceUserManagePanelType {
     case mediaAndSeat
@@ -17,7 +18,7 @@ enum AudienceUserManagePanelType {
 }
 
 class AudienceUserInfoPanelView: RTCBaseView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     
     private var user: SeatInfo
     @Published private var isFollow = false
@@ -25,18 +26,17 @@ class AudienceUserInfoPanelView: RTCBaseView {
     
     private var cancellableSet = Set<AnyCancellable>()
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 55.scale375() / 2
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 2.0
-        imageView.layer.borderColor = UIColor.cyanColor.cgColor
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .l,
+            shape: .round
+        )
+        return avatar
     }()
     
     private let backgroundView : UIView = {
         let view = UIView()
-        view.backgroundColor = .g2
         view.layer.cornerRadius = 12.scale375()
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return view
@@ -68,17 +68,17 @@ class AudienceUserInfoPanelView: RTCBaseView {
         return label
     }()
     
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .b1
-        button.setTitleColor(.flowKitWhite, for: .normal)
-        button.layer.cornerRadius = 20
-        button.setTitle(.followText, for: .normal)
-        button.titleLabel?.font = .customFont(ofSize: 14)
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: .followText)
+        )
         return button
     }()
     
-    init(user: SeatInfo, manager: AudienceManager) {
+    init(user: SeatInfo, manager: AudienceStore) {
         self.user = user
         self.manager = manager
         super.init(frame: .zero)
@@ -98,13 +98,12 @@ class AudienceUserInfoPanelView: RTCBaseView {
         addSubview(userIdLabel)
         addSubview(fansLabel)
         addSubview(followButton)
-        addSubview(avatarImageView)
+        addSubview(avatarView)
     }
     
     override func activateConstraints() {
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.top.centerX.equalToSuperview()
-            make.height.width.equalTo(55.scale375Width())
         }
         backgroundView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(29.scale375Height())
@@ -135,12 +134,14 @@ class AudienceUserInfoPanelView: RTCBaseView {
     }
     
     override func bindInteraction() {
-        followButton.addTarget(self, action: #selector(followButtonClick), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
         subscribeRoomInfoPanelState()
     }
     
     override func setupViewStyle() {
-        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(user.userInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         initFansView()
         checkFollowType()
     }
@@ -178,15 +179,16 @@ class AudienceUserInfoPanelView: RTCBaseView {
         
         $isFollow.receive(on: RunLoop.main)
             .removeDuplicates()
-            .receive(on: RunLoop.main)
             .sink { [weak self] isFollow in
                 guard let self = self else { return }
                 if isFollow {
-                    followButton.backgroundColor = .g5
-                    followButton.setTitle(.unfollowText, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .unfollowText))
+                    followButton.setVariant(.filled)
+                    followButton.setColorType(.secondary)
                 } else {
-                    followButton.backgroundColor = .deepSeaBlueColor
-                    followButton.setTitle(.followText, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .followText))
+                    followButton.setVariant(.filled)
+                    followButton.setColorType(.primary)
                 }
             }
             .store(in: &cancellableSet)
@@ -195,7 +197,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
 
 // MARK: - Action
 extension AudienceUserInfoPanelView {
-    @objc private func followButtonClick() {
+    private func followButtonClick() {
         if isFollow {
             V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
@@ -203,11 +205,11 @@ extension AudienceUserInfoPanelView {
                     isFollow = false
                     fansNumber -= 1
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    manager.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                manager.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         } else {
             V2TIMManager.sharedInstance().followUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
@@ -216,11 +218,11 @@ extension AudienceUserInfoPanelView {
                     isFollow = true
                     fansNumber += 1
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    manager.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                manager.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         }
     }

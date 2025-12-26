@@ -8,6 +8,7 @@ import UIKit
 import SnapKit
 import RTCCommon
 import Combine
+import AtomicX
 
 class NetWorkInfoItemCell: UITableViewCell {
     static let reuseIdentifier = "NetWorkInfoItemCell"
@@ -18,10 +19,11 @@ class NetWorkInfoItemCell: UITableViewCell {
         return view
     }()
 
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Medium", size: 14)
-        label.textColor = UIColor.white.withAlphaComponent(0.9)
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium14)
+        }
         return label
     }()
 
@@ -39,10 +41,11 @@ class NetWorkInfoItemCell: UITableViewCell {
         return scrollView
     }()
 
-    private let detailLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
+    private let detailLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
 
@@ -58,10 +61,11 @@ class NetWorkInfoItemCell: UITableViewCell {
         return view
     }()
 
-    private let rightLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
+    private let rightLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
 
@@ -84,11 +88,11 @@ class NetWorkInfoItemCell: UITableViewCell {
         return slider
     }()
     
-    private lazy var volumeLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
-        label.text = "100"
+    private lazy var volumeLabel: AtomicLabel = {
+        let label = AtomicLabel("100") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         label.isHidden = true
         return label
     }()
@@ -143,25 +147,25 @@ class NetWorkInfoItemCell: UITableViewCell {
         }
 
         iconView.snp.makeConstraints { make in
-            make.left.equalToSuperview()
+            make.leading.equalToSuperview()
             make.top.equalToSuperview().offset(1.scale375())
             make.width.height.equalTo(20.scale375())
         }
 
         titleLabel.snp.makeConstraints { make in
-            make.left.equalTo(iconView.snp.right).offset(6.scale375())
+            make.leading.equalTo(iconView.snp.trailing).offset(6.scale375())
             make.top.equalTo(iconView)
             make.height.equalTo(22.scale375())
         }
 
         statusLabel.snp.makeConstraints { make in
-            make.left.equalTo(titleLabel.snp.right)
+            make.leading.equalTo(titleLabel.snp.trailing)
             make.top.equalTo(iconView)
             make.height.equalTo(22.scale375())
         }
 
         detailScrollView.snp.makeConstraints { make in
-            make.left.equalTo(iconView.snp.right).offset(6.scale375())
+            make.leading.equalTo(iconView.snp.trailing).offset(6.scale375())
             make.top.equalTo(titleLabel.snp.bottom).offset(4.scale375())
             make.height.equalTo(20.scale375())
             make.width.equalTo(200.scale375())
@@ -174,19 +178,19 @@ class NetWorkInfoItemCell: UITableViewCell {
         }
 
         rightComponentsView.snp.makeConstraints { make in
-            make.left.equalTo(detailScrollView.snp.right).offset(12.scale375())
+            make.leading.equalTo(detailScrollView.snp.trailing).offset(12.scale375())
             make.centerY.equalTo(detailLabel)
             make.height.equalTo(30.scale375())
         }
 
         separatorView.snp.makeConstraints { make in
-            make.left.centerY.equalToSuperview()
+            make.leading.centerY.equalToSuperview()
             make.width.equalTo(1.scale375())
             make.height.equalTo(12.scale375())
         }
 
         rightLabel.snp.makeConstraints { make in
-            make.left.equalTo(separatorView.snp.right).offset(8.scale375())
+            make.leading.equalTo(separatorView.snp.trailing).offset(8.scale375())
             make.centerY.equalToSuperview()
         }
     }
@@ -208,24 +212,27 @@ class NetWorkInfoItemCell: UITableViewCell {
         if hasSlider {
             contentView.addSubview(slider)
             rightComponentsView.addSubview(arrowIcon)
-            slider.snp.makeConstraints { make in
-                make.left.equalTo(titleLabel)
-                make.width.equalTo(270.scale375())
+            contentView.addSubview(volumeLabel)
+            
+            volumeLabel.snp.makeConstraints { make in
+                make.trailing.equalToSuperview().offset(-16.scale375())
+                make.width.equalTo(30.scale375())
                 make.top.equalTo(detailLabel.snp.bottom).offset(12.scale375())
                 make.height.equalTo(20.scale375())
             }
             
-            contentView.addSubview(volumeLabel)
-            volumeLabel.snp.makeConstraints { make in
-                make.left.equalTo(slider.snp.right).offset(4.scale375())
-                make.centerY.equalTo(slider)
-                make.right.lessThanOrEqualToSuperview().offset(-16.scale375())
+            slider.snp.makeConstraints { make in
+                make.leading.equalTo(titleLabel)
+                make.trailing.equalTo(volumeLabel.snp.leading).offset(-4.scale375())
+                make.centerY.equalTo(volumeLabel)
+                make.height.equalTo(20.scale375())
             }
+            
             arrowIcon.snp.makeConstraints { make in
-                make.left.equalTo(rightLabel.snp.right)
+                make.leading.equalTo(rightLabel.snp.trailing)
                 make.centerY.equalToSuperview()
                 make.width.height.equalTo(16.scale375())
-                make.right.equalToSuperview()
+                make.trailing.equalToSuperview()
             }
         }
     }

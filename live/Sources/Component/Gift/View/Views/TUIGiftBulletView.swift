@@ -5,9 +5,9 @@
 //  Created by krabyu on 2024/1/2.
 //
 
-import Kingfisher
-import AtomicXCore
 import UIKit
+import AtomicX
+import AtomicXCore
 
 typealias TUIGiftAnimationCompletionBlock = (Bool) -> Void
 
@@ -21,11 +21,14 @@ class TUIGiftBulletView: UIView {
         }
     }
 
-    private let avatarView: UIImageView = {
-        let view = UIImageView(frame: CGRect(x: 5, y: 5, width: 40, height: 40))
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = view.mm_h * 0.5
-        return view
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .icon(image: UIImage()),
+            size: .m,
+            shape: .round
+        )
+        avatar.frame = CGRect(x: 5, y: 5, width: 40, height: 40)
+        return avatar
     }()
 
     private let giftIconView: UIImageView = {
@@ -86,7 +89,7 @@ class TUIGiftBulletView: UIView {
         let width = max(giveDescLabel.mm_w, nickNameLabel.mm_w)
         mm_w = avatarView.mm_w + width + giftIconView.mm_w + 30
         giftIconView.kf.setImage(with: URL(string: giftData.giftInfo.iconURL))
-        avatarView.kf.setImage(with: URL(string: avatarUrl))
+        avatarView.setContent(.url(avatarUrl, placeholder: nil))
     }
 
     func play(isPureMode: Bool, completion: @escaping TUIGiftAnimationCompletionBlock) {

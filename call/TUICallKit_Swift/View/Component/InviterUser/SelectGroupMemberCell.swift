@@ -5,6 +5,7 @@
 //  Created by vincepzhang on 2025/3/3.
 //
 
+import AtomicXCore
 
 class SelectGroupMemberCell: UITableViewCell {
     
@@ -19,6 +20,8 @@ class SelectGroupMemberCell: UITableViewCell {
         let label = UILabel(frame: CGRect.zero)
         label.textColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_select_group_member_name_color",
                                                                          defaultHex: "#242424")
+        label.lineBreakMode = .byTruncatingTail
+        label.numberOfLines = 1
         return label
     }()
     
@@ -84,9 +87,9 @@ class SelectGroupMemberCell: UITableViewCell {
         }
     }
     
-    func configCell(user: User, isSelect: Bool) {
+    func configCell(user: CallParticipantInfo, isSelect: Bool) {
         backgroundColor = UIColor.clear
-        userImageView.sd_setImage(with: URL(string: user.avatar.value), placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon"))
+        userImageView.sd_setImage(with: URL(string: user.avatarURL), placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon"))
         
         if isSelect {
             selectImageView.image = CallKitBundle.getBundleImage(name: "icon_check_box_group_selected")

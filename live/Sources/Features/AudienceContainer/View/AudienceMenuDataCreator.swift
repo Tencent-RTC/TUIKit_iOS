@@ -5,6 +5,7 @@
 //  Created by aby on 2024/5/31.
 //
 
+import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
@@ -13,12 +14,12 @@ import TUICore
 
 class AudienceRootMenuDataCreator {
     private weak var coreView: LiveCoreView?
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     private var lastApplyHashValue: Int?
 
-    init(coreView: LiveCoreView, manager: AudienceManager, routerManager: AudienceRouterManager) {
+    init(coreView: LiveCoreView, manager: AudienceStore, routerManager: AudienceRouterManager) {
         self.coreView = coreView
         self.manager = manager
         self.routerManager = routerManager
@@ -34,22 +35,19 @@ class AudienceRootMenuDataCreator {
         
         func applyForSeat(seatIndex: Int, openCamera: Bool) {
             manager.willApplying()
-            manager.toastSubject.send(.waitToLinkText)
+            manager.toastSubject.send((.waitToLinkText, .info))
             manager.coGuestStore.applyForSeat(seatIndex: seatIndex, timeout: timeOutValue, extraInfo: nil) { [weak self] result in
                 guard let self = self else { return }
                 manager.stopApplying()
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    manager.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
             
-            for item in cancellableSet.filter({ $0.hashValue == lastApplyHashValue }) {
-                item.cancel()
-                cancellableSet.remove(item)
-            }
+            clearLastApplyHashValue()
             
             let cancelable = manager.coGuestStore.guestEventPublisher
                 .receive(on: RunLoop.main)
@@ -63,8 +61,10 @@ class AudienceRootMenuDataCreator {
                             manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera, completion: nil)
                         }
                         manager.deviceStore.openLocalMicrophone(completion: nil)
+                        clearLastApplyHashValue()
                     case .onGuestApplicationNoResponse(reason: _):
                         manager.stopApplying()
+                        clearLastApplyHashValue()
                     default: break
                     }
                 }
@@ -84,6 +84,15 @@ class AudienceRootMenuDataCreator {
             routerManager.router(action: .dismiss())
         }))
         return data
+    }
+    
+    private func clearLastApplyHashValue() {
+        guard let hashValue = lastApplyHashValue else { return }
+        for item in cancellableSet.filter({ $0.hashValue == hashValue }) {
+            item.cancel()
+            cancellableSet.remove(item)
+        }
+        lastApplyHashValue = nil
     }
     
     deinit {
@@ -108,10 +117,7 @@ extension AudienceRootMenuDataCreator {
                     return
                 }
                 if sender.isSelected {
-                    let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
-                    designConfig.backgroundColor = .bgOperateColor
-                    designConfig.lineColor = .g3.withAlphaComponent(0.3)
-                    let item = ActionItem(title: .cancelLinkMicRequestText, designConfig: designConfig) { [weak self] _ in
+                    let cancelRequestItem = AlertButtonConfig(text: .cancelLinkMicRequestText, type: .red) { [weak self] _ in
                         guard let self = self else { return }
                         routerManager.router(action: .dismiss())
                         manager.stopApplying()
@@ -120,18 +126,25 @@ extension AudienceRootMenuDataCreator {
                             switch result {
                             case .failure(let err):
                                 let error = InternalError(code: err.code, message: err.message)
-                                manager.toastSubject.send(error.localizedMessage)
+                                manager.toastSubject.send((error.localizedMessage, .error))
                             default: break
                             }
                         }
                     }
-                    routerManager.router(action: .present(.listMenu(ActionPanelData(items: [item], cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
+                    
+                    let cancelItem = AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                        guard let self = self else { return }
+                        self.routerManager.dismiss()
+                    }
+                    
+                    let alertConfig = AlertViewConfig(items: [cancelRequestItem, cancelItem])
+                    routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
                 } else {
                     if manager.coGuestState.connected.isOnSeat() {
                         confirmToTerminateCoGuest()
                     } else {
                         let data = generateLinkTypeMenuData()
-                        routerManager.router(action: .present(.linkType(data)))
+                        routerManager.router(action: .present(.linkType(data, seatIndex: -1)))
                     }
                 }
             }
@@ -168,26 +181,28 @@ extension AudienceRootMenuDataCreator {
     }
     
     private func confirmToTerminateCoGuest() {
-        var items: [ActionItem] = []
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-
-        let terminateGoGuestItem = ActionItem(title: .confirmTerminateCoGuestText, designConfig: designConfig, actionClosure: { [weak self] _ in
-            guard let self = self else { return }
-            manager.coGuestStore.disConnect { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success(()):
-                    manager.deviceStore.closeLocalCamera()
-                    manager.deviceStore.closeLocalMicrophone()
-                default: break
+        let alertConfig = AlertViewConfig(
+            items: [
+                AlertButtonConfig(text: .confirmTerminateCoGuestText, type: .red) { [weak self] _ in
+                    guard let self = self else { return }
+                    manager.coGuestStore.disConnect { [weak self] result in
+                        guard let self = self else { return }
+                        switch result {
+                        case .success(()):
+                            manager.deviceStore.closeLocalCamera()
+                            manager.deviceStore.closeLocalMicrophone()
+                        default: break
+                        }
+                    }
+                    routerManager.router(action: .routeTo(.audience))
+                },
+                AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                    guard let self = self else { return }
+                    routerManager.router(action: .routeTo(.audience))
                 }
-            }
-            routerManager.router(action: .routeTo(.audience))
-        })
-        items.append(terminateGoGuestItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
+            ]
+        )
+        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
     }
 }
 

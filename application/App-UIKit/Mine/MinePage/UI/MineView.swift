@@ -9,6 +9,7 @@ import Foundation
 import Kingfisher
 import UIKit
 import TUICore
+import AtomicXCore
 import RTCCommon
 
 protocol MineViewDelegate: NSObjectProtocol {
@@ -215,7 +216,7 @@ class MineView: UIView {
     }
     
     private func updateHeadImage() {
-        if let url = URL(string: TUILogin.getFaceUrl() ?? "") {
+        if let url = URL(string: LoginStore.shared.state.value.loginUserInfo?.avatarURL ?? "") {
             headImageView.kf.setImage(with: .network(url), placeholder: UIImage(named: "default_avatar"))
         } else {
             headImageView.image = UIImage(named: "default_avatar")
@@ -223,11 +224,13 @@ class MineView: UIView {
     }
     
     private func updateUserId() {
-        userIdLabel.text = "ID:\(TUILogin.getUserID() ?? "")"
+        if let userID = LoginStore.shared.state.value.loginUserInfo?.userID {
+            userIdLabel.text = "ID:\(String(describing: userID))"
+        }
     }
     
     private func updateName() {
-        if let nickName = TUILogin.getNickName() {
+        if let nickName = LoginStore.shared.state.value.loginUserInfo?.nickname {
             userNameLabel.text = nickName
             userNameLabel.snp.makeConstraints { make in
                 make.top.equalTo(headImageView.snp.bottom).offset(12.scale375Height())
@@ -274,3 +277,4 @@ extension MineView : UITableViewDelegate {
         }
     }
 }
+

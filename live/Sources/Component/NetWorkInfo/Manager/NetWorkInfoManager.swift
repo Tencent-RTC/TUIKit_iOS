@@ -11,6 +11,7 @@ import Combine
 import RTCCommon
 import Network
 import RTCRoomEngine
+import AtomicXCore
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
@@ -21,7 +22,7 @@ class NetWorkInfoManager: NSObject {
     private(set) var state: ObservableState<NetWorkInfoState>
     var netWorkInfoState: NetWorkInfoState { state.state }
     let kickedOutSubject = PassthroughSubject<Void, Never>()
-    private let service: NetWorkInfoService
+    private let service = NetWorkInfoService()
     private var poorNetworkTimer: Timer?
     private var poorNetworkStartTime: Date?
     private let monitor = NWPathMonitor()
@@ -31,13 +32,14 @@ class NetWorkInfoManager: NSObject {
     private var hasAudioPermission: Bool = false
     private var hasVideoPermission: Bool = false
     private var isNetworkAvailable: Bool = false
+    private let liveID: String
 
     private var thermalState: ProcessInfo.ThermalState {
         ProcessInfo.processInfo.thermalState
     }
     // MARK: - Initialization
-    init(service: NetWorkInfoService) {
-        self.service = service
+    init(liveID: String) {
+        self.liveID = liveID
         self.state = ObservableState(initialState: NetWorkInfoState())
         super.init()
 
@@ -227,9 +229,6 @@ extension NetWorkInfoManager: TUIRoomObserver {
         let userId = service.getSelfUserId()
         if let matchedInfo = networkList.first(where: { $0.userId == userId }) {
             state.update { state in
-                state.rtt = matchedInfo.delay
-                state.downLoss = matchedInfo.downLoss
-                state.upLoss = matchedInfo.upLoss
                 if isNetworkAvailable {
                     state.netWorkQuality = matchedInfo.quality
                 }

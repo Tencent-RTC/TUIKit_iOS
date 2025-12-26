@@ -12,14 +12,14 @@ import RTCRoomEngine
 import AtomicXCore
 
 class AnchorCoHostView: UIView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private var isViewReady: Bool = false
     private var seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(seatInfo: SeatInfo, manager: AnchorManager) {
+    init(seatInfo: SeatInfo, store: AnchorStore) {
         self.seatInfo = seatInfo
-        self.manager = manager
+        self.store = store
         super.init(frame: .zero)
     }
     
@@ -38,9 +38,9 @@ class AnchorCoHostView: UIView {
         subscribeState()
         self.isUserInteractionEnabled = false
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
             .removeDuplicates()
-            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected)).removeDuplicates())
+            .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] coHostList, coGuestList in
                 guard let self = self else { return }
@@ -49,7 +49,7 @@ class AnchorCoHostView: UIView {
             .store(in: &cancellableSet)
     }
     
-    private lazy var userInfoView = AnchorUserStatusView(seatInfo: seatInfo, manager: manager)
+    private lazy var userInfoView = AnchorUserStatusView(seatInfo: seatInfo, store: store)
     
     private func constructViewHierarchy() {
         addSubview(userInfoView)

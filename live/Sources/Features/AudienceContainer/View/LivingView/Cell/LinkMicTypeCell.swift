@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import  AtomicX
 
 class LinkMicTypeCellData {
     let image: UIImage?
@@ -38,11 +39,11 @@ class LinkMicTypeCell: UITableViewCell {
         return view
     }()
 
-    private let label: UILabel = {
-        let view = UILabel()
-        view.textColor = .g7
-        view.font = .customFont(ofSize: 16)
-        view.textAlignment = .left
+    private let label: AtomicLabel = {
+        let view = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         return view
     }()
 

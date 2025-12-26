@@ -102,11 +102,14 @@ public class TUILiveRoomAnchorViewController: UIViewController {
     }
     
     public func stopLive(onSuccess: TUISuccessBlock?, onError: TUIErrorBlock?) {
-        coreView.stopLiveStream(onSuccess: {
-            onSuccess?()
-        }, onError: { code, message in
-            onError?(code, message)
-        })
+        LiveListStore.shared.endLive { result in
+            switch result {
+            case .success(_):
+                onSuccess?()
+            case .failure(let err):
+                onError?(TUIError(rawValue: err.code) ?? .failed, err.message)
+            }
+        }
     }
 
     public override func viewDidLoad() {
@@ -190,8 +193,7 @@ extension TUILiveRoomAnchorViewController: FloatWindowProvider {
     }
     
     public func getOwnerId() -> String {
-        let roomState: RoomState = coreView.getState()
-        return roomState.ownerInfo.userId
+        LiveListStore.shared.state.value.currentLive.liveOwner.userID
     }
     
     public func getCoreView() -> AtomicXCore.LiveCoreView {
@@ -203,9 +205,7 @@ extension TUILiveRoomAnchorViewController: FloatWindowProvider {
     }
     
     public func getIsLinking() -> Bool {
-        let coGuestState: CoGuestState = coreView.getState()
-        let userState: UserState = coreView.getState()
-        return coGuestState.connectedUserList.contains(where: { $0.userId == userState.selfInfo.userId })
+        CoGuestStore.create(liveID: liveInfo.liveID).state.value.connected.isOnSeat()
     }
 }
 

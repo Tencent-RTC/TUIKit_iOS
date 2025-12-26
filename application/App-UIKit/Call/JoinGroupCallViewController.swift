@@ -275,17 +275,10 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
             }
         }
         
-        let roomId = TUIRoomId()
-        if roomTypeIndex == 0 {
-            roomId.intRoomId = UInt32(roomIdString) ?? 0
-        } else {
-            roomId.strRoomId = roomIdString
-        }
-        
         if (SettingsConfig.share.is1VN) {
-            TUICallKit.createInstance().join(callId: groupId)
+            TUICallKit.createInstance().join(callId: groupId, completion: nil)
         } else {
-            TUICallKit.createInstance().joinInGroupCall(roomId: roomId, groupId: groupId, callMediaType: callType)
+            TUICallKit.createInstance().join(callId: roomIdString, completion: nil)
         }
     }
     

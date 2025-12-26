@@ -8,6 +8,7 @@
 import UIKit
 import TUICore
 import RTCRoomEngine
+import AtomicXCore
 
 let kJoinGroupCallViewDefaultHeight: CGFloat = 52.0
 let kJoinGroupCallViewExpandHeight: CGFloat = 225.0
@@ -22,7 +23,7 @@ protocol JoinCallViewDelegate: AnyObject {
 class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     weak var delegate: JoinCallViewDelegate?
-    var listDate = Array<User>()
+    private var participants: [CallParticipantInfo] = []
     
     let bottomContainerView: UIView = {
         let view = UIView()
@@ -96,15 +97,12 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         super.init(frame: frame)
         backgroundColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_join_group_bg_color", defaultHex: "#ECF0F5")
         self.frame = CGRect(x: 0, y: 0, width: Screen_Width, height: kJoinGroupCallViewDefaultHeight)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(expandButtonClick(sender:)))
-        self.addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: UI Specification Processing
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -115,7 +113,7 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         isViewReady = true
     }
     
-    func constructViewHierarchy() {
+    private func constructViewHierarchy() {
         addSubview(bottomContainerView)
         bottomContainerView.addSubview(titleIcon)
         bottomContainerView.addSubview(titleLabel)
@@ -128,55 +126,48 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
     
     func activateConstraints() {
         bottomContainerView.translatesAutoresizingMaskIntoConstraints = false
+        titleIcon.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        expandButton.translatesAutoresizingMaskIntoConstraints = false
+        expandView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        lineView.translatesAutoresizingMaskIntoConstraints = false
+        joinButton.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             bottomContainerView.topAnchor.constraint(equalTo: self.topAnchor, constant: 8),
             bottomContainerView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16),
-            bottomContainerView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            bottomContainerView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
+            bottomContainerView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16),
+            bottomContainerView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -8)
         ])
 
-        titleIcon.translatesAutoresizingMaskIntoConstraints = false
-        if let superview = titleIcon.superview {
-            NSLayoutConstraint.activate([
-                titleIcon.topAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: 8),
-                titleIcon.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 16),
-                titleIcon.widthAnchor.constraint(equalToConstant: 20),
-                titleIcon.heightAnchor.constraint(equalToConstant: 20)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            titleIcon.topAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: 8),
+            titleIcon.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 16),
+            titleIcon.widthAnchor.constraint(equalToConstant: 20),
+            titleIcon.heightAnchor.constraint(equalToConstant: 20)
+        ])
 
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        if let superview = titleLabel.superview {
-            NSLayoutConstraint.activate([
-                titleLabel.centerYAnchor.constraint(equalTo: titleIcon.centerYAnchor),
-                titleLabel.leadingAnchor.constraint(equalTo: titleIcon.trailingAnchor, constant: 10),
-                titleLabel.widthAnchor.constraint(equalToConstant: 200),
-                titleLabel.heightAnchor.constraint(equalToConstant: 20)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            titleLabel.centerYAnchor.constraint(equalTo: titleIcon.centerYAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: titleIcon.trailingAnchor, constant: 10),
+        ])
 
-        expandButton.translatesAutoresizingMaskIntoConstraints = false
-        if let superview = expandButton.superview {
-            NSLayoutConstraint.activate([
-                expandButton.centerYAnchor.constraint(equalTo: titleIcon.centerYAnchor),
-                expandButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 10),
-                expandButton.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -16),
-                expandButton.widthAnchor.constraint(equalToConstant: 30),
-                expandButton.heightAnchor.constraint(equalToConstant: 30)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            expandButton.centerYAnchor.constraint(equalTo: titleIcon.centerYAnchor),
+            expandButton.leadingAnchor.constraint(greaterThanOrEqualTo: titleLabel.trailingAnchor, constant: 10),
+            expandButton.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -16),
+            expandButton.widthAnchor.constraint(equalToConstant: 30),
+            expandButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
 
-        expandView.translatesAutoresizingMaskIntoConstraints = false
-        if let superview = expandView.superview {
-            NSLayoutConstraint.activate([
-                expandView.topAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: 36),
-                expandView.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 16),
-                expandView.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -16),
-                expandView.heightAnchor.constraint(equalToConstant: 157)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            expandView.topAnchor.constraint(equalTo: bottomContainerView.topAnchor, constant: 36),
+            expandView.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 16),
+            expandView.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -16),
+            expandView.heightAnchor.constraint(equalToConstant: 157)
+        ])
 
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: expandView.topAnchor, constant: 37),
             collectionView.leadingAnchor.constraint(equalTo: expandView.leadingAnchor, constant: 10),
@@ -184,7 +175,6 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             collectionView.heightAnchor.constraint(equalToConstant: kJoinGroupCallItemWidth)
         ])
 
-        lineView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             lineView.topAnchor.constraint(equalTo: expandView.topAnchor, constant: 117),
             lineView.leadingAnchor.constraint(equalTo: expandView.leadingAnchor),
@@ -192,72 +182,63 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
             lineView.heightAnchor.constraint(equalToConstant: 1)
         ])
 
-        joinButton.translatesAutoresizingMaskIntoConstraints = false
-        if let superview = joinButton.superview, let expandSuperview = expandView.superview {
-            NSLayoutConstraint.activate([
-                joinButton.topAnchor.constraint(equalTo: lineView.bottomAnchor, constant: 5),
-                joinButton.centerXAnchor.constraint(equalTo: expandSuperview.centerXAnchor),
-                joinButton.widthAnchor.constraint(equalTo: expandSuperview.widthAnchor),
-                joinButton.heightAnchor.constraint(equalToConstant: 30)
-            ])
-        }
+        NSLayoutConstraint.activate([
+            joinButton.topAnchor.constraint(equalTo: lineView.bottomAnchor),
+            joinButton.leadingAnchor.constraint(equalTo: expandView.leadingAnchor),
+            joinButton.trailingAnchor.constraint(equalTo: expandView.trailingAnchor),
+            joinButton.bottomAnchor.constraint(equalTo: expandView.bottomAnchor)
+        ])
     }
     
     func bindInteraction() {
-        expandButton.addTarget(self, action: #selector(expandButtonClick(sender: )), for: .touchUpInside)
-        joinButton.addTarget(self, action: #selector(joinButtonClick(sender: )), for: .touchUpInside)
-        collectionView.register(JoinCallUserCell.self,
-                                forCellWithReuseIdentifier: String(describing: JoinCallUserCell.self))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(expandButtonClick(sender:)))
+        bottomContainerView.addGestureRecognizer(tap)
+        
+        expandButton.addTarget(self, action: #selector(expandButtonClick(sender:)), for: .touchUpInside)
+        joinButton.addTarget(self, action: #selector(joinButtonClick(sender:)), for: .touchUpInside)
+        
+        collectionView.register(JoinCallUserCell.self, forCellWithReuseIdentifier: String(describing: JoinCallUserCell.self))
     }
     
-    @objc func expandButtonClick(sender: UIButton) {
+    @objc func expandButtonClick(sender: UIControl) {
         expandView.isHidden = expandButton.isSelected
         expandButton.isSelected = !expandButton.isSelected
         delegate?.updatePageContent(isExpand: expandButton.isSelected)
     }
     
     @objc func joinButtonClick(sender: UIButton) {
-        expandButton.isSelected = false;
+        expandButton.isSelected = false
         delegate?.joinCall()
     }
     
-    func updateView(with userList: [User], callMediaType: TUICallMediaType) {
-        listDate.removeAll()
-        userList.forEach {
-            obj in if obj.id.value != TUILogin.getUserID() { listDate.append(obj) } }
-        titleLabel.isHidden = listDate.isEmpty
-        titleLabel.text = String(format: TUICallKitLocalize(key: "TUICallKit.JoinGroupView.title") ?? "",
-                                 listDate.count)
+    func updateView(with participants: [CallParticipantInfo], callMediaType: CallMediaType?) {
+        self.participants = participants.filter { $0.id != TUILogin.getUserID() }
+        
+        titleLabel.isHidden = self.participants.isEmpty
+        titleLabel.text = String(format: TUICallKitLocalize(key: "TUICallKit.JoinGroupView.title") ?? "", self.participants.count)
         titleLabel.textAlignment = TUICoreDefineConvert.getIsRTL() ? .right : .left
         collectionView.reloadData()
     }
-    
-    func getCallMediaTypeStr(with callMediaType: TUICallMediaType) -> String {
-        var callMediaTypeStr: String = ""
-        if callMediaType == .audio {
-            callMediaTypeStr = TUICallKitLocalize(key: "TUICallKit.JoinGroupView.audioCall") ?? ""
-        } else if callMediaType == .video {
-            callMediaTypeStr = TUICallKitLocalize(key: "TUICallKit.JoinGroupView.videoCall") ?? ""
-        }
-        return callMediaTypeStr
-    }
 }
 
-// MARK: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
+// MARK: UICollectionViewDataSource
 extension JoinCallView {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return listDate.count
+        return participants.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: JoinCallUserCell.self),
                                                       for: indexPath) as! JoinCallUserCell
-        let model = listDate[indexPath.item]
-        cell.setModel(user: model)
+        let participant = participants[indexPath.item]
+        cell.setModel(participant: participant)
         return cell
     }
-    
+}
+
+// MARK: UICollectionViewDelegateFlowLayout
+extension JoinCallView {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -273,14 +254,21 @@ extension JoinCallView {
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         insetForSectionAt section: Int) -> UIEdgeInsets {
-        let totalCellWidth: CGFloat = kJoinGroupCallItemWidth * CGFloat(listDate.count)
-        let totalSpacingWidth: CGFloat = kJoinGroupCallSpacing * (CGFloat(listDate.count - 1) < 0 ? 0 : CGFloat(listDate.count - 1))
-        let leftInset = (CGFloat(collectionView.bounds.size.width) - (totalCellWidth + totalSpacingWidth)) / 2
-        if leftInset > 0 {
-            let rightInset = leftInset
-            let sectionInset = UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: rightInset)
-            return sectionInset
+        guard participants.count > 0 else {
+            return .zero
         }
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
+        let totalCellWidth = kJoinGroupCallItemWidth * CGFloat(participants.count)
+        let totalSpacingWidth = kJoinGroupCallSpacing * CGFloat(participants.count - 1)
+        let totalContentWidth = totalCellWidth + totalSpacingWidth
+        
+        let collectionViewWidth = collectionView.bounds.width
+        
+        if totalContentWidth < collectionViewWidth {
+            let inset = (collectionViewWidth - totalContentWidth) / 2
+            return UIEdgeInsets(top: 0, left: inset, bottom: 0, right: inset)
+        }
+        
+        return .zero
     }
 }

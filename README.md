@@ -116,6 +116,72 @@ TUIKit_iOS/
 └── devops/              # Build and deployment scripts
 ```
 
+## Getting Started with Development
+
+### Prerequisites
+
+Before you begin development, ensure you have:
+
+1. **Development Environment:**
+   - macOS with Xcode 14.0+
+   - iOS 14.0+ deployment target
+   - CocoaPods installed
+
+2. **Tencent Cloud Account:**
+   - SDKAppID from Tencent Cloud Console
+   - Valid UserSig for testing
+
+### Building from Source
+
+1. **Clone and Setup:**
+   ```bash
+   git clone https://github.com/Tencent-RTC/TUIKit_iOS.git
+   cd TUIKit_iOS/application
+   pod install
+   ```
+
+2. **Configure Credentials:**
+   - Open `App-UIKit.xcworkspace` in Xcode
+   - Navigate to `GenerateTestUserSig.swift`
+   - Replace placeholder values with your actual SDKAppID and SecretKey
+
+3. **Build and Run:**
+   - Select your target device or simulator
+   - Press Cmd+R to build and run
+
+### Integration Guide
+
+To integrate TUIKit_iOS into your existing project:
+
+1. **Add Podfile Dependencies:**
+   ```ruby
+   pod 'AtomicX'
+   pod 'TUICallKit_Swift'
+   pod 'TUIRoomKit'
+   pod 'TUILiveKit'
+   ```
+
+2. **Import and Initialize:**
+   ```swift
+   import AtomicXCore
+   import AtomicX
+   
+   // Initialize in your AppDelegate
+   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+       // Configure AtomicXCore with your credentials
+       return true
+   }
+   ```
+
+3. **Use UI Components:**
+   ```swift
+   import AtomicX
+   
+   // Example: Add a call view
+   let callView = CallView()
+   view.addSubview(callView)
+   ```
+
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to submit pull requests, report issues, and contribute to the project.

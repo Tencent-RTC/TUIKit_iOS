@@ -26,13 +26,13 @@ class ScoreBoardView: UIView {
         return label
     }()
 
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 14
-        imageView.image = UIImage.atomicXBundleImage(named: "ktv_note")
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .icon(image: UIImage.atomicXBundleImage(named: "ktv_note") ?? UIImage()),
+            size: .xxs,
+            shape: .round
+        )
+        return avatar
     }()
 
     private lazy var nameLabel: UILabel = {
@@ -64,7 +64,7 @@ class ScoreBoardView: UIView {
     private func constructViewHierarchy() {
         addSubview(scoreLabel)
         addSubview(unitLabel)
-        addSubview(avatarImageView)
+        addSubview(avatarView)
         addSubview(nameLabel)
         addSubview(textLabel)
     }
@@ -83,21 +83,19 @@ class ScoreBoardView: UIView {
             make.width.equalTo(16.scale375())
         }
 
-        avatarImageView.snp.makeConstraints{ make in
+        avatarView.snp.makeConstraints{ make in
             make.top.equalTo(scoreLabel.snp.bottom).offset(10.scale375())
             make.left.equalToSuperview()
-            make.height.equalTo(14.scale375())
-            make.width.equalTo(14.scale375())
         }
 
         nameLabel.snp.makeConstraints{ make in
-            make.top.equalTo(avatarImageView.snp.top)
-            make.left.equalTo(avatarImageView.snp.right).offset(5.scale375())
+            make.top.equalTo(avatarView.snp.top)
+            make.left.equalTo(avatarView.snp.right).offset(5.scale375())
         }
 
         textLabel.snp.makeConstraints{ make in
             make.left.equalTo(nameLabel.snp.right).offset(9.scale375())
-            make.top.equalTo(avatarImageView.snp.top).offset(-2.scale375())
+            make.top.equalTo(avatarView.snp.top).offset(-2.scale375())
             make.height.equalTo(20.scale375())
         }
     }
@@ -106,8 +104,8 @@ class ScoreBoardView: UIView {
 
     }
 
-    func showScoreBoard(imageURl: String,username: String, score: Float) {
-        avatarImageView.kf.setImage(with: URL(string: imageURl), placeholder: UIImage.avatarPlaceholderImage)
+    func showScoreBoard(imageURl: String, username: String, score: Int32) {
+        avatarView.setContent(.url(imageURl, placeholder: UIImage.avatarPlaceholderImage))
         nameLabel.text = username
         scoreLabel.text = String(format: "%.1f", score)
     }

@@ -251,7 +251,7 @@ class MusicControlView: UIView {
                 } else {
                     guard let karaokeManager = karaokeManager else {return}
                     guard let musicInfo = karaokeManager.karaokeState.songLibrary.first(
-                        where: { $0.musicId ==  selectedSongs.first?.musicId
+                        where: { $0.musicId ==  selectedSongs.first?.songId
                         }),
                           !karaokeManager.karaokeState.selectedSongs.isEmpty else {
                         return

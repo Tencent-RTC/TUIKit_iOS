@@ -284,7 +284,7 @@ extension GiftListView: UICollectionViewDataSource {
                             switch result {
                             case .failure(let error):
                                 let err = InternalError(code: error.code, message: error.message)
-                                GiftManager.shared.toastSubject.send(err.localizedMessage)
+                                GiftManager.shared.toastSubject.send((err.localizedMessage,.error))
                             default: break
                             }
                         }

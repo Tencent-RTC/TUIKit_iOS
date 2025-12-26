@@ -9,9 +9,10 @@ import AtomicXCore
 import Combine
 import Foundation
 import RTCCommon
+import AtomicX
 
 class AnchorLinkControlPanel: UIView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private weak var coreView: LiveCoreView?
     private var cancellable = Set<AnyCancellable>()
@@ -28,16 +29,16 @@ class AnchorLinkControlPanel: UIView {
         return view
     }()
 
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.anchorLinkControlTitle) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.contentMode = .center
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .g7
-        label.text = .anchorLinkControlTitle
         label.sizeToFit()
         return label
     }()
-
+    
     private lazy var userListTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.separatorStyle = .none
@@ -50,8 +51,8 @@ class AnchorLinkControlPanel: UIView {
         return tableView
     }()
 
-    init(manager: AnchorManager, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
-        self.manager = manager
+    init(store: AnchorStore, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
+        self.store = store
         self.routerManager = routerManager
         self.coreView = coreView
         super.init(frame: .zero)
@@ -74,7 +75,7 @@ class AnchorLinkControlPanel: UIView {
     }
 
     private func subscribeSeatState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] seatApplicationList in
@@ -83,22 +84,22 @@ class AnchorLinkControlPanel: UIView {
                 userListTableView.reloadData()
             }
             .store(in: &cancellable)
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] connected in
                 guard let self = self else { return }
-                let selfUserId = manager.selfUserID
+                let selfUserId = store.selfUserID
                 linkingList = connected.filter { $0.userID != selfUserId }
                 userListTableView.reloadData()
             }
             .store(in: &cancellable)
 
-        manager.toastSubject
+        store.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] message,style in
                 guard let self = self else { return }
-                makeToast(message: message)
+                showAtomicToast(text: message, style: style)
             }
             .store(in: &cancellable)
     }
@@ -132,7 +133,6 @@ extension AnchorLinkControlPanel {
             make.centerY.equalTo(backButton)
             make.centerX.equalToSuperview()
             make.height.equalTo(24.scale375())
-            make.width.equalTo(titleLabel.mm_w)
         }
 
         userListTableView.snp.remakeConstraints { make in
@@ -186,14 +186,17 @@ extension AnchorLinkControlPanel: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 20.scale375Height()))
         headerView.backgroundColor = .g2
-        let label = UILabel(frame: CGRect(x: 24, y: 0, width: headerView.frame.width, height: headerView.frame.height))
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular14)
+        }
+        label.frame = CGRect(x: 24, y: 0, width: headerView.frame.width, height: headerView.frame.height)
         if section == 0 {
             label.text = .localizedReplace(.anchorLinkControlSeatCount, replace: String(linkingList.count))
         } else if section == 1 {
             label.text = .localizedReplace(.anchorLinkControlRequestCount,
                                            replace: "\(applyList.count)")
         }
-        label.textColor = .greyColor
         headerView.addSubview(label)
         return headerView
     }
@@ -237,12 +240,12 @@ extension AnchorLinkControlPanel: UITableViewDelegate {
 
         cell.kickoffEventClosure = { [weak self] seatInfo in
             guard let self = self else { return }
-            manager.seatStore.kickUserOutOfSeat(userID: seatInfo.userID) { [weak self] result in
+            store.seatStore.kickUserOutOfSeat(userID: seatInfo.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
+                    store.onError(error)
                 default: break
                 }
             }
@@ -263,26 +266,26 @@ extension AnchorLinkControlPanel: UITableViewDelegate {
         cell.respondEventClosure = { [weak self] seatApplication, isAccepted, onComplete in
             guard let self = self else { return }
             if isAccepted {
-                manager.coGuestStore.acceptApplication(userID: seatApplication.userID) { [weak self] result in
+                store.coGuestStore.acceptApplication(userID: seatApplication.userID) { [weak self] result in
                     guard let self = self else { return }
                     switch result {
                     case .success(()):
                         onComplete()
                     case .failure(let err):
                         let error = InternalError(code: err.code, message: err.message)
-                        manager.onError(error)
+                        store.onError(error)
                         onComplete()
                     }
                 }
             } else {
-                manager.coGuestStore.rejectApplication(userID: seatApplication.userID) { [weak self] result in
+                store.coGuestStore.rejectApplication(userID: seatApplication.userID) { [weak self] result in
                     guard let self = self else { return }
                     switch result {
                     case .success(()):
                         onComplete()
                     case .failure(let err):
                         let error = InternalError(code: err.code, message: err.message)
-                        manager.onError(error)
+                        store.onError(error)
                         onComplete()
                     }
                 }

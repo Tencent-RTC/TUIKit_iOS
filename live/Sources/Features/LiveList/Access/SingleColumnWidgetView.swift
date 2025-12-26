@@ -7,6 +7,7 @@
 
 import RTCCommon
 import AtomicXCore
+import AtomicX
 
 class SingleColumnWidgetView: RTCBaseView {
     private var liveInfo: LiveInfo
@@ -25,11 +26,13 @@ class SingleColumnWidgetView: RTCBaseView {
         return label
     }()
     
-    private lazy var ownerAvatarView: UIImageView = {
-        let view = UIImageView(frame: .zero)
-        view.layer.cornerRadius = 10.scale375()
-        view.layer.masksToBounds = true
-        return view
+    private lazy var ownerAvatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .xs,
+            shape: .round
+        )
+        return avatar
     }()
     
     private lazy var ownerNameLabel: UILabel = {
@@ -95,7 +98,6 @@ class SingleColumnWidgetView: RTCBaseView {
         ownerAvatarView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(20.scale375())
             make.centerY.equalTo(ownerNameLabel)
-            make.width.height.equalTo(20.scale375())
         }
 
         ownerNameLabel.snp.makeConstraints { make in
@@ -129,7 +131,7 @@ class SingleColumnWidgetView: RTCBaseView {
         self.liveInfo = liveInfo
         roomNameLabel.text = !liveInfo.liveName.isEmpty ? liveInfo.liveName : liveInfo.liveID
         ownerNameLabel.text = liveInfo.liveOwner.userName.isEmpty ? liveInfo.liveOwner.userID : liveInfo.liveOwner.userName
-        ownerAvatarView.sd_setImage(with: URL(string: liveInfo.liveOwner.avatarURL), placeholderImage: .avatarPlaceholderImage)
+        ownerAvatarView.setContent(.url(liveInfo.liveOwner.avatarURL, placeholder: .avatarPlaceholderImage))
     }
 }
 

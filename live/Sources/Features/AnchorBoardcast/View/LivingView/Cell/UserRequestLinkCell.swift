@@ -7,42 +7,36 @@
 
 import Foundation
 import AtomicXCore
+import AtomicX
 
 class UserRequestLinkCell: LinkMicBaseCell {
     var respondEventClosure: ((LiveUserInfo, Bool, @escaping () -> Void) -> Void)?
     private var isPending = false
     
-    private lazy var acceptButton: UIButton = {
-        let view = UIButton(type: .system)
-        view.showsTouchWhenHighlighted = false
-        view.backgroundColor = .b1
-        view.setTitleColor(.white, for: .normal)
-        view.titleLabel?.font = .customFont(ofSize: 12)
-        view.setTitle(.anchorLinkAgreeTitle, for: .normal)
-        view.mm_w = 64.scale375()
-        view.mm_h = 24.scale375()
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = view.mm_h*0.5
-        view.addTarget(self, action: #selector(acceptButtonClick), for: .touchUpInside)
-        return view
+    private lazy var acceptButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .anchorLinkAgreeTitle)
+        )
+        button.setClickAction { [weak self] _ in
+            self?.acceptButtonClick()
+        }
+        return button
     }()
     
-    private lazy var rejectButton: UIButton = {
-        let view = UIButton(type: .system)
-        
-        view.showsTouchWhenHighlighted = false
-        view.backgroundColor = .clear
-        view.setTitleColor(.b1, for: .normal)
-        view.titleLabel?.font = .customFont(ofSize: 12)
-        view.setTitle(.anchorLinkRejectTitle, for: .normal)
-        view.mm_w = 64.scale375()
-        view.mm_h = 24.scale375()
-        view.layer.masksToBounds = true
-        view.layer.cornerRadius = view.mm_h*0.5
-        view.layer.borderColor = UIColor.b1.cgColor
-        view.layer.borderWidth = 1
-        view.addTarget(self, action: #selector(rejectButtonClick), for: .touchUpInside)
-        return view
+    private lazy var rejectButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .outlined,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .anchorLinkRejectTitle)
+        )
+        button.setClickAction { [weak self] _ in
+            self?.rejectButtonClick()
+        }
+        return button
     }()
     
     private var isViewReady = false
@@ -57,7 +51,7 @@ class UserRequestLinkCell: LinkMicBaseCell {
     }
     
     func constructViewHierarchy() {
-        contentView.addSubview(avatarImageView)
+        contentView.addSubview(avatarView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(acceptButton)
         contentView.addSubview(rejectButton)
@@ -65,32 +59,31 @@ class UserRequestLinkCell: LinkMicBaseCell {
     }
     
     func activateConstraints() {
-        avatarImageView.snp.makeConstraints { (make) in
+        avatarView.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().inset(24)
-            make.width.equalTo(40.scale375())
-            make.height.equalTo(40.scale375())
+            make.size.equalTo(40.scale375())
         }
         
         nameLabel.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
             make.height.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(14.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(14.scale375())
             make.trailing.equalTo(acceptButton.snp.leading).offset(-14.scale375())
         }
         
         rejectButton.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().inset(24)
-            make.width.equalTo(rejectButton.mm_w)
-            make.height.equalTo(rejectButton.mm_h)
+            make.width.equalTo(64.scale375())
+            make.height.equalTo(24.scale375())
         }
         
         acceptButton.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
             make.trailing.equalTo(rejectButton.snp.leading).offset(-14.scale375())
-            make.width.equalTo(acceptButton.mm_w)
-            make.height.equalTo(acceptButton.mm_h)
+            make.width.equalTo(64.scale375())
+            make.height.equalTo(24.scale375())
         }
         
         
@@ -108,7 +101,7 @@ class UserRequestLinkCell: LinkMicBaseCell {
 // MARK: Action
 
 extension UserRequestLinkCell {
-    @objc func acceptButtonClick() {
+    func acceptButtonClick() {
         guard let seatApplication = seatApplication, let respondEventClosure = respondEventClosure, !isPending else { return }
         isPending = true
         respondEventClosure(seatApplication, true) { [weak self] in
@@ -117,7 +110,7 @@ extension UserRequestLinkCell {
         }
     }
     
-    @objc func rejectButtonClick() {
+    func rejectButtonClick() {
         guard let seatApplication = seatApplication, let respondEventClosure = respondEventClosure, !isPending else { return }
         isPending = true
         respondEventClosure(seatApplication, false) { [weak self] in

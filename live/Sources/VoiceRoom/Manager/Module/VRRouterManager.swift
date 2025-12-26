@@ -7,6 +7,7 @@
 
 import RTCCommon
 import Combine
+import AtomicX
 
 class VRRouterManager {
     let observerState = ObservableState<VRRouterState>(initialState: VRRouterState())
@@ -40,8 +41,21 @@ extension VRRouterManager {
             }
         case .dismiss(let dimissType, let completion):
             if dimissType == .alert {
-                if let currentRoute = routerState.routeStack.last, case .alert(_) = currentRoute {
-                    handleDissmiss(completion: completion)
+                if let currentRoute = routerState.routeStack.last {
+                    var shouldDismiss = false
+                    
+                    switch currentRoute {
+                    case .custom(let item):
+                        if item.view is AtomicAlertView {
+                            shouldDismiss = true
+                        }
+                    default:
+                        break
+                    }
+                    
+                    if shouldDismiss {
+                        handleDissmiss(completion: completion)
+                    }
                 }
             } else {
                 handleDissmiss(completion: completion)
@@ -87,4 +101,18 @@ extension VRRouterManager {
     func update(routerState: ((inout VRRouterState) -> Void)) {
         observerState.update(reduce: routerState)
     }
+}
+
+extension VRRouterManager {
+    
+    func present(view: UIView, position: ViewPosition = .center) {
+        let item = RouteItem(view: view, position: position)
+        let route = VRRoute.custom(item)
+        self.router(action: .present(route))
+    }
+    
+    func dismiss(dismissType: VRDismissType = .panel, completion: (() -> Void)? = nil) {
+        self.router(action: .dismiss(dismissType, completion: completion))
+    }
+
 }

@@ -9,6 +9,7 @@ import Foundation
 import RTCCommon
 import TUICore
 import AtomicXCore
+import AtomicX
 
 public class AnchorPrepareView: UIView {
     public weak var delegate: AnchorPrepareViewDelegate?
@@ -101,14 +102,17 @@ public class AnchorPrepareView: UIView {
         return view
     }()
     
-    private lazy var startButton: UIButton = {
-        let view = UIButton()
-        view.layer.cornerRadius = 26.scale375()
-        view.setTitle(.startLivingTitle, for: .normal)
-        view.titleLabel?.font = .customFont(ofSize: 20, weight: .semibold)
-        view.addTarget(self, action: #selector(startButtonClick), for: .touchUpInside)
-        view.backgroundColor = .b1
-        return view
+    private lazy var startButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: .startLivingTitle)
+        )
+        button.setClickAction { [weak self] _ in
+            self?.startButtonClick()
+        }
+        return button
     }()
     
     private var isViewReady: Bool = false
@@ -169,7 +173,7 @@ public class AnchorPrepareView: UIView {
                     switch result {
                     case .failure(let err):
                         let error = InternalError(code: err.code, message: err.message)
-                        makeToast(message: error.localizedMessage)
+                        showAtomicToast(text: error.localizedMessage, style: .error)
                         DeviceStore.shared.closeLocalCamera()
                         startButton.isEnabled = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
@@ -181,7 +185,7 @@ public class AnchorPrepareView: UIView {
                 }
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                makeToast(message: error.localizedMessage)
+                showAtomicToast(text: error.localizedMessage, style: .error)
                 startButton.isEnabled = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                     guard let self = self else { return }
@@ -438,7 +442,7 @@ extension AnchorPrepareView {
         delegate?.onClickBackButton()
     }
     
-    @objc func startButtonClick() {
+    func startButtonClick() {
         isUserInteractionEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
@@ -565,7 +569,7 @@ extension AnchorPrepareView {
         let viewRatio = coreView.bounds.width / coreView.bounds.height
         let canvasRatio: CGFloat = 9.0 / 16.0
         if mode == .verticalFloatDynamic && viewRatio > canvasRatio {
-            view.makeToast(message: .template601ExceptionText)
+            showAtomicToast(text: .template601ExceptionText, style: .warning)
         }
     }
     

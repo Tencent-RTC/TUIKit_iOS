@@ -7,6 +7,7 @@
 
 import UIKit
 import RTCCommon
+import AtomicX
 
 class AudienceEndStatisticsView: UIView {
     private let roomId: String
@@ -29,12 +30,13 @@ class AudienceEndStatisticsView: UIView {
         return button
     }()
     
-    private lazy var imageView: UIImageView = {
-        let view = UIImageView()
-        view.layer.cornerRadius = 40
-        view.layer.masksToBounds = true
-        view.kf.setImage(with: URL(string: avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
-        return view
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage),
+            size: .xxl,
+            shape: .round
+        )
+        return avatar
     }()
     
     private lazy var nameLabel: UILabel = {
@@ -71,7 +73,7 @@ class AudienceEndStatisticsView: UIView {
     func constructViewHierarchy() {
         addSubview(titleLabel)
         addSubview(closeButton)
-        addSubview(imageView)
+        addSubview(avatarView)
         addSubview(nameLabel)
     }
     
@@ -89,14 +91,13 @@ class AudienceEndStatisticsView: UIView {
             make.width.height.equalTo(30.scale375())
         }
         
-        imageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(50.scale375Height())
             make.centerX.equalToSuperview()
-            make.width.height.equalTo(80.scale375())
         }
         
         nameLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(5.scale375())
+            make.top.equalTo(avatarView.snp.bottom).offset(5.scale375())
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
             make.height.equalTo(25.scale375Height())
@@ -108,7 +109,7 @@ class AudienceEndStatisticsView: UIView {
     }
     
     func update(avatarUrl: String) {
-        imageView.kf.setImage(with: URL(string: avatarUrl))
+        avatarView.setContent(.url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage))
     }
     
     func update(userName: String) {

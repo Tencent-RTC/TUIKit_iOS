@@ -6,9 +6,9 @@
 //
 
 import SnapKit
-import Kingfisher
 import RTCCommon
 import Combine
+import AtomicX
 
 class AudienceBackgroundWidgetView: UIView {
     init(avatarUrl: String) {
@@ -16,13 +16,11 @@ class AudienceBackgroundWidgetView: UIView {
         
         backgroundColor = .bgOperateColor
         
-        addSubview(avatarImageView)
-        avatarImageView.snp.makeConstraints { make in
+        addSubview(avatarView)
+        avatarView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.width.equalTo(40.scale375())
-            make.height.equalTo(40.scale375())
         }
-        avatarImageView.kf.setImage(with: URL(string: avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage))
         
         subscribeState()
     }
@@ -33,11 +31,13 @@ class AudienceBackgroundWidgetView: UIView {
     
     private var cancellableSet = Set<AnyCancellable>()
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 40.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
     func subscribeState() {

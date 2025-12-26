@@ -222,8 +222,8 @@ class DefaultBeautyPanel: UIView {
     
     private func updatePreview() {
         if hasRenderView {
-            TUIRoomEngine.sharedInstance().setLocalVideoView(view: previewView)
-            deviceStore.openLocalCamera(isFront: true, completion: nil)
+            deviceStore.switchCamera(isFront: true)
+            deviceStore.startCameraTest(cameraView: previewView, completion: nil)
         }
     }
 }

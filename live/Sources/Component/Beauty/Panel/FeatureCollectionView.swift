@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import RTCCommon
+import AtomicX
 
 enum LiveKitClickEvent {
     case `default`
@@ -60,12 +61,11 @@ class FeatureCollectionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private lazy var titleLabel: UILabel = {
-        let view = UILabel()
-        view.text = self.headerTitle
-        view.textColor = .g7
-        view.font = .customFont(ofSize: 14)
-        view.textAlignment = .left
+    private lazy var titleLabel: AtomicLabel = {
+        let view = AtomicLabel(self.headerTitle) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular14)
+        }
         return view
     }()
 
@@ -172,10 +172,11 @@ class FeatureCell: UICollectionViewCell {
         return imageView
     }()
 
-    lazy var titleLabel: UILabel = {
-        let view = UILabel()
-        view.font = .customFont(ofSize: 12)
-        view.textColor = .flowKitWhite
+    lazy var titleLabel: AtomicLabel = {
+        let view = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular12)
+        }
         view.textAlignment = .center
         self.contentView.addSubview(view)
         return view

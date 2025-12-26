@@ -6,6 +6,7 @@
 //
 
 import AtomicXCore
+import AtomicX
 import Combine
 import Foundation
 import RTCRoomEngine
@@ -37,7 +38,7 @@ class GiftManager {
     static let shared = GiftManager()
     private init() {}
 
-    let toastSubject = PassthroughSubject<String, Never>()
+    let toastSubject = PassthroughSubject<(String,ToastStyle), Never>()
     let giftCacheService = GiftCacheService()
 }
 

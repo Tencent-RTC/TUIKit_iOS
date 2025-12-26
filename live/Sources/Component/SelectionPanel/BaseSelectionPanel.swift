@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AtomicX
 
 class BaseSelectionPanel: UIView {
     var selectedClosure: ((Int) -> Void)?
@@ -127,10 +128,11 @@ extension BaseSelectionPanel: UITableViewDataSource, UITableViewDelegate {
 class SelectionPanelCell: UITableViewCell {
     static let cellID = "kSelectionPanelCellID"
 
-    lazy var contentLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 16)
-        label.textColor = .g7
+    lazy var contentLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         return label
     }()
 

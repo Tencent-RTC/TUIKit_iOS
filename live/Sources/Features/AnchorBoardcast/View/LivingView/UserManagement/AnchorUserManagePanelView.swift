@@ -10,62 +10,62 @@ import Combine
 import ImSDK_Plus
 import RTCCommon
 import RTCRoomEngine
+import AtomicX
 
 class AnchorUserManagePanelView: RTCBaseView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private let userManagePanelType: AnchorUserManagePanelType
-    @Published private var user: TUIUserInfo
+    private let user: LiveUserInfo
     @Published private var isFollow: Bool = false
     private var isMessageDisabled = false
     
     private var isSelf: Bool {
-        user.userId == manager.selfUserID
+        user.userID == store.selfUserID
     }
 
     private var isOwner: Bool {
-        user.userId == manager.liveListState.currentLive.liveOwner.userID
+        user.userID == store.liveListState.currentLive.liveOwner.userID
     }
 
     private var isSelfOwner: Bool {
-        manager.selfUserID == manager.liveListState.currentLive.liveOwner.userID
+        store.selfUserID == store.liveListState.currentLive.liveOwner.userID
     }
 
     private var isSelfMuted: Bool {
-        if let selfInfo = manager.seatState.seatList.filter({ $0.userInfo.userID == manager.selfUserID }).first {
+        if let selfInfo = store.seatState.seatList.filter({ $0.userInfo.userID == store.selfUserID }).first {
             return selfInfo.userInfo.microphoneStatus == .off
         }
         return true
     }
 
     private var isSelfCameraOpened: Bool {
-        if let selfInfo = manager.seatState.seatList.filter({ $0.userInfo.userID == manager.selfUserID }).first {
+        if let selfInfo = store.seatState.seatList.filter({ $0.userInfo.userID == store.selfUserID }).first {
             return selfInfo.userInfo.cameraStatus == .on
         }
         return false
     }
 
     private var isSelfOnSeat: Bool {
-        manager.coGuestState.connected.isOnSeat()
+        store.coGuestState.connected.isOnSeat()
     }
 
     private var isAudioLocked: Bool {
-        !(manager.coGuestState.connected.filter { $0.userID == user.userId }.first?.allowOpenMicrophone ?? true)
+        !(store.coGuestState.connected.filter { $0.userID == user.userID }.first?.allowOpenMicrophone ?? true)
     }
 
     private var isCameraLocked: Bool {
-        !(manager.coGuestState.connected.filter { $0.userID == user.userId }.first?.allowOpenCamera ?? true)
+        !(store.coGuestState.connected.filter { $0.userID == user.userID }.first?.allowOpenCamera ?? true)
     }
 
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(user: LiveUserInfo, manager: AnchorManager, routerManager: AnchorRouterManager, type: AnchorUserManagePanelType) {
-        self.user = TUIUserInfo(from: user)
-        self.manager = manager
+    init(user: LiveUserInfo, store: AnchorStore, routerManager: AnchorRouterManager, type: AnchorUserManagePanelType) {
+        self.user = user
+        self.store = store
         self.routerManager = routerManager
         self.userManagePanelType = type
         super.init(frame: .zero)
-        getUserInfo(userID: user.userID)
     }
     
     @available(*, unavailable)
@@ -82,16 +82,18 @@ class AnchorUserManagePanelView: RTCBaseView {
         return view
     }()
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 20.scale375()
-        imageView.layer.masksToBounds = true
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
-        label.text = user.userName.isEmpty ? user.userId : user.userName
+        label.text = user.userName.isEmpty ? user.userID : user.userName
         label.font = .customFont(ofSize: 16)
         label.textColor = .g7
         return label
@@ -100,19 +102,18 @@ class AnchorUserManagePanelView: RTCBaseView {
     private lazy var idLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12)
-        label.text = "ID: " + user.userId
+        label.text = "ID: " + user.userID
         label.textColor = .greyColor
         return label
     }()
     
-    private lazy var followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .deepSeaBlueColor
-        button.titleLabel?.font = .customFont(ofSize: 14)
-        button.setTitle(.followText, for: .normal)
-        button.setTitleColor(.g7, for: .normal)
-        button.setImage(internalImage("live_user_followed_icon"), for: .selected)
-        button.layer.cornerRadius = 16
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .medium,
+            content: .textOnly(text: .followText)
+        )
         button.isHidden = isSelf
         return button
     }()
@@ -126,7 +127,7 @@ class AnchorUserManagePanelView: RTCBaseView {
     override func constructViewHierarchy() {
         layer.masksToBounds = true
         addSubview(userInfoView)
-        userInfoView.addSubview(avatarImageView)
+        userInfoView.addSubview(avatarView)
         userInfoView.addSubview(userNameLabel)
         userInfoView.addSubview(idLabel)
         userInfoView.addSubview(followButton)
@@ -138,13 +139,12 @@ class AnchorUserManagePanelView: RTCBaseView {
             make.leading.trailing.top.equalToSuperview().inset(24)
             make.height.equalTo(43.scale375())
         }
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.leading.centerY.equalToSuperview()
-            make.width.height.equalTo(40.scale375())
         }
         userNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
             make.height.equalTo(20.scale375())
             make.width.lessThanOrEqualTo(170.scale375())
         }
@@ -168,24 +168,18 @@ class AnchorUserManagePanelView: RTCBaseView {
     
     override func bindInteraction() {
         subscribeState()
-        followButton.addTarget(self, action: #selector(followButtonClick), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
     }
     
     override func setupViewStyle() {
         backgroundColor = .g2
         layer.cornerRadius = 12
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+        userNameLabel.text = user.userName.isEmpty ? user.userID : user.userName
+        avatarView.setContent(.url(user.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         checkFollowStatus()
-    }
-    
-    private func getUserInfo(userID: String) {
-        TUIRoomEngine.sharedInstance().getUserInfo(userID) { [weak self] userInfo in
-            guard let self = self, let userInfo = userInfo else { return }
-            user = userInfo
-        } onError: { code, message in
-            debugPrint("getUserInfoError: \(code), msg:\(message)")
-        }
     }
     
     private func subscribeState() {
@@ -194,32 +188,33 @@ class AnchorUserManagePanelView: RTCBaseView {
             .sink { [weak self] isFollow in
                 guard let self = self else { return }
                 if isFollow {
-                    followButton.backgroundColor = .g5
-                    followButton.setTitle("", for: .normal)
-                    followButton.setImage(internalImage("live_user_followed_icon"), for: .normal)
+                    followButton.setButtonContent(.iconOnly(icon: internalImage("live_user_followed_icon")))
+                    followButton.setVariant(.filled)
+                    followButton.setColorType(.secondary)
                 } else {
-                    followButton.backgroundColor = .deepSeaBlueColor
-                    followButton.setTitle(.followText, for: .normal)
-                    followButton.setImage(nil, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .followText))
+                    followButton.setVariant(.filled)
+                    followButton.setColorType(.primary)
                 }
             }
             .store(in: &cancellableSet)
         
-        $user.receive(on: RunLoop.main)
-            .sink { [weak self] user in
+        store.audienceStore.state.subscribe(StatePublisherSelector(keyPath: \LiveAudienceState.messageBannedUserList))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] userList in
                 guard let self = self else { return }
-                userNameLabel.text = user.userName.isEmpty ? user.userId : user.userName
-                avatarImageView.kf.setImage(with: URL(string: user.avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
-                isMessageDisabled = user.isMessageDisabled
+                let userID = user.userID
+                isMessageDisabled = userList.contains(where: { $0.userID == userID })
                 updateFeatureItems()
             }
             .store(in: &cancellableSet)
         
-        let microphoneStatusPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \DeviceState.microphoneStatus))
-        let guestConnectedPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
-        let hostConnectedPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+        let microphoneStatusPublisher = store.subscribeState(StatePublisherSelector(keyPath: \DeviceState.microphoneStatus))
+        let guestConnectedPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+        let hostConnectedPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \DeviceState.cameraStatus))
+        store.subscribeState(StatePublisherSelector(keyPath: \DeviceState.cameraStatus))
             .removeDuplicates()
             .combineLatest(microphoneStatusPublisher.removeDuplicates(),
                            guestConnectedPublisher.removeDuplicates(),
@@ -231,14 +226,14 @@ class AnchorUserManagePanelView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] seatList in
                 guard let self = self else { return }
-                let currentUserID = user.userId
+                let currentUserID = user.userID
                 guard userManagePanelType == .mediaAndSeat,
-                      currentUserID != manager.liveListState.currentLive.liveOwner.userID else { return }
+                      currentUserID != store.liveListState.currentLive.liveOwner.userID else { return }
                 if !seatList.contains(where: { $0.userID == currentUserID }) {
                     routerManager.router(action: .dismiss())
                 }
@@ -247,7 +242,7 @@ class AnchorUserManagePanelView: RTCBaseView {
     }
     
     private func checkFollowStatus() {
-        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userId]) { [weak self] checkResultList in
+        V2TIMManager.sharedInstance().checkFollowType(userIDList: [user.userID]) { [weak self] checkResultList in
             guard let self = self, let result = checkResultList?.first else { return }
             if result.followType == .FOLLOW_TYPE_IN_BOTH_FOLLOWERS_LIST || result.followType == .FOLLOW_TYPE_IN_MY_FOLLOWING_LIST {
                 self.isFollow = true
@@ -414,36 +409,36 @@ class AnchorUserManagePanelView: RTCBaseView {
 // MARK: - Action
 
 extension AnchorUserManagePanelView {
-    @objc private func followButtonClick() {
+    private func followButtonClick() {
         if isFollow {
-            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = false
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    store.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                store.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         } else {
-            V2TIMManager.sharedInstance().followUser(userIDList: [user.userId]) { [weak self] followResultList in
+            V2TIMManager.sharedInstance().followUser(userIDList: [user.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = true
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    store.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                store.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         }
     }
     
     private func disableChatClick(_ sender: AnchorFeatureItemButton) {
-        manager.audienceStore.disableSendMessage(userID: user.userId, isDisable: !isMessageDisabled) { [weak self, weak sender] result in
+        store.audienceStore.disableSendMessage(userID: user.userID, isDisable: !isMessageDisabled) { [weak self, weak sender] result in
             guard let self = self else { return }
             switch result {
             case .success(()):
@@ -451,51 +446,53 @@ extension AnchorUserManagePanelView {
                 sender?.isSelected = isMessageDisabled
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
             }
         }
         routerManager.router(action: .dismiss())
     }
     
     private func kickOutOfRoomClick() {
-        let alertInfo = AnchorAlertInfo(description: .localizedReplace(.kickOutAlertText, replace: user.userName.isEmpty ? user.userId : user.userName),
-                                        imagePath: nil,
-                                        cancelButtonInfo: (.cancelText, .cancelTextColor),
-                                        defaultButtonInfo: (.kickOutOfRoomConfirmText, .warningTextColor))
-        { alertPanel in
-            alertPanel.dismiss()
-        } defaultClosure: { [weak self] alertPanel in
+        let cancelButton = AlertButtonConfig(text: .cancelText, type: .grey) { alertView in
+            alertView.dismiss()
+        }
+        
+        let confirmButton = AlertButtonConfig(text: .kickOutOfRoomConfirmText, type: .red) { [weak self] alertView in
             guard let self = self else { return }
-            manager.audienceStore.kickUserOutOfRoom(userID: user.userId) { [weak self] result in
+            store.audienceStore.kickUserOutOfRoom(userID: user.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
-            alertPanel.dismiss()
-            routerManager.router(action: .dismiss())
+            alertView.dismiss()
+            routerManager.dismiss()
         }
-        let alertPanel = AnchorAlertPanel(alertInfo: alertInfo)
-        alertPanel.show()
+        let alertConfig = AlertViewConfig(title: .localizedReplace(.kickOutAlertText,
+                                                                   replace: user.userName.isEmpty ? user.userID : user.userName),
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton)
+        let alertView = AtomicAlertView(config: alertConfig)
+        alertView.show()
     }
     
     private func muteSelfAudioClick(_ sender: AnchorFeatureItemButton) {
         if isSelfMuted {
-            manager.seatStore.unmuteMicrophone { [weak self, weak sender] result in
+            store.seatStore.unmuteMicrophone { [weak self, weak sender] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
                     sender?.isSelected = isSelfMuted
                 case .failure(let err):
                     let err = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(err.localizedMessage)
+                    store.toastSubject.send((err.localizedMessage, .error))
                 }
             }
         } else {
-            manager.seatStore.muteMicrophone()
+            store.seatStore.muteMicrophone()
             sender.isSelected = !sender.isSelected
         }
         routerManager.router(action: .dismiss())
@@ -503,17 +500,17 @@ extension AnchorUserManagePanelView {
     
     private func closeSelfCameraClick(_ sender: AnchorFeatureItemButton) {
         if isSelfCameraOpened {
-            manager.deviceStore.closeLocalCamera()
+            store.deviceStore.closeLocalCamera()
             sender.isSelected = !sender.isSelected
         } else {
-            manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera) { [weak self, weak sender] result in
+            store.deviceStore.openLocalCamera(isFront: store.deviceState.isFrontCamera) { [weak self, weak sender] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
                     sender?.isSelected = !isSelfCameraOpened
                 case .failure(let err):
                     let err = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(err.localizedMessage)
+                    store.toastSubject.send((err.localizedMessage, .error))
                 }
             }
         }
@@ -521,54 +518,57 @@ extension AnchorUserManagePanelView {
     }
     
     private func flipClick() {
-        manager.deviceStore.switchCamera(isFront: !manager.deviceState.isFrontCamera)
+        store.deviceStore.switchCamera(isFront: !store.deviceState.isFrontCamera)
         routerManager.router(action: .dismiss())
     }
     
     private func leaveSeatClick() {
-        let alertInfo = AnchorAlertInfo(description: .leaveSeatAlertText, imagePath: nil,
-                                        cancelButtonInfo: (.cancelText, .cancelTextColor),
-                                        defaultButtonInfo: (.disconnectText, .warningTextColor))
-        { alertPanel in
-            alertPanel.dismiss()
-        } defaultClosure: { [weak self] alertPanel in
+        let cancelButton = AlertButtonConfig(text: .cancelText, type: .grey) { alertView in
+            alertView.dismiss()
+        }
+        
+        let confirmButton = AlertButtonConfig(text: .disconnectText, type: .red) { [weak self] alertview in
             guard let self = self else { return }
-            manager.coGuestStore.disConnect { [weak self] result in
+            store.coGuestStore.disConnect { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
-                    manager.deviceStore.closeLocalCamera()
-                    manager.deviceStore.closeLocalMicrophone()
+                    store.deviceStore.closeLocalCamera()
+                    store.deviceStore.closeLocalMicrophone()
                 case .failure(let err):
                     let err = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(err.localizedMessage)
+                    store.toastSubject.send((err.localizedMessage, .error))
                 }
             }
-            alertPanel.dismiss()
-            routerManager.router(action: .dismiss())
+            alertview.dismiss()
+            routerManager.dismiss()
         }
-        let alertPanel = AnchorAlertPanel(alertInfo: alertInfo)
-        alertPanel.show()
+        
+        let alertConfig = AlertViewConfig(title: .leaveSeatAlertText,
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton)
+        let alertView = AtomicAlertView(config: alertConfig)
+        alertView.show()
     }
     
     private func disableAudioClick() {
         if isAudioLocked {
-            manager.seatStore.openRemoteMicrophone(userID: user.userId, policy: .unlockOnly) { [weak self] result in
+            store.seatStore.openRemoteMicrophone(userID: user.userID, policy: .unlockOnly) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
         } else {
-            manager.seatStore.closeRemoteMicrophone(userID: user.userId) { [weak self] result in
+            store.seatStore.closeRemoteMicrophone(userID: user.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
@@ -578,22 +578,22 @@ extension AnchorUserManagePanelView {
     
     private func disableCameraClick() {
         if isCameraLocked {
-            manager.seatStore.openRemoteCamera(userID: user.userId, policy: .unlockOnly) { [weak self] result in
+            store.seatStore.openRemoteCamera(userID: user.userID, policy: .unlockOnly) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
         } else {
-            manager.seatStore.closeRemoteCamera(userID: user.userId) { [weak self] result in
+            store.seatStore.closeRemoteCamera(userID: user.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 default: break
                 }
             }
@@ -602,28 +602,31 @@ extension AnchorUserManagePanelView {
     }
     
     private func kickOffSeatClick() {
-        let alertInfo = AnchorAlertInfo(description: .localizedReplace(.hangupAlertText, replace: user.userName.isEmpty ? user.userId : user.userName),
-                                        imagePath: nil,
-                                        cancelButtonInfo: (.cancelText, .cancelTextColor),
-                                        defaultButtonInfo: (.disconnectText, .redColor))
-        { alertPanel in
-            alertPanel.dismiss()
-        } defaultClosure: { [weak self] alertPanel in
+        let cancelButton = AlertButtonConfig(text: .cancelText, type: .grey) { alertView in
+            alertView.dismiss()
+        }
+        
+        let confirmButton = AlertButtonConfig(text: .disconnectText, type: .red) { [weak self] alertView in
             guard let self = self else { return }
-            manager.seatStore.kickUserOutOfSeat(userID: user.userId) { [weak self] result in
+            store.seatStore.kickUserOutOfSeat(userID: user.userID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success(()):
-                    routerManager.router(action: .dismiss())
+                    routerManager.dismiss()
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(error.localizedMessage)
+                    store.toastSubject.send((error.localizedMessage, .error))
                 }
             }
-            alertPanel.dismiss()
+            alertView.dismiss()
         }
-        let alertPanel = AnchorAlertPanel(alertInfo: alertInfo)
-        alertPanel.show()
+        
+        let alertConfig = AlertViewConfig(title: .localizedReplace(.hangupAlertText,
+                                                                   replace: user.userName.isEmpty ? user.userID : user.userName),
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton)
+        let alertView = AtomicAlertView(config: alertConfig)
+        alertView.show()
     }
 }
 
@@ -631,7 +634,7 @@ private extension String {
     static let followText = internalLocalized("Follow")
     static let disableChatText = internalLocalized("Disable Chat")
     static let enableChatText = internalLocalized("Enable Chat")
-    static let kickOutOfRoomText = internalLocalized("Kick Out")
+    static let kickOutOfRoomText = internalLocalized("Remove")
     static let kickOutOfRoomConfirmText = internalLocalized("Remove")
     static let kickOutAlertText = internalLocalized("Are you sure you want to remove xxx?")
     static let muteAudioText = internalLocalized("Mute")

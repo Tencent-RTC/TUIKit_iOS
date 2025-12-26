@@ -396,7 +396,6 @@ private extension SeatGridView {
                 guard !liveListStore.state.value.currentLive.isEmpty else { return }
                 if connected.contains(where: { $0.liveID == self.liveListStore.state.value.currentLive.liveID}) {
                     self.isConnection = true
-                    KickUsersInConnect()
                 } else {
                     self.isConnection = false
                 }
@@ -419,39 +418,41 @@ private extension SeatGridView {
     }
 
     private func KickUsersInConnect() {
-        if !isSelfOwner {
-            return
-        }
+        guard isSelfOwner else { return }
+        
         let seatList = seatStore.state.value.seatList
         let currentLiveID = liveListStore.state.value.currentLive.liveID
-        let removeCount = liveListStore.state.value.currentLive.maxSeatCount - KSGConnectMaxSeatCount
-        guard let firstConnectIndex = seatList.firstIndex(where: {
+
+        let startIndex = KSGConnectMaxSeatCount
+
+        guard startIndex < seatList.count else { return }
+
+        guard let firstConnectIndex = seatList[startIndex...].firstIndex(where: {
             let userLiveID = $0.userInfo.liveID
             return !userLiveID.isEmpty && userLiveID != currentLiveID
         }) else {
             return
         }
 
-        let startIndex = max(0, firstConnectIndex - removeCount)
         let endIndex = firstConnectIndex - 1
-        if startIndex > endIndex {
-            return
-        }
+
+        guard startIndex <= endIndex else { return }
+        
         let targetSeats = Array(seatList[startIndex...endIndex])
+
+        if !targetSeats.isEmpty {
+            self.showAtomicToast(text: .kickOutByConnectTex, style: .info, duration: .long)
+        }
 
         for seatInfo in targetSeats {
             let userID = seatInfo.userInfo.userID
             guard !userID.isEmpty else { continue }
-            makeToast(message: .kickOutByConnectTex,duration: 3.5)
-            seatStore.kickUserOutOfSeat(userID: seatInfo.userInfo.userID) { [weak self] result in
+            
+            seatStore.kickUserOutOfSeat(userID: userID) { [weak self] result in
                 guard let self = self else { return }
-                switch result {
-                    case .success():
-                        break
-                    case .failure(let error):
-                        let err = InternalError(errorInfo: error)
-                        makeToast(message: err.localizedMessage)
-                        break
+                if case .failure(let error) = result {
+                    let err = InternalError(errorInfo: error)
+                    self.showAtomicToast(text: err.localizedMessage, style: .error)
                 }
             }
         }

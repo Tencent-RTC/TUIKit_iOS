@@ -92,7 +92,6 @@ class VoiceRoomPrepareView: RTCBaseView {
             guard let self = self else { return }
             self.routerManager.router(action: .present(.prepareSetting(prepareStore)))
         }))
-#if !RTCube_APPSTORE
         model.items.append(VRFeatureItem(normalTitle: .layoutText,
                                          normalImage: internalImage("ktv_layout"),
                                          designConfig: designConfig,
@@ -100,7 +99,6 @@ class VoiceRoomPrepareView: RTCBaseView {
             guard let self = self else { return }
             self.routerManager.router(action: .present(.layout(prepareStore)))
         }))
-#endif
         let featureClickPanel = VRFeatureClickPanel(model: model)
         return featureClickPanel
     }()

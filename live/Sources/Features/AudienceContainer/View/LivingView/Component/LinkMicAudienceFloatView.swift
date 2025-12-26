@@ -7,27 +7,25 @@
 
 import AtomicXCore
 import Combine
-import Kingfisher
 import RTCCommon
 import TUICore
+import AtomicX
 
 class AudienceUserImageCell: UICollectionViewCell {
     var user: UserProfile? {
         didSet {
-            if let url = URL(string: user?.avatarURL ?? "") {
-                avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = .avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(user?.avatarURL ?? "", placeholder: UIImage.avatarPlaceholderImage))
         }
     }
 
-    lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 40.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        contentView.addSubview(imageView)
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        contentView.addSubview(avatar)
+        return avatar
     }()
 
     private var isViewReady = false
@@ -38,26 +36,25 @@ class AudienceUserImageCell: UICollectionViewCell {
         }
         isViewReady = true
         contentView.backgroundColor = .clear
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
 
     func setImage(image: UIImage?) {
-        avatarImageView.kf.cancelDownloadTask()
-        avatarImageView.image = image
+        avatarView.setContent(.icon(image: image ?? UIImage.placeholderImage))
     }
 }
 
 class LinkMicAudienceFloatView: UIView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
 
     private var cancellableSet = Set<AnyCancellable>()
 
     private var dotsTimer: Timer = .init()
     private var isViewReady: Bool = false
-    init(manager: AudienceManager, routerManager: AudienceRouterManager) {
+    init(manager: AudienceStore, routerManager: AudienceRouterManager) {
         self.manager = manager
         self.routerManager = routerManager
         super.init(frame: .zero)
@@ -222,26 +219,29 @@ extension LinkMicAudienceFloatView {
     }
 
     private func showCancelLinkMicPanel() {
-        var items: [ActionItem] = []
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-        let item = ActionItem(title: .cancelLinkMicRequestText, designConfig: designConfig) { [weak self] _ in
-            guard let self = self else { return }
-            manager.stopApplying()
-            manager.coGuestStore.cancelApplication { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .failure(let err):
-                    let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
-                default: break
+        let alertConfig = AlertViewConfig(
+            items: [
+                AlertButtonConfig(text: .cancelLinkMicRequestText, type: .red) { [weak self] _ in
+                    guard let self = self else { return }
+                    manager.stopApplying()
+                    manager.coGuestStore.cancelApplication { [weak self] result in
+                        guard let self = self else { return }
+                        switch result {
+                        case .failure(let err):
+                            let error = InternalError(code: err.code, message: err.message)
+                            manager.onError(error)
+                        default: break
+                        }
+                    }
+                    routerManager.router(action: .dismiss())
+                },
+                AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                    guard let self = self else { return }
+                    routerManager.router(action: .dismiss())
                 }
-            }
-            routerManager.router(action: .dismiss())
-        }
-        items.append(item)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor), .stickToBottom)))
+            ]
+        )
+        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
     }
 }
 

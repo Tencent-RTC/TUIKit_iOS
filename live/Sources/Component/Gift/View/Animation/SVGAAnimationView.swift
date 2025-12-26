@@ -15,7 +15,7 @@ class SVGAAnimationView: UIView, AnimationView {
         finishClosure = onFinished
         reportGiftData()
         if !isSVGAFile(url: playUrl) {
-            makeToast(message: .isNotSVGAFileText)
+            showAtomicToast(text: .isNotSVGAFileText, style: .error)
             finishClosure?(-1)
             return
         }

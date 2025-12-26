@@ -71,15 +71,14 @@ extension MineViewController: MineViewDelegate {
         let cancelAction = UIAlertAction(title: ("Cancel").localized, style: .cancel, handler: nil)
         let sureAction = UIAlertAction(title: ("Yes").localized, style: .default) { _ in
             UserDefaults.standard.removeObject(forKey: "UserIdKey")
-            LoginStore.shared.logout { result in
-                switch result {
-                case .success(()):
+            LoginStore.shared.logout { _ in
+                TUILogin.logout {
                     DispatchQueue.main.async {
                         if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
                             appDelegate.showLoginViewController()
                         }
                     }
-                case .failure(_):
+                } fail: { _, _ in
                     DispatchQueue.main.async {
                         if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
                             appDelegate.showLoginViewController()

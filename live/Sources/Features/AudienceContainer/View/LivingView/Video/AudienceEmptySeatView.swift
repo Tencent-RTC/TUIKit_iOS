@@ -11,13 +11,13 @@ import Combine
 
 class AudienceEmptySeatView: UIView {
     
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private let creator: AudienceRootMenuDataCreator
     private let seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
 
-    init(seatInfo: SeatInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    init(seatInfo: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.seatInfo = seatInfo
         self.manager = manager
         self.routerManager = routerManager
@@ -66,7 +66,7 @@ class AudienceEmptySeatView: UIView {
             return
         }
         let data = creator.generateLinkTypeMenuData(seatIndex: seatInfo.index)
-        routerManager.router(action: .present(.linkType(data)))
+        routerManager.router(action: .present(.linkType(data, seatIndex: seatInfo.index)))
     }
     
     required init?(coder: NSCoder) {

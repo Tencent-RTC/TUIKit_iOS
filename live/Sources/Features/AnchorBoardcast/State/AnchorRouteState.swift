@@ -6,6 +6,7 @@
 //
 
 import AtomicXCore
+import AtomicX
 import Foundation
 import RTCCommon
 
@@ -31,16 +32,16 @@ enum AnchorRoute {
     case liveLinkControl
     case connectionControl
     case featureSetting(_ settingModel: AnchorFeatureClickPanelModel)
-    case listMenu(_ data: ActionPanelData, _ layout: ActionPanelLayoutMode = .stickToBottom)
     case audioEffect
     case beauty
     case giftView
     case battleCountdown(_ countdownTime: TimeInterval)
-    case alert(info: AnchorAlertInfo)
     case streamDashboard
     case userManagement(_ user: SeatInfo, type: AnchorUserManagePanelType)
     case netWorkInfo(_ manager: NetWorkInfoManager, isAudience: Bool)
     case mirror
+    case pip
+    case custom(_ item: RouteItem) //TODO: chengyu暂时新增一个插槽，重构完成后删除
 }
 
 extension AnchorRoute: Equatable {
@@ -52,34 +53,34 @@ extension AnchorRoute: Equatable {
                  (.audioEffect, .audioEffect),
                  (.beauty, .beauty),
                  (.giftView, .giftView),
-                 (.alert, .alert),
                  (.mirror, .mirror),
+                 (.pip, .pip),
                  (.streamDashboard, .streamDashboard):
                 return true
             case let (.featureSetting(l), .featureSetting(r)):
                 return l == r
-            case let (.listMenu(lData, lLayout), .listMenu(rData, rLayout)):
-                return lData == rData && lLayout == rLayout
             case let (.battleCountdown(l), .battleCountdown(r)):
                 return l == r
             case let (.userManagement(l1, l2), .userManagement(r1, r2)):
                 return l1 == r1 && l2 == r2
             case let (.netWorkInfo(l1, l2), .netWorkInfo(r1, r2)):
                 return l1 == r1 && l2 == r2
+            case let (.custom(l), .custom(r)):
+                return l == r
             case (.anchor, _),
                  (.liveLinkControl, _),
                  (.connectionControl, _),
                  (.featureSetting, _),
-                 (.listMenu, _),
                  (.audioEffect, _),
                  (.beauty, _),
                  (.giftView, _),
                  (.battleCountdown, _),
-                 (.alert, _),
                  (.streamDashboard, _),
+                 (.pip, _),
                  (.userManagement, _),
                  (.mirror, _),
-                 (.netWorkInfo, _):
+                 (.netWorkInfo, _),
+                 (.custom, _):
                 return false
             default:
                 break
@@ -98,12 +99,6 @@ extension AnchorRoute: Hashable {
                 return "connectionControl"
             case let .featureSetting(settingModel):
                 return "featureSetting" + settingModel.id.uuidString
-            case let .listMenu(data, _):
-                var result = "listMenu"
-                for item in data.items {
-                    result += item.id.uuidString
-                }
-                return result
             case .audioEffect:
                 return "audioEffect"
             case .beauty:
@@ -112,8 +107,6 @@ extension AnchorRoute: Hashable {
                 return "giftView"
             case let .battleCountdown(countdownTime):
                 return "battleCountdown \(countdownTime)"
-            case let .alert(alertInfo):
-                return "alert \(alertInfo.description)"
             case .streamDashboard:
                 return "streamDashboard"
             case let .userManagement(user, type):
@@ -122,10 +115,63 @@ extension AnchorRoute: Hashable {
                 return "netWorkInfo"
             case .mirror:
                 return "mirror"
+            case .pip:
+                return "pip"
+            case let .custom(item):
+                return "custom_\(item.id)"
         }
     }
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(self.convertToString())
+    }
+}
+
+enum ViewPosition: Equatable {
+    case bottom
+    case center
+}
+
+
+struct RouteItemConfig {
+    let position: ViewPosition
+
+    let backgroundColor: PopoverColor
+
+    init(position: ViewPosition = .center, backgroundColor: PopoverColor = .defaultThemeColor) {
+        self.position = position
+        self.backgroundColor = backgroundColor
+    }
+
+    static func bottomDefault() -> RouteItemConfig {
+        return RouteItemConfig(position: .bottom, backgroundColor: .defaultThemeColor)
+    }
+
+    static func centerDefault() -> RouteItemConfig {
+        return RouteItemConfig(position: .center, backgroundColor: .defaultThemeColor)
+    }
+
+    static func centerTransparent() -> RouteItemConfig {
+        return RouteItemConfig(position: .center, backgroundColor: .custom(.clear))
+    }
+}
+
+struct RouteItem: Identifiable, Equatable {
+    let id: String = UUID().uuidString
+    let view: UIView
+    let config: RouteItemConfig
+
+    init(view: UIView, config: RouteItemConfig = .centerDefault()) {
+        self.view = view
+        self.config = config
+    }
+
+    init(view: UIView, position: ViewPosition) {
+        self.view = view
+        self.config = RouteItemConfig(position: position)
+    }
+    
+    static func == (lhs: RouteItem, rhs: RouteItem) -> Bool {
+        return lhs.id == rhs.id
     }
 }

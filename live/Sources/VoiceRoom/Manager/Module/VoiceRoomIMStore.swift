@@ -105,16 +105,16 @@ class VoiceRoomIMStore: NSObject {
 
 extension VoiceRoomIMStore: V2TIMFriendshipListener {
     func onMyFollowingListChanged(userInfoList: [V2TIMUserFullInfo], isAdd: Bool) {
-        var myFollowingUserList = state.myFollowingUserList
-        if isAdd {
-            let newFollowingUsers = userInfoList.map { TUIUserInfo(userFullInfo: $0) }
-            myFollowingUserList.formUnion(newFollowingUsers)
-        } else {
-            let userIdsToRemove = Set(userInfoList.map { $0.userID })
-            myFollowingUserList = myFollowingUserList.filter { !userIdsToRemove.contains($0.userId) }
-        }
         update { state in
-            state.myFollowingUserList = myFollowingUserList
+            if isAdd {
+                let newUserIds = Set(userInfoList.map { $0.userID })
+                state.myFollowingUserList = state.myFollowingUserList.filter { !newUserIds.contains($0.userId) }
+                let newFollowingUsers = userInfoList.map { TUIUserInfo(userFullInfo: $0) }
+                state.myFollowingUserList.formUnion(newFollowingUsers)
+            } else {
+                let userIdsToRemove = Set(userInfoList.map { $0.userID })
+                state.myFollowingUserList = state.myFollowingUserList.filter { !userIdsToRemove.contains($0.userId) }
+            }
         }
     }
 }

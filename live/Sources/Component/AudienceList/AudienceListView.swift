@@ -8,29 +8,25 @@
 import AtomicXCore
 import Combine
 import Foundation
-import Kingfisher
 import RTCCommon
 import SnapKit
+import AtomicX
 
 class UserInfoCell: UICollectionViewCell {
     var userInfo: LiveUserInfo? {
         didSet {
-            if let url = URL(string: userInfo?.avatarURL ?? "") {
-                avatarImageView.kf.setImage(with: url, placeholder: avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(userInfo?.avatarURL ?? "", placeholder: avatarPlaceholderImage))
         }
     }
 
-    lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 24.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 1
-        imageView.layer.borderColor = UIColor.g1.withAlphaComponent(0.4).cgColor
-        contentView.addSubview(imageView)
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("", placeholder: avatarPlaceholderImage),
+            size: .xs,
+            shape: .round
+        )
+        contentView.addSubview(avatar)
+        return avatar
     }()
 
     private var isViewReady = false
@@ -41,7 +37,7 @@ class UserInfoCell: UICollectionViewCell {
         }
         isViewReady = true
         contentView.backgroundColor = .clear
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }

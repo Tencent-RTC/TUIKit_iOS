@@ -11,13 +11,13 @@ import RTCCommon
 import UIKit
 
 class AudienceBattleMemberInfoView: RTCBaseView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private var userId: String
     private var cancellableSet: Set<AnyCancellable> = []
     
     private let maxRankingValue = 9
     
-    init(manager: AudienceManager, userId: String) {
+    init(manager: AudienceStore, userId: String) {
         self.manager = manager
         self.userId = userId
         super.init(frame: .zero)

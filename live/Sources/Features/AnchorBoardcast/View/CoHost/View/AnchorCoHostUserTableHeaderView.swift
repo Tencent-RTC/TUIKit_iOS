@@ -6,13 +6,16 @@
 //
 
 import Foundation
+import AtomicX
 
 class AnchorCoHostUserTableHeaderView: UITableViewHeaderFooterView {
     static let identifier = "AnchorCoHostUserTableHeaderView"
-    lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = .customFont(ofSize: 14, weight: .medium)
+    
+    lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Medium14)
+        }
         return label
     }()
     

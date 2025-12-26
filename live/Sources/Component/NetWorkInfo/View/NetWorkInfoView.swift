@@ -10,6 +10,8 @@ import SnapKit
 import Combine
 import RTCCommon
 import RTCRoomEngine
+import AtomicXCore
+import AtomicX
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
@@ -24,16 +26,18 @@ enum NetWorkInfoItemViewType {
 }
 
 class NetWorkInfoView: UIView {
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellableSet = Set<AnyCancellable>()
     private weak var presentedPanelController: UIViewController?
     private let isAudience: Bool
     private weak var manager: NetWorkInfoManager?
     private weak var popupViewController: UIViewController?
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = .liveInfoTitle
-        label.font = UIFont(name: "pingFangSC-Medium", size: 16)
-        label.textColor = UIColor.white.withAlphaComponent(0.9)
+    
+    var onRequestDismissNetworkPanel: ((@escaping () -> Void) -> Void)?
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.liveInfoTitle) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
 
@@ -65,18 +69,19 @@ class NetWorkInfoView: UIView {
         return view
     }()
 
-    private let rttValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Medium", size: 16)
-        label.textColor = .greenColor
+    private let rttValueLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSuccess,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
 
-    private let rttTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
-        label.text = .roundTripDelay
+    private let rttTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.roundTripDelay) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
 
@@ -85,18 +90,19 @@ class NetWorkInfoView: UIView {
         return view
     }()
 
-    private let downLossValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Medium", size: 16)
-        label.textColor = UIColor.white.withAlphaComponent(0.9)
+    private let downLossValueLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
 
-    private let downLossTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
-        label.text = .downlinkLoss
+    private let downLossTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.downlinkLoss) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
 
@@ -105,18 +111,19 @@ class NetWorkInfoView: UIView {
         return view
     }()
 
-    private let upLossValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Medium", size: 16)
-        label.textColor = UIColor.white.withAlphaComponent(0.9)
+    private let upLossValueLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
 
-    private let upLossTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont(name: "pingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
-        label.text = .uplinkLoss
+    private let upLossTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.uplinkLoss) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
 
@@ -131,8 +138,10 @@ class NetWorkInfoView: UIView {
     }()
     
     private var items: [NetWorkInfoItemViewType] = []
+    private let liveID: String
     
-    init(manager: NetWorkInfoManager, isAudience: Bool = false) {
+    init(liveID: String, manager: NetWorkInfoManager, isAudience: Bool = false) {
+        self.liveID = liveID
         self.manager = manager
         self.isAudience = isAudience
         if isAudience == false {
@@ -273,74 +282,63 @@ class NetWorkInfoView: UIView {
         isUserInteractionEnabled = true
         tableView.delegate = self
         tableView.dataSource = self
-        guard let manager = manager else { return }
-
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.downLoss))
+        
+        DeviceStore.shared.state.subscribe(StatePublisherSelector(keyPath: \DeviceState.networkInfo))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { [weak self] downLoss in
-                self?.onDownLossChanged(downLoss)
+            .sink { [weak self] networkInfo in
+                guard let self = self else { return }
+                onDownLossChanged(networkInfo.downLoss)
+                onRttChanged(networkInfo.delay)
+                onUpLossChanged(networkInfo.upLoss)
+                onNetWorkQualityChanged(networkInfo.quality)
             }
-            .store(in: &cancellables)
-
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.rtt))
-            .sink { [weak self] status in
-                self?.onRttChanged(status)
-            }
-            .store(in: &cancellables)
-
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.upLoss))
-            .sink { [weak self] upLoss in
-                self?.onUpLossChanged(upLoss)
-            }
-            .store(in: &cancellables)
-
+            .store(in: &cancellableSet)
+        
+        guard let manager = manager else { return }
         manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.deviceTemperature))
             .sink { [weak self] temperature in
                 self?.onTemperatureChanged(temperature)
             }
-            .store(in: &cancellables)
+            .store(in: &cancellableSet)
 
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.netWorkQuality))
-            .sink { [weak self] netWorkQualit in
-                self?.onNetWorkQualitChanged(netWorkQualit)
-            }
-            .store(in: &cancellables)
         manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.audioState))
             .sink { [weak self] audioState in
                 self?.onAudioStateChanged(audioState)
             }
-            .store(in: &cancellables)
-        manager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.audioQuality))
+            .store(in: &cancellableSet)
+        
+        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.audioQuality))
             .sink { [weak self] audioQuality in
                 self?.onAudioQualityChanged(audioQuality)
             }
-            .store(in: &cancellables)
-        manager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.videoState))
+            .store(in: &cancellableSet)
+        
+        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.videoState))
             .sink { [weak self] videoState in
                 self?.onVideoStateChanged(videoState)
             }
-            .store(in: &cancellables)
-        manager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.videoResolution))
+            .store(in: &cancellableSet)
+        
+        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.videoResolution))
             .sink { [weak self] videoResolution in
                 self?.onVideoResolutionChanged(videoResolution: videoResolution)
             }
-            .store(in: &cancellables)
-        manager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.volume))
+            .store(in: &cancellableSet)
+        
+        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.volume))
             .sink { [weak self] volume in
                 self?.onVolumeChanged(volume)
             }
-            .store(in: &cancellables)
+            .store(in: &cancellableSet)
+        
         manager.kickedOutSubject
             .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self = self else { return }
                 self.dismissPanel()
             }
-            .store(in: &cancellables)
+            .store(in: &cancellableSet)
     }
 
     private func onDownLossChanged(_ downLoss: UInt32) {
@@ -392,11 +390,11 @@ class NetWorkInfoView: UIView {
         }
     }
 
-    private func onNetWorkQualitChanged(_ netWorkQualit: TUINetworkQuality) {
+    private func onNetWorkQualityChanged(_ netWorkQuality: NetworkQuality) {
         let statusText: String
         let statusColor: UIColor
         let iconName: String
-        switch netWorkQualit {
+        switch netWorkQuality {
             case .excellent:
                 statusText = .excellentText
                 statusColor = .greenColor
@@ -479,7 +477,6 @@ class NetWorkInfoView: UIView {
     private func onAudioStateChanged(_ audioState: AudioState) {
         let statusColor: UIColor
         let statusText: String
-        let detailText: String
 
         switch audioState {
             case .close,.mute:
@@ -575,48 +572,56 @@ class NetWorkInfoView: UIView {
     
     
     private func showAudioSettingsMenu() {
-        let designConfig = ActionItemDesignConfig(titleColor: .whiteColor, backgroundColor: .blackColor, lineColor: .bgEntrycardColor)
-        let items = [
-            ActionItem(title: .AudioQualityDefault, designConfig: designConfig, actionClosure: { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.default)
-                self?.dismissPanel()
-            }),
-            ActionItem(title: .AudioQualityMusic, designConfig: designConfig, actionClosure: { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.music)
-                self?.dismissPanel()
-            }),
-            ActionItem(title: .AudioQualitySpeech, designConfig: designConfig, actionClosure: { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.speech)
-                self?.dismissPanel()
-            })
-        ]
-        
-        let panelData = ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .blackColor, cancelTitleColor: .whiteColor)
-        let panel = ActionPanel(panelData: panelData)
-        
-        presentPanel(panel: panel)
+        onRequestDismissNetworkPanel? { [weak self] in
+            guard let self = self else { return }
+            self.presentAudioQualityPanel()
+        }
     }
     
-    private func presentPanel(panel: ActionPanel) {
+    private func presentAudioQualityPanel() {
+        let items = [
+            AlertButtonConfig(text: .AudioQualityDefault, type: .primary) { [weak self] _ in
+                self?.manager?.onAudioQualityChanged(TUIAudioQuality.default)
+                self?.dismissPanel()
+            },
+            AlertButtonConfig(text: .AudioQualityMusic, type: .primary) { [weak self] _ in
+                self?.manager?.onAudioQualityChanged(TUIAudioQuality.music)
+                self?.dismissPanel()
+            },
+            AlertButtonConfig(text: .AudioQualitySpeech, type: .primary) { [weak self] _ in
+                self?.manager?.onAudioQualityChanged(TUIAudioQuality.speech)
+                self?.dismissPanel()
+            },
+            AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+                self?.dismissPanel()
+            }
+        ]
+        
+        let alertConfig = AlertViewConfig(items: items)
+        let alertView = AtomicAlertView(config: alertConfig)
+        
+        let config = AtomicPopover.AtomicPopoverConfig(
+            position: .bottom,
+            height: .wrapContent,
+            animation: .slideFromBottom,
+            onBackdropTap: { [weak self] in
+                self?.dismissPanel()
+            }
+        )
+        
+        let popover = AtomicPopover(contentView: alertView, configuration: config)
+        
         if let vc = WindowUtils.getCurrentWindowViewController() {
             popupViewController = vc
-            let menuContainerView = MenuContainerView(contentView: panel)
-            panel.cancelActionClosure = { [weak self] in
-                guard let self = self else { return }
-                dismissPanel()
-            }
-            menuContainerView.blackAreaClickClosure = dismissPanel
-            let viewController = PopupViewController(
-                contentView: menuContainerView,
-                supportBlurView: false
-            )
-            popupViewController?.present(viewController, animated: true)
+            vc.present(popover, animated: false)
+            presentedPanelController = popover
         }
     }
 
     private func dismissPanel() {
-        if let presentedVC = popupViewController?.presentedViewController {
-            presentedVC.dismiss(animated: true)
+        if let presentedVC = presentedPanelController {
+            presentedVC.dismiss(animated: false)
+            presentedPanelController = nil
         }
     }
 
@@ -632,8 +637,8 @@ class NetWorkInfoView: UIView {
     }
 
     deinit {
-        cancellables.forEach { $0.cancel() }
-        cancellables.removeAll()
+        cancellableSet.forEach { $0.cancel() }
+        cancellableSet.removeAll()
         manager = nil
         print("deinit \(type(of: self))")
     }

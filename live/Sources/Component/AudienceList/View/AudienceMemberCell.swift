@@ -8,6 +8,7 @@
 import Foundation
 import AtomicXCore
 import RTCCommon
+import AtomicX
 
 class AudienceMemberCell: UITableViewCell {
     var onUserManageButtonClicked: ((LiveUserInfo) -> Void)? {
@@ -24,22 +25,20 @@ class AudienceMemberCell: UITableViewCell {
                 return
             }
             
-            if let url = URL(string: user.avatarURL) {
-                avatarImageView.kf.setImage(with: url,placeholder: avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(user.avatarURL, placeholder: avatarPlaceholderImage))
             
             nameLabel.text = user.userName.isEmpty ? user.userID : user.userName
         }
     }
     
-    lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 40.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        contentView.addSubview(imageView)
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("", placeholder: avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        contentView.addSubview(avatar)
+        return avatar
     }()
     
     lazy var nameLabel: UILabel = {
@@ -83,23 +82,22 @@ class AudienceMemberCell: UITableViewCell {
     }
     
     func constructViewHierarchy() {
-        contentView.addSubview(avatarImageView)
+        contentView.addSubview(avatarView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(lineView)
     }
     
     func activateConstraints() {
-        avatarImageView.snp.makeConstraints { (make) in
-            make.centerY.equalToSuperview()
+        avatarView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(24)
-            make.width.equalTo(40.scale375())
-            make.height.equalTo(40.scale375())
+            make.centerY.equalToSuperview()
+            make.size.equalTo(40.scale375())
         }
         
         nameLabel.snp.makeConstraints { (make) in
             make.centerY.equalToSuperview()
             make.height.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(14.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(14.scale375())
             make.trailing.equalToSuperview().inset(24)
         }
         
@@ -123,7 +121,7 @@ class AudienceMemberCell: UITableViewCell {
         nameLabel.snp.remakeConstraints { make in
             make.centerY.equalToSuperview()
             make.height.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(14.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(14.scale375())
             make.trailing.equalTo(userManageButton).offset(-10)
         }
     }

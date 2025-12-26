@@ -16,6 +16,7 @@ import Combine
 
 class LoginViewController: UIViewController {
     private let userIdKey = "UserIdKey"
+    private let autoLoginKey = "AutoLoginKey"
     private let loading = UIActivityIndicatorView()
     private let rootView = LoginView()
     private var isTestEnvironment = false
@@ -67,7 +68,7 @@ class LoginViewController: UIViewController {
                             return
                         }
                         nickName = user.nickname ?? ""
-                        loginSucc()
+                        loginTUICore(userID: userId)
                         cancelableSet.forEach { $0.cancel() }
                         cancelableSet.removeAll()
                     }
@@ -78,23 +79,24 @@ class LoginViewController: UIViewController {
         }
     }
     
-    private func loginSucc() {
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        if nickName.count == 0 {
-            let vc = RegisterViewController()
-            navigationController?.pushViewController(vc, animated: true)
-        } else {
-            self.view.makeToast("Logged In".localized)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                appDelegate?.showMainViewController()
-            }
+    private func loginTUICore(userID: String) {
+        // FIXME: 临时方案 修复RoomKit 1.0版本 在应用内会议相关功能不可用问题， 后续升级到RoomKit 2.0版本 这部分逻辑将删除。
+        TUILogin.login(Int32(SDKAPPID), userID: userID, userSig: GenerateTestUserSig.genTestUserSig(identifier: userID)) { [weak self] in
+            guard let self = self else { return }
+            loginSuccess()
+        } fail: { code, message in
+            TUITool.makeToast("Login failed, code: \(code), error: \(message ?? "")")
         }
     }
     
     private func autoLogin() {
         if let userId = UserDefaults.standard.string(forKey: userIdKey), !userId.isEmpty {
             rootView.userIdTextField.text = userId
-            login(userId: userId)
+            // 只有在自动登录开关打开时才自动登录
+            let isAutoLoginEnabled = UserDefaults.standard.bool(forKey: autoLoginKey)
+            if isAutoLoginEnabled {
+                login(userId: userId)
+            }
         } else {
             rootView.userIdTextField.text = UserDefaults.standard.string(forKey: userIdKey)
         }
@@ -104,6 +106,10 @@ class LoginViewController: UIViewController {
 extension LoginViewController: LoginViewDelegate {
     func testModeSwitchChanged(isOn: Bool) {
         isTestEnvironment = isOn
+    }
+    
+    func autoLoginSwitchChanged(isOn: Bool) {
+        UserDefaults.standard.set(isOn, forKey: "AutoLoginKey")
     }
     
     func loginDelegate(userId: String) {
@@ -139,6 +145,21 @@ extension LoginViewController: LanguageSelectViewControllerDelegate {
             nav.pushViewController(languageVC, animated: true)
         } else {
             self.present(languageVC, animated: true, completion: nil)
+        }
+    }
+}
+
+extension LoginViewController {
+    private func loginSuccess() {
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        if nickName.count == 0 {
+            let vc = RegisterViewController()
+            navigationController?.pushViewController(vc, animated: true)
+        } else {
+            self.view.makeToast("Logged In".localized)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                appDelegate?.showMainViewController()
+            }
         }
     }
 }

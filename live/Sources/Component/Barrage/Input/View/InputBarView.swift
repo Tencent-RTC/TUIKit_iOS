@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AtomicX
 
 let UIInputBarViewMinHeight = 58.scale375Height()
 let UIInputTextViewMinHeight = 32.scale375Height()
@@ -41,15 +42,16 @@ class InputBarView: UIView {
         return button
     }()
 
-    lazy var rightSendButton: UIButton = {
-        let button = UIButton()
-        button.setTitle(.sendText, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.setTitleColor(.white.withAlphaComponent(0.42), for: .disabled)
-        button.titleLabel?.font = .customFont(ofSize: 15, weight: .medium)
-        button.layer.cornerRadius = 18.scale375Height()
-        button.backgroundColor = .b1
-        button.addTarget(self, action: #selector(rightSendButtonClick), for: .touchUpInside)
+    lazy var rightSendButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .medium,
+            content: .textOnly(text: .sendText)
+        )
+        button.setClickAction { [weak self] _ in
+            self?.rightSendButtonClick()
+        }
         return button
     }()
 
@@ -120,7 +122,7 @@ class InputBarView: UIView {
         delegate?.inputBarViewDidSwitchToEmotion(isEmotion: sender.isSelected)
     }
 
-    @objc func rightSendButtonClick() {
+    private func rightSendButtonClick() {
         delegate?.inputBarView(inputBarView: self, onSendText: inputTextView.normalText)
         inputTextView.text = nil
     }
@@ -164,7 +166,6 @@ class InputBarView: UIView {
     private func initSendButtonStatus() {
         let isEnabled = !BarrageManager.shared.inputString.isEmpty
         rightSendButton.isEnabled = isEnabled
-        rightSendButton.backgroundColor = isEnabled ? .b1 : .btnDisabledColor
     }
     
     override init(frame: CGRect) {
@@ -210,10 +211,8 @@ extension InputBarView: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         if textView.text.isEmpty {
             rightSendButton.isEnabled = false
-            rightSendButton.backgroundColor = .btnDisabledColor
         } else {
             rightSendButton.isEnabled = true
-            rightSendButton.backgroundColor = .b1
         }
         delegate?.inputBarEmptyChanged(isEmpty: textView.text.isEmpty)
     }

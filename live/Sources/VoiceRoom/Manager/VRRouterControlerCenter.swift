@@ -9,6 +9,7 @@ import Combine
 import RTCCommon
 import RTCRoomEngine
 import RTCCommon
+import AtomicX
 
 class VRRouterControlCenter {
     
@@ -110,16 +111,14 @@ extension VRRouterControlCenter {
         if let view = getRouteDefaultView(route: route) {
             var presentedViewController: UIViewController = UIViewController()
             switch route {
-            case .alert(_, _):
-                presentedViewController = presentAlert(alertView: view)
-            case .listMenu(_, let layout):
-                if layout == .center {
-                    presentedViewController = presentPopup(view: view, route: route, portraitPosition: .center(horizontalPadding: 47.scale375()))
+            case .custom(let item):
+                if let alertView = item.view as? AtomicAlertView {
+                    presentedViewController = presentAtomicAlert(alert: alertView, config: item.config)
                 } else {
-                    presentedViewController = presentPopup(view: view, route: route)
+                    presentedViewController = presentPopover(view: item.view, config: item.config)
                 }
             default:
-                presentedViewController = presentPopup(view: view, route: route)
+                presentedViewController = presentPopover(view: view, config: .bottomDefault())
             }
             presentedRouteStack.append(route)
             presentedViewControllerMap[route] = presentedViewController
@@ -134,7 +133,7 @@ extension VRRouterControlCenter {
             if let rootViewController = rootViewController,
                let presentedController = presentedViewControllerMap[route] {
                 let presentingViewController = getPresentingViewController(rootViewController)
-                presentingViewController.present(presentedController, animated: supportAnimation(route: route))
+                presentingViewController.present(presentedController, animated: false)
                 presentedRouteStack.append(route)
                 isSuccess = true
             }
@@ -150,13 +149,13 @@ extension VRRouterControlCenter {
             
             if let route = presentedRouteStack.popLast(), let vc = presentedViewControllerMap[route] {
                 if let dismissEvent = routerManager.routerState.dismissEvent {
-                    vc.dismiss(animated: supportAnimation(route: route)) { [weak self] in
+                    vc.dismiss(animated: false) { [weak self] in
                         guard let self = self else { return }
                         dismissEvent()
                         self.routerManager.clearDismissEvent()
                     }
                 } else {
-                    vc.dismiss(animated: supportAnimation(route: route))
+                    vc.dismiss(animated: false)
                 }
                 if isTempPanel(route: route) {
                     presentedViewControllerMap[route] = nil
@@ -181,6 +180,9 @@ extension VRRouterControlCenter {
 // MARK: - Default Route View
 extension VRRouterControlCenter {
     private func getRouteDefaultView(route: VRRoute) -> UIView? {
+        if case .custom(let item) = route {
+            return item.view
+        }
         var view: UIView?
         switch route {
         case .voiceLinkControl:
@@ -198,13 +200,6 @@ extension VRRouterControlCenter {
                 self.routerManager.router(action: .dismiss())
             }
             view = audioEffect
-        case .listMenu(let data, _):
-            let actionPanel = ActionPanel(panelData: data)
-            actionPanel.cancelActionClosure = { [weak self] in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            view = actionPanel
         case .systemImageSelection(let imageType, let sceneType):
             let imageConfig = VRSystemImageFactory.getImageAssets(imageType: imageType)
             let systemImageSelectionPanel = VRImageSelectionPanel(configs: imageConfig,
@@ -224,14 +219,14 @@ extension VRRouterControlCenter {
         case .layout(let prepareStore):
             view = VRLayoutPanel(prepareStore: prepareStore, routerManager: routerManager)
         case .connectionControl:
-                let panel = VRCoHostManagerPanel(liveID: liveID,toastService: toastService,routerManager: routerManager)
+                let panel = interactionInvitePanel(liveID: liveID,toastService: toastService,routerManager: routerManager)
             panel.onClickBack = { [weak self] in
                 guard let self = self else { return }
                 routerManager.router(action: .dismiss())
             }
             view = panel
         case .coHostUserControl(let seatInfo,let type):
-            let panel = VRCoHostUserManagerPanel(liveID: liveID,seatInfo: seatInfo, routerManager: routerManager, type: type, toastService: toastService)
+            let panel = CoHostViewManagerPanel(liveID: liveID,seatInfo: seatInfo, routerManager: routerManager, type: type, toastService: toastService)
             view = panel
         default:
             break
@@ -250,79 +245,49 @@ extension VRRouterControlCenter {
             return false
         }
     }
-    
-    private func supportBlurView(route: VRRoute) -> Bool {
-        switch route {
-        case .giftView:
-            return false
-        case .layout:
-            return false
-        case .listMenu(_, let layout):
-            return layout == .center
-        default:
-            return true
-        }
-    }
-    
-    private func supportAnimation(route: VRRoute) -> Bool{
-        switch route {
-        default:
-            return true
-        }
-    }
-    
-    private func getSafeBottomViewBackgroundColor(route: VRRoute) -> UIColor {
-        var safeBottomViewBackgroundColor = UIColor.g2
-        switch route {
-        case .listMenu(_, _):
-            safeBottomViewBackgroundColor = .white
-        case .featureSetting(_), .giftView, .connectionControl:
-            safeBottomViewBackgroundColor = .bgOperateColor
-        default:
-            break
-        }
-        return safeBottomViewBackgroundColor
-    }
 }
 
-// MARK: - Popup
+// MARK: - AtomicPopover
 extension VRRouterControlCenter {
-    private func presentPopup(view: UIView, route: VRRoute, portraitPosition: MenuContainerViewPosition = .bottom) -> UIViewController {
-        let safeBottomViewBackgroundColor = getSafeBottomViewBackgroundColor(route: route)
-        let menuContainerView = MenuContainerView(contentView: view,
-                                                  safeBottomViewBackgroundColor: safeBottomViewBackgroundColor,
-                                                  portraitPosition: portraitPosition)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.routerManager.router(action: .dismiss())
+    
+    private func presentAtomicAlert(alert: AtomicAlertView, config: RouteItemConfig) -> UIViewController {
+        var popover: AtomicPopover
+        if config.position == .bottom {
+            let popoverConfig = AtomicPopover.AtomicPopoverConfig(onBackdropTap: { [weak self] in
+                self?.routerManager.router(action: .dismiss())
+            })
+            popover = AtomicPopover(contentView: alert, configuration: popoverConfig)
+        } else {
+            let popoverConfig = AtomicPopover.AtomicPopoverConfig.centerDefault()
+            popover = AtomicPopover(contentView: alert, configuration: popoverConfig)
         }
-        guard let rootViewController = rootViewController else { return UIViewController() }
-        let presentingViewController = getPresentingViewController(rootViewController)
-        let alertTransitionAnimator = AlertTransitionAnimator(duration: 0.5,transitionStyle: .present,transitionPosition: .fade)
-        if portraitPosition != .bottom {
-            let popupViewController = PopupViewController(contentView: menuContainerView,
-                                                          supportBlurView: supportBlurView(route: route),alertTransitionAnimator: alertTransitionAnimator)
-            presentingViewController.present(popupViewController, animated: true)
-            return popupViewController
-        } else  {
-            let popupViewController = PopupViewController(contentView: menuContainerView,supportBlurView: supportBlurView(route: route))
-            presentingViewController.present(popupViewController, animated: true)
-            return popupViewController
-        }
-    }
-}
-
-// MARK: - Alert
-extension VRRouterControlCenter {
-    private func presentAlert(alertView: UIView) -> UIViewController {
-        let alertContainerView = VRAlertContainerView(contentView: alertView)
-        let alertTransitionAnimator = AlertTransitionAnimator(duration: 0.2,transitionStyle: .present,transitionPosition: .fade)
-        let popupViewController = PopupViewController(contentView: alertContainerView,
-                                                      supportBlurView: true,alertTransitionAnimator: alertTransitionAnimator)
         guard let rootViewController = rootViewController else { return UIViewController()}
         let presentingViewController = getPresentingViewController(rootViewController)
-        presentingViewController.present(popupViewController, animated: true)
+        presentingViewController.present(popover, animated: false)
 
-        return popupViewController
+        return popover
+    }
+
+    private func presentPopover(view: UIView, config: RouteItemConfig) -> UIViewController {
+        let position: PopoverPosition = config.position == .bottom ? .bottom : .center
+        let animation: PopoverAnimation = config.position == .bottom ? .slideFromBottom : .none
+
+        let popoverConfig = AtomicPopover.AtomicPopoverConfig(
+            position: position,
+            height: .wrapContent,
+            animation: animation,
+            backgroundColor: config.backgroundColor,
+            onBackdropTap: { [weak self] in
+                self?.routerManager.router(action: .dismiss())
+            }
+        )
+
+        let popover = AtomicPopover(contentView: view, configuration: popoverConfig)
+
+        guard let rootViewController = rootViewController else { return UIViewController() }
+        let presentingViewController = getPresentingViewController(rootViewController)
+        presentingViewController.present(popover, animated: false)
+
+        return popover
     }
 }

@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RTCRoomEngine
+import AtomicXCore
 
 @objc
 public class TUICallKit: NSObject {
@@ -25,64 +25,8 @@ public class TUICallKit: NSObject {
      * @param avatar   User profile photo URL, which can contain up to 500 bytes
      * For example: https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png
      */
-    @objc
-    public func setSelfInfo(nickname: String, avatar: String, succ:@escaping TUICallSucc, fail: @escaping TUICallFail) {
-        return TUICallKitImpl.shared.setSelfInfo(nickname: nickname, avatar: avatar, succ: succ, fail: fail)
-    }
-    
-    /**
-     * Make a call
-     *
-     * @param userId        callees
-     * @param callMediaType Call type
-     */
-    @available(*, deprecated, message: "This interface has been deprecated, please use the 'calls' interface.")
-    @objc
-    public func call(userId: String, callMediaType: TUICallMediaType) {
-        return TUICallKitImpl.shared.call(userId: userId, callMediaType: callMediaType)
-    }
-    
-    /**
-     * Make a call
-     *
-     * @param userId        callees
-     * @param callMediaType Call type
-     * @param params        Extension param: eg: offlinePushInfo
-     */
-    @available(*, deprecated, message: "This interface has been deprecated, please use the 'calls' interface.")
-    @objc
-    public func call(userId: String, callMediaType: TUICallMediaType, params: TUICallParams,
-                     succ: @escaping TUICallSucc, fail: @escaping TUICallFail) {
-        return TUICallKitImpl.shared.call(userId: userId, callMediaType: callMediaType, params: params, succ: succ, fail: fail)
-    }
-    
-    /**
-     * Make a group call
-     *
-     * @param groupId       GroupId
-     * @param userIdList    List of userId
-     * @param callMediaType Call type
-     */
-    @available(*, deprecated, message: "This interface has been deprecated, please use the 'calls' interface.")
-    @objc
-    public func groupCall(groupId: String, userIdList: [String], callMediaType: TUICallMediaType) {
-        return TUICallKitImpl.shared.groupCall(groupId: groupId, userIdList: userIdList, callMediaType: callMediaType)
-    }
-    
-    /**
-     * Make a group call
-     *
-     * @param groupId       GroupId
-     * @param userIdList    List of userId
-     * @param callMediaType Call type
-     * @param params        Extension param: eg: offlinePushInfo
-     */
-    @available(*, deprecated, message: "This interface has been deprecated, please use the 'calls' interface.")
-    @objc
-    public func groupCall(groupId: String, userIdList: [String], callMediaType: TUICallMediaType, params: TUICallParams,
-                          succ: @escaping TUICallSucc, fail: @escaping TUICallFail) {
-        return TUICallKitImpl.shared.groupCall(groupId: groupId, userIdList: userIdList, callMediaType: callMediaType, params: params,
-                                                 succ: succ, fail: fail)
+    public func setSelfInfo(nickname: String, avatar: String, completion: CompletionClosure?) {
+        return TUICallKitImpl.shared.setSelfInfo(nickname: nickname, avatar: avatar, completion: completion)
     }
     
     /**
@@ -92,11 +36,8 @@ public class TUICallKit: NSObject {
      * @param callMediaType Call type
      * @param params        Extension param: eg: offlinePushInfo
      */
-    @objc
-    public func calls(userIdList: [String], callMediaType: TUICallMediaType, params: TUICallParams?,
-                      succ: @escaping TUICallSucc, fail: @escaping TUICallFail) {
-        return TUICallKitImpl.shared.calls(userIdList: userIdList, callMediaType: callMediaType, params: params,
-                                             succ: succ, fail: fail)
+    public func calls(userIdList: [String], callMediaType: CallMediaType, params: CallParams?, completion: CompletionClosure?) {
+        return TUICallKitImpl.shared.calls(userIdList: userIdList, callMediaType: callMediaType, params: params, completion: completion)
     }
   
     /**
@@ -105,21 +46,8 @@ public class TUICallKit: NSObject {
      * @param callId        current call ID
      * @param callMediaType call type
      */
-    @objc
-    public func join(callId: String) {
-        return TUICallKitImpl.shared.join(callId: callId)
-    }
-    
-    /**
-     * Join a current call
-     *
-     * @param roomId        current call room ID
-     * @param callMediaType call type
-     */
-    @available(*, deprecated, message: "This interface has been deprecated, please use the 'join' interface.")
-    @objc
-    public func joinInGroupCall(roomId: TUIRoomId, groupId: String, callMediaType: TUICallMediaType) {
-        return TUICallKitImpl.shared.joinInGroupCall(roomId: roomId, groupId: groupId, callMediaType: callMediaType)
+    public func join(callId: String, completion: CompletionClosure?) {
+        return TUICallKitImpl.shared.join(callId: callId, completion: completion)
     }
     
     /**
@@ -169,12 +97,11 @@ public class TUICallKit: NSObject {
     }
     
     /**
-         * Set the display direction of the CallKit interface. The default value is portrait
-         * @param orientation 0-Portrait, 1-LandScape, 2-Auto;   default value: 0
-         * Note: You are advised to use portrait mode to avoid abnormal display for small screen devices such as mobile phone
-         */
-    @objc
-    public func setScreenOrientation(orientation: Int, succ:@escaping TUICallSucc, fail: @escaping TUICallFail) {
-        return TUICallKitImpl.shared.setScreenOrientation(orientation: orientation, succ: succ, fail: fail)
+     * Set the display direction of the CallKit interface. The default value is portrait
+     * @param orientation 0-Portrait, 1-LandScape, 2-Auto;   default value: 0
+     * Note: You are advised to use portrait mode to avoid abnormal display for small screen devices such as mobile phone
+     */
+    public func setScreenOrientation(orientation: Int, completion: CompletionClosure?) {
+        return TUICallKitImpl.shared.setScreenOrientation(orientation: orientation, completion: completion)
     }
 }

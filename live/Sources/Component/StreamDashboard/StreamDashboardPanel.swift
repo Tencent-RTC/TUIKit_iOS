@@ -6,36 +6,26 @@
 //
 
 import Foundation
-import RTCRoomEngine
+import AtomicX
 
 class StreamDashboardPanel: UIView {
     
-    private let manager: StreamDashboardManager
+    private let liveID: String
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = .dashboardText
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = .textPrimaryColor
+    private lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.dashboardText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.textAlignment = .center
         return label
     }()
     
-    private lazy var networkInfoView: StreamDashboardNetView = {
-        let view = StreamDashboardNetView(manager: manager)
-        
-        return view
-    }()
+    private lazy var networkInfoView = StreamDashboardNetView()
+    private lazy var mediaView = StreamDashboardMediaView(liveID: liveID)
     
-    private lazy var mediaView: StreamDashboardMediaView = {
-        let view = StreamDashboardMediaView(manager: manager)
-        
-        return view
-    }()
-    
-    init(roomId: String, roomEngine: TUIRoomEngine) {
-        let service = EngineStreamDashboardService(roomEngine: roomEngine)
-        self.manager = StreamDashboardManager(service: service, roomId: roomId)
+    init(liveID: String) {
+        self.liveID = liveID
         super.init(frame: .zero)
     }
     
@@ -43,9 +33,6 @@ class StreamDashboardPanel: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        manager.removeObserver()
-    }
     
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -54,7 +41,6 @@ class StreamDashboardPanel: UIView {
         isViewReady = true
         constructViewHierarchy()
         activateConstraints()
-        bindInteraction()
         setupViewStyle()
     }
     
@@ -83,10 +69,6 @@ extension StreamDashboardPanel {
             make.top.equalTo(networkInfoView.snp.bottom).offset(8.scale375Height())
             make.bottom.equalToSuperview()
         }
-    }
-    
-    private func bindInteraction() {
-        manager.addObserver()
     }
     
     private func setupViewStyle() {

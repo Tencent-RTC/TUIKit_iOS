@@ -8,10 +8,11 @@
 import Foundation
 import TUICore
 import RTCCommon
+import AtomicXCore
 
 class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-        
-    var groupMemberList: Observable<[User]> = Observable([])
+    
+    var groupMemberList: [CallParticipantInfo] = []
     var groupMemberState: [String: Bool] = [:]
     var groupMemberStateOrigin: [String: Bool] = [:]
 
@@ -73,6 +74,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
     
     // MARK: UI Specification Processing
     override func viewDidLoad() {
+        super.viewDidLoad()
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
@@ -80,7 +82,6 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
     
     func constructViewHierarchy() {
         view.addSubview(navigationView)
-        view.addSubview(leftBtn)
         view.addSubview(leftBtn)
         view.addSubview(centerLabel)
         view.addSubview(rightBtn)
@@ -145,53 +146,64 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
     
     //MARK: other private
     private func getGroupMember() {
-        V2TIMManager.sharedInstance().getGroupMemberList(CallManager.shared.callState.chatGroupId.value,
+        let groupId = CallStore.shared.state.value.activeCall.chatGroupId
+        guard !groupId.isEmpty else { return }
+        
+        V2TIMManager.sharedInstance().getGroupMemberList(groupId,
                                                          filter: .max,
                                                          nextSeq: 0) { [weak self] nextSeq, imUserInfoList in
             guard let self = self else { return }
             guard let imUserInfoList = imUserInfoList else { return }
+
+            let selfId = CallStore.shared.state.value.selfInfo.id
             
-            for imUserInfo in imUserInfoList {
-                if imUserInfo.userID == CallManager.shared.userState.selfUser.id.value {
+            for imUserInfoList in imUserInfoList {
+                if imUserInfoList.userID == selfId {
                     continue
                 }
-                let user = UserManager.convertUserFromImFullInfo(user: imUserInfo)
-                self.groupMemberList.value.append(user)
-                self.groupMemberState[user.id.value] = false
-                self.groupMemberStateOrigin[user.id.value] = false
+
+                var participant = CallParticipantInfo()
+                participant.id = imUserInfoList.userID ?? ""
+                participant.name = imUserInfoList.nickName ?? ""
+                participant.avatarURL = imUserInfoList.faceURL ?? ""
+                
+                self.groupMemberList.append(participant)
+                self.groupMemberState[participant.id] = false
+                self.groupMemberStateOrigin[participant.id] = false
             }
-            
-            for user in CallManager.shared.userState.remoteUserList.value {
-                self.groupMemberState[user.id.value] = true
-                self.groupMemberStateOrigin[user.id.value] = true
+
+            let allParticipants = CallStore.shared.state.value.allParticipants
+            for user in allParticipants {
+                self.groupMemberState[user.id] = true
+                self.groupMemberStateOrigin[user.id] = true
             }
             
             self.selectTableView.reloadData()
-        } fail: { code, message in
             
+        } fail: { code, message in
+            print("getGroupMemberList failed, code: \(code), message: \(message ?? "")")
         }
     }
     
     // MARK: Action
     @objc func addUser() {
         var userIds: [String] = []
-        for state in groupMemberStateOrigin {
-            if state.value {
+        for (userId, isOriginSelected) in groupMemberStateOrigin {
+            if isOriginSelected {
                 continue
             }
-            if let isSelect = groupMemberState[state.key] {
-                if isSelect {
-                    userIds.append(state.key)
-                }
+            if let isNowSelected = groupMemberState[userId], isNowSelected {
+                userIds.append(userId)
             }
         }
         
-        if userIds.count + CallManager.shared.userState.remoteUserList.value.count >=  MAX_USER {
+        let currentParticipantCount = CallStore.shared.state.value.allParticipants.count
+        if userIds.count + currentParticipantCount >=  MAX_USER {
             Toast.showToast(TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit"))
             return
         }
         
-        CallManager.shared.inviteUser(userIds: userIds) { } fail: { code, message in }
+        CallStore.shared.invite(participantIds: userIds, params: nil, completion: nil)
         dismiss(animated: true)
     }
     
@@ -204,7 +216,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
 extension SelectGroupMemberViewController {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return groupMemberList.value.count + 1
+        return groupMemberList.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -214,10 +226,11 @@ extension SelectGroupMemberViewController {
         }
         
         if indexPath.row == 0 {
-            cell.configCell(user: CallManager.shared.userState.selfUser, isSelect: true)
+            let selfUser = CallStore.shared.state.value.selfInfo
+            cell.configCell(user: selfUser, isSelect: true)
         } else {
-            let user = groupMemberList.value[indexPath.row - 1]
-            let isSelect = groupMemberState[user.id.value]
+            let user = groupMemberList[indexPath.row - 1]
+            let isSelect = groupMemberState[user.id]
             cell.configCell(user: user, isSelect: isSelect ?? false)
         }
         
@@ -232,16 +245,16 @@ extension SelectGroupMemberViewController {
         if indexPath.row == 0 {
             return
         }
-        
-        let user = groupMemberList.value[indexPath.row - 1]
-        if groupMemberStateOrigin[user.id.value] ?? false {
+
+        let user = groupMemberList[indexPath.row - 1]
+        if groupMemberStateOrigin[user.id] ?? false {
             return
         }
         
-        if groupMemberState[user.id.value] ?? false {
-            groupMemberState[user.id.value] = false
+        if groupMemberState[user.id] ?? false {
+            groupMemberState[user.id] = false
         } else {
-            groupMemberState[user.id.value] = true
+            groupMemberState[user.id] = true
         }
         selectTableView.reloadData()
     }

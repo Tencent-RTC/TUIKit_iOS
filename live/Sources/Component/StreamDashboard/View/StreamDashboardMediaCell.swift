@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 import RTCCommon
+import AtomicXCore
+import AtomicX
 
 class StreamDashboardMediaCell: UICollectionViewCell {
     static let CellID: String = "StreamDashboardMediaCell"
@@ -31,11 +33,11 @@ class StreamDashboardMediaCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 14, weight: .medium)
-        label.textColor = .textPrimaryColor
-        label.textAlignment = .left
+    private lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium14)
+        }
         return label
     }()
     
@@ -45,11 +47,11 @@ class StreamDashboardMediaCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var videoTitleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.text = .videoText
-        label.font = .customFont(ofSize: 12, weight: .medium)
-        label.textColor = .textPrimaryColor
+    private lazy var videoTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.videoText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium12)
+        }
         return label
     }()
     
@@ -66,11 +68,11 @@ class StreamDashboardMediaCell: UICollectionViewCell {
         return view
     }()
     
-    private lazy var audioTitleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.text = .audioText
-        label.font = .customFont(ofSize: 12, weight: .medium)
-        label.textColor = .textPrimaryColor
+    private lazy var audioTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.audioText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium12)
+        }
         return label
     }()
     
@@ -114,13 +116,13 @@ class StreamDashboardMediaCell: UICollectionViewCell {
         return layoutAttributes
     }
     
-    private var data: StreamDashboardUser = StreamDashboardUser()
-    func updateData(_ data: StreamDashboardUser) {
+    private var data: AVStatistics?
+    func updateData(_ data: AVStatistics) {
         self.data = data
-        if data.isLocal {
+        if data.userID.isEmpty {
             titleLabel.text = .localText
         } else {
-            titleLabel.text = .remoteText + ": \(data.userId)"
+            titleLabel.text = .remoteText + ": \(data.userID)"
         }
         self.videoTableView.reloadData()
         self.audioTableView.reloadData()
@@ -209,13 +211,13 @@ extension StreamDashboardMediaCell {
         switch dataType {
         case .bitrate:
             cell.titleLabel.text = .bitrateText
-            cell.valueLabel.text = "\(data.videoBitrate) kbps"
+            cell.valueLabel.text = "\(data?.videoBitrate ?? 0) kbps"
         case .fps:
             cell.titleLabel.text = .videoFrameRateText
-            cell.valueLabel.text = "\(data.videoFrameRate) FPS"
+            cell.valueLabel.text = "\(data?.frameRate ?? 0) FPS"
         case .resolution:
             cell.titleLabel.text = .videoResolutionText
-            cell.valueLabel.text = "\(data.videoResolution)"
+            cell.valueLabel.text = "\(Int(data?.videoWidth ?? 0))x\(Int(data?.videoHeight ?? 0))"
         }
     }
     
@@ -223,10 +225,10 @@ extension StreamDashboardMediaCell {
         switch dataType {
         case .bitrate:
             cell.titleLabel.text = .bitrateText
-            cell.valueLabel.text = "\(data.audioBitrate) kbps"
+            cell.valueLabel.text = "\(data?.audioBitrate ?? 0) kbps"
         case .sampleRate:
             cell.titleLabel.text = .audioSampleRateText
-            cell.valueLabel.text = "\(data.audioSampleRate) Hz"
+            cell.valueLabel.text = "\(data?.audioSampleRate ?? 0) Hz"
         }
     }
 }
@@ -266,18 +268,20 @@ class StreamDashboardMediaItemCell: UITableViewCell {
     static let CellID: String = "StreamDashboardMediaItemCell"
     static let CellHeight: CGFloat = 20.scale375Height()
     
-    lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 12)
-        label.textColor = .textSecondaryColor
+    lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
     
-    lazy var valueLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 12)
-        label.textColor = .textPrimaryColor
+    lazy var valueLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular12)
+        }
         return label
     }()
     

@@ -137,13 +137,12 @@ private extension FloatWindow {
     }
     
     func leaveRoom() {
-        guard let coreView = coreView else { return }
-        let roomState: RoomState = coreView.getState()
-        let userState: UserState = coreView.getState()
-        if roomState.ownerInfo.userId == userState.selfInfo.userId {
-            coreView.stopLiveStream() {_ in} onError: { _, _ in }
+        let store = LiveListStore.shared
+        let state = store.state.value
+        if state.currentLive.liveOwner.userID == LoginStore.shared.state.value.loginUserInfo?.userID {
+            store.endLive(completion: nil)
         } else {
-            coreView.leaveLiveStream() {} onError: { _, _ in }
+            store.leaveLive(completion: nil)
         }
     }
 }

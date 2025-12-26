@@ -8,7 +8,7 @@
 import AtomicXCore
 import RTCCommon
 import TUICore
-
+import AtomicX
 public enum AudienceViewFeature {
     case sliding
     case floatWin
@@ -156,7 +156,7 @@ extension AudienceContainerView {
     }
     
     private func disableFeature(_ feature: AudienceViewFeature, isDisable: Bool) {
-        AudienceManager.disableFeature(feature, isDisable: isDisable)
+        AudienceStore.disableFeature(feature, isDisable: isDisable)
     }
 }
 
@@ -262,7 +262,7 @@ extension AudienceContainerView: LiveListViewDelegate {
 }
 
 extension AudienceContainerView: AudienceListCellDelegate {
-    func handleScrollToNewRoom(roomId: String, ownerId: String, manager: AudienceManager,
+    func handleScrollToNewRoom(roomId: String, ownerId: String, manager: AudienceStore,
                                coreView: LiveCoreView,
                                relayoutCoreViewClosure: @escaping () -> Void)
     {
@@ -277,8 +277,8 @@ extension AudienceContainerView: AudienceListCellDelegate {
         delegate?.onClickFloatWindow()
     }
     
-    func showToast(message: String) {
-        makeToast(message: message)
+    func showAtomicToast(message: String, toastStyle: ToastStyle) {
+        showAtomicToast(text: message, style: toastStyle)
     }
     
     func disableScrolling() {

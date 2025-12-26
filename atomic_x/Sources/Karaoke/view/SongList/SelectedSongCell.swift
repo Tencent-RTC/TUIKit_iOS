@@ -9,6 +9,7 @@ import SnapKit
 import Combine
 import Kingfisher
 import RTCCommon
+import RTCRoomEngine
 
 class SelectedSongCell: UITableViewCell {
     private let indexLabel: UILabel = {
@@ -51,11 +52,13 @@ class SelectedSongCell: UITableViewCell {
         return label
     }()
 
-    private let avatarImage: UIImageView = {
-        let view = UIImageView()
-        view.layer.cornerRadius = 14.scale375()/2
-        view.layer.masksToBounds = true
-        return view
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .text(name: ""),
+            size: .xxs,
+            shape: .round
+        )
+        return avatar
     }()
 
     private let topButton: UIButton = {
@@ -112,7 +115,7 @@ class SelectedSongCell: UITableViewCell {
         contentView.addSubview(coverImageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(userNameLabel)
-        contentView.addSubview(avatarImage)
+        contentView.addSubview(avatarView)
         contentView.addSubview(topButton)
         contentView.addSubview(removeButton)
         contentView.addSubview(playPauseButton)
@@ -144,15 +147,14 @@ class SelectedSongCell: UITableViewCell {
             make.right.lessThanOrEqualToSuperview().offset(-10)
         }
 
-        avatarImage.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.left.equalTo(titleLabel)
             make.top.equalTo(titleLabel.snp.bottom).offset(6.scale375())
-            make.width.height.equalTo(14.scale375())
         }
 
         userNameLabel.snp.makeConstraints { make in
-            make.left.equalTo(avatarImage.snp.right).offset(4.scale375())
-            make.top.equalTo(avatarImage.snp.top)
+            make.left.equalTo(avatarView.snp.right).offset(4.scale375())
+            make.top.equalTo(avatarView.snp.top)
             make.bottom.equalToSuperview().offset(-16)
         }
 
@@ -169,17 +171,19 @@ class SelectedSongCell: UITableViewCell {
 
     func configure(with song: MusicInfo, at index: Int) {
         titleLabel.text = song.musicName
-        if karaokeManager?.karaokeState.selectedSongs[index].userName == "" {
-            userNameLabel.text = karaokeManager?.karaokeState.selectedSongs[index].userId
+        if karaokeManager?.karaokeState.selectedSongs[index].requester.userName == "" {
+            userNameLabel.text = karaokeManager?.karaokeState.selectedSongs[index].requester.userId
         } else {
-            userNameLabel.text = karaokeManager?.karaokeState.selectedSongs[index].userName
+            userNameLabel.text = karaokeManager?.karaokeState.selectedSongs[index].requester.userName
         }
         if song.coverUrl == "" {
             coverImageView.image = UIImage.atomicXBundleImage(named: "ktv_coverUrl")
         } else {
             coverImageView.kf.setImage(with: URL(string: song.coverUrl), placeholder: UIImage.avatarPlaceholderImage)
         }
-        avatarImage.kf.setImage(with: URL(string: karaokeManager?.karaokeState.selectedSongs[index].avatarUrl ?? ""), placeholder: UIImage.avatarPlaceholderImage)
+        
+        let avatarUrl = karaokeManager?.karaokeState.selectedSongs[index].requester.avatarUrl ?? ""
+        avatarView.setContent(.url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage))
 
         self.musicId = song.musicId
         if index == 0 {
@@ -275,7 +279,7 @@ class SelectedSongCell: UITableViewCell {
 
     @objc private func topButtonTapped() {
         guard let karaokeManager = karaokeManager else {return}
-        karaokeManager.prioritizeMusic(musicId: self.musicId)
+        karaokeManager.setNextSong(musicId: self.musicId)
     }
 
     @objc private func removeButtonTapped() {

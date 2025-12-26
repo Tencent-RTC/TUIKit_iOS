@@ -11,6 +11,7 @@ import Combine
 import AtomicXCore
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 class VRSeatManagerPanel: RTCBaseView {
     private let liveID: String
@@ -22,20 +23,20 @@ class VRSeatManagerPanel: RTCBaseView {
     private lazy var seatListPublisher = seatStore.state.subscribe(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
     private lazy var seatApplicationPublisher = coGuestStore.state.subscribe(StatePublisherSelector(keyPath: \CoGuestState.applicants))
     
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = UIFont.customFont(ofSize: 20)
-        label.text = .seatControlTitleText
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.seatControlTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular20)
+        }
         return label
     }()
     
-    private let changeSeatModeLabel: UILabel = {
-        let label = UILabel(frame: .zero)
+    private let changeSeatModeLabel: AtomicLabel = {
+        let label = AtomicLabel(.needRequestText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .g7
-        label.text = .needRequestText
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -62,17 +63,19 @@ class VRSeatManagerPanel: RTCBaseView {
         return tableView
     }()
     
-    private lazy var onTheSeatHeaderLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = .customFont(ofSize: 16, weight: .medium)
+    private lazy var onTheSeatHeaderLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
     
-    private lazy var applySeatHeaderLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = .customFont(ofSize: 16, weight: .medium)
+    private lazy var applySeatHeaderLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
     
@@ -81,21 +84,22 @@ class VRSeatManagerPanel: RTCBaseView {
         return view
     }()
     
-    private let inviteTipsLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.text = .inviteAudienceText
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .tipsGrayColor
+    private let inviteTipsLabel: AtomicLabel = {
+        let label = AtomicLabel(.inviteAudienceText) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Medium16)
+        }
         label.numberOfLines = 1
         return label
     }()
     
-    private let inviteButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setTitle(.inviteText, for: .normal)
-        button.backgroundColor = .b1
-        button.titleLabel?.font = .customFont(ofSize: 20, weight: .semibold)
-        button.layer.cornerRadius = 20.scale375Height()
+    private let inviteButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .medium,
+            content: .textOnly(text: .inviteText)
+        )
         return button
     }()
     
@@ -202,8 +206,10 @@ class VRSeatManagerPanel: RTCBaseView {
         tableView.delegate = self
         tableView.dataSource = self
         seatModeSwitch.addTarget(self, action: #selector(seatModeSwitchClick(sender:)), for: .valueChanged)
-        inviteButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
-        inviteImageButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
+        inviteButton.setClickAction { [weak self] _ in
+            self?.inviteButtonClick()
+        }
+        inviteImageButton.addTarget(self, action: #selector(inviteImageButtonClick), for: .touchUpInside)
         subscribeOnSeatListState()
         subscribeApplyTakeSeatState()
         subscribeSeatModeState()
@@ -255,9 +261,9 @@ class VRSeatManagerPanel: RTCBaseView {
             .store(in: &cancellableSet)
         
         toastService
-            .subscribeToast { [weak self] message in
+            .subscribeToast { [weak self] message,style in
                 guard let self = self else { return }
-                self.makeToast(message: message)
+                self.showAtomicToast(text: message, style: style)
             }
     }
     
@@ -283,7 +289,7 @@ extension VRSeatManagerPanel {
         var currentLive = liveListStore.state.value.currentLive
         guard !currentLive.isEmpty else {
             let err = InternalError(code: TUIError.failed.rawValue, message: "Not in room")
-            toastService.showToast(err.localizedMessage)
+            toastService.showToast(err.localizedMessage, toastStyle: .error)
             return
         }
         currentLive.seatMode = sender.isOn ? .apply : .free
@@ -292,13 +298,17 @@ extension VRSeatManagerPanel {
             guard let self = self else { return }
             if case .failure(let error) = result {
                 let err = InternalError(errorInfo: error)
-                toastService.showToast(err.localizedMessage)
+                toastService.showToast(err.localizedMessage, toastStyle: .error)
             }
         }
     }
     
     @objc
-    private func inviteButtonClick(sender: UIButton) {
+    private func inviteImageButtonClick() {
+        routerManager.router(action: .present(.linkInviteControl(-1)))
+    }
+    
+    private func inviteButtonClick() {
         routerManager.router(action: .present(.linkInviteControl(-1)))
     }
     
@@ -391,7 +401,7 @@ extension VRSeatManagerPanel: UITableViewDataSource {
                         guard let self = self else { return }
                         if case .failure(let error) = result {
                             let err = InternalError(errorInfo: error)
-                            toastService.showToast(err.localizedMessage)
+                            toastService.showToast(err.localizedMessage, toastStyle: .error)
                         }
                     }
                 }
@@ -406,7 +416,7 @@ extension VRSeatManagerPanel: UITableViewDataSource {
                     let seatAllToken = seatStore.state.value.seatList.prefix(KSGConnectMaxSeatCount).allSatisfy({ $0.isLocked || $0.userInfo.userID != "" })
 
                     if seatAllToken && coHostStore.state.value.connected.count != 0 {
-                        toastService.showToast(.seatAllTakenText)
+                        toastService.showToast(.seatAllTakenText, toastStyle: .warning)
                         return
                     }
                     coGuestStore.acceptApplication(userID: seatApplication.userID) { [weak self] result in
@@ -414,7 +424,7 @@ extension VRSeatManagerPanel: UITableViewDataSource {
                         //TODO: 成功后会刷新申请列表，评估下是否需要
                         if case .failure(let error) = result {
                             let err = InternalError(errorInfo: error)
-                            toastService.showToast(err.localizedMessage)
+                            toastService.showToast(err.localizedMessage, toastStyle: .error)
                         }
                     }
                 }
@@ -426,7 +436,7 @@ extension VRSeatManagerPanel: UITableViewDataSource {
                         //TODO: 成功后会刷新申请列表，评估下是否需要
                         if case .failure(let error) = result {
                             let err = InternalError(errorInfo: error)
-                            toastService.showToast(err.localizedMessage)
+                            toastService.showToast(err.localizedMessage, toastStyle: .error)
                         }
                     }
                 }

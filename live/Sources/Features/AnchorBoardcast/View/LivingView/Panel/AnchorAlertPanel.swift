@@ -7,6 +7,7 @@
 
 import UIKit
 import RTCCommon
+import AtomicX
 
 typealias AnchorAlertButtonClickClosure = (AnchorAlertPanel) -> Void
 
@@ -62,11 +63,13 @@ class AnchorAlertPanel: UIView {
         return view
     }()
     
-    let avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 12.scale375()
-        imageView.layer.masksToBounds = true
-        return imageView
+    let avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .xs,
+            shape: .round
+        )
+        return avatar
     }()
     
     let descriptionLabel: UILabel = {
@@ -165,7 +168,7 @@ extension AnchorAlertPanel {
         addSubview(alertContentView)
         alertContentView.addSubview(descriptionContentView)
         if alertInfo.imagePath != nil {
-            descriptionContentView.addSubview(avatarImageView)
+            descriptionContentView.addSubview(avatarView)
         }
         descriptionContentView.addSubview(descriptionLabel)
         alertContentView.addSubview(horizontalSeparator)
@@ -192,15 +195,15 @@ extension AnchorAlertPanel {
         }
         
         if alertInfo.imagePath != nil {
-            avatarImageView.snp.makeConstraints { make in
+            avatarView.snp.makeConstraints { make in
                 make.leading.equalToSuperview()
                 make.trailing.equalTo(descriptionLabel.snp.leading).offset(-4.scale375())
                 make.centerY.equalTo(descriptionLabel.snp.centerY)
-                make.size.equalTo(CGSize(width: 24.scale375(), height: 24.scale375()))
+                make.size.equalTo(24.scale375())
             }
             
             descriptionLabel.snp.makeConstraints { make in
-                make.leading.equalTo(avatarImageView.snp.trailing).offset(4.scale375())
+                make.leading.equalTo(avatarView.snp.trailing).offset(4.scale375())
                 make.top.trailing.bottom.equalToSuperview()
             }
         } else {
@@ -252,7 +255,7 @@ extension AnchorAlertPanel {
     
     private func setupStyle() {
         if let imagePath = alertInfo.imagePath {
-            avatarImageView.kf.setImage(with: URL(string:imagePath), placeholder: UIImage.avatarPlaceholderImage)
+            avatarView.setContent(.url(imagePath, placeholder: UIImage.avatarPlaceholderImage))
         }
         
         descriptionLabel.text = alertInfo.description

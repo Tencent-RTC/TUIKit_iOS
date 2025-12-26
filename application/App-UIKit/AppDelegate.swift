@@ -10,6 +10,12 @@ import TUICore
 import RTCRoomEngine
 import AtomicX
 
+#if canImport(TUICallKit_Swift)
+import TUICallKit_Swift
+#elseif canImport(TUICallKit)
+import TUICallKit
+#endif
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func initKaraokeConfig() {
@@ -19,6 +25,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         initKaraokeConfig()
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(configIfLoggedIn(_:)),
+                                               name: Notification.Name("TUILoginSuccessNotification"),
+                                               object: nil)
+        
         return true
     }
 
@@ -56,6 +68,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         else {
             debugPrint("window error")
+        }
+    }
+    
+    @objc func configIfLoggedIn(_ notification: Notification) {
+        DispatchQueue.main.async {
+            TUICallKit.createInstance().enableFloatWindow(enable: SettingsConfig.share.floatWindow)
+            TUICallKit.createInstance().enableIncomingBanner(enable: SettingsConfig.share.enableIncomingBanner)
         }
     }
 }

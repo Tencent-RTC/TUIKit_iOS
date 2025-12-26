@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import AtomicXCore
+import AtomicX
 
 class LinkMicBaseCell: UITableViewCell {
     var cancellableSet: Set<AnyCancellable> = []
@@ -16,11 +17,7 @@ class LinkMicBaseCell: UITableViewCell {
             guard let seatInfo = seatInfo else {
                 return
             }
-            if let url = URL(string: seatInfo.avatarURL) {
-                avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = .avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(seatInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
             nameLabel.text = seatInfo.userName
         }
     }
@@ -29,27 +26,26 @@ class LinkMicBaseCell: UITableViewCell {
             guard let seatApplication = seatApplication else {
                 return
             }
-            if let url = URL(string: seatApplication.avatarURL) {
-                avatarImageView.kf.setImage(with: url,placeholder: UIImage.avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = .avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(seatApplication.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
             nameLabel.text = seatApplication.userName
         }
     }
     
-    lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 40.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        contentView.addSubview(imageView)
-        return imageView
+    lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        contentView.addSubview(avatar)
+        return avatar
     }()
     
-    lazy var nameLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 16)
-        label.textColor = .white
+    lazy var nameLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         return label
     }()
     

@@ -7,12 +7,13 @@
 
 import Combine
 import RTCRoomEngine
+import AtomicX
 
 class SGSeatView: UIView {
     @Published var seatInfo: TUISeatInfo
     @Published var isSpeaking: Bool = false
     @Published var isAudioMuted: Bool = true
-    
+
     private var userId: String {
         seatInfo.userId ?? ""
     }
@@ -20,30 +21,32 @@ class SGSeatView: UIView {
     private var isViewReady: Bool = false
     private var cancellableSet = Set<AnyCancellable>()
     private(set) var seatIndex: Int = -1
-    
+
     init(seatInfo: TUISeatInfo, ownerId: String) {
         self.seatInfo = seatInfo
         self.ownerId = ownerId
         super.init(frame: .zero)
         setupViewConfig()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     let soundWaveView: SGSeatSoundWaveView = {
         let view = SGSeatSoundWaveView()
         return view
     }()
-    
-    let mainImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.masksToBounds = true
-        return imageView
+
+    let mainAvatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .text(name: ""),
+            size: .l,
+            shape: .round
+        )
+        return avatar
     }()
-    
+
     let seatContentView: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .seatContentColor
@@ -91,7 +94,6 @@ class SGSeatView: UIView {
 
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        mainImageView.layer.cornerRadius = mainImageView.frame.height * 0.5
         soundWaveView.layer.cornerRadius = soundWaveView.frame.height * 0.5
         seatContentView.layer.cornerRadius = seatContentView.frame.height * 0.5
         seatContentView.layer.borderWidth = 0.5
@@ -112,11 +114,11 @@ class SGSeatView: UIView {
     }
     
     func constructViewHierarchy() {
-        addSubview(mainImageView)
+        addSubview(mainAvatarView)
         addSubview(seatContentView)
         addSubview(muteImageView)
         addSubview(nameContentView)
-        insertSubview(soundWaveView, belowSubview: mainImageView)
+        insertSubview(soundWaveView, belowSubview: mainAvatarView)
         seatContentView.addSubview(seatImageView)
         nameContentView.addSubview(ownerImageView)
         nameContentView.addSubview(nameLabel)
@@ -129,13 +131,12 @@ class SGSeatView: UIView {
             make.height.equalTo(seatContentView).multipliedBy(1.3)
         }
 
-        mainImageView.snp.makeConstraints { (make) in
+        mainAvatarView.snp.makeConstraints { (make) in
             make.top.equalToSuperview().offset(10.scale375())
-            make.size.equalTo(CGSizeMake(50, 50))
             make.centerX.equalToSuperview()
         }
         muteImageView.snp.makeConstraints { (make) in
-            make.trailing.bottom.equalTo(mainImageView)
+            make.trailing.bottom.equalTo(mainAvatarView)
             make.size.equalTo(CGSize(width: 16.scale375(), height: 16.scale375()))
         }
         
@@ -146,7 +147,7 @@ class SGSeatView: UIView {
     func activateConstraintsSeatContent() {
         seatContentView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10.scale375())
-            make.size.equalTo(CGSizeMake(50, 50))
+            make.size.equalTo(CGSizeMake(48, 48))
             make.centerX.equalToSuperview()
         }
         seatImageView.snp.makeConstraints { make in
@@ -156,7 +157,7 @@ class SGSeatView: UIView {
     
     func activateConstraintsNameContent() {
         nameContentView.snp.makeConstraints { make in
-            make.top.equalTo(mainImageView.snp.bottom).offset(4.scale375())
+            make.top.equalTo(mainAvatarView.snp.bottom).offset(4.scale375())
             make.width.lessThanOrEqualToSuperview()
             make.centerX.equalToSuperview()
             make.height.equalTo(18.scale375())
@@ -205,11 +206,7 @@ class SGSeatView: UIView {
     
     private func update(seatInfo: TUISeatInfo) {
         if let userId = seatInfo.userId, !userId.isEmpty {
-            if let avatarUrl = seatInfo.avatarUrl, let url = URL(string: avatarUrl) {
-                mainImageView.kf.setImage(with: url, placeholder: avatarPlaceholderImage)
-            } else {
-                mainImageView.image = .avatarPlaceholderImage
-            }
+            mainAvatarView.setContent(.url(seatInfo.avatarUrl ?? "", placeholder: UIImage.avatarPlaceholderImage))
             nameLabel.text = seatInfo.userName ?? ""
             toUserOnSeatStyle()
         } else {
@@ -230,16 +227,17 @@ extension SGSeatView {
         muteImageView.isHidden = true
         ownerImageView.isHidden = true
         soundWaveView.isHidden = true
-        mainImageView.image = nil
+        mainAvatarView.isHidden = true
         nameLabel.snp.remakeConstraints { make in
             make.leading.trailing.top.bottom.equalToSuperview()
         }
     }
-    
+
     private func toUserOnSeatStyle() {
         soundWaveView.isHidden = false
+        mainAvatarView.isHidden = false
         seatImageView.isHidden = true
-        ownerImageView.isHidden = !isOwner()
+        ownerImageView.isHidden = true
         ownerImageView.snp.remakeConstraints { make in
             make.leading.equalToSuperview()
             make.trailing.equalTo(nameLabel.snp.leading).offset(-1)
@@ -247,18 +245,15 @@ extension SGSeatView {
             make.size.equalTo(CGSize(width: 14, height: 14))
         }
         nameLabel.snp.remakeConstraints { (make) in
-            if isOwner() {
-                make.leading.equalTo(ownerImageView.snp.trailing).offset(1)
-            } else {
-                make.leading.equalToSuperview()
-            }
+            make.leading.equalToSuperview()
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
         }
     }
-    
+
     private func isOwner() -> Bool {
         return ownerId == seatInfo.userId
     }
 }
+

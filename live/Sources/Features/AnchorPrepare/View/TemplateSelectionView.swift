@@ -7,6 +7,7 @@
 
 import SnapKit
 import RTCCommon
+import AtomicX
 
 class TemplateSelectionView: UIView {
     var onSelectPkMode: ((LiveTemplateMode) -> ())?
@@ -62,10 +63,10 @@ class TemplateSelectionView: UIView {
             make.size.equalTo(CGSize(width: 24, height: 24))
         }
         
-        let titleLabel = UILabel(frame: .zero)
-        titleLabel.font = .customFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = .white.withAlphaComponent(0.9)
-        titleLabel.text = .titleText
+        let titleLabel = AtomicLabel(.titleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         titleView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -260,10 +261,11 @@ class TemplateSelectionHeaderView: UICollectionReusableView {
         }
     }
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 14, weight: .regular)
-        label.textColor = .white.withAlphaComponent(0.55)
+    private lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular14)
+        }
         return label
     }()
     

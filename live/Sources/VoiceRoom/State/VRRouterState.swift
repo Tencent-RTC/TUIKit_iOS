@@ -32,7 +32,6 @@ enum VRRoute {
     case linkInviteControl(_ index: Int)
     case userControl(_ imStore: VoiceRoomIMStore, _ user: TUISeatInfo)
     case featureSetting(_ settingModel: VRFeatureClickPanelModel)
-    case listMenu(_ data: ActionPanelData,_ layout: ActionPanelLayoutMode = .stickToBottom)
     case audioEffect
     case giftView
     case systemImageSelection(_ imageType: VRImageType, _ sceneType: VRImageSelectionPanel.SceneType)
@@ -40,7 +39,8 @@ enum VRRoute {
     case alert(info: VRAlertInfo,_ second: Int = 0)
     case layout(_ prepareStore: VoiceRoomPrepareStore)
     case connectionControl
-    case coHostUserControl(_ seatInfo: SeatInfo,_ type: VRCoHostUserManagerPanelType)
+    case coHostUserControl(_ seatInfo: SeatInfo,_ type: CoHostViewManagerPanelType)
+    case custom(_ item: RouteItem)
 }
 
 extension VRRoute: Equatable {
@@ -59,8 +59,6 @@ extension VRRoute: Equatable {
                 return true
             case let (.featureSetting(l), .featureSetting(r)):
                 return l == r
-            case let (.listMenu(l1,l2), .listMenu(r1,r2)):
-                return l1 == r1 && l2 == r2
             case let (.systemImageSelection(l1, l2), .systemImageSelection(r1, r2)):
                 return l1 == r1 && l2 == r2
             case let (.linkInviteControl(l), .linkInviteControl(r)):
@@ -71,6 +69,8 @@ extension VRRoute: Equatable {
                 return l1 == r1 && l2 == r2
             case let (.alert(l1,l2), .alert(r1, r2)):
                 return l1 == r1 && l2 == r2
+            case let (.custom(l), .custom(r)):
+                return l == r
             case (.anchor, _),
                 (.audience, _),
                 (.roomInfo, _),
@@ -79,7 +79,6 @@ extension VRRoute: Equatable {
                 (.linkInviteControl, _),
                 (.userControl, _),
                 (.featureSetting, _),
-                (.listMenu, _),
                 (.audioEffect, _),
                 (.giftView, _),
                 (.systemImageSelection, _),
@@ -87,7 +86,8 @@ extension VRRoute: Equatable {
                 (.alert, _),
                 (.layout,_),
                 (.coHostUserControl,_),
-                (.connectionControl,_):
+                (.connectionControl,_),
+                (.custom, _):
                 return false
             default:
                 break
@@ -114,12 +114,6 @@ extension VRRoute: Hashable {
                 return "linkInviteControl \(seatInfo.userId ?? "")"
             case .featureSetting(let settingModel):
                 return "featureSetting" + settingModel.id.uuidString
-            case .listMenu(let data,_):
-                var result = "listMenu"
-                data.items.forEach { item in
-                    result += item.id.uuidString
-                }
-                return result
             case .audioEffect:
                 return "audioEffect"
             case .giftView:
@@ -136,6 +130,8 @@ extension VRRoute: Hashable {
                 return "connectionControl"
             case .coHostUserControl(let seatInfo,_):
                 return "coHostUserControl \(seatInfo.userInfo.userID)"
+            case let .custom(item):
+                return "custom_\(item.id)"
         }
     }
     

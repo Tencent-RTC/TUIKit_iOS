@@ -441,7 +441,7 @@ extension LiveListView: LiveListDataSource {
             case .failure(let err):
                 if let self = self {
                     let error = InternalError(code: err.code, message: err.message)
-                    makeToast(message: error.localizedMessage)
+                    showAtomicToast(text: error.localizedMessage, style: .error)
                 }
                 LiveKitLog.error("\(#file)", "\(#line)", "fetchLiveList:[onError:[code:\(err.code),message:\(err.message)]]")
                 onError(err)

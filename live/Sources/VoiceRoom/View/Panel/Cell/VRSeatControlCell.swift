@@ -8,17 +8,23 @@
 import UIKit
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 class VRSeatControlCell: UITableViewCell {
-    let avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        return imageView
+    lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("", placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
-    let userNameLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = UIFont.customFont(ofSize: 16)
-        label.textColor = .grayColor
+    let userNameLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         label.adjustsFontSizeToFitWidth = false
         label.minimumScaleFactor = 1
         return label
@@ -35,11 +41,6 @@ class VRSeatControlCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        avatarImageView.roundedRect(.allCorners, withCornerRatio: 20.scale375())
-    }
-    
     private var isViewReady = false
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -51,20 +52,19 @@ class VRSeatControlCell: UITableViewCell {
     }
     
     func constructViewHierarchy() {
-        contentView.addSubview(avatarImageView)
+        contentView.addSubview(avatarView)
         contentView.addSubview(userNameLabel)
     }
     
     func activateConstraints() {
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(24.scale375())
-            make.size.equalTo(CGSize(width: 40.scale375(), height: 40.scale375()))
         }
         
         userNameLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
             make.width.lessThanOrEqualTo(120.scale375())
         }
     }
@@ -87,15 +87,13 @@ class VRTheSeatCell: VRSeatControlCell {
         return label
     }()
     
-    let kickoffSeatButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 12.scale375()
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.warningTextColor.cgColor
-        button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(.warningTextColor, for: .normal)
-        button.backgroundColor = .clear
-        button.setTitle(.endTitleText, for: .normal)
+    let kickoffSeatButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .outlined,
+            colorType: .danger,
+            size: .xsmall,
+            content: .textOnly(text: .endTitleText)
+        )
         return button
     }()
     
@@ -121,8 +119,8 @@ class VRTheSeatCell: VRSeatControlCell {
     override func activateConstraints() {
         super.activateConstraints()
         seatIndexLabel.snp.makeConstraints { make in
-            make.trailing.bottom.equalTo(avatarImageView)
-            make.size.equalTo(CGSize(width: 16.scale375(), height: 16.scale375()))
+            make.trailing.bottom.equalTo(avatarView)
+            make.size.equalTo(16.scale375())
         }
         
         kickoffSeatButton.snp.makeConstraints { make in
@@ -134,18 +132,19 @@ class VRTheSeatCell: VRSeatControlCell {
     
     override func bindInteraction() {
         super.bindInteraction()
-        kickoffSeatButton.addTarget(self, action: #selector(kickoffSeatButtonClick(sender:)), for: .touchUpInside)
+        kickoffSeatButton.setClickAction { [weak self] _ in
+            self?.kickoffSeatButtonClick()
+        }
     }
     
     func updateSeatInfo(seatInfo: SeatInfo) {
         self.seatInfo = seatInfo
-        avatarImageView.kf.setImage(with: URL(string: seatInfo.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(seatInfo.userInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = seatInfo.userInfo.userName
         seatIndexLabel.text = "\(seatInfo.index + 1)"
     }
     
-    @objc
-    private func kickoffSeatButtonClick(sender: UIButton) {
+    private func kickoffSeatButtonClick() {
         if let kickoffEventClosure = kickoffEventClosure, let seatInfo = seatInfo {
             kickoffEventClosure(seatInfo)
         }
@@ -158,25 +157,23 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
     var rejectEventClosure: ((LiveUserInfo) -> Void)?
     var seatApplication: LiveUserInfo?
     
-    let approveButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 12.scale375()
-        button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .b1
-        button.setTitle(.approveText, for: .normal)
+    let approveButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .approveText)
+        )
         return button
     }()
     
-    let rejectButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 12.scale375()
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.b1.cgColor
-        button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(UIColor.b1, for: .normal)
-        button.backgroundColor = .clear
-        button.setTitle(.rejectText, for: .normal)
+    let rejectButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .outlined,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .rejectText)
+        )
         return button
     }()
     
@@ -199,7 +196,7 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
         
         userNameLabel.snp.remakeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
             make.trailing.equalTo(approveButton.snp.leading).offset(-4.scale375())
         }
         
@@ -218,25 +215,27 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
     
     override func bindInteraction() {
         super.bindInteraction()
-        approveButton.addTarget(self, action: #selector(approveButtonClick(sender:)), for: .touchUpInside)
-        rejectButton.addTarget(self, action: #selector(rejectButtonClick(sender:)), for: .touchUpInside)
+        approveButton.setClickAction { [weak self] _ in
+            self?.approveButtonClick()
+        }
+        rejectButton.setClickAction { [weak self] _ in
+            self?.rejectButtonClick()
+        }
     }
     
     func updateSeatApplication(seatApplication: LiveUserInfo) {
         self.seatApplication = seatApplication
-        avatarImageView.kf.setImage(with: URL(string: seatApplication.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(seatApplication.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = seatApplication.userName
     }
     
-    @objc
-    private func approveButtonClick(sender: UIButton) {
+    private func approveButtonClick() {
         if let approveEventClosure = approveEventClosure, let seatApplication = seatApplication {
             approveEventClosure(seatApplication)
         }
     }
     
-    @objc
-    private func rejectButtonClick(sender: UIButton) {
+    private func rejectButtonClick() {
         if let rejectEventClosure = rejectEventClosure, let seatApplication = seatApplication {
             rejectEventClosure(seatApplication)
         }
@@ -250,16 +249,15 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
     var user: LiveUserInfo?
     var lastClickTime: Date?
     let clickInterval = 0.5
+    private var isInvited: Bool = false
     
-    let inviteButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 12.scale375()
-        button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(.white, for: .normal)
-        button.setTitle(.inviteText, for: .normal)
-        button.setTitle(.cancelText, for: .selected)
-        button.setTitleColor(.warningTextColor, for: .selected)
-        button.backgroundColor = .b1
+    let inviteButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .inviteText)
+        )
         return button
     }()
 
@@ -287,27 +285,35 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
     
     override func bindInteraction() {
         super.bindInteraction()
-        inviteButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
+        inviteButton.setClickAction { [weak self] _ in
+            self?.inviteButtonClick()
+        }
     }
     
     func updateUser(user: LiveUserInfo) {
         self.user = user
-        avatarImageView.kf.setImage(with: URL(string: user.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(user.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = user.userName
     }
     
     func updateButtonView(isSelected: Bool) {
+        self.isInvited = isSelected
+        
+        if isSelected {
+            inviteButton.setVariant(.outlined)
+            inviteButton.setColorType(.danger)
+        } else {
+            inviteButton.setVariant(.filled)
+            inviteButton.setColorType(.primary)
+        }
+        
         inviteButton.isSelected = isSelected
-        inviteButton.layer.borderWidth = isSelected ? 1 : 0
-        inviteButton.layer.borderColor = isSelected ? UIColor.warningTextColor.cgColor : UIColor.clear.cgColor
-        inviteButton.backgroundColor = isSelected ? .clear : .b1
     }
     
-    @objc
-    private func inviteButtonClick(sender: UIButton) {
+    private func inviteButtonClick() {
         guard isClickable() else  { return }
         
-        if sender.isSelected {
+        if isInvited {
             if let cancelEventClosure = cancelEventClosure, let user = user {
                 cancelEventClosure(user)
             }

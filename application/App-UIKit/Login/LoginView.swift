@@ -15,6 +15,7 @@ import TUICore
 protocol LoginViewDelegate: NSObjectProtocol {
     func loginDelegate(userId: String)
     func testModeSwitchChanged(isOn: Bool)
+    func autoLoginSwitchChanged(isOn: Bool)
 }
 
 class LoginView: UIView {
@@ -84,6 +85,24 @@ class LoginView: UIView {
         switcher.isOn = false
         return switcher
     }()
+    
+    private let autoLoginView: UIView = {
+        let view = UIView(frame: .zero)
+        return view
+    }()
+    
+    private let autoLoginTitleLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.textColor = .black
+        label.text = "Auto Login".localized
+        return label
+    }()
+    
+    private let autoLoginSwitch: UISwitch = {
+        let switcher = UISwitch(frame: .zero)
+        switcher.isOn = UserDefaults.standard.bool(forKey: "AutoLoginKey")
+        return switcher
+    }()
 
     private weak var currentTextField: UITextField?
     private let loginBtn: UIButton = {
@@ -143,6 +162,9 @@ class LoginView: UIView {
         addSubview(testModeView)
         testModeView.addSubview(testTitleLabel)
         testModeView.addSubview(testModeSwitch)
+        addSubview(autoLoginView)
+        autoLoginView.addSubview(autoLoginTitleLabel)
+        autoLoginView.addSubview(autoLoginSwitch)
     }
 
     private func activateConstraints() {
@@ -203,11 +225,29 @@ class LoginView: UIView {
             make.trailing.equalTo(testModeSwitch.snp.leading).offset(-20.scale375Width())
             make.leading.centerY.equalToSuperview()
         }
+        
+        autoLoginView.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-20.scale375Width())
+            make.top.equalTo(testModeView.snp.bottom).offset(10.scale375Height())
+            make.height.equalTo(44.scale375Height())
+            make.width.greaterThanOrEqualTo(120.scale375Height())
+        }
+        
+        autoLoginSwitch.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-10.scale375Width())
+            make.centerY.equalToSuperview()
+        }
+        
+        autoLoginTitleLabel.snp.makeConstraints { make in
+            make.trailing.equalTo(autoLoginSwitch.snp.leading).offset(-20.scale375Width())
+            make.leading.centerY.equalToSuperview()
+        }
     }
 
     private func bindInteraction() {
         loginBtn.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
         testModeSwitch.addTarget(self, action: #selector(onTestModeSwitchValueChanged), for: .valueChanged)
+        autoLoginSwitch.addTarget(self, action: #selector(onAutoLoginSwitchValueChanged), for: .valueChanged)
         TUICSToastManager.setDefaultPosition(TUICSToastPositionCenter)
         userIdTextField.delegate = self
     }
@@ -224,6 +264,10 @@ class LoginView: UIView {
     
     @objc private func onTestModeSwitchValueChanged(_ switcher: UISwitch) {
         delegate?.testModeSwitchChanged(isOn: switcher.isOn)
+    }
+    
+    @objc private func onAutoLoginSwitchValueChanged(_ switcher: UISwitch) {
+        delegate?.autoLoginSwitchChanged(isOn: switcher.isOn)
     }
 }
 

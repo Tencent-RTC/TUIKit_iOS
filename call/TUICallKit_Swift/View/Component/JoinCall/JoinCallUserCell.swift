@@ -1,24 +1,26 @@
 //
-//  Untitled.swift
+//  JoinCallUserCell.swift (Refactored Version)
 //  Pods
 //
 //  Created by vincepzhang on 2025/3/3.
 //
 
 import Foundation
+import UIKit
+
+import AtomicXCore
 
 class JoinCallUserCell: UICollectionViewCell {
     
-    private var user: User = User()
+    private var participant: CallParticipantInfo = CallParticipantInfo()
     
-    private let userIcon = {
-        let imageView = UIImageView(frame: CGRect.zero)
+    private let userIcon: UIImageView = {
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 4.0
-        if let image = CallKitBundle.getBundleImage(name: "default_user_icon") {
-            imageView.image = image
-        }
+        imageView.image = CallKitBundle.getBundleImage(name: "default_user_icon")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
@@ -45,7 +47,6 @@ class JoinCallUserCell: UICollectionViewCell {
     }
     
     private func activateConstraints() {
-        userIcon.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             userIcon.topAnchor.constraint(equalTo: contentView.topAnchor),
             userIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -54,19 +55,18 @@ class JoinCallUserCell: UICollectionViewCell {
         ])
     }
     
-    func setModel(user: User) {
-        self.user = user
+    func setModel(participant: CallParticipantInfo) {
+        self.participant = participant
         setUserIcon()
     }
     
     private func setUserIcon() {
-        let userImage: UIImage? = CallKitBundle.getBundleImage(name: "default_user_icon")
-        
-        if user.avatar.value == "" {
-            guard let image = userImage else { return }
-            userIcon.image = image
+        let userImage = CallKitBundle.getBundleImage(name: "default_user_icon")
+       
+        if let url = URL(string: participant.avatarURL), !participant.avatarURL.isEmpty {
+            userIcon.sd_setImage(with: url, placeholderImage: userImage)
         } else {
-            userIcon.sd_setImage(with: URL(string: user.avatar.value), placeholderImage: userImage)
+            userIcon.image = userImage
         }
     }
 }

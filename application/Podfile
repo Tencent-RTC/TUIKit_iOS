@@ -7,10 +7,12 @@ target 'App-UIKit' do
   use_frameworks!
   # Pods for UIKitApp-UIKit
   pod 'SnapKit'
+  pod 'SensorsAnalyticsSDK'
   pod 'RTCCommon'
   
   pod 'TUICallKit_Swift', :path=>'../call/TUICallKit_Swift.podspec'
-  pod 'TUIRoomKit/Professional', :path=>'../conference/TUIRoomKit.podspec'
+  # pod 'TUIRoomKit/Professional', :path=>'../conference/TUIRoomKit.podspec'
+  pod 'TUIRoomKit/Professional', :path=>'../room_v2/TUIRoomKit.podspec'
 
   pod 'TUILiveKit', :path=>'../live/TUILiveKit.podspec'
   pod 'AtomicX', :path=>'../atomic_x/AtomicX.podspec'

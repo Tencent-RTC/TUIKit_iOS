@@ -11,6 +11,7 @@ import TUICore
 import AtomicXCore
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 class VRSeatInvitationPanel: RTCBaseView {
     private let liveID: String
@@ -20,19 +21,19 @@ class VRSeatInvitationPanel: RTCBaseView {
     private var audienceTupleList: [(audienceInfo: LiveUserInfo, isInvited: Bool)] = []
     private let seatIndex: Int
     
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = UIFont.customFont(ofSize: 20)
-        label.text = .inviteText
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.inviteText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular20)
+        }
         return label
     }()
     
-    private let subTitleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = UIFont.customFont(ofSize: 16, weight: .medium)
-        label.text = .onlineAudienceText
+    private let subTitleLabel: AtomicLabel = {
+        let label = AtomicLabel(.onlineAudienceText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
     
@@ -119,9 +120,9 @@ extension VRSeatInvitationPanel {
     }
     
     private func subscribeToastState() {
-        toastService.subscribeToast({ [weak self] message in
+        toastService.subscribeToast({ [weak self] message, style in
             guard let self = self else { return }
-            self.makeToast(message: message)
+            self.showAtomicToast(text: message, style: style)
         })
     }
     
@@ -133,11 +134,11 @@ extension VRSeatInvitationPanel {
                 switch event {
                 case .onHostInvitationResponded(isAccept: let isAccept, guestUser: let guestUser):
                     if !isAccept {
-                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: guestUser.userName.isEmpty ? guestUser.userID : guestUser.userName))
+                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: guestUser.userName.isEmpty ? guestUser.userID : guestUser.userName), toastStyle: .info)
                     }
                 case .onHostInvitationNoResponse(guestUser: _, reason: let reason):
                     if reason == .timeout {
-                        toastService.showToast(.requestTimeoutText)
+                        toastService.showToast(.requestTimeoutText, toastStyle: .info)
                     }
                 default:
                     break
@@ -173,7 +174,7 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
                 let seatAllTokenInConnect = seatStore.state.value.seatList.prefix(KSGConnectMaxSeatCount).allSatisfy({ $0.isLocked || $0.userInfo.userID != "" })
 
                 if seatAllTokenInConnect && coHostStore.state.value.connected.count != 0 {
-                    toastService.showToast(.seatAllTokenText)
+                    toastService.showToast(.seatAllTokenText, toastStyle: .warning)
                     return
                 }
                 self.coGuestStore.inviteToSeat(userID: user.userID, seatIndex: self.seatIndex, timeout: kSGDefaultTimeout, extraInfo: nil) { [weak self] result in
@@ -183,7 +184,7 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
                         inviteTakeSeatCell.updateButtonView(isSelected: true)
                     case .failure(let error):
                         let err = InternalError(errorInfo: error)
-                        toastService.showToast(err.localizedMessage)
+                        toastService.showToast(err.localizedMessage, toastStyle: .error)
                     }
                 }
                 
@@ -197,11 +198,11 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
                     guard let self = self else { return }
                     switch result {
                     case .success(()):
-                        toastService.showToast(.inviteSeatCancelText)
+                            toastService.showToast(.inviteSeatCancelText, toastStyle: .success)
                         inviteTakeSeatCell.updateButtonView(isSelected: false)
                     case .failure(let error):
                         let err = InternalError(errorInfo: error)
-                        toastService.showToast(err.localizedMessage)
+                            toastService.showToast(err.localizedMessage, toastStyle: .error)
                     }
                 }
             }

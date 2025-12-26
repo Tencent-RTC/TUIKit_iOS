@@ -9,6 +9,7 @@ import Combine
 import RTCRoomEngine
 import RTCCommon
 import AtomicXCore
+import AtomicX
 
 class VRImageSelectionPanel: UIView {
     
@@ -83,17 +84,15 @@ class VRImageSelectionPanel: UIView {
         return collection
     }()
     
-    private lazy var confirmButton: UIButton = {
-        let view = UIButton(type: .system)
-        view.frame = CGRect(origin: .zero, size: CGSize(width: 200.scale375(), height: 52.scale375()))
-        view.showsTouchWhenHighlighted = false
-        view.titleLabel?.font = .customFont(ofSize: 16,weight: .medium)
-        view.setTitleColor(.flowKitWhite, for:  .normal)
-        view.addTarget(self, action: #selector(confirmButtonClick), for: .touchUpInside)
-        view.layer.cornerRadius = view.mm_h*0.5
-        view.layer.masksToBounds = true
-        view.backgroundColor = .brandBlueColor
-        return view
+    private lazy var confirmButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: "")
+        )
+        button.frame = CGRect(origin: .zero, size: CGSize(width: 200.scale375(), height: 52.scale375()))
+        return button
     }()
     
     private var currentCoverUrl: String {
@@ -190,10 +189,13 @@ extension VRImageSelectionPanel {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         if panelMode == .cover {
             titleLabel.text = .coverTitleText
-            confirmButton.setTitle(.coverConfirmText, for: .normal)
+            confirmButton.setButtonContent(.textOnly(text: .coverConfirmText))
         } else {
             titleLabel.text = .backgroundTitleText
-            confirmButton.setTitle(.backgroundConfirmText, for: .normal)
+            confirmButton.setButtonContent(.textOnly(text: .backgroundConfirmText))
+        }
+        confirmButton.setClickAction { [weak self] _ in
+            self?.confirmButtonClick()
         }
     }
     
@@ -217,7 +219,6 @@ extension VRImageSelectionPanel {
         backButtonClickClosure?()
     }
     
-    @objc
     func confirmButtonClick() {
         guard let newImageUrlString = currentSelectModel?.imageUrl?.absoluteString else {
             backButtonClickClosure?()

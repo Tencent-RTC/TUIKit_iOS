@@ -6,28 +6,30 @@
 //
 
 import RTCCommon
+import AtomicXCore
+import Combine
 
 class IncomingBannerViewController: UIViewController {
     private var isViewReady: Bool = false
+    private var cancellables = Set<AnyCancellable>()
 
     private let userHeadImageView: UIImageView = {
         let userHeadImageView = UIImageView(frame: CGRect.zero)
         userHeadImageView.layer.masksToBounds = true
         userHeadImageView.layer.cornerRadius = 7.0
-        if let remoteUser = CallManager.shared.userState.remoteUserList.value.first {
-            userHeadImageView.sd_setImage(with: URL(string: remoteUser.avatar.value), placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon"))
-        }
+        userHeadImageView.contentMode = .scaleAspectFill
+        userHeadImageView.image = CallKitBundle.getBundleImage(name: "default_user_icon")
         return userHeadImageView
     }()
     private let userNameLabel: UILabel = {
-        let userNameLabel = UILabel(frame: CGRect.zero)
+        let userNameLabel = UILabel()
         userNameLabel.textColor = Color_OweWhite
         userNameLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
         userNameLabel.backgroundColor = UIColor.clear
         userNameLabel.textAlignment = .center
-        if let remoteUser = CallManager.shared.userState.remoteUserList.value.first {
-            userNameLabel.text = UserManager.getUserDisplayName(user: remoteUser)
-        }
+        userNameLabel.lineBreakMode = .byTruncatingTail
+        userNameLabel.numberOfLines = 1
+        userNameLabel.text = ""
         return userNameLabel
     }()
     private lazy var callStatusTipView: UILabel = {
@@ -43,16 +45,14 @@ class IncomingBannerViewController: UIViewController {
         if let image = CallKitBundle.getBundleImage(name: "icon_hangup") {
             btn.setBackgroundImage(image, for: .normal)
         }
-        btn.addTarget(self, action: #selector(rejectTouchEvent(sender: )), for: .touchUpInside)
         return btn
     }()
     private let acceptBtn: UIButton = {
         let btn = UIButton(type: .system)
-        let imageStr = CallManager.shared.callState.mediaType.value == .video ? "icon_video_dialing" : "icon_dialing"
+        let imageStr = CallStore.shared.state.value.activeCall.mediaType == .video ? "icon_video_dialing" : "icon_dialing"
         if let image = CallKitBundle.getBundleImage(name: imageStr) {
             btn.setBackgroundImage(image, for: .normal)
         }
-        btn.addTarget(self, action: #selector(acceptTouchEvent(sender: )), for: .touchUpInside)
         return btn
     }()
     
@@ -63,7 +63,6 @@ class IncomingBannerViewController: UIViewController {
         
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super .init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
         view.layer.cornerRadius = 10.0
         view.backgroundColor = UIColor(hex: "#22262E")
         let tap = UITapGestureRecognizer(target: self, action: #selector(showCallView(sender:)))
@@ -77,6 +76,9 @@ class IncomingBannerViewController: UIViewController {
         isViewReady = true
         constructViewHierarchy()
         activateConstraints()
+        bindInteraction()
+        updateUserInfoUI()
+        subscribeParticipantInfo()
     }
     
     private func constructViewHierarchy() {
@@ -102,7 +104,8 @@ class IncomingBannerViewController: UIViewController {
         if let superview = userNameLabel.superview {
             NSLayoutConstraint.activate([
                 userNameLabel.topAnchor.constraint(equalTo: userHeadImageView.topAnchor, constant: 10.scale375Width()),
-                userNameLabel.leadingAnchor.constraint(equalTo: userHeadImageView.trailingAnchor, constant: 12.scale375Width())
+                userNameLabel.leadingAnchor.constraint(equalTo: userHeadImageView.trailingAnchor, constant: 12.scale375Width()),
+                userNameLabel.trailingAnchor.constraint(lessThanOrEqualTo: rejectBtn.leadingAnchor, constant: -8.scale375Width())
             ])
         }
         
@@ -135,6 +138,11 @@ class IncomingBannerViewController: UIViewController {
         }
     }
     
+    func bindInteraction() {
+        rejectBtn.addTarget(self, action: #selector(rejectTouchEvent(sender: )), for: .touchUpInside)
+        acceptBtn.addTarget(self, action: #selector(acceptTouchEvent(sender: )), for: .touchUpInside)
+    }
+    
     // MARK: Event Action
     @objc func showCallView(sender: UIButton) {
         view.removeFromSuperview()
@@ -143,31 +151,65 @@ class IncomingBannerViewController: UIViewController {
     
     @objc func rejectTouchEvent(sender: UIButton) {
         view.removeFromSuperview()
-        CallManager.shared.reject() { } fail: { code, message in }
+        CallStore.shared.reject(completion: nil)
         WindowManager.shared.closeWindow()
     }
     
     @objc func acceptTouchEvent(sender: UIButton) {
         view.removeFromSuperview()
-        CallManager.shared.accept() { } fail: { code, message in }
+        CallStore.shared.accept(completion: nil)
         WindowManager.shared.showCallingWindow()
     }
-    
+
+    private func updateUserInfoUI() {
+        let remoteUsers = CallStore.shared.state.value.allParticipants
+            .filter { $0.id != CallStore.shared.state.value.selfInfo.id }
+        if let firstRemoteUser = remoteUsers.first {
+            userHeadImageView.sd_setImage(
+                with: URL(string: firstRemoteUser.avatarURL),
+                placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon")
+            )
+            userNameLabel.text = UserManager.getUserDisplayName(user: firstRemoteUser)
+        } else {
+            userHeadImageView.image = CallKitBundle.getBundleImage(name: "default_user_icon")
+            userNameLabel.text = ""
+        }
+    }
+
+    private func subscribeParticipantInfo() {
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector { state in
+                state.allParticipants.first(where: { $0.id != state.selfInfo.id })
+            })
+            .receive(on: RunLoop.main)
+            .sink { [weak self] participant in
+                guard let self = self else { return }
+                if let user = participant {
+                    self.userHeadImageView.sd_setImage(
+                        with: URL(string: user.avatarURL),
+                        placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon")
+                    )
+                    self.userNameLabel.text = UserManager.getUserDisplayName(user: user)
+                } else {
+                    self.userHeadImageView.image = CallKitBundle.getBundleImage(name: "default_user_icon")
+                    self.userNameLabel.text = ""
+                }
+            }
+            .store(in: &cancellables)
+    }
+
     // MARK: other private
     private func getCallStatusTipText() -> String {
-        if CallManager.shared.viewState.callingViewType.value == .multi {
+        if !(CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1) {
             return TUICallKitLocalize(key: "TUICallKit.Group.inviteToGroupCall") ?? ""
         }
-        
         var tipLabelText = String()
-        switch CallManager.shared.callState.mediaType.value {
+        switch CallStore.shared.state.value.activeCall.mediaType {
         case .audio:
             tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToAudioCall") ?? ""
         case .video:
             tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToVideoCall") ?? ""
-        case .unknown:
-            break
-        default:
+        case nil:
             break
         }
         return tipLabelText

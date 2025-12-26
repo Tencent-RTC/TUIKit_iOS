@@ -4,33 +4,80 @@
 //
 //  Created by vincepzhang on 2022/12/30.
 //
-
 import Foundation
 import UIKit
 import TUICore
-
+import AtomicX
+import AtomicXCore
+import Combine
+import SnapKit
+import RTCCommon
 class CallMainViewController: UIViewController {
         
-    let mainView = CallMainView(frame: .zero)
-    private let screenObserver = Observer()
+    let mainView = CallView(frame: .zero)
+    private var cancellables = Set<AnyCancellable>()
+    
+    private let floatWindowButton: UIButton = {
+        let button = UIButton(type: .system)
+        if let image = CallKitBundle.getBundleImage(name: "icon_min_window") {
+            button.setBackgroundImage(image, for: .normal)
+        }
+        button.isHidden = !TUICallKitImpl.shared.globalState.enableFloatWindow
+        
+        return button
+    }()
+    
+    private lazy var inviteUserButton: UIButton = {
+        let button = UIButton(type: .system)
+        if let image = CallKitBundle.getBundleImage(name: "icon_add_user") {
+            button.setBackgroundImage(image, for: .normal)
+        }
+        button.isHidden = true
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.addSubview(mainView)
-        mainView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            mainView.topAnchor.constraint(equalTo: view.topAnchor),
-            mainView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            mainView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            mainView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        view.addSubview(floatWindowButton)
+        view.addSubview(inviteUserButton)
+        
+        activateConstraints()
+        bindInteraction()
+        subscribeCallState()
         updateInitialOrientation()
     }
     
+    private func activateConstraints() {
+        mainView.translatesAutoresizingMaskIntoConstraints = false
+        floatWindowButton.translatesAutoresizingMaskIntoConstraints = false
+        inviteUserButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        mainView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        floatWindowButton.snp.makeConstraints { make in
+            make.size.equalTo(24.scale375Width())
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12.scale375Height())
+            make.leading.equalToSuperview().offset(12.scale375Width())
+        }
+            
+        inviteUserButton.snp.makeConstraints { make in
+            make.size.equalTo(24.scale375Width())
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12.scale375Height())
+            make.trailing.equalToSuperview().offset(-12.scale375Width())
+        }
+    }
+    
+    private func bindInteraction() {
+        floatWindowButton.addTarget(self, action: #selector(floatWindowTapped), for: .touchUpInside)
+        inviteUserButton.addTarget(self, action: #selector(inviteUserTapped), for: .touchUpInside)
+    }
     private func updateInitialOrientation() {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            switch CallManager.shared.globalState.orientation {
+            switch TUICallKitImpl.shared.globalState.orientation {
             case .portrait:
                 forceOrientation(false)
             case .landscape:
@@ -47,7 +94,6 @@ class CallMainViewController: UIViewController {
             self.mainView.updateConstraints()
         }, completion: nil)
     }
-
     private func forceOrientation(_ isLandscape: Bool) {
         let orientationMask: UIInterfaceOrientationMask = isLandscape ? .landscapeRight : .portrait
         let orientation: UIDeviceOrientation = isLandscape ? .landscapeRight : .portrait
@@ -63,6 +109,40 @@ class CallMainViewController: UIViewController {
             UIViewController.attemptRotationToDeviceOrientation()
         }
     }
+    
+    private func subscribeCallState() {
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector(keyPath: \.activeCall))
+            .removeDuplicates { previous, current in
+                return previous.chatGroupId == current.chatGroupId
+            }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] activeCall in
+                guard let self = self else { return }
+                let isMultiCall = !activeCall.chatGroupId.isEmpty
+                self.inviteUserButton.isHidden = !isMultiCall
+            }
+            .store(in: &cancellables)
+    }
+    
+    @objc private func floatWindowTapped() {
+        WindowManager.shared.showFloatingWindow()
+    }
+
+    @objc private func inviteUserTapped() {
+        let selectGroupMemberVC = SelectGroupMemberViewController()
+        selectGroupMemberVC.modalPresentationStyle = .fullScreen
+        getKeyWindow()?.rootViewController?.present(selectGroupMemberVC, animated: false)
+    }
+    
+    private func getKeyWindow() -> UIWindow? {
+        return UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first?
+            .windows
+            .first(where: { $0.isKeyWindow })
+    }
 }
 
 class CallKitNavigationController: UINavigationController {
@@ -73,9 +153,9 @@ class CallKitNavigationController: UINavigationController {
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            if CallManager.shared.globalState.orientation == .auto {
+            if TUICallKitImpl.shared.globalState.orientation == .auto {
                 return .all
-            } else if CallManager.shared.globalState.orientation == .landscape {
+            } else if TUICallKitImpl.shared.globalState.orientation == .landscape {
                 return .landscape
             }
         } else {
@@ -85,7 +165,7 @@ class CallKitNavigationController: UINavigationController {
     }
     
     override var shouldAutorotate: Bool {
-        if UIDevice.current.userInterfaceIdiom == .pad && CallManager.shared.globalState.orientation == .auto {
+        if UIDevice.current.userInterfaceIdiom == .pad && TUICallKitImpl.shared.globalState.orientation == .auto {
             return true
         } else {
             return false

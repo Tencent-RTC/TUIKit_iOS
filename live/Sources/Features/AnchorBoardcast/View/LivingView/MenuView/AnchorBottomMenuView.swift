@@ -28,7 +28,7 @@ public enum AnchorBottomMenuFeature: CaseIterable {
 class AnchorBottomMenuView: RTCBaseView {
     var cancellableSet = Set<AnyCancellable>()
     
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private let coreView: LiveCoreView
     private let buttonSliceIndex: Int = 1
@@ -39,7 +39,7 @@ class AnchorBottomMenuView: RTCBaseView {
     
     private var anchorFeatures: [AnchorBottomMenuFeature] = AnchorBottomMenuFeature.allCases
     
-    private lazy var creator = AnchorMenuDataCreator(coreView: coreView, manager: manager, routerManager: routerManager)
+    private lazy var creator = AnchorMenuDataCreator(coreView: coreView, store: store, routerManager: routerManager)
     private var menus = [AnchorButtonMenuInfo]()
     
     let stackView: UIStackView = {
@@ -52,8 +52,8 @@ class AnchorBottomMenuView: RTCBaseView {
     
     var buttons: [UIButton] = []
     
-    init(manager: AnchorManager, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
-        self.manager = manager
+    init(store: AnchorStore, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
+        self.store = store
         self.routerManager = routerManager
         self.coreView = coreView
         super.init(frame: .zero)

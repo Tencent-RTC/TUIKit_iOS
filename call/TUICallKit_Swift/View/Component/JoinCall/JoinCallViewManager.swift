@@ -9,37 +9,43 @@ import UIKit
 import RTCRoomEngine
 import ImSDK_Plus
 import TUICore
-import RTCCommon
+import Combine
+import AtomicXCore
 
 class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
-    static let shared = JoinCallViewManager()
-    
-    private let callStatusObserver = Observer()
-    private var joinGroupCallView = JoinCallView()
-    private var roomId = TUIRoomId()
-    private var groupId: String = ""
-    private var callId: String = ""
-    private var callMediaType: TUICallMediaType = .unknown
-    private var recordExpansionStatus: Bool = false
     
     private override init() {
         super.init()
         V2TIMManager.sharedInstance().addGroupListener(listener: self)
-        registerCallStatusObserver()
+        subscribeCallState()
     }
     
+    // MARK: Private
+    private var cancellables = Set<AnyCancellable>()
+    private var joinGroupCallView = JoinCallView()
+    private var roomId = TUIRoomId()
+    private var groupId: String = ""
+    private var callId: String = ""
+    private var callMediaType: CallMediaType? = nil
+    
+    private var recordExpansionStatus: Bool = false
+    
+    static let shared = JoinCallViewManager()
+    
     deinit {
-        CallManager.shared.userState.selfUser.callStatus.removeObserver(callStatusObserver)
+        cancellables.forEach { $0.cancel() }
+        V2TIMManager.sharedInstance().removeGroupListener(listener: self)
     }
     
     func getGroupAttributes(_ groupID: String) {
-        groupId = groupID
-        recordExpansionStatus = false
-        guard CallManager.shared.userState.selfUser.callStatus.value == .none else {
+        self.groupId = groupID
+        self.recordExpansionStatus = false
+        let selfStatus = CallStore.shared.state.value.selfInfo.status
+        guard selfStatus == .none else {
             return
         }
         V2TIMManager.sharedInstance().getGroupAttributes(groupID, keys: nil) { [weak self] groupAttributeList in
-            guard let self = self, let attributeList = groupAttributeList as? [String : String] else {
+            guard let self = self, let attributeList = groupAttributeList as? [String: String] else {
                 return
             }
             self.processGroupAttributeData(attributeList)
@@ -53,18 +59,9 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
         joinGroupCallView.isHidden = true
     }
     
-    func registerCallStatusObserver() {
-        CallManager.shared.userState.selfUser.callStatus.addObserver(callStatusObserver, closure: { [weak self] newValue, _ in
-            guard let self = self else { return }
-            if newValue == .none && !self.groupId.isEmpty && self.groupId.count > 0 {
-                self.getGroupAttributes(self.groupId)
-            }
-        })
-    }
-    
     // MARK: - Private Method
     private func processGroupAttributeData(_ groupAttributeList: [String: String]) {
-        guard let jsonStr = groupAttributeList["inner_attr_kit_info"], jsonStr.count > 0,
+        guard let jsonStr = groupAttributeList["inner_attr_kit_info"], !jsonStr.isEmpty,
               let jsonData = jsonStr.data(using: .utf8),
               let groupAttributeDic = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any],
               checkBusinessType(groupAttributeDic) else {
@@ -76,12 +73,13 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
         handleCallMediaType(groupAttributeDic)
         handleCallId(groupAttributeDic)
         
-        guard let userIdList = getUserIdList(groupAttributeDic), userIdList.count > 0 else {
+        guard let userIdList = getUserIdList(groupAttributeDic), !userIdList.isEmpty else {
             hiddenJoinGroupCallView()
             return
         }
         
-        if userIdList.contains(CallManager.shared.userState.selfUser.id.value) {
+        let selfId = CallStore.shared.state.value.selfInfo.id
+        if userIdList.contains(selfId) {
             hiddenJoinGroupCallView()
             return
         }
@@ -97,16 +95,13 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     }
     
     private func handleRoomId(_ groupAttributeValue: [String: Any]) {
-        guard let strRoomId = groupAttributeValue["room_id"] as? String, strRoomId.count > 0 else {
+        guard let strRoomId = groupAttributeValue["room_id"] as? String, !strRoomId.isEmpty else {
             return
         }
         
         if groupAttributeValue["room_id_type"] as? Int == 2 {
             roomId.strRoomId = strRoomId
-            return
-        }
-        
-        if let intRoomId = UInt32(strRoomId) {
+        } else if let intRoomId = UInt32(strRoomId) {
             roomId.intRoomId = intRoomId
         } else {
             roomId.strRoomId = strRoomId
@@ -114,56 +109,43 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     }
     
     private func handleCallMediaType(_ groupAttributeValue: [String: Any]) {
-        guard let callMediaType = groupAttributeValue["call_media_type"] as? String, callMediaType.count > 0 else {
+        guard let callMediaTypeStr = groupAttributeValue["call_media_type"] as? String, !callMediaTypeStr.isEmpty else {
             return
         }
         
-        if callMediaType == "audio" {
-            self.callMediaType = TUICallMediaType.audio
-        } else if callMediaType == "video" {
-            self.callMediaType = TUICallMediaType.video
+        if callMediaTypeStr == "audio" {
+            self.callMediaType = .audio
+        } else if callMediaTypeStr == "video" {
+            self.callMediaType = .video
         }
     }
     
     private func handleCallId(_ groupAttributeValue: [String: Any]) {
-        guard let callId = groupAttributeValue["call_id"] as? String else {
-            return
-        }
-        self.callId = callId
+        self.callId = groupAttributeValue["call_id"] as? String ?? ""
     }
     
     private func getUserIdList(_ groupAttributeValue: [String: Any]) -> [String]? {
         guard let userInfoList = groupAttributeValue["user_list"] as? [[String: Any]] else {
             return nil
         }
-        
-        var userIdList = [String]()
-        for userInfoDic in userInfoList {
-            guard let userId = userInfoDic["userid"] as? String else {
-                break
-            }
-            userIdList.append(userId)
-        }
-        
-        return userIdList
+        return userInfoList.compactMap { $0["userid"] as? String }
     }
     
     private func handleUsersInfo(_ userIdList: [String]) {
         V2TIMManager.sharedInstance().getUsersInfo(userIdList) { [weak self] infoList in
             guard let self = self, let userInfoList = infoList else { return }
-            
-            var userModelList: [User] = Array()
-            
-            for userInfo in userInfoList {
-                let userModel = User()
-                userModel.id.value = userInfo.userID ?? ""
-                userModel.avatar.value = userInfo.faceURL ?? ""
-                userModelList.append(userModel)
+    
+            let participants = userInfoList.map { userInfo -> CallParticipantInfo in
+                var participant = CallParticipantInfo()
+                participant.id = userInfo.userID ?? ""
+                participant.avatarURL = userInfo.faceURL ?? ""
+                participant.name = userInfo.nickName ?? ""
+                return participant
             }
             
-            if userModelList.count > 1 {
+            if participants.count > 0 {
                 self.showJoinGroupCallView()
-                self.joinGroupCallView.updateView(with: userModelList, callMediaType:self.callMediaType)
+                self.joinGroupCallView.updateView(with: participants, callMediaType: self.callMediaType)
             } else {
                 self.hiddenJoinGroupCallView()
             }
@@ -180,23 +162,17 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     func hiddenJoinGroupCallView() {
         joinGroupCallView.isHidden = true
         if let parentView = joinGroupCallView.superview {
-            parentView.frame = CGRect(x: 0, y: 0, width: parentView.bounds.size.width, height: 0)
+            parentView.frame = CGRect(x: 0, y: 0, width: parentView.bounds.width, height: 0)
             postUpdateNotification()
         }
     }
     
     func updatePageContent() {
         DispatchQueue.main.async {
-            let joinGroupCallViewHeight = self.recordExpansionStatus ? kJoinGroupCallViewExpandHeight : kJoinGroupCallViewDefaultHeight
-            self.joinGroupCallView.frame = CGRect(x: self.joinGroupCallView.frame.origin.x,
-                                                  y: self.joinGroupCallView.frame.origin.y,
-                                                  width: self.joinGroupCallView.bounds.size.width,
-                                                  height: joinGroupCallViewHeight)
+            let height = self.recordExpansionStatus ? kJoinGroupCallViewExpandHeight : kJoinGroupCallViewDefaultHeight
+            self.joinGroupCallView.frame.size.height = height
             if let parentView = self.joinGroupCallView.superview {
-                parentView.frame = CGRect(x: 0,
-                                          y: 0,
-                                          width: parentView.bounds.size.width,
-                                          height: self.joinGroupCallView.bounds.size.height)
+                parentView.frame.size.height = height
             }
         }
     }
@@ -207,7 +183,6 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
         }
     }
     
-    // MARK: - TUICallKitJoinGroupCallViewDelegate
     func updatePageContent(isExpand: Bool) {
         if recordExpansionStatus != isExpand {
             recordExpansionStatus = isExpand
@@ -217,15 +192,9 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     }
     
     func joinCall() {
-        hiddenJoinGroupCallView()
-        
-        if CallManager.shared.globalState.enableForceUseV2API {
-            TUICallKit.createInstance().joinInGroupCall(roomId: roomId, groupId: groupId, callMediaType: callMediaType)
-            return
-        }
-        
+        hiddenJoinGroupCallView() 
         guard !callId.isEmpty else { return }
-        TUICallKit.createInstance().join(callId: callId)
+        TUICallKit.createInstance().join(callId: callId, completion: nil)
     }
     
     // MARK: - V2TIMGroupListener
@@ -235,10 +204,29 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
             return
         }
         
-        if CallManager.shared.userState.selfUser.callStatus.value != .none {
+        let selfStatus = CallStore.shared.state.value.selfInfo.status
+        if selfStatus != .none {
             self.hiddenJoinGroupCallView()
             return
         }
         processGroupAttributeData(attributes)
+    }
+}
+
+// MARK: Subscribe
+extension JoinCallViewManager {
+    func subscribeCallState() {
+        let statusSelector = StatePublisherSelector<CallState, CallParticipantStatus>(keyPath: \CallState.selfInfo.status)
+        
+        CallStore.shared.state
+            .subscribe(statusSelector)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newStatus in
+                guard let self = self else { return }
+                if newStatus == .none && !self.groupId.isEmpty {
+                    self.getGroupAttributes(self.groupId)
+                }
+            }
+            .store(in: &cancellables)
     }
 }

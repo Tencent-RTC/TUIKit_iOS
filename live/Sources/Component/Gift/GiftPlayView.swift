@@ -70,6 +70,9 @@ public class GiftPlayView: UIView {
         super.init(frame: .zero)
         isUserInteractionEnabled = false
         addObserver()
+        if let currentLanguage = Bundle.main.preferredLocalizations.first {
+            giftStore.setLanguage(currentLanguage)
+        }
     }
     
     @available(*, unavailable)
@@ -129,9 +132,9 @@ public class GiftPlayView: UIView {
         
         GiftManager.shared.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] message,style in
                 guard let self = self else { return }
-                makeToast(message: message)
+                showAtomicToast(text: message, style: .info)
             }
             .store(in: &cancellableSet)
     }
@@ -157,7 +160,7 @@ public extension GiftPlayView {
         animationView.playAnimation(playUrl: playUrl) { [weak self] code in
             guard let self = self else { return }
             if code != 0 {
-                makeToast(message: .playFailedText)
+                showAtomicToast(text: .playFailedText, style: .error)
             }
             self.advancedAnimationManager.finishPlay()
         }

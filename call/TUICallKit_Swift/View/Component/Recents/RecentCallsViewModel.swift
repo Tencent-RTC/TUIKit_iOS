@@ -10,6 +10,8 @@ import UIKit
 import RTCRoomEngine
 import TUICore
 import RTCCommon
+import Combine
+import AtomicXCore
 
 enum RecentCallsType: Int {
     case all
@@ -21,9 +23,9 @@ enum RecentCallsUIStyle: Int {
     case minimalist
 }
 
-class RecentCallsViewModel {
+class RecentCallsViewModel: ObservableObject {
     
-    var dataSource: Observable<[RecentCallsCellViewModel]> = Observable(Array())
+    @Published var dataSource: [RecentCallsCellViewModel] = []
     var allDataSource: [RecentCallsCellViewModel] = []
     var missedDataSource: [RecentCallsCellViewModel] = []
     
@@ -33,27 +35,46 @@ class RecentCallsViewModel {
     typealias SuccClosureType = @convention(block) (UIViewController) -> Void
     typealias FailClosureType = @convention(block) (Int, String) -> Void
     
-    func queryRecentCalls() {
-        let filter = TUICallRecentCallsFilter()
-        TUICallEngine.createInstance().queryRecentCalls(filter: filter, succ: { [weak self] callRecords in
-            guard let self = self else { return }
-            var viewModelList: [RecentCallsCellViewModel] = []
-            callRecords.forEach { callRecord in
-                let viewModel = RecentCallsCellViewModel(callRecord)
-                viewModelList.append(viewModel)
-            }
-            self.updateDataSource(viewModelList)
-        }, fail: {})
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        subscribeRecentCalls()
     }
+    
+    deinit {
+        cancellables.removeAll()
+    }
+    
+    func queryRecentCalls() {
+        CallStore.shared.queryRecentCalls(cursor: "", count: 100, completion: nil)
+    }
+    
+    private func subscribeRecentCalls() {
+        let selector = StatePublisherSelector(keyPath: \CallState.recentCalls)
+        CallStore.shared.state.subscribe(selector)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] callInfos in
+                guard let self = self else { return }
+                var viewModelList: [RecentCallsCellViewModel] = []
+                callInfos.forEach { callInfo in
+                    let viewModel = RecentCallsCellViewModel(callInfo)
+                    viewModelList.append(viewModel)
+                }
+                self.updateDataSource(viewModelList.reversed())
+            }
+            .store(in: &cancellables)
+        }
     
     func updateDataSource(_ viewModelList: [RecentCallsCellViewModel]) {
         if viewModelList.isEmpty {
+            cleanAllSource()
+            reloadDataSource()
             return
         }
         cleanAllSource()
         allDataSource = viewModelList
         viewModelList.forEach { viewModel in
-            if viewModel.callRecord.result == .missed {
+            if viewModel.callInfo.result == .missed {
                 missedDataSource.append(viewModel)
             }
         }
@@ -68,59 +89,56 @@ class RecentCallsViewModel {
     func reloadDataSource() {
         switch recordCallsType {
         case .all:
-            dataSource.value = allDataSource
+            dataSource = allDataSource
         case .missed:
-            dataSource.value = missedDataSource
+            dataSource = missedDataSource
         }
     }
     
     func cleanAllSource() {
-        dataSource.value.removeAll()
+        dataSource.removeAll()
         allDataSource.removeAll()
         missedDataSource.removeAll()
     }
     
     func cleanSource(viewModel: RecentCallsCellViewModel) {
-        allDataSource.removeAll() { $0.callRecord.callId == viewModel.callRecord.callId }
-        missedDataSource.removeAll() { $0.callRecord.callId == viewModel.callRecord.callId }
+        allDataSource.removeAll() { $0.callInfo.callId == viewModel.callInfo.callId }
+        missedDataSource.removeAll() { $0.callInfo.callId == viewModel.callInfo.callId }
     }
     
     func cleanSource(callId: String) {
-        allDataSource.removeAll() { $0.callRecord.callId == callId }
-        missedDataSource.removeAll() { $0.callRecord.callId == callId }
+        allDataSource.removeAll() { $0.callInfo.callId == callId }
+        missedDataSource.removeAll() { $0.callInfo.callId == callId }
     }
     
     func repeatCall(_ indexPath: IndexPath) {
-        let callRecord = dataSource.value[indexPath.row].callRecord
-        guard var userIds = callRecord.inviteList as? [String] else { return }
-        userIds.append(callRecord.inviter)
-        let selfUserId = CallManager.shared.userState.selfUser.id.value
+        guard indexPath.row < dataSource.count else { return }
+        let callInfo = dataSource[indexPath.row].callInfo
+        guard let mediaType = callInfo.mediaType else { return }
+        var userIds = callInfo.inviteeIds
+        userIds.append(callInfo.inviterId)
+        let selfUserId = CallStore.shared.state.value.selfInfo.id
         userIds = userIds.filter { $0 != selfUserId }
         
-        if (callRecord.groupId.isEmpty && userIds.count <= 1) {
-            repeatSingleCall(callRecord, userIds)
+        if (callInfo.chatGroupId.isEmpty && userIds.count <= 1) {
+            repeatSingleCall(callInfo, userIds)
+        } else {
+            CallStore.shared.calls(participantIds: userIds, callMediaType: mediaType, params: nil, completion: nil)
         }
     }
     
-    func repeatSingleCall(_ callRecord: TUICallRecords, _ otherUserIds: [String]) {
-        let targetUserId:String
-        if callRecord.role == .called {
-            guard let inviter = callRecord.inviter as? String else {
-                return
-            }
-            targetUserId = inviter
+    func repeatSingleCall(_ callInfo: CallInfo, _ otherUserIds: [String]) {
+        guard let mediaType = callInfo.mediaType else { return }
+        let targetUserId: String
+        let selfUserId = CallStore.shared.state.value.selfInfo.id
+        
+        if callInfo.inviterId != selfUserId {
+            targetUserId = callInfo.inviterId
         } else {
-            guard let userid = otherUserIds.first as? String else {
-                return
-            }
+            guard let userid = otherUserIds.first else { return }
             targetUserId = userid
         }
-        
-        if CallManager.shared.globalState.enableForceUseV2API {
-            TUICallKit.createInstance().call(userId: targetUserId, callMediaType: callRecord.mediaType)
-        } else {
-            TUICallKit.createInstance().calls(userIdList: [targetUserId], callMediaType: callRecord.mediaType, params: nil) { } fail: { _, _ in }
-        }
+        CallStore.shared.calls(participantIds: [targetUserId], callMediaType: mediaType, params: nil, completion: nil)
     }
     
     func deleteAllRecordCalls() {
@@ -132,15 +150,16 @@ class RecentCallsViewModel {
             callIdList = getCallIdList(missedDataSource)
         }
         
-        TUICallEngine.createInstance().deleteRecordCalls(callIdList, succ: { [weak self] succList in
+        CallStore.shared.deleteRecentCalls(callIdList: callIdList) { [weak self] result in
             guard let self = self else { return }
-            
-            succList.forEach { callId in
-                self.cleanSource(callId: callId)
+            switch result {
+                case .success:
+                    callIdList.forEach { self.cleanSource(callId: $0) }
+                    self.reloadDataSource()
+                case .failure:
+                    break
+                }
             }
-            
-            self.reloadDataSource()
-        }, fail: {})
     }
     
     func getCallIdList(_ cellViewModelArray: [RecentCallsCellViewModel]) -> [String] {
@@ -151,37 +170,33 @@ class RecentCallsViewModel {
         }
         
         cellViewModelArray.forEach { obj in
-            callIdList.append(obj.callRecord.callId)
+            callIdList.append(obj.callInfo.callId)
         }
         
         return callIdList
     }
     
     func deleteRecordCall(_ indexPath: IndexPath) {
-        if indexPath.row < 0 || indexPath.row >= dataSource.value.count {
+        if indexPath.row < 0 || indexPath.row >= dataSource.count {
             return
         }
-        let viewModel = dataSource.value[indexPath.row]
+        let viewModel = dataSource[indexPath.row]
         
-        TUICallEngine.createInstance().deleteRecordCalls([viewModel.callRecord.callId], succ: { [weak self] _ in
-            guard let self = self else { return }
-            self.cleanSource(viewModel: viewModel)
-            self.reloadDataSource()
-            
-        }, fail: {})
+        CallStore.shared.deleteRecentCalls(callIdList: [viewModel.callInfo.callId], completion: nil)
     }
     
     func jumpUserInfoController(indexPath: IndexPath, navigationController: UINavigationController) {
-        if indexPath.row < 0 || indexPath.row >= dataSource.value.count {
+        if indexPath.row < 0 || indexPath.row >= dataSource.count {
             return
         }
-        let cellViewModel = dataSource.value[indexPath.row]
+        let cellViewModel = dataSource[indexPath.row]
+        let callInfo = cellViewModel.callInfo
         
-        let groupId = cellViewModel.callRecord.groupId
-        var userId = cellViewModel.callRecord.inviter
-        
-        if cellViewModel.callRecord.role == .call {
-            guard let firstUserId = cellViewModel.callRecord.inviteList.first as? String else { return }
+        let groupId = callInfo.chatGroupId
+        var userId = callInfo.inviterId
+
+        if callInfo.inviterId == CallStore.shared.state.value.selfInfo.id {
+            guard let firstUserId = callInfo.inviteeIds.first else { return }
             userId = firstUserId
         }
         

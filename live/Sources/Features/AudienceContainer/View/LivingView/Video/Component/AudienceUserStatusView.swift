@@ -12,13 +12,13 @@ import RTCCommon
 import AtomicXCore
 
 class AudienceUserStatusView: UIView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private var cancellableSet = Set<AnyCancellable>()
     private var muteAudio: Bool = true
     private var isViewReady: Bool = false
     private var seatInfo: SeatInfo
     
-    init(seatInfo: SeatInfo, manager: AudienceManager) {
+    init(seatInfo: SeatInfo, manager: AudienceStore) {
         self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)

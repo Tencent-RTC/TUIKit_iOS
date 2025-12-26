@@ -6,6 +6,7 @@
 //
 
 import AtomicXCore
+import AtomicX
 import Foundation
 import RTCRoomEngine
 import TUICore
@@ -31,24 +32,23 @@ public class VideoLiveKit: NSObject {
     public func startLive(roomId: String) {
         if FloatWindow.shared.isShowingFloatWindow() {
             if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == LoginStore.shared.state.value.loginUserInfo?.userID {
-                getRootController()?.view.makeToast(message: .pushingToReturnText)
-                return
-            } else if FloatWindow.shared.getIsLinking() {
-                getRootController()?.view.makeToast(message: .pushingToReturnText)
+                getRootController()?.view.showAtomicToast(text: .pushingToReturnText, style: .error)
                 return
             }
+            FloatWindow.shared.releaseFloatWindow()
         }
-        guard let listManager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .liveListManager) as? TUILiveListManager else { return }
-        listManager.getLiveInfo(roomId) { [weak self] liveInfo in
+        LiveListStore.shared.fetchLiveInfo(liveID: roomId) { [weak self] result in
             guard let self = self else { return }
-            if liveInfo.keepOwnerOnSeat {
+            switch result {
+            case .success(let liveInfo):
+                if liveInfo.keepOwnerOnSeat {
+                    showPrepareViewController(roomId: roomId)
+                } else {
+                    showAnchorViewController(roomId: roomId)
+                }
+            case .failure(_):
                 showPrepareViewController(roomId: roomId)
-            } else {
-                showAnchorViewController(roomId: roomId)
             }
-        } onError: { [weak self] _, _ in
-            guard let self = self else { return }
-            showPrepareViewController(roomId: roomId)
         }
     }
     
@@ -90,7 +90,7 @@ public class VideoLiveKit: NSObject {
             } onError: { err in
                 onError?(err)
             }
-        } else if let vc = viewController as? TUILiveRoomAnchorViewController {
+        } else if viewController is TUILiveRoomAnchorViewController {
             LiveListStore.shared.leaveLive { [weak self] result in
                 guard let self = self else { return }
                 switch result {

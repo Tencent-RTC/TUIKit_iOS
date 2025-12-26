@@ -64,7 +64,7 @@ public class TUIVoiceRoomViewController: UIViewController {
                 ]
                 let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
                 if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    SeatGridView.callExperimentalAPI(jsonString)
+                    LiveCoreView.callExperimentalAPI(jsonString)
                 }
             } catch {
                 LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
@@ -211,9 +211,9 @@ extension TUIVoiceRoomViewController {
 // MARK: - Subscribe state
 extension TUIVoiceRoomViewController {
     private func subscribeToast() {
-        toastService.subscribeToast { [weak self] message in
+        toastService.subscribeToast { [weak self] message, style in
             guard let self = self else { return }
-            view.makeToast(message: message)
+            view.showAtomicToast(text: message, style: style)
         }
     }
     

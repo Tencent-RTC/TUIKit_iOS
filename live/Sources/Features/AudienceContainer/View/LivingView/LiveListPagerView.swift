@@ -118,7 +118,7 @@ class LiveListPagerView: UIView {
     }
     
     private func subscribeAudienceConfig() {
-        AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
                                                                 \AudienceContainerConfig.disableSliding))
         .receive(on: RunLoop.main)
         .removeDuplicates()
@@ -144,7 +144,7 @@ class LiveListPagerView: UIView {
     }
     
     func enableScrolling() {
-        guard !AudienceManager.audienceContainerConfig.disableSliding else { return }
+        guard !AudienceStore.audienceContainerConfig.disableSliding else { return }
         isScrollEnable = true
         tableView.isScrollEnabled = true
     }

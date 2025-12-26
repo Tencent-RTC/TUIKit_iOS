@@ -1,0 +1,108 @@
+# SwiftLint Configuration for TUIRoomKit V2
+# Based on Apple Swift Style Guide and Project Constitution
+
+# Disabled rules
+disabled_rules:
+  - trailing_comma  # Allow trailing commas for better version control diffs
+
+# Opt-in rules
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - sorted_imports
+  - closure_spacing
+
+# Line length - Constitution requirement
+line_length:
+  warning: 150
+  error: 200
+  ignores_comments: true
+  ignores_urls: true
+
+# Function parameter count - Constitution requirement
+function_parameter_count:
+  warning: 6
+  error: 8
+  ignores_default_parameters: true
+
+# Type body length
+type_body_length:
+  warning: 300
+  error: 500
+
+# File length
+file_length:
+  warning: 500
+  error: 1000
+
+# Function body length
+function_body_length:
+  warning: 50
+  error: 100
+
+# Identifier naming
+identifier_name:
+  min_length:
+    warning: 1
+    error: 1
+  max_length:
+    warning: 60
+    error: 80
+  excluded:
+    - id
+    - ok
+    - x
+    - y
+    - at
+    - to
+
+# Type name
+type_name:
+  min_length: 3
+  max_length: 60
+
+# Cyclomatic complexity
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+# Nesting depth
+nesting:
+  type_level:
+    warning: 2
+    error: 3
+  statement_level:
+    warning: 5
+    error: 10
+
+# Excluded paths
+excluded:
+  - Pods
+  - Tests
+  - Example/Pods
+  - Build
+  - DerivedData
+  - .build
+  - fastlane
+
+# Included paths
+included:
+  - Source
+
+# Reporter
+reporter: "xcode"
+
+# Custom rules
+custom_rules:
+  force_unwrap_comment:
+    name: "Force Unwrap Requires Comment"
+    regex: '!\s*(?!//)'
+    message: "Force unwrap (!) must be accompanied by a comment explaining safety"
+    severity: warning
+  
+  force_cast_comment:
+    name: "Force Cast Requires Comment"  
+    regex: 'as!\s*\w+\s*(?!//)'
+    message: "Force cast (as!) must be accompanied by a comment explaining safety"
+    severity: warning

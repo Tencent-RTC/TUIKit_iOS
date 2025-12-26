@@ -6,10 +6,10 @@
 //
 
 import AtomicXCore
-import RTCCommon
 import Combine
-import TUICore
+import RTCCommon
 import RTCRoomEngine
+import TUICore
 
 public class TUILiveRoomAnchorPrepareViewController: UIViewController {
     private let roomId: String
@@ -30,7 +30,18 @@ public class TUILiveRoomAnchorPrepareViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let coreView = LiveCoreView(viewType: .pushView)
+    private let coreView: LiveCoreView = {
+        let jsonObject: [String: Any] = [
+            "api": "component",
+            "component": 21
+        ]
+        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8)
+        {
+            LiveCoreView.callExperimentalAPI(jsonString)
+        }
+        return LiveCoreView(viewType: .pushView)
+    }()
     
     private lazy var rootView: AnchorPrepareView = {
         let view = AnchorPrepareView(roomId: roomId, coreView: coreView)
@@ -40,7 +51,7 @@ public class TUILiveRoomAnchorPrepareViewController: UIViewController {
     
     var willStartLive: ((_ vc: TUILiveRoomAnchorViewController) -> ())?
     
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         
 #if DEV_MODE
@@ -53,18 +64,18 @@ public class TUILiveRoomAnchorPrepareViewController: UIViewController {
 #endif
     }
     
-    public override func loadView() {
+    override public func loadView() {
         view = rootView
     }
     
-    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         let isPortrait = size.width < size.height
         rootView.updateRootViewOrientation(isPortrait: isPortrait)
     }
 }
 
-extension TUILiveRoomAnchorPrepareViewController : AnchorPrepareViewDelegate {
+extension TUILiveRoomAnchorPrepareViewController: AnchorPrepareViewDelegate {
     public func onClickBackButton() {
         if let nav = navigationController {
             nav.popViewController(animated: true)

@@ -10,6 +10,7 @@ import RTCCommon
 import Combine
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 class VRUserManagerPanel: RTCBaseView {
     private let liveID: String
@@ -25,11 +26,13 @@ class VRUserManagerPanel: RTCBaseView {
         return currentLive.liveOwner.userID == TUIRoomEngine.getSelfInfo().userId
     }
     
-    private let avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 20.scale375()
-        imageView.layer.masksToBounds = true
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
     private let userContentView: UIView = {
@@ -52,14 +55,13 @@ class VRUserManagerPanel: RTCBaseView {
         return label
     }()
     
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .b1
-        button.titleLabel?.font = .customFont(ofSize: 14, weight: .medium)
-        button.setTitle(.followText, for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.setImage(internalImage("live_user_followed_icon"), for: .selected)
-        button.layer.cornerRadius = 16.scale375Height()
+    private let followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .small,
+            content: .textOnly(text: .followText)
+        )
         button.isHidden = true
         return button
     }()
@@ -113,7 +115,7 @@ class VRUserManagerPanel: RTCBaseView {
     }
     
     override func constructViewHierarchy() {
-        addSubview(avatarImageView)
+        addSubview(avatarView)
         addSubview(userContentView)
         userContentView.addSubview(userNameLabel)
         userContentView.addSubview(userIdLabel)
@@ -124,17 +126,16 @@ class VRUserManagerPanel: RTCBaseView {
     }
     
     override func activateConstraints() {
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.leading.top.equalToSuperview().offset(24.scale375())
-            make.size.equalTo(CGSize(width: 40.scale375(), height: 40.scale375()))
             if !isOwner {
                 make.bottom.equalToSuperview().offset(-24.scale375())
             }
         }
         
         userContentView.snp.makeConstraints { make in
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
-            make.top.bottom.equalTo(avatarImageView)
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
+            make.top.bottom.equalTo(avatarView)
         }
         
         userNameLabel.snp.makeConstraints { make in
@@ -156,8 +157,8 @@ class VRUserManagerPanel: RTCBaseView {
         
         if isOwner {
             featureClickPanel.snp.makeConstraints { make in
-                make.top.equalTo(avatarImageView.snp.bottom).offset(30.scale375Height())
-                make.leading.equalTo(avatarImageView.snp.leading)
+                make.top.equalTo(avatarView.snp.bottom).offset(30.scale375Height())
+                make.leading.equalTo(avatarView.snp.leading)
                 make.bottom.equalToSuperview().offset(-24.scale375())
             }
         }
@@ -170,7 +171,7 @@ class VRUserManagerPanel: RTCBaseView {
     }
     
     override func setupViewStyle() {
-        avatarImageView.kf.setImage(with: URL(string: seatInfo.avatarUrl ?? ""), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(seatInfo.avatarUrl ?? "", placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = seatInfo.userName
         userIdLabel.text = "ID: " + (seatInfo.userId ?? "")
     }
@@ -192,13 +193,13 @@ extension VRUserManagerPanel {
                     guard let self = self else { return false }
                     return $0 == self.seatInfo.userId
                 }) {
+                    self.followButton.setButtonContent(.iconOnly(icon: internalImage("live_user_followed_icon")))
+                    self.followButton.setColorType(.secondary)
                     self.followButton.isSelected = true
-                    self.followButton.backgroundColor = .g3.withAlphaComponent(0.3)
-                    self.followButton.setTitle("", for: .normal)
                 } else {
+                    self.followButton.setButtonContent(.textOnly(text: .followText))
+                    self.followButton.setColorType(.primary)
                     self.followButton.isSelected = false
-                    self.followButton.backgroundColor = .deepSeaBlueColor
-                    self.followButton.setTitle(.followText, for: .normal)
                 }
             }
             .store(in: &cancellableSet)
@@ -248,7 +249,7 @@ extension VRUserManagerPanel {
         } onError: { [weak self] error, message in
             guard let self = self else { return }
             let err = InternalError(code: error.rawValue, message: message)
-            toastService.showToast(err.localizedMessage)
+            toastService.showToast(err.localizedMessage, toastStyle: .error)
         }
     }
     
@@ -258,7 +259,7 @@ extension VRUserManagerPanel {
             guard let self = self else { return }
             if case .failure(let error) = result {
                 let err = InternalError(errorInfo: error)
-                toastService.showToast(err.localizedMessage)
+                toastService.showToast(err.localizedMessage, toastStyle: .error)
             }
         }
         routerManager.router(action: .dismiss())

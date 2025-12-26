@@ -11,12 +11,12 @@ import Combine
 import AtomicXCore
 
 class AudienceCoHostView: UIView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private var isViewReady: Bool = false
     private var seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(seatInfo: SeatInfo, manager: AudienceManager) {
+    init(seatInfo: SeatInfo, manager: AudienceStore) {
         self.seatInfo = seatInfo
         self.manager = manager
         super.init(frame: .zero)

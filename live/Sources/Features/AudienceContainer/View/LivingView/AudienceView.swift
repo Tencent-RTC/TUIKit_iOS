@@ -11,6 +11,7 @@ import Foundation
 import RTCCommon
 import RTCRoomEngine
 import TUICore
+import AtomicX
 
 public protocol RotateScreenDelegate: AnyObject {
     func rotateScreen(isPortrait: Bool)
@@ -23,7 +24,7 @@ class AudienceView: RTCBaseView {
     
     // MARK: - private property
 
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     
@@ -82,7 +83,7 @@ class AudienceView: RTCBaseView {
         return view
     }()
     
-    init(roomId: String, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    init(roomId: String, manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.roomId = roomId
         self.manager = manager
         self.routerManager = routerManager
@@ -246,7 +247,7 @@ extension AudienceView {
                 case .onLocalMicrophoneOpenedByAdmin(policy: _):
                     text = .unmutedAudioText
                 }
-                manager.toastSubject.send(text)
+                manager.toastSubject.send((text, .info))
             }
             .store(in: &cancellableSet)
     }
@@ -273,16 +274,16 @@ extension AudienceView {
                 switch event {
                 case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
                     if !isAccept {
-                        makeToast(message: .takeSeatApplicationRejected)
+                        showAtomicToast(text: .takeSeatApplicationRejected, style: .info)
                     }
                 case .onGuestApplicationNoResponse(reason: let reason):
                     switch reason {
                     case .timeout:
-                        makeToast(message: .takeSeatApplicationTimeout)
+                        showAtomicToast(text: .takeSeatApplicationTimeout, style: .info)
                     default: break
                     }
                 case .onKickedOffSeat(seatIndex: _, hostUser: _):
-                    makeToast(message: .kickedOutOfSeat)
+                    showAtomicToast(text: .kickedOutOfSeat, style: .info)
                 default: break
                 }
             }
@@ -296,9 +297,9 @@ extension AudienceView {
                 case .onAudienceMessageDisabled(audience: let user, isDisable: let isDisable):
                     guard user.userID == manager.selfUserID else { break }
                     if isDisable {
-                        makeToast(message: .disableChatText)
+                        showAtomicToast(text: .disableChatText, style: .info)
                     } else {
-                        makeToast(message: .enableChatText)
+                        showAtomicToast(text: .enableChatText, style: .info)
                     }
                 default: break
                 }
@@ -349,7 +350,7 @@ extension AudienceView {
     }
         
     private func onKickedByAdmin() {
-        manager.toastSubject.send(.kickedOutText)
+        manager.toastSubject.send((.kickedOutText,.info))
         isUserInteractionEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
@@ -369,13 +370,10 @@ extension AudienceView {
             leaveRoom()
             return
         }
-        var items: [ActionItem] = []
-        let lineConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .warningTextColor)
-        lineConfig.backgroundColor = .bgOperateColor
-        lineConfig.lineColor = .g3.withAlphaComponent(0.3)
-
+        var items: [AlertButtonConfig] = []
+        
         let title: String = .endLiveOnLinkMicText
-        let endLinkMicItem = ActionItem(title: .endLiveLinkMicDisconnectText, designConfig: lineConfig, actionClosure: { [weak self] _ in
+        let endLinkMicItem = AlertButtonConfig(text: .endLiveLinkMicDisconnectText, type: .red) { [weak self] _ in
             guard let self = self else { return }
             manager.coGuestStore.disConnect { [weak self] result in
                 guard let self = self else { return }
@@ -386,21 +384,25 @@ extension AudienceView {
                 default: break
                 }
             }
-            routerManager.router(action: .dismiss())
-        })
+            routerManager.dismiss()
+        }
         items.append(endLinkMicItem)
         
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .defaultTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-        let endLiveItem = ActionItem(title: .confirmCloseText, designConfig: designConfig, actionClosure: { [weak self] _ in
+        let endLiveItem = AlertButtonConfig(text: .confirmCloseText, type: .primary) { [weak self] _ in
             guard let self = self else { return }
-            routerManager.router(action: .dismiss())
+            routerManager.dismiss()
             leaveRoom()
-        })
+        }
         items.append(endLiveItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(title: title, items: items, cancelText: .cancelText, cancelColor: .bgOperateColor,
-                                                                        cancelTitleColor: .defaultTextColor), .center)))
+        
+        let cancelItem = AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss()
+        }
+        items.append(cancelItem)
+
+        let alertView = AtomicAlertView(config: AlertViewConfig(title: title, items: items))
+        routerManager.present(view: alertView)
     }
     
     func leaveRoom() {
@@ -518,38 +520,38 @@ extension AudienceView {
 }
 
 extension AudienceView: VideoViewDelegate {
-    func createCoGuestView(seatInfo: TUISeatFullInfo, viewLayer: ViewLayer) -> UIView? {
+    func createCoGuestView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
         switch viewLayer {
         case .foreground:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AudienceCoGuestView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager)
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AudienceCoGuestView(seatInfo: seatInfo, manager: manager, routerManager: routerManager)
             }
-            return AudienceEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
         case .background:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
             }
             return nil
         }
     }
     
-    func createCoHostView(seatInfo: TUISeatFullInfo, viewLayer: ViewLayer) -> UIView? {
+    func createCoHostView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
         switch viewLayer {
         case .foreground:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AudienceCoHostView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager)
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AudienceCoHostView(seatInfo: seatInfo, manager: manager)
             }
-            return AudienceEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
         case .background:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
             }
             return nil
         }
     }
     
-    func createBattleView(battleUser: TUIBattleUser) -> UIView? {
-        return AudienceBattleMemberInfoView(manager: manager, userId: battleUser.userId)
+    func createBattleView(seatInfo: SeatInfo) -> UIView? {
+        return AudienceBattleMemberInfoView(manager: manager, userId: seatInfo.userInfo.userID)
     }
     
     func createBattleContainerView() -> UIView? {

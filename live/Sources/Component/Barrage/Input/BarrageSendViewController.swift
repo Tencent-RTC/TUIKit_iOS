@@ -209,7 +209,7 @@ extension BarrageSendViewController: InputBarViewDelegate {
                 BarrageManager.shared.inputString = ""
             case .failure(let errorInfo):
                 let error = InternalError(errorInfo: errorInfo)
-                BarrageManager.shared.toastSubject.send(error.localizedMessage)
+                    BarrageManager.shared.toastSubject.send((error.localizedMessage,.error))
             }
         }
         close()

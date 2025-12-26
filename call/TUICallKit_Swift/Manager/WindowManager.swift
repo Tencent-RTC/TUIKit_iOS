@@ -5,8 +5,9 @@
 //  Created by vincepzhang on 2025/2/21.
 //
 import RTCCommon
+import AtomicXCore
 
-class WindowManager: NSObject, GestureViewDelegate {
+class WindowManager: NSObject {
     static let shared = WindowManager()
 
     private var floatWindowBeganPoint: CGPoint = .zero
@@ -45,7 +46,7 @@ class WindowManager: NSObject, GestureViewDelegate {
     }
     
     @objc private func handleOrientationChange() {
-        if !window.isHidden && CallManager.shared.viewState.router.value == .floatView {
+        if !window.isHidden && TUICallKitImpl.shared.viewState.router.value == .floatView {
             let onRight = window.frame.midX > currentScreenWidth / 2
             let yRatio = window.frame.origin.y / max(1, (currentScreenHeight - window.frame.height))
             DispatchQueue.main.async {
@@ -58,7 +59,7 @@ class WindowManager: NSObject, GestureViewDelegate {
             }
         }
         
-        if !window.isHidden && CallManager.shared.viewState.router.value == .banner {
+        if !window.isHidden && TUICallKitImpl.shared.viewState.router.value == .banner {
                 DispatchQueue.main.async {
                     self.window.frame = self.getBannerWindowFrame()
                 }
@@ -71,9 +72,11 @@ class WindowManager: NSObject, GestureViewDelegate {
         UIDevice.current.setValue(orientationValue, forKey: "orientation")
         UIViewController.attemptRotationToDeviceOrientation()
 
-
-        Permission.hasPermission(callMediaType: CallManager.shared.callState.mediaType.value, fail: nil)
-        CallManager.shared.viewState.router.value = .fullView
+        if let mediaType = CallStore.shared.state.value.activeCall.mediaType {
+            _ = Permission.hasPermission(callMediaType: mediaType, completion: nil)
+        }
+        
+        TUICallKitImpl.shared.viewState.router.value = .fullView
         window.frame = currentScreenFrame
         window.rootViewController = CallKitNavigationController(rootViewController: CallMainViewController())
         window.isHidden = false
@@ -83,20 +86,26 @@ class WindowManager: NSObject, GestureViewDelegate {
     
     // MARK: show Floating Window
     func showFloatingWindow() {
-        closeWindow()
-        CallManager.shared.viewState.router.value = .floatView
-        let vc = FloatWindowViewController(nibName: nil, bundle: nil)
-        vc.delegate = self
+        TUICallKitImpl.shared.viewState.router.value = .floatView
+        let vc = FloatWindowViewController()
+        vc.tapGestureAction = { [weak self] gesture in
+            self?.tapGestureAction(tapGesture: gesture)
+        }
+            
+        vc.panGestureAction = { [weak self] gesture in
+            self?.panGestureAction(panGesture: gesture)
+        }
+            
         window.rootViewController = vc
         window.frame = getFloatWindowFrame()
         window.isHidden = false
         window.backgroundColor = UIColor.clear
-        window.t_makeKeyAndVisible()
+        window.makeKeyAndVisible()
     }
         
     // MARK: show Incoming Banner Window
     func showIncomingBannerWindow() {
-        CallManager.shared.viewState.router.value = .banner
+        TUICallKitImpl.shared.viewState.router.value = .banner
         window.rootViewController = IncomingBannerViewController(nibName: nil, bundle: nil)
         window.isHidden = false
         window.backgroundColor = UIColor.clear
@@ -106,14 +115,14 @@ class WindowManager: NSObject, GestureViewDelegate {
     
     // MARK: close windows
     func closeWindow() {
-        CallManager.shared.viewState.router.value = .none
+        TUICallKitImpl.shared.viewState.router.value = .none
         window.rootViewController = nil
         window.isHidden = true
     }
     
     func hideFloatingWindow() {
         window.isHidden = true
-        CallManager.shared.viewState.router.value = .fullView
+        TUICallKitImpl.shared.viewState.router.value = .fullView
         
         let orientationValue = WindowUtils.isPortrait ?
             UIInterfaceOrientation.portrait.rawValue :
@@ -140,15 +149,15 @@ class WindowManager: NSObject, GestureViewDelegate {
             
         case .changed:
             let point = panGesture.translation(in: window)
-            var dstX = floatWindowBeganPoint.x + point.x
-            var dstY = floatWindowBeganPoint.y + point.y
+            let dstX = floatWindowBeganPoint.x + point.x
+            let dstY = floatWindowBeganPoint.y + point.y
             window.frame = CGRect(x: max(0, min(dstX, currentScreenWidth - window.frame.width)),
-                                 y: max(0, min(dstY, currentScreenHeight - window.frame.height)),
-                                 width: window.frame.width,
-                                 height: window.frame.height)
+                                  y: max(0, min(dstY, currentScreenHeight - window.frame.height)),
+                                  width: window.frame.width,
+                                  height: window.frame.height)
             
         case .ended, .cancelled:
-            var dstX: CGFloat = window.frame.midX < (screenWidth / 2) ? 0 : (screenWidth - window.frame.width)
+            let dstX: CGFloat = window.frame.midX < (currentScreenWidth / 2) ? 0 : (currentScreenWidth - window.frame.width)
             UIView.animate(withDuration: 0.3) {
                 self.window.frame.origin.x = dstX
             }
@@ -163,9 +172,9 @@ class WindowManager: NSObject, GestureViewDelegate {
         let yOffset = 150.scale375Height()
         let rect: CGRect
 
-        if CallManager.shared.viewState.callingViewType.value == .multi {
+        if !(CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1) {
             rect = CGRect(x: xOffset, y: yOffset, width: kMicroGroupViewWidth, height: kMicroGroupViewHeight)
-        } else if CallManager.shared.callState.mediaType.value == .audio {
+        } else if CallStore.shared.state.value.activeCall.mediaType == .audio {
             rect = CGRect(x: xOffset, y: yOffset, width: kMicroAudioViewWidth, height: kMicroAudioViewHeight)
         } else {
             xOffset = currentScreenWidth - kMicroVideoViewWidth

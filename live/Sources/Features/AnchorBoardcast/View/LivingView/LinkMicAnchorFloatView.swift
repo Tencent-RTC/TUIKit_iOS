@@ -10,24 +10,23 @@ import Combine
 import RTCCommon
 import SnapKit
 import UIKit
+import AtomicX
 
 class AnchorUserImageCell: UICollectionViewCell {
     var user: LiveUserInfo? {
         didSet {
-            if let url = URL(string: user?.avatarURL ?? "") {
-                avatarImageView.kf.setImage(with: url, placeholder: UIImage.avatarPlaceholderImage)
-            } else {
-                avatarImageView.image = .avatarPlaceholderImage
-            }
+            avatarView.setContent(.url(user?.avatarURL ?? "", placeholder: UIImage.avatarPlaceholderImage))
         }
     }
 
-    lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        imageView.layer.cornerRadius = 40.scale375() * 0.5
-        imageView.layer.masksToBounds = true
-        contentView.addSubview(imageView)
-        return imageView
+    lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        contentView.addSubview(avatar)
+        return avatar
     }()
 
     private var isViewReady = false
@@ -38,19 +37,18 @@ class AnchorUserImageCell: UICollectionViewCell {
         }
         isViewReady = true
         contentView.backgroundColor = .clear
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
 
     func setImage(image: UIImage?) {
-        avatarImageView.kf.cancelDownloadTask()
-        avatarImageView.image = image
+        avatarView.setContent(.icon(image: image ?? UIImage.placeholderImage))
     }
 }
 
 class LinkMicAnchorFloatView: UIView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private var cancellableSet = Set<AnyCancellable>()
 
@@ -82,8 +80,8 @@ class LinkMicAnchorFloatView: UIView {
         return collectionView
     }()
 
-    init(manager: AnchorManager, routerManager: AnchorRouterManager) {
-        self.manager = manager
+    init(store: AnchorStore, routerManager: AnchorRouterManager) {
+        self.store = store
         self.routerManager = routerManager
         super.init(frame: .zero)
     }
@@ -104,7 +102,7 @@ class LinkMicAnchorFloatView: UIView {
     }
 
     private func subscribeSeatState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] applyList in
@@ -123,9 +121,9 @@ class LinkMicAnchorFloatView: UIView {
             case 1:
                 make.width.equalTo(40.scale375())
             case 2:
-                make.width.equalTo(56.scale375())
+                make.width.equalTo(64.scale375())
             default:
-                make.width.equalTo(76.scale375())
+                make.width.equalTo(88.scale375())
             }
         }
     }

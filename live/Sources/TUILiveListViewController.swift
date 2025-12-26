@@ -34,7 +34,6 @@ public class TUILiveListViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        enableSwitchPlaybackQuality(true)
         initNavigationItemTitleView()
     }
     
@@ -86,14 +85,7 @@ public class TUILiveListViewController: UIViewController {
         rootView.setColumnStyle(style: style)
     }
     
-    private func enableSwitchPlaybackQuality(_ enable: Bool) {
-        TUICore.callService(.TUICore_VideoAdvanceService,
-                            method: .TUICore_VideoAdvanceService_EnableSwitchMultiPlayback,
-                            param: ["enable" : NSNumber(value: enable)])
-    }
-    
     deinit {
-        enableSwitchPlaybackQuality(false)
         print("deinit \(type(of: self))")
     }
 }
@@ -124,10 +116,7 @@ extension TUILiveListViewController: OnItemClickDelegate {
                 FloatWindow.shared.resumeLive(atViewController: self.navigationController ?? self)
                 return
             } else if let ownerId = FloatWindow.shared.getRoomOwnerId(), ownerId == LoginStore.shared.state.value.loginUserInfo?.userID {
-                view.makeToast(message: .pushingToReturnText)
-                return
-            } else if FloatWindow.shared.getIsLinking() {
-                view.makeToast(message: .pushingToReturnText)
+                view.showAtomicToast(text: .pushingToReturnText, style: .error)
                 return
             } else {
                 FloatWindow.shared.releaseFloatWindow()
@@ -221,6 +210,5 @@ extension String {
     fileprivate static let pushingToReturnText = internalLocalized("Live streaming in progress. Please try again later.")
     
     fileprivate static let TUICore_VideoAdvanceService = "TUICore_VideoAdvanceService"
-    fileprivate static let TUICore_VideoAdvanceService_EnableSwitchMultiPlayback = "TUICore_VideoAdvanceService_EnableSwitchMultiPlayback"
 
 }

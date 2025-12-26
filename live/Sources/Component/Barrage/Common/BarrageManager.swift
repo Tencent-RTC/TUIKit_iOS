@@ -4,7 +4,7 @@
 //
 //  Created by gg on 2025/3/11.
 //
-
+import AtomicX
 import RTCRoomEngine
 import Combine
 import RTCCommon
@@ -28,5 +28,5 @@ class BarrageManager: NSObject {
     }
     
     var inputString: String = ""
-    let toastSubject = PassthroughSubject<String, Never>()
+    let toastSubject = PassthroughSubject<(String,ToastStyle), Never>()
 }

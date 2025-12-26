@@ -11,14 +11,14 @@ import RTCCommon
 import UIKit
 
 class AnchorBattleMemberInfoView: RTCBaseView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private var userId: String
     private var cancellableSet: Set<AnyCancellable> = []
     
     private let maxRankingValue = 9
     
-    init(manager: AnchorManager, userId: String) {
-        self.manager = manager
+    init(store: AnchorStore, userId: String) {
+        self.store = store
         self.userId = userId
         super.init(frame: .zero)
     }
@@ -122,7 +122,7 @@ class AnchorBattleMemberInfoView: RTCBaseView {
     }
     
     private func subscribeBattleState() {
-        manager.battleStore.battleEventPublisher
+        store.battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
@@ -138,9 +138,9 @@ class AnchorBattleMemberInfoView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
+        store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
             .removeDuplicates()
-            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore)).removeDuplicates())
+            .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] battleUsers, battleScore in
                 guard let self = self else { return }
@@ -150,7 +150,7 @@ class AnchorBattleMemberInfoView: RTCBaseView {
     }
     
     private func onBattleScoreChanged(battleUsers: [SeatUserInfo], score: [String: UInt]) {
-        guard manager.coHostState.connected.count > 2 else {
+        guard store.coHostState.connected.count > 2 else {
             reset()
             return
         }
@@ -215,7 +215,7 @@ class AnchorBattleMemberInfoView: RTCBaseView {
     }
     
     private func onBattleEnd() {
-        onBattleScoreChanged(battleUsers: manager.battleState.battleUsers, score: manager.battleState.battleScore)
+        onBattleScoreChanged(battleUsers: store.battleState.battleUsers, score: store.battleState.battleScore)
     }
 }
 

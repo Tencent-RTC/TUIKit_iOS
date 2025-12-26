@@ -7,7 +7,6 @@
 
 import UIKit
 import RTCRoomEngine
-import Factory
 import Combine
 import TUIRoomKit
 
@@ -46,7 +45,7 @@ class ConferenceOptionsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        ConferenceSession.sharedInstance.enableWaterMark()
+//        ConferenceSession.sharedInstance.enableWaterMark()
     }
     
     deinit {
@@ -77,7 +76,7 @@ extension ConferenceOptionsViewController {
     }
     
     func scheduleRoom() {
-        let scheduleViewController = ScheduleConferenceViewController()
-        navigationController?.pushViewController(scheduleViewController, animated: true)
+//        let scheduleViewController = ScheduleConferenceViewController()
+//        navigationController?.pushViewController(scheduleViewController, animated: true)
     }
 }

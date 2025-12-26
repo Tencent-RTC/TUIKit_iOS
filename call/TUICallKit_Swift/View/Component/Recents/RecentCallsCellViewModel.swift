@@ -11,84 +11,95 @@ import RTCRoomEngine
 import ImSDK_Plus
 import TUICore
 import RTCCommon
+import Combine
+import AtomicXCore
 
-class RecentCallsCellViewModel {
+class RecentCallsCellViewModel: ObservableObject {
     
-    var avatarImage: Observable<UIImage> = Observable(UIImage())
-    var faceURL: Observable<String> = Observable("")
+    @Published var avatarImage: UIImage?
+    @Published var faceURL: String = ""
+    @Published var titleLabelStr: String = ""
     
-    var titleLabelStr: Observable<String> = Observable("")
     var mediaTypeImageStr: String = ""
     var resultLabelStr: String = ""
     var timeLabelStr: String = ""
     
-    var callRecord: TUICallRecords
+    var callInfo: CallInfo
     
-    init(_ record: TUICallRecords) {
-        callRecord = record
+    init(_ info: CallInfo) {
+        callInfo = info
         
-        configAvatarImage(callRecord)
-        configResult(callRecord.result)
-        configMediaTypeImageName(callRecord.mediaType)
-        configTitle(callRecord)
-        configTime(callRecord)
+        configAvatarImage(callInfo)
+        configResult(callInfo.result)
+        configMediaTypeImageName(callInfo.mediaType)
+        configTitle(callInfo)
+        configTime(callInfo)
     }
     
-    private func configAvatarImage(_ callRecord: TUICallRecords) {
-        guard var userIds = callRecord.inviteList as? [String] else { return }
-        userIds.append(callRecord.inviter)
-        let selfUserId = CallManager.shared.userState.selfUser.id.value
+    private func configAvatarImage(_ callInfo: CallInfo) {
+        var userIds = callInfo.inviteeIds
+        userIds.append(callInfo.inviterId)
+        
+        let selfUserId = CallStore.shared.state.value.selfInfo.id
         userIds = userIds.filter { $0 != selfUserId }
         
-        if (!callRecord.groupId.isEmpty || userIds.count >= 2) {
-            var inviteList = callRecord.inviteList
-            inviteList.insert(callRecord.inviter, at: 0)
-            guard let inviteList = inviteList as? [String] else { return }
+        if (!callInfo.chatGroupId.isEmpty || userIds.count >= 2) {
+            var inviteList = callInfo.inviteeIds
+            inviteList.insert(callInfo.inviterId, at: 0)
             configGroupAvatarImage(inviteList)
         } else {
-            configSingleAvatarImage(callRecord)
+            configSingleAvatarImage(callInfo)
         }
     }
     
     private func configGroupAvatarImage(_ inviteList: [String]) {
         if inviteList.isEmpty {
-            avatarImage.value = TUICoreDefineConvert.getDefaultGroupAvatarImage()
+            DispatchQueue.main.async {
+                self.avatarImage = TUICoreDefineConvert.getDefaultGroupAvatarImage()
+            }
             return
         }
         
-        let inviteStr = inviteList.joined(separator: "#")
+        let inviteStr = inviteList.sorted().joined(separator: "#")
         
         getCacheAvatarForInviteStr(inviteStr) { [weak self] avatar in
             guard let self = self else { return }
-            if let avatar = avatar {
-                self.avatarImage.value = avatar
-            } else {
-                V2TIMManager.sharedInstance().getUsersInfo(inviteList, succ: { infoList in
-                    var avatarsList = [String]()
-                    
-                    infoList?.forEach { userFullInfo in
-                        if let faceURL = userFullInfo.faceURL, !faceURL.isEmpty {
-                            avatarsList.append(faceURL)
-                        } else {
-                            avatarsList.append("http://placeholder")
+            DispatchQueue.main.async {
+                if let avatar = avatar {
+                    self.avatarImage = avatar
+                } else {
+                    V2TIMManager.sharedInstance().getUsersInfo(inviteList, succ: { infoList in
+                        var avatarsList = [String]()
+                        
+                        infoList?.forEach { userFullInfo in
+                            if let faceURL = userFullInfo.faceURL, !faceURL.isEmpty {
+                                avatarsList.append(faceURL)
+                            } else {
+                                avatarsList.append("http://placeholder")
+                            }
                         }
-                    }
-                    TUIGroupAvatar.createGroupAvatar(avatarsList, finished: { [weak self] image in
-                        guard let self = self else { return }
-                        self.avatarImage.value = image
-                        self.cacheGroupCallAvatar(image, inviteStr: inviteStr)
-                    })
-                }, fail: nil)
+                        TUIGroupAvatar.createGroupAvatar(avatarsList, finished: { [weak self] image in
+                            guard let self = self else { return }
+                            DispatchQueue.main.async {
+                                self.avatarImage = image
+                            }
+                            self.cacheGroupCallAvatar(image, inviteStr: inviteStr)
+                        })
+                    }, fail: nil)
+                }
             }
         }
     }
     
-    private func configSingleAvatarImage(_ callRecord: TUICallRecords) {
-        avatarImage.value = TUICoreDefineConvert.getDefaultAvatarImage()
-        var useId = callRecord.inviter
+    private func configSingleAvatarImage(_ callInfo: CallInfo) {
+        DispatchQueue.main.async {
+            self.avatarImage = TUICoreDefineConvert.getDefaultAvatarImage()
+        }
+        var useId = callInfo.inviterId
         
-        if callRecord.role == .call {
-            guard let firstInvite = callRecord.inviteList.first as? String else { return }
+        let selfUserId = CallStore.shared.state.value.selfInfo.id
+        if callInfo.inviterId == selfUserId {
+            guard let firstInvite = callInfo.inviteeIds.first else { return }
             useId = firstInvite
         }
         
@@ -97,14 +108,16 @@ class RecentCallsCellViewModel {
                 guard let self = self else { return }
                 if let userFullInfo = infoList?.first {
                     if let faceURL = userFullInfo.faceURL, !faceURL.isEmpty, faceURL.hasPrefix("http") {
-                        self.faceURL.value = faceURL
+                        DispatchQueue.main.async {
+                            self.faceURL = faceURL
+                        }
                     }
                 }
             }, fail: nil)
         }
     }
     
-    private func configResult(_ callResultType: TUICallResultType) {
+    private func configResult(_ callResultType: CallDirection) {
         switch callResultType {
         case .missed:
             resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.missed") ?? "Missed"
@@ -114,12 +127,10 @@ class RecentCallsCellViewModel {
             resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.outgoing") ?? "Outgoing"
         case .unknown:
             break
-        @unknown default:
-            break
         }
     }
     
-    private func configMediaTypeImageName(_ callMediaType: TUICallMediaType) {
+    private func configMediaTypeImageName(_ callMediaType: CallMediaType?) {
         if callMediaType == .audio {
             mediaTypeImageStr = "ic_recents_audio"
         } else if callMediaType == .video {
@@ -127,25 +138,30 @@ class RecentCallsCellViewModel {
         }
     }
     
-    func configTitle(_ callRecord: TUICallRecords) {
-        guard var userIds = callRecord.inviteList as? [String] else { return }
-        userIds.append(callRecord.inviter)
+    func configTitle(_ callInfo: CallInfo) {
+        var userIds = callInfo.inviteeIds
+        userIds.append(callInfo.inviterId)
         
-        let selfUserId = CallManager.shared.userState.selfUser.id.value
+        let selfUserId = CallStore.shared.state.value.selfInfo.id
         userIds = userIds.filter { $0 != selfUserId }
 
-        titleLabelStr.value = ""
+        DispatchQueue.main.async {
+            self.titleLabelStr = ""
+        }
+        
         UserManager.getUserInfosFromIM(userIDs: userIds) { [weak self] infoList in
             guard let self = self else { return }
-            let titleArray = infoList.map { $0.remark.value.count > 0
-                ? $0.remark.value
-                : $0.nickname.value.count > 0 ? $0.nickname.value : $0.id.value }
-            self.titleLabelStr.value = titleArray.joined(separator: ",")
+            let titleArray = infoList.map { $0.remark.count > 0
+                ? $0.remark
+                : $0.name.count > 0 ? $0.name : $0.id }
+            DispatchQueue.main.async {
+                self.titleLabelStr = titleArray.joined(separator: ",")
+            }
         }
     }
     
-    private func configTime(_ callRecord: TUICallRecords) {
-        let beginTime: TimeInterval = callRecord.beginTime / 1_000
+    private func configTime(_ callInfo: CallInfo) {
+        let beginTime: TimeInterval = callInfo.startTime
         if beginTime <= 0 {
             return
         }
@@ -157,25 +173,27 @@ class RecentCallsCellViewModel {
         let cacheKey = "group_call_avatar_\(inviteStr)"
         let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first ?? ""
         let filePath = "\(cachePath)/\(cacheKey)"
-        let fileManager = FileManager.default
         
-        if fileManager.fileExists(atPath: filePath) {
-            if let data = fileManager.contents(atPath: filePath), let image = UIImage(data: data) {
+        DispatchQueue.global(qos: .background).async {
+            if FileManager.default.fileExists(atPath: filePath),
+               let data = FileManager.default.contents(atPath: filePath),
+               let image = UIImage(data: data) {
                 completion(image)
-                return
+            } else {
+                completion(nil)
             }
         }
-        completion(nil)
     }
     
     private func cacheGroupCallAvatar(_ avatar: UIImage, inviteStr: String) {
         let cacheKey = "group_call_avatar_\(inviteStr)"
         let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first ?? ""
         let filePath = "\(cachePath)/\(cacheKey)"
-        let fileManager = FileManager.default
         
-        if let data = avatar.pngData() {
-            fileManager.createFile(atPath: filePath, contents: data, attributes: nil)
+        DispatchQueue.global(qos: .background).async {
+            if let data = avatar.pngData() {
+                FileManager.default.createFile(atPath: filePath, contents: data, attributes: nil)
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 //  Created by ssc on 2025/5/9.
 //
 
+import AtomicXCore
 import Foundation
 import Network
 import RTCRoomEngine
@@ -20,20 +21,17 @@ protocol NetWorkInfoServiceDelegate {
 }
 
 class NetWorkInfoService {
-
-    private let trtcCloud: TRTCCloud
     private let roomEngine: TUIRoomEngine = TUIRoomEngine.sharedInstance()
-
-    init(trtcCloud: TRTCCloud) {
-        self.trtcCloud = trtcCloud
+    private var trtcCloud: TRTCCloud {
+        roomEngine.getTRTCCloud()
     }
 
-    func setAudioCaptureVolume(volume : Int) {
+    func setAudioCaptureVolume(volume: Int) {
         trtcCloud.setAudioCaptureVolume(volume)
     }
 
     func getSelfUserId() -> String {
-        return TUIRoomEngine.getSelfInfo().userId
+        return LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
     }
 
     func getVolueme() -> Int {

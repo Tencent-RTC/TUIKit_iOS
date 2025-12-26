@@ -12,11 +12,12 @@ import TUICore
 import Combine
 import RTCCommon
 import AtomicXCore
+import AtomicX
 
 class LSLiveInfoEditView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
     private var state: PrepareState
-    private weak var popupViewController: PopupViewController?
+    private weak var popupViewController: AtomicPopover?
 
     lazy var modeSelectionModel: PrepareSelectionModel = {
         let model = PrepareSelectionModel()
@@ -42,12 +43,19 @@ class LSLiveInfoEditView: UIView {
         view.layer.masksToBounds = true
         view.addTarget(self, action: #selector(coverButtonClick), for: .touchUpInside)
         view.kf.setImage(with: URL(string: state.coverUrl), for: .normal, placeholder: UIImage.placeholderImage)
-        let label = UILabel(frame: .zero)
-        label.backgroundColor = .pureBlackColor.withAlphaComponent(0.5)
-        label.font = .customFont(ofSize: 14)
+        
+        let label = AtomicLabel(.editCoverTitle) { theme in
+            let color = theme.tokens.color.textColorPrimary
+            let bg = theme.tokens.color.bgColorTagMask
+            let font = theme.tokens.typography.Regular14
+            let appearance = LabelAppearance(textColor: color,
+                                   backgroundColor: bg,
+                                   font: font,
+                                   cornerRadius: 0.0)
+            return appearance
+        }
+
         label.textAlignment = .center
-        label.textColor = .g7
-        label.text = .editCoverTitle
         view.addSubview(label)
         label.snp.makeConstraints { make in
             make.width.equalTo(view)
@@ -179,17 +187,22 @@ extension LSLiveInfoEditView {
         let systemImageSelectionPanel = LSSystemImageSelectionPanel(configs: imageConfig, state: &state)
         systemImageSelectionPanel.backButtonClickClosure = { [weak self] in
             guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
+            self.popupViewController?.dismiss(animated: false)
         }
-        let menuContainerView = MenuContainerView(contentView: systemImageSelectionPanel, safeBottomViewBackgroundColor: .g2)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: true)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        
+        let config = AtomicPopover.AtomicPopoverConfig(
+            position: .bottom,
+            height: .wrapContent,
+            animation: .slideFromBottom,
+            onBackdropTap: { [weak self] in
+                self?.popupViewController?.dismiss(animated: false)
+            }
+        )
+        
+        let popover = AtomicPopover(contentView: systemImageSelectionPanel, configuration: config)
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: false)
+        self.popupViewController = popover
     }
 
     @objc func editIconClick() {
@@ -202,32 +215,32 @@ extension LSLiveInfoEditView {
     }
 
     private func showModeSelection() {
-        var items: [PrepareActionItem] = []
-        let config = PrepareActionItemDesignConfig()
+        var items: [AlertButtonConfig] = []
         for mode in LiveStreamPrivacyStatus.allCases {
-            let item = PrepareActionItem(title: mode.getString(), designConfig: config, actionClosure: { [weak self] _ in
+            let item = AlertButtonConfig(text: mode.getString(), type: .primary) { [weak self] _ in
                 guard let self = self else { return }
                 state.privacyMode = mode
-                self.popupViewController?.dismiss(animated: true)
-            })
+                self.popupViewController?.dismiss(animated: false)
+            }
             items.append(item)
         }
-        var panelData = PrepareActionPanelData(items: items)
-        panelData.containCancel = false
-        let actionPanel = PrepareActionPanel(panelData: panelData)
-        actionPanel.cancelActionClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
-        let menuContainerView = MenuContainerView(contentView: actionPanel, safeBottomViewBackgroundColor: .white)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        
+        let alertConfig = AlertViewConfig(items: items)
+        let alertView = AtomicAlertView(config: alertConfig)
+        
+        let config = AtomicPopover.AtomicPopoverConfig(
+            position: .bottom,
+            height: .wrapContent,
+            animation: .slideFromBottom,
+            onBackdropTap: { [weak self] in
+                self?.popupViewController?.dismiss(animated: false)
+            }
+        )
+        
+        let popover = AtomicPopover(contentView: alertView, configuration: config)
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: false)
+        self.popupViewController = popover
     }
 }
 

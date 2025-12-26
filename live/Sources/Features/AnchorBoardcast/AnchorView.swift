@@ -5,6 +5,7 @@
 //  Created by WesleyLei on 2023/12/14.
 //
 
+import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
@@ -57,17 +58,17 @@ public class AnchorView: UIView {
         liveInfo.liveID
     }
         
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private lazy var routerManager: AnchorRouterManager = .init()
-    private lazy var routerCenter = AnchorRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), rootRoute: .anchor, routerManager: routerManager, manager: manager, coreView: videoView)
+    private lazy var routerCenter = AnchorRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), rootRoute: .anchor, routerManager: routerManager, store: store, coreView: videoView)
     
-    private lazy var isInWaitingPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.isInWaiting))
+    private lazy var isInWaitingPublisher = store.subscribeState(StateSelector(keyPath: \AnchorBattleState.isInWaiting))
     private var cancellableSet = Set<AnyCancellable>()
     
     private let videoView: LiveCoreView
     
     private lazy var livingView: AnchorLivingView = {
-        let view = AnchorLivingView(manager: manager, routerManager: routerManager, coreView: videoView)
+        let view = AnchorLivingView(store: store, routerManager: routerManager, coreView: videoView)
         return view
     }()
     
@@ -83,23 +84,23 @@ public class AnchorView: UIView {
         return view
     }()
     
-    private var needPresentAlertInfo: AnchorAlertInfo?
+    private var needPresentAlertConfig: AlertViewConfig?
     
     public init(liveInfo: LiveInfo, coreView: LiveCoreView, behavior: RoomBehavior = .createRoom) {
         self.liveInfo = liveInfo
         self.videoView = coreView
-        self.manager = AnchorManager(liveID: liveInfo.liveID)
+        self.store = AnchorStore(liveID: liveInfo.liveID)
         super.init(frame: .zero)
-        manager.prepareLiveInfoBeforeEnterRoom(pkTemplateMode: .verticalGridDynamic)
+        store.prepareLiveInfoBeforeEnterRoom(pkTemplateMode: .verticalGridDynamic)
         initialize(behavior: behavior)
     }
     
     public init(liveParams: LiveParams, coreView: LiveCoreView, behavior: RoomBehavior = .createRoom) {
         self.liveInfo = liveParams.liveInfo
         self.videoView = coreView
-        self.manager = AnchorManager(liveID: liveParams.liveID)
+        self.store = AnchorStore(liveID: liveParams.liveID)
         super.init(frame: .zero)
-        manager.prepareLiveInfoBeforeEnterRoom(pkTemplateMode: liveParams.prepareState.pkTemplateMode)
+        store.prepareLiveInfoBeforeEnterRoom(pkTemplateMode: liveParams.prepareState.pkTemplateMode)
         initialize(behavior: behavior)
     }
     
@@ -122,7 +123,7 @@ public class AnchorView: UIView {
     }
     
     deinit {
-        manager.deviceStore.reset()
+        store.deviceStore.reset()
         TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
                             subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
                             object: nil,
@@ -244,19 +245,19 @@ extension AnchorView {
 extension AnchorView {
     func startLiveStream() {
         setLocalVideoMuteImage()
-        routerManager.router(action: .dismiss(.alert, completion: nil))
-        if liveInfo.keepOwnerOnSeat, manager.deviceState.cameraStatus == .off {
+        routerManager.dismiss(dismissType: .alert, completion: nil)
+        if liveInfo.keepOwnerOnSeat, store.deviceState.cameraStatus == .off {
             openLocalCamera()
             openLocalMicrophone()
         }
-        manager.liveListStore.createLive(liveInfo) { [weak self] result in
+        store.liveListStore.createLive(liveInfo) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
                 startLiveBlock?()
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                manager.onError(error)
+                store.onError(error)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                     guard let self = self else { return }
                     routerManager.router(action: .exit)
@@ -267,7 +268,7 @@ extension AnchorView {
     
     func joinSelfCreatedRoom() {
         setLocalVideoMuteImage()
-        manager.liveListStore.joinLive(liveID: liveID) { [weak self] result in
+        store.liveListStore.joinLive(liveID: liveID) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let liveInfo):
@@ -278,7 +279,7 @@ extension AnchorView {
                 startLiveBlock?()
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                manager.onError(error)
+                store.onError(error)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                     guard let self = self else { return }
                     routerManager.router(action: .exit)
@@ -288,57 +289,60 @@ extension AnchorView {
     }
     
     private func subscribeCoHostState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.applicant))
+        store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.applicant))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] applicant in
                 guard let self = self else { return }
                 if let applicantUser = applicant {
-                    let selfUserID = manager.selfUserID
-                    if !manager.coGuestState.applicants.isEmpty
-                        || !manager.coGuestState.connected.filter({ $0.userID != selfUserID }).isEmpty
-                        || !manager.coGuestState.invitees.isEmpty
+                    let selfUserID = store.selfUserID
+                    if !store.coGuestState.applicants.isEmpty
+                        || !store.coGuestState.connected.filter({ $0.userID != selfUserID }).isEmpty
+                        || !store.coGuestState.invitees.isEmpty
                     {
                         // If received linkmic request first, reject connection auto.
-                        manager.coHostStore.rejectHostConnection(fromHostLiveID: applicantUser.liveID, completion: nil)
+                        store.coHostStore.rejectHostConnection(fromHostLiveID: applicantUser.liveID, completion: nil)
                         return
                     }
-                    let alertInfo = AnchorAlertInfo(description: String.localizedReplace(.connectionInviteText, replace: "\(applicantUser.userName)"),
-                                                    imagePath: applicantUser.avatarURL,
-                                                    cancelButtonInfo: (String.rejectText, .cancelTextColor),
-                                                    defaultButtonInfo: (String.acceptText, .white))
-                    { [weak self] _ in
+                    let cancelButton = AlertButtonConfig(text: String.rejectText, type: .grey) { [weak self] _ in
                         guard let self = self else { return }
-                        manager.coHostStore.rejectHostConnection(fromHostLiveID: applicantUser.liveID) { [weak self] result in
+                        store.coHostStore.rejectHostConnection(fromHostLiveID: applicantUser.liveID) { [weak self] result in
                             guard let self = self else { return }
                             switch result {
                             case .failure(let err):
                                 let error = InternalError(code: err.code, message: err.message)
-                                manager.onError(error)
+                                store.onError(error)
                             default: break
                             }
                         }
-                        routerManager.router(action: .dismiss(.alert, completion: nil))
-                    } defaultClosure: { [weak self] _ in
-                        guard let self = self else { return }
-                        manager.coHostStore.acceptHostConnection(fromHostLiveID: applicantUser.liveID) { [weak self] result in
-                            guard let self = self else { return }
-                            switch result {
-                            case .failure(let err):
-                                let error = InternalError(code: err.code, message: err.message)
-                                manager.onError(error)
-                            default: break
-                            }
-                        }
-                        routerManager.router(action: .dismiss(.alert, completion: nil))
+                        routerManager.dismiss(dismissType: .alert, completion: nil)
                     }
+                    let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
+                        guard let self = self else { return }
+                        store.coHostStore.acceptHostConnection(fromHostLiveID: applicantUser.liveID) { [weak self] result in
+                            guard let self = self else { return }
+                            switch result {
+                            case .failure(let err):
+                                let error = InternalError(code: err.code, message: err.message)
+                                store.onError(error)
+                            default: break
+                            }
+                        }
+                        routerManager.dismiss(dismissType: .alert, completion: nil)
+                    }
+                    let alertConfig = AlertViewConfig(title: String.localizedReplace(.connectionInviteText,
+                                                                                     replace: "\(applicantUser.userName)"),
+                                                      iconUrl: applicantUser.avatarURL,
+                                                      cancelButton: cancelButton,
+                                                      confirmButton: confirmButton)
                     if FloatWindow.shared.isShowingFloatWindow() {
-                        needPresentAlertInfo = alertInfo
+                        needPresentAlertConfig = alertConfig
                     } else {
-                        routerManager.router(action: .present(.alert(info: alertInfo)))
+                        let alertView = AtomicAlertView(config: alertConfig)
+                        routerManager.present(view: alertView)
                     }
                 } else {
-                    routerManager.router(action: .dismiss(.alert, completion: nil))
+                    routerManager.dismiss(dismissType: .alert, completion: nil)
                 }
             }
             .store(in: &cancellableSet)
@@ -353,13 +357,13 @@ extension AnchorView {
     }
 
     private func openLocalCamera() {
-        guard manager.deviceState.cameraStatus == .off else { return }
-        manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera) { [weak self] result in
+        guard store.deviceState.cameraStatus == .off else { return }
+        store.deviceStore.openLocalCamera(isFront: store.deviceState.isFrontCamera) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                manager.onError(error)
+                store.onError(error)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                     guard let self = self else { return }
                     routerManager.router(action: .exit)
@@ -370,13 +374,13 @@ extension AnchorView {
     }
 
     private func openLocalMicrophone() {
-        guard manager.deviceState.microphoneStatus == .off else { return }
-        manager.deviceStore.openLocalMicrophone { [weak self] result in
+        guard store.deviceState.microphoneStatus == .off else { return }
+        store.deviceStore.openLocalMicrophone { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
-                manager.onError(error)
+                store.onError(error)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                     guard let self = self else { return }
                     routerManager.router(action: .exit)
@@ -387,18 +391,21 @@ extension AnchorView {
     }
 
     private func subscribeBattleState() {
-        manager.battleStore.battleEventPublisher
+        store.battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
                 case .onBattleStarted(battleInfo: _, inviter: _, invitees: _):
                     routerManager.router(action: .dismiss(AnchorDismissType.panel, completion: nil))
-                case .onBattleRequestCancelled(battleID: _, inviter: _, invitee: _),
-                     .onBattleRequestTimeout(battleID: _, inviter: _, invitee: _):
-                    routerManager.router(action: .dismiss(.alert, completion: nil))
+                case .onBattleRequestCancelled(battleID: _, inviter: let inviter, invitee: _):
+                    routerManager.dismiss(dismissType: .alert, completion: nil)
+                    makeToast(.cancelBattleText.replacingOccurrences(of: "xxx", with: inviter.displayName))
+                case .onBattleRequestTimeout(battleID: _, inviter: _, invitee: _):
+                    routerManager.dismiss(dismissType: .alert, completion: nil)
+                    makeToast(.battleRequestTimeoutText)
                 case .onBattleRequestReject(battleID: _, inviter: _, invitee: let invitee):
-                    makeToast(message: .rejectBattleText.replacingOccurrences(of: "xxx", with: invitee.displayName))
+                    showAtomicToast(text: .rejectBattleText.replacingOccurrences(of: "xxx", with: invitee.displayName), style: .info)
                 case .onBattleRequestReceived(battleID: let battleID, inviter: let inviter, invitee: _):
                     onReceivedBattleRequestChanged(battleID: battleID, inviter: inviter)
                 default: break
@@ -417,14 +424,14 @@ extension AnchorView {
     }
     
     private func subscribeSubjects() {
-        manager.toastSubject
+        store.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] message, style in
                 guard let self = self else { return }
-                makeToast(message: message)
+                showAtomicToast(text: message, style: style)
             }.store(in: &cancellableSet)
         
-        manager.floatWindowSubject
+        store.floatWindowSubject
             .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self = self else { return }
@@ -432,7 +439,7 @@ extension AnchorView {
             }
             .store(in: &cancellableSet)
 
-        manager.onEndLivingSubject
+        store.onEndLivingSubject
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
@@ -444,9 +451,10 @@ extension AnchorView {
             .receive(on: RunLoop.main)
             .dropFirst()
             .sink { [weak self] isShow in
-                guard let self = self, !isShow, let alertInfo = needPresentAlertInfo else { return }
-                routerManager.router(action: .present(.alert(info: alertInfo)))
-                needPresentAlertInfo = nil
+                guard let self = self, !isShow, let alertConfig = needPresentAlertConfig else { return }
+                let alertView = AtomicAlertView(config: alertConfig)
+                routerManager.present(view: alertView)
+                needPresentAlertConfig = nil
             }
             .store(in: &cancellableSet)
     }
@@ -454,39 +462,42 @@ extension AnchorView {
 
 extension AnchorView {
     private func onReceivedBattleRequestChanged(battleID: String, inviter: SeatUserInfo) {
-        let alertInfo = AnchorAlertInfo(description: .localizedReplace(.battleInvitationText, replace: inviter.userName),
-                                        imagePath: inviter.avatarURL,
-                                        cancelButtonInfo: (String.rejectText, .cancelTextColor),
-                                        defaultButtonInfo: (String.acceptText, .white))
-        { [weak self] _ in
+        let cancelButton = AlertButtonConfig(text: String.rejectText, type: .grey) { [weak self] _ in
             guard let self = self else { return }
-            manager.battleStore.rejectBattle(battleID: battleID) { [weak self] result in
+            store.battleStore.rejectBattle(battleID: battleID) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .failure(let err):
                     let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
+                    store.onError(error)
                 default: break
                 }
             }
-            routerManager.router(action: .dismiss(.alert, completion: nil))
-        } defaultClosure: { [weak self] _ in
-            guard let self = self else { return }
-            manager.battleStore.acceptBattle(battleID: battleID) { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .failure(let err):
-                    let error = InternalError(code: err.code, message: err.message)
-                    manager.onError(error)
-                default: break
-                }
-            }
-            routerManager.router(action: .dismiss(.alert, completion: nil))
+            routerManager.dismiss(dismissType: .alert, completion: nil)
         }
+        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            store.battleStore.acceptBattle(battleID: battleID) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .failure(let err):
+                    let error = InternalError(code: err.code, message: err.message)
+                    store.onError(error)
+                default: break
+                }
+            }
+            routerManager.dismiss(dismissType: .alert, completion: nil)
+        }
+        
+        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.userName),
+                                          iconUrl: inviter.avatarURL,
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton)
         if FloatWindow.shared.isShowingFloatWindow() {
-            needPresentAlertInfo = alertInfo
+            needPresentAlertConfig = alertConfig
         } else {
-            routerManager.router(action: .present(.alert(info: alertInfo)))
+            let alertView = AtomicAlertView(config: alertConfig)
+            routerManager.present(view: alertView)
         }
     }
     
@@ -506,44 +517,44 @@ extension AnchorView {
 }
 
 extension AnchorView: VideoViewDelegate {
-    public func createCoGuestView(seatInfo: TUISeatFullInfo, viewLayer: ViewLayer) -> UIView? {
+    public func createCoGuestView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
         switch viewLayer {
         case .foreground:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AnchorCoGuestView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager, routerManager: routerManager)
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AnchorCoGuestView(seatInfo: seatInfo, store: store, routerManager: routerManager)
             }
-            return AnchorEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo))
+            return AnchorEmptySeatView(seatInfo: seatInfo)
         case .background:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
             }
             return nil
         }
     }
     
-    public func createCoHostView(seatInfo: TUISeatFullInfo, viewLayer: ViewLayer) -> UIView? {
+    public func createCoHostView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
         switch viewLayer {
         case .foreground:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AnchorCoHostView(seatInfo: SeatInfo(seatFullInfo: seatInfo), manager: manager)
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AnchorCoHostView(seatInfo: seatInfo, store: store)
             }
-            return AnchorEmptySeatView(seatInfo: SeatInfo(seatFullInfo: seatInfo))
+            return AnchorEmptySeatView(seatInfo: seatInfo)
         case .background:
-            if let userId = seatInfo.userId, !userId.isEmpty {
-                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userAvatar ?? "")
+            if !seatInfo.userInfo.userID.isEmpty {
+                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
             }
             return nil
         }
     }
     
-    public func createBattleView(battleUser: TUIBattleUser) -> UIView? {
-        let battleView = AnchorBattleMemberInfoView(manager: manager, userId: battleUser.userId)
+    public func createBattleView(seatInfo: SeatInfo) -> UIView? {
+        let battleView = AnchorBattleMemberInfoView(store: store, userId: seatInfo.userInfo.userID)
         battleView.isUserInteractionEnabled = false
         return battleView
     }
     
     public func createBattleContainerView() -> UIView? {
-        return AnchorBattleInfoView(manager: manager, routerManager: routerManager)
+        return AnchorBattleInfoView(store: store, routerManager: routerManager)
     }
 }
 
@@ -580,4 +591,6 @@ private extension String {
     static let acceptText = internalLocalized("Accept")
     static let battleInvitationText = internalLocalized("xxx invite you to battle together")
     static let rejectBattleText = internalLocalized("xxx rejected battle")
+    static let cancelBattleText = internalLocalized("xxx canceled battle, please try to initiate it again")
+    static let battleRequestTimeoutText = internalLocalized("Battle request has been timeout")
 }

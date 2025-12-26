@@ -9,11 +9,28 @@ import Foundation
 import UIKit
 import TUICore
 import RTCCommon
+import Combine
+import AtomicXCore
 
 @objc public class RecentCallsViewController: UIViewController {
     
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(recordCallsUIStyle: RecentCallsUIStyle) {
+        super.init(nibName: nil, bundle: nil)
+        
+        viewModel.recordCallsUIStyle = recordCallsUIStyle
+        
+        view.backgroundColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_recents_bg_color",
+                                                                              defaultHex: "#FFFFFF")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Private
     private let viewModel = RecentCallsViewModel()
-    private let dataSourceObserver = Observer()
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -104,47 +121,37 @@ import RTCCommon
         return tableView
     }()
     
-    
-    init(recordCallsUIStyle: RecentCallsUIStyle) {
-        super.init(nibName: nil, bundle: nil)
-        
-        viewModel.recordCallsUIStyle = recordCallsUIStyle
-        
-        view.backgroundColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_recents_bg_color",
-                                                                              defaultHex: "#FFFFFF")
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: Observe
-    func registerObserve() {
-        NotificationCenter.default.addObserver(self, selector: #selector(windowDidChange),
-                                               name: UIWindow.didBecomeKeyNotification, object: nil)
-        
-        viewModel.dataSource.addObserver(dataSourceObserver) {[weak self] _, _ in
-            guard let self = self else { return }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.recordCallsList.reloadData()
+    private func subscribeState() {
+        viewModel.$dataSource
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.recordCallsList.reloadData()
+                self?.updateNoRecordCallsLabel()
             }
-        }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: UIWindow.didBecomeKeyNotification)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.viewModel.queryRecentCalls()
+            }
+            .store(in: &cancellables)
     }
     
-    func unregisterObserve() {
-        NotificationCenter.default.removeObserver(self, name: UIWindow.didBecomeKeyNotification, object: nil)
-        viewModel.dataSource.removeObserver(dataSourceObserver)
+    private func unsubscribeState() {
+        cancellables.removeAll()
     }
     
-    // Register the UI data refresh callback when the page appears, close it when the page disappears, to prevent the UI refresh from running in a non-main thread.
     public override func viewWillAppear(_ animated: Bool) {
-        registerObserve()
+        super.viewWillAppear(animated)
+        subscribeState()
         viewModel.queryRecentCalls()
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
-        unregisterObserve()
+        super.viewWillDisappear(animated)
+        unsubscribeState()
     }
     
     // MARK: UI Specification Processing
@@ -221,7 +228,8 @@ import RTCCommon
         if let view = view {
             NSLayoutConstraint.activate([
                 notRecordCallsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                notRecordCallsLabel.widthAnchor.constraint(equalTo: view.widthAnchor)
+                notRecordCallsLabel.widthAnchor.constraint(equalTo: view.widthAnchor),
+                notRecordCallsLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor)
             ])
         }
     }
@@ -237,8 +245,13 @@ import RTCCommon
         segmentedControl.addTarget(self, action: #selector(segmentSelectItem(_:)), for: .valueChanged)
     }
     
-    @objc func windowDidChange() {
-        viewModel.queryRecentCalls()
+    private func updateNoRecordCallsLabel() {
+        notRecordCallsLabel.isHidden = !viewModel.dataSource.isEmpty
+        if viewModel.recordCallsType == .all {
+            notRecordCallsLabel.text = TUICallKitLocalize(key: "TUICallKit.Recents.noCall")
+        } else {
+            notRecordCallsLabel.text = TUICallKitLocalize(key: "TUICallKit.Recents.noMissedCall")
+        }
     }
     
     @objc func clearButtonClick(_ button: UIButton) {
@@ -267,13 +280,10 @@ import RTCCommon
     }
     
     @objc func segmentSelectItem(_ sender: UISegmentedControl) {
-        var type: RecentCallsType = .all
-        
-        if sender.selectedSegmentIndex == 1 {
-            type = .missed
-        }
-        
+        let type: RecentCallsType = (sender.selectedSegmentIndex == 1) ? .missed : .all
         viewModel.switchRecordCallsType(type)
+        self.recordCallsList.reloadData()
+        self.updateNoRecordCallsLabel()
     }
     
     func setShowEditButton(_ isShow: Bool) {
@@ -295,16 +305,16 @@ extension RecentCallsViewController: UITableViewDataSource, UITableViewDelegate 
     
     @available(iOS 11.0, *)
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteRowAction = UIContextualAction(style: .normal,
+        let deleteRowAction = UIContextualAction(style: .destructive,
                                                  title: TUICallKitLocalize(key: "TUICallKit.Recents.delete"))
         { [weak self] action, sourceView, completionHandler in
             guard let self = self else { return }
             self.viewModel.deleteRecordCall(indexPath)
+            completionHandler(true)
         }
         deleteRowAction.backgroundColor = .red
         let config = UISwipeActionsConfiguration(actions: [deleteRowAction])
         config.performsFirstActionWithFullSwipe = false
-        self.setShowEditButton(false)
         return config
     }
     
@@ -313,22 +323,26 @@ extension RecentCallsViewController: UITableViewDataSource, UITableViewDelegate 
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.dataSource.value.count
+        return viewModel.dataSource.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(RecentCallsCell.self),
                                                        for: indexPath) as? RecentCallsCell else { return UITableViewCell() }
+        
+        guard indexPath.row < viewModel.dataSource.count else { return cell }
+        
         cell.moreBtnClickedHandler =  { [weak self] in
             guard let self = self else { return }
             guard let navigationController = self.navigationController else { return }
             self.viewModel.jumpUserInfoController(indexPath: indexPath, navigationController: navigationController)
         }
-        cell.configViewModel(viewModel.dataSource.value[indexPath.row])
+        cell.configViewModel(viewModel.dataSource[indexPath.row])
         return cell
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
         viewModel.repeatCall(indexPath)
     }
 }

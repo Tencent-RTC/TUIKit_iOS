@@ -110,11 +110,11 @@ class VRBottomMenuView: UIView {
                  switch event {
                  case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
                      if !isAccept {
-                         toastService.showToast(.takeSeatApplicationRejected)
+                         toastService.showToast(.takeSeatApplicationRejected, toastStyle: .info)
                      }
                  case .onGuestApplicationNoResponse(reason: let reason):
                      if reason == .timeout {
-                         toastService.showToast(.takeSeatApplicationTimeout)
+                         toastService.showToast(.takeSeatApplicationTimeout, toastStyle: .info)
                      }
                  default:
                      break
@@ -305,7 +305,6 @@ extension VRBottomMenuView {
             self.routerManager.router(action: .present(.featureSetting(settingItems)))
         }
         menus.append(setting)
-#if !RTCube_APPSTORE
         var songListButton = VRButtonMenuInfo(normalIcon: "ktv_songList")
         songListButton.tapAction = { [weak self] sender in
             guard let self = self else { return }
@@ -314,7 +313,6 @@ extension VRBottomMenuView {
         if coHostStore.state.value.connected.count == 0 {
             menus.append(songListButton)
         }
-#endif
 
         var linkMic = VRButtonMenuInfo(normalIcon: "live_link_voice_room", normalTitle: "")
         linkMic.tapAction = { [weak self] sender in
@@ -384,7 +382,7 @@ extension VRBottomMenuView {
                         viewStore.onRespondedTakeSeatRequest()
                     case .failure(let error):
                         let err = InternalError(errorInfo: error)
-                        toastService.showToast(err.localizedMessage)
+                        toastService.showToast(err.localizedMessage, toastStyle: .error)
                     }
                 }
             } else {
@@ -394,19 +392,19 @@ extension VRBottomMenuView {
                         guard let self = self else { return }
                         if case .failure(let error) = result {
                             let err = InternalError(errorInfo: error)
-                            toastService.showToast(err.localizedMessage)
+                            toastService.showToast(err.localizedMessage, toastStyle: .error)
                         }
                     }
                 } else {
                     // request
                     if viewStore.state.isApplyingToTakeSeat {
-                        toastService.showToast(.repeatRequest)
+                        toastService.showToast(.repeatRequest, toastStyle: .warning)
                         return
                     }
                     let seatAllToken = seatStore.state.value.seatList.prefix(KSGConnectMaxSeatCount).allSatisfy({ $0.isLocked || $0.userInfo.userID != "" })
 
                     if seatAllToken && coHostStore.state.value.connected.count != 0 {
-                        toastService.showToast(.seatAllTokenCancelText)
+                        toastService.showToast(.seatAllTokenCancelText, toastStyle: .warning)
                         return
                     }
                     let kTimeoutValue = 60.0
@@ -442,7 +440,6 @@ extension VRBottomMenuView {
                 .store(in: &cancellableSet)
         }
         menus.append(linkMic)
-#if !RTCube_APPSTORE
         var songListButton = VRButtonMenuInfo(normalIcon: "ktv_songList")
         songListButton.tapAction = { [weak self] sender in
             guard let self = self else { return }
@@ -451,7 +448,6 @@ extension VRBottomMenuView {
         if coHostStore.state.value.connected.count == 0 {
             menus.append(songListButton)
         }
-#endif
         return menus
     }
     
@@ -465,7 +461,7 @@ extension VRBottomMenuView {
                 viewStore.onRespondedTakeSeatRequest()
             }
             let err = InternalError(errorInfo: error)
-            toastService.showToast(err.localizedMessage)
+            toastService.showToast(err.localizedMessage, toastStyle: .error)
         }
     }
 }

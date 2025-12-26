@@ -7,7 +7,8 @@
 
 import Foundation
 import Combine
-import RTCCommon
+import AtomicXCore
+import AtomicX
 
 class StreamDashboardNetView: UIView {
     
@@ -43,16 +44,6 @@ class StreamDashboardNetView: UIView {
     }()
     
     private var cancellableSet: Set<AnyCancellable> = []
-    private weak var manager: StreamDashboardManager?
-    init(manager: StreamDashboardManager) {
-        self.manager = manager
-        super.init(frame: .zero)
-        
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
@@ -82,28 +73,14 @@ extension StreamDashboardNetView {
     }
     
     private func subscribeState() {
-        manager?.subscribe(StateSelector(keyPath: \StreamDashboardState.rtt))
+        DeviceStore.shared.state.subscribe(StatePublisherSelector(keyPath: \DeviceState.networkInfo))
             .receive(on: RunLoop.main)
             .removeDuplicates()
-            .sink { [weak self] rtt in
+            .sink { [weak self] networkInfo in
                 guard let self = self else { return }
-                self.rttInfoView.setValue(value: "\(rtt)ms", status: getRttStatus(rtt: rtt))
-            }
-            .store(in: &cancellableSet)
-        manager?.subscribe(StateSelector(keyPath: \StreamDashboardState.downLoss))
-            .receive(on: RunLoop.main)
-            .removeDuplicates()
-            .sink { [weak self] downLoss in
-                guard let self = self else { return }
-                self.downLossInfoView.setValue(value: "\(downLoss)%",status: getLossStatus(loss: downLoss))
-            }
-            .store(in: &cancellableSet)
-        manager?.subscribe(StateSelector(keyPath: \StreamDashboardState.upLoss))
-            .receive(on: RunLoop.main)
-            .removeDuplicates()
-            .sink { [weak self] upLoss in
-                guard let self = self else { return }
-                self.upLossInfoView.setValue(value: "\(upLoss)%", status: getLossStatus(loss: upLoss))
+                rttInfoView.setValue(value: "\(networkInfo.delay)ms", status: getRttStatus(rtt: networkInfo.delay))
+                downLossInfoView.setValue(value: "\(networkInfo.downLoss)%",status: getLossStatus(loss: networkInfo.downLoss))
+                upLossInfoView.setValue(value: "\(networkInfo.upLoss)%", status: getLossStatus(loss: networkInfo.upLoss))
             }
             .store(in: &cancellableSet)
     }
@@ -142,11 +119,11 @@ fileprivate class StreamDashboardNetItemView: UIView {
         return label
     }()
     
-    private lazy var nameLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 12)
-        label.textColor = .white
-        label.alpha = 0.6
+    private lazy var nameLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         label.textAlignment = .center
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true

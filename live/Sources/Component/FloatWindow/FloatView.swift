@@ -60,7 +60,7 @@ class FloatView: UIView {
         layer.shadowOpacity = 1
         layer.shadowOffset = CGSize(width: CGFloat.zero, height: CGFloat.zero)
     
-        layer.cornerRadius = 9
+        layer.cornerRadius = 13
         layer.shouldRasterize = true
         layer.rasterizationScale = UIScreen.main.scale
         

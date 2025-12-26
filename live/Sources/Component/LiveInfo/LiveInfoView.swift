@@ -7,10 +7,10 @@
 
 import Foundation
 import Combine
-import Kingfisher
 import RTCCommon
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 public class LiveInfoView: UIView {
     private let service = LiveInfoService()
@@ -34,24 +34,23 @@ public class LiveInfoView: UIView {
         return view
     }()
 
-    private lazy var imageView: UIImageView = {
-        let view = UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 32.scale375(), height: 32.scale375())))
-        view.layer.cornerRadius = view.frame.width * 0.5
-        view.layer.masksToBounds = true
-        view.layer.borderColor = UIColor.cyanColor.cgColor
-        view.layer.borderWidth = 0.86
-        view.isUserInteractionEnabled = false
-        return view
+    private lazy var avatarView: AtomicAvatar = {
+        let avatarSize = AtomicAvatarSize.s
+        let avatar = AtomicAvatar(
+            content: .icon(image: UIImage()),
+            size: avatarSize,
+            shape: .round
+        )
+        return avatar
     }()
     
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .deepSeaBlueColor
-        button.titleLabel?.font = .customFont(ofSize: 12)
-        button.setTitle(.followText, for: .normal)
-        button.setTitleColor(.g7, for: .normal)
-        button.setImage(internalImage("live_user_followed_icon"), for: .selected)
-        button.layer.cornerRadius = 12.scale375()
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .followText)
+        )
         return button
     }()
     
@@ -80,21 +79,20 @@ public class LiveInfoView: UIView {
 
     private func constructViewHierarchy() {
         addSubview(roomOwnerNameLabel)
-        addSubview(imageView)
+        addSubview(avatarView)
         if !isOwner && enableFollow {
             addSubview(followButton)
         }
     }
 
     private func activateConstraints() {
-        imageView.snp.makeConstraints { make in
-            make.size.equalTo(imageView.frame.size)
+        avatarView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(4.scale375())
             make.centerY.equalToSuperview()
         }
 
         roomOwnerNameLabel.snp.makeConstraints { make in
-            make.leading.equalTo(imageView.snp.trailing).offset(8.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
             if state.selfUserId != state.ownerId {
                 make.trailing.equalTo(followButton.snp.leading).offset(-8.scale375())
             } else {
@@ -114,7 +112,10 @@ public class LiveInfoView: UIView {
     }
     
     private func bindInteraction() {
-        followButton.addTarget(self, action: #selector(followButtonClick(_:)), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
+        
         subscribeRoomInfoState()
     }
     
@@ -123,7 +124,7 @@ public class LiveInfoView: UIView {
         containerTapAction()
     }
     
-    @objc func followButtonClick(_ sender: UIButton) {
+    private func followButtonClick() {
         if state.followingList.contains(where: { $0.userId == state.ownerId }) {
             service.unfollowUser(userId: state.ownerId)
         } else {
@@ -137,17 +138,17 @@ public class LiveInfoView: UIView {
             .sink { [weak self] userList in
                 guard let self = self else { return }
                 let userIdList = userList.map { $0.userId }
-                if userIdList.contains(state.ownerId) {
-                    self.followButton.isSelected = true
-                    self.followButton.backgroundColor = .g5
-                    self.followButton.setTitle("", for: .normal)
-                    self.followButton.setImage(internalImage("live_user_followed_icon"), for: .selected)
+                let isFollowing = userIdList.contains(state.ownerId)
+                
+                if isFollowing {
+                    self.followButton.setButtonContent(.iconOnly(icon: internalImage("live_user_followed_icon")))
+                    self.followButton.setColorType(.secondary)
                 } else {
-                    self.followButton.isSelected = false
-                    self.followButton.backgroundColor = .deepSeaBlueColor
-                    self.followButton.setTitle(.followText, for: .normal)
-                    self.followButton.setImage(nil, for: .normal)
+                    self.followButton.setButtonContent(.textOnly(text: .followText))
+                    self.followButton.setColorType(.primary)
                 }
+                
+                self.followButton.isSelected = isFollowing
             }
             .store(in: &cancellableSet)
    
@@ -155,7 +156,7 @@ public class LiveInfoView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] avatarUrl in
                 guard let self = self else { return }
-                self.imageView.kf.setImage(with: URL(string: avatarUrl), placeholder: avatarPlaceholderImage)
+                self.avatarView.setContent(.url(avatarUrl, placeholder: avatarPlaceholderImage))
             }
             .store(in: &cancellableSet)
         
@@ -202,7 +203,7 @@ public class LiveInfoView: UIView {
                 make.height.equalTo(24.scale375Height())
             }
             roomOwnerNameLabel.snp.remakeConstraints { make in
-                make.leading.equalTo(imageView.snp.trailing).offset(8.scale375())
+                make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
                 make.trailing.equalTo(followButton.snp.leading).offset(-8.scale375())
                 make.centerY.equalToSuperview()
                 make.height.equalToSuperview()
@@ -210,7 +211,7 @@ public class LiveInfoView: UIView {
         } else {
             followButton.safeRemoveFromSuperview()
             roomOwnerNameLabel.snp.remakeConstraints { make in
-                make.leading.equalTo(imageView.snp.trailing).offset(8.scale375())
+                make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
                 make.trailing.equalToSuperview().inset(8.scale375())
                 make.centerY.equalToSuperview()
                 make.height.equalToSuperview()

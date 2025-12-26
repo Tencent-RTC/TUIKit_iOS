@@ -20,10 +20,6 @@ struct NetWorkInfoState {
     var audioQuality: TUIAudioQuality = .default
     var volume: Int = 50
 
-    var rtt: UInt32 = 0
-    var upLoss: UInt32 = 0
-    var downLoss: UInt32 = 0
-    var uploadSpeed: UInt64 = 0
     var netWorkQuality: TUINetworkQuality = .excellent
 
     var deviceTemperature: Int = 0

@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import RTCRoomEngine
 import RTCCommon
+import AtomicX
 
 class LSSystemImageSelectionPanel: UIView {
     
@@ -30,11 +31,13 @@ class LSSystemImageSelectionPanel: UIView {
         return view
     }()
     
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.contentMode = .center
-        label.font = .customFont(ofSize: 16,weight: .medium)
-        label.textColor = .g7
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            return LabelAppearance(textColor: theme.color.textColorPrimary,
+                                   backgroundColor: theme.color.clearColor,
+                                   font: theme.typography.Medium16,
+                                   cornerRadius: 0.0)
+        }
         return label
     }()
     
@@ -61,17 +64,17 @@ class LSSystemImageSelectionPanel: UIView {
         return collection
     }()
     
-    private lazy var confirmButton: UIButton = {
-        let view = UIButton(type: .system)
-        view.frame = CGRect(origin: .zero, size: CGSize(width: 200.scale375(), height: 52.scale375()))
-        view.showsTouchWhenHighlighted = false
-        view.titleLabel?.font = .customFont(ofSize: 16,weight: .medium)
-        view.setTitleColor(.flowKitWhite, for:  .normal)
-        view.addTarget(self, action: #selector(confirmButtonClick), for: .touchUpInside)
-        view.layer.cornerRadius = view.mm_h*0.5
-        view.layer.masksToBounds = true
-        view.backgroundColor = .brandBlueColor
-        return view
+    private lazy var confirmButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: .coverConfirmText)
+        )
+        button.setClickAction { [weak self] _ in
+            self?.confirmButtonClick()
+        }
+        return button
     }()
     
     init(configs:[LSSystemImageModel], state: inout PrepareState) {
@@ -138,8 +141,8 @@ extension LSSystemImageSelectionPanel {
         confirmButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().inset(34.scale375Height())
-            make.height.equalTo(confirmButton.mm_h)
-            make.width.equalTo(confirmButton.mm_w)
+            make.height.equalTo(52.scale375())
+            make.width.equalTo(200.scale375())
         }
     }
     
@@ -148,7 +151,6 @@ extension LSSystemImageSelectionPanel {
         layer.cornerRadius = 16
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         titleLabel.text = .coverTitleText
-        confirmButton.setTitle(.coverConfirmText, for: .normal)
     }
     
     private func defaultSelectItem() {
@@ -167,7 +169,6 @@ extension LSSystemImageSelectionPanel {
         backButtonClickClosure?()
     }
     
-    @objc
     func confirmButtonClick() {
         guard let newImageUrlString = currentSelectModel?.imageUrl?.absoluteString else {
             backButtonClickClosure?()

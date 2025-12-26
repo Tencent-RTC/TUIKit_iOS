@@ -18,13 +18,13 @@ public enum AnchorBattleResultType {
 }
 
 class AnchorBattleInfoView: RTCBaseView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     private var timer: DispatchSourceTimer?
 
-    init(manager: AnchorManager, routerManager: AnchorRouterManager) {
-        self.manager = manager
+    init(store: AnchorStore, routerManager: AnchorRouterManager) {
+        self.store = store
         self.routerManager = routerManager
         super.init(frame: .zero)
         backgroundColor = .clear
@@ -129,27 +129,27 @@ class AnchorBattleInfoView: RTCBaseView {
     }
 
     private func subscribeBattleState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.currentBattleInfo))
+        store.subscribeState(StatePublisherSelector(keyPath: \BattleState.currentBattleInfo))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] currentBattleInfo in
                 guard let self = self else { return }
                 if let battleInfo = currentBattleInfo {
-                    manager.updateBattleDurationCountDown(Int(battleInfo.config.duration + Double(battleInfo.startTime) - Date().timeIntervalSince1970))
+                    store.updateBattleDurationCountDown(Int(battleInfo.config.duration + Double(battleInfo.startTime) - Date().timeIntervalSince1970))
                     startCountDown()
                     onBattleStart()
                 }
             }
             .store(in: &cancellableSet)
         
-        manager.battleStore.battleEventPublisher
+        store.battleStore.battleEventPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
                 case .onBattleEnded(battleInfo: _, reason: _):
                     onBattleEnd()
-                    manager.updateBattleDurationCountDown(0)
+                    store.updateBattleDurationCountDown(0)
                     timer?.cancel()
                     timer = nil
                     onResultDisplay(display: true)
@@ -162,9 +162,9 @@ class AnchorBattleInfoView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore))
+        store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleScore))
             .removeDuplicates()
-            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates())
+            .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] battleScore, battleUsers in
                 guard let self = self else { return }
@@ -172,7 +172,7 @@ class AnchorBattleInfoView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.durationCountDown))
+        store.subscribeState(StateSelector(keyPath: \AnchorBattleState.durationCountDown))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] duration in
@@ -190,9 +190,9 @@ class AnchorBattleInfoView: RTCBaseView {
         timer?.schedule(deadline: .now() + 1, repeating: 1)
         timer?.setEventHandler { [weak self] in
             guard let self = self else { return }
-            let t = manager.anchorBattleState.durationCountDown
+            let t = store.anchorBattleState.durationCountDown
             if t > 0 {
-                manager.updateBattleDurationCountDown(t - 1)
+                store.updateBattleDurationCountDown(t - 1)
             } else {
                 timer?.cancel()
                 timer = nil
@@ -207,10 +207,10 @@ class AnchorBattleInfoView: RTCBaseView {
     
     private func onResultDisplay(display: Bool) {
         if display {
-            manager.startShowBattleResult()
+            store.startShowBattleResult()
             showBattleResult(type: singleBattleScoreView.getResult())
         } else {
-            manager.stopShowBattleResult()
+            store.stopShowBattleResult()
             stopDisplayBattleResult()
         }
     }
@@ -218,7 +218,7 @@ class AnchorBattleInfoView: RTCBaseView {
     private func onBattleScoreChanged(battleUsers: [SeatUserInfo], score: [String: UInt]) {
         guard battleUsers.count == 2 else { return }
         
-        let currentLiveID = manager.liveID
+        let currentLiveID = store.liveID
         guard let leftUser = battleUsers.filter({ $0.liveID == currentLiveID }).first,
               let rightUser = battleUsers.filter({ $0.liveID != currentLiveID }).first else { return }
         let leftScore = score[leftUser.userID] ?? 0

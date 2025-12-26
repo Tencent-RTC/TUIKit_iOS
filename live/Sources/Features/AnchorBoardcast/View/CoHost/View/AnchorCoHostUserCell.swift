@@ -7,6 +7,7 @@
 
 import Foundation
 import AtomicXCore
+import AtomicX
 
 class AnchorCoHostUserCell: UITableViewCell {
     static let identifier = "AnchorCoHostUserCell"
@@ -14,26 +15,30 @@ class AnchorCoHostUserCell: UITableViewCell {
     private var connectionUser:AnchorCoHostUserInfo?
     var inviteEventClosure: ((AnchorCoHostUserInfo) -> Void)?
     
-    let avatarImageView: UIImageView = {
-        let imageView = UIImageView(frame: .zero)
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
-    let userNameLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.font = UIFont.customFont(ofSize: 16)
-        label.textColor = .grayColor
+    let userNameLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
     
-    let inviteButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 12.scale375()
-        button.titleLabel?.font = UIFont.customFont(ofSize: 12)
-        button.setTitleColor(.white, for: .normal)
-        button.setTitle(.inviteText, for: .normal)
-        button.setTitle(.invitingTest, for: .disabled)
-        button.backgroundColor = .b1
+    let inviteButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .xsmall,
+            content: .textOnly(text: .inviteText)
+        )
         return button
     }()
     
@@ -50,7 +55,6 @@ class AnchorCoHostUserCell: UITableViewCell {
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        avatarImageView.roundedRect(.allCorners, withCornerRatio: 20.scale375())
     }
     
     private var isViewReady = false
@@ -64,21 +68,20 @@ class AnchorCoHostUserCell: UITableViewCell {
     }
     
     func constructViewHierarchy() {
-        contentView.addSubview(avatarImageView)
+        contentView.addSubview(avatarView)
         contentView.addSubview(userNameLabel)
         contentView.addSubview(inviteButton)
     }
     
     func activateConstraints() {
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalToSuperview().offset(24.scale375())
-            make.size.equalTo(CGSize(width: 40.scale375(), height: 40.scale375()))
         }
         
         userNameLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
             make.width.lessThanOrEqualTo(120.scale375())
         }
         
@@ -90,12 +93,14 @@ class AnchorCoHostUserCell: UITableViewCell {
     }
     
     func bindInteraction() {
-        inviteButton.addTarget(self, action: #selector(inviteButtonClick(sender:)), for: .touchUpInside)
+        inviteButton.setClickAction { [weak self] _ in
+            self?.inviteButtonClick()
+        }
     }
     
     func updateUser(_ user: AnchorCoHostUserInfo) {
         self.connectionUser = user
-        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(user.userInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = user.userInfo.userName.isEmpty ? user.userInfo.userID : user.userInfo.userName
         
         inviteButton.isHidden = user.connectionStatus == .connected
@@ -103,15 +108,23 @@ class AnchorCoHostUserCell: UITableViewCell {
     }
     
     func updateButtonView(isEnabled: Bool) {
-        inviteButton.isEnabled = isEnabled
-        inviteButton.backgroundColor = isEnabled ? .b1 : .b1.withAlphaComponent(0.5)
+        if isEnabled {
+            inviteButton.setButtonContent(.textOnly(text: .inviteText))
+            inviteButton.setVariant(.filled)
+            inviteButton.setColorType(.primary)
+            inviteButton.isUserInteractionEnabled = true
+        } else {
+            inviteButton.setButtonContent(.textOnly(text: .invitingTest))
+            inviteButton.setVariant(.outlined)
+            inviteButton.setColorType(.secondary)
+            inviteButton.isUserInteractionEnabled = false
+        }
     }
 }
 
 // MARK: - Action
 extension AnchorCoHostUserCell {
-    @objc
-    private func inviteButtonClick(sender: UIButton) {
+    private func inviteButtonClick() {
         if let user = connectionUser {
             inviteEventClosure?(user)
         }

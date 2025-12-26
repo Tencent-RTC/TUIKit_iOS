@@ -5,6 +5,7 @@
 //  Created by jack on 2024/8/7.
 //
 
+import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
@@ -22,15 +23,15 @@ class AnchorCoHostManagerPanel: RTCBaseView {
     private var recommendedUsers: [AnchorCoHostUserInfo] = []
     private var connectedUsers: [AnchorCoHostUserInfo] = []
 
-    private let manager: AnchorManager
+    private let store: AnchorStore
     
     private var lastApplyHashValue: Int?
-
-    private let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
-        label.textColor = .g7
-        label.font = UIFont.customFont(ofSize: 20)
-        label.text = .connectionTitleText
+    
+    private let titleLabel: AtomicLabel = {
+        let label = AtomicLabel(.connectionTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         return label
     }()
     
@@ -61,8 +62,8 @@ class AnchorCoHostManagerPanel: RTCBaseView {
         return tableView
     }()
     
-    init(manager: AnchorManager) {
-        self.manager = manager
+    init(store: AnchorStore) {
+        self.store = store
         super.init(frame: .zero)
         backgroundColor = .g2
         layer.cornerRadius = 16
@@ -135,9 +136,9 @@ extension AnchorCoHostManagerPanel {
         
         let footer = MJRefreshAutoNormalFooter(refreshingBlock: { [weak self] in
             guard let self = self else { return }
-            let cursor = manager.liveListState.liveListCursor
+            let cursor = store.coHostState.candidatesCursor
             if cursor != "" {
-                manager.liveListStore.fetchLiveList(cursor: cursor, count: 20, completion: nil)
+                store.coHostStore.getCoHostCandidates(cursor: cursor, completion: nil)
                 tableView.mj_footer?.endRefreshing()
             } else {
                 tableView.mj_footer?.endRefreshingWithNoMoreData()
@@ -151,14 +152,14 @@ extension AnchorCoHostManagerPanel {
     
     private func refreshRoomListData() {
         tableView.reloadData()
-        manager.liveListStore.fetchLiveList(cursor: "", count: 20, completion: nil)
+        store.coHostStore.getCoHostCandidates(cursor: "", completion: nil)
     }
     
     private func subscribeConnectionState() {
-        manager.subscribeState(StateSelector(keyPath: \AnchorCoHostState.connectedUsers))
+        store.subscribeState(StateSelector(keyPath: \AnchorCoHostState.connectedUsers))
             .removeDuplicates()
-            .combineLatest(manager.subscribeState(StateSelector(keyPath: \AnchorCoHostState.recommendedUsers)).removeDuplicates(),
-                           manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.liveListCursor)).removeDuplicates())
+            .combineLatest(store.subscribeState(StateSelector(keyPath: \AnchorCoHostState.recommendedUsers)).removeDuplicates(),
+                           store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.candidatesCursor)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] connected, recommended, cursor in
                 guard let self = self else { return }
@@ -167,9 +168,9 @@ extension AnchorCoHostManagerPanel {
                 } else {
                     tableView.mj_footer?.resetNoMoreData()
                 }
-                let liveID = manager.liveID
-                connectedUsers = connected.filter { $0.liveID != liveID }
-                recommendedUsers = recommended.filter { $0.liveID != liveID }
+                let liveID = store.liveID
+                connectedUsers = connected.filter { $0.userInfo.liveID != liveID }
+                recommendedUsers = recommended.filter { $0.userInfo.liveID != liveID }
                 disconnectButton.isHidden = connectedUsers.count <= 0
                 tableView.reloadData()
             }
@@ -177,11 +178,11 @@ extension AnchorCoHostManagerPanel {
     }
     
     private func subscribeToastState() {
-        manager.toastSubject
+        store.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] message, style in
                 guard let self = self else { return }
-                self.makeToast(message: message)
+                self.showAtomicToast(text: message, style: style)
             }
             .store(in: &cancellableSet)
     }
@@ -192,19 +193,17 @@ extension AnchorCoHostManagerPanel {
 extension AnchorCoHostManagerPanel {
     @objc
     private func disconnect() {
-        let alertInfo = AnchorAlertInfo(description: .disconnectAlertText,
-                                        imagePath: nil,
-                                        cancelButtonInfo: (String.disconnectAlertCancelText, .cancelTextColor),
-                                        defaultButtonInfo: (String.disconnectAlertDisconnectText, .warningTextColor))
-        { alertPanel in
-            alertPanel.dismiss()
-        } defaultClosure: { [weak self] alertPanel in
-            guard let self = self else { return }
-            manager.coHostStore.exitHostConnection()
-            alertPanel.dismiss()
+        let cancelButton = AlertButtonConfig(text: String.disconnectAlertCancelText, type: .grey) { alertView in
+            alertView.dismiss()
         }
-        let alertPanel = AnchorAlertPanel(alertInfo: alertInfo)
-        alertPanel.show()
+        let confirmButton = AlertButtonConfig(text: String.disconnectAlertDisconnectText, type: .red) { [weak self] alertView in
+            guard let self = self else { return }
+            store.coHostStore.exitHostConnection()
+            alertView.dismiss()
+        }
+        let alertConfig = AlertViewConfig(title: .disconnectAlertText, cancelButton: cancelButton, confirmButton: confirmButton)
+        let alertView = AtomicAlertView(config: alertConfig)
+        alertView.show()
     }
 }
 
@@ -254,23 +253,24 @@ extension AnchorCoHostManagerPanel: UITableViewDataSource {
                 connectionUserCell.updateUser(recommendedUsers[indexPath.row])
                 connectionUserCell.inviteEventClosure = { [weak self] user in
                     guard let self = self else { return }
-                    manager.willApplyingHost()
-                    manager.coHostStore.requestHostConnection(targetHost: user.liveID, layoutTemplate: manager.pkTemplateMode.toPkAtomicType(), timeout: kCoHostTimeout) { [weak self] result in
+                    store.willApplyingHost()
+                    store.coHostStore.requestHostConnection(targetHost: user.userInfo.liveID, layoutTemplate: store.pkTemplateMode.toPkAtomicType(), timeout: kCoHostTimeout) { [weak self] result in
                         guard let self = self else { return }
                         switch result {
                         case .failure(let err):
-                            manager.stopApplyingHost()
+                            store.stopApplyingHost()
                             switch err.code {
                             case TUIConnectionCode.roomNotExist.rawValue,
                                  TUIConnectionCode.connecting.rawValue,
                                  TUIConnectionCode.connectingOtherRoom.rawValue,
                                  TUIConnectionCode.full.rawValue,
-                                 TUIConnectionCode.retry.rawValue:
+                                 TUIConnectionCode.retry.rawValue,
+                                 TUIConnectionCode.roomMismatch.rawValue:
                                 let error = InternalError(error: TUIConnectionCode(rawValue: err.code) ?? .unknown, message: err.message)
-                                manager.onError(error)
+                                store.onError(error)
                             default:
                                 let error = InternalError(code: err.code, message: err.message)
-                                manager.onError(error)
+                                store.onError(error)
                             }
                         default: break
                         }
@@ -283,7 +283,7 @@ extension AnchorCoHostManagerPanel: UITableViewDataSource {
                         }
                     }
                     
-                    let publisher = manager.coHostStore.coHostEventPublisher
+                    let publisher = store.coHostStore.coHostEventPublisher
                         .receive(on: RunLoop.main)
                         .sink { [weak self] event in
                             guard let self = self else { return }
@@ -291,7 +291,7 @@ extension AnchorCoHostManagerPanel: UITableViewDataSource {
                             case .onCoHostRequestAccepted(invitee: _),
                                  .onCoHostRequestRejected(invitee: _),
                                  .onCoHostRequestTimeout(inviter: _, invitee: _):
-                                manager.stopApplyingHost()
+                                store.stopApplyingHost()
                             default: break
                             }
                         }
@@ -308,7 +308,7 @@ private extension String {
     static let connectionTitleText = internalLocalized("Start Co-hosting")
     static let connectedTitleText = internalLocalized("Connecting")
     static let recommendedTitleText = internalLocalized("Suggested Hosts")
-    static let disconnectText = internalLocalized("End Co-host")
+    static let disconnectText = internalLocalized("Exit connect")
     
     static let disconnectAlertText = internalLocalized("Are you sure you want to disconnect from other streamers?")
     static let disconnectAlertCancelText = internalLocalized("Cancel")

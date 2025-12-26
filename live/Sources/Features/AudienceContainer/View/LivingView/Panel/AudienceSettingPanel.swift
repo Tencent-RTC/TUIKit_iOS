@@ -9,12 +9,14 @@ import Foundation
 import Combine
 import RTCCommon
 import AtomicXCore
+import AtomicX
 
 class AudienceSettingPanel: UIView {
     
     enum SettingItemType {
         case resolution
         case dashboard
+        case pip
         
         var title: String {
             switch self {
@@ -22,6 +24,8 @@ class AudienceSettingPanel: UIView {
                 return .resolutionText
             case .dashboard:
                 return .dashboardText
+            case .pip:
+                return .pipText
             }
         }
         
@@ -31,17 +35,19 @@ class AudienceSettingPanel: UIView {
                 return internalImage("live_video_resolution_icon")
             case .dashboard:
                 return internalImage("live_setting_stream_dashboard")
+            case .pip:
+                return internalImage("live_floatwindow_open_icon")
             }
         }
     }
     
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
-    private var items:[SettingItemType] = [.dashboard]
+    private var items:[SettingItemType] = [.dashboard, .pip]
 
     private var cancellableSet = Set<AnyCancellable>()
     
-    public init(manager: AudienceManager, routerManager: AudienceRouterManager) {
+    public init(manager: AudienceStore, routerManager: AudienceRouterManager) {
         self.manager = manager
         self.routerManager = routerManager
         super.init(frame: .zero)
@@ -52,11 +58,11 @@ class AudienceSettingPanel: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let titleLabel: UILabel = {
-        let view = UILabel()
-        view.text = .settingTitleText
-        view.textColor = .textPrimaryColor
-        view.font = .customFont(ofSize: 16, weight: .medium)
+    private let titleLabel: AtomicLabel = {
+        let view = AtomicLabel(.settingTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         view.textAlignment = .center
         return view
     }()
@@ -159,6 +165,13 @@ extension AudienceSettingPanel {
             self.routerManager.router(action: .present(.streamDashboard))
         }))
     }
+    
+    private func selectPip() {
+        routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
+            guard let self = self else { return }
+            routerManager.router(action: .present(.pip))
+        }))
+    }
 }
 
 // MARK: - UICollectionViewDataSource
@@ -194,11 +207,13 @@ extension AudienceSettingPanel: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let item = items[indexPath.item]
-        if item == .resolution {
+        switch item {
+        case .resolution:
             selectResolution()
-        }
-        if item == .dashboard {
+        case .dashboard:
             selectDashBoard()
+        case .pip:
+            selectPip()
         }
     }
 }
@@ -207,12 +222,13 @@ class AudienceSettingPanelCell: UICollectionViewCell {
     
     static let CellId: String = "AudienceSettingPanelCell"
     
-    let titleLabel: UILabel = {
-        let label = UILabel()
+    let titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular12)
+        }
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
-        label.textColor = .white
-        label.font = .systemFont(ofSize: 12)
         return label
     }()
     
@@ -268,4 +284,5 @@ private extension String {
     
     static let resolutionText: String = internalLocalized("Resolution")
     static let dashboardText: String = internalLocalized("Dashboard")
+    static let pipText: String = internalLocalized("Pip")
 }

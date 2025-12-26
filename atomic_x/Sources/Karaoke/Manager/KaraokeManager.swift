@@ -12,92 +12,181 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 import RTCRoomEngine
-
 import Combine
 import RTCCommon
 import TUICore
 
 public class KaraokeManager: NSObject {
+
     private(set) var state: ObservableState<KaraokeState>
     let kickedOutSubject = PassthroughSubject<Void, Never>()
+    public let errorSubject = PassthroughSubject<String, Never>()
     var karaokeState: KaraokeState { state.state }
-    private var isNaturalEnd: Bool = true
+
+    private let roomId: String
     private let trtcCloud = TRTCCloud.sharedInstance()
     private let roomEngine = TUIRoomEngine.sharedInstance()
+    private let config: KaraokeConfig = KaraokeConfig.shared
+    private let service = MusicCatalogServiceManager.shared.getService()
+
     private lazy var audioEffectManager: TXAudioEffectManager = trtcCloud.getAudioEffectManager()
-    private let roomId: String
-    private let config: KaraokeConfig = {
-        return KaraokeConfig.shared
-    }()
-    private var scorePanelTimer: Timer?
     private lazy var chorusMusicPlayer: TXChorusMusicPlayer = {
-        let chorusMusicPlayer = TXChorusMusicPlayer.createPlayer(with: trtcCloud, roomId: roomId, delegate: self) ?? TXChorusMusicPlayer()
-        return chorusMusicPlayer
+        let player = TXChorusMusicPlayer.createPlayer(with: trtcCloud, roomId: roomId, delegate: self) ?? TXChorusMusicPlayer()
+        return player
     }()
 
+    private lazy var songListManager: TUISongListManager? = {
+        let manager = TUIRoomEngine.sharedInstance().getExtension(extensionType: .songListManager) as? TUISongListManager
+        manager?.addObserver(self)
+        return manager
+    }()
+
+    private var scorePanelTimer: Timer?
+    private var isNaturalEnd: Bool = true
+
+    private var lastSentJsonData: String?
+    private var sendCounter: Int = 0
+    private let userIdKey = "u"
+    private let pitchKey = "p"
+    private let scoreKey = "s"
+    private let avgScoreKey = "a"
+    private var ownerId: String = ""
+    private var userId: String = TUIRoomEngine.getSelfInfo().userId
+    
     public init(roomId: String) {
         self.roomId = roomId
         self.state = ObservableState(initialState: KaraokeState())
         super.init()
+        
+        setupObservers()
+        setupAudioEffect()
+        loadMusicCatalog()
+
+        getWaitingList(cursor: "")
+    }
+    
+    deinit {
+        cleanup()
+    }
+    
+    // MARK: - Setup & Cleanup
+    
+    private func setupObservers() {
         roomEngine.addObserver(self)
+        trtcCloud.setAudioFrameDelegate(self)
+    }
+    
+    private func setupAudioEffect() {
         setAudioEffect()
     }
-
-    deinit {
+    
+    private func loadMusicCatalog() {
+        service.getSongList { [weak self] songList in
+            self?.state.update { state in
+                state.songLibrary = songList
+            }
+        }
+    }
+    
+    private func cleanup() {
         releaseScorePanelTimer()
         roomEngine.removeObserver(self)
+        songListManager?.removeObserver(self)
+        trtcCloud.setAudioFrameDelegate(nil)
     }
 
+    // MARK: - Chorus Role Management
+    
     func setChorusRole(chorusRole: TXChorusRole) {
-        let bgmParams = TRTCParams()
-        bgmParams.sdkAppId = UInt32(config.SDKAPPID)
-        bgmParams.userId = "\(roomId)_bgm";
-        bgmParams.userSig = GenerateTestUserSig
-            .genTestUserSig(
-                SDKAPPID: config.SDKAPPID,
-                SECRETKEY: config.SECRETKEY,
-                identifier: bgmParams.userId
-            )
-        bgmParams.roomId = 0
-        bgmParams.strRoomId = roomId
-        bgmParams.role = .anchor
+        let bgmParams = createBGMParams()
         chorusMusicPlayer.setChorusRole(chorusRole, trtcParamsForPlayer: bgmParams)
+        
         state.update { state in
             state.chorusRole = chorusRole
         }
     }
-
-    func loadCopyrightedMusic(musicId: String, playToken: String) {
-        let params = TXChorusCopyrightedMusicParams()
-        params.musicId = ""
-        params.playToken = ""
-        params.copyrightedLicenseKey = ""
-        params.copyrightedLicenseUrl = ""
-
-        chorusMusicPlayer.loadMusic(params)
+    
+    private func createBGMParams() -> TRTCParams {
+        let bgmParams = TRTCParams()
+        bgmParams.sdkAppId = UInt32(config.SDKAPPID)
+        bgmParams.userId = "\(roomId)_bgm"
+        bgmParams.userSig = GenerateTestUserSig.genTestUserSig(
+            SDKAPPID: config.SDKAPPID,
+            SECRETKEY: config.SECRETKEY,
+            identifier: bgmParams.userId
+        )
+        bgmParams.roomId = 0
+        bgmParams.strRoomId = roomId
+        bgmParams.role = .anchor
+        return bgmParams
     }
 
-    func loadLocalDemoMusic(musicId: String, musicUrl: String, accompanyUrl: String) {
+    // MARK: - Music Loading
+
+    func loadLocalMusic() {
+        if let musicInfo = self.karaokeState.songLibrary.first(where: { $0.musicId == self.karaokeState.selectedSongs[0].songId }) {
+            loadLocalDemoMusic(
+                musicId: musicInfo.musicId,
+                musicUrl: musicInfo.originalUrl,
+                accompanyUrl: musicInfo.accompanyUrl
+            )
+        }
+    }
+
+    func loadNetWorkMusic(musicId: String) {
+        loadCopyrightedMusic(musicId: musicId)
+    }
+
+    private func loadCopyrightedMusic(musicId: String) {
+        service.queryPlayToken(musicId: musicId, liveID: roomId, callback: ClosureQueryPlayTokenCallback(
+            onSuccess: { [weak self] musicId, playToken, licenseKey, licenseUrl in
+                guard let self = self else { return }
+                self.loadCopyrightedMusicWithToken(
+                    musicId: musicId,
+                    playToken: playToken,
+                    copyrightedLicenseKey: licenseKey ?? "",
+                    copyrightedLicenseUrl: licenseUrl ?? ""
+                )
+            },
+            onFailure: { [weak self] code, desc in
+                self?.errorSubject.send(.loadFailedText)
+            }
+        ))
+    }
+    
+    private func loadCopyrightedMusicWithToken(musicId: String, playToken: String, copyrightedLicenseKey: String, copyrightedLicenseUrl: String) {
+        let params = TXChorusCopyrightedMusicParams()
+        params.musicId = musicId
+        params.playToken = playToken
+        params.copyrightedLicenseKey = copyrightedLicenseKey
+        params.copyrightedLicenseUrl = copyrightedLicenseUrl
+        chorusMusicPlayer.loadMusic(params)
+    }
+    
+    private func loadLocalDemoMusic(musicId: String, musicUrl: String, accompanyUrl: String) {
         let params = TXChorusExternalMusicParams()
         params.musicId = musicId
         params.musicUrl = musicUrl
         params.accompanyUrl = accompanyUrl
         params.isEncrypted = 0
         params.encryptBlockLength = 0
-
+        
         chorusMusicPlayer.loadExternalMusic(params)
     }
+
+    // MARK: - Music Playback Contro
 
     func start() {
         let musicTrackType = karaokeState.musicTrackType
         switchMusicTrack(trackType: musicTrackType)
         chorusMusicPlayer.start()
-        self.state.update { state in
+        
+        state.update { state in
             state.playbackState = .start
             state.playProgress = 0
         }
     }
-
+    
     func stopPlayback() {
         chorusMusicPlayer.stop()
         state.update { state in
@@ -105,49 +194,49 @@ public class KaraokeManager: NSObject {
             state.playProgress = 0
         }
     }
-
+    
     func pausePlayback() {
         chorusMusicPlayer.pause()
         state.update { state in
             state.playbackState = .pause
         }
     }
-
+    
     func resumePlayback() {
         chorusMusicPlayer.resume()
         state.update { state in
             state.playbackState = .resume
         }
     }
-
+    
     func seek(positionMs: TimeInterval) {
         chorusMusicPlayer.seek(Int64(positionMs) / 1000)
         state.update { state in
             state.playProgress = positionMs
         }
     }
-
+    
     func switchMusicTrack(trackType: TXChorusMusicTrack) {
         state.update { state in
             state.musicTrackType = trackType
         }
         chorusMusicPlayer.switch(trackType)
     }
-
+    
     func setPlayoutVolume(volume: Int) {
         state.update { state in
             state.playoutVolume = volume
         }
         chorusMusicPlayer.setPlayoutVolume(Int32(volume))
     }
-
+    
     func setPublishVolume(volume: Int) {
         state.update { state in
             state.publishVolume = volume
         }
         chorusMusicPlayer.setPublishVolume(Int32(volume))
     }
-
+    
     func setMusicPitch(pitch: Float) {
         state.update { state in
             state.musicPitch = pitch
@@ -155,72 +244,11 @@ public class KaraokeManager: NSObject {
         chorusMusicPlayer.setMusicPitch(pitch)
     }
     
-    func prioritizeMusic(musicId: String) {
-        state.update { state in
-            if let index = state.selectedSongs.firstIndex(where: { $0.musicId == musicId }) {
-                let removedSong = state.selectedSongs.remove(at: index)
-                state.selectedSongs.insert(removedSong, at: 1)
-            }
-        }
-        updateSelectedMusicList()
-    }
-    
-    func eraseMusic(musicId: String) {
-        state.update { state in
-            if let index = state.selectedSongs.firstIndex(where: { $0.musicId == musicId }) {
-                state.selectedSongs.remove(at: index)
-            }
-
-        }
-        updateSelectedMusicList()
-    }
-    
-    func addSong(selectedMusic: SelectedMusicInfo) {
-        state.update { state in
-            state.selectedSongs.append(selectedMusic)
-        }
-
-        if karaokeState.selectedSongs.count == 1 {
-            if let song = karaokeState.songLibrary.first(where: { $0.musicId == karaokeState.selectedSongs[0].musicId}) {
-                loadLocalDemoMusic(
-                    musicId: song.musicId,
-                    musicUrl: song.originalUrl,
-                    accompanyUrl: song.accompanyUrl
-                )
-                start()
-            }
-        }
-        updateSelectedMusicList()
-    }
-
-    func playNextMusic() {
-        releaseScorePanelTimer()
-        isNaturalEnd = false
-
-        if karaokeState.playbackState == .idel {
-            performplayNextMusic()
-        } else {
-            stopPlayback()
-        }
-    }
-
     func setVoiceEarMonitorEnable(_ enable: Bool) {
         audioEffectManager.enableVoiceEarMonitor(enable)
         state.update { state in
             state.EarMonitor = enable
         }
-    }
-
-    func enableScore(enable: Bool) {
-        guard let data = try? JSONEncoder().encode(enable),
-              let jsonString = String(data: data, encoding: .utf8) else {
-            return
-        }
-
-        let metadata: [String: String] = ["EnableScore": jsonString]
-        roomEngine.setRoomMetadataByAdmin(metadata, onSuccess: {
-        }, onError: { error, message in
-        })
     }
     
     func setReverbType(_ type: MusicReverbType) {
@@ -230,120 +258,212 @@ public class KaraokeManager: NSObject {
         }
     }
 
-    public func synchronizeMetadata(isOwner: Bool) {
-        if !isOwner {
-            getMetadata()
+    // MARK: - Song List Management
+
+    func addSong(songInfo: TUISongInfo) {
+        songListManager?.addSong(songList: [songInfo], onSuccess: {
+        }, onError: { code, message in
+        })
+    }
+    
+    func eraseMusic(musicId: String) {
+        songListManager?.removeSong(songIdList: [musicId], onSuccess: {
+        }, onError: { code, message in
+        })
+    }
+    
+    func setNextSong(musicId: String) {
+        songListManager?.setNextSong(targetSongId: musicId, onSuccess: {
+        }, onError: { code, message in
+        })
+    }
+    
+    func playNextSong() {
+        songListManager?.playNextSong(onSuccess: {
+        }, onError: { code, message in
+        })
+    }
+    
+    func playNextMusic() {
+        releaseScorePanelTimer()
+        isNaturalEnd = false
+        
+        if karaokeState.playbackState == .idel {
+            playNextSong()
         } else {
-            updateSelectedMusicList()
-            enableScore(enable: false)
+            stopPlayback()
         }
     }
 
+    func eraseAllMusic() {
+        let allMusicIds = karaokeState.selectedSongs.map { $0.songId }
+        guard !allMusicIds.isEmpty else { return }
+
+        songListManager?.removeSong(songIdList: allMusicIds, onSuccess: {
+        }, onError: { code, message in
+        })
+    }
+
+    private func getWaitingList(cursor: String) {
+        songListManager?.getWaitingList(cursor: cursor, count: 20, onSuccess: { [weak self] result in
+            guard let self = self else { return }
+            self.updateWaitingListState(with: result.songList, cursor: cursor)
+
+            if result.cursor != "" {
+                self.getWaitingList(cursor: result.cursor)
+            }
+        }, onError: { code, message in
+        })
+    }
+    
+    private func updateWaitingListState(with songList: [TUISongInfo], cursor: String) {
+        state.update { state in
+            let wasEmpty = state.selectedSongs.isEmpty
+
+            if cursor.isEmpty {
+                state.selectedSongs = songList
+            } else {
+                state.selectedSongs.append(contentsOf: songList)
+            }
+
+            if wasEmpty && !state.selectedSongs.isEmpty {
+                guard let firstSong = state.selectedSongs.first else { return }
+
+                if firstSong.songId.hasPrefix("local_demo") {
+                    loadLocalMusic()
+                } else {
+                    loadNetWorkMusic(musicId: firstSong.songId)
+                }
+            }
+        }
+    }
+
+
+    // MARK: - Score & Metadata Management
+    
+    func enableScore(enable: Bool) {
+        guard let data = try? JSONEncoder().encode(enable),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            return
+        }
+        
+        let metadata: [String: String] = ["EnableScore": jsonString]
+        roomEngine.setRoomMetadataByAdmin(metadata, onSuccess: {
+        }, onError: { _,_ in
+        })
+    }
+
+    // MARK: - Room Management
+    
+    public func synchronizeMetadata(isOwner: Bool) {
+        if !isOwner {
+            getMetadata()
+            getWaitingList(cursor: "")
+        } else {
+            enableScore(enable: false)
+        }
+    }
+    
+    public func show() {
+        guard karaokeState.chorusRole == .leadSinger else {
+            return
+        }
+        
+        state.update { state in
+            state.enableRequestMusic = true
+        }
+        
+        enableRequestMusic(enable: true)
+    }
+    
     public func exit() {
+        eraseAllMusic()
         state.update { state in
             state.enableRequestMusic = false
             state.selectedSongs = []
         }
-        if karaokeState.chorusRole != .leadSinger {
+        
+        guard karaokeState.chorusRole == .leadSinger else {
             return
         }
-        guard let data = try? JSONEncoder().encode(""),
-              let jsonString = String(data: data, encoding: .utf8) else {
-            return
-        }
-
-        let metadata: [String: String] = ["SongPlayList": jsonString]
-        roomEngine.setRoomMetadataByAdmin(metadata, onSuccess: {
-        }, onError: { error, message in
-        })
-
-        guard let data = try? JSONEncoder().encode(false),
-              let jsonString = String(data: data, encoding: .utf8) else {
-            return
-        }
-
-        let metadata1: [String: String] = ["EnableRequestMusic": jsonString]
-        roomEngine.setRoomMetadataByAdmin(metadata1, onSuccess: {
-        }, onError: { error, message in
-        })
-
+        
+        enableRequestMusic(enable: false)
         enableScore(enable: false)
         stopPlayback()
     }
-
-    public func show() {
-        if karaokeState.chorusRole != .leadSinger {
-            return
-        }
-        state.update { state in
-            state.enableRequestMusic = true
-        }
-        guard let data = try? JSONEncoder().encode(true),
+    
+    private func enableRequestMusic(enable: Bool) {
+        guard let data = try? JSONEncoder().encode(enable),
               let jsonString = String(data: data, encoding: .utf8) else {
             return
         }
-
+        
         let metadata: [String: String] = ["EnableRequestMusic": jsonString]
         roomEngine.setRoomMetadataByAdmin(metadata, onSuccess: {
-        }, onError: { error, message in
+        }, onError: { _, _ in
         })
+
     }
 
-    private func updateSelectedMusicList() {
-        guard let data = try? JSONEncoder().encode(karaokeState.selectedSongs),
-              let jsonString = String(data: data, encoding: .utf8) else {
-            return
-        }
-
-        let metadata: [String: String] = ["SongPlayList": jsonString]
-        roomEngine.setRoomMetadataByAdmin(metadata, onSuccess: {
-        }, onError: { error, message in
-        })
-    }
-
-    private func performplayNextMusic() {
+    // MARK: - Private Helper Methods
+    
+    private func performPlayNextMusic() {
         state.update { state in
             state.playbackState = .stop
             isNaturalEnd = true
         }
-        if karaokeState.selectedSongs.isEmpty {
+        
+        guard !karaokeState.selectedSongs.isEmpty else {
             return
         }
-        state.update { state in
-            state.selectedSongs.remove(at: 0)
-        }
-        updateSelectedMusicList()
-
-        if karaokeState.selectedSongs.isEmpty { return }
-        if let song = karaokeState.songLibrary.first(where: { $0.musicId == karaokeState.selectedSongs[0].musicId}) {
-            loadLocalDemoMusic(musicId: song.musicId, musicUrl: song.originalUrl, accompanyUrl: song.accompanyUrl)
-            start()
+        
+        songListManager?.playNextSong { [weak self] in
+            guard let self = self else { return }
+        } onError: { code, message in
         }
     }
 
     private func getMetadata() {
-        roomEngine.getRoomMetadata(["SongPlayList"], onSuccess: { [weak self] response in
-            guard let self = self, let value = response["SongPlayList"] else { return }
-            parsePlayListJson(value)
-        }, onError: { error, message in
-        })
-
-        roomEngine.getRoomMetadata(["EnableSocre"], onSuccess: { [weak self] response in
-            guard let self = self, let value = response["EnableSocre"] else { return }
-            parseEnableScoreJson(value)
-        }, onError: { error, message in
+        roomEngine.getRoomMetadata(["EnableScore"], onSuccess: { [weak self] response in
+            guard let self = self, let value = response["EnableScore"] else { return }
+            self.parseEnableScoreJson(value)
+        }, onError: {error, message in
         })
 
         roomEngine.getRoomMetadata(["EnableRequestMusic"], onSuccess: { [weak self] response in
             guard let self = self, let value = response["EnableRequestMusic"] else { return }
-            parseenableRequestMusicJson(value)
+            self.parseEnableRequestMusicJson(value)
         }, onError: { error, message in
         })
     }
-
+    
     private func releaseScorePanelTimer() {
         scorePanelTimer?.invalidate()
         scorePanelTimer = nil
+    }
+    
+    private func parseEnableScoreJson(_ jsonString: String) {
+        guard !jsonString.isEmpty,
+              let data = jsonString.data(using: .utf8),
+              let isEnabled = try? JSONDecoder().decode(Bool.self, from: data) else {
+            return
+        }
+        
+        state.update { state in
+            state.enableScore = isEnabled
+        }
+    }
+    
+    private func parseEnableRequestMusicJson(_ jsonString: String) {
+        guard !jsonString.isEmpty,
+              let data = jsonString.data(using: .utf8),
+              let isEnabled = try? JSONDecoder().decode(Bool.self, from: data) else {
+            return
+        }
+        
+        state.update { state in
+            state.enableRequestMusic = isEnabled
+        }
     }
 
     func subscribe<Value>(_ selector: StateSelector<KaraokeState, Value>) -> AnyPublisher<Value, Never> {
@@ -351,171 +471,7 @@ public class KaraokeManager: NSObject {
     }
 }
 
-extension KaraokeManager: ITXChorusPlayerDelegate {
-    public func onChorusMusicLoadSucceed(_ musicId: String,
-                                  lyricList: [TXLyricLine],
-                                  pitchList: [TXReferencePitch]) {
-        state.update { state in
-            state.currentMusicId = musicId
-        }
-    }
-
-    public func onVoicePitchUpdated(_ pitch: Int32, hasVoice: Bool, progressMs: Int64) {
-        state.update { state in
-            state.pitch = pitch
-        }
-    }
-
-    public func onChorusRequireLoadMusic(_ musicId: String) {
-        releaseScorePanelTimer()
-        loadLocalDemoMusic(
-            musicId: musicId,
-            musicUrl: karaokeState.songLibrary
-                .first{$0.musicId == musicId}?.originalUrl ?? "",
-            accompanyUrl: karaokeState.songLibrary
-                .first{$0.musicId == musicId}?.accompanyUrl ?? ""
-        )
-        state.update { state in
-            state.currentMusicId = musicId
-        }
-    }
-
-    public func onMusicProgressUpdated(_ progressMs: Int64, durationMs: Int64) {
-        state.update { state in
-            state.playProgress = TimeInterval(progressMs) / 1000.0
-            state.currentMusicTotalDuration = TimeInterval(durationMs) / 1000.0
-            if state.currentMusicTotalDuration - state.playProgress <= 1 || state.playProgress > state.currentMusicTotalDuration {
-                isNaturalEnd = true
-            } else {
-                isNaturalEnd = false
-            }
-        }
-    }
-
-    public func onChorusError(_ errCode: TXChorusError, errMsg: String) {
-    }
-
-    public func onChorusMusicLoadProgress(_ musicId: String, progress: Float) {
-    }
-
-    public func onVoiceScoreUpdated(_ currentScore: Int32, averageScore: Int32, currentLine: Int32) {
-        state.update { state in
-            state.currentScore = currentScore
-            state.averageScore = averageScore
-        }
-    }
-
-    public func onChorusStopped() {
-        if self.karaokeState.chorusRole == .leadSinger {
-            setReverb(enable: false)
-        }
-        if isNaturalEnd && karaokeState.enableScore {
-            state.update { state in
-                state.playbackState = .idel
-            }
-            scorePanelTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] _ in
-                guard let self = self else {return}
-                if self.karaokeState.chorusRole == .leadSinger {
-                    self.performplayNextMusic()
-                } else {
-                    state.update { state in
-                        state.playbackState = .stop
-                    }
-                }
-            }
-        } else {
-            if karaokeState.chorusRole == .leadSinger {
-                self.performplayNextMusic()
-            } else {
-                state.update { state in
-                    state.playbackState = .stop
-                }
-            }
-        }
-    }
-
-    public func onChorusStarted() {
-        if self.karaokeState.chorusRole == .leadSinger {
-            setReverb(enable: true)
-        }
-        state.update { state in
-            state.playbackState = .start
-        }
-        getMetadata()
-    }
-
-    public func onChorusPaused() {
-        state.update { state in
-            state.playbackState = .pause
-        }
-    }
-
-    public func onChorusResumed() {
-        state.update { state in
-            state.playbackState = .resume
-        }
-    }
-}
-
-extension KaraokeManager: TUIRoomObserver {
-    public func onRoomMetadataChanged(key: String, value: String) {
-        if key == "SongPlayList" && !value.isEmpty {
-            parsePlayListJson(value)
-        } else if key == "EnableScore" && !value.isEmpty {
-            parseEnableScoreJson(value)
-        } else if key == "EnableRequestMusic" && !value.isEmpty {
-            parseenableRequestMusicJson(value)
-        }
-    }
-
-    public func onRoomDismissed(roomId: String, reason: TUIRoomDismissedReason) {
-        kickedOutSubject.send()
-    }
-
-    public func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
-        kickedOutSubject.send()
-    }
-
-    private func parsePlayListJson(_ jsonString: String) {
-        guard !jsonString.isEmpty else { return }
-        guard let jsonData = jsonString.data(using: .utf8) else { return }
-        do {
-            let songs = try JSONDecoder().decode([SelectedMusicInfo].self, from: jsonData)
-            guard songs != karaokeState.selectedSongs else { return }
-            state.update { state in
-                state.selectedSongs = songs
-                if state.selectedSongs.isEmpty {
-                    state.currentMusicId = ""
-                    state.currentMusicTotalDuration = 0
-                }
-            }
-        } catch {
-        }
-    }
-
-    private func parseEnableScoreJson(_ jsonString: String) {
-        guard !jsonString.isEmpty else { return }
-        guard let data = jsonString.data(using: .utf8),
-              let isEnabled = try? JSONDecoder().decode(Bool.self, from: data) else {
-            return
-        }
-        state.update { state in
-            state.enableScore = isEnabled
-        }
-    }
-
-    private func parseenableRequestMusicJson(_ jsonString: String) {
-        guard !jsonString.isEmpty else { return }
-        guard let data = jsonString.data(using: .utf8),
-              let isEnabled = try? JSONDecoder().decode(Bool.self, from: data) else {
-            return
-        }
-        state.update { state in
-            state.enableRequestMusic = isEnabled
-        }
-    }
-}
-
+// MARK: - Audio Effects Extension
 extension KaraokeManager {
     func setAudioEffect() {
         let dspConfig: [String: Any] = [
@@ -627,5 +583,323 @@ extension KaraokeManager {
             trtcCloud.callExperimentalAPI(jsonString)
         }
     }
-
 }
+
+// MARK: - TUISongListManagerObserver
+extension KaraokeManager: TUISongListManagerObserver {
+    public func onWaitingListChanged(reason: TUISongListChangeReason, changedSongs: [TUISongInfo]) {
+        state.update { state in
+            switch reason {
+                case .add:
+                    for song in changedSongs {
+                        if !state.selectedSongs.contains(where: { $0.songId == song.songId }) {
+                            state.selectedSongs.append(song)
+                        }
+                        if self.karaokeState.selectedSongs.count == 1 {
+                            guard let firstSong = state.selectedSongs.first else { return }
+
+                            if firstSong.songId.hasPrefix("local_demo") {
+                                loadLocalMusic()
+                            } else {
+                                loadNetWorkMusic(musicId: firstSong.songId)
+                            }
+                        }
+                    }
+                    break
+                case .remove:
+                    let removedSongIds = Set(changedSongs.map { $0.songId })
+                    let isPlayingSongRemoved = !state.selectedSongs.isEmpty && removedSongIds.contains(state.selectedSongs[0].songId)
+
+                    state.selectedSongs.removeAll { removedSongIds.contains($0.songId) }
+
+                    if isPlayingSongRemoved, let firstSong = state.selectedSongs.first {
+                        guard let firstSong = state.selectedSongs.first else { return }
+
+                        if firstSong.songId.hasPrefix("local_demo") {
+                            loadLocalMusic()
+                        } else {
+                            loadNetWorkMusic(musicId: firstSong.songId)
+                        }
+                    }
+                    break
+                case .orderChanged:
+                    for song in changedSongs {
+                        if let index = state.selectedSongs.firstIndex(where: { $0.songId == song.songId }) {
+                            let selectedMusic = state.selectedSongs.remove(at: index)
+                            let insertIndex = min(1, state.selectedSongs.count)
+                            state.selectedSongs.insert(selectedMusic, at: insertIndex)
+                        }
+                    }
+                case .unknown:
+                    let removedSongIds = Set(changedSongs.map { $0.songId })
+                    state.selectedSongs.removeAll { removedSongIds.contains($0.songId) }
+                    break
+                default:
+                    break
+            }
+        }
+    }
+
+    public func onPlayedListChanged(addedSongs: [TUISongInfo]) {
+
+    }
+}
+
+// MARK: - ITXChorusMusicPlayerDelegate
+extension KaraokeManager: ITXChorusPlayerDelegate {
+    public func onChorusMusicLoadSucceed(_ musicId: String,
+                                         lyricList: [TXLyricLine],
+                                         pitchList: [TXReferencePitch]) {
+        let isLocalMusic = musicId.hasPrefix("local_demo")
+
+        start()
+        state.update { state in
+            state.currentMusicId = musicId
+            state.currentLyricList = lyricList
+            state.currentPitchList = pitchList
+            state.isLocalMusic = isLocalMusic
+        }
+    }
+
+    public func onVoicePitchUpdated(_ pitch: Int32, hasVoice: Bool, progressMs: Int64) {
+        state.update { state in
+            state.pitch = pitch
+            state.progressMs = progressMs
+        }
+    }
+
+    public func onChorusRequireLoadMusic(_ musicId: String) {
+        releaseScorePanelTimer()
+        if musicId.hasPrefix("local_demo") {
+            loadLocalDemoMusic(
+                musicId: musicId,
+                musicUrl: karaokeState.songLibrary
+                    .first{$0.musicId == musicId}?.originalUrl ?? "",
+                accompanyUrl: karaokeState.songLibrary
+                    .first{$0.musicId == musicId}?.accompanyUrl ?? ""
+            )
+        }
+        state.update { state in
+            state.currentMusicId = musicId
+        }
+    }
+
+    public func onMusicProgressUpdated(_ progressMs: Int64, durationMs: Int64) {
+        state.update { state in
+            state.playProgress = TimeInterval(progressMs) / 1000.0
+            state.currentMusicTotalDuration = TimeInterval(durationMs) / 1000.0
+            if state.currentMusicTotalDuration - state.playProgress <= 1 || state.playProgress > state.currentMusicTotalDuration {
+                isNaturalEnd = true
+            } else {
+                isNaturalEnd = false
+            }
+        }
+    }
+
+    public func onChorusError(_ errCode: TXChorusError, errMsg: String) {
+        if errCode == TXChorusError.musicLoadFailed {
+            state.update { state in
+                if !state.selectedSongs.isEmpty { self.eraseMusic(musicId: state.selectedSongs.first?.songId ?? "")}
+                state.currentMusicId = ""
+                state.currentMusicTotalDuration = 0
+                state.currentLyricList = []
+                state.currentPitchList = []
+            }
+            errorSubject.send(.loadFailedText)
+        }
+    }
+
+    public func onChorusMusicLoadProgress(_ musicId: String, progress: Float) {
+    }
+
+    public func onVoiceScoreUpdated(_ currentScore: Int32, averageScore: Int32, currentLine: Int32) {
+        state.update { state in
+            state.currentScore = currentScore
+            state.averageScore = averageScore
+        }
+    }
+
+    public func onChorusStopped() {
+        if self.karaokeState.chorusRole == .leadSinger {
+            setReverb(enable: false)
+        }
+        if isNaturalEnd && karaokeState.enableScore {
+            state.update { state in
+                state.playbackState = .idel
+            }
+            scorePanelTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] _ in
+                guard let self = self else {return}
+                if self.karaokeState.chorusRole == .leadSinger {
+                    self.performPlayNextMusic()
+                } else {
+                    state.update { state in
+                        state.playbackState = .stop
+                    }
+                }
+            }
+        } else {
+            if karaokeState.chorusRole == .leadSinger {
+                self.performPlayNextMusic()
+            } else {
+                state.update { state in
+                    state.playbackState = .stop
+                }
+            }
+        }
+    }
+
+    public func onChorusStarted() {
+        if self.karaokeState.chorusRole == .leadSinger {
+            setReverb(enable: true)
+        }
+        state.update { state in
+            state.playbackState = .start
+        }
+        getMetadata()
+    }
+
+    public func onChorusPaused() {
+        state.update { state in
+            state.playbackState = .pause
+        }
+    }
+
+    public func onChorusResumed() {
+        state.update { state in
+            state.playbackState = .resume
+        }
+    }
+}
+
+// MARK: - TUIRoomObserver
+extension KaraokeManager: TUIRoomObserver {
+    public func onRoomMetadataChanged(key: String, value: String) {
+        if key == "EnableScore" && !value.isEmpty {
+            parseEnableScoreJson(value)
+        } else if key == "EnableRequestMusic" && !value.isEmpty {
+            parseEnableRequestMusicJson(value)
+        }
+    }
+
+    public func onRoomDismissed(roomId: String, reason: TUIRoomDismissedReason) {
+        kickedOutSubject.send()
+    }
+
+    public func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
+        kickedOutSubject.send()
+    }
+}
+
+// MARK: - TRTCAudioFrameDelegate
+extension KaraokeManager: TRTCAudioFrameDelegate {
+
+    public func onCapturedAudioFrame(_ frame: TRTCAudioFrame) {
+    }
+    
+    public func onLocalProcessedAudioFrame(_ frame: TRTCAudioFrame) {
+        guard karaokeState.chorusRole == .leadSinger,
+              karaokeState.playbackState == .start || karaokeState.playbackState == .resume else {
+            lastSentJsonData = nil
+            sendCounter = 0
+            return
+        }
+        
+        var dataMap: [String: Any] = [:]
+        dataMap[userIdKey] = userId
+
+        if karaokeState.pitch != 0 {
+            dataMap[pitchKey] = karaokeState.pitch
+        }
+
+        if karaokeState.currentScore != 0 {
+            dataMap[scoreKey] = karaokeState.currentScore
+        }
+
+        if karaokeState.averageScore != 0 {
+            dataMap[avgScoreKey] = karaokeState.averageScore
+        }
+
+        if dataMap.count > 1 {
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: dataMap)
+                let currentJsonString = String(data: jsonData, encoding: .utf8)
+                
+                if currentJsonString != lastSentJsonData {
+                    lastSentJsonData = currentJsonString
+                    sendCounter = 5
+                }
+            } catch {
+            }
+        }
+
+        if sendCounter > 0, let jsonString = lastSentJsonData {
+            if let dataBytes = jsonString.data(using: .utf8) {
+                frame.extraData = dataBytes
+                sendCounter -= 1
+            }
+        }
+    }
+    
+    public func onRemoteUserAudioFrame(_ frame: TRTCAudioFrame, userId: String) {
+        guard let extraData = frame.extraData, !extraData.isEmpty else {
+            return
+        }
+        
+        do {
+            let jsonString = String(data: extraData, encoding: .utf8) ?? ""
+            guard !jsonString.isEmpty else { return }
+            
+            let jsonData = jsonString.data(using: .utf8) ?? Data()
+            let dataMap = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+            
+            guard let dataMap = dataMap,
+                  let itemUserId = dataMap[userIdKey] as? String,
+                  itemUserId == ownerId else {
+                return
+            }
+
+            if let pitch = dataMap[pitchKey] as? NSNumber {
+                let pitchValue = pitch.int32Value
+                if karaokeState.pitch != pitchValue {
+                    state.update { state in
+                        state.pitch = pitchValue
+                    }
+                }
+            }
+
+            if let score = dataMap[scoreKey] as? NSNumber {
+                let scoreValue = score.int32Value
+                if karaokeState.currentScore != scoreValue {
+                    state.update { state in
+                        state.currentScore = scoreValue
+                    }
+                }
+            }
+
+            if let avgScore = dataMap[avgScoreKey] as? NSNumber {
+                let avgScoreValue = avgScore.int32Value
+                if karaokeState.averageScore != avgScoreValue {
+                    state.update { state in
+                        state.averageScore = avgScoreValue
+                    }
+                }
+            }
+            
+        } catch {
+        }
+    }
+    
+    public func onMixedPlay(_ frame: TRTCAudioFrame) {
+
+    }
+    
+    public func onMixedAllAudioFrame(_ frame: TRTCAudioFrame) {
+
+    }
+}
+
+// MARK: - String Localization
+fileprivate extension String {
+    static let loadFailedText = ("Music loading failed").localized
+}
+

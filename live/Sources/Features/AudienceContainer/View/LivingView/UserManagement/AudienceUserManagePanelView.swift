@@ -9,9 +9,10 @@ import AtomicXCore
 import Combine
 import ImSDK_Plus
 import RTCCommon
+import AtomicX
 
 class AudienceUserManagePanelView: RTCBaseView {
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private weak var coreView: LiveCoreView?
     private let userManagePanelType: AudienceUserManagePanelType
@@ -54,7 +55,7 @@ class AudienceUserManagePanelView: RTCBaseView {
 
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(user: SeatInfo, manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView, type: AudienceUserManagePanelType) {
+    init(user: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView, type: AudienceUserManagePanelType) {
         self.user = user
         self.manager = manager
         self.routerManager = routerManager
@@ -77,11 +78,13 @@ class AudienceUserManagePanelView: RTCBaseView {
         return view
     }()
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 20.scale375()
-        imageView.layer.masksToBounds = true
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .m,
+            shape: .round
+        )
+        return avatar
     }()
     
     private lazy var userNameLabel: UILabel = {
@@ -100,14 +103,13 @@ class AudienceUserManagePanelView: RTCBaseView {
         return label
     }()
     
-    private lazy var followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .deepSeaBlueColor
-        button.titleLabel?.font = .customFont(ofSize: 14)
-        button.setTitle(.followText, for: .normal)
-        button.setTitleColor(.g7, for: .normal)
-        button.setImage(internalImage("live_user_followed_icon"), for: .selected)
-        button.layer.cornerRadius = 16
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .medium,
+            content: .textOnly(text: .followText)
+        )
         button.isHidden = isSelf
         return button
     }()
@@ -121,7 +123,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     override func constructViewHierarchy() {
         layer.masksToBounds = true
         addSubview(userInfoView)
-        userInfoView.addSubview(avatarImageView)
+        userInfoView.addSubview(avatarView)
         userInfoView.addSubview(userNameLabel)
         userInfoView.addSubview(idLabel)
         userInfoView.addSubview(followButton)
@@ -133,13 +135,12 @@ class AudienceUserManagePanelView: RTCBaseView {
             make.leading.trailing.top.equalToSuperview().inset(24)
             make.height.equalTo(43.scale375())
         }
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.leading.centerY.equalToSuperview()
-            make.width.height.equalTo(40.scale375())
         }
         userNameLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()
-            make.leading.equalTo(avatarImageView.snp.trailing).offset(12.scale375())
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
             make.height.equalTo(20.scale375())
             make.width.lessThanOrEqualTo(170.scale375())
         }
@@ -163,14 +164,16 @@ class AudienceUserManagePanelView: RTCBaseView {
     
     override func bindInteraction() {
         subscribeState()
-        followButton.addTarget(self, action: #selector(followButtonClick), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
     }
     
     override func setupViewStyle() {
         backgroundColor = .g2
         layer.cornerRadius = 12
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        avatarImageView.kf.setImage(with: URL(string: user.userInfo.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(user.userInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         checkFollowStatus()
     }
     
@@ -180,13 +183,9 @@ class AudienceUserManagePanelView: RTCBaseView {
             .sink { [weak self] isFollow in
                 guard let self = self else { return }
                 if isFollow {
-                    followButton.backgroundColor = .g5
-                    followButton.setTitle("", for: .normal)
-                    followButton.setImage(internalImage("live_user_followed_icon"), for: .normal)
+                    followButton.setButtonContent(.iconOnly(icon: internalImage("live_user_followed_icon")))
                 } else {
-                    followButton.backgroundColor = .deepSeaBlueColor
-                    followButton.setTitle(.followText, for: .normal)
-                    followButton.setImage(nil, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .followText))
                 }
             }
             .store(in: &cancellableSet)
@@ -320,18 +319,18 @@ class AudienceUserManagePanelView: RTCBaseView {
 // MARK: - Action
 
 extension AudienceUserManagePanelView {
-    @objc private func followButtonClick() {
+    private func followButtonClick() {
         if isFollow {
             V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
                 if result.resultCode == 0 {
                     isFollow = false
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    manager.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                manager.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         } else {
             V2TIMManager.sharedInstance().followUser(userIDList: [user.userInfo.userID]) { [weak self] followResultList in
@@ -339,11 +338,11 @@ extension AudienceUserManagePanelView {
                 if result.resultCode == 0 {
                     isFollow = true
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    manager.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                manager.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         }
     }
@@ -358,7 +357,7 @@ extension AudienceUserManagePanelView {
                     sender.isSelected = isSelfMuted
                 case .failure(let err):
                     let err = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(err.localizedMessage)
+                    manager.toastSubject.send((err.localizedMessage,.error))
                 }
             }
         } else {
@@ -381,7 +380,7 @@ extension AudienceUserManagePanelView {
                     sender.isSelected = !isSelfCameraOpened
                 case .failure(let err):
                     let err = InternalError(code: err.code, message: err.message)
-                    manager.toastSubject.send(err.localizedMessage)
+                    manager.toastSubject.send((err.localizedMessage,.error))
                 }
             }
         }
@@ -394,25 +393,28 @@ extension AudienceUserManagePanelView {
     }
     
     private func leaveSeatClick() {
-        let alertInfo = AudienceAlertInfo(description: .leaveSeatAlertText, imagePath: nil,
-                                          cancelButtonInfo: (.cancelText, .cancelTextColor),
-                                          defaultButtonInfo: (.disconnectText, .warningTextColor))
-        { alertPanel in
-            alertPanel.dismiss()
-        } defaultClosure: { [weak self] alertPanel in
+        let cancelButton = AlertButtonConfig(text: .cancelText, type: .grey) { alertView in
+            alertView.dismiss()
+        }
+        
+        let confirmButton = AlertButtonConfig(text: .disconnectText, type: .red) { [weak self] alertView in
             guard let self = self else { return }
             manager.coGuestStore.disConnect(completion: nil)
-            alertPanel.dismiss()
-            routerManager.router(action: .dismiss())
+            alertView.dismiss()
+            routerManager.dismiss()
         }
-        let alertPanel = AudienceAlertPanel(alertInfo: alertInfo)
-        alertPanel.show()
+        
+        let alertConfig = AlertViewConfig(title: .leaveSeatAlertText,
+                                          cancelButton: cancelButton,
+                                          confirmButton: confirmButton)
+        let alertView = AtomicAlertView(config: alertConfig)
+        alertView.show()
     }
 }
 
 private extension String {
     static let followText = internalLocalized("Follow")
-    static let kickOutOfRoomText = internalLocalized("Kick Out")
+    static let kickOutOfRoomText = internalLocalized("Remove")
     static let kickOutOfRoomConfirmText = internalLocalized("Remove")
     static let kickOutAlertText = internalLocalized("Are you sure you want to remove xxx?")
     static let muteAudioText = internalLocalized("Mute")

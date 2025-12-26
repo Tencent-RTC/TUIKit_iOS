@@ -192,14 +192,23 @@ class SongListCell: UITableViewCell {
     @objc private func selectSongButtonTapped() {
         guard let karaokeManager = karaokeManager else {return}
         let userInfo = TUIRoomEngine.getSelfInfo()
-        let musicInfo = SelectedMusicInfo(
-            musicId: musicId,
-            userId: userInfo.userId,
-            userName: userInfo.userName,
-            avatarUrl: userInfo.avatarUrl
-        )
-        karaokeManager.addSong(selectedMusic: musicInfo)
+
+        let songInfo = TUISongInfo()
+        songInfo.songId = musicId
+
+        if let musicData = karaokeManager.karaokeState.songLibrary.first(where: { $0.musicId == musicId }) {
+            songInfo.songName = musicData.musicName
+            songInfo.artistName = musicData.artist
+            songInfo.duration = UInt(musicData.duration)
+            songInfo.coverUrl = String(musicData.coverUrl)
+        }
+
+        songInfo.requester.userId = userInfo.userId
+        songInfo.requester.userName = userInfo.userName
+        songInfo.requester.avatarUrl = userInfo.avatarUrl
+        karaokeManager.addSong(songInfo: songInfo)
     }
+    
 }
 
 fileprivate extension String {

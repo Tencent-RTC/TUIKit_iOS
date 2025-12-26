@@ -8,16 +8,22 @@
 import Foundation
 import Combine
 import RTCCommon
+import AtomicXCore
 
 class StreamDashboardMediaView: UIView {
     private let Screen_Width = UIScreen.main.bounds.size.width
     
-    private var userDataSource: [StreamDashboardUser] = []
+    private var userDataSource: [AVStatistics] = []
     
     private var cancellableSet: Set<AnyCancellable> = []
-    private weak var manager: StreamDashboardManager?
-    init(manager: StreamDashboardManager) {
-        self.manager = manager
+    private let liveID: String
+    
+    private var seatStore: LiveSeatStore {
+        LiveSeatStore.create(liveID: liveID)
+    }
+    
+    init(liveID: String) {
+        self.liveID = liveID
         super.init(frame: .zero)
     }
     
@@ -77,24 +83,16 @@ extension StreamDashboardMediaView {
     }
     
     private func subscribeState() {
-        guard let localPublisher = manager?.subscribe(StateSelector(keyPath: \StreamDashboardState.localUsers)) else {
-            return
-        }
-        guard let remotePublisher = manager?.subscribe(StateSelector(keyPath: \StreamDashboardState.remoteUsers)) else {
-            return
-        }
-        localPublisher
+        LiveSeatStore.create(liveID: liveID).state.subscribe(StatePublisherSelector(keyPath: \LiveSeatState.avStatistics))
             .removeDuplicates()
-            .combineLatest(remotePublisher.removeDuplicates())
             .receive(on: RunLoop.main)
-            .sink { [weak self] localUsers, remoteUsers in
+            .sink { [weak self] avStatistics in
                 guard let self = self else { return }
-                self.userDataSource = localUsers + remoteUsers
-                self.updatePageControl()
-                self.reloadUIData()
+                userDataSource = avStatistics
+                updatePageControl()
+                reloadUIData()
             }
             .store(in: &cancellableSet)
-        
     }
     
     private func reloadUIData() {
@@ -102,7 +100,7 @@ extension StreamDashboardMediaView {
             guard let self = self else { return }
             self.collectionView.reloadData()
             
-            let isRemoteUsersEmpty = manager?.state.remoteUsers.isEmpty ?? true
+            let isRemoteUsersEmpty = isRemoteUsersEmpty()
             collectionView.snp.remakeConstraints { make in
                 make.leading.trailing.equalToSuperview()
                 make.top.equalToSuperview()
@@ -134,6 +132,10 @@ extension StreamDashboardMediaView {
     private func removePageControl() {
         pageControl.safeRemoveFromSuperview()
     }
+    
+    private func isRemoteUsersEmpty() -> Bool {
+        seatStore.state.value.avStatistics.filter({ !$0.userID.isEmpty }).isEmpty
+    }
 }
 
 extension StreamDashboardMediaView: UICollectionViewDataSource {
@@ -145,15 +147,14 @@ extension StreamDashboardMediaView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StreamDashboardMediaCell.CellID, for: indexPath) as! StreamDashboardMediaCell
         cell.updateData(userDataSource[indexPath.item])
-        cell.changeRemoteUserEmpty(isEmpty: manager?.state.remoteUsers.isEmpty ?? true)
+        cell.changeRemoteUserEmpty(isEmpty: isRemoteUsersEmpty())
         return cell
     }
 }
 
 extension StreamDashboardMediaView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let isRemoteUsersEmpty = manager?.state.remoteUsers.isEmpty ?? true
-        return CGSize(width: Screen_Width, height: isRemoteUsersEmpty ? 128.scale375Height() : 174.scale375Height())
+        return CGSize(width: Screen_Width, height: isRemoteUsersEmpty() ? 128.scale375Height() : 174.scale375Height())
     }
 }
 

@@ -19,10 +19,11 @@ Pod::Spec.new do |s|
   s.dependency 'RTCRoomEngine/Professional'
   s.dependency 'SnapKit'
   s.dependency 'RTCCommon'
-  s.dependency 'TXLiteAVSDK_Professional','>= 12.8'
+  s.dependency 'TXLiteAVSDK_Professional', '>= 12.8', '< 13.0'
   s.dependency 'TUICore'
   s.dependency 'Kingfisher'
   s.dependency 'AtomicXCore'
+  s.dependency 'TXIMSDK_Plus_iOS_XCFramework', '>= 8.8.7357'
   
   s.static_framework = true
 
@@ -35,6 +36,6 @@ Pod::Spec.new do |s|
     'Sources/VideoAdvanceExtension/**/*.{swift,h,m}'
   ]
   s.resource_bundles = {
-    'AtomicXBundle' => ['Resources/**/*.{xcassets,json,png,xcstrings,vtt,mp3,json,flac}']
+    'AtomicXBundle' => ['Resources/**/*.{xcassets,json,png,xcstrings,vtt,mp3,json,flac,gif}']
   }
 end

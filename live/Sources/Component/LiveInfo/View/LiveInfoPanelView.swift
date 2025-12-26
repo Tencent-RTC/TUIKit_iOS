@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import RTCCommon
 import RTCRoomEngine
+import AtomicX
 
 class RoomInfoPanelView: RTCBaseView {
     private var cancellableSet = Set<AnyCancellable>()
@@ -19,11 +20,14 @@ class RoomInfoPanelView: RTCBaseView {
     }
     private let enableFollow: Bool
     
-    private lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 55.scale375()/2
-        imageView.layer.masksToBounds = true
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatarSize = AtomicAvatarSize.l
+        let avatar = AtomicAvatar(
+            content: .icon(image: UIImage()),
+            size: avatarSize,
+            shape: .round
+        )
+        return avatar
     }()
     
     private let backgroundView: UIView = {
@@ -34,38 +38,40 @@ class RoomInfoPanelView: RTCBaseView {
         return view
     }()
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .customFont(ofSize: 16)
-        label.textColor = .g7
+    private lazy var titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         label.textAlignment = .center
         return label
     }()
     
-    private lazy var roomIdLabel: UILabel = {
-        let label = UILabel()
-        label.font = .customFont(ofSize: 12)
-        label.text = .localizedReplace(.roomIdText, replace: state.roomId)
-        label.textColor = .greyColor
+    private lazy var roomIdLabel: AtomicLabel = {
+        let label = AtomicLabel(.localizedReplace(.roomIdText, replace: state.roomId)) { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         label.textAlignment = .center
         return label
     }()
     
-    private lazy var fansLabel: UILabel = {
-        let label = UILabel()
-        label.font = .customFont(ofSize: 12)
-        label.textColor = .greyColor
+    private lazy var fansLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorSecondary,
+                            font: theme.typography.Regular12)
+        }
         label.textAlignment = .center
         return label
     }()
     
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .b1
-        button.setTitleColor(.flowKitWhite, for: .normal)
-        button.layer.cornerRadius = 8.scale375Width()
-        button.setTitle(.followText, for: .normal)
-        button.titleLabel?.font = .customFont(ofSize: 14)
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: .followText)
+        )
         return button
     }()
     
@@ -94,13 +100,12 @@ class RoomInfoPanelView: RTCBaseView {
         if !isOwner && enableFollow {
             addSubview(followButton)
         }
-        addSubview(imageView)
+        addSubview(avatarView)
     }
     
     override func activateConstraints() {
-        imageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.top.centerX.equalToSuperview()
-            make.height.width.equalTo(55.scale375Width())
         }
         var totalHeight = isOwner ? 159 : 212
         if !enableFollow {
@@ -139,7 +144,10 @@ class RoomInfoPanelView: RTCBaseView {
     }
     
     override func bindInteraction() {
-        followButton.addTarget(self, action: #selector(followButtonClick(_:)), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
+
         subscribeRoomInfoPanelState()
     }
     
@@ -152,7 +160,7 @@ class RoomInfoPanelView: RTCBaseView {
         service.getFansNumber()
     }
     
-    @objc private func followButtonClick(_ sender: UIButton) {
+    private func followButtonClick() {
         if state.followingList.contains(where: { $0.userId == state.ownerId }) {
             service.unfollowUser(userId: state.ownerId)
         } else {
@@ -182,7 +190,7 @@ class RoomInfoPanelView: RTCBaseView {
             .receive(on: RunLoop.main)
             .sink { [weak self] avatarUrl in
                 guard let self = self else { return }
-                self.imageView.kf.setImage(with: URL(string: avatarUrl), placeholder: UIImage.avatarPlaceholderImage)
+                self.avatarView.setContent(.url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage))
             }
             .store(in: &cancellableSet)
         
@@ -207,15 +215,17 @@ class RoomInfoPanelView: RTCBaseView {
             .sink { [weak self] userList in
                 guard let self = self else { return }
                 let userIdList = userList.map { $0.userId }
-                if userIdList.contains(self.state.ownerId) {
-                    self.followButton.isSelected = true
-                    self.followButton.backgroundColor = .g3.withAlphaComponent(0.3)
-                    self.followButton.setTitle(.unfollowText, for: .normal)
+                let isFollowing = userIdList.contains(self.state.ownerId)
+                
+                if isFollowing {
+                    self.followButton.setButtonContent(.textOnly(text: .unfollowText))
+                    self.followButton.setColorType(.secondary)
                 } else {
-                    self.followButton.isSelected = false
-                    self.followButton.backgroundColor = .deepSeaBlueColor
-                    self.followButton.setTitle(.followText, for: .normal)
+                    self.followButton.setButtonContent(.textOnly(text: .followText))
+                    self.followButton.setColorType(.primary)
                 }
+                
+                self.followButton.isSelected = isFollowing
             }
             .store(in: &cancellableSet)
         

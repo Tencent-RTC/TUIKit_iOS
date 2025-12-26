@@ -8,15 +8,16 @@
 import Combine
 import Foundation
 import RTCCommon
+import AtomicX
 
 class VRSettingPanel: UIView {
     private let settingPanelModel: VRFeatureClickPanelModel
     
-    private let titleLabel: UILabel = {
-        let view = UILabel()
-        view.text = .settingTitleText
-        view.textColor = .g7
-        view.font = .customFont(ofSize: 16)
+    private let titleLabel: AtomicLabel = {
+        let view = AtomicLabel(.settingTitleText) { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Regular16)
+        }
         view.textAlignment = .center
         return view
     }()

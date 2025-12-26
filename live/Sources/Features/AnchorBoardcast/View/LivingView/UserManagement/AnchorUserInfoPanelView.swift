@@ -10,6 +10,7 @@ import Combine
 import RTCCommon
 import ImSDK_Plus
 import AtomicXCore
+import AtomicX
 
 enum AnchorUserManagePanelType {
     case messageAndKickOut
@@ -18,7 +19,7 @@ enum AnchorUserManagePanelType {
 }
 
 class AnchorUserInfoPanelView: RTCBaseView {
-    private let manager: AnchorManager
+    private let store: AnchorStore
     
     private var user: LiveUserInfo
     @Published private var isFollow = false
@@ -26,13 +27,13 @@ class AnchorUserInfoPanelView: RTCBaseView {
     
     private var cancellableSet = Set<AnyCancellable>()
     
-    private lazy var avatarImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 55.scale375() / 2
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 2.0
-        imageView.layer.borderColor = UIColor.cyanColor.cgColor
-        return imageView
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .url("",placeholder: UIImage.avatarPlaceholderImage),
+            size: .xl,
+            shape: .round
+        )
+        return avatar
     }()
     
     private let backgroundView : UIView = {
@@ -69,19 +70,19 @@ class AnchorUserInfoPanelView: RTCBaseView {
         return label
     }()
     
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .b1
-        button.setTitleColor(.flowKitWhite, for: .normal)
-        button.layer.cornerRadius = 20
-        button.setTitle(.followText, for: .normal)
-        button.titleLabel?.font = .customFont(ofSize: 14)
+    private lazy var followButton: AtomicButton = {
+        let button = AtomicButton(
+            variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .textOnly(text: .followText)
+        )
         return button
     }()
     
-    init(user: LiveUserInfo, manager: AnchorManager) {
+    init(user: LiveUserInfo, store: AnchorStore) {
         self.user = user
-        self.manager = manager
+        self.store = store
         super.init(frame: .zero)
     }
     
@@ -99,13 +100,12 @@ class AnchorUserInfoPanelView: RTCBaseView {
         addSubview(userIdLabel)
         addSubview(fansLabel)
         addSubview(followButton)
-        addSubview(avatarImageView)
+        addSubview(avatarView)
     }
     
     override func activateConstraints() {
-        avatarImageView.snp.makeConstraints { make in
+        avatarView.snp.makeConstraints { make in
             make.top.centerX.equalToSuperview()
-            make.height.width.equalTo(55.scale375Width())
         }
         backgroundView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(29.scale375Height())
@@ -136,12 +136,14 @@ class AnchorUserInfoPanelView: RTCBaseView {
     }
     
     override func bindInteraction() {
-        followButton.addTarget(self, action: #selector(followButtonClick), for: .touchUpInside)
+        followButton.setClickAction { [weak self] _ in
+            self?.followButtonClick()
+        }
         subscribeRoomInfoPanelState()
     }
     
     override func setupViewStyle() {
-        avatarImageView.kf.setImage(with: URL(string: user.avatarURL), placeholder: UIImage.avatarPlaceholderImage)
+        avatarView.setContent(.url(user.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
         initFansView()
         checkFollowType()
     }
@@ -179,15 +181,12 @@ class AnchorUserInfoPanelView: RTCBaseView {
         
         $isFollow.receive(on: RunLoop.main)
             .removeDuplicates()
-            .receive(on: RunLoop.main)
             .sink { [weak self] isFollow in
                 guard let self = self else { return }
                 if isFollow {
-                    followButton.backgroundColor = .g5
-                    followButton.setTitle(.unfollowText, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .unfollowText))
                 } else {
-                    followButton.backgroundColor = .deepSeaBlueColor
-                    followButton.setTitle(.followText, for: .normal)
+                    followButton.setButtonContent(.textOnly(text: .followText))
                 }
             }
             .store(in: &cancellableSet)
@@ -196,7 +195,7 @@ class AnchorUserInfoPanelView: RTCBaseView {
 
 // MARK: - Action
 extension AnchorUserInfoPanelView {
-    @objc private func followButtonClick() {
+    private func followButtonClick() {
         if isFollow {
             V2TIMManager.sharedInstance().unfollowUser(userIDList: [user.userID]) { [weak self] followResultList in
                 guard let self = self, let result = followResultList?.first else { return }
@@ -204,11 +203,11 @@ extension AnchorUserInfoPanelView {
                     isFollow = false
                     fansNumber -= 1
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    store.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))", .error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                store.toastSubject.send(("code: \(code), message: \(String(describing: message))", .error))
             }
         } else {
             V2TIMManager.sharedInstance().followUser(userIDList: [user.userID]) { [weak self] followResultList in
@@ -217,11 +216,11 @@ extension AnchorUserInfoPanelView {
                     isFollow = true
                     fansNumber += 1
                 } else {
-                    manager.toastSubject.send("code: \(result.resultCode), message: \(String(describing: result.resultInfo))")
+                    store.toastSubject.send(("code: \(result.resultCode), message: \(String(describing: result.resultInfo))",.error))
                 }
             } fail: { [weak self] code, message in
                 guard let self = self else { return }
-                manager.toastSubject.send("code: \(code), message: \(String(describing: message))")
+                store.toastSubject.send(("code: \(code), message: \(String(describing: message))",.error))
             }
         }
     }

@@ -10,19 +10,23 @@ import Combine
 import Foundation
 import RTCCommon
 import TUICore
+import AtomicX
 
 class AnchorMenuDataCreator {
     private weak var coreView: LiveCoreView?
-    private let manager: AnchorManager
+    private let store: AnchorStore
     private let routerManager: AnchorRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     
     private var lastApplyHashValue: Int?
     
-    init(coreView: LiveCoreView, manager: AnchorManager, routerManager: AnchorRouterManager) {
+    private weak var presentedExitBattleAlertView: AtomicAlertView?
+    
+    init(coreView: LiveCoreView, store: AnchorStore, routerManager: AnchorRouterManager) {
         self.coreView = coreView
-        self.manager = manager
+        self.store = store
         self.routerManager = routerManager
+        subscribeState()
     }
     
     func generateBottomMenuData(features: [AnchorBottomMenuFeature]) -> [AnchorButtonMenuInfo] {
@@ -32,6 +36,23 @@ class AnchorMenuDataCreator {
     deinit {
         print("deinit \(type(of: self))")
     }
+    
+    private func subscribeState() {
+        store.battleStore.battleEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onBattleEnded(battleInfo: _, reason: _):
+                    if let alertView = presentedExitBattleAlertView {
+                        alertView.dismiss()
+                        presentedExitBattleAlertView = nil
+                    }
+                default: break
+                }
+            }
+            .store(in: &cancellableSet)
+    }
 }
 
 extension AnchorMenuDataCreator {
@@ -39,10 +60,10 @@ extension AnchorMenuDataCreator {
         var menus: [AnchorButtonMenuInfo] = []
         if features.contains(.coHost) {
             var connection = AnchorButtonMenuInfo(normalIcon: "live_connection_icon", normalTitle: .coHostText)
-            let selfUserId = manager.selfUserID
+            let selfUserId = store.selfUserID
             connection.tapAction = { [weak self] _ in
                 guard let self = self else { return }
-                if manager.coGuestState.connected.count > 1 || manager.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) {
+                if store.coGuestState.connected.count > 1 || store.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) {
                     return
                 } else {
                     routerManager.router(action: .present(.connectionControl))
@@ -51,9 +72,9 @@ extension AnchorMenuDataCreator {
             
             connection.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
-                manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+                store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
                     .removeDuplicates()
-                    .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers)).removeDuplicates())
+                    .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers)).removeDuplicates())
                     .receive(on: RunLoop.main)
                     .sink { [weak button] seatList, battleUsers in
                         let isBattle = battleUsers.contains(where: { $0.userID == selfUserId })
@@ -70,13 +91,13 @@ extension AnchorMenuDataCreator {
             var battle = AnchorButtonMenuInfo(normalIcon: "live_battle_icon", normalTitle: .battleText)
             battle.tapAction = { [weak self] _ in
                 guard let self = self else { return }
-                let selfUserId = manager.selfUserID
-                let isSelfInBattle = manager.battleState.battleUsers.contains(where: { $0.userID == selfUserId })
+                let selfUserId = store.selfUserID
+                let isSelfInBattle = store.battleState.battleUsers.contains(where: { $0.userID == selfUserId })
                 if isSelfInBattle {
                     confirmToExitBattle()
                 } else {
-                    let isOnDisplayResult = manager.anchorBattleState.isOnDisplayResult
-                    let isSelfInConnection = manager.coHostState.connected.isOnSeat()
+                    let isOnDisplayResult = store.anchorBattleState.isOnDisplayResult
+                    let isSelfInConnection = store.coHostState.connected.isOnSeat()
                     guard !isOnDisplayResult, isSelfInConnection else {
                         return
                     }
@@ -85,16 +106,16 @@ extension AnchorMenuDataCreator {
                     config.duration = anchorBattleDuration
                     config.needResponse = true
                     config.extensionInfo = ""
-                    manager.willApplyingBattle()
-                    manager.battleStore.requestBattle(config: config, userIDList: manager.coHostState.connected.filter { $0.userID != selfUserId }.map { $0.userID }, timeout: anchorBattleRequestTimeout) { [weak self] result in
+                    store.willApplyingBattle()
+                    store.battleStore.requestBattle(config: config, userIDList: store.coHostState.connected.filter { $0.userID != selfUserId }.map { $0.userID }, timeout: anchorBattleRequestTimeout) { [weak self] result in
                         guard let self = self else { return }
                         switch result {
                         case .success((let battleInfo, _)):
-                            manager.setRequestBattleID(battleInfo.battleID)
+                            store.setRequestBattleID(battleInfo.battleID)
                         case .failure(let err):
-                            manager.stopApplyingBattle()
+                            store.stopApplyingBattle()
                             let err = InternalError(code: err.code, message: err.message)
-                            manager.onError(err)
+                            store.onError(err)
                         }
                     }
                     
@@ -105,7 +126,7 @@ extension AnchorMenuDataCreator {
                         }
                     }
                     
-                    let publisher = manager.battleStore.battleEventPublisher
+                    let publisher = store.battleStore.battleEventPublisher
                         .receive(on: RunLoop.main)
                         .sink { [weak self] event in
                             guard let self = self else { return }
@@ -113,7 +134,7 @@ extension AnchorMenuDataCreator {
                             case .onBattleRequestAccept(battleID: _, inviter: _, invitee: _),
                                  .onBattleRequestReject(battleID: _, inviter: _, invitee: _),
                                  .onBattleRequestTimeout(battleID: _, inviter: _, invitee: _):
-                                manager.stopApplyingBattle()
+                                store.stopApplyingBattle()
                             default: break
                             }
                         }
@@ -123,10 +144,10 @@ extension AnchorMenuDataCreator {
             }
             battle.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
-                let selfUserId = manager.selfUserID
-                let battleUsersPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
-                let connectedUsersPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
-                let displayResultPublisher = manager.subscribeState(StateSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
+                let selfUserId = store.selfUserID
+                let battleUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
+                let connectedUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+                let displayResultPublisher = store.subscribeState(StateSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
               
                 battleUsersPublisher
                     .removeDuplicates()
@@ -171,14 +192,14 @@ extension AnchorMenuDataCreator {
             var linkMic = AnchorButtonMenuInfo(normalIcon: "live_link_icon", animateIcon: ["live_link_animate1_icon", "live_link_animate2_icon", "live_link_animate3_icon"], normalTitle: .coGuestText)
             linkMic.tapAction = { [weak self] _ in
                 guard let self = self else { return }
-                if !manager.coHostState.connected.isEmpty {
+                if !store.coHostState.connected.isEmpty {
                     return
                 }
                 routerManager.router(action: .present(.liveLinkControl))
             }
             linkMic.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
-                manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+                store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
                     .map { !$0.isEmpty }
                     .receive(on: RunLoop.main)
                     .removeDuplicates()
@@ -188,10 +209,10 @@ extension AnchorMenuDataCreator {
                     }
                     .store(in: &cancellableSet)
                 
-                manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+                store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
                     .removeDuplicates()
                     .map { $0.count > 1 }
-                    .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates().map { !$0.isEmpty })
+                    .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates().map { !$0.isEmpty })
                     .receive(on: RunLoop.main)
                     .sink { [weak button] isGuestLinking, isHostConnecting in
                         if isHostConnecting {
@@ -215,30 +236,40 @@ extension AnchorMenuDataCreator {
     }
     
     private func confirmToExitBattle() {
-        var items: [ActionItem] = []
-        let designConfig = ActionItemDesignConfig(lineWidth: 7, titleColor: .warningTextColor)
-        designConfig.backgroundColor = .bgOperateColor
-        designConfig.lineColor = .g3.withAlphaComponent(0.3)
-        let endBattleItem = ActionItem(title: .confirmEndBattleText, designConfig: designConfig, actionClosure: { [weak self] _ in
+        var items: [AlertButtonConfig] = []
+        let endBattleItem = AlertButtonConfig(text: .confirmEndBattleText, type: .red) { [weak self] _ in
             guard let self = self else { return }
-            let alertInfo = AnchorAlertInfo(description: String.endBattleAlertText, imagePath: nil,
-                                            cancelButtonInfo: (String.cancelText, .cancelTextColor),
-                                            defaultButtonInfo: (String.confirmEndBattleText, .warningTextColor))
-            { [weak self] _ in
+            let cancelButton = AlertButtonConfig(text: String.cancelText, type: .grey) { [weak self] _ in
                 guard let self = self else { return }
-                routerManager.router(action: .routeTo(.anchor))
-            } defaultClosure: { [weak self] _ in
-                guard let self = self else { return }
-                manager.battleStore.exitBattle(battleID: manager.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
                 routerManager.router(action: .routeTo(.anchor))
             }
+            let confirmButton = AlertButtonConfig(text: String.confirmEndBattleText, type: .red) { [weak self] _ in
+                guard let self = self else { return }
+                store.battleStore.exitBattle(battleID: store.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
+                routerManager.router(action: .routeTo(.anchor))
+            }
+            let alertConfig = AlertViewConfig(title: String.endBattleAlertText,
+                                              cancelButton: cancelButton,
+                                              confirmButton: confirmButton)
             routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                 guard let self = self else { return }
-                routerManager.router(action: .present(.alert(info: alertInfo)))
+                let alertView = AtomicAlertView(config: alertConfig)
+                routerManager.present(view: alertView)
+                presentedExitBattleAlertView = alertView
             }))
-        })
+        }
         items.append(endBattleItem)
-        routerManager.router(action: .present(.listMenu(ActionPanelData(items: items, cancelText: .cancelText, cancelColor: .bgOperateColor, cancelTitleColor: .defaultTextColor))))
+        
+        let cancelItem = AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
+            guard let self = self else { return }
+            self.routerManager.dismiss()
+        }
+        items.append(cancelItem)
+        
+        let alertConfig = AlertViewConfig(items: items)
+        let alertView = AtomicAlertView(config: alertConfig)
+        routerManager.present(view: alertView, position: .bottom)
+        presentedExitBattleAlertView = alertView
     }
     
     private func generateSettingModel(features: [AnchorBottomMenuFeature]) -> AnchorFeatureClickPanelModel {
@@ -280,7 +311,7 @@ extension AnchorMenuDataCreator {
                                              designConfig: designConfig,
                                              actionClosure: { [weak self] _ in
                                                  guard let self = self else { return }
-                                                 manager.deviceStore.switchCamera(isFront: !manager.deviceState.isFrontCamera)
+                                                 store.deviceStore.switchCamera(isFront: !store.deviceState.isFrontCamera)
                                                  
                                              }))
         model.items.append(AnchorFeatureItem(normalTitle: .mirrorText,

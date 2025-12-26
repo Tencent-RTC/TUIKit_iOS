@@ -6,14 +6,15 @@
 //
 
 import AtomicXCore
+import AtomicX
 import Combine
 import RTCCommon
 import TUICore
 
 protocol AudienceListCellDelegate: AnyObject {
-    func handleScrollToNewRoom(roomId: String, ownerId: String, manager: AudienceManager, coreView: LiveCoreView, relayoutCoreViewClosure: @escaping () -> Void)
+    func handleScrollToNewRoom(roomId: String, ownerId: String, manager: AudienceStore, coreView: LiveCoreView, relayoutCoreViewClosure: @escaping () -> Void)
     func showFloatWindow()
-    func showToast(message: String)
+    func showAtomicToast(message: String, toastStyle: ToastStyle)
     func disableScrolling()
     func enableScrolling()
     func scrollToNextPage()
@@ -50,15 +51,17 @@ class AudienceSliderCell: UIView {
         return view
     }()
 
-    private lazy var manager = AudienceManager(liveID: liveID)
+    private lazy var manager = AudienceStore(liveID: liveID)
     private let routerManager: AudienceRouterManager
     private var cancellableSet = Set<AnyCancellable>()
     private var isStartedPreload = false
+    private var currentLiveOwner: LiveUserInfo?
     
     init(liveInfo: LiveInfo, routerManager: AudienceRouterManager, routerCenter: AudienceRouterControlCenter) {
         self.liveID = liveInfo.liveID
         self.routerManager = routerManager
         self.routerCenter = routerCenter
+        self.currentLiveOwner = liveInfo.liveOwner
         super.init(frame: .zero)
         // TODO: gg check this
 //        manager.onAudienceSliderCellInit(liveInfo: liveInfo)
@@ -141,6 +144,7 @@ class AudienceSliderCell: UIView {
             guard let self = self else { return }
             if case .success = result {
                 delegate?.enableScrolling()
+                currentLiveOwner = manager.liveListState.currentLive.liveOwner
             }
         }
     }
@@ -169,9 +173,9 @@ extension AudienceSliderCell {
     private func subscribeSubjects() {
         manager.toastSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] message,style in
                 guard let self = self, let delegate = delegate else { return }
-                delegate.showToast(message: message)
+                delegate.showAtomicToast(message: message, toastStyle: style)
             }.store(in: &cancellableSet)
         
         manager.floatWindowSubject
@@ -204,10 +208,12 @@ extension AudienceSliderCell {
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
-                case .onLiveEnded(liveID: let liveID, reason: _, message: _):
-                    let currentLive = manager.liveListState.currentLive
-                    delegate?.onRoomDismissed(roomId: currentLive.liveID, avatarUrl: currentLive.liveOwner.avatarURL, userName: currentLive.liveOwner.userName)
-                default: break
+                    case .onLiveEnded(liveID: let liveID, reason: _, message: _):
+                        guard liveID == manager.liveID else { return }
+                        delegate?.onRoomDismissed(roomId: liveID,
+                                                  avatarUrl: currentLiveOwner?.avatarURL ?? "",
+                                                  userName: currentLiveOwner?.userName ?? "")
+                    default: break
                 }
             }
             .store(in: &cancellableSet)

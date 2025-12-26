@@ -6,13 +6,12 @@
 //
 import UIKit
 import Combine
-import Factory
 import TUIRoomKit
 import TUICore
 
 class ConferenceOptionsView: UIView {
     weak var rootViewController: ConferenceOptionsViewController?
-    private var listView: ConferenceListView
+//    private var listView: ConferenceListView
     
     lazy var options: [ConferenceOptionInfo] = {
         return ConferenceOptionsModel().generateOptionsData()
@@ -47,7 +46,7 @@ class ConferenceOptionsView: UIView {
     
     init(viewController: ConferenceOptionsViewController) {
         rootViewController = viewController
-        listView = ConferenceListView(viewController: viewController)
+//        listView = ConferenceListView(viewController: viewController)
         super.init(frame: .zero)
     }
     
@@ -72,7 +71,7 @@ class ConferenceOptionsView: UIView {
         topViewContainer.addSubview(backButton)
         addSubview(stackView)
         addSubview(lineView)
-        addSubview(listView)
+//        addSubview(listView)
     }
     
     func activateConstraints() {
@@ -106,12 +105,12 @@ class ConferenceOptionsView: UIView {
             make.trailing.equalToSuperview().offset(-20)
             make.top.equalTo(stackView.snp.bottom).offset(20)
         }
-        listView.snp.makeConstraints { make in
-            make.top.equalTo(lineView.snp.bottom).offset(19)
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
-        }
+//        listView.snp.makeConstraints { make in
+//            make.top.equalTo(lineView.snp.bottom).offset(19)
+//            make.leading.equalToSuperview().offset(20)
+//            make.trailing.equalToSuperview().offset(-20)
+//            make.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
+//        }
     }
     
     func bindInteraction() {
@@ -163,7 +162,7 @@ class ConferenceOptionsView: UIView {
     }
     
     func reloadConferenceList() {
-        listView.reloadList()
+//        listView.reloadList()
     }
     
     deinit {

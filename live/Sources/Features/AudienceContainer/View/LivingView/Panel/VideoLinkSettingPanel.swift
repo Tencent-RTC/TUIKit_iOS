@@ -13,7 +13,7 @@ import TUICore
 
 class VideoLinkSettingPanel: RTCBaseView {
     private weak var coreView: LiveCoreView?
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private let requestTimeOutValue: TimeInterval = 60
     
@@ -97,10 +97,16 @@ class VideoLinkSettingPanel: RTCBaseView {
         return view
     }()
     
-    init(manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    private var seatIndex: Int
+    func updateSeatIndex(_ seatIndex: Int) {
+        self.seatIndex = seatIndex
+    }
+    
+    init(manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView, seatIndex: Int) {
         self.manager = manager
         self.routerManager = routerManager
         self.coreView = coreView
+        self.seatIndex = seatIndex
         super.init(frame: .zero)
     }
     
@@ -160,8 +166,8 @@ class VideoLinkSettingPanel: RTCBaseView {
 extension VideoLinkSettingPanel {
     @objc func requestLinkMicButtonClick(_ sender: AudienceFeatureItemButton) {
         manager.willApplying()
-        manager.toastSubject.send(.waitToLinkText)
-        manager.coGuestStore.applyForSeat(timeout: requestTimeOutValue, extraInfo: nil) { [weak self] result in
+        manager.toastSubject.send((.waitToLinkText, .info))
+        manager.coGuestStore.applyForSeat(seatIndex: seatIndex, timeout: requestTimeOutValue, extraInfo: nil) { [weak self] result in
             guard let self = self else { return }
             manager.stopApplying()
             switch result {
@@ -172,10 +178,7 @@ extension VideoLinkSettingPanel {
             }
         }
         
-        for item in cancellableSet.filter({ $0.hashValue == lastApplyHashValue }) {
-            item.cancel()
-            cancellableSet.remove(item)
-        }
+        clearLastApplyHashValue()
         
         let cancelable = manager.coGuestStore.guestEventPublisher
             .receive(on: RunLoop.main)
@@ -186,6 +189,9 @@ extension VideoLinkSettingPanel {
                     guard isAccept else { break }
                     manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera, completion: nil)
                     manager.deviceStore.openLocalMicrophone(completion: nil)
+                    clearLastApplyHashValue()
+                case .onGuestApplicationNoResponse(reason: _):
+                    clearLastApplyHashValue()
                 default: break
                 }
             }
@@ -194,27 +200,36 @@ extension VideoLinkSettingPanel {
         routerManager.router(action: .routeTo(.audience))
     }
     
+    private func clearLastApplyHashValue() {
+        guard let hashValue = lastApplyHashValue else { return }
+        for item in cancellableSet.filter({ $0.hashValue == hashValue }) {
+            item.cancel()
+            cancellableSet.remove(item)
+        }
+        lastApplyHashValue = nil
+    }
+    
     private func subscribeCurrentRoute() {
         routerManager.subscribeRouterState(StateSelector(keyPath: \AudienceRouterState.routeStack))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] routeStack in
                 guard let self = self else { return }
-                if routeStack.last == .linkSetting {
-                    manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera) { [weak self] result in
+                if case .linkSetting = routeStack.last {
+                    manager.deviceStore.switchCamera(isFront: true)
+                    manager.deviceStore.startCameraTest(cameraView: previewView) { [weak self] result in
                         guard let self = self else { return }
                         switch result {
                         case .success(()):
-                            manager.audienceMediaManager.setLocalVideoView(view: previewView)
                             needCloseCameraWhenViewDisappear = true
                         case .failure(let err):
                             let error = InternalError(code: err.code, message: err.message)
                             manager.onError(error)
                         }
                     }
-                } else if !routeStack.contains(.linkSetting) {
+                } else if !routeStack.contains(where: { if case .linkSetting = $0 { true } else { false } }) {
                     if needCloseCameraWhenViewDisappear {
-                        manager.deviceStore.closeLocalCamera()
+                        manager.deviceStore.stopCameraTest()
                         needCloseCameraWhenViewDisappear = false
                     }
                 }

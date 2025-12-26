@@ -11,6 +11,7 @@ import TUICore
 import Combine
 import RTCCommon
 import AtomicXCore
+import AtomicX
 
 class VRLiveInfoEditView: UIView {
     private let store: VoiceRoomPrepareStore
@@ -182,20 +183,19 @@ extension VRLiveInfoEditView {
     }
 
     private func showModeSelection() {
-        var items: [ActionItem] = []
-        let config = ActionItemDesignConfig()
+        var alertItems: [AlertButtonConfig] = []
+        
         for mode in LiveStreamPrivacyStatus.allCases {
-            let item = ActionItem(title: mode.getString(), designConfig: config, actionClosure: { [weak self] value in
+            let item = AlertButtonConfig(text: mode.getString(), type: .primary) { [weak self] _ in
                 guard let self = self else { return }
-                guard let privacy = LiveStreamPrivacyStatus(rawValue: value) else { return }
-                self.store.onSetRoomPrivacy(privacy)
+                self.store.onSetRoomPrivacy(mode)
                 self.routerManager.router(action: .dismiss())
-            })
-            items.append(item)
+            }
+            alertItems.append(item)
         }
-        var panelData = ActionPanelData(items: items, cancelText: .cancelText)
-        panelData.containCancel = false
-        routerManager.router(action: .present(.listMenu(panelData)))
+        
+        let alertConfig = AlertViewConfig(items: alertItems)
+        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
     }
 }
 

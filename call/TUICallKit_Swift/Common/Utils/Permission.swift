@@ -6,7 +6,7 @@
 //
 
 import AVFoundation
-import RTCRoomEngine
+import AtomicXCore
 
 enum AuthorizationDeniedType: Int {
     case audio
@@ -14,23 +14,23 @@ enum AuthorizationDeniedType: Int {
 }
 
 class Permission: NSObject {
-    static func hasPermission(callMediaType: TUICallMediaType, fail: TUICallFail?) -> Bool  {
+    static func hasPermission(callMediaType: CallMediaType, completion: CompletionClosure?) -> Bool {
         if Permission.checkAuthorizationStatusIsDenied(mediaType: .audio) {
             Permission.showAuthorizationAlert(mediaType: .audio)
-            fail?(ERROR_PARAM_INVALID, "call failed, authorization status is denied")
+            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "call failed, authorization status is denied")))
             return false
         }
 
         if callMediaType == .video && Permission.checkAuthorizationStatusIsDenied(mediaType: .video){
             Permission.showAuthorizationAlert(mediaType: .video)
-            fail?(ERROR_PARAM_INVALID, "call failed, authorization status is denied")
+            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "call failed, authorization status is denied")))
             return false
         }
         
         return true
     }
     
-    static func showAuthorizationAlert(mediaType: TUICallMediaType) {
+    static func showAuthorizationAlert(mediaType: CallMediaType) {
         let statusVideo: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         var deniedType: AuthorizationDeniedType = AuthorizationDeniedType.audio
         
@@ -39,21 +39,21 @@ class Permission: NSObject {
         }
         
         Permission.showAuthorizationAlert(deniedType: deniedType) {
-            CallManager.shared.hangup() { } fail: { code, message in }
+            CallStore.shared.hangup(completion: nil)
         } cancelHandler: {
-            CallManager.shared.hangup() { } fail: { code, message in }
+            CallStore.shared.hangup(completion: nil)
         }
     }
 
-    static func checkAuthorizationStatusIsDenied(mediaType: TUICallMediaType) -> Bool {
+    static func checkAuthorizationStatusIsDenied(mediaType: CallMediaType) -> Bool {
         let statusAudio: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .audio)
         let statusVideo: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
         
-        if mediaType == TUICallMediaType.video && statusVideo == .denied {
+        if mediaType == .video && statusVideo == .denied {
             return true
         }
         
-        if mediaType == TUICallMediaType.audio && statusAudio == .denied {
+        if mediaType == .audio && statusAudio == .denied {
             return true
         }
         
@@ -61,8 +61,8 @@ class Permission: NSObject {
     }
 
     static func showAuthorizationAlert(deniedType: AuthorizationDeniedType,
-                                              openSettingHandler: @escaping () -> Void,
-                                              cancelHandler: @escaping () -> Void) {
+                                     openSettingHandler: @escaping () -> Void,
+                                     cancelHandler: @escaping () -> Void) {
         var title: String
         var message: String
         var laterMessage: String

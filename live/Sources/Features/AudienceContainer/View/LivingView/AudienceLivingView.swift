@@ -18,15 +18,10 @@ class AudienceLivingView: RTCBaseView {
     // MARK: - private property.
 
     lazy var barrageStore: BarrageStore = .create(liveID: manager.liveID)
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private let coreView: LiveCoreView
-    private let audiencePipManager = AudiencePipManager()
-    private let netWorkInfoManager = NetWorkInfoManager(
-        service: NetWorkInfoService(
-            trtcCloud: TUIRoomEngine.sharedInstance().getTRTCCloud()
-        )
-    )
+    private lazy var netWorkInfoManager = NetWorkInfoManager(liveID: manager.liveID)
     private var cancellableSet = Set<AnyCancellable>()
     private let giftCacheService = GiftManager.shared.giftCacheService
     private let liveInfoView: LiveInfoView = {
@@ -34,13 +29,13 @@ class AudienceLivingView: RTCBaseView {
         view.mm_h = 40.scale375()
         view.backgroundColor = UIColor.g1.withAlphaComponent(0.4)
         view.layer.cornerRadius = view.mm_h * 0.5
-        view.isHidden = AudienceManager.audienceContainerConfig.disableHeaderLiveData
+        view.isHidden = AudienceStore.audienceContainerConfig.disableHeaderLiveData
         return view
     }()
 
     private let audienceListView: AudienceListView = {
         var view = AudienceListView()
-        view.isHidden = AudienceManager.audienceContainerConfig.disableHeaderVisitorCnt
+        view.isHidden = AudienceStore.audienceContainerConfig.disableHeaderVisitorCnt
         return view
     }()
 
@@ -57,7 +52,7 @@ class AudienceLivingView: RTCBaseView {
         button.setImage(internalImage("live_floatwindow_open_icon"), for: .normal)
         button.addTarget(self, action: #selector(onFloatWindowButtonClick), for: .touchUpInside)
         button.imageEdgeInsets = UIEdgeInsets(top: 2.scale375(), left: 2.scale375(), bottom: 2.scale375(), right: 2.scale375())
-        button.isHidden = AudienceManager.audienceContainerConfig.disableHeaderFloatWin
+        button.isHidden = AudienceStore.audienceContainerConfig.disableHeaderFloatWin
         return button
     }()
 
@@ -101,7 +96,7 @@ class AudienceLivingView: RTCBaseView {
     }()
 
     private lazy var netWorkInfoButton: NetworkInfoButton = {
-        let button = NetworkInfoButton(liveId: manager.liveID, manager: netWorkInfoManager)
+        let button = NetworkInfoButton(liveId: manager.liveID)
         button.onNetWorkInfoButtonClicked = { [weak self] in
             guard let self = self, WindowUtils.isPortrait else { return }
             routerManager.router(action: .present(AudienceRoute.netWorkInfo(netWorkInfoManager, isAudience: !manager.coGuestState.connected.isOnSeat())))
@@ -122,7 +117,7 @@ class AudienceLivingView: RTCBaseView {
 
     private var playbackQuality: VideoQuality?
 
-    init(manager: AudienceManager, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    init(manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.manager = manager
         self.routerManager = routerManager
         self.coreView = coreView
@@ -199,7 +194,7 @@ class AudienceLivingView: RTCBaseView {
             #else
                 audienceListView.snp.remakeConstraints { make in
                     make.trailing.equalToSuperview()
-                        .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
+                        .offset(AudienceStore.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
                     make.centerY.equalTo(floatWindowButton)
                     make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
                 }
@@ -280,7 +275,7 @@ class AudienceLivingView: RTCBaseView {
             #else
                 audienceListView.snp.remakeConstraints { make in
                     make.trailing.equalToSuperview()
-                        .offset(AudienceManager.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
+                        .offset(AudienceStore.audienceContainerConfig.disableHeaderFloatWin ? -48.scale375() : -80.scale375())
                     make.centerY.equalTo(floatWindowButton)
                     make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
                 }
@@ -369,7 +364,7 @@ extension AudienceLivingView {
                     self.bottomMenu.disableFooterCoGuest(true)
                 } else {
                     self.rotateScreenButton.isHidden = true
-                    if !AudienceManager.audienceContainerConfig.disableFooterCoGuest {
+                    if !AudienceStore.audienceContainerConfig.disableFooterCoGuest {
                         self.bottomMenu.disableFooterCoGuest(false)
                     }
                 }
@@ -386,7 +381,7 @@ extension AudienceLivingView {
                     return
                 }
                 if let quality = playbackQuality, self.playbackQuality != nil {
-                    makeToast(message: .resolutionChangedText + .videoQualityToString(quality: quality))
+                    showAtomicToast(text: .resolutionChangedText + .videoQualityToString(quality: quality), style: .success)
                 }
                 self.playbackQuality = playbackQuality
             }
@@ -419,7 +414,7 @@ extension AudienceLivingView {
     }
 
     private func subscribeAudienceConfig() {
-        AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
             \AudienceContainerConfig.disableHeaderFloatWin))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -437,7 +432,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
             \AudienceContainerConfig.disableHeaderLiveData))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -448,7 +443,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
             \AudienceContainerConfig.disableHeaderVisitorCnt))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -459,7 +454,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceManager.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
             \AudienceContainerConfig.disableFooterCoGuest))
             .receive(on: RunLoop.main)
             .removeDuplicates()

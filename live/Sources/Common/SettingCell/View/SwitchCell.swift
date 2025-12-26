@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import AtomicX
 
 public class SwitchCell: UITableViewCell {
     public static let identifier = "SwitchCell"
@@ -22,11 +23,12 @@ public class SwitchCell: UITableViewCell {
         }
     }
     
-    let titleLabel: UILabel = {
-        let label = UILabel(frame: .zero)
+    let titleLabel: AtomicLabel = {
+        let label = AtomicLabel("") { theme in
+            LabelAppearance(textColor: theme.color.textColorPrimary,
+                            font: theme.typography.Medium16)
+        }
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = .g7
         return label
     }()
     

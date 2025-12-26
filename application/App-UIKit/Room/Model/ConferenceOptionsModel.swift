@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Factory
+import UIKit
 
 typealias ConferenceItemTapClosure = (UIButton) -> Void
 

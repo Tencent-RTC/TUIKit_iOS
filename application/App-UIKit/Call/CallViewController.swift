@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import RTCRoomEngine
+import AtomicXCore
 
 #if canImport(TUICallKit_Swift)
 import TUICallKit_Swift
@@ -16,7 +16,7 @@ import TUICallKit
 #endif
 
 class CallViewController: UIViewController, UITextFieldDelegate {
-    private var callType: TUICallMediaType = .audio
+    private var callType: CallMediaType = .audio
     
     private let line1View: UIView = {
         let view = UIView(frame: .zero)
@@ -270,7 +270,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
             make.top.equalTo(optionalParamLabel.snp.bottom).offset(100.scale375Height())
             make.centerX.equalToSuperview()
         }
-                
+              
         callButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().offset(-60.scale375Height())
@@ -293,7 +293,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         
         let joinInGroupLabelTapGesture = UITapGestureRecognizer(target: self, action: #selector(joinInGroupClick))
         joinInGroupLabel.addGestureRecognizer(joinInGroupLabelTapGesture)
-                
+              
         calledUserIdTextField.delegate = self
     }
     
@@ -336,24 +336,15 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         }
         let userIds = userIdArray.components(separatedBy: ",")
         
-        let params = TUICallParams()
-        params.timeout = Int32(SettingsConfig.share.timeout)
+        var params = CallParams()
+        params.timeout = Int(SettingsConfig.share.timeout)
         params.userData = SettingsConfig.share.userData
-        params.offlinePushInfo = SettingsConfig.share.pushInfo
-        
-        let roomId = TUIRoomId()
-        roomId.intRoomId = SettingsConfig.share.intRoomId
-        roomId.strRoomId = SettingsConfig.share.strRoomId
-        params.roomId = roomId
         
         if !groupId.isEmpty {
             params.chatGroupId = groupId
         }
         
-        TUICallKit.createInstance().calls(userIdList: userIds, callMediaType: callType, params: params){
-            
-        } fail: { code, message in
-        }
+        TUICallKit.createInstance().calls(userIdList: userIds, callMediaType: callType, params: params, completion: nil)
     }
     
     @objc private func backButtonClick() {
@@ -392,5 +383,3 @@ extension CallViewController {
         return true
     }
 }
-
-

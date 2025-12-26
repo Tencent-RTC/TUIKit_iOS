@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import AtomicX
 
 class PrepareSelectionModel {
     var textLeftDiff:Float = 8.0
@@ -44,11 +45,16 @@ class PrepareSelectionButton: UIButton {
         view.image = self.model.leftIcon
         return view
     }()
-
-    private lazy var titleLab: UILabel = {
-        let view = UILabel(frame: .zero)
-        view.font = .customFont(ofSize: 14)
-        view.textColor = .g7
+    
+    private lazy var titleLab: AtomicLabel = {
+        let view = AtomicLabel("") { theme in
+            return LabelAppearance(
+                textColor: theme.tokens.color.textColorPrimary,
+                backgroundColor: theme.tokens.color.clearColor,
+                font: theme.tokens.typography.Regular14,
+                cornerRadius: 0.0
+            )
+        }
         view.text = self.model.midText
         view.sizeToFit()
         return view

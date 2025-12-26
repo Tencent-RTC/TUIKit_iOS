@@ -117,35 +117,6 @@
         }
       }
     },
-    "Are you sure you want to delete xxx?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to delete xxx?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "确定要删除xxx吗？"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "確定要刪除xxx嗎？"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "XXXを削除したいですか？"
-          }
-        }
-      }
-    },
     "Are you sure you want to disconnect xxx?": {
       "extractionState": "manual",
       "localizations": {
@@ -171,35 +142,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "XXXの接続を切断したいですか？"
-          }
-        }
-      }
-    },
-    "Are you sure you want to remove xxx?": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Are you sure you want to remove xxx?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "确定要移除xxx吗？"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "確定要移除xxx嗎？"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "xxxを削除したいですか？"
           }
         }
       }
@@ -1451,31 +1393,31 @@
         }
       }
     },
-    "Kick Out": {
+    "Remove": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kick Out"
+            "value": "Remove"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "踢出房间"
+            "value": "移除"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "踢出房間"
+            "value": "移除"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "キックアウト"
+            "value": "取り除く"
           }
         }
       }
@@ -2611,6 +2553,35 @@
         }
       }
     },
+    "The room types do not match; connections can only be initiated in rooms of the same type.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The room types do not match; connections can only be initiated in rooms of the same type."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房间类型不匹配，只能在相同类型房间发起连线。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房間類型不匹配，只能在相同類型房間發起連線。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部屋のタイプが一致しません。接続は同じタイプの部屋でのみ開始できます。"
+          }
+        }
+      }
+    },
     "animation is not MP4 resource file": {
       "extractionState": "manual",
       "localizations": {
@@ -3100,35 +3071,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "PKを開始できない他のエラー"
-          }
-        }
-      }
-    },
-    "Recharge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recharge"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "充值"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "充值"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "補充します"
           }
         }
       }
@@ -5685,6 +5627,35 @@
         }
       }
     },
+    "Exit connect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit connect"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出连线"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出連線"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連線終結"
+          }
+        }
+      }
+    },
     "End": {
       "extractionState": "manual",
       "localizations": {
@@ -5855,6 +5826,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "電話を切る"
+          }
+        }
+      }
+    },
+    "Are you sure you want to remove xxx?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to remove xxx?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定要移除xxx吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確定要移除xxx嗎?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "％sを削除したいですか？"
           }
         }
       }
@@ -8788,6 +8788,93 @@
         }
       }
     },
+    "Pip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pip"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画中画"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "畫中畫"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピクチャー・イン・ピクチャー"
+          }
+        }
+      }
+    },
+    "Pip Toggle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pip Toggle"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画中画开关"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "畫中畫開關"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ピクチャーインピクチャーの切り替え"
+          }
+        }
+      }
+    },
+    "After enabling, the app will automatically enter picture-in-picture mode when moved to the background": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After enabling, the app will automatically enter picture-in-picture mode when moved to the background"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，应用退后台时自动进入画中画模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "啟用後，應用退到後台時會自動進入畫中畫模式"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オンにすると、アプリがバックグラウンドに移動したときに自動的にピクチャーインピクチャーモードに入ります"
+          }
+        }
+      }
+    },
     "No users in the seat, go to invite": {
       "extractionState": "manual",
       "localizations": {
@@ -8842,6 +8929,64 @@
           "stringUnit": {
             "state": "translated",
             "value": "Shangmaiへの招待状がキャンセルされました"
+          }
+        }
+      }
+    },
+    "Seat invitation has been rejected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seat invitation has been rejected"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上麦邀请已被拒绝"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上麥邀請已被拒絕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shangmaiへの招待状が拒否されました"
+          }
+        }
+      }
+    },
+    "Seat invitation timeout": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seat invitation timeout"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上麦邀请超时"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上麥邀請超時"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shangmaiへの招待状がタイムアウトしました"
           }
         }
       }
@@ -11108,35 +11253,6 @@
         }
       }
     },
-    "Remove": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "移除"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "取り除く"
-          }
-        }
-      }
-    },
     "The connection is successful. Users beyond the first 6 seats have been removed.": {
       "extractionState": "manual",
       "localizations": {
@@ -11191,6 +11307,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "接続は先着6席のみ表示されます。あなたはマイクから降ろされました。"
+          }
+        }
+      }
+    },
+    "Cannot connect when back 4 seats occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot connect when back 4 seats occupied"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "后四个麦位已有用户，无法进行连线/PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "後四個麥位有人，無法連線"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "後方4席が占有されており、接続できません"
           }
         }
       }

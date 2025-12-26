@@ -10,7 +10,10 @@ import ImSDK_Plus
 import TUICore
 import RTCCommon
 import TUICallKit_Swift
+import SensorsAnalyticsSDK
 import Kingfisher
+import AtomicXCore
+import TUIRoomKit
 
 private let mainMenuItemColors = [
     UIColor(red: 204/255.0, green: 223/255.0, blue: 255/255.0, alpha: 1),
@@ -55,6 +58,7 @@ class MainViewController: UIViewController {
                               selectHandle: { [weak self] in
                                   guard let self = self else { return }
                                   self.gotoCallView()
+                                  self.trackSensorData("video_call")
                               }),
             MainMenuItemModel(imageName: "main_live",
                               title: "live".localized,
@@ -63,6 +67,7 @@ class MainViewController: UIViewController {
                               selectHandle: { [weak self] in
                                   guard let self = self else { return }
                                   self.gotoLiveView()
+                                  self.trackSensorData("live_streaming")
                               }),
             MainMenuItemModel(imageName: "main_room",
                               title: "tuiRoom".localized,
@@ -71,6 +76,7 @@ class MainViewController: UIViewController {
                               selectHandle: { [weak self] in
                                   guard let self = self else { return }
                                   self.gotoRoomView()
+                                  self.trackSensorData("conference")
                               }),
         ]
     }
@@ -140,19 +146,27 @@ extension MainViewController {
     }
     
     func gotoRoomView() {
-        let enterRoomVC = ConferenceOptionsViewController()
-        self.navigationController?.pushViewController(enterRoomVC, animated: true)
+//        let enterRoomVC = ConferenceOptionsViewController()
+//        self.navigationController?.pushViewController(enterRoomVC, animated: true)
+        let roomHomeViewController = RoomHomeViewController()
+        self.navigationController?.pushViewController(roomHomeViewController, animated: true)
     }
     
 }
 
 extension MainViewController {
+    func trackSensorData(_ sensor: String) {
+        SensorsAnalyticsSDK.sharedInstance()?.track("app_uikit_main_click_event", withProperties: ["main" : sensor])
+    }
+}
+
+extension MainViewController {
     func updateMineCenterImage() {
-        guard let userId = TUILogin.getUserID(), !userId.isEmpty else {
+        guard let userId = LoginStore.shared.state.value.loginUserInfo?.userID, !userId.isEmpty else {
             mainView.updateIconImage(with: UIImage(named: "default_avatar")!)
             return
         }
-        let faceUrl = TUILogin.getFaceUrl()
+        let faceUrl = LoginStore.shared.state.value.loginUserInfo?.avatarURL
         if let avatarURL = faceUrl, !avatarURL.isEmpty {
             loadAvatarImage(from: avatarURL)
         } else {

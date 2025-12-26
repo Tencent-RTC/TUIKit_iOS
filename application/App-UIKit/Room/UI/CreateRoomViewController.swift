@@ -58,7 +58,7 @@ class CreateRoomViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        ConferenceSession.sharedInstance.addObserver(observer: self)
+//        ConferenceSession.sharedInstance.addObserver(observer: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,7 +75,7 @@ class CreateRoomViewController: UIViewController {
     }
     
     deinit {
-        ConferenceSession.sharedInstance.removeObserver(observer: self)
+//        ConferenceSession.sharedInstance.removeObserver(observer: self)
         debugPrint("deinit \(self)")
     }
 }
@@ -140,14 +140,14 @@ extension CreateRoomViewController {
     }
     
     private func quickStartConference(roomId: String) {
-        let vc = ConferenceMainViewController()
-        let params = StartConferenceParams(roomId: roomId)
-        params.isSeatEnabled = isSeatEnable
-        params.isOpenMicrophone = enableLocalAudio
-        params.isOpenCamera = enableLocalVideo
-        params.isOpenSpeaker = isSoundOnSpeaker
-        vc.setStartConferenceParams(params: params)
-        navigationController?.pushViewController(vc, animated: true)
+//        let vc = ConferenceMainViewController()
+//        let params = StartConferenceParams(roomId: roomId)
+//        params.isSeatEnabled = isSeatEnable
+//        params.isOpenMicrophone = enableLocalAudio
+//        params.isOpenCamera = enableLocalVideo
+//        params.isOpenSpeaker = isSoundOnSpeaker
+//        vc.setStartConferenceParams(params: params)
+//        navigationController?.pushViewController(vc, animated: true)
     }
     
     func switchRoomTypeClick() {
@@ -207,22 +207,22 @@ extension CreateRoomViewController {
     }
 }
 
-extension CreateRoomViewController: ConferenceObserver {
-    func onConferenceStarted(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
-        guard error != .success else { return }
-        navigationController?.popViewController(animated: true)
-        guard !message.isEmpty else { return }
-        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
-    }
-    
-    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
-        debugPrint("onConferenceFinished")
-    }
-    
-    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
-        debugPrint("onConferenceExited")
-    }
-}
+//extension CreateRoomViewController: ConferenceObserver {
+//    func onConferenceStarted(roomInfo: TUIRoomInfo, error: TUIError, message: String) {
+//        guard error != .success else { return }
+//        navigationController?.popViewController(animated: true)
+//        guard !message.isEmpty else { return }
+//        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
+//    }
+//    
+//    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {
+//        debugPrint("onConferenceFinished")
+//    }
+//    
+//    func onConferenceExited(roomInfo: TUIRoomInfo, reason: ConferenceExitedReason) {
+//        debugPrint("onConferenceExited")
+//    }
+//}
 
 private extension String {
     static var userNameText: String {

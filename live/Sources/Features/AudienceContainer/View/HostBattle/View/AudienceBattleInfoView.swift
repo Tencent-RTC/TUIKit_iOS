@@ -12,7 +12,7 @@ import UIKit
 
 class AudienceBattleInfoView: RTCBaseView {
     private weak var coreView: LiveCoreView?
-    private let manager: AudienceManager
+    private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private let isOwner: Bool
     private var cancellableSet: Set<AnyCancellable> = []
@@ -23,7 +23,7 @@ class AudienceBattleInfoView: RTCBaseView {
         manager.liveListState.currentLive.liveOwner.userID
     }
     
-    init(manager: AudienceManager, routerManager: AudienceRouterManager, isOwner: Bool, coreView: LiveCoreView) {
+    init(manager: AudienceStore, routerManager: AudienceRouterManager, isOwner: Bool, coreView: LiveCoreView) {
         self.manager = manager
         self.routerManager = routerManager
         self.isOwner = isOwner

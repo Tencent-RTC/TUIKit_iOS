@@ -8,9 +8,12 @@
 import UIKit
 import AtomicXCore
 import TUILiveKit
+import AtomicX
+import Combine
 
 class VideoLiveViewController: UIViewController {
     private var currentStyle = LiveListViewStyle.doubleColumn
+    private var cancellables = Set<AnyCancellable>()
     
     private lazy var goLiveButton: UIButton = {
         let button = UIButton()
@@ -36,7 +39,7 @@ class VideoLiveViewController: UIViewController {
         setupNavigation()
         constructViewHierarchy()
         activateConstraints()
-        view.backgroundColor = .bgTopBarColor
+        bindInteraction()
     }
     
     
@@ -89,16 +92,31 @@ extension VideoLiveViewController {
         switchItem.tintColor = .white
         navigationItem.rightBarButtonItems = [switchItem]
     
-        let titleView = UILabel()
-        titleView.text = .videoLiveTitle
-        titleView.textColor = .white
-        titleView.textAlignment = .center
-        titleView.font = UIFont.boldSystemFont(ofSize: 17)
+        let titleView = AtomicLabel(.videoLiveTitle) { theme in
+            return LabelAppearance(textColor: theme.tokens.color.textColorPrimary,
+                                   backgroundColor: theme.tokens.color.clearColor,
+                                   font: theme.tokens.typography.Medium20,
+                                   cornerRadius: 0.0)
+        }
         titleView.adjustsFontSizeToFitWidth = true
         let width = titleView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
                                                   height: CGFloat.greatestFiniteMagnitude)).width
         titleView.frame = CGRect(origin: CGPoint.zero, size: CGSize(width: width, height: 44))
         self.navigationItem.titleView = titleView
+    }
+    
+    private func bindInteraction() {
+        ThemeStore.shared.$currentTheme
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] theme in
+                guard let self = self else { return }
+                self.applyAppearance(for: theme )
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func applyAppearance(for theme: Theme) {
+        view.backgroundColor = theme.tokens.color.bgColorTopBar
     }
 
 }

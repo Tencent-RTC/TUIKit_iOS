@@ -15,10 +15,10 @@ class AnchorBattleCountDownView: UIView {
     var timeEndClosure: (() -> Void)?
     var cancelClosure: (() -> Void)?
     private var dotsTimer: Timer = .init()
-    private let manager: AnchorManager
+    private let store: AnchorStore
     
-    init(countdownTime: TimeInterval, manager: AnchorManager) {
-        self.manager = manager
+    init(countdownTime: TimeInterval, store: AnchorStore) {
+        self.store = store
         self.countdownTime = countdownTime
         super.init(frame: .zero)
     }
@@ -135,16 +135,10 @@ class AnchorBattleCountDownView: UIView {
     }
     
     @objc private func cancelButtonClick() {
-        manager.battleStore.cancelBattleRequest(battleId: manager.anchorBattleState.requestBattleID,
-                                                userIdList: manager.coHostState.connected.map { $0.userID }.filter { $0 != manager.selfUserID })
-        { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(()):
-                manager.stopApplyingBattle()
-            default: break
-            }
-        }
+        store.battleStore.cancelBattleRequest(battleId: store.anchorBattleState.requestBattleID,
+                                              userIdList: store.coHostState.connected.map { $0.userID }.filter { $0 != store.selfUserID },
+                                              completion: nil)
+        store.stopApplyingBattle()
         cancelClosure?()
         countdownTimer.stop()
         if dotsTimer.isValid {
