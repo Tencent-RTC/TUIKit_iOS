@@ -17,7 +17,7 @@ target 'App-UIKit' do
   pod 'AtomicX', :path=>'../atomic_x/AtomicX.podspec'
   
   pod 'AtomicXCore'
-
+  pod 'TXLiteAVSDK_Professional', '12.9.20085'
   pod 'Kingfisher'
 
 end
