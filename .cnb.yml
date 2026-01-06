@@ -13,16 +13,16 @@
 #             password: ${GITHUB_ACCESS_TOKEN}
 #             sync_mode: rebase
 
+# .cnb.yml
 main:
-  push:
-    - stages:
-        - name: sync to github with rebase
+  "crontab: 0 1 * * *": 
+    - name: sync from github
+      stages:
+        - name: sync from github
           image: tencentcom/git-sync
-          imports:
-            - https://cnb.cool/tencent/cloud/trtc/github-access-tokens/-/blob/main/env.access_token.yml
           settings:
             target_url: https://github.com/Tencent-RTC/TUIKit_iOS.git
             auth_type: https
-            username: ${GITHUB_USER_NAME}
-            password: ${GITHUB_ACCESS_TOKEN}
-            sync_mode: rebase
+            username: ${GIT_USERNAME}
+            password: ${GIT_ACCESS_TOKEN}
+            sync_mode: pull
