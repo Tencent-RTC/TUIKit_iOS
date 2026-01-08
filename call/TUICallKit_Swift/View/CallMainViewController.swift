@@ -38,6 +38,7 @@ class CallMainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        KeyMetrics.countUV(eventId: .wakeup, callId: CallStore.shared.state.value.activeCall.callId)
         
         view.addSubview(mainView)
         view.addSubview(floatWindowButton)
