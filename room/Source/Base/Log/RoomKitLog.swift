@@ -12,7 +12,7 @@ import Foundation
     import TXLiteAVSDK_Professional
 #endif
 
-public class LiveKitLog {
+public class RoomKitLog {
     private static let API = "TuikitLog"
     private static let LOG_KEY_API = "api"
     private static let LOG_KEY_PARAMS = "params"
@@ -24,7 +24,7 @@ public class LiveKitLog {
     private static let LOG_KEY_PARAMS_MODULE_VALUE = "RoomKit"
 
     private func `init`() {}
-    enum LiveKitLogLevel: Int {
+    enum RoomKitLogLevel: Int {
         case error = 2
         case warn = 1
         case info = 0
@@ -42,7 +42,7 @@ public class LiveKitLog {
         log(level: .info, file: file, line: String(line), messages)
     }
 
-    private static func log(level: LiveKitLogLevel = .info, file: String, line: String, _ messages: [String]) {
+    private static func log(level: RoomKitLogLevel = .info, file: String, line: String, _ messages: [String]) {
         let apiParams: [String: Any] = [
             LOG_KEY_API: API,
             LOG_KEY_PARAMS: [
