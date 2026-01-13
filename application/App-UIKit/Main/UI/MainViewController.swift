@@ -146,8 +146,6 @@ extension MainViewController {
     }
     
     func gotoRoomView() {
-//        let enterRoomVC = ConferenceOptionsViewController()
-//        self.navigationController?.pushViewController(enterRoomVC, animated: true)
         let roomHomeViewController = RoomHomeViewController()
         self.navigationController?.pushViewController(roomHomeViewController, animated: true)
     }

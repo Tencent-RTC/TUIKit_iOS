@@ -22,7 +22,7 @@ struct DataChanges {
 }
 
 // MARK: - RoomView Component
-class RoomView: UIView, BaseView {
+public class RoomView: UIView, BaseView {
     // MARK: - BaseView Properties
     weak var routerContext: RouterContext?
     private let roomID: String
@@ -77,7 +77,7 @@ class RoomView: UIView, BaseView {
     }()
     
     // MARK: - Initialization
-    init(roomID: String) {
+    public init(roomID: String) {
         self.roomID = roomID
         super.init(frame: .zero)
         setupViews()
@@ -155,7 +155,7 @@ class RoomView: UIView, BaseView {
 
 // MARK: - UICollectionViewDataSource
 extension RoomView: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
         if participantList.0 != nil {
             return 2
         } else {
@@ -163,7 +163,7 @@ extension RoomView: UICollectionViewDataSource {
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if participantList.0 != nil {
             if section == 0 {
                 return 1 
@@ -174,7 +174,7 @@ extension RoomView: UICollectionViewDataSource {
         return participantList.1.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let participant: RoomParticipant
         if let screenShareParticipant = participantList.0 {
             if indexPath.section == 0 {
@@ -319,7 +319,7 @@ extension RoomView: UICollectionViewDataSource {
 
 // MARK: - UICollectionViewDelegate
 extension RoomView: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let videoStreamCell = cell as? RoomViewVideoStreamCell else { return }
         guard let videoParticipant = participantList.1[safe: indexPath.item] else { return }
         guard let participant = videoStreamCell.participant else { return }
@@ -337,14 +337,14 @@ extension RoomView: UICollectionViewDelegate {
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let videoStreamCell = cell as? RoomViewVideoStreamCell else { return }
         videoStreamCell.participantView.setActive(isActive: false)
     }
     
     // MARK: - Custom Paging Logic
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, 
-                                   withVelocity velocity: CGPoint, 
+    public func scrollViewWillEndDragging(_ scrollView: UIScrollView,
+                                   withVelocity velocity: CGPoint,
                                    targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let pageWidth = scrollView.bounds.width
         guard pageWidth > 0 else { return }
@@ -369,7 +369,7 @@ extension RoomView: UICollectionViewDelegate {
         updatePageButtons(targetPage: targetPage)
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageWidth = scrollView.bounds.width
         guard pageWidth > 0 else { return }
         

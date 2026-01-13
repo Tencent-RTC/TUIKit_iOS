@@ -9,20 +9,19 @@
 import AtomicXCore
 import Combine
 
-protocol RoomBottomBarViewDelegate: AnyObject {
+public protocol RoomBottomBarViewDelegate: AnyObject {
     func onMembersButtonTapped()
     func onMicrophoneButtonTapped()
     func onCameraButtonTapped()
-//    func onMoreButtonTapped()
 }
 
 // MARK: - RoomBottomBarView Component
-class RoomBottomBarView: UIView, BaseView {
+public class RoomBottomBarView: UIView, BaseView {
     // MARK: - BaseView Properties
     weak var routerContext: RouterContext?
     
     // MARK: - Properties
-    weak var delegate: RoomBottomBarViewDelegate?
+    public weak var delegate: RoomBottomBarViewDelegate?
     
     private let deviceStore: DeviceStore = DeviceStore.shared
     private let roomStore: RoomStore = RoomStore.shared
@@ -80,20 +79,10 @@ class RoomBottomBarView: UIView, BaseView {
         return button
     }()
     
-//    private lazy var moreButton: RoomIconButton = {
-//        let button = RoomIconButton()
-//        button.setIcon(ResourceLoader.loadImage("room_more"))
-//        button.setTitle("Expansion".localized)
-//        button.setIconPosition(.top, spacing: RoomSpacing.extraSmall)
-//        button.setTitleColor(.white)
-//        button.setTitleFont(RoomFonts.pingFangSCFont(size: 10, weight: .regular))
-//        return button
-//    }()
-    
     private lazy var buttons: [RoomIconButton] = {[membersButton, microphoneButton, cameraButton]}()
     
     // MARK: - Initialization
-    init(roomID: String) {
+    public init(roomID: String) {
         self.roomID = roomID
         super.init(frame: .zero)
         setupViews()
@@ -143,7 +132,6 @@ class RoomBottomBarView: UIView, BaseView {
         membersButton.addTarget(self, action: #selector(membersButtonTapped), for: .touchUpInside)
         microphoneButton.addTarget(self, action: #selector(microphoneButtonTapped), for: .touchUpInside)
         cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
-//        moreButton.addTarget(self, action: #selector(moreButtonTapped(sender:)), for: .touchUpInside)
         
         participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .combineLatest(roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom)))
@@ -222,10 +210,6 @@ extension RoomBottomBarView {
     @objc private func cameraButtonTapped() {
         delegate?.onCameraButtonTapped()
     }
-    
-//    @objc private func moreButtonTapped() {
-//        delegate?.onMoreButtonTapped()
-//    }
 }
 
 fileprivate extension String {

@@ -12,7 +12,7 @@ import AtomicXCore
 import Combine
 import Kingfisher
 
-class RoomHomeView: UIView, BaseView {
+public class RoomHomeView: UIView, BaseView {
     
     // MARK: - Properties
     weak var routerContext: RouterContext?
@@ -80,7 +80,7 @@ class RoomHomeView: UIView, BaseView {
     
     // MARK: - Initialization
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         setupConstraints()

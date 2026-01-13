@@ -11,27 +11,26 @@ import SnapKit
 import AtomicXCore
 
 // MARK: - Protocol
-protocol RoomChangeNicknameViewDelegate: AnyObject {
+public protocol RoomChangeNicknameViewDelegate: AnyObject {
     func changeNickname(view: RoomChangeNicknameView, didConfirmName name: String)
 }
 
 // MARK: - RoomChangeNicknameView
-class RoomChangeNicknameView: UIView, BasePanel, PanelHeightProvider {
+public class RoomChangeNicknameView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
-    weak var parentView: UIView?
-    var backgroundMaskView: PanelMaskView?
+    weak public var parentView: UIView?
+    public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
-    var panelHeight: CGFloat {
+    public var panelHeight: CGFloat {
         return 60
     }
     
-    weak var delegate: RoomChangeNicknameViewDelegate?
+    public weak var delegate: RoomChangeNicknameViewDelegate?
     
     // MARK: - Properties
     private let currentName: String
-    private var lastValidKeyboardHeight: CGFloat = 0
     
     // MARK: - UI Components
     
@@ -69,7 +68,7 @@ class RoomChangeNicknameView: UIView, BasePanel, PanelHeightProvider {
     
     
     // MARK: - Initialization
-    init(currentName: String) {
+    public init(currentName: String) {
         self.currentName = currentName
         super.init(frame: .zero)
         setupViews()
@@ -82,7 +81,7 @@ class RoomChangeNicknameView: UIView, BasePanel, PanelHeightProvider {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func didMoveToSuperview() {
+    public override func didMoveToSuperview() {
         super.didMoveToSuperview()
         guard superview != nil else { return }
         textField.becomeFirstResponder()
@@ -188,21 +187,18 @@ extension RoomChangeNicknameView {
             guard let self = self else { return }
             transform = CGAffineTransform(translationX: 0, y: keyboardEndFrameValue.height)
             dismiss()
-        } completion: { [weak self] _ in
-            guard let self = self else { return }
-            lastValidKeyboardHeight = 0
         }
     }
 }
 
 // MARK: - UITextFieldDelegate
 extension RoomChangeNicknameView: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         confirmButtonTapped()
         return true
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)

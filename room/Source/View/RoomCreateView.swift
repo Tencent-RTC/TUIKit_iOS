@@ -11,7 +11,7 @@ import SnapKit
 import AtomicXCore
 import Combine
 
-class RoomCreateView: UIView, BaseView {
+public class RoomCreateView: UIView, BaseView {
     
     // MARK: - Properties
     weak var routerContext: RouterContext?
@@ -140,7 +140,7 @@ class RoomCreateView: UIView, BaseView {
     
     // MARK: - Initialization
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         setupConstraints()

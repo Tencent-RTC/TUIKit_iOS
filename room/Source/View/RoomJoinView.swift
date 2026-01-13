@@ -11,7 +11,7 @@ import SnapKit
 import AtomicXCore
 import Combine
 
-class RoomJoinView: UIView, BaseView {
+public class RoomJoinView: UIView, BaseView {
     
     // MARK: - Properties
     weak var routerContext: RouterContext?
@@ -173,7 +173,7 @@ class RoomJoinView: UIView, BaseView {
     
     // MARK: - Initialization
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         setupConstraints()
@@ -410,7 +410,7 @@ extension RoomJoinView {
 // MARK: - UITextFieldDelegate
 
 extension RoomJoinView: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }

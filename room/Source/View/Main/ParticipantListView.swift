@@ -12,25 +12,25 @@ import Combine
 import AtomicXCore
 import Kingfisher
 
-protocol ParticipantListViewDelegate: AnyObject {
+public protocol ParticipantListViewDelegate: AnyObject {
     func muteAllAudioButtonTapped(disable: Bool)
     func muteAllVideoButtonTapped(disable: Bool)
     func participantTapped(view: ParticipantListView, participant: RoomParticipant)
 }
 
 // MARK: - ParticipantListView
-class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
+public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
-    weak var parentView: UIView?
-    var backgroundMaskView: PanelMaskView?
+    weak public var parentView: UIView?
+    public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
-    var panelHeight: CGFloat {
+    public var panelHeight: CGFloat {
         return UIScreen.main.bounds.height * 0.8
     }
     
-    weak var delegate: ParticipantListViewDelegate?
+    public weak var delegate: ParticipantListViewDelegate?
    
     // MARK: - Properties
     
@@ -109,19 +109,8 @@ class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         return button
     }()
     
-//    private lazy var moreButton: UIButton = {
-//        let button = UIButton(type: .custom)
-//        button.setTitle(.more, for: .normal)
-//        button.setTitleColor(RoomColors.g6, for: .normal)
-//        button.titleLabel?.font = RoomFonts.pingFangSCFont(size: 14, weight: .regular)
-//        button.backgroundColor = RoomColors.g3
-//        button.layer.cornerRadius = 6
-//        button.isHidden = true
-//        return button
-//    }()
-    
     // MARK: - Initialization
-    init(roomID: String) {
+    public init(roomID: String) {
         self.roomID = roomID
         super.init(frame: .zero)
         setupViews()
@@ -145,7 +134,6 @@ class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         
         bottomBarView.addSubview(muteAllAudioButton)
         bottomBarView.addSubview(muteAllVideoButton)
-//        bottomBarView.addSubview(moreButton)
     }
     
     func setupConstraints() {
@@ -182,13 +170,6 @@ class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             make.width.equalTo(muteAllAudioButton)
             make.height.equalTo(40)
         }
-//        
-//        moreButton.snp.makeConstraints { make in
-//            make.centerY.equalTo(muteAllAudioButton)
-//            make.right.equalToSuperview().offset(-RoomSpacing.large)
-//            make.width.equalTo(muteAllAudioButton)
-//            make.height.equalTo(40)
-//        }
         
         tableView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(RoomSpacing.medium)
@@ -206,7 +187,6 @@ class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         dropButton.addTarget(self, action: #selector(dropButtonTapped), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioButtonTapped), for: .touchUpInside)
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoButtonTapped), for: .touchUpInside)
-//        moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
         
         participantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantList))
@@ -238,14 +218,12 @@ class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
                 if let currentRoom = currentRoom {
                     muteAllAudioButton.isHidden = false
                     muteAllVideoButton.isHidden = false
-//                    moreButton.isHidden = false
                     
                     muteAllAudioButton.isSelected = currentRoom.isAllMicrophoneDisabled
                     muteAllVideoButton.isSelected = currentRoom.isAllCameraDisabled
                 } else {
                     muteAllAudioButton.isHidden = true
                     muteAllVideoButton.isHidden = true
-//                    moreButton.isHidden = true
                 }
             }
             .store(in: &cancellableSet)
@@ -278,20 +256,15 @@ extension ParticipantListView {
     @objc private func muteAllVideoButtonTapped(sender: UIButton) {
         delegate?.muteAllVideoButtonTapped(disable: !sender.isSelected)
     }
-    
-    @objc private func moreButtonTapped() {
-        // TODO: Handle more action
-        print("More button tapped")
-    }
 }
 
 // MARK: - UITableViewDataSource
 extension ParticipantListView: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return allParticipants .count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantListCell.reuseIdentifier, for: indexPath) as? ParticipantListCell else {
             return UITableViewCell()
         }
@@ -305,11 +278,11 @@ extension ParticipantListView: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension ParticipantListView: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let participant = allParticipants[indexPath.row]
         guard canInteractWith(participant: participant) else {
             return

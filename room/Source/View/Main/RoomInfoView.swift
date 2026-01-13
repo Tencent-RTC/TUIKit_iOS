@@ -12,14 +12,14 @@ import AtomicXCore
 import Combine
 
 // MARK: - RoomInfoView
-class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
+public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
-    weak var parentView: UIView?
-    var backgroundMaskView: PanelMaskView?
+    weak public var parentView: UIView?
+    public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
-    var panelHeight: CGFloat {
+    public var panelHeight: CGFloat {
         return 242 + safeAreaInsets.bottom
     }
     
@@ -88,7 +88,7 @@ class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     }()
     
     // MARK: - Initialization
-    init(roomID: String) {
+    public init(roomID: String) {
         self.roomID = roomID
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false

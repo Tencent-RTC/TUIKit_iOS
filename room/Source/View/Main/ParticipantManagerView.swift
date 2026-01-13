@@ -27,7 +27,7 @@ struct ParticipantActionItem {
     }
 }
 
-protocol ParticipantManagerViewDelegate: AnyObject {
+public protocol ParticipantManagerViewDelegate: AnyObject {
     func handleTransferHost(view: ParticipantManagerView, participant: RoomParticipant)
     func handleSetAsAdmin(view: ParticipantManagerView, participant: RoomParticipant)
     func handleKickOut(view: ParticipantManagerView, participant: RoomParticipant)
@@ -35,14 +35,14 @@ protocol ParticipantManagerViewDelegate: AnyObject {
 }
 
 // MARK: - ParticipantManagerView
-class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
+public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
-    weak var parentView: UIView?
-    var backgroundMaskView: PanelMaskView?
+    weak public var parentView: UIView?
+    public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
-    var panelHeight: CGFloat {
+    public var panelHeight: CGFloat {
         let headerHeight: CGFloat = 100
         let itemHeight: CGFloat = 56
         let totalItemsHeight = CGFloat(actionItems.count) * itemHeight
@@ -50,7 +50,7 @@ class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
         return headerHeight + totalItemsHeight + bottomSafeArea + 20
     }
     
-    weak var delegate: ParticipantManagerViewDelegate?
+    public weak var delegate: ParticipantManagerViewDelegate?
     
     // MARK: - Properties
     private var participant: RoomParticipant
@@ -106,7 +106,7 @@ class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     }()
     
     // MARK: - Initialization
-    init(participant: RoomParticipant, roomID: String) {
+    public init(participant: RoomParticipant, roomID: String) {
         self.participant = participant
         self.roomID = roomID
         super.init(frame: .zero)
@@ -346,11 +346,11 @@ extension ParticipantManagerView {
 
 // MARK: - UITableViewDataSource
 extension ParticipantManagerView: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return actionItems.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantManagerCell.reuseIdentifier, for: indexPath) as? ParticipantManagerCell else {
             return UITableViewCell()
         }
@@ -364,11 +364,11 @@ extension ParticipantManagerView: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension ParticipantManagerView: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 56
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let item = actionItems[indexPath.row]
         item.action()
@@ -377,7 +377,7 @@ extension ParticipantManagerView: UITableViewDelegate {
 
 // MARK: - RoomChangeNicknameViewDelegate
 extension ParticipantManagerView: RoomChangeNicknameViewDelegate {
-    func changeNickname(view: RoomChangeNicknameView, didConfirmName name: String) {
+    public func changeNickname(view: RoomChangeNicknameView, didConfirmName name: String) {
         participantStore.updateParticipantNameCard(userID: participant.userID, nameCard: name) { [weak self] result in
             guard let self = self else { return }
             switch result {

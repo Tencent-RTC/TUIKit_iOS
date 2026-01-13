@@ -10,12 +10,12 @@ import AtomicXCore
 import Combine
 
 // MARK: - RoomTopBarView Component
-protocol RoomTopBarViewDelegate: AnyObject {
+public protocol RoomTopBarViewDelegate: AnyObject {
     func onEndButtonTapped()
     func onRoomInfoButtonTapped()
 }
 
-class RoomTopBarView: UIView, BaseView {
+public class RoomTopBarView: UIView, BaseView {
     // MARK: - BaseView Properties
     weak var routerContext: RouterContext?
     
@@ -82,7 +82,7 @@ class RoomTopBarView: UIView, BaseView {
     }()
     
     // MARK: - Initialization
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
         setupConstraints()

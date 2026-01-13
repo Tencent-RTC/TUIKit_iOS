@@ -31,14 +31,11 @@ public struct ConnectConfig {
     }
 }
 
-class RoomMainView: UIView, BaseView {
+public class RoomMainView: UIView, BaseView {
     // MARK: - Properties
     weak var routerContext: RouterContext?
     private let roomStore: RoomStore = RoomStore.shared
     private let deviceStore: DeviceStore = DeviceStore.shared
-    private var participantViewList: [RoomParticipantView] = []
-    
-    private var loginUser: UserProfile? = LoginStore.shared.state.value.loginUserInfo
     
     private lazy var participantStore: RoomParticipantStore = {
         let store = RoomParticipantStore.create(roomID: roomID)
@@ -83,7 +80,7 @@ class RoomMainView: UIView, BaseView {
     private var inviteMicrophoneAlertView: AtomicAlertView?
     
     // MARK: - Initialization
-    init(roomID: String, behavior: RoomBehavior, config: ConnectConfig) {
+    public init(roomID: String, behavior: RoomBehavior, config: ConnectConfig) {
         self.roomID = roomID
         self.behavior = behavior
         self.config = config
@@ -484,7 +481,7 @@ extension RoomMainView {
 }
 
 extension RoomMainView: RoomTopBarViewDelegate {
-    func onEndButtonTapped() {
+    public func onEndButtonTapped() {
         if let localParticipant = localParticipant, localParticipant.role == .owner  {
             showEndActionSheet()
         } else {
@@ -492,7 +489,7 @@ extension RoomMainView: RoomTopBarViewDelegate {
         }
     }
     
-    func onRoomInfoButtonTapped() {
+    public func onRoomInfoButtonTapped() {
         RoomInfoView(roomID: roomID).show(in: self, animated: true)
     }
     
@@ -530,16 +527,16 @@ extension RoomMainView: RoomTopBarViewDelegate {
 }
 
 extension RoomMainView: RoomBottomBarViewDelegate {
-    func onMembersButtonTapped() {
+    public func onMembersButtonTapped() {
         listView.show(in: self, animated: true)
     }
     
-    func onMicrophoneButtonTapped() {
+    public func onMicrophoneButtonTapped() {
         guard let localParticipant = localParticipant else { return }
         localParticipant.microphoneStatus == .off ? unmuteMicrophone() : muteMicrophone()
     }
     
-    func onCameraButtonTapped() {
+    public func onCameraButtonTapped() {
         guard let localParticipant = localParticipant else { return }
         localParticipant.cameraStatus == .off ? openLocalCamera() : closeLocalCamera()
     }
@@ -547,13 +544,13 @@ extension RoomMainView: RoomBottomBarViewDelegate {
 }
 
 extension RoomMainView: ParticipantListViewDelegate {
-    func participantTapped(view: ParticipantListView, participant: RoomParticipant) {
+    public func participantTapped(view: ParticipantListView, participant: RoomParticipant) {
         let managerView = ParticipantManagerView(participant: participant, roomID: roomID)
         managerView.delegate = self
         managerView.show(in: self, animated: true)
     }
     
-    func muteAllAudioButtonTapped(disable: Bool) {
+    public func muteAllAudioButtonTapped(disable: Bool) {
         let title = disable ? String.muteAllMembersTitle : String.unmuteAllMembersTitle
         let message = disable ? String.muteAllMembersMessage : String.unmuteAllMembersMessage
         let sureTitle = disable ? String.muteAll : String.confirmRelease
@@ -578,7 +575,7 @@ extension RoomMainView: ParticipantListViewDelegate {
         AtomicAlertView(config: config).show()
     }
     
-    func muteAllVideoButtonTapped(disable: Bool) {
+    public func muteAllVideoButtonTapped(disable: Bool) {
         let title = disable ? String.stopAllVideoTitle : String.enableAllVideoTitle
         let message = disable ? String.stopAllVideoMessage : String.enableAllVideoMessage
         let sureTitle = disable ? String.stopAllVideo : String.confirmRelease
@@ -605,7 +602,7 @@ extension RoomMainView: ParticipantListViewDelegate {
 }
 
 extension RoomMainView: ParticipantManagerViewDelegate {
-    func handleInviteToOpenDevice(view: ParticipantManagerView, device: DeviceType, participant: AtomicXCore.RoomParticipant) {
+    public func handleInviteToOpenDevice(view: ParticipantManagerView, device: DeviceType, participant: AtomicXCore.RoomParticipant) {
         participantStore.inviteToOpenDevice(userID: participant.userID, device: device, timeout: 30) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -618,7 +615,7 @@ extension RoomMainView: ParticipantManagerViewDelegate {
         showToast(device == .camera ? .invitedToOpenVideo : .invitedToOpenAudio)
     }
     
-    func handleKickOut(view: ParticipantManagerView, participant: RoomParticipant) {
+    public func handleKickOut(view: ParticipantManagerView, participant: RoomParticipant) {
         let cancelButtonConfig = AlertButtonConfig(text: .cancel) { view in
             view.dismiss()
         }
@@ -640,7 +637,7 @@ extension RoomMainView: ParticipantManagerViewDelegate {
         AtomicAlertView(config: config).show()
     }
     
-    func handleSetAsAdmin(view: ParticipantManagerView, participant: RoomParticipant) {
+    public func handleSetAsAdmin(view: ParticipantManagerView, participant: RoomParticipant) {
         if participant.role == .generalUser {
             participantStore.setAdmin(userID: participant.userID) { [weak self] result in
                 guard let self = self else { return }
@@ -666,7 +663,7 @@ extension RoomMainView: ParticipantManagerViewDelegate {
         }
     }
     
-    func handleTransferHost(view: ParticipantManagerView, participant: RoomParticipant) {
+    public func handleTransferHost(view: ParticipantManagerView, participant: RoomParticipant) {
         let cancelButtonConfig = AlertButtonConfig(text: .cancel) { view in
             view.dismiss()
         }

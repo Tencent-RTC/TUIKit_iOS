@@ -49,7 +49,7 @@ import UIKit
 /// // - Auto-dismiss when user taps the mask area
 /// // - Support programmatic dismissal via dismiss(animated:completion:)
 /// ```
-protocol BasePanel: AnyObject {
+public protocol BasePanel: AnyObject {
     /// Parent view to attach the panel (usually window or view controller's view)
     var parentView: UIView? { get set }
 
@@ -63,7 +63,7 @@ protocol BasePanel: AnyObject {
 }
 
 // MARK: - Default Implementation
-extension BasePanel where Self: UIView {
+public extension BasePanel where Self: UIView {
     /// Show the panel with animation
     /// - Parameters:
     ///   - parentView: Parent view to attach the panel
@@ -175,15 +175,15 @@ extension BasePanel where Self: UIView {
 }
 
 // MARK: - Panel Height Provider Protocol
-protocol PanelHeightProvider {
+public protocol PanelHeightProvider {
     var panelHeight: CGFloat { get }
 }
 
 // MARK: - Panel Mask View
-class PanelMaskView: UIView {
+public class PanelMaskView: UIView {
     var onTap: (() -> Void)?
     
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
         return view == self ? self : nil
     }
