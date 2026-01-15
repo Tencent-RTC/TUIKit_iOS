@@ -111,7 +111,7 @@ class VRSeatManagerPanel: RTCBaseView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -447,11 +447,11 @@ extension VRSeatManagerPanel: UITableViewDataSource {
 }
 
 fileprivate extension String {
-    static let seatControlTitleText = internalLocalized("Link Management")
-    static let needRequestText = internalLocalized("Require owner's consent to speak")
-    static let onSeatListText = internalLocalized("On Seat List (xxx)")
-    static let applySeatListText = internalLocalized("Application List (xxx)")
-    static let inviteText = internalLocalized("Invite")
-    static let inviteAudienceText = internalLocalized("No users in the seat, go to invite")
-    static let seatAllTakenText = internalLocalized("The seats are all taken.")
+    static let seatControlTitleText = internalLocalized("common_link_mic_manager")
+    static let needRequestText = internalLocalized("common_voiceroom_need_agree")
+    static let onSeatListText = internalLocalized("live_on_seat_list")
+    static let applySeatListText = internalLocalized("live_application_list_xxx")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let inviteAudienceText = internalLocalized("common_voiceroom_empty_view")
+    static let seatAllTakenText = internalLocalized("common_server_error_the_seats_are_all_taken")
 }

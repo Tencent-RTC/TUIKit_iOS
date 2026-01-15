@@ -196,6 +196,6 @@ extension LinkMicAnchorFloatView {
 
 private extension String {
     static var applyLinkMicCount: String {
-        internalLocalized("Link Application(xxx)")
+        internalLocalized("common_seat_application_title")
     }
 }

@@ -250,7 +250,7 @@ private extension String {
         internalLocalized("Waitingxxx")
     }
 
-    static var cancelLinkMicRequestText = internalLocalized("Cancel application for link mic")
+    static var cancelLinkMicRequestText = internalLocalized("common_text_cancel_link_mic_apply")
 
-    static var cancelText = internalLocalized("Cancel")
+    static var cancelText = internalLocalized("common_cancel")
 }

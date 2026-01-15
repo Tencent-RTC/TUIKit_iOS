@@ -15,6 +15,7 @@ import RTCRoomEngine
 import Combine
 import RTCCommon
 import TUICore
+import AtomicXCore
 
 public class KaraokeManager: NSObject {
 
@@ -43,6 +44,7 @@ public class KaraokeManager: NSObject {
 
     private var scorePanelTimer: Timer?
     private var isNaturalEnd: Bool = true
+    private var isLoadingMusic: Bool = false
 
     private var lastSentJsonData: String?
     private var sendCounter: Int = 0
@@ -50,9 +52,9 @@ public class KaraokeManager: NSObject {
     private let pitchKey = "p"
     private let scoreKey = "s"
     private let avgScoreKey = "a"
-    private var ownerId: String = ""
+    private var ownerId: String = LiveListStore.shared.state.value.currentLive.liveOwner.userID
     private var userId: String = TUIRoomEngine.getSelfInfo().userId
-    
+
     public init(roomId: String) {
         self.roomId = roomId
         self.state = ObservableState(initialState: KaraokeState())
@@ -177,13 +179,21 @@ public class KaraokeManager: NSObject {
     // MARK: - Music Playback Contro
 
     func start() {
-        let musicTrackType = karaokeState.musicTrackType
+        let musicTrackType: TXChorusMusicTrack
+        if isTrackAvailable(karaokeState.musicTrackType) {
+            musicTrackType = karaokeState.musicTrackType
+        } else {
+            musicTrackType = .accompaniment
+            state.update { state in
+                state.musicTrackType = .accompaniment
+            }
+        }
+        
         switchMusicTrack(trackType: musicTrackType)
         chorusMusicPlayer.start()
         
         state.update { state in
             state.playbackState = .start
-            state.playProgress = 0
         }
     }
     
@@ -217,10 +227,52 @@ public class KaraokeManager: NSObject {
     }
     
     func switchMusicTrack(trackType: TXChorusMusicTrack) {
+        guard isTrackAvailable(trackType) else {
+            state.update { state in
+                state.musicTrackType = state.musicTrackType
+            }
+            if karaokeState.chorusRole == .leadSinger {
+                errorSubject.send(.trackSwitchNotSupportedText)
+            }
+            return
+        }
+
         state.update { state in
             state.musicTrackType = trackType
         }
         chorusMusicPlayer.switch(trackType)
+    }
+
+    func isTrackAvailable(_ trackType: TXChorusMusicTrack) -> Bool {
+        guard let currentSong = karaokeState.selectedSongs.first else {
+            return false
+        }
+        
+        let musicId = currentSong.songId
+
+        if musicId.hasPrefix("local_demo") {
+            guard let musicInfo = karaokeState.songLibrary.first(where: { $0.musicId == musicId }) else {
+                return false
+            }
+            
+            switch trackType {
+                case .originalSong:
+                    return !musicInfo.originalUrl.isEmpty
+                case .accompaniment:
+                    return !musicInfo.accompanyUrl.isEmpty
+                @unknown default:
+                    return false
+            }
+        }
+
+        guard let media = TXCopyrightedMedia.instance() else {
+            return true
+        }
+        
+        let bgmType: Int = (trackType == .originalSong) ? 0 : 1
+        let trackPath = media.genMusicURI(musicId, bgmType: Int32(bgmType), bitrateDefinition: "audio/hi")
+
+        return (trackPath?.count ?? 0) > 0
     }
     
     func setPlayoutVolume(volume: Int) {
@@ -262,36 +314,59 @@ public class KaraokeManager: NSObject {
 
     func addSong(songInfo: TUISongInfo) {
         songListManager?.addSong(songList: [songInfo], onSuccess: {
-        }, onError: { code, message in
+        }, onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         })
     }
     
     func eraseMusic(musicId: String) {
         songListManager?.removeSong(songIdList: [musicId], onSuccess: {
-        }, onError: { code, message in
+        }, onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         })
     }
     
     func setNextSong(musicId: String) {
         songListManager?.setNextSong(targetSongId: musicId, onSuccess: {
-        }, onError: { code, message in
+        }, onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         })
     }
-    
+
     func playNextSong() {
         songListManager?.playNextSong(onSuccess: {
-        }, onError: { code, message in
+        }, onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         })
     }
     
     func playNextMusic() {
+        guard !isLoadingMusic else {
+            return
+        }
+
         releaseScorePanelTimer()
         isNaturalEnd = false
         
         if karaokeState.playbackState == .idel {
             playNextSong()
         } else {
-            stopPlayback()
+            songListManager?.playNextSong(onSuccess: { [weak self] in
+                guard let self = self else {return}
+                stopPlayback()
+            }, onError: { [weak self] code, message in
+                if code == .freqLimit {
+                    self?.errorSubject.send(.freqLimitText)
+                }
+            })
         }
     }
 
@@ -300,7 +375,10 @@ public class KaraokeManager: NSObject {
         guard !allMusicIds.isEmpty else { return }
 
         songListManager?.removeSong(songIdList: allMusicIds, onSuccess: {
-        }, onError: { code, message in
+        }, onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         })
     }
 
@@ -360,7 +438,7 @@ public class KaraokeManager: NSObject {
             getMetadata()
             getWaitingList(cursor: "")
         } else {
-            enableScore(enable: false)
+            enableScore(enable: true)
         }
     }
     
@@ -378,6 +456,7 @@ public class KaraokeManager: NSObject {
     
     public func exit() {
         eraseAllMusic()
+        stopPlayback()
         state.update { state in
             state.enableRequestMusic = false
             state.selectedSongs = []
@@ -389,7 +468,6 @@ public class KaraokeManager: NSObject {
         
         enableRequestMusic(enable: false)
         enableScore(enable: false)
-        stopPlayback()
     }
     
     private func enableRequestMusic(enable: Bool) {
@@ -410,6 +488,7 @@ public class KaraokeManager: NSObject {
     private func performPlayNextMusic() {
         state.update { state in
             state.playbackState = .stop
+            state.currentScore = -1001
             isNaturalEnd = true
         }
         
@@ -419,7 +498,10 @@ public class KaraokeManager: NSObject {
         
         songListManager?.playNextSong { [weak self] in
             guard let self = self else { return }
-        } onError: { code, message in
+        } onError: { [weak self] code, message in
+            if code == .freqLimit {
+                self?.errorSubject.send(.freqLimitText)
+            }
         }
     }
 
@@ -612,14 +694,24 @@ extension KaraokeManager: TUISongListManagerObserver {
 
                     state.selectedSongs.removeAll { removedSongIds.contains($0.songId) }
 
-                    if isPlayingSongRemoved, let firstSong = state.selectedSongs.first {
-                        guard let firstSong = state.selectedSongs.first else { return }
-
-                        if firstSong.songId.hasPrefix("local_demo") {
-                            loadLocalMusic()
-                        } else {
-                            loadNetWorkMusic(musicId: firstSong.songId)
+                    if isPlayingSongRemoved && state.chorusRole == .leadSinger {
+                        if let firstSong = state.selectedSongs.first {
+                            if firstSong.songId.hasPrefix("local_demo") {
+                                loadLocalMusic()
+                            } else {
+                                loadNetWorkMusic(musicId: firstSong.songId)
+                            }
                         }
+                    }
+
+                    if state.selectedSongs.isEmpty {
+                        if state.playbackState != .stop && state.playbackState != .idel {
+                            self.stopPlayback()
+                        }
+                        state.currentMusicId = ""
+                        state.currentLyricList = []
+                        state.currentPitchList = []
+                        state.currentScore = -1001
                     }
                     break
                 case .orderChanged:
@@ -633,6 +725,14 @@ extension KaraokeManager: TUISongListManagerObserver {
                 case .unknown:
                     let removedSongIds = Set(changedSongs.map { $0.songId })
                     state.selectedSongs.removeAll { removedSongIds.contains($0.songId) }
+
+                    if state.selectedSongs.isEmpty {
+                        if state.playbackState != .stop && state.playbackState != .idel {
+                            self.stopPlayback()
+                        }
+                        state.currentMusicId = ""
+                        state.currentScore = -1001
+                    }
                     break
                 default:
                     break
@@ -652,6 +752,8 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
                                          pitchList: [TXReferencePitch]) {
         let isLocalMusic = musicId.hasPrefix("local_demo")
 
+        isLoadingMusic = false
+
         start()
         state.update { state in
             state.currentMusicId = musicId
@@ -664,12 +766,13 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
     public func onVoicePitchUpdated(_ pitch: Int32, hasVoice: Bool, progressMs: Int64) {
         state.update { state in
             state.pitch = pitch
-            state.progressMs = progressMs
         }
     }
 
     public func onChorusRequireLoadMusic(_ musicId: String) {
         releaseScorePanelTimer()
+        isLoadingMusic = true
+
         if musicId.hasPrefix("local_demo") {
             loadLocalDemoMusic(
                 musicId: musicId,
@@ -678,10 +781,10 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
                 accompanyUrl: karaokeState.songLibrary
                     .first{$0.musicId == musicId}?.accompanyUrl ?? ""
             )
+        } else {
+            loadNetWorkMusic(musicId: musicId)
         }
-        state.update { state in
-            state.currentMusicId = musicId
-        }
+
     }
 
     public func onMusicProgressUpdated(_ progressMs: Int64, durationMs: Int64) {
@@ -723,7 +826,15 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
         if self.karaokeState.chorusRole == .leadSinger {
             setReverb(enable: false)
         }
-        if isNaturalEnd && karaokeState.enableScore {
+        guard isNaturalEnd else {
+            state.update { state in
+                state.playbackState = .stop
+                state.currentScore = -1001
+            }
+            return
+        }
+
+        if karaokeState.enableScore {
             state.update { state in
                 state.playbackState = .idel
             }
@@ -734,6 +845,7 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
                 } else {
                     state.update { state in
                         state.playbackState = .stop
+                        state.currentScore = -1001
                     }
                 }
             }
@@ -743,6 +855,7 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
             } else {
                 state.update { state in
                     state.playbackState = .stop
+                    state.currentScore = -1001
                 }
             }
         }
@@ -841,17 +954,13 @@ extension KaraokeManager: TRTCAudioFrameDelegate {
     }
     
     public func onRemoteUserAudioFrame(_ frame: TRTCAudioFrame, userId: String) {
-        guard let extraData = frame.extraData, !extraData.isEmpty else {
+        guard let extraData = frame.extraData else {
             return
         }
-        
+
         do {
-            let jsonString = String(data: extraData, encoding: .utf8) ?? ""
-            guard !jsonString.isEmpty else { return }
-            
-            let jsonData = jsonString.data(using: .utf8) ?? Data()
-            let dataMap = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
-            
+            let dataMap = try JSONSerialization.jsonObject(with: extraData) as? [String: Any]
+
             guard let dataMap = dataMap,
                   let itemUserId = dataMap[userIdKey] as? String,
                   itemUserId == ownerId else {
@@ -900,6 +1009,7 @@ extension KaraokeManager: TRTCAudioFrameDelegate {
 
 // MARK: - String Localization
 fileprivate extension String {
-    static let loadFailedText = ("Music loading failed").localized
-}
+    static let loadFailedText = ("karaoke_music_loading_error").localized
+    static let trackSwitchNotSupportedText = ("karaoke_cant_switch_tracks").localized
+    static let freqLimitText = ("common_client_error_freq_limit").localized}
 

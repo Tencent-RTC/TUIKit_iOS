@@ -14,9 +14,9 @@ public enum LiveStreamPrivacyStatus: NSInteger, CaseIterable {
     func getString() -> String {
         switch self {
         case .public:
-            return internalLocalized("Public")
+            return internalLocalized("common_stream_privacy_status_default")
         case .privacy:
-            return internalLocalized("Privacy")
+            return internalLocalized("common_stream_privacy_status_privacy")
         }
     }
 }
@@ -30,13 +30,13 @@ public enum LiveTemplateMode: NSInteger, CaseIterable {
     func toString() -> String {
         switch self {
         case .verticalGridDynamic:
-            return internalLocalized("Dynamic grid layout")
+            return internalLocalized("common_template_dynamic_grid")
         case .verticalFloatDynamic:
-            return internalLocalized("Dynamic float layout")
+            return internalLocalized("common_template_dynamic_float")
         case .verticalGridStatic:
-            return internalLocalized("Static grid layout")
+            return internalLocalized("common_template_static_grid")
         case .verticalFloatStatic:
-            return internalLocalized("Static float layout")
+            return internalLocalized("common_template_static_float")
         }
     }
     
@@ -78,15 +78,15 @@ public enum LiveStreamCategory: NSInteger, CaseIterable {
     func getString() -> String {
         switch self {
         case .chat:
-            return internalLocalized("Daily chat")
+            return internalLocalized("common_stream_categories_default")
         case .beauty:
-            return internalLocalized("Beauty")
+            return internalLocalized("common_stream_categories_beauty")
         case .teach:
-            return internalLocalized("Knowledge Teaching")
+            return internalLocalized("common_stream_categories_teach")
         case .shopping:
-            return internalLocalized("Shopping")
+            return internalLocalized("common_stream_categories_shopping")
         case .music:
-            return internalLocalized("Music")
+            return internalLocalized("common_music")
         }
     }
 }

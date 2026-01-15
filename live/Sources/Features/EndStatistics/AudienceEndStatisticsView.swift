@@ -119,6 +119,6 @@ class AudienceEndStatisticsView: UIView {
 
 private extension String {
     static var titleText: String {
-        internalLocalized("Live broadcast has ended")
+        internalLocalized("common_live_has_stop")
     }
 }

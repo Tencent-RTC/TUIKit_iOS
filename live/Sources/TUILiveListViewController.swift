@@ -54,7 +54,7 @@ public class TUILiveListViewController: UIViewController {
     
     private func initNavigationItemTitleView() {
         let backBtn = UIButton(type: .custom)
-        backBtn.setImage(internalImage("live_back")?.withTintColor(.white), for: .normal)
+        backBtn.setImage(internalImage("live_back", rtlFlipped: true)?.withTintColor(.white), for: .normal)
         backBtn.addTarget(self, action: #selector(backBtnClick), for: .touchUpInside)
         backBtn.sizeToFit()
         let backItem = UIBarButtonItem(customView: backBtn)
@@ -206,8 +206,8 @@ class LiveTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate
 }
 
 extension String {
-    fileprivate static let liveTitleText = internalLocalized("Live Video")
-    fileprivate static let pushingToReturnText = internalLocalized("Live streaming in progress. Please try again later.")
+    fileprivate static let liveTitleText = internalLocalized("common_preview_video_live")
+    fileprivate static let pushingToReturnText = internalLocalized("livelist_exit_float_window_tip")
     
     fileprivate static let TUICore_VideoAdvanceService = "TUICore_VideoAdvanceService"
 

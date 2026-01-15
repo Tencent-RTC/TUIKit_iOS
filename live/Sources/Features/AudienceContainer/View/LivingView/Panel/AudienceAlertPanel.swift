@@ -287,5 +287,5 @@ extension AudienceAlertPanel {
 }
 
 fileprivate extension String {
-    static let confirmText = internalLocalized("Confirm")
+    static let confirmText = internalLocalized("common_music_confirm")
 }

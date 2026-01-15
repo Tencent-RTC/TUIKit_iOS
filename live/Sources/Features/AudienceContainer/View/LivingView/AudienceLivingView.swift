@@ -564,8 +564,8 @@ extension AudienceLivingView: GiftPlayViewDelegate {
 }
 
 private extension String {
-    static let meText = internalLocalized("Me")
-    static let resolutionChangedText = internalLocalized("resolution changed to")
+    static let meText = internalLocalized("common_gift_me")
+    static let resolutionChangedText = internalLocalized("live_video_resolution_changed")
 
     static func videoQualityToString(quality: VideoQuality) -> String {
         switch quality {

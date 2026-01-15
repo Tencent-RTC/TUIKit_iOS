@@ -57,7 +57,7 @@ class AnchorCoHostStore {
                 case .onCoHostRequestRejected(invitee: let invitee):
                         toastSubject.send((.requestRejectedText.replacingOccurrences(of: "xxx", with: invitee.displayName), .info))
                 case .onCoHostRequestTimeout(inviter: let inviter, invitee: _):
-                    if inviter.userID == liveID {
+                    if inviter.userID == LoginStore.shared.state.value.loginUserInfo?.userID {
                         toastSubject.send((.requestTimeoutText, .info))
                     }
                 default: break
@@ -104,6 +104,6 @@ extension AnchorCoHostStore {
 }
 
 private extension String {
-    static let requestRejectedText = internalLocalized("xxx rejected")
-    static let requestTimeoutText = internalLocalized("Invitation has timed out")
+    static let requestRejectedText = internalLocalized("common_request_rejected")
+    static let requestTimeoutText = internalLocalized("common_connect_invitation_timeout")
 }

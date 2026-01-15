@@ -74,6 +74,7 @@ class IncomingBannerViewController: UIViewController {
         super.viewDidLoad()
         if isViewReady { return }
         isViewReady = true
+        KeyMetrics.countUV(eventId: .wakeup, callId: CallStore.shared.state.value.activeCall.callId)
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()

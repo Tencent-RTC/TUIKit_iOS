@@ -265,5 +265,5 @@ extension BarrageStreamView {
 }
 
 private extension String {
-    static let comingText: String = internalLocalized("Entered room")
+    static let comingText: String = internalLocalized("common_entered_room")
 }

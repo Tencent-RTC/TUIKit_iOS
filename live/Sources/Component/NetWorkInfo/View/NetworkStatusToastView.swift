@@ -131,6 +131,6 @@ class NetworkStatusToastView: UIView {
 }
 
 fileprivate extension String {
-    static let netWorkWarning = internalLocalized("Network lag detected suggestions")
-    static let SwitchNetWork = internalLocalized("Switch Network")
+    static let netWorkWarning = internalLocalized("common_network_bad_tips")
+    static let SwitchNetWork = internalLocalized("common_switch_network")
 }

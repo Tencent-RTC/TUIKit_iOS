@@ -9,20 +9,22 @@ import RTCCommon
 import SnapKit
 import UIKit
 import AtomicXCore
+import AtomicX
 
-fileprivate let cellMargin: CGFloat = 6.scale375Height()
-fileprivate let barrageContentMaxWidth: CGFloat = 240.scale375Width()
+private let cellMargin: CGFloat = 6.scale375Height()
+private let barrageContentMaxWidth: CGFloat = 240.scale375Width()
 
 class BarrageCell: UITableViewCell {
     static let identifier: String = "BarrageCell"
     private var contentCell: UIView?
-    
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         backgroundColor = .clear
         selectionStyle = .none
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -59,26 +61,31 @@ class BarrageDefaultCell: UIView {
         barrage.sender.userID == ownerId
     }
 
-    private let anchorButton: UIButton = {
+    private lazy var anchorTagImage: UIImage = {
         let button = UIButton()
         button.backgroundColor = UIColor(hex: "#4D8EFF")
         button.layer.cornerRadius = 7
         button.setTitle(.anchorText, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .customFont(ofSize: 8, weight: .semibold)
-        return button
+        button.clipsToBounds = true
+
+        button.frame = CGRect(x: 0, y: 0, width: 42, height: 14)
+
+        let renderer = UIGraphicsImageRenderer(size: button.bounds.size)
+        return renderer.image { _ in
+            button.layer.render(in: UIGraphicsGetCurrentContext()!)
+        }
     }()
 
     private lazy var barrageLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12, weight: .semibold)
         label.numberOfLines = 0
-        label.textAlignment = .left
-        label.lineBreakMode = .byCharWrapping
         label.textColor = .white
         return label
     }()
-    
+
     private lazy var backgroundView: UIView = {
         let view = UIView(frame: .zero)
         view.backgroundColor = .black.withAlphaComponent(0.25)
@@ -104,6 +111,7 @@ class BarrageDefaultCell: UIView {
         isViewReady = true
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -111,9 +119,6 @@ class BarrageDefaultCell: UIView {
     func constructViewHierarchy() {
         addSubview(backgroundView)
         backgroundView.addSubview(barrageLabel)
-        if isOwner {
-            backgroundView.addSubview(anchorButton)
-        }
     }
 
     func activateConstraints() {
@@ -122,15 +127,7 @@ class BarrageDefaultCell: UIView {
             make.trailing.lessThanOrEqualToSuperview()
             make.top.equalToSuperview().offset(cellMargin)
         }
-        if isOwner {
-            anchorButton.snp.makeConstraints { make in
-                make.leading.equalToSuperview().offset(5)
-                make.top.equalToSuperview().offset(6)
-                make.height.equalTo(14)
-                make.width.equalTo(42)
-            }
-        }
-        
+
         barrageLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(5)
             make.trailing.equalToSuperview().inset(8)
@@ -140,20 +137,45 @@ class BarrageDefaultCell: UIView {
     }
 
     func getBarrageLabelAttributedText(barrage: Barrage) -> NSMutableAttributedString {
-        let placeholderString = String(repeating: " ", count: isOwner ? 12 : 0)
+        let result = NSMutableAttributedString()
+        let isRTL = isRTLLanguage()
+
+        if isOwner {
+            let attachment = NSTextAttachment()
+            attachment.image = anchorTagImage
+            let font = UIFont.customFont(ofSize: 12, weight: .semibold)
+            let imageHeight: CGFloat = 14
+            let imageWidth: CGFloat = 42
+            let yOffset = (font.capHeight - imageHeight) / 2
+            attachment.bounds = CGRect(x: 0, y: yOffset, width: imageWidth, height: imageHeight)
+            result.append(NSAttributedString(attachment: attachment))
+            result.append(NSAttributedString(string: " "))
+        }
+
         let userName = barrage.sender.userName
-        let displayName = (userName.isEmpty ? barrage.sender.userID : userName) + "："
-        let userNameAttributes: [NSAttributedString.Key: Any] =
-        [.foregroundColor: UIColor.lightBlueColor, .font: UIFont.customFont(ofSize: 12, weight: .semibold)]
-        let userNameAttributedText = NSMutableAttributedString(string: "\(placeholderString)\(displayName)",
-                                                               attributes: userNameAttributes)
-        
-        userNameAttributedText.append(getBarrageContentAttributedText(content: barrage.textContent))
-        return userNameAttributedText
+        let displayName = userName.isEmpty ? barrage.sender.userID : userName
+        let userNameAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.lightBlueColor,
+            .font: UIFont.customFont(ofSize: 12, weight: .semibold)
+        ]
+        result.append(NSAttributedString(string: FSI + displayName + PDI + "：", attributes: userNameAttributes))
+
+        let contentAttr = getBarrageContentAttributedText(content: barrage.textContent)
+        let wrappedContent = NSMutableAttributedString(string: FSI)
+        wrappedContent.append(contentAttr)
+        wrappedContent.append(NSAttributedString(string: PDI))
+        result.append(wrappedContent)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byCharWrapping
+        paragraphStyle.baseWritingDirection = isRTL ? .rightToLeft : .leftToRight
+        paragraphStyle.alignment = isRTL ? .right : .left
+        result.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: result.length))
+
+        return result
     }
-    
-    func getBarrageContentAttributedText(content: String)
-        -> NSMutableAttributedString {
+
+    private func getBarrageContentAttributedText(content: String) -> NSMutableAttributedString {
         return EmotionHelper.shared.obtainImagesAttributedString(byText: content,
                                                                  font: UIFont.customFont(ofSize: 12, weight: .semibold))
     }
@@ -167,6 +189,7 @@ class BarrageCustomCell: UIView {
         backgroundColor = .clear
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -184,7 +207,7 @@ class BarrageCustomCell: UIView {
     func constructViewHierarchy() {
         addSubview(customView)
     }
-    
+
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         let height = customView.bounds.height
@@ -202,5 +225,5 @@ class BarrageCustomCell: UIView {
 }
 
 private extension String {
-    static let anchorText = internalLocalized("Anchor")
+    static let anchorText = internalLocalized("live_barrage_anchor")
 }

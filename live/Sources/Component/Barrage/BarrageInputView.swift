@@ -115,5 +115,5 @@ extension BarrageInputView {
 }
 
 private extension String {
-    static let chatText = internalLocalized("Join Chat!")
+    static let chatText = internalLocalized("live_barrage_text_hint")
 }

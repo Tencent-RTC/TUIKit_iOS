@@ -255,8 +255,8 @@ extension VRLiveInfoEditView {
 }
 
 private extension String {
-    static let editCoverTitle = internalLocalized("Set Cover")
-    static let editPlaceholderText = internalLocalized("Please enter room name")
+    static let editCoverTitle = internalLocalized("common_set_cover")
+    static let editPlaceholderText = internalLocalized("live_edit_placeholder_text")
     static let modeText = internalLocalized("Live Mode:xxx")
-    static let cancelText = internalLocalized("Cancel")
+    static let cancelText = internalLocalized("common_cancel")
 }

@@ -8,47 +8,47 @@
 import Foundation
 
 public extension String {
-    static let audioEffectTitleText: String = internalLocalized("Audio Effect Settings")
+    static let audioEffectTitleText: String = internalLocalized("common_audio_effect_settings")
     
-    static var voiceEarMonitorText: String = internalLocalized("Ear Monitor")
+    static var voiceEarMonitorText: String = internalLocalized("common_ear_return")
     
-    static let voiceEarMonitorVolumeText: String = internalLocalized("Ear Monitor Volume")
+    static let voiceEarMonitorVolumeText: String = internalLocalized("common_ear_return_volume")
     
-    static var backgroundMusicText: String = internalLocalized("Music")
+    static var backgroundMusicText: String = internalLocalized("common_audio_mode_music")
     
-    static var chooseMusicText: String = internalLocalized("Choose Music")
+    static var chooseMusicText: String = internalLocalized("live_choose_music")
     
-    static var audioSettingText: String = internalLocalized("Audio settings")
+    static var audioSettingText: String = internalLocalized("common_audio_settings")
     
-    static var musicVolumeText: String = internalLocalized("Music volume")
+    static var musicVolumeText: String = internalLocalized("common_music_volume")
     
-    static var microphoneVolumeText: String = internalLocalized("Voice volume")
+    static var microphoneVolumeText: String = internalLocalized("common_people_volume")
     
-    static var voicePitchText: String = internalLocalized("Music Pitch")
+    static var voicePitchText: String = internalLocalized("live_music_pitch")
     
-    static var changerText: String = internalLocalized("Voice changer")
+    static var changerText: String = internalLocalized("common_change_voice")
     
-    static var reverbText: String = internalLocalized("Reverb")
+    static var reverbText: String = internalLocalized("common_reverb")
     
-    static var noneVoiceText: String = internalLocalized("Original")
+    static var noneVoiceText: String = internalLocalized("common_change_voice_none")
 
-    static var childText: String = internalLocalized("Naughty child")
+    static var childText: String = internalLocalized("common_change_voice_child")
 
-    static var girlText: String = internalLocalized("Loli")
+    static var girlText: String = internalLocalized("common_change_voice_girl")
     
-    static var uncleText: String = internalLocalized("Uncle")
+    static var uncleText: String = internalLocalized("common_change_voice_uncle")
     
-    static var etherealText: String = internalLocalized("Ethereal")
+    static var etherealText: String = internalLocalized("common_change_voice_ethereal")
     
-    static var withoutEffectText: String = internalLocalized("No effect")
+    static var withoutEffectText: String = internalLocalized("common_reverb_none")
     
-    static var karaokeText: String = internalLocalized("KTV")
+    static var karaokeText: String = internalLocalized("common_main_item_ktv_room")
     
-    static var metalText: String = internalLocalized("Metallic sound")
+    static var metalText: String = internalLocalized("common_reverb_metallic_sound")
     
-    static var lowText: String = internalLocalized("Low")
+    static var lowText: String = internalLocalized("common_reverb_low")
 
-    static var loudText: String = internalLocalized("Loud")
+    static var loudText: String = internalLocalized("common_reverb_loud_and_loud")
     
-    static var doneText: String = internalLocalized("Done")
+    static var doneText: String = internalLocalized("common_setting_done")
 }

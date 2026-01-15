@@ -133,6 +133,6 @@ extension AnchorCoHostUserCell {
 }
 
 fileprivate extension String {
-    static let inviteText = internalLocalized("Invite")
-    static let invitingTest = internalLocalized("Waiting")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let invitingTest = internalLocalized("common_connect_inviting")
 }

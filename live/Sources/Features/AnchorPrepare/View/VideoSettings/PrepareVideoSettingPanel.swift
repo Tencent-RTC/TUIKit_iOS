@@ -275,10 +275,10 @@ class PrepareVideoSettingPullDownCell: UITableViewCell {
 }
 
 private extension String {
-    static let settingTitleText: String = internalLocalized("Video settings")
+    static let settingTitleText: String = internalLocalized("common_video_settings")
     
-    static let mirrorText: String = internalLocalized("Mirror")
-    static let resolutionText: String = internalLocalized("Resolution")
+    static let mirrorText: String = internalLocalized("common_video_settings_item_mirror")
+    static let resolutionText: String = internalLocalized("live_video_resolution")
     
     static func videoQualityToString(quality: VideoQuality) -> String {
         switch quality {

@@ -29,7 +29,7 @@ public class SliderCell: UITableViewCell {
             LabelAppearance(textColor: theme.color.textColorPrimary,
                             font: theme.typography.Medium16)
         }
-        label.textAlignment = .center
+        label.numberOfLines = 2
         return label
     }()
     
@@ -38,7 +38,6 @@ public class SliderCell: UITableViewCell {
             LabelAppearance(textColor: theme.color.textColorPrimary,
                             font: theme.typography.Regular16)
         }
-        label.textAlignment = .right
         return label
     }()
     
@@ -76,12 +75,17 @@ public class SliderCell: UITableViewCell {
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24)
             make.centerY.equalToSuperview()
+            make.trailing.lessThanOrEqualTo(valueLabel.snp.leading).offset(-24).priority(.required)
         }
+        titleLabel.snp.contentCompressionResistanceHorizontalPriority = 250
+        
         valueLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.width.lessThanOrEqualTo(50)
             make.trailing.equalTo(configSlider.snp.leading).offset(-5)
         }
+        valueLabel.snp.contentCompressionResistanceHorizontalPriority = 751
+        valueLabel.snp.contentHuggingHorizontalPriority = 251
+        
         configSlider.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-24)
             make.centerY.equalToSuperview()

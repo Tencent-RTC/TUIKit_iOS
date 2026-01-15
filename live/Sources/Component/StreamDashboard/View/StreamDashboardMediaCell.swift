@@ -55,6 +55,28 @@ class StreamDashboardMediaCell: UICollectionViewCell {
         return label
     }()
     
+    private lazy var mediaContainerStackView: UIStackView = {
+        let view = UIStackView()
+        view.axis = .horizontal
+        view.distribution = .fillEqually
+        view.alignment = .fill
+        view.spacing = 0
+        view.semanticContentAttribute = .unspecified
+        return view
+    }()
+    
+    private lazy var videoContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var audioContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private lazy var videoTableView: UITableView = {
         let view = UITableView(frame: .zero, style: .plain)
         view.isScrollEnabled = false
@@ -160,10 +182,13 @@ extension StreamDashboardMediaCell {
             containerView.addSubview(titleLabel)
             containerView.addSubview(separatorLine)
         }
-        containerView.addSubview(videoTitleLabel)
-        containerView.addSubview(videoTableView)
-        containerView.addSubview(audioTitleLabel)
-        containerView.addSubview(audioTableView)
+        videoContainerView.addSubview(videoTitleLabel)
+        videoContainerView.addSubview(videoTableView)
+        audioContainerView.addSubview(audioTitleLabel)
+        audioContainerView.addSubview(audioTableView)
+        mediaContainerStackView.addArrangedSubview(videoContainerView)
+        mediaContainerStackView.addArrangedSubview(audioContainerView)
+        containerView.addSubview(mediaContainerStackView)
     }
     
     private func activateConstraints() {
@@ -181,29 +206,40 @@ extension StreamDashboardMediaCell {
                 make.height.equalTo(1)
             }
         }
-        videoTitleLabel.snp.remakeConstraints { make in
-            make.leading.equalToSuperview().offset(16.scale375())
+        mediaContainerStackView.snp.remakeConstraints { make in
             if isRemoteUserEmpty {
                 make.top.equalToSuperview().offset(16.scale375Height())
             } else {
                 make.top.equalTo(separatorLine.snp.bottom).offset(12.scale375Height())
             }
+            make.leading.trailing.equalToSuperview().inset(16.scale375())
+            make.bottom.equalToSuperview().inset(16.scale375Height())
+        }
+        
+        let videoTableHeight = StreamDashboardMediaItemCell.CellHeight * CGFloat(videoDataSource.count)
+        let audioTableHeight = StreamDashboardMediaItemCell.CellHeight * CGFloat(audioDataSource.count)
+        let maxTableHeight = max(videoTableHeight, audioTableHeight)
+        
+        videoTitleLabel.snp.remakeConstraints { make in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(20.scale375Height())
         }
         videoTableView.snp.remakeConstraints { make in
             make.top.equalTo(videoTitleLabel.snp.bottom).offset(8.scale375Height())
-            make.leading.equalToSuperview().inset(16.scale375())
-            make.width.equalTo(bounds.width / 2 - 44.scale375())
-            make.height.equalTo(StreamDashboardMediaItemCell.CellHeight * CGFloat(videoDataSource.count))
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(maxTableHeight)
+            make.bottom.equalToSuperview()
         }
+        
         audioTitleLabel.snp.remakeConstraints { make in
-            make.leading.equalTo(videoTableView.snp.trailing).offset(16.scale375())
-            make.centerY.equalTo(videoTitleLabel)
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(20.scale375Height())
         }
         audioTableView.snp.remakeConstraints { make in
             make.top.equalTo(audioTitleLabel.snp.bottom).offset(8.scale375Height())
-            make.leading.equalTo(audioTitleLabel)
-            make.trailing.equalToSuperview().inset(16.scale375())
-            make.height.equalTo(StreamDashboardMediaItemCell.CellHeight * CGFloat(audioDataSource.count))
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(maxTableHeight)
+            make.bottom.equalToSuperview()
         }
     }
     
@@ -317,14 +353,14 @@ class StreamDashboardMediaItemCell: UITableViewCell {
 
 fileprivate extension String {
     
-    static let localText = internalLocalized("Local User")
-    static let remoteText = internalLocalized("Remote User")
+    static let localText = internalLocalized("common_dashboard_local_user")
+    static let remoteText = internalLocalized("common_dashboard_remote_user")
     
-    static let videoText = internalLocalized("Video Information")
-    static let videoResolutionText = internalLocalized("Resolution")
-    static let bitrateText = internalLocalized("Bitrate")
-    static let videoFrameRateText = internalLocalized("FPS")
+    static let videoText = internalLocalized("common_dashboard_video_info_title")
+    static let videoResolutionText = internalLocalized("live_video_resolution")
+    static let bitrateText = internalLocalized("common_dashboard_bitrate")
+    static let videoFrameRateText = internalLocalized("common_dashboard_video_fps")
     
-    static let audioText = internalLocalized("Audio Information")
-    static let audioSampleRateText = internalLocalized("Sample Rate")
+    static let audioText = internalLocalized("common_dashboard_audio_info_title")
+    static let audioSampleRateText = internalLocalized("common_dashboard_audio_sample_rate")
 }

@@ -66,7 +66,7 @@ class MusicSwitchCell: UITableViewCell {
     }
     
     private func bindInteraction() {
-        configSwitch.addTarget(self, action: #selector(switchAction(sender:)), for: .touchUpInside)
+        configSwitch.addTarget(self, action: #selector(switchAction(sender:)), for: .valueChanged)
     }
     
     func setupStyle() {
@@ -84,8 +84,13 @@ class MusicSwitchCell: UITableViewCell {
 extension MusicSwitchCell {
     @objc
     func switchAction(sender: UISwitch) {
-        if let item = self.item {
-            item(payload: sender.isOn)
+        guard let item = self.item else { return }
+
+        if !item.isEnabled {
+            sender.setOn(!sender.isOn, animated: true)
+            item(payload: !sender.isOn)
+            return
         }
+        item(payload: sender.isOn)
     }
 }

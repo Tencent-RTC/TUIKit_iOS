@@ -1,7 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "input can't be empty!": {
+    "roomkit_input_can_not_empty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -15,10 +15,22 @@
             "state": "translated",
             "value": "输入不能为空"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入力は空にできません!"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن أن يكون الإدخال فارغاً!"
+          }
         }
       }
     },
-    "Create room": {
+    "roomkit_create_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -32,10 +44,22 @@
             "state": "translated",
             "value": "新建房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームを作成"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنشاء غرفة"
+          }
         }
       }
     },
-    "Enter roomID": {
+    "roomkit_enter_room_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -49,10 +73,22 @@
             "state": "translated",
             "value": "请输入房间号"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDを入力してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أدخل معرف الغرفة"
+          }
         }
       }
     },
-    "Freedom speaker room": {
+    "roomkit_room_type_freedom_speaker": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -66,10 +102,22 @@
             "state": "translated",
             "value": "自由发言房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自由発言ルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة التحدث الحر"
+          }
         }
       }
     },
-    "Join room": {
+    "roomkit_join_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -83,10 +131,22 @@
             "state": "translated",
             "value": "加入房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームに参加"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انضم للغرفة"
+          }
         }
       }
     },
-    "On-stage speaking room": {
+    "roomkit_room_type_stage_speaker": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -100,10 +160,22 @@
             "state": "translated",
             "value": "上台发言房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステージ発言ルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة التحدث على المنصة"
+          }
         }
       }
     },
-    "Room ID": {
+    "roomkit_room_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -117,10 +189,22 @@
             "state": "translated",
             "value": "房间号"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームID"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة"
+          }
         }
       }
     },
-    "Room type": {
+    "roomkit_room_type": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -134,10 +218,22 @@
             "state": "translated",
             "value": "房间类型"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームタイプ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نوع الغرفة"
+          }
         }
       }
     },
-    "Start video": {
+    "roomkit_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -151,10 +247,22 @@
             "state": "translated",
             "value": "打开视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビデオを開始"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء الفيديو"
+          }
         }
       }
     },
-    "Stop video": {
+    "roomkit_stop_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -168,10 +276,22 @@
             "state": "translated",
             "value": "关闭视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビデオを停止"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف الفيديو"
+          }
         }
       }
     },
-    "Your name": {
+    "roomkit_your_name": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -185,10 +305,22 @@
             "state": "translated",
             "value": "您的姓名"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お名前"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسمك"
+          }
         }
       }
     },
-    "Enable speaker": {
+    "roomkit_enable_speaker": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -202,10 +334,22 @@
             "state": "translated",
             "value": "开启扬声器"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピーカーを有効にする"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل مكبر الصوت"
+          }
         }
       }
     },
-    "Enable audio": {
+    "roomkit_enable_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -219,10 +363,22 @@
             "state": "translated",
             "value": "开启音频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーディオを有効にする"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل الصوت"
+          }
         }
       }
     },
-    "Enable video": {
+    "roomkit_enable_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -236,10 +392,22 @@
             "state": "translated",
             "value": "开启视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビデオを有効にする"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل الفيديو"
+          }
         }
       }
     },
-    "Mute": {
+    "roomkit_mute": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -253,10 +421,22 @@
             "state": "translated",
             "value": "静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم الصوت"
+          }
         }
       }
     },
-    "Unmute": {
+    "roomkit_unmute": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -270,10 +450,22 @@
             "state": "translated",
             "value": "取消静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート解除"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء كتم الصوت"
+          }
         }
       }
     },
-    "End": {
+    "roomkit_end": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -287,10 +479,22 @@
             "state": "translated",
             "value": "结束"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終了"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء"
+          }
         }
       }
     },
-    "Members(xxx)": {
+    "roomkit_member_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -304,10 +508,22 @@
             "state": "translated",
             "value": "成员(xxx)"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバー(xxx)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأعضاء (xxx)"
+          }
         }
       }
     },
-    "Expansion": {
+    "roomkit_expand": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -321,10 +537,22 @@
             "state": "translated",
             "value": "展开"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展開"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توسيع"
+          }
         }
       }
     },
-    "xxx's room": {
+    "roomkit_user_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -338,10 +566,22 @@
             "state": "translated",
             "value": "xxx的房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxのルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة xxx"
+          }
         }
       }
     },
-    "Screen share": {
+    "roomkit_screen_share": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -355,10 +595,22 @@
             "state": "translated",
             "value": "屏幕分享"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشاركة الشاشة"
+          }
         }
       }
     },
-    "Mute all": {
+    "roomkit_mute_all_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -372,10 +624,22 @@
             "state": "translated",
             "value": "全体静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ミュート"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم صوت الجميع"
+          }
         }
       }
     },
-    "Unmute all": {
+    "roomkit_unmute_all_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -389,10 +653,22 @@
             "state": "translated",
             "value": "解除全体静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ミュート解除"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء كتم صوت الجميع"
+          }
         }
       }
     },
-    "More": {
+    "roomkit_more": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -406,10 +682,22 @@
             "state": "translated",
             "value": "更多"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "もっと見る"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المزيد"
+          }
         }
       }
     },
-    "Search members": {
+    "roomkit_search_members": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -423,10 +711,22 @@
             "state": "translated",
             "value": "搜索成员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバーを検索"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البحث عن أعضاء"
+          }
         }
       }
     },
-    "Invite": {
+    "roomkit_invite": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -440,10 +740,22 @@
             "state": "translated",
             "value": "邀请"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "招待"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة"
+          }
         }
       }
     },
-    "Owner": {
+    "roomkit_role_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -457,10 +769,22 @@
             "state": "translated",
             "value": "房主"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーナー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المالك"
+          }
         }
       }
     },
-    "Administrator": {
+    "roomkit_role_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -474,10 +798,22 @@
             "state": "translated",
             "value": "管理员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理者"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المسؤول"
+          }
         }
       }
     },
-    "Me": {
+    "roomkit_me": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -491,10 +827,22 @@
             "state": "translated",
             "value": "我"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنا"
+          }
         }
       }
     },
-    "Room link": {
+    "roomkit_room_link": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -508,10 +856,22 @@
             "state": "translated",
             "value": "房间链接"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームリンク"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رابط الغرفة"
+          }
         }
       }
     },
-    "Copy": {
+    "roomkit_copy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -525,10 +885,22 @@
             "state": "translated",
             "value": "复制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسخ"
+          }
         }
       }
     },
-    "Copy room info": {
+    "roomkit_copy_room_info": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -542,10 +914,22 @@
             "state": "translated",
             "value": "复制房间信息"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム情報をコピー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسخ معلومات الغرفة"
+          }
         }
       }
     },
-    "All current and incoming members will be muted": {
+    "roomkit_msg_all_members_will_be_muted": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -559,10 +943,22 @@
             "state": "translated",
             "value": "所有及新加入的成员将被静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべての現在および新規メンバーがミュートされます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتم كتم صوت جميع الأعضاء الحاليين والقادمين"
+          }
         }
       }
     },
-    "All current and incoming members will be restricted from video": {
+    "roomkit_msg_all_members_video_disabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -576,10 +972,22 @@
             "state": "translated",
             "value": "所有及新加入的成员将被禁止视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべての現在および新規メンバーのビデオが制限されます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتم تقييد الفيديو لجميع الأعضاء الحاليين والقادمين"
+          }
         }
       }
     },
-    "Members will unable to turn on the microphone": {
+    "roomkit_msg_members_cannot_unmute": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -593,10 +1001,22 @@
             "state": "translated",
             "value": "成员将无法开启麦克风"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバーはマイクをオンにできなくなります"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لن يتمكن الأعضاء من تشغيل الميكروفون"
+          }
         }
       }
     },
-    "Members will unable to turn on video": {
+    "roomkit_msg_members_cannot_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -610,10 +1030,22 @@
             "state": "translated",
             "value": "成员将无法开启视频画面"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバーはビデオをオンにできなくなります"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لن يتمكن الأعضاء من تشغيل الفيديو"
+          }
         }
       }
     },
-    "Confirm": {
+    "roomkit_confirm": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -627,10 +1059,22 @@
             "state": "translated",
             "value": "确认"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تأكيد"
+          }
         }
       }
     },
-    "Cancel": {
+    "roomkit_cancel": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -644,10 +1088,22 @@
             "state": "translated",
             "value": "取消"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء"
+          }
         }
       }
     },
-    "Stop all video": {
+    "roomkit_disable_all_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -661,10 +1117,22 @@
             "state": "translated",
             "value": "全体禁画"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ビデオ禁止"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف جميع الفيديو"
+          }
         }
       }
     },
-    "Enable all video": {
+    "roomkit_enable_all_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -678,10 +1146,22 @@
             "state": "translated",
             "value": "解除全体禁画"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ビデオ許可"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل جميع الفيديو"
+          }
         }
       }
     },
-    "All members will be unmuted": {
+    "roomkit_msg_all_members_will_be_unmuted": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -695,10 +1175,22 @@
             "state": "translated",
             "value": "所有成员将被解除静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのメンバーのミュートが解除されます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتم إلغاء كتم صوت جميع الأعضاء"
+          }
         }
       }
     },
-    "Members will be able to turn on the microphone": {
+    "roomkit_msg_members_can_unmute": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -712,10 +1204,22 @@
             "state": "translated",
             "value": "解除后用户可以自由开启麦克风"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバーはマイクを自由にオンにできます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتمكن الأعضاء من تشغيل الميكروفون"
+          }
         }
       }
     },
-    "Confirm release": {
+    "roomkit_confirm_release": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -729,10 +1233,22 @@
             "state": "translated",
             "value": "确认解除"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除を確認"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تأكيد الإلغاء"
+          }
         }
       }
     },
-    "All members will not be restricted from video": {
+    "roomkit_msg_all_members_video_enabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -746,10 +1262,22 @@
             "state": "translated",
             "value": "所有成员将被解除禁止开启视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのメンバーのビデオ制限が解除されます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لن يتم تقييد الفيديو لجميع الأعضاء"
+          }
         }
       }
     },
-    "Members will be able to turn on video": {
+    "roomkit_msg_members_can_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -763,10 +1291,22 @@
             "state": "translated",
             "value": "解除后用户可以自由开启视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバーはビデオを自由にオンにできます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتمكن الأعضاء من تشغيل الفيديو"
+          }
         }
       }
     },
-    "All videos disabled": {
+    "roomkit_toast_all_video_disabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -780,10 +1320,22 @@
             "state": "translated",
             "value": "已开启全体禁画"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ビデオ禁止を有効にしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعطيل جميع الفيديو"
+          }
         }
       }
     },
-    "All videos enabled": {
+    "roomkit_toast_all_video_enabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -797,10 +1349,22 @@
             "state": "translated",
             "value": "已解除全体禁画"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ビデオ禁止を解除しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تفعيل جميع الفيديو"
+          }
         }
       }
     },
-    "All audios disabled": {
+    "roomkit_toast_all_audio_disabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -814,10 +1378,22 @@
             "state": "translated",
             "value": "已开启全体静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ミュートを有効にしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم جميع الأصوات"
+          }
         }
       }
     },
-    "All audios enabled": {
+    "roomkit_toast_all_audio_enabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -831,10 +1407,22 @@
             "state": "translated",
             "value": "已解除全体静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ミュートを解除しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تفعيل جميع الأصوات"
+          }
         }
       }
     },
-    "Modify the name": {
+    "roomkit_modify_name": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -848,10 +1436,22 @@
             "state": "translated",
             "value": "修改名称"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名前を変更"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعديل الاسم"
+          }
         }
       }
     },
-    "Ask to unmute": {
+    "roomkit_request_unmute_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -865,10 +1465,22 @@
             "state": "translated",
             "value": "请求开启音频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート解除をリクエスト"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب إلغاء كتم الصوت"
+          }
         }
       }
     },
-    "Ask to start video": {
+    "roomkit_request_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -882,10 +1494,22 @@
             "state": "translated",
             "value": "请求开启视频"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビデオ開始をリクエスト"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب بدء الفيديو"
+          }
         }
       }
     },
-    "Make host": {
+    "roomkit_transfer_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -899,10 +1523,22 @@
             "state": "translated",
             "value": "转交房主"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストを譲渡"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقل المضيف"
+          }
         }
       }
     },
-    "Set as administrator": {
+    "roomkit_set_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -916,10 +1552,22 @@
             "state": "translated",
             "value": "设为管理员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理者に設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كمسؤول"
+          }
         }
       }
     },
-    "Undo administrator": {
+    "roomkit_revoke_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -933,10 +1581,22 @@
             "state": "translated",
             "value": "撤销管理员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理者を解除"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء المسؤول"
+          }
         }
       }
     },
-    "Mute message": {
+    "roomkit_mute_text_chat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -950,10 +1610,22 @@
             "state": "translated",
             "value": "禁言"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メッセージ禁止"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم الرسائل"
+          }
         }
       }
     },
-    "Unmute message": {
+    "roomkit_unmute_text_chat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -967,10 +1639,22 @@
             "state": "translated",
             "value": "解除禁言"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メッセージ許可"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء كتم الرسائل"
+          }
         }
       }
     },
-    "Remove": {
+    "roomkit_remove_member": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -984,10 +1668,22 @@
             "state": "translated",
             "value": "踢出房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "削除"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إزالة"
+          }
         }
       }
     },
-    "Transfer the host to xxx": {
+    "roomkit_msg_transfer_owner_to": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1001,10 +1697,22 @@
             "state": "translated",
             "value": "将房主转交给xxx"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストをxxxに譲渡"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقل المضيف إلى xxx"
+          }
         }
       }
     },
-    "After transfer the host you will become a general user": {
+    "roomkit_msg_transfer_owner_tip": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1018,10 +1726,22 @@
             "state": "translated",
             "value": "转交房主后将成为普通成员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストを譲渡すると一般ユーザーになります"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد نقل المضيف ستصبح مستخدماً عادياً"
+          }
         }
       }
     },
-    "Confirm transfer": {
+    "roomkit_confirm_transfer": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1035,10 +1755,22 @@
             "state": "translated",
             "value": "确认转交"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "譲渡を確認"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تأكيد النقل"
+          }
         }
       }
     },
-    "You are now a host": {
+    "roomkit_toast_you_are_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1052,10 +1784,22 @@
             "state": "translated",
             "value": "您已成为房主"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたはホストになりました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت الآن مضيف"
+          }
         }
       }
     },
-    "The host has been transferred to xxx": {
+    "roomkit_toast_owner_transferred": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1069,10 +1813,22 @@
             "state": "translated",
             "value": "已将房主转交给xxx"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストがxxxに譲渡されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم نقل المضيف إلى xxx"
+          }
         }
       }
     },
-    "You have become a conference admin": {
+    "roomkit_toast_you_are_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1086,10 +1842,22 @@
             "state": "translated",
             "value": "您已成为管理员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたは管理者になりました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لقد أصبحت مسؤول المؤتمر"
+          }
         }
       }
     },
-    "xxx has been set as conference admin": {
+    "roomkit_toast_admin_set": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1103,10 +1871,22 @@
             "state": "translated",
             "value": "已将xxx设为管理员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxを管理者に設定しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعيين xxx كمسؤول المؤتمر"
+          }
         }
       }
     },
-    "The conference admin status of xxx has been withdrawn": {
+    "roomkit_toast_admin_revoked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1120,10 +1900,22 @@
             "state": "translated",
             "value": "已将xxx的管理员身份撤回"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxの管理者権限を取り消しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم سحب صلاحية مسؤول المؤتمر من xxx"
+          }
         }
       }
     },
-    "Your conference admin status has been revoked": {
+    "roomkit_toast_you_are_no_longer_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1137,10 +1929,22 @@
             "state": "translated",
             "value": "您的管理员身份被收回"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたの管理者権限が取り消されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إلغاء صلاحية مسؤول المؤتمر الخاصة بك"
+          }
         }
       }
     },
-    "Room ID copied": {
+    "roomkit_toast_room_id_copied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1154,10 +1958,22 @@
             "state": "translated",
             "value": "房间号已复制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDをコピーしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم نسخ معرف الغرفة"
+          }
         }
       }
     },
-    "Room link copied": {
+    "roomkit_toast_room_link_copied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1171,10 +1987,22 @@
             "state": "translated",
             "value": "房间链接已复制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームリンクをコピーしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم نسخ رابط الغرفة"
+          }
         }
       }
     },
-    "Room information copied successfully": {
+    "roomkit_toast_room_info_copied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1188,10 +2016,22 @@
             "state": "translated",
             "value": "房间信息复制成功"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム情報をコピーしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم نسخ معلومات الغرفة بنجاح"
+          }
         }
       }
     },
-    "Leave room": {
+    "roomkit_leave_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1205,10 +2045,22 @@
             "state": "translated",
             "value": "离开房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームを退出"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مغادرة الغرفة"
+          }
         }
       }
     },
-    "End room": {
+    "roomkit_end_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1222,10 +2074,22 @@
             "state": "translated",
             "value": "结束房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームを終了"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء الغرفة"
+          }
         }
       }
     },
-    "Room ended": {
+    "roomkit_toast_room_ended": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1239,10 +2103,22 @@
             "state": "translated",
             "value": "房间已结束"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームが終了しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت الغرفة"
+          }
         }
       }
     },
-    "Are you sure you want to leave the room": {
+    "roomkit_confirm_leave_room_by_genera_user": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1256,10 +2132,22 @@
             "state": "translated",
             "value": "您确定要离开房间吗"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームを退出してもよろしいですか"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد مغادرة الغرفة"
+          }
         }
       }
     },
-    "If you don't want to end the conference, please assign a new host before leaving the conference": {
+    "roomkit_confirm_leave_room_by_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1273,10 +2161,22 @@
             "state": "translated",
             "value": "如果您不想结束房间，请在离开房间前指定新的主持人"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会議を終了したくない場合は、退出前に新しいホストを指定してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إذا كنت لا تريد إنهاء المؤتمر، يرجى تعيين مضيف جديد قبل المغادرة"
+          }
         }
       }
     },
-    "Do you want to move xxx out of the room?": {
+    "roomkit_confirm_remove_member": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1290,10 +2190,22 @@
             "state": "translated",
             "value": "是否将xxx移除房间？"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxをルームから削除しますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل تريد إزالة xxx من الغرفة؟"
+          }
         }
       }
     },
-    "OK": {
+    "roomkit_ok": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1307,10 +2219,22 @@
             "state": "translated",
             "value": "确定"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موافق"
+          }
         }
       }
     },
-    "The room was closed.": {
+    "roomkit_toast_room_closed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1324,10 +2248,22 @@
             "state": "translated",
             "value": "房间已被销毁"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームが閉じられました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إغلاق الغرفة."
+          }
         }
       }
     },
-    "You were removed by the host.": {
+    "roomkit_toast_you_were_removed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1341,10 +2277,22 @@
             "state": "translated",
             "value": "你已经被主持人移除"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストによって削除されました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمت إزالتك بواسطة المضيف."
+          }
         }
       }
     },
-    "The audience has been invited to open the audio": {
+    "roomkit_toast_audio_invite_sent": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1358,10 +2306,22 @@
             "state": "translated",
             "value": "已向观众发出开启音频邀请"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "視聴者にオーディオ開始の招待を送信しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمت دعوة الجمهور لتشغيل الصوت"
+          }
         }
       }
     },
-    "The audience has been invited to open the video": {
+    "roomkit_toast_video_invite_sent": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1375,10 +2335,22 @@
             "state": "translated",
             "value": "已向观众发出开启视频邀请"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "視聴者にビデオ開始の招待を送信しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمت دعوة الجمهور لتشغيل الفيديو"
+          }
         }
       }
     },
-    "You have been banned from text chat": {
+    "roomkit_toast_text_chat_disabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1392,10 +2364,22 @@
             "state": "translated",
             "value": "您已被禁止文字聊天"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストチャットが禁止されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم حظرك من الدردشة النصية"
+          }
         }
       }
     },
-    "You are allowed to text chat": {
+    "roomkit_toast_text_chat_enabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1409,10 +2393,22 @@
             "state": "translated",
             "value": "您已被允许文字聊天"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テキストチャットが許可されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُسمح لك بالدردشة النصية"
+          }
         }
       }
     },
-    "xxx invites you to turn on the microphone": {
+    "roomkit_msg_invite_unmute_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1426,10 +2422,22 @@
             "state": "translated",
             "value": "xxx邀请您开启语音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxがマイクをオンにするよう招待しています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx يدعوك لتشغيل الميكروفون"
+          }
         }
       }
     },
-    "xxx invites you to turn on the camera": {
+    "roomkit_msg_invite_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1443,10 +2451,22 @@
             "state": "translated",
             "value": "xxx邀请您开启视频画面"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxがカメラをオンにするよう招待しています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx يدعوك لتشغيل الكاميرا"
+          }
         }
       }
     },
-    "Agree": {
+    "roomkit_agree": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1460,10 +2480,22 @@
             "state": "translated",
             "value": "同意"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موافق"
+          }
         }
       }
     },
-    "Reject": {
+    "roomkit_reject": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1477,10 +2509,22 @@
             "state": "translated",
             "value": "拒绝"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒否"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رفض"
+          }
         }
       }
     },
-    "You were closed camera by the host.": {
+    "roomkit_toast_camera_closed_by_host": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1494,10 +2538,22 @@
             "state": "translated",
             "value": "您已被关闭摄像头"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストによってカメラがオフにされました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إيقاف الكاميرا بواسطة المضيف."
+          }
         }
       }
     },
-    "You were muted by the host.": {
+    "roomkit_toast_muted_by_host": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1511,10 +2567,22 @@
             "state": "translated",
             "value": "您已被静音"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホストによってミュートされました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوتك بواسطة المضيف."
+          }
         }
       }
     },
-    "Enter nickname": {
+    "roomkit_enter_nickname": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1528,10 +2596,22 @@
             "state": "translated",
             "value": "请输入昵称"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ニックネームを入力してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أدخل الاسم المستعار"
+          }
         }
       }
     },
-    "All on mute audio unable to turn on microphone": {
+    "roomkit_tip_all_muted_cannot_unmute": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1545,10 +2625,22 @@
             "state": "translated",
             "value": "全员静音中，无法开启麦克风"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ミュート中のため、マイクをオンにできません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الجميع في وضع كتم الصوت، لا يمكن تشغيل الميكروفون"
+          }
         }
       }
     },
-    "All on mute video unable to turn on camera": {
+    "roomkit_tip_all_video_off_cannot_start": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1562,10 +2654,22 @@
             "state": "translated",
             "value": "全员禁画中，无法开启摄像头"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全員ビデオ禁止中のため、カメラをオンにできません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الجميع في وضع كتم الفيديو، لا يمكن تشغيل الكاميرا"
+          }
         }
       }
     },
-    "Room name": {
+    "roomkit_room_name": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1579,10 +2683,22 @@
             "state": "translated",
             "value": "房间名称"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム名"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسم الغرفة"
+          }
         }
       }
     },
-    "Operation successful": {
+    "roomkit_err_0_success": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1596,10 +2712,22 @@
             "state": "translated",
             "value": "操作成功"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作が成功しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمت العملية بنجاح"
+          }
         }
       }
     },
-    "Temporarily unclassified general error": {
+    "roomkit_err_general": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1613,10 +2741,22 @@
             "state": "translated",
             "value": "暂未归类的通用错误"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未分類の一般エラー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ عام غير مصنف مؤقتاً"
+          }
         }
       }
     },
-    "Request rate limited, please try again later": {
+    "roomkit_err_n2_request_rate_limited": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1630,10 +2770,51 @@
             "state": "translated",
             "value": "请求被限频，请稍后重试"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リクエストが制限されています。後でもう一度お試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تحديد معدل الطلبات، يرجى المحاولة لاحقاً"
+          }
         }
       }
     },
-    "You have been muted in the current room": {
+    "roomkit_err_7008_request_rate_limited": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request rate limited, please try again later"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求被限频，请稍后重试"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リクエストが制限されています。後でもう一度お試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تحديد معدل الطلبات، يرجى المحاولة لاحقاً"
+          }
+        }
+      }
+    },
+    "roomkit_err_10017_muted_in_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1647,10 +2828,22 @@
             "state": "translated",
             "value": "当前房间内，您已被禁言"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のルームでミュートされています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوتك في الغرفة الحالية"
+          }
         }
       }
     },
-    "Sensitive words are detected, please modify it and try again": {
+    "roomkit_err_7015_sensitive_words": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1664,10 +2857,22 @@
             "state": "translated",
             "value": "检测到敏感词，请修改后重试"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不適切な言葉が検出されました。修正してもう一度お試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم اكتشاف كلمات حساسة، يرجى التعديل والمحاولة مرة أخرى"
+          }
         }
       }
     },
-    "The content is too long, please reduce the content and try again": {
+    "roomkit_err_9522_content_too_long": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1681,10 +2886,22 @@
             "state": "translated",
             "value": "内容太长，请缩减内容后再试"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内容が長すぎます。内容を短くしてもう一度お試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المحتوى طويل جداً، يرجى تقليل المحتوى والمحاولة مرة أخرى"
+          }
         }
       }
     },
-    "The network is abnormal, please try again later": {
+    "roomkit_err_network_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1698,10 +2915,22 @@
             "state": "translated",
             "value": "网络异常，请稍后再试"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネットワークエラーです。後でもう一度お試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الشبكة غير طبيعية، يرجى المحاولة لاحقاً"
+          }
         }
       }
     },
-    "Repeat operation": {
+    "roomkit_err_n3_repeat_operation": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1715,10 +2944,22 @@
             "state": "translated",
             "value": "重复操作"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重複操作"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عملية مكررة"
+          }
         }
       }
     },
-    "Room ID does not match, please check if you have checked out or changed rooms.": {
+    "roomkit_err_n4_roomID_not_match": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1732,10 +2973,22 @@
             "state": "translated",
             "value": "房间 ID 不匹配，请检查是否退房或者切换了房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDが一致しません。退出または切り替えを確認してください。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة غير متطابق، يرجى التحقق مما إذا كنت قد غادرت أو غيرت الغرف."
+          }
         }
       }
     },
-    "Not found sdkappid, please confirm application info in trtc console": {
+    "roomkit_err_n1000_sdk_appid_not_found": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1749,10 +3002,22 @@
             "state": "translated",
             "value": "未找到 SDKAppID，请在 腾讯云视立方 SDK 控制台 确认应用信息"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SDKAppIDが見つかりません。TRTCコンソールでアプリ情報を確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يتم العثور على SDKAppID، يرجى تأكيد معلومات التطبيق في وحدة تحكم TRTC"
+          }
         }
       }
     },
-    "Passing illegal parameters when calling api, check if the parameters are legal": {
+    "roomkit_err_n1001_invalid_parameter": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1766,10 +3031,22 @@
             "state": "translated",
             "value": "调用 API 时，传入的参数不合法，检查入参是否合法"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "APIを呼び出す際のパラメータが不正です。パラメータを確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمرير معلمات غير قانونية عند استدعاء API، تحقق من صحة المعلمات"
+          }
         }
       }
     },
-    "Not logged in, please call login api": {
+    "roomkit_err_n1002_not_logged_in": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1783,10 +3060,22 @@
             "state": "translated",
             "value": "未登录,请调用 Login 接口"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ログインしていません。ログインAPIを呼び出してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يتم تسجيل الدخول، يرجى استدعاء API تسجيل الدخول"
+          }
         }
       }
     },
-    "Failed to obtain permission, unauthorized audio/video permission, please check if device permission is enabled": {
+    "roomkit_err_n1003_permission_denied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1800,10 +3089,22 @@
             "state": "translated",
             "value": "获取权限失败，当前未授权音/视频权限，请查看是否开启设备权限"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "権限の取得に失敗しました。デバイスの権限が有効か確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل الحصول على الإذن، تحقق من تفعيل أذونات الجهاز"
+          }
         }
       }
     },
-    "This feature requires an additional package. please activate the corresponding package as needed in the trtc console": {
+    "roomkit_err_n1004_package_required": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1817,10 +3118,22 @@
             "state": "translated",
             "value": "该功能需要开通额外的套餐，请在 腾讯云视立方 SDK 控制台 按需开通对应套餐"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この機能には追加パッケージが必要です。TRTCコンソールで必要なパッケージを有効にしてください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتطلب هذه الميزة باقة إضافية. يرجى تفعيل الباقة المناسبة في وحدة تحكم TRTC"
+          }
         }
       }
     },
-    "License is invalid or expired, please check its validity period in the trtc console. please activate the corresponding package as needed in the trtc console.": {
+    "roomkit_err_n1005_invalid_license": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1834,10 +3147,22 @@
             "state": "translated",
             "value": "License无效或已过期，请在 腾讯云视立方 SDK控制台确认License有效期"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライセンスが無効または期限切れです。TRTCコンソールで有効期限を確認してください。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الترخيص غير صالح أو منتهي الصلاحية، يرجى التحقق من صلاحيته في وحدة تحكم TRTC."
+          }
         }
       }
     },
-    "System issue, failed to open camera. check if camera device is normal": {
+    "roomkit_err_n1100_camera_open_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1851,10 +3176,22 @@
             "state": "translated",
             "value": "系统问题，打开摄像头失败。检查摄像头设备是否正常"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムの問題でカメラを開けませんでした。カメラデバイスを確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشكلة في النظام، فشل فتح الكاميرا. تحقق من جهاز الكاميرا"
+          }
         }
       }
     },
-    "Camera has no system authorization, check system authorization": {
+    "roomkit_err_n1101_camera_no_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1868,10 +3205,22 @@
             "state": "translated",
             "value": "摄像头没有系统授权, 检查系统授权"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラにシステム権限がありません。システム権限を確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الكاميرا ليس لديها إذن النظام، تحقق من إذن النظام"
+          }
         }
       }
     },
-    "Camera is occupied, check if other process is using camera": {
+    "roomkit_err_n1102_camera_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1885,10 +3234,22 @@
             "state": "translated",
             "value": "摄像头被占用，检查是否有其他进程使用摄像头"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラが使用中です。他のプロセスがカメラを使用していないか確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الكاميرا مشغولة، تحقق مما إذا كانت عملية أخرى تستخدم الكاميرا"
+          }
         }
       }
     },
-    "No camera device currently, please insert camera device to solve the problem": {
+    "roomkit_err_n1103_camera_not_found": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1902,10 +3263,22 @@
             "state": "translated",
             "value": "当前无摄像头设备，请插入摄像头设备解决该问题"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラデバイスがありません。カメラデバイスを接続してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد جهاز كاميرا حالياً، يرجى توصيل جهاز كاميرا"
+          }
         }
       }
     },
-    "System issue, failed to open mic. check if mic device is normal": {
+    "roomkit_err_n1104_mic_open_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1919,10 +3292,22 @@
             "state": "translated",
             "value": "系统问题，打开麦克风失败。检查麦克风设备是否正常"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムの問題でマイクを開けませんでした。マイクデバイスを確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشكلة في النظام، فشل فتح الميكروفون. تحقق من جهاز الميكروفون"
+          }
         }
       }
     },
-    "Mic has no system authorization, check system authorization": {
+    "roomkit_err_n1105_mic_no_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1936,10 +3321,22 @@
             "state": "translated",
             "value": "麦克风没有系统授权，检查系统授权"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイクにシステム権限がありません。システム権限を確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الميكروفون ليس لديه إذن النظام، تحقق من إذن النظام"
+          }
         }
       }
     },
-    "Mic is occupied": {
+    "roomkit_err_n1106_mic_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1953,10 +3350,22 @@
             "state": "translated",
             "value": "麦克风被占用"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイクが使用中です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الميكروفون مشغول"
+          }
         }
       }
     },
-    "No mic device currently": {
+    "roomkit_err_n1107_mic_not_found": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1970,10 +3379,22 @@
             "state": "translated",
             "value": "当前无麦克风设备"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイクデバイスがありません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد جهاز ميكروفون حالياً"
+          }
         }
       }
     },
-    "Failed to get screen sharing source (screen and window), check screen recording permissions": {
+    "roomkit_err_n1108_screen_share_get_source_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1987,10 +3408,22 @@
             "state": "translated",
             "value": "获取屏幕分享源（屏幕和窗口）失败，检查屏幕录制权限"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有ソースの取得に失敗しました。画面録画の権限を確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل الحصول على مصدر مشاركة الشاشة، تحقق من أذونات تسجيل الشاشة"
+          }
         }
       }
     },
-    "Failed to enable screen sharing, check if someone is already screen sharing in the room": {
+    "roomkit_err_n1109_screen_share_start_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2004,10 +3437,22 @@
             "state": "translated",
             "value": "开启屏幕分享失败，检查房间内是否有人正在屏幕分享"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有の開始に失敗しました。他の人が画面共有中か確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل تفعيل مشاركة الشاشة، تحقق مما إذا كان شخص آخر يشارك الشاشة"
+          }
         }
       }
     },
-    "This feature can only be used after entering the room": {
+    "roomkit_err_n2101_not_in_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2021,10 +3466,22 @@
             "state": "translated",
             "value": "需要进房后才可使用此功能"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この機能はルームに入室後のみ使用できます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يمكن استخدام هذه الميزة فقط بعد دخول الغرفة"
+          }
         }
       }
     },
-    "Room owner does not support leaving the room, room owner can only close the room": {
+    "roomkit_err_n2102_owner_cannot_leave": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2038,10 +3495,22 @@
             "state": "translated",
             "value": "房主不支持退房操作，房主只能解散房间"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーナーは退出できません。ルームを閉じることのみ可能です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صاحب الغرفة لا يدعم مغادرة الغرفة، يمكنه فقط إغلاق الغرفة"
+          }
         }
       }
     },
-    "This operation is not supported in the current room type": {
+    "roomkit_err_n2103_unsupported_in_room_type": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2055,10 +3524,22 @@
             "state": "translated",
             "value": "当前房间类型下不支持该操作"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のルームタイプではこの操作はサポートされていません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذه العملية غير مدعومة في نوع الغرفة الحالي"
+          }
         }
       }
     },
-    "Illegal custom room id, must be printable ascii characters (0x20–0x7e), up to 48 bytes long": {
+    "roomkit_err_n2105_invalid_room_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2072,10 +3553,22 @@
             "state": "translated",
             "value": "创建房间 ID 非法，自定义 ID 必须为可打印 ASCII 字符（0x20–0x7e），最长48个字节"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDが不正です。印刷可能なASCII文字（0x20-0x7e）で最大48バイトである必要があります"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة المخصص غير قانوني، يجب أن يكون أحرف ASCII قابلة للطباعة، بحد أقصى 48 بايت"
+          }
         }
       }
     },
-    "Illegal room name, maximum 30 bytes, must be utf-8 encoding if contains chinese characters": {
+    "roomkit_err_n2107_invalid_room_name": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2089,10 +3582,22 @@
             "state": "translated",
             "value": "房间名称非法，名称最长30字节，字符编码必须是 UTF-8 ，如果包含中文"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム名が不正です。最大30バイトで、UTF-8エンコーディングである必要があります"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسم الغرفة غير قانوني، بحد أقصى 30 بايت، يجب أن يكون بترميز UTF-8"
+          }
         }
       }
     },
-    "User is already in another room, single roomengine instance only supports user entering one room, to enter different room, please leave the room or use new roomengine instance": {
+    "roomkit_err_n2108_user_already_in_other_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2106,10 +3611,22 @@
             "state": "translated",
             "value": "当前用户已在别的房间内，单个 roomEngine 实例只支持用户进入一个房间，如果要进入不同的房间请先退房或者使用新的 roomEngine 实例"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ユーザーは既に別のルームにいます。別のルームに入るには、まず退出するか新しいインスタンスを使用してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم موجود بالفعل في غرفة أخرى، للدخول إلى غرفة مختلفة، يرجى مغادرة الغرفة أو استخدام مثيل جديد"
+          }
         }
       }
     },
-    "User is not exist": {
+    "roomkit_err_n2200_user_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2123,10 +3640,22 @@
             "state": "translated",
             "value": "用户不存在"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ユーザーが存在しません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم غير موجود"
+          }
         }
       }
     },
-    "Room owner permission required for operation": {
+    "roomkit_err_n2300_need_owner_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2140,10 +3669,22 @@
             "state": "translated",
             "value": "需要房主权限才能操作"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この操作にはオーナー権限が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطلوب إذن صاحب الغرفة للعملية"
+          }
         }
       }
     },
-    "Room owner or administrator permission required for operation": {
+    "roomkit_err_n2301_need_admin_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2157,10 +3698,22 @@
             "state": "translated",
             "value": "需要房主或者管理员权限才能操作"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この操作にはオーナーまたは管理者権限が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطلوب إذن صاحب الغرفة أو المسؤول للعملية"
+          }
         }
       }
     },
-    "No permission for signaling request, e.g. canceling an invite not initiated by yourself": {
+    "roomkit_err_n2310_signal_no_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2174,10 +3727,22 @@
             "state": "translated",
             "value": "信令请求无权限，例如取消非自己发起的邀请"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シグナリングリクエストの権限がありません。例：自分が開始していない招待のキャンセル"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد إذن لطلب الإشارة، مثل إلغاء دعوة لم تبدأها بنفسك"
+          }
         }
       }
     },
-    "Signaling request id is invalid or has been processed": {
+    "roomkit_err_n2311_signal_invalid_request_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2191,10 +3756,22 @@
             "state": "translated",
             "value": "信令请求 ID 无效或已经被处理过"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シグナリングリクエストIDが無効または既に処理済みです"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف طلب الإشارة غير صالح أو تمت معالجته"
+          }
         }
       }
     },
-    "Signal request repetition": {
+    "roomkit_err_n2312_signal_request_duplicated": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2208,10 +3785,22 @@
             "state": "translated",
             "value": "信令请求重复"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シグナリングリクエストが重複しています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تكرار طلب الإشارة"
+          }
         }
       }
     },
-    "Maximum seat exceeds package quantity limit": {
+    "roomkit_err_n2340_seat_count_limit_exceeded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2225,10 +3814,22 @@
             "state": "translated",
             "value": "最大麦位超出套餐包数量限制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最大席数がパッケージ数量制限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الحد الأقصى للمقاعد يتجاوز حد الباقة"
+          }
         }
       }
     },
-    "Seat serial number does not exist": {
+    "roomkit_err_n2344_seat_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2242,10 +3843,22 @@
             "state": "translated",
             "value": "麦位编号不存在"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "席番号が存在しません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رقم المقعد التسلسلي غير موجود"
+          }
         }
       }
     },
-    "Current seat audio is locked": {
+    "roomkit_err_n2360_seat_audio_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2259,10 +3872,22 @@
             "state": "translated",
             "value": "当前麦位音频被锁"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の席のオーディオがロックされています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت المقعد الحالي مقفل"
+          }
         }
       }
     },
-    "Need to apply to room owner or administrator to open mic": {
+    "roomkit_err_n2361_mic_need_request_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2276,10 +3901,22 @@
             "state": "translated",
             "value": "需要向房主或管理员申请后打开麦克风"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マイクを開くにはオーナーまたは管理者に申請が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب التقدم لصاحب الغرفة أو المسؤول لفتح الميكروفون"
+          }
         }
       }
     },
-    "Current seat video is locked, need room owner to unlock mic seat before opening camera": {
+    "roomkit_err_n2370_seat_video_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2293,10 +3930,22 @@
             "state": "translated",
             "value": "当前麦位视频被锁, 需要由房主解锁麦位后，才能打开摄像头"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の席のビデオがロックされています。カメラを開くにはオーナーによる解除が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو المقعد الحالي مقفل، يحتاج صاحب الغرفة لفتح القفل قبل تشغيل الكاميرا"
+          }
         }
       }
     },
-    "Need to apply to room owner or administrator to open camera": {
+    "roomkit_err_n2371_camera_need_request_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2310,10 +3959,22 @@
             "state": "translated",
             "value": "需要向房主或管理员申请后打开摄像头"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カメラを開くにはオーナーまたは管理者に申請が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب التقدم لصاحب الغرفة أو المسؤول لفتح الكاميرا"
+          }
         }
       }
     },
-    "The current microphone position video is locked and needs to be unlocked by the room owner before screen sharing can be enabled": {
+    "roomkit_err_n2372_screen_share_seat_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2327,10 +3988,22 @@
             "state": "translated",
             "value": "当前麦位视频被锁, 需要由房主解锁麦位后，才能打开屏幕分享"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の席のビデオがロックされています。画面共有を開くにはオーナーによる解除が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو موضع الميكروفون الحالي مقفل ويحتاج لفتح القفل من صاحب الغرفة قبل تفعيل مشاركة الشاشة"
+          }
         }
       }
     },
-    "Screen sharing needs to be enabled after applying to the room owner or administrator": {
+    "roomkit_err_n2373_screen_share_need_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2344,10 +4017,22 @@
             "state": "translated",
             "value": "需要向房主或管理员申请后打开屏幕分享"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有を開くにはオーナーまたは管理者に申請が必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب تفعيل مشاركة الشاشة بعد التقدم لصاحب الغرفة أو المسؤول"
+          }
         }
       }
     },
-    "All members muted in the current room": {
+    "roomkit_err_n2380_all_members_muted": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2361,10 +4046,22 @@
             "state": "translated",
             "value": "当前房间已开启全员禁言"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のルームで全員ミュートが有効です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوت جميع الأعضاء في الغرفة الحالية"
+          }
         }
       }
     },
-    "The current room does not support preloading": {
+    "roomkit_err_n4001_room_not_support_preload": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2378,10 +4075,22 @@
             "state": "translated",
             "value": "当前房间不支持预加载"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在のルームはプリロードをサポートしていません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة الحالية لا تدعم التحميل المسبق"
+          }
         }
       }
     },
-    "The device operation failed while in a call": {
+    "roomkit_err_n6001_device_busy_during_call": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2395,10 +4104,22 @@
             "state": "translated",
             "value": "正在通话中，设备操作失败"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通話中のため、デバイス操作に失敗しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشلت عملية الجهاز أثناء المكالمة"
+          }
         }
       }
     },
-    "Server internal error, please retry": {
+    "roomkit_err_100001_server_internal_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2412,10 +4133,22 @@
             "state": "translated",
             "value": "服务器内部错误，请重试"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サーバー内部エラーです。再試行してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ داخلي في الخادم، يرجى إعادة المحاولة"
+          }
         }
       }
     },
-    "The parameter is illegal. check whether the request is correct according to the error description": {
+    "roomkit_err_100002_server_invalid_parameter": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2429,10 +4162,22 @@
             "state": "translated",
             "value": "请参数非法，请根据错误描述检查请求是否正确"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パラメータが不正です。エラーの説明に従ってリクエストを確認してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المعلمة غير قانونية. تحقق مما إذا كان الطلب صحيحاً وفقاً لوصف الخطأ"
+          }
         }
       }
     },
-    "The room id already exists. please select another room id": {
+    "roomkit_err_100003_room_id_already_exists": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2446,10 +4191,22 @@
             "state": "translated",
             "value": "房间ID 已被使用，请选择别的房间ID"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDは既に使用されています。別のルームIDを選択してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة موجود بالفعل. يرجى اختيار معرف آخر"
+          }
         }
       }
     },
-    "The room does not exist, or it once existed but has now been dissolved": {
+    "roomkit_err_100004_room_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2463,10 +4220,22 @@
             "state": "translated",
             "value": "房间不存在，或者曾经存在过，但是目前已经被解散"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームが存在しないか、既に解散されています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة غير موجودة، أو كانت موجودة ولكن تم حلها"
+          }
         }
       }
     },
-    "Not a room member": {
+    "roomkit_err_100005_not_room_member": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2480,10 +4249,22 @@
             "state": "translated",
             "value": "非房间成员"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームメンバーではありません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس عضواً في الغرفة"
+          }
         }
       }
     },
-    "You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)": {
+    "roomkit_err_100006_operation_not_allowed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2497,10 +4278,22 @@
             "state": "translated",
             "value": "您当前无法执行此操作（可能是无权限，或受场景限制等原因）"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この操作を実行できません（権限がないか、シナリオ制限のため）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكنك حالياً تنفيذ هذه العملية (ربما بسبب نقص الإذن أو قيود السيناريو)"
+          }
         }
       }
     },
-    "No payment information, you need to purchase a package in the console": {
+    "roomkit_err_100007_no_payment_info": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2514,10 +4307,22 @@
             "state": "translated",
             "value": "无付费信息，需在控制台购买套餐包"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支払い情報がありません。コンソールでパッケージを購入してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد معلومات دفع، تحتاج لشراء باقة في وحدة التحكم"
+          }
         }
       }
     },
-    "The room is full": {
+    "roomkit_err_100008_room_is_full": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2531,10 +4336,22 @@
             "state": "translated",
             "value": "房间成员已满"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームが満員です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة ممتلئة"
+          }
         }
       }
     },
-    "Tag quantity exceeds upper limit": {
+    "roomkit_err_100009_room_tag_limit_exceeded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2548,10 +4365,22 @@
             "state": "translated",
             "value": "标签数量超上限"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タグ数が上限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد العلامات يتجاوز الحد الأعلى"
+          }
         }
       }
     },
-    "The room id has been used, and the operator is the room owner, it can be used directly": {
+    "roomkit_err_100010_room_id_reusable_by_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2565,10 +4394,22 @@
             "state": "translated",
             "value": "房间 ID 已被使用，并且操作者为房主，可以直接使用"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDは既に使用されており、操作者がオーナーの場合は直接使用できます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم استخدام معرف الغرفة، والمشغل هو صاحب الغرفة، يمكن استخدامه مباشرة"
+          }
         }
       }
     },
-    "The room id has been occupied by chat. you can use a different room id or dissolve the group first": {
+    "roomkit_err_100011_room_id_occupied_by_im": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2582,10 +4423,22 @@
             "state": "translated",
             "value": "房间 ID 已被 IM 占用，可以换一个房间 ID 使用，或者先通过 IM 接口解散该群"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームIDはIMに使用されています。別のルームIDを使用するか、グループを解散してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة مشغول بواسطة الدردشة. يمكنك استخدام معرف مختلف أو حل المجموعة أولاً"
+          }
         }
       }
     },
-    "Creating rooms exceeds the frequency limit, the same room id can only be created once within 1 second": {
+    "roomkit_err_100012_create_room_frequency_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2599,10 +4452,22 @@
             "state": "translated",
             "value": "频率超过限制，例如创建房间超过频率超限，同一房间 ID， 1秒内只能创建一次"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム作成の頻度制限を超えています。同じルームIDは1秒に1回のみ作成可能です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز إنشاء الغرف حد التردد، يمكن إنشاء نفس معرف الغرفة مرة واحدة فقط في الثانية"
+          }
         }
       }
     },
-    "Exceeds the upper limit, for example, the number of microphone seats, the number of pk match rooms, etc., exceeds the payment limit": {
+    "roomkit_err_100013_payment_limit_exceeded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2616,10 +4481,22 @@
             "state": "translated",
             "value": "超过付费上限，例如麦位数，pk场次房间数量等超过付费限制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支払い上限を超えています。例：席数、PKマッチルーム数などが支払い制限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز الحد الأعلى، مثل عدد المقاعد وعدد غرف مباريات PK وما إلى ذلك"
+          }
         }
       }
     },
-    "Invalid room type": {
+    "roomkit_err_100015_invalid_room_type": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2633,10 +4510,22 @@
             "state": "translated",
             "value": "无效的房间类型"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無効なルームタイプ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نوع غرفة غير صالح"
+          }
         }
       }
     },
-    "This member has been banned": {
+    "roomkit_err_100016_member_already_banned": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2650,10 +4539,22 @@
             "state": "translated",
             "value": "该成员已经被封禁"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このメンバーは既にBANされています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم حظر هذا العضو"
+          }
         }
       }
     },
-    "This member has been muted": {
+    "roomkit_err_100017_member_already_muted": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2667,10 +4568,22 @@
             "state": "translated",
             "value": "该成员已经被禁言"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このメンバーは既にミュートされています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوت هذا العضو"
+          }
         }
       }
     },
-    "The current room requires a password for entry": {
+    "roomkit_err_100018_room_password_required": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2684,10 +4597,22 @@
             "state": "translated",
             "value": "当前房间需要密码才能进入"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このルームに入るにはパスワードが必要です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة الحالية تتطلب كلمة مرور للدخول"
+          }
         }
       }
     },
-    "Room entry password error": {
+    "roomkit_err_100019_room_password_incorrect": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2701,10 +4626,22 @@
             "state": "translated",
             "value": "进房密码错误"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルーム入室パスワードが間違っています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ في كلمة مرور دخول الغرفة"
+          }
         }
       }
     },
-    "The admin quantity exceeds the upper limit": {
+    "roomkit_err_100020_admin_limit_exceeded": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2718,10 +4655,22 @@
             "state": "translated",
             "value": "管理员数量超过上限"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理者数が上限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد المسؤولين يتجاوز الحد الأعلى"
+          }
         }
       }
     },
-    "Signal request conflict": {
+    "roomkit_err_100102_signal_request_conflict": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2735,10 +4684,22 @@
             "state": "translated",
             "value": "信令请求冲突"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "シグナリングリクエストの競合"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعارض طلب الإشارة"
+          }
         }
       }
     },
-    "The seat is locked. you can try another seat": {
+    "roomkit_err_100200_seat_is_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2752,10 +4713,22 @@
             "state": "translated",
             "value": "麦位已锁定，可以尝试换一个麦位"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "席がロックされています。別の席をお試しください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقعد مقفل. يمكنك تجربة مقعد آخر"
+          }
         }
       }
     },
-    "The current seat is already occupied": {
+    "roomkit_err_100201_seat_is_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2769,10 +4742,22 @@
             "state": "translated",
             "value": "当前麦位已经有人了"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在の席は既に使用されています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقعد الحالي مشغول بالفعل"
+          }
         }
       }
     },
-    "Already on the seat queue": {
+    "roomkit_err_100202_already_in_seat_queue": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2786,10 +4771,22 @@
             "state": "translated",
             "value": "已经处于排麦状态"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "既に席待ちキューにいます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجود بالفعل في قائمة انتظار المقاعد"
+          }
         }
       }
     },
-    "Already on the seat": {
+    "roomkit_err_100203_already_on_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2803,10 +4800,22 @@
             "state": "translated",
             "value": "已经处于麦上状态"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "既に席についています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجود بالفعل على المقعد"
+          }
         }
       }
     },
-    "Not on the seat queue": {
+    "roomkit_err_100204_not_in_seat_queue": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2820,10 +4829,22 @@
             "state": "translated",
             "value": "没有在排麦列表中"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "席待ちキューにいません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس في قائمة انتظار المقاعد"
+          }
         }
       }
     },
-    "The seats are all taken.": {
+    "roomkit_err_100205_all_seats_are_full": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2837,10 +4858,22 @@
             "state": "translated",
             "value": "麦位已满"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべての席が埋まっています。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جميع المقاعد مشغولة."
+          }
         }
       }
     },
-    "Not on the seat": {
+    "roomkit_err_100206_not_on_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2854,10 +4887,22 @@
             "state": "translated",
             "value": "未在麦上"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "席についていません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس على المقعد"
+          }
         }
       }
     },
-    "The user is already on the seat": {
+    "roomkit_err_100210_user_already_on_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2871,10 +4916,22 @@
             "state": "translated",
             "value": "已经有用户在麦位上"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ユーザーは既に席についています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم موجود بالفعل على المقعد"
+          }
         }
       }
     },
-    "The room does not support seat ability": {
+    "roomkit_err_100211_seat_not_supported": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2888,10 +4945,22 @@
             "state": "translated",
             "value": "该房间不支持连麦"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このルームは席機能をサポートしていません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة لا تدعم ميزة المقاعد"
+          }
         }
       }
     },
-    "The seat list is empty": {
+    "roomkit_err_100251_seat_list_is_empty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2905,10 +4974,22 @@
             "state": "translated",
             "value": "连麦列表为空"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "席リストが空です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة المقاعد فارغة"
+          }
         }
       }
     },
-    "The number of keys in the room's metadata exceeds the limit": {
+    "roomkit_err_100500_room_metadata_key_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2922,10 +5003,22 @@
             "state": "translated",
             "value": "房间 meta 数据中的 key 数量超过上限"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームメタデータのキー数が上限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد المفاتيح في البيانات الوصفية للغرفة يتجاوز الحد"
+          }
         }
       }
     },
-    "The size of value in the room's metadata exceeds the maximum byte limit": {
+    "roomkit_err_100501_room_metadata_value_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2939,10 +5032,22 @@
             "state": "translated",
             "value": "房间 meta 数据中单个 key 对应的 val 超过最大字节数限制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームメタデータの値サイズが最大バイト制限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حجم القيمة في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "The total size of all value in the room's metadata exceeds the maximum byte limit": {
+    "roomkit_err_100502_room_metadata_total_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2956,10 +5061,22 @@
             "state": "translated",
             "value": "房间 meta数据中所有 key 对应的 val 总和超过最大字节数限制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームメタデータの全値の合計サイズが最大バイト制限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الحجم الإجمالي لجميع القيم في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "There is no valid keys when delete metadata": {
+    "roomkit_err_100503_room_metadata_no_valid_keys": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2973,10 +5090,22 @@
             "state": "translated",
             "value": "删除房间 meta 数据时候，被删除的 key 没有一个存在"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メタデータ削除時に有効なキーがありません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد مفاتيح صالحة عند حذف البيانات الوصفية"
+          }
         }
       }
     },
-    "The size of key in the room's metadata exceeds the maximum byte limit": {
+    "roomkit_err_100504_room_metadata_key_size_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2990,10 +5119,22 @@
             "state": "translated",
             "value": "房间 meta 数据中的 key 大小超过了最大字节数限制"
           }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームメタデータのキーサイズが最大バイト制限を超えています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حجم المفتاح في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "Invalid userid": {
+    "roomkit_err_7002_invalid_user_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3006,6 +5147,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "非法的userId"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無効なユーザーID"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف مستخدم غير صالح"
           }
         }
       }

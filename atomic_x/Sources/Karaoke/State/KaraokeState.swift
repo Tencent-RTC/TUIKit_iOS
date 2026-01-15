@@ -39,7 +39,7 @@ class KaraokeState {
     var averageScore: Int32 = 0
 
     var EarMonitor: Bool = false
-    var enableScore: Bool = false
+    var enableScore: Bool = true
     var publishVolume: Int = 60
     var playoutVolume: Int = 95
     var musicPitch: Float = 0.0

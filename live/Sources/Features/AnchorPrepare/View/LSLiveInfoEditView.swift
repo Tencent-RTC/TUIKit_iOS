@@ -312,9 +312,9 @@ extension LSLiveInfoEditView {
 }
 
 private extension String {
-    static let editCoverTitle = internalLocalized("Set Cover")
-    static let editPlaceholderText = internalLocalized("Please enter room name")
-    static let categoryText = internalLocalized("Live Category:xxx")
+    static let editCoverTitle = internalLocalized("common_set_cover")
+    static let editPlaceholderText = internalLocalized("live_edit_placeholder_text")
+    static let categoryText = internalLocalized("Live type:xxx")
     static let modeText = internalLocalized("Live Mode:xxx")
-    static let templateText  = internalLocalized("Template:")
+    static let templateText  = internalLocalized("common_template_select")
 }

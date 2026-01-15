@@ -62,7 +62,7 @@ class PrepareSelectionButton: UIButton {
 
     private lazy var rightIconImageView: UIImageView = {
         let view = UIImageView()
-        view.image = self.model.rightIcon
+        view.image = self.model.rightIcon?.rtlFlipped()
         return view
     }()
 }
@@ -87,8 +87,6 @@ extension PrepareSelectionButton {
         titleLab.snp.remakeConstraints { make in
             make.leading.equalTo(leftIconImageView.snp.trailing).offset(self.model.textLeftDiff)
             make.centerY.equalToSuperview()
-            make.width.equalTo(titleLab.mm_w)
-            make.height.equalTo(titleLab.mm_h)
         }
 
         rightIconImageView.snp.remakeConstraints { make in
@@ -101,12 +99,9 @@ extension PrepareSelectionButton {
 
     func updateTitleLable(text: String) {
         titleLab.text = model.midText
-        titleLab.sizeToFit()
         titleLab.snp.remakeConstraints { make in
             make.leading.equalTo(leftIconImageView.snp.trailing).offset(8)
             make.centerY.equalToSuperview()
-            make.width.equalTo(titleLab.mm_w)
-            make.height.equalTo(titleLab.mm_h)
         }
     }
     

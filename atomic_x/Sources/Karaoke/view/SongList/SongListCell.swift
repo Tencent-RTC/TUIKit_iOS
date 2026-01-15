@@ -212,11 +212,11 @@ class SongListCell: UITableViewCell {
 }
 
 fileprivate extension String {
-    static var orderedText: String = ("Ordered").localized
-    static var orderedCountText: String = ("Ordered(xxx)").localized
-    static var exitOrder: String = ("Exit Order").localized
-    static var SongText: String = ("Song").localized
-    static var originalText: String = ("Original").localized
-    static var scoreText: String = ("Score").localized
+    static var orderedText: String = ("karaoke_ordered").localized
+    static var orderedCountText: String = ("karaoke_ordered_count").localized
+    static var exitOrder: String = ("karaoke_exit_order").localized
+    static var SongText: String = ("karaoke_order_song").localized
+    static var originalText: String = ("karaoke_original").localized
+    static var scoreText: String = ("karaoke_score").localized
 }
 

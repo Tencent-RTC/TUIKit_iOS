@@ -73,16 +73,16 @@ class NetworkInfoButton: UIView {
         }
 
         wifiImageView.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(4.scale375())
+            make.leading.equalToSuperview().offset(4.scale375())
             make.centerY.equalToSuperview()
             make.width.height.equalTo(14.scale375())
         }
 
         timeLabel.snp.makeConstraints { make in
-            make.left.equalTo(wifiImageView.snp.right).offset(4.scale375())
+            make.leading.equalTo(wifiImageView.snp.trailing).offset(4.scale375())
             make.centerY.equalToSuperview()
             make.height.equalTo(16.scale375())
-            make.right.equalToSuperview().inset(2.scale375())
+            make.trailing.equalToSuperview().inset(2.scale375())
         }
     }
 

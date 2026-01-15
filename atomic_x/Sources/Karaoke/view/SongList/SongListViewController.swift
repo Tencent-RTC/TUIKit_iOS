@@ -148,6 +148,14 @@ public class SongListViewController: UIViewController {
                 vc.dismiss(animated: true)
             }
             .store(in: &cancellables)
+
+        karaokeManager.errorSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] errorMessage in
+                guard let self = self else { return }
+                self.view.showAtomicToast(text: errorMessage, style: .error)
+            }
+            .store(in: &cancellables)
     }
 
     private func constructViewHierarchy() {
@@ -321,8 +329,8 @@ extension SongListViewController: UITableViewDataSource, UITableViewDelegate{
 }
 
 fileprivate extension String {
-    static var orderedText: String = ("Ordered").localized
-    static var songText: String = ("Song").localized
-    static var orderedCountText: String = ("Ordered(xxx)").localized
-    static var exitOrder: String = ("Exit Order").localized
+    static var orderedText: String = ("karaoke_ordered").localized
+    static var songText: String = ("karaoke_order_song").localized
+    static var orderedCountText: String = ("karaoke_ordered_count").localized
+    static var exitOrder: String = ("karaoke_exit_order").localized
 }

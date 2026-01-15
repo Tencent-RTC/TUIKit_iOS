@@ -207,6 +207,6 @@ extension RoomChangeNicknameView: UITextFieldDelegate {
 }
 
 fileprivate extension String {
-    static let enterNickname = "Enter nickname".localized
-    static let okTitle = "OK".localized
+    static let enterNickname = "roomkit_enter_nickname".localized
+    static let okTitle = "roomkit_ok".localized
 }

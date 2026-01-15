@@ -624,5 +624,5 @@ extension SeatGridView {
 }
 
 fileprivate extension String {
-    static let kickOutByConnectTex = internalLocalized("The connection is successful. Users beyond the first 6 seats have been removed.")
+    static let kickOutByConnectTex = internalLocalized("common_host_kick_user_after_connect")
 }

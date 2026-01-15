@@ -110,5 +110,5 @@ class DoubleColumnWidgetView: RTCBaseView {
 }
 
 extension String {
-    static let watching = internalLocalized("xxx people viewed")
+    static let watching = internalLocalized("livelist_viewed_audience_count")
 }

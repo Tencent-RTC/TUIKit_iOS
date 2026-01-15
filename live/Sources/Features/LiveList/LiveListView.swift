@@ -466,9 +466,9 @@ extension LiveListView: LiveListViewAdapter {
 }
 
 extension String {
-    static let pullToRefreshText = internalLocalized("Pull to refresh")
-    static let releaseToRefreshText = internalLocalized("Release to refresh")
-    static let loadingText = internalLocalized("Loading...")
-    static let loadingMoreText = internalLocalized("Loading more")
-    static let noMoreDataText = internalLocalized("There is no more data")
+    static let pullToRefreshText = internalLocalized("live_room_list_pull_to_refresh")
+    static let releaseToRefreshText = internalLocalized("live_room_list_release_to_refresh")
+    static let loadingText = internalLocalized("livelist_loading")
+    static let loadingMoreText = internalLocalized("live_room_list_loading_more")
+    static let noMoreDataText = internalLocalized("livelist_no_more_data")
 }

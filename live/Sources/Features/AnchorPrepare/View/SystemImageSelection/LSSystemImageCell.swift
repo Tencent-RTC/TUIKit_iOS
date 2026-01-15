@@ -107,7 +107,7 @@ extension LSSystemImageCell {
             make.edges.equalToSuperview().inset(4.scale375())
         })
         selectedView.snp.makeConstraints { make in
-            make.centerX.equalTo(imageView.snp.right)
+            make.centerX.equalTo(imageView.snp.trailing)
             make.centerY.equalTo(imageView.snp.top)
             make.size.equalTo(CGSize(width: 50.scale375(), height: 50.scale375()))
         }

@@ -107,11 +107,11 @@ class ScoreBoardView: UIView {
     func showScoreBoard(imageURl: String, username: String, score: Int32) {
         avatarView.setContent(.url(imageURl, placeholder: UIImage.avatarPlaceholderImage))
         nameLabel.text = username
-        scoreLabel.text = String(format: "%.1f", score)
+        scoreLabel.text = String(format: "%.1f", Double(score))
     }
 }
 
 fileprivate extension String {
-    static var songingScoreText: String = ("Singing Score").localized
-    static var pointText: String = ("Points").localized
+    static var songingScoreText: String = ("karaoke_singing_score").localized
+    static var pointText: String = ("karaoke_point").localized
 }

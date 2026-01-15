@@ -12,10 +12,16 @@ public extension UIImage {
     static func liveBundleImage(_ named: String) -> UIImage? {
         return UIImage(named: named, in: Bundle.liveBundle, compatibleWith: nil) ?? UIImage(named: named)
     }
+
     static var placeholderImage: UIImage {
         UIColor.lightPurpleColor.trans2Image()
     }
+
     static var avatarPlaceholderImage: UIImage? {
         UIImage(named: "live_seat_placeholder_avatar", in: .liveBundle, compatibleWith: nil)
+    }
+
+    func rtlFlipped() -> UIImage {
+        return imageFlippedForRightToLeftLayoutDirection()
     }
 }

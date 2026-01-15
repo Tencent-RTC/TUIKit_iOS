@@ -52,15 +52,14 @@ class NetWorkInfoView: UIView {
         return view
     }()
 
-    private let bottomView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(hex: "#2B2C30")
+    private let bottomView: UIStackView = {
+        let view = UIStackView()
+        view.backgroundColor = UIColor("2B2C30")
         view.layer.cornerRadius = 10
-        return view
-    }()
-
-    private let networkStatsContainer: UIView = {
-        let view = UIView()
+        view.axis = .horizontal
+        view.distribution = .fillEqually
+        view.alignment = .center
+        view.spacing = 23.scale375()
         return view
     }()
 
@@ -169,16 +168,15 @@ class NetWorkInfoView: UIView {
         containerView.addSubview(tableView)
         containerView.addSubview(bottomView)
 
-        bottomView.addSubview(networkStatsContainer)
-        networkStatsContainer.addSubview(rttView)
+        bottomView.addArrangedSubview(rttView)
         rttView.addSubview(rttValueLabel)
         rttView.addSubview(rttTitleLabel)
 
-        networkStatsContainer.addSubview(downLossView)
+        bottomView.addArrangedSubview(downLossView)
         downLossView.addSubview(downLossValueLabel)
         downLossView.addSubview(downLossTitleLabel)
 
-        networkStatsContainer.addSubview(upLossView)
+        bottomView.addArrangedSubview(upLossView)
         upLossView.addSubview(upLossValueLabel)
         upLossView.addSubview(upLossTitleLabel)
     }
@@ -201,7 +199,6 @@ class NetWorkInfoView: UIView {
             make.height.equalTo(CGFloat(items.count) * 66.scale375())
         }
 
-
         bottomView.snp.makeConstraints { make in
             make.width.equalTo(309.scale375())
             make.height.equalTo(64.scale375())
@@ -210,15 +207,7 @@ class NetWorkInfoView: UIView {
             make.bottom.equalToSuperview().inset(20.scale375())
         }
 
-        networkStatsContainer.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.equalTo(303.scale375())
-            make.height.equalTo(48.scale375())
-        }
-
         rttView.snp.makeConstraints { make in
-            make.left.equalToSuperview()
-            make.centerY.equalToSuperview()
             make.width.equalTo(80.scale375())
             make.height.equalTo(48.scale375())
         }
@@ -236,8 +225,6 @@ class NetWorkInfoView: UIView {
         }
 
         downLossView.snp.makeConstraints { make in
-            make.left.equalTo(rttView.snp.right).offset(23.scale375())
-            make.centerY.equalToSuperview()
             make.width.equalTo(80.scale375())
             make.height.equalTo(48.scale375())
         }
@@ -255,8 +242,6 @@ class NetWorkInfoView: UIView {
         }
 
         upLossView.snp.makeConstraints { make in
-            make.left.equalTo(downLossView.snp.right).offset(23.scale375())
-            make.centerY.equalToSuperview()
             make.width.equalTo(80.scale375())
             make.height.equalTo(48.scale375())
         }
@@ -676,37 +661,34 @@ extension NetWorkInfoView: UITableViewDataSource, UITableViewDelegate {
 }
 
 fileprivate extension String {
-    static let liveInfoTitle = internalLocalized("Live Information")
-    static let roundTripDelay = internalLocalized("RTT")
-    static let downlinkLoss = internalLocalized("Down Loss")
-    static let uplinkLoss = internalLocalized("Up Loss")
-    static let longSilence = internalLocalized("Long silence detected")
-    static let audioClipping = internalLocalized("Audio clipping detected")
-    static let audioInterruption = internalLocalized("Abnormal audio interruption detected")
+    static let liveInfoTitle = internalLocalized("common_live_info")
+    static let roundTripDelay = internalLocalized("common_rtt")
+    static let downlinkLoss = internalLocalized("common_down_loss")
+    static let uplinkLoss = internalLocalized("common_up_loss")
 
-    static let normalText = internalLocalized("normal")
-    static let closeText = internalLocalized("close")
-    static let exceptionText = internalLocalized("exception")
+    static let normalText = internalLocalized("common_normal")
+    static let closeText = internalLocalized("common_close")
+    static let exceptionText = internalLocalized("common_exception")
 
-    static let excellentText = internalLocalized("excellent")
-    static let goodText = internalLocalized("good")
-    static let poorText = internalLocalized("poor")
-    static let badText = internalLocalized("bad")
-    static let verybadText = internalLocalized("veryBad")
-    static let downText = internalLocalized("down")
+    static let excellentText = internalLocalized("common_excellent")
+    static let goodText = internalLocalized("common_good")
+    static let poorText = internalLocalized("common_poor")
+    static let badText = internalLocalized("common_bad")
+    static let verybadText = internalLocalized("common_verybad")
+    static let downText = internalLocalized("common_down")
 
-    static let fairText = internalLocalized("fair")
-    static let seriousText = internalLocalized("serious")
+    static let fairText = internalLocalized("common_device_temp_fair")
+    static let seriousText = internalLocalized("common_device_temp_serious")
 
-    static let AudioQualityDefault = internalLocalized("Default")
-    static let AudioQualitySpeech = internalLocalized("Speech")
-    static let AudioQualityMusic = internalLocalized("Music")
+    static let AudioQualityDefault = internalLocalized("common_audio_mode_default")
+    static let AudioQualitySpeech = internalLocalized("common_audio_mode_speech")
+    static let AudioQualityMusic = internalLocalized("common_audio_mode_music")
 
-    static let smoothStreaming = internalLocalized("Smooth streaming")
-    static let properVolume = internalLocalized("Proper volume ensures good viewing experience")
-    static let regularChecks = internalLocalized("Regular checks ensure good viewing experience")
-    static let avoidSwitching = internalLocalized("Avoid frequent network switching")
-    static let VideoException = internalLocalized("Freezing streaming")
-    static let VideoDisable = internalLocalized("Video capture disabled")
-    static let cancelText = internalLocalized("Cancel")
+    static let smoothStreaming = internalLocalized("common_video_stream_smooth")
+    static let properVolume = internalLocalized("common_audio_tips_proper_volume")
+    static let regularChecks = internalLocalized("common_audio_tips_regular_checks")
+    static let avoidSwitching = internalLocalized("common_network_switch_tips")
+    static let VideoException = internalLocalized("common_video_stream_freezing")
+    static let VideoDisable = internalLocalized("common_video_capture_closed")
+    static let cancelText = internalLocalized("common_cancel")
 }

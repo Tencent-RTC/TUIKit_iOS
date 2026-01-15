@@ -270,5 +270,5 @@ class AnchorBattleInfoView: RTCBaseView {
 }
 
 private extension String {
-    static let battleEndText = internalLocalized("PK End")
+    static let battleEndText = internalLocalized("common_battle_pk_end")
 }

@@ -77,7 +77,7 @@ public class AudienceListView: RTCBaseView {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.backgroundColor = .clear
-        collectionView.semanticContentAttribute = .forceRightToLeft
+        collectionView.semanticContentAttribute = isRTLLanguage() ? .forceLeftToRight : .forceRightToLeft
         collectionView.isUserInteractionEnabled = true
         collectionView.contentMode = .scaleToFill
         collectionView.dataSource = self

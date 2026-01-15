@@ -417,12 +417,12 @@ extension RoomJoinView: UITextFieldDelegate {
 }
 
 fileprivate extension String {
-    static let joinRoom = "Join room".localized
-    static let roomID = "Room ID".localized
-    static let enterRoomID = "Enter roomID".localized
-    static let yourName = "Your name".localized
-    static let enableAudio = "Enable audio".localized
-    static let enableSpeaker = "Enable speaker".localized
-    static let enableVideo = "Enable video".localized
-    static let inputNotEmpty = "input can't be empty!".localized
+    static let joinRoom = "roomkit_join_room".localized
+    static let roomID = "roomkit_room_id".localized
+    static let enterRoomID = "roomkit_enter_room_id".localized
+    static let yourName = "roomkit_your_name".localized
+    static let enableAudio = "roomkit_enable_audio".localized
+    static let enableSpeaker = "roomkit_enable_speaker".localized
+    static let enableVideo = "roomkit_enable_video".localized
+    static let inputNotEmpty = "roomkit_input_can_not_empty".localized
 }

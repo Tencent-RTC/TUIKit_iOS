@@ -280,9 +280,9 @@ class AudienceSettingPanelCell: UICollectionViewCell {
 
 
 private extension String {
-    static let settingTitleText: String = internalLocalized("More Features")
+    static let settingTitleText: String = internalLocalized("common_more_features")
     
-    static let resolutionText: String = internalLocalized("Resolution")
-    static let dashboardText: String = internalLocalized("Dashboard")
-    static let pipText: String = internalLocalized("Pip")
+    static let resolutionText: String = internalLocalized("live_video_resolution")
+    static let dashboardText: String = internalLocalized("common_dashboard_title")
+    static let pipText: String = internalLocalized("common_video_settings_item_pip")
 }

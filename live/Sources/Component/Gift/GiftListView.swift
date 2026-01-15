@@ -10,6 +10,7 @@ import Combine
 import RTCRoomEngine
 import SnapKit
 import TUICore
+import AtomicX
 
 public class GiftListView: UIView {
     private let liveId: String
@@ -29,7 +30,7 @@ public class GiftListView: UIView {
 
     // MARK: - UI组件
     private lazy var categoryTabView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
+        let layout = GiftCollectionViewLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 0
@@ -78,7 +79,7 @@ public class GiftListView: UIView {
         super.init(frame: .zero)
         addObserver()
         setupUI()
-        var language = TUIGlobalization.getPreferredLanguage() ?? "en"
+        var language = getPreferredLanguage()
         if language != "en", language != "zh-Hans", language != "zh-Hant" {
             language = "en"
         }
@@ -210,6 +211,7 @@ extension GiftListView {
         currentSelectedCellIndex = .init(row: 0, section: 0)
         
         categoryTabView.reloadData()
+        categoryTabView.layoutIfNeeded()
         
         let indexPath = IndexPath(item: index, section: 0)
         categoryTabView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)

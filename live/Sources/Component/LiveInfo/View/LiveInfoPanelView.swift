@@ -52,16 +52,15 @@ class RoomInfoPanelView: RTCBaseView {
             LabelAppearance(textColor: theme.color.textColorSecondary,
                             font: theme.typography.Regular12)
         }
-        label.textAlignment = .center
         return label
     }()
     
+    // TODO: gg 这个label RTL方向始终不对，后面再看
     private lazy var fansLabel: AtomicLabel = {
         let label = AtomicLabel("") { theme in
             LabelAppearance(textColor: theme.color.textColorSecondary,
                             font: theme.typography.Regular12)
         }
-        label.textAlignment = .center
         return label
     }()
     
@@ -129,7 +128,7 @@ class RoomInfoPanelView: RTCBaseView {
         if enableFollow {
             fansLabel.snp.makeConstraints { make in
                 make.top.equalTo(roomIdLabel.snp.bottom).offset(10.scale375Height())
-                make.leading.trailing.equalToSuperview()
+                make.centerX.equalToSuperview()
                 make.height.equalTo(17.scale375Height())
             }
         }
@@ -242,8 +241,8 @@ class RoomInfoPanelView: RTCBaseView {
 // MARK: Action
 
 fileprivate extension String {
-    static let roomIdText = internalLocalized("Live Room ID: xxx")
+    static let roomIdText = internalLocalized("common_roominfo_liveroom_id")
     static let fansCountText = internalLocalized("xxx Fans")
-    static let followText = internalLocalized("Follow")
-    static let unfollowText = internalLocalized("Unfollow")
+    static let followText = internalLocalized("common_follow_anchor")
+    static let unfollowText = internalLocalized("common_unfollow_anchor")
 }

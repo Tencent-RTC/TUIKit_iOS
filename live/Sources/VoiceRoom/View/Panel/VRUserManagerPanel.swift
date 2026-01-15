@@ -173,7 +173,7 @@ class VRUserManagerPanel: RTCBaseView {
     override func setupViewStyle() {
         avatarView.setContent(.url(seatInfo.avatarUrl ?? "", placeholder: UIImage.avatarPlaceholderImage))
         userNameLabel.text = seatInfo.userName
-        userIdLabel.text = "ID: " + (seatInfo.userId ?? "")
+        userIdLabel.text = .userIDText.replacingOccurrences(of: "xxx", with: seatInfo.userId ?? "")
     }
     
     deinit {
@@ -277,8 +277,9 @@ extension VRUserManagerPanel {
 }
 
 fileprivate extension String {
-    static let followText = internalLocalized("Follow")
-    static let muteText = internalLocalized("Mute")
-    static let unmuteText = internalLocalized("Unmute")
-    static let kickoffText = internalLocalized("End")
+    static let followText = internalLocalized("common_follow_anchor")
+    static let muteText = internalLocalized("common_voiceroom_mute_seat")
+    static let unmuteText = internalLocalized("common_voiceroom_unmuted_seat")
+    static let kickoffText = internalLocalized("common_end_user")
+    static let userIDText = internalLocalized("common_user_id")
 }

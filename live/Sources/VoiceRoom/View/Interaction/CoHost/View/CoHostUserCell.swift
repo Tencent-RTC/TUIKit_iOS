@@ -142,7 +142,7 @@ extension CoHostUserCell {
 }
 
 fileprivate extension String {
-    static let inviteCoHostText = internalLocalized("Invite Host")
-    static let inviteBattleText = internalLocalized("Invite Battle")
-    static let invitingCancelText = internalLocalized("Cancel invite")
+    static let inviteCoHostText = internalLocalized("seat_request_host")
+    static let inviteBattleText = internalLocalized("seat_invite_battle")
+    static let invitingCancelText = internalLocalized("seat_cancel_invite")
 }

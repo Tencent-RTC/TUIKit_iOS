@@ -145,5 +145,5 @@ extension TUIGiftView {
 // MARK: localized String
 
 private extension String {
-    static var sendOut = internalLocalized("Send Out")
+    static var sendOut = internalLocalized("common_gift_give_gift")
 }

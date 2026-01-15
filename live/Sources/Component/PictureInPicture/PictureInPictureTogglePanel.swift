@@ -49,7 +49,8 @@ class PictureInPictureTogglePanel: RTCBaseView {
         let label = UILabel(frame: .zero)
         label.text = .pipDescText
         label.font = .customFont(ofSize: 14, weight: .medium)
-        label.textColor = .g7
+        label.textColor = .white.withAlphaComponent(0.549)
+        label.numberOfLines = 0
         return label
     }()
     
@@ -93,7 +94,8 @@ class PictureInPictureTogglePanel: RTCBaseView {
         pipDescLabel.snp.makeConstraints { make in
             make.top.equalTo(pipTitleLabel.snp.bottom).offset(12.scale375Height())
             make.leading.equalTo(pipTitleLabel)
-            make.bottom.equalToSuperview()
+            make.trailing.lessThanOrEqualTo(pipSwitch.snp.trailing)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
     }
     
@@ -123,9 +125,9 @@ class PictureInPictureTogglePanel: RTCBaseView {
 // MARK: - Localized Strings
 
 private extension String {
-    static let titleText = internalLocalized("Pip")
-    static let pipTitleText = internalLocalized("Pip Toggle")
-    static let pipDescText = internalLocalized("After enabling, the app will automatically enter picture-in-picture mode when moved to the background")
+    static let titleText = internalLocalized("common_video_settings_item_pip")
+    static let pipTitleText = internalLocalized("common_pip_toggle")
+    static let pipDescText = internalLocalized("common_pip_toggle_description")
     
-    static let pipPermissionTitleText = internalLocalized("You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)")
+    static let pipPermissionTitleText = internalLocalized("common_server_error_insufficient_operation_permissions")
 }

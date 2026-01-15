@@ -335,9 +335,9 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
 }
 
 fileprivate extension String {
-    static let endTitleText = internalLocalized("End")
-    static let approveText = internalLocalized("Agree")
-    static let rejectText = internalLocalized("Reject")
-    static let inviteText = internalLocalized("Invite")
-    static let cancelText = internalLocalized("Cancel")
+    static let endTitleText = internalLocalized("common_end_user")
+    static let approveText = internalLocalized("live_barrage_agree")
+    static let rejectText = internalLocalized("common_reject")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let cancelText = internalLocalized("common_cancel")
 }

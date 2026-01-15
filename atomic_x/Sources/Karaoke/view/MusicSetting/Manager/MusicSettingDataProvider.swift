@@ -52,18 +52,28 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
 
         var original = MusicSwitchItem(
             title: .Original,
-            isOn: manager.karaokeState.musicTrackType == .originalSong)
+            isOn: manager.karaokeState.musicTrackType == .originalSong,
+            isEnabled: manager
+                .isTrackAvailable(
+                    manager.karaokeState.musicTrackType == .originalSong ? .accompaniment
+                    : .originalSong)
+        )
         original.action = { [weak self] isOpened in
-            guard let self = self else { return }
-            self.manager?
-                .switchMusicTrack(
-                    trackType: isOpened ? .originalSong : .accompaniment
-                )
+            guard let self = self, let manager = self.manager else { return }
+            
+            let targetTrack: TXChorusMusicTrack = isOpened ? .originalSong : .accompaniment
+            if !manager.isTrackAvailable(targetTrack) {
+                manager.errorSubject.send(.trackSwitchNotSupported)
+                return
+            }
+
+            manager.switchMusicTrack(trackType: targetTrack)
         }
 
         original.subscribeState = { [weak self] cell, cancellableSet in
-            guard let self = self else { return }
-            self.manager?.subscribe(StateSelector(keyPath: \.musicTrackType))
+            guard let self = self, let manager = self.manager else { return }
+
+            manager.subscribe(StateSelector(keyPath: \.musicTrackType))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] musicTrackType in
                     if musicTrackType == .accompaniment {
@@ -170,53 +180,43 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
 }
 
 fileprivate extension String {
-    static var voiceEarMonitor: String = ("Ear Monitor").localized
+    static var voiceEarMonitor: String = ("karaoke_setting_ear_return").localized
 
-    static let voiceEarMonitorVolume: String = ("Ear Monitor Volume").localized
+    static var audioSetting: String = ("karaoke_setting_audio").localized
 
-    static var backgroundMusic: String = ("Music").localized
+    static var captureVolume: String = ("karaoke_setting_capture_volume").localized
 
-    static var chooseMusic: String = ("Choose Music").localized
+    static var playoutVolume: String = ("karaoke_setting_playback_volume").localized
 
-    static var audioSetting: String = ("Audio settings").localized
+    static var voicePitch: String = ("karaoke_setting_music_pitch").localized
 
-    static var musicVolume: String = ("Music volume").localized
+    static var reverb: String = ("karaoke_change_reverb").localized
 
-    static var microphoneVolume: String = ("Voice volume").localized
+    static var Original: String = ("karaoke_original").localized
 
-    static var captureVolume: String = ("Capture Volume").localized
+    static var child: String = ("karaoke_voice_child").localized
 
-    static var playoutVolume: String = ("Playout Volume").localized
+    static var girl: String = ("karaoke_voice_girl").localized
 
-    static var voicePitch: String = ("Music Pitch").localized
+    static var uncle: String = ("karaoke_voice_uncle").localized
 
-    static var changer: String = ("Voice changer").localized
+    static var ethereal: String = ("karaoke_voice_ethereal").localized
 
-    static var reverb: String = ("Reverb").localized
+    static var withoutEffect: String = ("karaoke_reverb_none").localized
 
-    static var Original: String = ("Original").localized
+    static var karaoke: String = ("karaoke_reverb_ktv").localized
 
-    static var child: String = ("Naughty child").localized
+    static var metal: String = ("karaoke_reverb_metallic").localized
 
-    static var girl: String = ("Loli").localized
+    static var low: String = ("karaoke_reverb_low").localized
 
-    static var uncle: String = ("Uncle").localized
+    static var loud: String = ("karaoke_reverb_loud").localized
 
-    static var ethereal: String = ("Ethereal").localized
+    static var done: String = ("karaoke_setting_done").localized
 
-    static var withoutEffect: String = ("None").localized
+    static var score: String = ("karaoke_score").localized
 
-    static var karaoke: String = ("KTV").localized
+    static var pitchSetting: String = ("karaoke_setting_pitch_shift").localized
 
-    static var metal: String = ("Metallic sound").localized
-
-    static var low: String = ("Low").localized
-
-    static var loud: String = ("Loud").localized
-
-    static var done: String = ("Done").localized
-
-    static var score: String = ("Score").localized
-
-    static var pitchSetting: String = ("Pitch Shift").localized
+    static var trackSwitchNotSupported = ("karaoke_cant_switch_tracks").localized
 }

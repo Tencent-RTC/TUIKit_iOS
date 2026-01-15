@@ -225,5 +225,5 @@ extension TUIGiftBulletView: CAAnimationDelegate {
 //MARK: localized String
 
 private extension String {
-    static let meText = internalLocalized("Me")
+    static let meText = internalLocalized("common_gift_me")
 }

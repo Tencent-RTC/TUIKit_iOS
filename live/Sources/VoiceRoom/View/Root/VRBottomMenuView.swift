@@ -497,11 +497,10 @@ extension VRBottomMenuView {
 }
 
 private extension String {
-    static let backgroundText = internalLocalized("Background")
-    static let audioEffectsText = internalLocalized("Audio")
-    static let songText = internalLocalized("Song")
-    static let repeatRequest = internalLocalized("Already on the seat queue")
-    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
-    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
-    static let seatAllTokenCancelText = internalLocalized("The seats are all taken.")
+    static let backgroundText = internalLocalized("common_settings_bg_image")
+    static let audioEffectsText = internalLocalized("common_audio_effect")
+    static let repeatRequest = internalLocalized("common_server_error_already_on_the_mic_queue")
+    static let takeSeatApplicationRejected = internalLocalized("common_voiceroom_take_seat_rejected")
+    static let takeSeatApplicationTimeout = internalLocalized("common_voiceroom_take_seat_timeout")
+    static let seatAllTokenCancelText = internalLocalized("common_server_error_the_seats_are_all_taken")
 }

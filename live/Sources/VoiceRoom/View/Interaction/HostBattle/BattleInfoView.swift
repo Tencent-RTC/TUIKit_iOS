@@ -316,6 +316,6 @@ extension BattleInfoView {
 }
 
 private extension String {
-    static let battleEndText = internalLocalized("PK End")
-    static let inPKText = internalLocalized("In PK")
+    static let battleEndText = internalLocalized("common_battle_pk_end")
+    static let inPKText = internalLocalized("seat_in_pk")
 }

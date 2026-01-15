@@ -24,7 +24,7 @@ class AnchorLinkControlPanel: UIView {
     private var applyList: [LiveUserInfo] = []
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -190,7 +190,7 @@ extension AnchorLinkControlPanel: UITableViewDelegate {
             LabelAppearance(textColor: theme.color.textColorSecondary,
                             font: theme.typography.Regular14)
         }
-        label.frame = CGRect(x: 24, y: 0, width: headerView.frame.width, height: headerView.frame.height)
+        label.frame = CGRect(x: 24, y: 0, width: headerView.frame.width - 48, height: headerView.frame.height)
         if section == 0 {
             label.text = .localizedReplace(.anchorLinkControlSeatCount, replace: String(linkingList.count))
         } else if section == 1 {
@@ -299,18 +299,18 @@ extension AnchorLinkControlPanel: UITableViewDelegate {
 
 private extension String {
     static var anchorLinkControlTitle: String {
-        internalLocalized("Link Management")
+        internalLocalized("common_link_mic_manager")
     }
 
     static var anchorLinkControlDesc: String {
-        internalLocalized("Allow viewers to apply for continuous microphone")
+        internalLocalized("common_enable_audience_request_link")
     }
 
     static var anchorLinkControlSeatCount: String {
-        internalLocalized("Current Mic (xxx)")
+        internalLocalized("common_seat_list_title")
     }
 
     static var anchorLinkControlRequestCount: String {
-        internalLocalized("Link Application(xxx)")
+        internalLocalized("common_seat_application_title")
     }
 }

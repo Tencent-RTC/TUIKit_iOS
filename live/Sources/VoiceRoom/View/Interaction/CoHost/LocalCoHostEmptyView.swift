@@ -90,8 +90,8 @@ class LocalCoHostEmptyView: UIView {
 }
 
 fileprivate extension String {
-    static let emptySeatText: String = internalLocalized("Conn Wait")
-    static let inviteText = internalLocalized("Invite")
-    static let locKSeat = internalLocalized("Locked")
-    static let noOneOnSeatText = internalLocalized("No guests")
+    static let emptySeatText: String = internalLocalized("common_wait_connection")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let locKSeat = internalLocalized("seat_locked")
+    static let noOneOnSeatText = internalLocalized("seat_no_guest")
 }

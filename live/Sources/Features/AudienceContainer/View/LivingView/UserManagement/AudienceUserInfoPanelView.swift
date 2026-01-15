@@ -54,7 +54,11 @@ class AudienceUserInfoPanelView: RTCBaseView {
     private lazy var userIdLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12)
-        label.text = "UserId: " + user.userInfo.userID
+        if isRTLLanguage() {
+            label.text = user.userInfo.userID +  " :UserId"
+        } else {
+            label.text = .userIDText.replacingOccurrences(of: "xxx", with: user.userInfo.userID)
+        }
         label.textColor = .greyColor
         label.textAlignment = .center
         return label
@@ -230,6 +234,7 @@ extension AudienceUserInfoPanelView {
 
 fileprivate extension String {
     static let fansCountText = internalLocalized("xxx Fans")
-    static let followText = internalLocalized("Follow")
-    static let unfollowText = internalLocalized("Unfollow")
+    static let followText = internalLocalized("common_follow_anchor")
+    static let unfollowText = internalLocalized("common_unfollow_anchor")
+    static let userIDText = internalLocalized("common_user_id")
 }

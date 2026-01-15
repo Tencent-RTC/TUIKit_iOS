@@ -179,7 +179,7 @@ class VideoQualityCell: UITableViewCell {
 
 
 fileprivate extension String {
-    static let cancelText: String = internalLocalized("Cancel")
+    static let cancelText: String = internalLocalized("common_cancel")
     
     static func videoQualityToString(quality: VideoQuality) -> String {
         switch quality {

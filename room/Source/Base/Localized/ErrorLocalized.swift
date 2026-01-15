@@ -39,7 +39,7 @@ public class ErrorLocalized {
             if let error = error {
                 return error.description
             }
-            return "Temporarily unclassified general error".localized + ":\(code)"
+            return "roomkit_err_general".localized + ":\(code)"
         }
         
         public init(error: LocalizedError, message: String) {
@@ -72,7 +72,7 @@ public class UnknownError: Error {
 
 extension UnknownError: LocalizedError {
     public var description: String {
-        "Temporarily unclassified general error".localized + ":\(rawValue)"
+        "roomkit_err_general".localized + ":\(rawValue)"
     }
 }
 
@@ -102,19 +102,19 @@ extension TIMError: LocalizedError {
     public var description: String {
         switch self {
         case .success:
-            return "Operation successful".localized
+            return "roomkit_err_0_success".localized
         case .failed:
-            return "Temporarily unclassified general error".localized + ":\(rawValue)"
+            return "roomkit_err_general".localized + ":\(rawValue)"
         case .invalidUserId:
-            return "Invalid userid".localized
+            return "roomkit_err_7002_invalid_user_id".localized
         case .ERR_SDK_COMM_API_CALL_FREQUENCY_LIMIT:
-            return "Request rate limited, please try again later".localized
+            return "roomkit_err_7008_request_rate_limited".localized
         case .ERR_SVR_GROUP_SHUTUP_DENY:
-            return "You have been muted in the current room".localized
+            return "roomkit_err_10017_muted_in_room".localized
         case .ERR_SDK_BLOCKED_BY_SENSITIVE_WORD:
-            return "Sensitive words are detected, please modify it and try again".localized
+            return "roomkit_err_7015_sensitive_words".localized
         case .ERR_SDK_NET_PKG_SIZE_LIMIT:
-            return "The content is too long, please reduce the content and try again".localized
+            return "roomkit_err_9522_content_too_long".localized
         case .ERR_SDK_NET_DISCONNECT,
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT,
                 .ERR_SDK_NET_ALLREADY_CONN,
@@ -127,7 +127,7 @@ extension TIMError: LocalizedError {
                 .ERR_SDK_NET_WAIT_SEND_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK:
-            return "The network is abnormal, please try again later".localized
+            return "roomkit_err_network_error".localized
         }
     }
 }
@@ -243,175 +243,175 @@ extension RoomError: LocalizedError {
     public var description: String {
         switch self {
         case .success:
-            return "Operation successful".localized
+            return "roomkit_err_0_success".localized
         case .freqLimit:
-            return "Request rate limited, please try again later".localized
+            return "roomkit_err_n2_request_rate_limited".localized
         case .repeatOperation:
-            return "Repeat operation".localized
+            return "roomkit_err_n3_repeat_operation".localized
         case .roomMismatch:
-            return "Room id does not match, please check if you have checked out or changed rooms.".localized
+            return "roomkit_err_n4_roomID_not_match".localized
         case .sdkAppIDNotFound:
-            return "Not found sdkappid, please confirm application info in trtc console".localized
+            return "roomkit_err_n1000_sdk_appid_not_found".localized
         case .invalidParameter:
-            return "Passing illegal parameters when calling api, check if the parameters are legal".localized
+            return "roomkit_err_n1001_invalid_parameter".localized
         case .sdkNotInitialized:
-            return "Not logged in, please call login api".localized
+            return "roomkit_err_n1002_not_logged_in".localized
         case .permissionDenied:
-            return "Failed to obtain permission, unauthorized audio/video permission, please check if device permission is enabled".localized
+            return "roomkit_err_n1003_permission_denied".localized
         case .requirePayment:
-            return "This feature requires an additional package. please activate the corresponding package as needed in the trtc console".localized
+            return "roomkit_err_n1004_package_required".localized
         case .invalidLicense:
-            return "License is invalid or expired, please check its validity period in the trtc console. please activate the corresponding package as needed in the trtc console.".localized
+            return "roomkit_err_n1005_invalid_license".localized
         case .cameraStartFail:
-            return "System issue, failed to open camera. check if camera device is normal".localized
+            return "roomkit_err_n1100_camera_open_failed".localized
         case .cameraNotAuthorized:
-            return "Camera has no system authorization, check system authorization".localized
+            return "roomkit_err_n1101_camera_no_permission".localized
         case .cameraOccupied:
-            return "Camera is occupied, check if other process is using camera".localized
+            return "roomkit_err_n1102_camera_occupied".localized
         case .cameraDeviceEmpty:
-            return "No camera device currently, please insert camera device to solve the problem".localized
+            return "roomkit_err_n1103_camera_not_found".localized
         case .microphoneStartFail:
-            return "System issue, failed to open mic. check if mic device is normal".localized
+            return "roomkit_err_n1104_mic_open_failed".localized
         case .microphoneNotAuthorized:
-            return "Mic has no system authorization, check system authorization".localized
+            return "roomkit_err_n1105_mic_no_permission".localized
         case .microphoneOccupied:
-            return "Mic is occupied".localized
+            return "roomkit_err_n1106_mic_occupied".localized
         case .microphoneDeviceEmpty:
-            return "No mic device currently".localized
+            return "roomkit_err_n1107_mic_not_found".localized
         case .getScreenSharingTargetFailed:
-            return "Failed to get screen sharing source (screen and window), check screen recording permissions".localized
+            return "roomkit_err_n1108_screen_share_get_source_failed".localized
         case .startScreenSharingFailed:
-            return "Failed to enable screen sharing, check if someone is already screen sharing in the room".localized
+            return "roomkit_err_n1109_screen_share_start_failed".localized
         case .operationInvalidBeforeEnterRoom:
-            return "This feature can only be used after entering the room".localized
+            return "roomkit_err_n2101_not_in_room".localized
         case .exitNotSupportedForRoomOwner:
-            return "Room owner does not support leaving the room, room owner can only close the room".localized
+            return "roomkit_err_n2102_owner_cannot_leave".localized
         case .operationNotSupportedInCurrentRoomType:
-            return "This operation is not supported in the current room type".localized
+            return "roomkit_err_n2103_unsupported_in_room_type".localized
         case .roomIdInvalid:
-            return "Illegal custom room id, must be printable ascii characters (0x20–0x7e), up to 48 bytes long".localized
+            return "roomkit_err_n2105_invalid_room_id".localized
         case .roomNameInvalid:
-            return "Illegal room name, maximum 30 bytes, must be utf-8 encoding if contains chinese characters".localized
+            return "roomkit_err_n2107_invalid_room_name".localized
         case .alreadyInOtherRoom:
-            return "User is already in another room, single roomengine instance only supports user entering one room, to enter different room, please leave the room or use new roomengine instance".localized
+            return "roomkit_err_n2108_user_already_in_other_room".localized
         case .userNotExist:
-            return "User is not exist".localized
+            return "roomkit_err_n2200_user_not_exist".localized
         case .userNeedOwnerPermission:
-            return "Room owner permission required for operation".localized
+            return "roomkit_err_n2300_need_owner_permission".localized
         case .userNeedAdminPermission:
-            return "Room owner or administrator permission required for operation".localized
+            return "roomkit_err_n2301_need_admin_permission".localized
         case .requestNoPermission:
-            return "No permission for signaling request, e.g. canceling an invite not initiated by yourself".localized
+            return "roomkit_err_n2310_signal_no_permission".localized
         case .requestIdInvalid:
-            return "Signaling request id is invalid or has been processed".localized
+            return "roomkit_err_n2311_signal_invalid_request_id".localized
         case .requestIdRepeat:
-            return "Signal request repetition".localized
+            return "roomkit_err_n2312_signal_request_duplicated".localized
         case .maxSeatCountLimit:
-            return "Maximum seat exceeds package quantity limit".localized
+            return "roomkit_err_n2340_seat_count_limit_exceeded".localized
         case .seatIndexNotExist:
-            return "Seat serial number does not exist".localized
+            return "roomkit_err_n2344_seat_not_exist".localized
         case .openMicrophoneNeedSeatUnlock:
-            return "Current seat audio is locked".localized
+            return "roomkit_err_n2360_seat_audio_locked".localized
         case .openMicrophoneNeedPermissionFromAdmin:
-            return "All on mute audio unable to turn on microphone".localized
+            return "roomkit_tip_all_muted_cannot_unmute".localized
         case .openCameraNeedSeatUnlock:
-            return "Current seat video is locked, need room owner to unlock mic seat before opening camera".localized
+            return "roomkit_err_n2370_seat_video_locked".localized
         case .openCameraNeedPermissionFromAdmin:
-            return "All on mute video unable to turn on camera".localized
+            return "roomkit_tip_all_video_off_cannot_start".localized
         case .openScreenShareNeedSeatUnlock:
-            return "The current microphone position video is locked and needs to be unlocked by the room owner before screen sharing can be enabled".localized
+            return "roomkit_err_n2372_screen_share_seat_locked".localized
         case .openScreenShareNeedPermissionFromAdmin:
-            return "Screen sharing needs to be enabled after applying to the room owner or administrator".localized
+            return "roomkit_err_n2373_screen_share_need_permission".localized
         case .sendMessageDisabledForAll:
-            return "All members muted in the current room".localized
+            return "roomkit_err_n2380_all_members_muted".localized
         case .sendMessageDisabledForCurrent:
-            return "You have been muted in the current room".localized
+            return "roomkit_err_10017_muted_in_room".localized
         case .roomNotSupportPreloading:
-            return "The current room does not support preloading".localized
+            return "roomkit_err_n4001_room_not_support_preload".localized
         case .callInProgress:
-            return "The device operation failed while in a call".localized
+            return "roomkit_err_n6001_device_busy_during_call".localized
         case .systemInternalError:  // 100001
-            return "Server internal error, please retry".localized
+            return "roomkit_err_100001_server_internal_error".localized
         case .paramIllegal:     // 100002
-            return "The parameter is illegal. check whether the request is correct according to the error description".localized
+            return "roomkit_err_100002_server_invalid_parameter".localized
         case .roomIdOccupied:   // 100003
-            return "The room id already exists. please select another room id".localized
+            return "roomkit_err_100003_room_id_already_exists".localized
         case .roomIdNotExist:   // 100004
-            return "The room does not exist, or it once existed but has now been dissolved".localized
+            return "roomkit_err_100004_room_not_exist".localized
         case .userNotEntered:   // 100005
-            return "Not a room member".localized
+            return "roomkit_err_100005_not_room_member".localized
         case .insufficientOperationPermissions: // 100006
-            return "You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)".localized
+            return "roomkit_err_100006_operation_not_allowed".localized
         case .noPaymentInformation: // 100007
-            return "No payment information, you need to purchase a package in the console".localized
+            return "roomkit_err_100007_no_payment_info".localized
         case .roomIsFull:   // 100008
-            return "The room is full".localized
+            return "roomkit_err_100008_room_is_full".localized
         case .tagQuantityExceedsUpperLimit: // 100009
-            return "Tag quantity exceeds upper limit".localized
+            return "roomkit_err_100009_room_tag_limit_exceeded".localized
         case .roomIdHasBeenUsed:    // 100010
-            return "The room id has been used, and the operator is the room owner, it can be used directly".localized
+            return "roomkit_err_100010_room_id_reusable_by_owner".localized
         case .roomIdHasBeenOccupiedByChat:  // 100011
-            return "The room id has been occupied by chat. you can use a different room id or dissolve the group first".localized
+            return "roomkit_err_100011_room_id_occupied_by_im".localized
         case .creatingRoomsExceedsTheFrequencyLimit:    // 100012
-            return "Creating rooms exceeds the frequency limit, the same room id can only be created once within 1 second".localized
+            return "roomkit_err_100012_create_room_frequency_limit".localized
         case .exceedsTheUpperLimit:     // 100013
-            return "Exceeds the upper limit, for example, the number of microphone seats, the number of pk match rooms, etc., exceeds the payment limit".localized
+            return "roomkit_err_100013_payment_limit_exceeded".localized
         case .invalidRoomType:  // 100015
-            return "Invalid room type".localized
+            return "roomkit_err_100015_invalid_room_type".localized
         case .memberHasBeenBanned:  // 100016
-            return "This member has been banned".localized
+            return "roomkit_err_100016_member_already_banned".localized
         case .memberHasBeenMuted:   // 100017
-            return "This member has been muted".localized
+            return "roomkit_err_100017_member_already_muted".localized
         case .requiresPassword:     // 100018
-            return "The current room requires a password for entry".localized
+            return "roomkit_err_100018_room_password_required".localized
         case .roomEntryPasswordError:   // 100019
-            return "Room entry password error".localized
+            return "roomkit_err_100019_room_password_incorrect".localized
         case .roomAdminQuantityExceedsTheUpperLimit:    // 100020
-            return "The admin quantity exceeds the upper limit".localized
+            return "roomkit_err_100020_admin_limit_exceeded".localized
         case .requestIdConflict:    // 100102
-            return "Signal request conflict".localized
+            return "roomkit_err_100102_signal_request_conflict".localized
         case .seatLocked:   // 100200
-            return "The seat is locked. you can try another seat".localized
+            return "roomkit_err_100200_seat_is_locked".localized
         case .seatOccupied:     // 100201
-            return "The current seat is already occupied".localized
+            return "roomkit_err_100201_seat_is_occupied".localized
         case .alreadyOnTheSeatQueue:    // 100202
-            return "Already on the seat queue".localized
+            return "roomkit_err_100202_already_in_seat_queue".localized
         case .alreadyInSeat:    // 100203
-            return "Already on the seat".localized
+            return "roomkit_err_100203_already_on_seat".localized
         case .notOnTheSeatQueue:    // 100204
-            return "Not on the seat queue".localized
+            return "roomkit_err_100204_not_in_seat_queue".localized
         case .allSeatOccupied:  // 100205
-            return "The seats are all taken.".localized
+            return "roomkit_err_100205_all_seats_are_full".localized
         case .userNotInSeat:    // 100206
-            return "Not on the seat".localized
+            return "roomkit_err_100206_not_on_seat".localized
         case .userAlreadyOnSeat:    // 100210
-            return "The user is already on the seat".localized
+            return "roomkit_err_100210_user_already_on_seat".localized
         case .seatNotSupportLinkMic:    // 100211
-            return "The room does not support seat ability".localized
+            return "roomkit_err_100211_seat_not_supported".localized
         case .emptySeatList:    // 100251
-            return "The seat list is empty".localized
+            return "roomkit_err_100251_seat_list_is_empty".localized
         case .metadataKeyExceedsLimit:  // 100500
-            return "The number of keys in the room's metadata exceeds the limit".localized
+            return "roomkit_err_100500_room_metadata_key_limit".localized
         case .metadataValueSizeExceedsByteLimit:  // 100501
-            return "The size of value in the room's metadata exceeds the maximum byte limit".localized
+            return "roomkit_err_100501_room_metadata_value_limit".localized
         case .metadataTotalValueSizeExceedsByteLimit:  // 100502
-            return "The total size of all value in the room's metadata exceeds the maximum byte limit".localized
+            return "roomkit_err_100502_room_metadata_total_limit".localized
         case .metadataNoValidKey:  // 100503
-            return "There is no valid keys when delete metadata".localized
+            return "roomkit_err_100503_room_metadata_no_valid_keys".localized
         case .metadataKeySizeExceedsByteLimit:  // 100504
-            return "The size of key in the room's metadata exceeds the maximum byte limit".localized
+            return "roomkit_err_100504_room_metadata_key_size_limit".localized
             
             // TIMError
         case .ERR_SDK_COMM_TINYID_EMPTY:
-            return "Invalid userid".localized
+            return "roomkit_err_7002_invalid_user_id".localized
         case .ERR_SDK_COMM_API_CALL_FREQUENCY_LIMIT:
-            return "Request rate limited, please try again later".localized
+            return "roomkit_err_7008_request_rate_limited".localized
         case .ERR_SVR_GROUP_SHUTUP_DENY:
-            return "You have been muted in the current room".localized
+            return "roomkit_err_10017_muted_in_room".localized
         case .ERR_SDK_BLOCKED_BY_SENSITIVE_WORD:
-            return "Sensitive words are detected, please modify it and try again".localized
+            return "roomkit_err_7015_sensitive_words".localized
         case .ERR_SDK_NET_PKG_SIZE_LIMIT:
-            return "The content is too long, please reduce the content and try again".localized
+            return "roomkit_err_9522_content_too_long".localized
         case .ERR_SDK_NET_DISCONNECT,
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT,
                 .ERR_SDK_NET_ALLREADY_CONN,
@@ -424,10 +424,10 @@ extension RoomError: LocalizedError {
                 .ERR_SDK_NET_WAIT_SEND_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK:
-            return "The network is abnormal, please try again later".localized
+            return "roomkit_err_network_error".localized
             
         @unknown default:
-            return "Temporarily unclassified general error".localized + ":\(self.rawValue)"
+            return "roomkit_err_general".localized + ":\(self.rawValue)"
         }
     }
 }

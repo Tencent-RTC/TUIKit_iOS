@@ -212,6 +212,21 @@ class AnchorLivingView: UIView {
                 }
             }
             .store(in: &cancellableSet)
+
+        store.liveListStore.liveListEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                    case .onLiveEnded(let liveID, let liveEndedReason, let message):
+                        if liveEndedReason == .endedByServer && liveID == store.liveID{
+                            onLiveEndedByService()
+                        }
+                    case .onKickedOutOfLive(let liveID, let reason, let message):
+                        break
+                }
+            }
+            .store(in: &cancellableSet)
     }
     
     private func subscribeSubject() {
@@ -306,7 +321,7 @@ extension AnchorLivingView {
         }
         
         barrageDisplayView.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(12.scale375())
+            make.leading.equalToSuperview().offset(12.scale375())
             make.width.equalTo(305.scale375())
             make.height.equalTo(212.scale375Height())
             make.bottom.equalTo(barrageSendView.snp.top).offset(-16.scale375Height())
@@ -493,6 +508,20 @@ extension AnchorLivingView {
             store.onEndLivingSubject.send(state)
         }
     }
+
+    func onLiveEndedByService() {
+        let date = store.summaryStore.state.value.summaryData
+        anchorObserverState.update { [weak self] state in
+            guard let self = self else { return }
+            state.duration = Int(date.totalDuration / 1000)
+            state.viewCount = Int(date.totalViewers)
+            state.giftTotalCoins = Int(date.totalGiftCoins)
+            state.giftTotalUniqueSender = Int(date.totalGiftUniqueSenders)
+            state.likeTotalUniqueSender = Int(date.totalLikesReceived)
+            state.messageCount = barrageDisplayView.getBarrageCount()
+            store.onEndLivingSubject.send(state)
+        }
+    }
 }
 
 extension AnchorLivingView {
@@ -554,18 +583,17 @@ extension AnchorLivingView: GiftPlayViewDelegate {
 }
 
 private extension String {
-    static let confirmCloseText = internalLocalized("End Live")
-    static let confirmEndLiveText = internalLocalized("Are you sure you want to End Live?")
-    static let confirmExitText = internalLocalized("Exit Live")
-    static let confirmExitLiveText = internalLocalized("Are you sure you want ro Exit Live?")
-    static let meText = internalLocalized("Me")
+    static let confirmCloseText = internalLocalized("common_end_live")
+    static let confirmEndLiveText = internalLocalized("live_end_live_tips")
+    static let confirmExitText = internalLocalized("common_exit_live")
+    static let meText = internalLocalized("common_gift_me")
     
-    static let endLiveOnConnectionText = internalLocalized("You are currently co-hosting with other streamers. Would you like to [End Co-host] or [End Live] ?")
-    static let endLiveDisconnectText = internalLocalized("End Co-host")
-    static let endLiveOnLinkMicText = internalLocalized("You are currently co-guesting with other streamers. Would you like to [End Live] ?")
-    static let endLiveOnBattleText = internalLocalized("You are currently in PK mode. Would you like to [End PK] or [End Live] ?")
-    static let endLiveBattleText = internalLocalized("End PK")
-    static let cancelText = internalLocalized("Cancel")
-    static let kickedOutText = internalLocalized("You have been kicked out of the room")
-    static let roomDismissText = internalLocalized("Broadcast has been ended")
+    static let endLiveOnConnectionText = internalLocalized("common_end_connection_tips")
+    static let endLiveDisconnectText = internalLocalized("common_end_connection")
+    static let endLiveOnLinkMicText = internalLocalized("common_anchor_end_link_tips")
+    static let endLiveOnBattleText = internalLocalized("common_end_pk_tips")
+    static let endLiveBattleText = internalLocalized("common_end_pk")
+    static let cancelText = internalLocalized("common_cancel")
+    static let kickedOutText = internalLocalized("common_kicked_out_of_room_by_owner")
+    static let roomDismissText = internalLocalized("common_room_destroy")
 }

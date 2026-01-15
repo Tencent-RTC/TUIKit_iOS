@@ -239,11 +239,11 @@ extension VideoLinkSettingPanel {
 }
 
 private extension String {
-    static let videoLinkConfigTitleText = internalLocalized("Adjust the video link screen")
-    static let requestText = internalLocalized("Apply for link mic")
-    static let videoLinkConfigTipsText = internalLocalized("The screen effect will automatically take effect after connecting")
-    static let beautyText = internalLocalized("Beauty")
-    static let videoParametersText = internalLocalized("Video Config")
-    static let flipText = internalLocalized("Flip")
-    static let waitToLinkText = internalLocalized("You have submitted a link mic request, please wait for the author approval")
+    static let videoLinkConfigTitleText = internalLocalized("common_title_link_video_settings")
+    static let requestText = internalLocalized("common_apply_link_mic")
+    static let videoLinkConfigTipsText = internalLocalized("common_tips_apply_link_mic")
+    static let beautyText = internalLocalized("common_video_settings_item_beauty")
+    static let videoParametersText = internalLocalized("common_video_params")
+    static let flipText = internalLocalized("common_video_settings_item_flip")
+    static let waitToLinkText = internalLocalized("common_toast_apply_link_mic")
 }

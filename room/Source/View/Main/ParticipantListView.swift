@@ -575,13 +575,13 @@ private class ParticipantListCell: UITableViewCell {
 }
 
 fileprivate extension String {
-    static let muteAll = "Mute all".localized
-    static let unmuteAll = "Unmute all".localized
-    static let stopAllVideo = "Stop all video".localized
-    static let enableAllVideo = "Enable all video".localized
-    static let more = "More".localized
-    static let members = "Members(xxx)"
-    static let me = "Me".localized
-    static let owner = "Owner".localized
-    static let administrator = "Administrator".localized
+    static let muteAll = "roomkit_mute_all_audio".localized
+    static let unmuteAll = "roomkit_unmute_all_audio".localized
+    static let stopAllVideo = "roomkit_disable_all_video".localized
+    static let enableAllVideo = "roomkit_enable_all_video".localized
+    static let more = "roomkit_more".localized
+    static let members = "roomkit_member_count"
+    static let me = "roomkit_me".localized
+    static let owner = "roomkit_role_owner".localized
+    static let administrator = "roomkit_role_admin".localized
 }

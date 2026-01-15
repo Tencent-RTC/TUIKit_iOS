@@ -48,7 +48,7 @@ class VRImageSelectionPanel: UIView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -290,10 +290,10 @@ extension VRImageSelectionPanel: UICollectionViewDelegateFlowLayout,
 }
 
 private extension String {
-    static let coverTitleText = internalLocalized("Cover")
-    static let coverConfirmText = internalLocalized("Set as cover")
-    static let backgroundTitleText = internalLocalized("Background")
-    static let backgroundConfirmText = internalLocalized("Set as background")
+    static let coverTitleText = internalLocalized("common_cover")
+    static let coverConfirmText = internalLocalized("common_set_as_cover")
+    static let backgroundTitleText = internalLocalized("common_settings_bg_image")
+    static let backgroundConfirmText = internalLocalized("common_set_as_background")
 }
 
 

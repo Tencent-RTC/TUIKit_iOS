@@ -226,6 +226,6 @@ extension PrepareActionPanel: UITableViewDataSource {
 
 private extension String {
     static var cancelText = {
-        internalLocalized("Cancel")
+        internalLocalized("common_cancel")
     }()
 }

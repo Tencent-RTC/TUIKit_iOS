@@ -231,10 +231,10 @@ extension VRSeatInvitationPanel {
 }
 
 fileprivate extension String {
-    static let inviteText = internalLocalized("Invite")
-    static let onlineAudienceText = internalLocalized("Online audience")
-    static let inviteSeatCancelText = internalLocalized("Seat invitation has been canceled")
-    static let seatAllTokenText = internalLocalized("The seats are all taken.")
-    static let requestRejectedText = internalLocalized("xxx rejected")
-    static let requestTimeoutText = internalLocalized("Invitation has timed out")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let onlineAudienceText = internalLocalized("common_anchor_audience_list_panel_title")
+    static let inviteSeatCancelText = internalLocalized("common_voiceroom_invite_seat_canceled")
+    static let seatAllTokenText = internalLocalized("common_server_error_the_seats_are_all_taken")
+    static let requestRejectedText = internalLocalized("common_request_rejected")
+    static let requestTimeoutText = internalLocalized("common_connect_invitation_timeout")
 }

@@ -46,9 +46,10 @@ class InputBarView: UIView {
         let button = AtomicButton(
             variant: .filled,
             colorType: .primary,
-            size: .medium,
+            size: .small,
             content: .textOnly(text: .sendText)
         )
+        button.titleLabel?.adjustsFontSizeToFitWidth = true
         button.setClickAction { [weak self] _ in
             self?.rightSendButtonClick()
         }
@@ -60,7 +61,7 @@ class InputBarView: UIView {
         view.font = UIFont.customFont(ofSize: 15, weight: .medium)
         view.returnKeyType = UIReturnKeyType.send
         view.scrollsToTop = false
-        view.textAlignment = .left
+        view.textAlignment = .natural
         view.textContainerInset = UIEdgeInsets(top: 6.scale375Height(), left: 8.0, bottom: 6.scale375Height(), right: 8.0)
         view.enablesReturnKeyAutomatically = true
         view.autoresizingMask = .flexibleWidth
@@ -106,7 +107,6 @@ class InputBarView: UIView {
             make.centerY.equalTo(emotionSwitchButton)
             make.leading.equalTo(emotionSwitchButton.snp.trailing).offset(textViewHorizontalMargin)
             make.trailing.equalToSuperview().offset(-horizontalPadding)
-            make.size.equalTo(CGSize(width: 64.scale375Width(), height: 32.scale375Height()))
         }
         inputTextView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(horizontalPadding)
@@ -264,6 +264,6 @@ extension InputBarView {
 
 private extension String {
     static let sendText = {
-        internalLocalized("Send")
+        internalLocalized("live_barrage_btn_send")
     }()
 }

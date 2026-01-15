@@ -136,12 +136,12 @@ class CoHostView: UIView {
 }
 
 fileprivate extension String {
-    static let inviteText = internalLocalized("Invite")
-    static let repeatRequest = internalLocalized("Signal request repetition")
-    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
-    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
-    static let unLockSeat = internalLocalized("Unlock Seat")
-    static let takeSeat = internalLocalized("Take Seat")
-    static let cancelText = internalLocalized("Cancel")
-    static let lockSeat = internalLocalized("Lock Seat")
+    static let inviteText = internalLocalized("common_voiceroom_invite")
+    static let repeatRequest = internalLocalized("common_client_error_request_id_repeat")
+    static let takeSeatApplicationTimeout = internalLocalized("common_voiceroom_take_seat_timeout")
+    static let takeSeatApplicationRejected = internalLocalized("common_voiceroom_take_seat_rejected")
+    static let unLockSeat = internalLocalized("common_voiceroom_unlock")
+    static let takeSeat = internalLocalized("common_voiceroom_take_seat")
+    static let cancelText = internalLocalized("common_cancel")
+    static let lockSeat = internalLocalized("common_voiceroom_lock")
 }

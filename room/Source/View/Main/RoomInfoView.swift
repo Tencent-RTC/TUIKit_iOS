@@ -322,11 +322,11 @@ private class RoomInfoRowView: UIView {
 }
 
 fileprivate extension String {
-    static let copyRoomInfo = "Copy room info".localized
-    static let roomIDCopied = "Room ID copied".localized
-    static let roomName = "Room name".localized
-    static let owner = "Owner".localized
-    static let roomID = "Room ID".localized
-    static let roomInfoCopiedSuccess = "Room information copied successfully".localized
-    static let copy = "Copy".localized
+    static let copyRoomInfo = "roomkit_copy_room_info".localized
+    static let roomIDCopied = "roomkit_toast_room_id_copied".localized
+    static let roomName = "roomkit_room_name".localized
+    static let owner = "roomkit_role_owner".localized
+    static let roomID = "roomkit_room_id".localized
+    static let roomInfoCopiedSuccess = "roomkit_toast_room_info_copied".localized
+    static let copy = "roomkit_copy".localized
 }

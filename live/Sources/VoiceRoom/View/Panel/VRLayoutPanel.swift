@@ -25,7 +25,7 @@ class VRLayoutPanel: UIView {
 
     private lazy var backButton: UIButton = {
         let button = UIButton()
-        button.setImage(internalImage("live_back_icon"), for: .normal)
+        button.setImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         button.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return button
     }()
@@ -217,7 +217,7 @@ private extension VRLayoutPanel {
 }
 
 fileprivate extension String {
-    static let ktvRoom = internalLocalized("KTV Room")
-    static let chatRoom = internalLocalized("Chat Room")
-    static let layoutSettings = internalLocalized("Layout settings")
+    static let ktvRoom = internalLocalized("karaoke_ktv_room")
+    static let chatRoom = internalLocalized("karaoke_chat_room")
+    static let layoutSettings = internalLocalized("common_template_layout_settings")
 }

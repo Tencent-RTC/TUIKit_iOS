@@ -25,13 +25,13 @@ enum BeautyTypeEvent {
     func getString() -> String {
         switch self {
         case .closeClick:
-            return internalLocalized("turn off")
+            return internalLocalized("te_beauty_capabilities_panel_view_switch_turn_off")
         case .buffingClick:
-            return internalLocalized("Microdermabrasion")
+            return internalLocalized("common_beauty_item_smooth")
         case .whitenessClick:
-            return internalLocalized("Whitening")
+            return internalLocalized("common_beauty_item_whiteness")
         case .ruddyClick:
-            return internalLocalized("Rosy")
+            return internalLocalized("common_beauty_item_ruddy")
         }
     }
 
@@ -109,7 +109,7 @@ class DefaultBeautyPanel: UIView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -385,8 +385,8 @@ extension DefaultBeautyPanel {
 }
 
 private extension String {
-    static let titleText = internalLocalized("One-click beauty")
-    static let buffingText = internalLocalized("Microdermabrasion")
-    static let whitenessText = internalLocalized("Whitening")
-    static let ruddyText = internalLocalized("Rosy")
+    static let titleText = internalLocalized("common_beauty_panel_title")
+    static let buffingText = internalLocalized("common_beauty_item_smooth")
+    static let whitenessText = internalLocalized("common_beauty_item_whiteness")
+    static let ruddyText = internalLocalized("common_beauty_item_ruddy")
     }

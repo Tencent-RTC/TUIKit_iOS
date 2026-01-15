@@ -29,7 +29,7 @@ class VRPrepareSettingPanel: UIView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -143,6 +143,6 @@ extension VRPrepareSettingPanel: UITableViewDelegate {
 }
 
 fileprivate extension String {
-    static let settingText: String = internalLocalized("Settings")
-    static let needRequestText: String = internalLocalized("Require owner's consent to speak")
+    static let settingText: String = internalLocalized("common_settings")
+    static let needRequestText: String = internalLocalized("common_voiceroom_need_agree")
 }

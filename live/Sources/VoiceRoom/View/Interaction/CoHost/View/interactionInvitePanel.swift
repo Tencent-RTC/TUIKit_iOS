@@ -84,7 +84,7 @@ class interactionInvitePanel: RTCBaseView {
 
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -553,23 +553,23 @@ fileprivate extension SeatUserInfo {
 }
 
 fileprivate extension String {
-    static let connectionTitleText = internalLocalized("Start Co-hosting")
-    static let connectedTitleText = internalLocalized("Connecting")
-    static let recommendedTitleText = internalLocalized("Suggested Hosts")
-    static let disconnectText = internalLocalized("Exit connect")
+    static let connectionTitleText = internalLocalized("common_connection")
+    static let connectedTitleText = internalLocalized("common_battle_connecting")
+    static let recommendedTitleText = internalLocalized("common_recommended_list")
+    static let disconnectText = internalLocalized("common_exit_connect")
 
-    static let disconnectAlertText = internalLocalized("Are you sure you want to disconnect from other streamers?")
-    static let disconnectAlertCancelText = internalLocalized("Cancel")
-    static let disconnectAlertDisconnectText = internalLocalized("End Co-host")
+    static let disconnectAlertText = internalLocalized("common_disconnect_tips")
+    static let disconnectAlertCancelText = internalLocalized("common_cancel")
+    static let disconnectAlertDisconnectText = internalLocalized("common_end_connection")
 
-    static let confirmEndBattleText = internalLocalized("End PK")
-    static let endBattleText = internalLocalized("Are you sure you want to end the battle? The current result will be the final result after the end")
-    static let startCoHostText = internalLocalized("Start Co-hosting")
-    static let inInviteText = internalLocalized("Inviting others you can withdraw the invitation and send a new one")
-    static let inBattleText = internalLocalized("In Battle")
-    static let requestBattleText = internalLocalized("Request Battle")
-    static let requestTimeoutText = internalLocalized("Invitation has timed out")
-    static let cannotConnectionWithBackSeatsOccupiedText = internalLocalized("Cannot connect when back 4 seats occupied")
+    static let confirmEndBattleText = internalLocalized("common_end_pk")
+    static let endBattleText = internalLocalized("common_battle_end_pk_tips")
+    static let startCoHostText = internalLocalized("common_connection")
+    static let inInviteText = internalLocalized("seat_repeat_invite_tips")
+    static let inBattleText = internalLocalized("seat_in_battle")
+    static let requestBattleText = internalLocalized("seat_request_battle")
+    static let requestTimeoutText = internalLocalized("common_connect_invitation_timeout")
+    static let cannotConnectionWithBackSeatsOccupiedText = internalLocalized("common_back_seats_occupied")
 }
 
 

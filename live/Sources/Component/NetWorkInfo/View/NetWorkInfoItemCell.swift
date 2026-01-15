@@ -71,7 +71,7 @@ class NetWorkInfoItemCell: UITableViewCell {
 
     private let arrowIcon: UIImageView = {
         let view = UIImageView()
-        view.image = internalImage("live_networkinfo_arrow")
+        view.image = internalImage("live_networkinfo_arrow", rtlFlipped: true)
         view.tintColor = UIColor.white.withAlphaComponent(0.55)
         return view
     }()
@@ -244,13 +244,13 @@ class NetWorkInfoItemCell: UITableViewCell {
             case .video:
                 titleLabel.text = .videoStatus
                 detailLabel.text = .smoothStreaming
-                rightLabel.text = .resolution4K
+                rightLabel.text = nil
                 iconView.image = internalImage("live_networkinfo_video")
                 iconView.tintColor = .greenColor
             case .audio:
                 titleLabel.text = .audioStatus
                 detailLabel.text = .properVolume
-                rightLabel.text = .audioMode
+                rightLabel.text = nil
                 iconView.image = internalImage("live_networkinfo_mic")
                 iconView.tintColor = .greenColor
             case .temperature:
@@ -306,16 +306,13 @@ class NetWorkInfoItemCell: UITableViewCell {
 
 
 fileprivate extension String {
-    static let videoStatus = internalLocalized("Video Status")
-    static let audioStatus = internalLocalized("Audio Status")
-    static let deviceTemp = internalLocalized("Device Temperature")
-    static let wifiMobile = internalLocalized("Wi-Fi/Mobile Network")
+    static let videoStatus = internalLocalized("common_video_status")
+    static let audioStatus = internalLocalized("common_audio_status")
+    static let deviceTemp = internalLocalized("common_device_temp")
+    static let wifiMobile = internalLocalized("common_wifi_or_mobile_network")
     
-    static let smoothStreaming = internalLocalized("Smooth streaming")
-    static let properVolume = internalLocalized("Proper volume ensures good viewing experience")
-    static let regularChecks = internalLocalized("Regular checks ensure good viewing experience")
-    static let avoidSwitching = internalLocalized("Avoid frequent network switching")
-
-    static let resolution4K = internalLocalized("Resolution: 1080")
-    static let audioMode = internalLocalized("Audio mode: High-fidelity voice")
+    static let smoothStreaming = internalLocalized("common_video_stream_smooth")
+    static let properVolume = internalLocalized("common_audio_tips_proper_volume")
+    static let regularChecks = internalLocalized("common_audio_tips_regular_checks")
+    static let avoidSwitching = internalLocalized("common_network_switch_tips")
 }

@@ -80,5 +80,5 @@ extension StreamDashboardPanel {
 
 
 fileprivate extension String {
-    static let dashboardText = internalLocalized("Dashboard")
+    static let dashboardText = internalLocalized("common_dashboard_title")
 }

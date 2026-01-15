@@ -216,5 +216,5 @@ class AudienceBattleMemberInfoView: RTCBaseView {
 }
 
 private extension String {
-    static let connectingText = internalLocalized("Connecting")
+    static let connectingText = internalLocalized("common_battle_connecting")
 }

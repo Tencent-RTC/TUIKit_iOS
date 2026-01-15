@@ -180,7 +180,7 @@ fileprivate class StreamDashboardNetItemView: UIView {
 }
 
 fileprivate extension String {
-    static let rttText = internalLocalized("RTT")
-    static let downLossText = internalLocalized("DownLoss")
-    static let upLossText = internalLocalized("UpLoss")
+    static let rttText = internalLocalized("common_rtt")
+    static let downLossText = internalLocalized("common_dashboard_down_loss")
+    static let upLossText = internalLocalized("common_dashboard_up_loss")
 }

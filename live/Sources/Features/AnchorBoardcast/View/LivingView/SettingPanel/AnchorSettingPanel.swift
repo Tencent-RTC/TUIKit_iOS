@@ -163,5 +163,5 @@ class AnchorSettingPanelCell: UICollectionViewCell {
 
 
 private extension String {
-    static let settingTitleText: String = internalLocalized("More Features")
+    static let settingTitleText: String = internalLocalized("common_more_features")
 }

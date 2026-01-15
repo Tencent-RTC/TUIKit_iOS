@@ -143,5 +143,5 @@ extension GiftBarrageCell {
 }
 
 private extension String {
-    static let sendText = internalLocalized("Sent")
+    static let sendText = internalLocalized("common_sent")
 }

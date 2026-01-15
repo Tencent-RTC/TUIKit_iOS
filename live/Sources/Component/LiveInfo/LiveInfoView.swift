@@ -105,8 +105,6 @@ public class LiveInfoView: UIView {
             followButton.snp.makeConstraints { make in
                 make.trailing.equalToSuperview().inset(8.scale375())
                 make.centerY.equalToSuperview()
-                make.width.equalTo(45.scale375())
-                make.height.equalTo(24.scale375Height())
             }
         }
     }
@@ -199,8 +197,6 @@ public class LiveInfoView: UIView {
             followButton.snp.remakeConstraints { make in
                 make.trailing.equalToSuperview().inset(8.scale375())
                 make.centerY.equalToSuperview()
-                make.width.equalTo(45.scale375())
-                make.height.equalTo(24.scale375Height())
             }
             roomOwnerNameLabel.snp.remakeConstraints { make in
                 make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
@@ -239,5 +235,5 @@ extension LiveInfoView {
 
 
 fileprivate extension String {
-    static let followText = internalLocalized("Follow")
+    static let followText = internalLocalized("common_follow_anchor")
 }

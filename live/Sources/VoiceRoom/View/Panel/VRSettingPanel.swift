@@ -90,5 +90,5 @@ private extension VRSettingPanel {
 }
 
 private extension String {
-    static let settingTitleText: String = internalLocalized("Settings")
+    static let settingTitleText: String = internalLocalized("common_settings")
 }

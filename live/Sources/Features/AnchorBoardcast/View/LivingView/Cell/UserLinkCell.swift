@@ -87,6 +87,6 @@ extension UserLinkCell {
 
 private extension String {
     static var anchorHangUpTitle: String {
-        internalLocalized("End")
+        internalLocalized("common_end_user")
     }
 }

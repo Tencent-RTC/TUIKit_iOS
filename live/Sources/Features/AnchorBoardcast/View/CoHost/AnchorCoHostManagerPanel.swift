@@ -48,7 +48,7 @@ class AnchorCoHostManagerPanel: RTCBaseView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -305,12 +305,12 @@ extension AnchorCoHostManagerPanel: UITableViewDataSource {
 }
 
 private extension String {
-    static let connectionTitleText = internalLocalized("Start Co-hosting")
-    static let connectedTitleText = internalLocalized("Connecting")
-    static let recommendedTitleText = internalLocalized("Suggested Hosts")
-    static let disconnectText = internalLocalized("Exit connect")
+    static let connectionTitleText = internalLocalized("common_connection")
+    static let connectedTitleText = internalLocalized("common_battle_connecting")
+    static let recommendedTitleText = internalLocalized("common_recommended_list")
+    static let disconnectText = internalLocalized("common_exit_connect")
     
-    static let disconnectAlertText = internalLocalized("Are you sure you want to disconnect from other streamers?")
-    static let disconnectAlertCancelText = internalLocalized("Cancel")
-    static let disconnectAlertDisconnectText = internalLocalized("End Co-host")
+    static let disconnectAlertText = internalLocalized("common_disconnect_tips")
+    static let disconnectAlertCancelText = internalLocalized("common_cancel")
+    static let disconnectAlertDisconnectText = internalLocalized("common_end_connection")
 }

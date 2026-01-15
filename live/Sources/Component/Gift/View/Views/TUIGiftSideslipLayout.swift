@@ -7,7 +7,13 @@
 
 import UIKit
 
-class TUIGiftSideslipLayout: UICollectionViewFlowLayout {
+class GiftCollectionViewLayout: UICollectionViewFlowLayout {
+    override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+        return true
+    }
+}
+
+class TUIGiftSideslipLayout: GiftCollectionViewLayout {
     var rows: Int = 2
     private var layoutAttributes: [UICollectionViewLayoutAttributes] = []
     private var beginDiff: CGFloat = 0

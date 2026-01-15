@@ -85,5 +85,5 @@ class SongListButton: UIControl {
 }
 
 fileprivate extension String {
-    static var songText = ("Song").localized
+    static var songText = ("karaoke_order_song").localized
 }

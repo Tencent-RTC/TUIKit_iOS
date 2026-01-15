@@ -98,11 +98,11 @@ extension MirrorType {
     func toString() -> String {
         switch self {
         case .auto:
-            return internalLocalized("Auto")
+            return internalLocalized("mirror_type_auto")
         case .enable:
-            return internalLocalized("Enable")
+            return internalLocalized("mirror_type_enable")
         case .disable:
-            return internalLocalized("Disable")
+            return internalLocalized("mirror_type_disable")
         }
     }
 

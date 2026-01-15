@@ -97,7 +97,11 @@ class PitchView: UIView {
             .sink { [weak self] currentScore in
                 guard let self = self ,let manager = manager else {return}
                 DispatchQueue.main.async {
-                    self.setScore(String(currentScore))
+                    if currentScore == -1001 {
+                        self.scoreButtonLayer?.string = String.score
+                    } else {
+                        self.setScore(String(currentScore))
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -293,17 +297,7 @@ class PitchView: UIView {
             let contain = !((progress > (stdPitch.startTime + stdPitch.duration + Int(config.estimatedCallInterval)))
                             || progress < stdPitch.startTime)
             if contain {
-                if pitch == -1001 {
-                    hit = true
-                    currentSingPitch = stdPitch.pitch
-                    updateHitPitchModelsAtProgress(progress: progress, pitch: currentSingPitch, matchedStdPitchModel: stdPitch)
-                    if !hitInPeriod {
-                        firstHitInPeriod = true
-                        DispatchQueue.main.async {
-                            self.setScore(.score.localized)
-                        }
-                    }
-                } else if abs(pitch - stdPitch.pitch) <= 3 {
+                if abs(pitch - stdPitch.pitch) <= 3 {
                     hit = true
                     currentSingPitch = stdPitch.pitch
                     updateHitPitchModelsAtProgress(progress: progress, pitch: currentSingPitch, matchedStdPitchModel: stdPitch)
@@ -447,5 +441,5 @@ extension PitchView: PitchCanvasDelegate {
 }
 
 fileprivate extension String {
-    static var score: String = ("Score").localized
+    static var score: String = ("karaoke_score").localized
 }

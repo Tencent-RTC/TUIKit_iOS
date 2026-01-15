@@ -29,7 +29,7 @@ class AudienceListPanelView: UIView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(.liveBundleImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(.liveBundleImage("live_back_icon")?.rtlFlipped(), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -155,6 +155,6 @@ extension AudienceListPanelView: UITableViewDelegate {
 }
 
 fileprivate extension String {
-    static let onlineAudience = internalLocalized("Online audience")
+    static let onlineAudience = internalLocalized("common_anchor_audience_list_panel_title")
 }
 

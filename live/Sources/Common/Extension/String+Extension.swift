@@ -5,11 +5,11 @@
 //  Created by krabyu on 2024/3/11.
 //
 
-import TUICore
+import AtomicX
 
 public extension String {
     static func localized(_ key: String, inBundle: Bundle, table: String = "TUILiveComponentLocalized") -> String {
-        if let bundlePath = inBundle.path(forResource: TUIGlobalization.getPreferredLanguage() ?? "", ofType: "lproj"),
+        if let bundlePath = inBundle.path(forResource: getPreferredLanguage(), ofType: "lproj"),
            let bundle = Bundle(path: bundlePath) {
             return bundle.localizedString(forKey: key, value: "", table: table)
         }

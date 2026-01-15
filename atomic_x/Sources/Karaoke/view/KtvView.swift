@@ -155,9 +155,8 @@ public class KtvView: UIView {
         }
     }
 
-    private func updatePitch(pitch: Int, progress: Int) {
+    private func updatePitch(pitch: Int) {
         pitchView.setCurrentPitch(pitch: pitch)
-        pitchView.setCurrentSongProgress(progress: progress)
     }
 
     private func generateStandardPitchModels(_ info: LyricsInfo?) {
@@ -202,8 +201,7 @@ public class KtvView: UIView {
         let username = songs.requester.userName == "" ? songs.requester.userId : songs.requester.userName
         if karaokeManager.karaokeState.enableScore && isKTV{
             scoreBoardView.isHidden = false
-            scoreBoardView.showScoreBoard(imageURl: imageURL,username: username,
-                                          score: self.averageScore == -1 ? Int32.random(in: 95...100) : self.averageScore)
+            scoreBoardView.showScoreBoard(imageURl: imageURL,username: username, score: karaokeManager.karaokeState.averageScore)
         } else {
             scoreBoardView.isHidden = true
         }
@@ -381,18 +379,6 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.currentMusicId))
-            .removeDuplicates()
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] musicId in
-                guard let self = self else {return}
-                if musicId != "" {
-                    self.loadCurrentSongResources(musicId: musicId)
-                }
-            }
-            .store(in: &cancellables)
-
         karaokeManager.subscribe(StateSelector(keyPath: \.currentPitchList))
             .removeDuplicates { $0.count == $1.count }
             .dropFirst()
@@ -426,7 +412,7 @@ extension KtvView {
             .dropFirst()
             .sink { [weak self] pitch in
                 guard let self = self else {return}
-                self.updatePitch(pitch: Int(pitch), progress: Int(karaokeManager.karaokeState.progressMs))
+                self.updatePitch(pitch: Int(pitch))
             }
             .store(in: &cancellables)
 
@@ -477,17 +463,6 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.currentScore))
-            .removeDuplicates()
-            .dropFirst()
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] currentScore in
-                guard let self = self else {return}
-                pitchView.setScore("\(currentScore)")
-            }
-            .store(in: &cancellables)
-
         karaokeManager.subscribe(StateSelector(keyPath: \.averageScore))
             .removeDuplicates()
             .dropFirst()
@@ -503,7 +478,7 @@ extension KtvView {
 }
 
 fileprivate extension String {
-    static let waitingTipsText = ("Waiting for song selection…").localized
-    static let pauseText = ("Song paused...").localized
+    static let waitingTipsText = ("karaoke_audience_waiting_tips").localized
+    static let pauseText = ("karaoke_song_pause").localized
 }
 

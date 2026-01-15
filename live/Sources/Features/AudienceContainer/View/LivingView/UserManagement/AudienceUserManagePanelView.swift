@@ -98,7 +98,7 @@ class AudienceUserManagePanelView: RTCBaseView {
     private lazy var idLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 12)
-        label.text = "ID: " + user.userInfo.userID
+        label.text = .userIDText.replacingOccurrences(of: "xxx", with: user.userInfo.userID)
         label.textColor = .greyColor
         return label
     }()
@@ -413,22 +413,23 @@ extension AudienceUserManagePanelView {
 }
 
 private extension String {
-    static let followText = internalLocalized("Follow")
-    static let kickOutOfRoomText = internalLocalized("Remove")
-    static let kickOutOfRoomConfirmText = internalLocalized("Remove")
-    static let kickOutAlertText = internalLocalized("Are you sure you want to remove xxx?")
-    static let muteAudioText = internalLocalized("Mute")
-    static let unmuteAudioText = internalLocalized("Unmute")
-    static let opneCameraText = internalLocalized("Start Video")
-    static let closeCameraText = internalLocalized("Stop Video")
-    static let filpText = internalLocalized("Flip")
-    static let leaveSeatAlertText = internalLocalized("Are you sure you want to disconnect?")
-    static let cancelText = internalLocalized("Cancel")
-    static let disableAudioText = internalLocalized("Disable Audio")
-    static let enableAudioText = internalLocalized("Enable Audio")
-    static let disableCameraText = internalLocalized("Disable Video")
-    static let enableCameraText = internalLocalized("Enable Video")
-    static let hangupText = internalLocalized("End")
-    static let hangupAlertText = internalLocalized("Are you sure you want to disconnect xxx?")
-    static let disconnectText = internalLocalized("End Co-guest")
+    static let followText = internalLocalized("common_follow_anchor")
+    static let kickOutOfRoomText = internalLocalized("common_remove")
+    static let kickOutOfRoomConfirmText = internalLocalized("common_remove")
+    static let kickOutAlertText = internalLocalized("common_kick_user_confirm_message")
+    static let muteAudioText = internalLocalized("common_voiceroom_mute_seat")
+    static let unmuteAudioText = internalLocalized("common_voiceroom_unmuted_seat")
+    static let opneCameraText = internalLocalized("common_start_video")
+    static let closeCameraText = internalLocalized("common_stop_video")
+    static let filpText = internalLocalized("common_video_settings_item_flip")
+    static let leaveSeatAlertText = internalLocalized("common_terminate_room_connection_message")
+    static let cancelText = internalLocalized("common_cancel")
+    static let disableAudioText = internalLocalized("common_disable_audio")
+    static let enableAudioText = internalLocalized("common_enable_audio")
+    static let disableCameraText = internalLocalized("common_disable_video")
+    static let enableCameraText = internalLocalized("common_enable_video")
+    static let hangupText = internalLocalized("common_end_user")
+    static let hangupAlertText = internalLocalized("common_disconnect_guest_tips")
+    static let disconnectText = internalLocalized("common_end_link")
+    static let userIDText = internalLocalized("common_user_id")
 }

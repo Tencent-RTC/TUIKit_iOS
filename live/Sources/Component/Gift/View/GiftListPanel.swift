@@ -61,6 +61,6 @@ extension GiftListPanel {
 }
 
 private extension String {
-    static let giftTitle = internalLocalized("Gift")
-    static let giftMutedText = internalLocalized("You have been muted in the current room and cannot send gifts")
+    static let giftTitle = internalLocalized("common_gift_title")
+    static let giftMutedText = internalLocalized("common_muted_gift")
 }

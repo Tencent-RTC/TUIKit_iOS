@@ -32,6 +32,7 @@ struct MusicSwitchItem: MusicSettingItem {
     public let cellType: MusicCellType = .switcher(MusicSwitchCell.identifier)
     // default value
     public var isOn: Bool
+    public var isEnabled: Bool = true
     public var action: ((Bool) -> Void)?
     public var subscribeState: ((MusicSwitchCell, inout Set<AnyCancellable>) -> Void)?
 
@@ -39,9 +40,10 @@ struct MusicSwitchItem: MusicSettingItem {
         action?(payload)
     }
 
-    public init(title: String, isOn: Bool, action: ((Bool) -> Void)? = nil, subscribeState: ((MusicSwitchCell, inout Set<AnyCancellable>) -> Void)? = nil) {
+    public init(title: String, isOn: Bool, isEnabled: Bool = true, action: ((Bool) -> Void)? = nil, subscribeState: ((MusicSwitchCell, inout Set<AnyCancellable>) -> Void)? = nil) {
         self.title = title
         self.isOn = isOn
+        self.isEnabled = isEnabled
         self.action = action
         self.subscribeState = subscribeState
     }

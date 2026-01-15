@@ -49,6 +49,10 @@ class AnchorStore {
             LiveAudienceStore.create(liveID: liveID)
         }
 
+        var summaryStore: LiveSummaryStore {
+            LiveSummaryStore.create(liveID: liveID)
+        }
+
         private(set) lazy var anchorMediaManager = AnchorMediaStore(context: self)
         private(set) lazy var anchorCoHostManager = AnchorCoHostStore(context: self)
 
@@ -170,6 +174,10 @@ extension AnchorStore {
 
     var barrageStore: BarrageStore {
         context.barrageStore
+    }
+
+    var summaryStore: LiveSummaryStore {
+        context.summaryStore
     }
 
     var battleStore: BattleStore {
@@ -336,7 +344,7 @@ extension AnchorStore.Context {
 }
 
 private extension String {
-    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
-    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
-    static let kickedOutOfSeat = internalLocalized("Kicked out of seat by room owner")
+    static let takeSeatApplicationRejected = internalLocalized("common_voiceroom_take_seat_rejected")
+    static let takeSeatApplicationTimeout = internalLocalized("common_voiceroom_take_seat_timeout")
+    static let kickedOutOfSeat = internalLocalized("common_voiceroom_kicked_out_of_seat")
 }

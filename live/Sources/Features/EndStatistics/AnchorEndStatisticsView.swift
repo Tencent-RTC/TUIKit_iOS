@@ -76,7 +76,7 @@ class AnchorEndStatisticsView: UIView {
     
     private lazy var contentDescLabel: UILabel = {
         let label = UILabel()
-        label.textAlignment = .left
+        label.textAlignment = .natural
         label.font = .customFont(ofSize: 14)
         label.textColor = .flowKitWhite
         label.text = .contentDestText
@@ -216,34 +216,34 @@ extension AnchorEndStatisticsView {
 
 private extension String {
     static var titleText: String {
-        internalLocalized("Live broadcast has ended")
+        internalLocalized("common_live_has_stop")
     }
     
     static var contentDestText: String {
-        internalLocalized("Live data")
+        internalLocalized("common_common_this_live_data")
     }
     
     static var durationText: String {
-        internalLocalized("Duration")
+        internalLocalized("common_common_live_duration")
     }
     
     static var giftIncomeText: String {
-        internalLocalized("Gift Income")
+        internalLocalized("common_common_gift_income")
     }
     
     static var audienceCountText: String {
-        internalLocalized("Total Views")
+        internalLocalized("common_common_live_people_number")
     }
     
     static var messageCountText: String {
-        internalLocalized("Messages")
+        internalLocalized("common_common_message_count")
     }
     
     static var giftPeopleCountText: String {
-        internalLocalized("Gift givers")
+        internalLocalized("common_common_send_gift_people_count")
     }
     
     static var likeCountText: String {
-        internalLocalized("Likes Count")
+        internalLocalized("common_common_like_count")
     }
 }

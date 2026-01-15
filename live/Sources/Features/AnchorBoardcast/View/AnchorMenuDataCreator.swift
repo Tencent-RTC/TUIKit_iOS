@@ -63,7 +63,9 @@ extension AnchorMenuDataCreator {
             let selfUserId = store.selfUserID
             connection.tapAction = { [weak self] _ in
                 guard let self = self else { return }
-                if store.coGuestState.connected.count > 1 || store.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) {
+                if store.coGuestState.connected.count > 1 ||
+                    store.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) ||
+                    store.coGuestState.applicants.count > 0 {
                     return
                 } else {
                     routerManager.router(action: .present(.connectionControl))
@@ -72,14 +74,17 @@ extension AnchorMenuDataCreator {
             
             connection.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
+                let battleUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers)).removeDuplicates()
+                let coGuestApplicantPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.applicants)).removeDuplicates()
                 store.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
                     .removeDuplicates()
-                    .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers)).removeDuplicates())
+                    .combineLatest(battleUsersPublisher, coGuestApplicantPublisher)
                     .receive(on: RunLoop.main)
-                    .sink { [weak button] seatList, battleUsers in
+                    .sink { [weak button] seatList, battleUsers, applicants in
                         let isBattle = battleUsers.contains(where: { $0.userID == selfUserId })
                         let isCoGuestConnected = seatList.count > 1
-                        let imageName = isBattle || isCoGuestConnected ? "live_connection_disable_icon" : "live_connection_icon"
+                        let isHandleApplicants = applicants.count > 0
+                        let imageName = isBattle || isCoGuestConnected || isHandleApplicants ? "live_connection_disable_icon" : "live_connection_icon"
                         button?.setImage(internalImage(imageName), for: .normal)
                     }
                     .store(in: &cancellableSet)
@@ -339,23 +344,23 @@ extension AnchorMenuDataCreator {
 }
 
 private extension String {
-    static let videoLinkRequestText = internalLocalized("Apply for video link")
-    static var audioLinkRequestText = internalLocalized("Apply for audio link")
-    static let waitToLinkText = internalLocalized("You have submitted a link mic request, please wait for the author approval")
-    static let beautyText = internalLocalized("Beauty")
-    static let audioEffectsText = internalLocalized("Audio")
-    static let flipText = internalLocalized("Flip")
-    static let mirrorText = internalLocalized("Mirror")
-    static let confirmEndBattleText = internalLocalized("End PK")
-    static let endBattleAlertText = internalLocalized("Are you sure you want to end the battle? The current result will be the final result after the end")
-    static let cancelText = internalLocalized("Cancel")
+    static let videoLinkRequestText = internalLocalized("common_text_link_mic_video")
+    static var audioLinkRequestText = internalLocalized("common_text_link_mic_audio")
+    static let waitToLinkText = internalLocalized("common_toast_apply_link_mic")
+    static let beautyText = internalLocalized("common_video_settings_item_beauty")
+    static let audioEffectsText = internalLocalized("common_audio_effect")
+    static let flipText = internalLocalized("common_video_settings_item_flip")
+    static let mirrorText = internalLocalized("common_video_settings_item_mirror")
+    static let confirmEndBattleText = internalLocalized("common_end_pk")
+    static let endBattleAlertText = internalLocalized("common_battle_end_pk_tips")
+    static let cancelText = internalLocalized("common_cancel")
     
-    static let streamDashboardText = internalLocalized("Dashboard")
-    static let cancelLinkMicRequestText = internalLocalized("Cancel application for link mic")
-    static let confirmTerminateCoGuestText = internalLocalized("End Link")
-    static let coHostText = internalLocalized("Host")
-    static let battleText = internalLocalized("Battle")
-    static let coGuestText = internalLocalized("Guest")
-    static let MoreText = internalLocalized("More")
-    static let switchToText = internalLocalized("Change to xxx")
+    static let streamDashboardText = internalLocalized("common_dashboard_title")
+    static let cancelLinkMicRequestText = internalLocalized("common_text_cancel_link_mic_apply")
+    static let confirmTerminateCoGuestText = internalLocalized("common_text_close_link_mic")
+    static let coHostText = internalLocalized("common_link_host")
+    static let battleText = internalLocalized("common_anchor_battle")
+    static let coGuestText = internalLocalized("common_link_guest")
+    static let MoreText = internalLocalized("common_more")
+    static let switchToText = internalLocalized("mirror_type_change_to")
 }

@@ -31,6 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                                name: Notification.Name("TUILoginSuccessNotification"),
                                                object: nil)
         
+        TUIGlobalization.enableLanguageHook()
+        
         return true
     }
 

@@ -207,16 +207,16 @@ extension AudienceRootMenuDataCreator {
 }
 
 private extension String {
-    static let videoLinkRequestText = internalLocalized("Apply for video link")
-    static var audioLinkRequestText = internalLocalized("Apply for audio link")
-    static let waitToLinkText = internalLocalized("You have submitted a link mic request, please wait for the author approval")
-    static let beautyText = internalLocalized("Beauty")
-    static let audioEffectsText = internalLocalized("Audio")
-    static let flipText = internalLocalized("Flip")
-    static let mirrorText = internalLocalized("Mirror")
+    static let videoLinkRequestText = internalLocalized("common_text_link_mic_video")
+    static var audioLinkRequestText = internalLocalized("common_text_link_mic_audio")
+    static let waitToLinkText = internalLocalized("common_toast_apply_link_mic")
+    static let beautyText = internalLocalized("common_video_settings_item_beauty")
+    static let audioEffectsText = internalLocalized("common_audio_effect")
+    static let flipText = internalLocalized("common_video_settings_item_flip")
+    static let mirrorText = internalLocalized("common_video_settings_item_mirror")
     
-    static let cancelLinkMicRequestText = internalLocalized("Cancel application for link mic")
-    static let confirmTerminateCoGuestText = internalLocalized("End Link")
-    static let coGuestText = internalLocalized("Guest")
-    static let cancelText = internalLocalized("Cancel")
+    static let cancelLinkMicRequestText = internalLocalized("common_text_cancel_link_mic_apply")
+    static let confirmTerminateCoGuestText = internalLocalized("common_text_close_link_mic")
+    static let coGuestText = internalLocalized("common_link_guest")
+    static let cancelText = internalLocalized("common_cancel")
 }

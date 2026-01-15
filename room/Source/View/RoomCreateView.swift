@@ -353,10 +353,10 @@ extension RoomCreateView {
 }
 
 fileprivate extension String {
-    static let createRoom = "Create room".localized
-    static let yourName = "Your name".localized
-    static let enableAudio = "Enable audio".localized
-    static let enableSpeaker = "Enable speaker".localized
-    static let enableVideo = "Enable video".localized
-    static let roomName = "xxx's room"
+    static let createRoom = "roomkit_create_room".localized
+    static let yourName = "roomkit_your_name".localized
+    static let enableAudio = "roomkit_enable_audio".localized
+    static let enableSpeaker = "roomkit_enable_speaker".localized
+    static let enableVideo = "roomkit_enable_video".localized
+    static let roomName = "roomkit_user_room"
 }

@@ -136,5 +136,5 @@ class SingleColumnWidgetView: RTCBaseView {
 }
 
 extension String {
-    static var joinLiveButtonText = internalLocalized("Click to enter the live room")
+    static var joinLiveButtonText = internalLocalized("livelist_click_enter_room")
 }

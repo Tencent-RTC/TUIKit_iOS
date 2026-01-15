@@ -53,7 +53,7 @@ class TemplateSelectionView: UIView {
         }
         
         let backBtn = UIButton(type: .custom)
-        backBtn.setImage(internalImage("live_back_icon"), for: .normal)
+        backBtn.setImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         backBtn.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         titleView.addSubview(backBtn)
         backBtn.snp.makeConstraints { make in
@@ -215,9 +215,7 @@ class TemplateSelectionViewCell: UICollectionViewCell {
         let view = UILabel(frame: .zero)
         view.font = .customFont(ofSize: 14, weight: .regular)
         view.textColor = .white.withAlphaComponent(0.9)
-        view.textAlignment = .left
-        view.adjustsFontSizeToFitWidth = true
-        view.minimumScaleFactor = 0.5
+        view.numberOfLines = 2
         view.baselineAdjustment = .alignCenters
         return view
     }()
@@ -246,7 +244,7 @@ class TemplateSelectionViewCell: UICollectionViewCell {
         bgView.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(imageView.snp.trailing).offset(12)
-            make.trailing.equalToSuperview().offset(-12)
+            make.trailing.lessThanOrEqualToSuperview().offset(-12)
             make.centerY.equalToSuperview()
         }
     }
@@ -309,9 +307,9 @@ enum SelectionMode: CaseIterable {
 }
 
 private extension String {
-    static let titleText = internalLocalized("Layout settings")
-    static let anchorPkText = internalLocalized("Layout co-host")
-    static let anchorLinkText = internalLocalized("Layout co-guest")
-    static let pkLayoutText = internalLocalized("Layout co-host")
-    static let layoutText = internalLocalized("Layout co-guest")
+    static let titleText = internalLocalized("common_template_layout_settings")
+    static let anchorPkText = internalLocalized("common_template_layout_co_host")
+    static let anchorLinkText = internalLocalized("common_template_layout_co_guest")
+    static let pkLayoutText = internalLocalized("common_template_layout_co_host")
+    static let layoutText = internalLocalized("common_template_layout_co_guest")
 }

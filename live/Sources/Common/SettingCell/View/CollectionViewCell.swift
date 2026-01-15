@@ -41,6 +41,7 @@ public class ButtonCollectionCell: UICollectionViewCell {
         view.font = .customFont(ofSize: 12)
         view.textColor = .flowKitWhite
         view.textAlignment = .center
+        view.numberOfLines = 2
         self.contentView.addSubview(view)
         return view
     }()
@@ -77,7 +78,6 @@ public class ButtonCollectionCell: UICollectionViewCell {
             make.top.equalTo(containerView.snp.bottom).offset(6.0)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
-            make.height.equalTo(18.0)
         }
     }
     

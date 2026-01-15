@@ -245,6 +245,6 @@ extension RoomHomeView {
 }
 
 fileprivate extension String {
-    static let joinRoom = "Join room".localized
-    static let createRoom = "Create room".localized
+    static let joinRoom = "roomkit_join_room".localized
+    static let createRoom = "roomkit_create_room".localized
 }

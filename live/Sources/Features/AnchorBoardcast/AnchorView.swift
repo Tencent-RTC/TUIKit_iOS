@@ -349,7 +349,7 @@ extension AnchorView {
     }
 
     private func setLocalVideoMuteImage() {
-        let imageName = TUIGlobalization.getPreferredLanguage() == "en" ? "live_muteImage_en" : "live_muteImage"
+        let imageName = getPreferredLanguage() == "en" ? "live_muteImage_en" : "live_muteImage"
         videoView.setLocalVideoMuteImage(
             bigImage: internalImage(imageName) ?? UIImage(),
             smallImage: internalImage("live_muteImage_small") ?? UIImage()
@@ -586,11 +586,11 @@ extension AnchorView {
 }
 
 private extension String {
-    static let connectionInviteText = internalLocalized("xxx invite you to host together")
-    static let rejectText = internalLocalized("Reject")
-    static let acceptText = internalLocalized("Accept")
-    static let battleInvitationText = internalLocalized("xxx invite you to battle together")
-    static let rejectBattleText = internalLocalized("xxx rejected battle")
-    static let cancelBattleText = internalLocalized("xxx canceled battle, please try to initiate it again")
-    static let battleRequestTimeoutText = internalLocalized("Battle request has been timeout")
+    static let connectionInviteText = internalLocalized("common_connect_inviting_append")
+    static let rejectText = internalLocalized("common_reject")
+    static let acceptText = internalLocalized("common_receive")
+    static let battleInvitationText = internalLocalized("common_battle_inviting")
+    static let rejectBattleText = internalLocalized("common_battle_invitee_reject")
+    static let cancelBattleText = internalLocalized("common_battle_inviter_cancel")
+    static let battleRequestTimeoutText = internalLocalized("common_battle_invitation_timeout")
 }

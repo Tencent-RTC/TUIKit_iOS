@@ -86,5 +86,5 @@ extension SVGAAnimationView {
 }
 
 private extension String {
-    static let isNotSVGAFileText = internalLocalized("animation is not svga resource file")
+    static let isNotSVGAFileText = internalLocalized("live_gift_animation_is_not_svga_file")
 }

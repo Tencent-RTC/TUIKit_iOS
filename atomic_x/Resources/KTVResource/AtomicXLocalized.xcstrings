@@ -1,7 +1,42 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Waiting for song selection…": {
+    "common_client_error_freq_limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request Rate Limited, Please Try Again Later"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求被限频，请稍后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請求被限頻，請稍後重試"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リクエストは制限されています。後でもう一度やり直してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تحديد معدل الطلبات، يرجى المحاولة لاحقاً"
+          }
+        }
+      }
+    },
+    "karaoke_audience_waiting_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -27,10 +62,16 @@
             "state": "translated",
             "value": "歌を待っています..."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار اختيار الأغنية..."
+          }
         }
       }
     },
-    "Reverb": {
+    "karaoke_change_reverb": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -56,10 +97,16 @@
             "state": "translated",
             "value": "残響"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدى"
+          }
         }
       }
     },
-    "Exit Order": {
+    "karaoke_exit_order": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -85,10 +132,16 @@
             "state": "translated",
             "value": "歌の注文を終了します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الخروج من الطلب"
+          }
         }
       }
     },
-    "No songs": {
+    "karaoke_no_song": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -114,10 +167,16 @@
             "state": "translated",
             "value": "まだ曲はありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد أغاني"
+          }
         }
       }
     },
-    "Song": {
+    "karaoke_order_song": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -143,10 +202,16 @@
             "state": "translated",
             "value": "歌の注文"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أغنية"
+          }
         }
       }
     },
-    "Ordered": {
+    "karaoke_ordered": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -172,10 +237,16 @@
             "state": "translated",
             "value": "すでにクリックしています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم الطلب"
+          }
         }
       }
     },
-    "Ordered(xxx)": {
+    "karaoke_ordered_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -201,10 +272,16 @@
             "state": "translated",
             "value": "クリック（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم الطلب (xxx)"
+          }
         }
       }
     },
-    "Original": {
+    "karaoke_original": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -216,24 +293,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "原声"
+            "value": "原唱"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "原聲"
+            "value": "原唱"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "オリジナルのサウンドトラック"
+            "value": "オリジナルの歌"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أصلي"
           }
         }
       }
     },
-    "KTV": {
+    "karaoke_reverb_ktv": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -259,10 +342,16 @@
             "state": "translated",
             "value": "KTV"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
         }
       }
     },
-    "Loud": {
+    "karaoke_reverb_loud": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -288,10 +377,16 @@
             "state": "translated",
             "value": "ホン・リアン"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عالي"
+          }
         }
       }
     },
-    "Low": {
+    "karaoke_reverb_low": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -317,10 +412,16 @@
             "state": "translated",
             "value": "低い"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منخفض"
+          }
         }
       }
     },
-    "Metallic sound": {
+    "karaoke_reverb_metallic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -346,10 +447,16 @@
             "state": "translated",
             "value": "メタルサウンド"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت معدني"
+          }
         }
       }
     },
-    "No effect": {
+    "karaoke_reverb_none": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -375,10 +482,16 @@
             "state": "translated",
             "value": "効果はありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدون تأثير"
+          }
         }
       }
     },
-    "Score": {
+    "karaoke_score": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -404,10 +517,16 @@
             "state": "translated",
             "value": "スコア"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقاط الغناء"
+          }
         }
       }
     },
-    "Audio settings": {
+    "karaoke_setting_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -433,10 +552,16 @@
             "state": "translated",
             "value": "オーディオ設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الصوت"
+          }
         }
       }
     },
-    "Capture Volume": {
+    "karaoke_setting_capture_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -462,10 +587,16 @@
             "state": "translated",
             "value": "ボリュームを収集します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت الالتقاط"
+          }
         }
       }
     },
-    "Done": {
+    "karaoke_setting_done": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -491,10 +622,16 @@
             "state": "translated",
             "value": "仕上げる"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم"
+          }
         }
       }
     },
-    "Ear Monitor": {
+    "karaoke_setting_ear_return": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -520,10 +657,16 @@
             "state": "translated",
             "value": "耳の復帰"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سماعة الأذن"
+          }
         }
       }
     },
-    "Music Pitch": {
+    "karaoke_setting_music_pitch": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -549,10 +692,16 @@
             "state": "translated",
             "value": "上下にミュージカル"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نغمة الموسيقى"
+          }
         }
       }
     },
-    "Pitch Shift": {
+    "karaoke_setting_pitch_shift": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -578,10 +727,16 @@
             "state": "translated",
             "value": "持ち上げと下降"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تغيير النغمة"
+          }
         }
       }
     },
-    "Playout Volume": {
+    "karaoke_setting_playback_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -607,10 +762,16 @@
             "state": "translated",
             "value": "ボリュームを再生します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت التشغيل"
+          }
         }
       }
     },
-    "Tune": {
+    "karaoke_setting_tune": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -636,10 +797,16 @@
             "state": "translated",
             "value": "チューニング"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضبط"
+          }
         }
       }
     },
-    "Singing Score": {
+    "karaoke_singing_score": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -665,10 +832,16 @@
             "state": "translated",
             "value": "歌のスコア"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقاط الغناء"
+          }
         }
       }
     },
-    "Points": {
+    "karaoke_point": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -694,10 +867,51 @@
             "state": "translated",
             "value": "ポイント"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نقاط"
+          }
         }
       }
     },
-    "Song paused...": {
+    "karaoke_cant_switch_tracks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The current music does not support switching audio tracks"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前音乐不支持切换音轨"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前音樂不支援切換音軌現"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在の音楽はオーディオトラックの切り替えをサポートしていません。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموسيقى الحالية لا تدعم تبديل المسارات الصوتية"
+          }
+        }
+      }
+    },
+    "karaoke_song_pause": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -723,10 +937,16 @@
             "state": "translated",
             "value": "歌を一時停止しています..."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأغنية متوقفة مؤقتاً..."
+          }
         }
       }
     },
-    "Naughty child": {
+    "karaoke_voice_child": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -752,10 +972,16 @@
             "state": "translated",
             "value": "クマの子供"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طفل مشاغب"
+          }
         }
       }
     },
-    "Ethereal": {
+    "karaoke_voice_ethereal": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -781,10 +1007,16 @@
             "state": "translated",
             "value": "空の精神"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أثيري"
+          }
         }
       }
     },
-    "Loli": {
+    "karaoke_voice_girl": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -810,10 +1042,51 @@
             "state": "translated",
             "value": "ロリ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لولي"
+          }
         }
       }
     },
-    "Uncle": {
+    "karaoke_voice_none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Original"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原声"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原聲"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オリジナルのサウンドトラック"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أصلي"
+          }
+        }
+      }
+    },
+    "karaoke_voice_uncle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -839,10 +1112,16 @@
             "state": "translated",
             "value": "叔父"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عم"
+          }
         }
       }
     },
-    "Song List": {
+    "karaoke_song_list": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -868,10 +1147,16 @@
             "state": "translated",
             "value": "歌リスト"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة الأغاني"
+          }
         }
       }
     },
-    "Music loading failed": {
+    "karaoke_music_loading_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -896,6 +1181,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "音楽の読み込みに失敗しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل تحميل الموسيقى"
           }
         }
       }

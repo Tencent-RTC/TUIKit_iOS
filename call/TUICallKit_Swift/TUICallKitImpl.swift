@@ -433,7 +433,8 @@ extension TUICallKitImpl {
             }
             showCallKitViewController(isCaller: true)
             
-        case .onCallReceived(_, _, _):
+        case let .onCallReceived(callId, _, _):
+            KeyMetrics.countUV(eventId: .received, callId: callId)
             showCallKitViewController(isCaller: false)
             
         case let .onCallEnded(callId: _, mediaType: _, reason: reason, userId: userId):

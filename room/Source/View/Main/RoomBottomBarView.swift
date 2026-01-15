@@ -213,9 +213,9 @@ extension RoomBottomBarView {
 }
 
 fileprivate extension String {
-    static let members = "Members(xxx)"
-    static let mute = "Mute".localized
-    static let unmute = "Unmute".localized
-    static let stopVideo = "Stop video".localized
-    static let startVideo = "Start video".localized
+    static let members = "roomkit_member_count"
+    static let mute = "roomkit_mute".localized
+    static let unmute = "roomkit_unmute".localized
+    static let stopVideo = "roomkit_stop_video".localized
+    static let startVideo = "roomkit_start_video".localized
 }

@@ -493,7 +493,7 @@ extension AudienceView {
 
 extension AudienceView {
     func joinLiveStream(onComplete: @escaping (Result<Void, InternalError>) -> Void) {
-        let imageName = TUIGlobalization.getPreferredLanguage() == "en" ? "live_muteImage_en" : "live_muteImage"
+        let imageName = getPreferredLanguage() == "en" ? "live_muteImage_en" : "live_muteImage"
         videoView
             .setLocalVideoMuteImage(
                 bigImage: internalImage(imageName) ?? UIImage(),
@@ -574,18 +574,18 @@ extension AudienceView: RotateScreenDelegate {
 }
 
 private extension String {
-    static let kickedOutText = internalLocalized("You have been kicked out of the room")
-    static let mutedAudioText = internalLocalized("The anchor has muted you")
-    static let unmutedAudioText = internalLocalized("The anchor has unmuted you")
-    static let mutedVideoText = internalLocalized("The anchor disabled your video")
-    static let unmutedVideoText = internalLocalized("The anchor enabled your video")
-    static let endLiveOnLinkMicText = internalLocalized("You are currently co-guesting with other streamers. Would you like to [End Co-guest] or [Exit Live] ?")
-    static let endLiveLinkMicDisconnectText = internalLocalized("End Co-guest")
-    static let confirmCloseText = internalLocalized("Exit Live")
-    static let cancelText = internalLocalized("Cancel")
-    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
-    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
-    static let disableChatText = internalLocalized("You have been muted in the current room")
-    static let enableChatText = internalLocalized("You have been unmuted in the current room")
-    static let kickedOutOfSeat = internalLocalized("Kicked out of seat by room owner")
+    static let kickedOutText = internalLocalized("common_kicked_out_of_room_by_owner")
+    static let mutedAudioText = internalLocalized("common_mute_audio_by_master")
+    static let unmutedAudioText = internalLocalized("common_un_mute_audio_by_master")
+    static let mutedVideoText = internalLocalized("common_mute_video_by_owner")
+    static let unmutedVideoText = internalLocalized("common_un_mute_video_by_master")
+    static let endLiveOnLinkMicText = internalLocalized("common_audience_end_link_tips")
+    static let endLiveLinkMicDisconnectText = internalLocalized("common_end_link")
+    static let confirmCloseText = internalLocalized("common_exit_live")
+    static let cancelText = internalLocalized("common_cancel")
+    static let takeSeatApplicationRejected = internalLocalized("common_voiceroom_take_seat_rejected")
+    static let takeSeatApplicationTimeout = internalLocalized("common_voiceroom_take_seat_timeout")
+    static let disableChatText = internalLocalized("common_send_message_disabled")
+    static let enableChatText = internalLocalized("common_send_message_enable")
+    static let kickedOutOfSeat = internalLocalized("common_voiceroom_kicked_out_of_seat")
 }

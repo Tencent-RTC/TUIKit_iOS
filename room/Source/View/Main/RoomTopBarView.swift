@@ -261,5 +261,5 @@ extension RoomTopBarView {
 }
 
 fileprivate extension String {
-    static let end = "End".localized
+    static let end = "roomkit_end".localized
 }

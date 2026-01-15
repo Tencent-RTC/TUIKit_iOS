@@ -15,20 +15,10 @@ class VideoLiveViewController: UIViewController {
     private var currentStyle = LiveListViewStyle.doubleColumn
     private var cancellables = Set<AnyCancellable>()
     
-    private lazy var goLiveButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 26.scale375()
-        button.setImage(UIImage(named: "create_live"), for: .normal)
-        button.setTitle(.goLiveText, for: .normal)
-        button.addTarget(self, action: #selector(goLiveClick), for: .touchUpInside)
-        button.titleLabel?.font = UIFont(name: "PingFangSC-Semibold", size: 20)
-        button.backgroundColor = UIColor("1C66E5")
-        
-        let spacing: CGFloat = 8
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing / 2, bottom: 0, right: spacing / 2)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing / 2, bottom: 0, right: -spacing / 2)
-        return button
-    }()
+    private lazy var goLiveButton = AtomicButton(variant: .filled,
+                                                 colorType: .primary,
+                                                 size: .large,
+                                                 content: .iconLeading(text: .goLiveText, icon: UIImage(named: "livekit_ic_add")))
     
     private lazy var liveListViewController = {
         return TUILiveListViewController()
@@ -77,7 +67,7 @@ extension VideoLiveViewController {
         navigationItem.scrollEdgeAppearance = appearance
         
         let backBtn = UIButton(type: .custom)
-        backBtn.setImage(UIImage(named: "back")?.withTintColor(.white), for: .normal)
+        backBtn.setImage(UIImage(named: "back")?.rtlFlipped().withTintColor(.white), for: .normal)
         backBtn.addTarget(self, action: #selector(backBtnClick), for: .touchUpInside)
         backBtn.sizeToFit()
         let backItem = UIBarButtonItem(customView: backBtn)
@@ -106,6 +96,8 @@ extension VideoLiveViewController {
     }
     
     private func bindInteraction() {
+        goLiveButton.addTarget(self, action: #selector(goLiveClick), for: .touchUpInside)
+        
         ThemeStore.shared.$currentTheme
             .receive(on: DispatchQueue.main)
             .sink { [weak self] theme in

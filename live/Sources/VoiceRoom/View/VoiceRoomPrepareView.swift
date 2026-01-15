@@ -44,7 +44,7 @@ class VoiceRoomPrepareView: RTCBaseView {
 
     private lazy var ktvView: UIImageView = {
         let view = UIImageView()
-        let imageName = TUIGlobalization.getPreferredLanguage() == "en" ? "live_prepare_song_en" : "live_prepare_song_zh"
+        let imageName = getPreferredLanguage() == "en" ? "live_prepare_song_en" : "live_prepare_song_zh"
         view.image = internalImage(imageName)
         view.isHidden = true
         view.isUserInteractionEnabled = false
@@ -53,7 +53,7 @@ class VoiceRoomPrepareView: RTCBaseView {
 
     private let backButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        button.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         return button
     }()
     
@@ -311,9 +311,9 @@ extension VoiceRoomPrepareView {
 }
 
 private extension String {
-    static let startText = internalLocalized("Start Live")
-    static let backgroundText: String = internalLocalized("Background")
-    static let audioEffectsText: String = internalLocalized("Audio")
-    static let settingText: String = internalLocalized("Settings")
-    static let layoutText: String = internalLocalized("Layout")
+    static let startText = internalLocalized("common_start_live")
+    static let backgroundText: String = internalLocalized("common_settings_bg_image")
+    static let audioEffectsText: String = internalLocalized("common_audio_effect")
+    static let settingText: String = internalLocalized("common_settings")
+    static let layoutText: String = internalLocalized("common_template_layout")
 }

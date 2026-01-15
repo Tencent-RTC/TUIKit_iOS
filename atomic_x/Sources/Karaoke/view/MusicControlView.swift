@@ -379,5 +379,5 @@ class MusicControlView: UIView {
 
 
 fileprivate extension String {
-    static var noSongText: String = ("No songs").localized
+    static var noSongText: String = ("karaoke_no_song").localized
 }

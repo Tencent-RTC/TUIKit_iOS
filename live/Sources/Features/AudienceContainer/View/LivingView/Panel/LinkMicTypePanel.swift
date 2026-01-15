@@ -162,18 +162,18 @@ extension LinkMicTypePanel: UITableViewDataSource {
 
 private extension String {
     static var linkTypeTitleText: String {
-        internalLocalized("Choose Link Mode")
+        internalLocalized("common_title_link_mic_selector")
     }
 
     static var linkTypeTipsText: String {
-        internalLocalized("connect upon host's approval")
+        internalLocalized("common_text_link_mic_selector")
     }
 
     static var videoLinkRequestText: String {
-        internalLocalized("Apply for video link")
+        internalLocalized("common_text_link_mic_video")
     }
 
     static var audioLinkRequestText: String {
-        internalLocalized("Apply for audio link")
+        internalLocalized("common_text_link_mic_audio")
     }
 }

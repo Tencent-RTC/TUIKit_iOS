@@ -134,6 +134,14 @@ extension MusicSettingViewController {
                 vc.dismiss(animated: true)
             }
             .store(in: &cancellables)
+        
+        karaokeManager?.errorSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] errorMessage in
+                guard let self = self else { return }
+                self.view.showAtomicToast(text: errorMessage, style: .error)
+            }
+            .store(in: &cancellables)
     }
 
     func setupViewStyle() {
@@ -263,6 +271,6 @@ extension MusicSettingViewController: UIGestureRecognizerDelegate {
 }
 
 fileprivate extension String {
-    static let MusicSettingTitle: String = ("Tune").localized
-    static let doneText: String = ("Done").localized
+    static let MusicSettingTitle: String = ("karaoke_setting_tune").localized
+    static let doneText: String = ("karaoke_setting_done").localized
 }

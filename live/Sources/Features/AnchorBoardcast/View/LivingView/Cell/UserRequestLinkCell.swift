@@ -122,11 +122,11 @@ extension UserRequestLinkCell {
 
 private extension String {
     static var anchorLinkAgreeTitle: String {
-        internalLocalized("Agree")
+        internalLocalized("live_barrage_agree")
     }
     
     static var anchorLinkRejectTitle: String {
-        internalLocalized("Reject")
+        internalLocalized("common_reject")
     }
 
 }

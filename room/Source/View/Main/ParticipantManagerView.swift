@@ -468,15 +468,15 @@ private class ParticipantManagerCell: UITableViewCell {
 }
 
 fileprivate extension String {
-    static let modifyName = "Modify the name".localized
-    static let askToUnmute = "Ask to unmute".localized
-    static let mute = "Mute".localized
-    static let askToStartVideo = "Ask to start video".localized
-    static let stopVideo = "Stop video".localized
-    static let unmuteMessage = "Unmute message".localized
-    static let muteMessage = "Mute message".localized
-    static let makeHost = "Make host".localized
-    static let undoAdministrator = "Undo administrator".localized
-    static let setAsAdministrator = "Set as administrator".localized
-    static let remove = "Remove".localized
+    static let modifyName = "roomkit_modify_name".localized
+    static let askToUnmute = "roomkit_request_unmute_audio".localized
+    static let mute = "roomkit_mute".localized
+    static let askToStartVideo = "roomkit_request_start_video".localized
+    static let stopVideo = "roomkit_stop_video".localized
+    static let unmuteMessage = "roomkit_unmute_text_chat".localized
+    static let muteMessage = "roomkit_mute_text_chat".localized
+    static let makeHost = "roomkit_transfer_owner".localized
+    static let undoAdministrator = "roomkit_revoke_admin".localized
+    static let setAsAdministrator = "roomkit_set_admin".localized
+    static let remove = "roomkit_remove_member".localized
 }

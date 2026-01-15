@@ -688,70 +688,70 @@ extension RoomMainView: ParticipantManagerViewDelegate {
 
 fileprivate extension String {
     // Alert titles and messages
-    static let ok = "OK".localized
-    static let cancel = "Cancel".localized
-    static let roomClosed = "The room was closed.".localized
+    static let ok = "roomkit_ok".localized
+    static let cancel = "roomkit_cancel".localized
+    static let roomClosed = "roomkit_toast_room_closed".localized
     
     // Admin and role changes
-    static let becameAdmin = "You have become a conference admin".localized
-    static let adminRevoked = "Your conference admin status has been revoked".localized
-    static let becameHost = "You are now a host".localized
-    static let administrator = "Administrator".localized
+    static let becameAdmin = "roomkit_toast_you_are_admin".localized
+    static let adminRevoked = "roomkit_toast_you_are_no_longer_admin".localized
+    static let becameHost = "roomkit_toast_you_are_owner".localized
+    static let administrator = "roomkit_role_admin".localized
     
     // Device invitations
-    static let inviteTurnOnCamera = "xxx invites you to turn on the camera"
-    static let inviteTurnOnMicrophone = "xxx invites you to turn on the microphone"
-    static let reject = "Reject".localized
-    static let agree = "Agree".localized
+    static let inviteTurnOnCamera = "roomkit_msg_invite_start_video"
+    static let inviteTurnOnMicrophone = "roomkit_msg_invite_unmute_audio"
+    static let reject = "roomkit_reject".localized
+    static let agree = "roomkit_agree".localized
     
     // Message and device restrictions
-    static let bannedFromChat = "You have been banned from text chat".localized
-    static let allowedToChat = "You are allowed to text chat".localized
-    static let cameraClosedByHost = "You were closed camera by the host.".localized
-    static let mutedByHost = "You were muted by the host.".localized
-    static let removedByHost = "You were removed by the host.".localized
+    static let bannedFromChat = "roomkit_toast_text_chat_disabled".localized
+    static let allowedToChat = "roomkit_toast_text_chat_enabled".localized
+    static let cameraClosedByHost = "roomkit_toast_camera_closed_by_host".localized
+    static let mutedByHost = "roomkit_toast_muted_by_host".localized
+    static let removedByHost = "roomkit_toast_you_were_removed".localized
     
     // Room actions
-    static let endRoomConfirm = "If you don't want to end the conference, please assign a new host before leaving the conference".localized
-    static let endRoom = "End room".localized
+    static let endRoomConfirm = "roomkit_confirm_leave_room_by_owner".localized
+    static let endRoom = "roomkit_end_room".localized
     
-    static let leaveRoomConfirm = "Are you sure you want to leave the room".localized
-    static let leaveRoom = "Leave room".localized
+    static let leaveRoomConfirm = "roomkit_confirm_leave_room_by_genera_user".localized
+    static let leaveRoom = "roomkit_leave_room".localized
     
     
     // Device restrictions for general users
-    static let allMutedCannotUnmute = "All on mute audio unable to turn on microphone".localized
-    static let allVideoOffCannotTurnOn = "All on mute video unable to turn on camera".localized
+    static let allMutedCannotUnmute = "roomkit_tip_all_muted_cannot_unmute".localized
+    static let allVideoOffCannotTurnOn = "roomkit_tip_all_video_off_cannot_start".localized
     
     // Mute all audio
-    static let muteAllMembersTitle = "All current and incoming members will be muted".localized
-    static let unmuteAllMembersTitle = "All members will be unmuted".localized
-    static let muteAllMembersMessage = "Members will unable to turn on the microphone".localized
-    static let unmuteAllMembersMessage = "Members will be able to turn on the microphone".localized
-    static let muteAll = "Mute all".localized
-    static let confirmRelease = "Confirm release".localized
-    static let allAudiosDisabled = "All audios disabled".localized
-    static let allAudiosEnabled = "All audios enabled".localized
-    static let invitedToOpenAudio = "The audience has been invited to open the audio".localized
+    static let muteAllMembersTitle = "roomkit_msg_all_members_will_be_muted".localized
+    static let unmuteAllMembersTitle = "roomkit_msg_all_members_will_be_unmuted".localized
+    static let muteAllMembersMessage = "roomkit_msg_members_cannot_unmute".localized
+    static let unmuteAllMembersMessage = "roomkit_msg_members_can_unmute".localized
+    static let muteAll = "roomkit_mute_all_audio".localized
+    static let confirmRelease = "roomkit_confirm_release".localized
+    static let allAudiosDisabled = "roomkit_toast_all_audio_disabled".localized
+    static let allAudiosEnabled = "roomkit_toast_all_audio_enabled".localized
+    static let invitedToOpenAudio = "roomkit_toast_audio_invite_sent".localized
     
     // Mute all video
-    static let stopAllVideoTitle = "All current and incoming members will be restricted from video".localized
-    static let enableAllVideoTitle = "All members will not be restricted from video".localized
-    static let stopAllVideoMessage = "Members will unable to turn on video".localized
-    static let enableAllVideoMessage = "Members will be able to turn on video".localized
-    static let stopAllVideo = "Stop all video".localized
-    static let allVideosDisabled = "All videos disabled".localized
-    static let allVideosEnabled = "All videos enabled".localized
-    static let invitedToOpenVideo = "The audience has been invited to open the video".localized
+    static let stopAllVideoTitle = "roomkit_msg_all_members_video_disabled".localized
+    static let enableAllVideoTitle = "roomkit_msg_all_members_video_enabled".localized
+    static let stopAllVideoMessage = "roomkit_msg_members_cannot_start_video".localized
+    static let enableAllVideoMessage = "roomkit_msg_members_can_start_video".localized
+    static let stopAllVideo = "roomkit_disable_all_video".localized
+    static let allVideosDisabled = "roomkit_toast_all_video_disabled".localized
+    static let allVideosEnabled = "roomkit_toast_all_video_enabled".localized
+    static let invitedToOpenVideo = "roomkit_toast_video_invite_sent".localized
     
     // Member actions
-    static let kickOutConfirm = "Do you want to move xxx out of the room?"
-    static let setAsAdminSuccess = "xxx has been set as conference admin"
-    static let revokeAdminSuccess = "The conference admin status of xxx has been withdrawn"
+    static let kickOutConfirm = "roomkit_confirm_remove_member"
+    static let setAsAdminSuccess = "roomkit_toast_admin_set"
+    static let revokeAdminSuccess = "roomkit_toast_admin_revoked"
     
     // Transfer host
-    static let transferHostTitle = "Transfer the host to xxx"
-    static let transferHostMessage = "After transfer the host you will become a general user".localized
-    static let confirmTransfer = "Confirm transfer".localized
-    static let hostTransferredSuccess = "The host has been transferred to xxx"
+    static let transferHostTitle = "roomkit_msg_transfer_owner_to"
+    static let transferHostMessage = "roomkit_msg_transfer_owner_tip".localized
+    static let confirmTransfer = "roomkit_confirm_transfer".localized
+    static let hostTransferredSuccess = "roomkit_toast_owner_transferred"
 }

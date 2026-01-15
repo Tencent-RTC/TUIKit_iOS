@@ -336,8 +336,8 @@ class VRCoHostCardView: UIView {
 
 
 fileprivate extension String {
-    static let inBattleText = internalLocalized("In Battle")
-    static let invitingCancelText = internalLocalized("Cancel invite")
-    static let requestBattleText = internalLocalized("Request Battle")
+    static let inBattleText = internalLocalized("seat_in_battle")
+    static let invitingCancelText = internalLocalized("seat_cancel_invite")
+    static let requestBattleText = internalLocalized("seat_request_battle")
 }
 

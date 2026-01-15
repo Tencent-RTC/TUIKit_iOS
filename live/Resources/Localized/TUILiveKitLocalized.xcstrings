@@ -1,7 +1,7 @@
 {
   "sourceLanguage": "en",
   "strings": {
-    "Cancel": {
+    "app_cancel": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -27,10 +27,16 @@
             "state": "translated",
             "value": "キャンセル"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء"
+          }
         }
       }
     },
-    "Warm Tips": {
+    "app_tips_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -56,10 +62,16 @@
             "state": "translated",
             "value": "親切なヒント"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نصائح مفيدة"
+          }
         }
       }
     },
-    "Login failed": {
+    "app_toast_login_fail": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -85,10 +97,16 @@
             "state": "translated",
             "value": "ログインに失敗しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل تسجيل الدخول"
+          }
         }
       }
     },
-    "Logged In": {
+    "app_toast_login_success": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -114,10 +132,16 @@
             "state": "translated",
             "value": "正常にログインします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تسجيل الدخول"
+          }
         }
       }
     },
-    "Are you sure you want to disconnect xxx?": {
+    "common_disconnect_guest_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -143,10 +167,16 @@
             "state": "translated",
             "value": "XXXの接続を切断したいですか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد قطع الاتصال بـ xxx؟"
+          }
         }
       }
     },
-    "Battle": {
+    "common_anchor_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -172,10 +202,16 @@
             "state": "translated",
             "value": "アンカーPK"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المنافسة"
+          }
         }
       }
     },
-    "You are currently co-guesting with other streamers. Would you like to [End Live] ?": {
+    "common_anchor_end_link_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -201,10 +237,16 @@
             "state": "translated",
             "value": "現在、接続されている州では、「ライブブロードキャストルームを閉じる」必要がありますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت حالياً في بث مشترك مع مذيعين آخرين. هل تريد [إنهاء البث]؟"
+          }
         }
       }
     },
-    "Connecting": {
+    "common_battle_connecting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -230,10 +272,16 @@
             "state": "translated",
             "value": "接続"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاري الاتصال"
+          }
         }
       }
     },
-    "End PK": {
+    "common_battle_end_pk": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -259,10 +307,16 @@
             "state": "translated",
             "value": "PKを終了します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء المنافسة"
+          }
         }
       }
     },
-    "Are you sure you want to end the battle? The current result will be the final result after the end": {
+    "common_battle_end_pk_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -288,10 +342,16 @@
             "state": "translated",
             "value": "PKを終了したいですか？終了後、現在の結果が最終結果になります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد إنهاء المنافسة؟ النتيجة الحالية ستكون النتيجة النهائية"
+          }
         }
       }
     },
-    "Battle request has been timeout": {
+    "common_battle_invitation_timeout": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -317,10 +377,16 @@
             "state": "translated",
             "value": "PKの招待状がタイムアウトしました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت مهلة طلب المنافسة"
+          }
         }
       }
     },
-    "xxx rejected battle": {
+    "common_battle_invitee_reject": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -346,10 +412,16 @@
             "state": "translated",
             "value": "xxxPKを拒否しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx رفض المنافسة"
+          }
         }
       }
     },
-    "xxx rejected": {
+    "common_request_rejected": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -375,10 +447,16 @@
             "state": "translated",
             "value": "xxx张绝了邀请"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx رفض"
+          }
         }
       }
     },
-    "xxx canceled battle, please try to initiate it again": {
+    "common_battle_inviter_cancel": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -404,10 +482,16 @@
             "state": "translated",
             "value": "xxx PKはキャンセルされました。もう一度開始してみてください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx ألغى المنافسة، يرجى المحاولة مرة أخرى"
+          }
         }
       }
     },
-    "xxx invite you to battle together": {
+    "common_battle_inviting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -433,10 +517,16 @@
             "state": "translated",
             "value": "xxxPK招待状を送信します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx يدعوك للمنافسة معاً"
+          }
         }
       }
     },
-    "PK End": {
+    "common_battle_pk_end": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -462,10 +552,51 @@
             "state": "translated",
             "value": "PKは終了します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت المنافسة"
+          }
         }
       }
     },
-    "The room you are invited to connect to is connected to another room.": {
+    "common_battle_wait_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء"
+          }
+        }
+      }
+    },
+    "common_connect_conflict": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -491,10 +622,16 @@
             "state": "translated",
             "value": "接続に招待された部屋は、他の部屋に接続されています。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة المدعو للاتصال بها متصلة بغرفة أخرى."
+          }
         }
       }
     },
-    "Other errors, cannot connect.": {
+    "common_connect_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -520,10 +657,16 @@
             "state": "translated",
             "value": "接続を開始できない他のエラー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أخطاء أخرى، لا يمكن الاتصال."
+          }
         }
       }
     },
-    "Waiting": {
+    "common_connect_inviting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -549,10 +692,16 @@
             "state": "translated",
             "value": "招待"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في الانتظار"
+          }
         }
       }
     },
-    "xxx invite you to host together": {
+    "common_connect_inviting_append": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -578,10 +727,16 @@
             "state": "translated",
             "value": "xxx接続への招待状を送ってください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx يدعوك للبث المشترك"
+          }
         }
       }
     },
-    "Invitation has timed out": {
+    "common_connect_invitation_timeout": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -607,10 +762,16 @@
             "state": "translated",
             "value": "招待がタイムアウトしました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت مهلة الدعوة"
+          }
         }
       }
     },
-    "Start Co-hosting": {
+    "common_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -636,10 +797,16 @@
             "state": "translated",
             "value": "接続を開始します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء البث المشترك"
+          }
         }
       }
     },
-    "The number of co-hosting has exceeded the maximum limit.": {
+    "common_connection_room_full": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -665,10 +832,16 @@
             "state": "translated",
             "value": "接続されている人の現在の数は、最大制限に達しました。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز عدد البث المشترك الحد الأقصى."
+          }
         }
       }
     },
-    "Cover": {
+    "common_cover": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -694,10 +867,16 @@
             "state": "translated",
             "value": "カバー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغلاف"
+          }
         }
       }
     },
-    "Audio Information": {
+    "common_dashboard_audio_info_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -723,10 +902,16 @@
             "state": "translated",
             "value": "オーディオ情報"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معلومات الصوت"
+          }
         }
       }
     },
-    "Sample Rate": {
+    "common_dashboard_audio_sample_rate": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -752,10 +937,16 @@
             "state": "translated",
             "value": "サンプリングレート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل العينات"
+          }
         }
       }
     },
-    "DownLoss": {
+    "common_dashboard_down_loss": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -781,10 +972,16 @@
             "state": "translated",
             "value": "ダウンリンクパケット損失率"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فقدان التنزيل"
+          }
         }
       }
     },
-    "Local User": {
+    "common_dashboard_local_user": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -810,10 +1007,16 @@
             "state": "translated",
             "value": "ローカルユーザー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم المحلي"
+          }
         }
       }
     },
-    "Remote User": {
+    "common_dashboard_remote_user": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -839,10 +1042,16 @@
             "state": "translated",
             "value": "リモートユーザー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم البعيد"
+          }
         }
       }
     },
-    "RTT": {
+    "common_dashboard_rtt": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -868,10 +1077,16 @@
             "state": "translated",
             "value": "往復遅延"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زمن الذهاب والإياب"
+          }
         }
       }
     },
-    "Dashboard": {
+    "common_dashboard_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -897,10 +1112,16 @@
             "state": "translated",
             "value": "ダッシュボード"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لوحة المعلومات"
+          }
         }
       }
     },
-    "UpLoss": {
+    "common_dashboard_up_loss": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -926,10 +1147,16 @@
             "state": "translated",
             "value": "アップリンクパケット損失率"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فقدان الرفع"
+          }
         }
       }
     },
-    "Bitrate": {
+    "common_dashboard_bitrate": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -955,10 +1182,16 @@
             "state": "translated",
             "value": "コードレート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل البت"
+          }
         }
       }
     },
-    "FPS": {
+    "common_dashboard_video_fps": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -984,10 +1217,16 @@
             "state": "translated",
             "value": "フレームレート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل الإطارات"
+          }
         }
       }
     },
-    "Video Information": {
+    "common_dashboard_video_info_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1013,10 +1252,16 @@
             "state": "translated",
             "value": "ビデオ情報"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معلومات الفيديو"
+          }
         }
       }
     },
-    "Resolution": {
+    "common_dashboard_video_resolution": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1028,24 +1273,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "清晰度"
+            "value": "分辨率"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "清晰度"
+            "value": "解析度"
           }
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "解決"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الدقة"
           }
         }
       }
     },
-    "Disable Audio": {
+    "common_disable_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1071,10 +1322,16 @@
             "state": "translated",
             "value": "オーディオを無効にします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعطيل الصوت"
+          }
         }
       }
     },
-    "Disable Chat": {
+    "common_disable_message": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1100,10 +1357,16 @@
             "state": "translated",
             "value": "チャット禁止"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعطيل الدردشة"
+          }
         }
       }
     },
-    "Disable Video": {
+    "common_disable_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1129,10 +1392,51 @@
             "state": "translated",
             "value": "ビデオを無効にします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعطيل الفيديو"
+          }
         }
       }
     },
-    "Are you sure you want to disconnect from other streamers?": {
+    "common_disconnect_cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء"
+          }
+        }
+      }
+    },
+    "common_disconnect_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1158,10 +1462,16 @@
             "state": "translated",
             "value": "他のアンカーから切断したいですか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد قطع الاتصال بالمذيعين الآخرين؟"
+          }
         }
       }
     },
-    "Disconnect": {
+    "common_disconnection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1173,24 +1483,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "断开连线"
+            "value": "断开"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "斷開連線"
+            "value": "斷開"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "切断された"
+            "value": "切断します"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطع الاتصال"
           }
         }
       }
     },
-    "Allow viewers to apply for continuous microphone": {
+    "common_enable_audience_request_link": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1216,10 +1532,16 @@
             "state": "translated",
             "value": "視聴者が接続を申請できるようにします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "السماح للمشاهدين بالتقدم للميكروفون المستمر"
+          }
         }
       }
     },
-    "Enable Audio": {
+    "common_enable_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1245,10 +1567,16 @@
             "state": "translated",
             "value": "オーディオを有効にします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل الصوت"
+          }
         }
       }
     },
-    "Enable Chat": {
+    "common_enable_message": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1274,10 +1602,16 @@
             "state": "translated",
             "value": "禁止を解放します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل الدردشة"
+          }
         }
       }
     },
-    "Enable Video": {
+    "common_enable_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1303,10 +1637,51 @@
             "state": "translated",
             "value": "ビデオを有効にします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل الفيديو"
+          }
         }
       }
     },
-    "End Co-host": {
+    "common_end_connect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnect"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开连线"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "斷開連線"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切断された"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطع الاتصال"
+          }
+        }
+      }
+    },
+    "common_end_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1332,10 +1707,16 @@
             "state": "translated",
             "value": "切断された"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء البث المشترك"
+          }
         }
       }
     },
-    "You are currently co-hosting with other streamers. Would you like to [End Co-host] or [End Live] ?": {
+    "common_end_connection_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1361,10 +1742,51 @@
             "state": "translated",
             "value": "現在、接続されている州では、「ライブブロードキャストルームを閉じる」または「閉じる」必要がありますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت حالياً في بث مشترك. هل تريد [إنهاء البث المشترك] أم [إنهاء البث]؟"
+          }
         }
       }
     },
-    "You are currently in PK mode. Would you like to [End PK] or [End Live] ?": {
+    "common_end_pk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End PK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束PK"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結束PK"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PKを終了します"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء المنافسة"
+          }
+        }
+      }
+    },
+    "common_end_pk_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1390,10 +1812,16 @@
             "state": "translated",
             "value": "現在、PKステータスでは、「PKを終了」する必要がありますか、それとも「ライブブロードキャストルームを閉じる」必要がありますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت حالياً في وضع المنافسة. هل تريد [إنهاء المنافسة] أم [إنهاء البث]؟"
+          }
         }
       }
     },
-    "Remove": {
+    "common_kick_out_of_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1419,10 +1847,16 @@
             "state": "translated",
             "value": "取り除く"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إزالة"
+          }
         }
       }
     },
-    "You have been kicked out of the room": {
+    "common_kicked_out_of_room_by_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1448,10 +1882,16 @@
             "state": "translated",
             "value": "あなたは部屋から追い出されました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم طردك من الغرفة"
+          }
         }
       }
     },
-    "More": {
+    "common_more": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1477,10 +1917,16 @@
             "state": "translated",
             "value": "もっと"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المزيد"
+          }
         }
       }
     },
-    "More Features": {
+    "common_more_features": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1506,10 +1952,16 @@
             "state": "translated",
             "value": "その他の機能"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المزيد من الميزات"
+          }
         }
       }
     },
-    "The anchor has muted you": {
+    "common_mute_audio_by_master": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1535,10 +1987,16 @@
             "state": "translated",
             "value": "あなたはアンカーによってミュートされました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قام المذيع بكتم صوتك"
+          }
         }
       }
     },
-    "The anchor disabled your video": {
+    "common_mute_video_by_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1564,10 +2022,16 @@
             "state": "translated",
             "value": "あなたはアンカーによってオフにされました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قام المذيع بتعطيل الفيديو الخاص بك"
+          }
         }
       }
     },
-    "You have been muted in the current room and cannot send gifts": {
+    "common_muted_gift": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1593,10 +2057,16 @@
             "state": "translated",
             "value": "あなたは部屋で禁止されており、贈り物を送ることができません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوتك في الغرفة الحالية ولا يمكنك إرسال الهدايا"
+          }
         }
       }
     },
-    "Live Video": {
+    "common_preview_video_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1622,10 +2092,16 @@
             "state": "translated",
             "value": "ライブビデオ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو مباشر"
+          }
         }
       }
     },
-    "Suggested Hosts": {
+    "common_recommended_list": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1651,10 +2127,16 @@
             "state": "translated",
             "value": "推奨リスト"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المذيعون المقترحون"
+          }
         }
       }
     },
-    "Requesting(xxx)": {
+    "common_requesting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1680,10 +2162,16 @@
             "state": "translated",
             "value": "接続を申請する（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاري الطلب (xxx)"
+          }
         }
       }
     },
-    "Live Room ID: xxx": {
+    "common_roominfo_liveroom_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1709,10 +2197,16 @@
             "state": "translated",
             "value": "ライブルームID：xxx"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف غرفة البث: xxx"
+          }
         }
       }
     },
-    "Link Application(xxx)": {
+    "common_seat_application_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1738,10 +2232,16 @@
             "state": "translated",
             "value": "接続を申請する（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب الربط (xxx)"
+          }
         }
       }
     },
-    "Current Mic (xxx)": {
+    "common_seat_list_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1767,10 +2267,16 @@
             "state": "translated",
             "value": "現在の位置（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الميكروفون الحالي (xxx)"
+          }
         }
       }
     },
-    "You have been muted in the current room": {
+    "common_send_message_disabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1796,10 +2302,16 @@
             "state": "translated",
             "value": "あなたは現在の部屋で禁止されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوتك في الغرفة الحالية"
+          }
         }
       }
     },
-    "You have been unmuted in the current room": {
+    "common_send_message_enable": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1825,10 +2337,16 @@
             "state": "translated",
             "value": "現在の部屋で、あなたは禁止から持ち上げられました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إلغاء كتم صوتك في الغرفة الحالية"
+          }
         }
       }
     },
-    "Done": {
+    "common_setting_done": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1854,10 +2372,16 @@
             "state": "translated",
             "value": "仕上げる"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم"
+          }
         }
       }
     },
-    "Invite": {
+    "common_start_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1869,24 +2393,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "邀请"
+            "value": "发起连线"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "邀請"
+            "value": "發起連線"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "招待する"
+            "value": "接続を開始します"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة"
           }
         }
       }
     },
-    "Start Live": {
+    "common_start_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1912,10 +2442,16 @@
             "state": "translated",
             "value": "ライブブロードキャストを開始します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء البث"
+          }
         }
       }
     },
-    "Start Video": {
+    "common_start_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1941,10 +2477,16 @@
             "state": "translated",
             "value": "ビデオをオンにします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء الفيديو"
+          }
         }
       }
     },
-    "Stop Video": {
+    "common_stop_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1970,10 +2512,16 @@
             "state": "translated",
             "value": "ビデオを閉じます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف الفيديو"
+          }
         }
       }
     },
-    "Are you sure you want to disconnect?": {
+    "common_terminate_room_connection_message": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -1999,10 +2547,16 @@
             "state": "translated",
             "value": "切断したいですか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد قطع الاتصال؟"
+          }
         }
       }
     },
-    "The anchor has unmuted you": {
+    "common_un_mute_audio_by_master": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2028,10 +2582,16 @@
             "state": "translated",
             "value": "アンカーはあなたを解きません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قام المذيع بإلغاء كتم صوتك"
+          }
         }
       }
     },
-    "The anchor enabled your video": {
+    "common_un_mute_video_by_master": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2057,10 +2617,51 @@
             "state": "translated",
             "value": "アンカーはカメラのロックを解除しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قام المذيع بتفعيل الفيديو الخاص بك"
+          }
         }
       }
     },
-    "Video Bitrate": {
+    "common_user_id": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID: xxx"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID: xxx"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID: xxx"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID：xxx"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx:ID"
+          }
+        }
+      }
+    },
+    "common_video_bitrate": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2086,10 +2687,16 @@
             "state": "translated",
             "value": "ビデオコードレート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل بت الفيديو"
+          }
         }
       }
     },
-    "Video FPS": {
+    "common_video_fps": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2115,10 +2722,16 @@
             "state": "translated",
             "value": "ビデオフレームレート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معدل إطارات الفيديو"
+          }
         }
       }
     },
-    "Video Resolution": {
+    "common_video_resolution": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2144,10 +2757,16 @@
             "state": "translated",
             "value": "ビデオ解像度"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دقة الفيديو"
+          }
         }
       }
     },
-    "Ultimate-Video": {
+    "common_video_ultimate": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2173,10 +2792,16 @@
             "state": "translated",
             "value": "究極の画質"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو فائق الجودة"
+          }
         }
       }
     },
-    "Guest": {
+    "common_link_guest": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2202,10 +2827,16 @@
             "state": "translated",
             "value": "聴衆でさえ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضيف"
+          }
         }
       }
     },
-    "Host": {
+    "common_link_host": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2230,6 +2861,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "アンカーでさえ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مضيف"
           }
         }
       }
@@ -2260,10 +2897,16 @@
             "state": "translated",
             "value": "ライブブロードキャストモード：xxx"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وضع البث: xxx"
+          }
         }
       }
     },
-    "Live Category:xxx": {
+    "Live type:xxx": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2289,10 +2932,16 @@
             "state": "translated",
             "value": "ライブブロードキャストカテゴリ：xxx"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فئة البث: xxx"
+          }
         }
       }
     },
-    "Application List (xxx)": {
+    "live_application_list_xxx": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2318,10 +2967,16 @@
             "state": "translated",
             "value": "アプリケーションリスト（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة الطلبات (xxx)"
+          }
         }
       }
     },
-    "Anchor": {
+    "live_barrage_anchor": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2347,10 +3002,16 @@
             "state": "translated",
             "value": "アンカー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المذيع"
+          }
         }
       }
     },
-    "The content is too long, please reduce the content and try again": {
+    "live_barrage_error_content_is_long": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2376,10 +3037,16 @@
             "state": "translated",
             "value": "コンテンツが長すぎるので、試す前にコンテンツを減らしてください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المحتوى طويل جداً، يرجى تقليل المحتوى والمحاولة مرة أخرى"
+          }
         }
       }
     },
-    "The network is abnormal, please try again later": {
+    "live_barrage_error_network": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2405,10 +3072,16 @@
             "state": "translated",
             "value": "ネットワークの異常、後でもう一度やり直してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الشبكة غير طبيعية، يرجى المحاولة لاحقاً"
+          }
         }
       }
     },
-    "Sensitive words are detected, please modify it and try again": {
+    "live_barrage_error_sensitive_word": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2434,10 +3107,16 @@
             "state": "translated",
             "value": "敏感な単語が検出されました。それらを変更して、もう一度やり直してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم اكتشاف كلمات حساسة، يرجى التعديل والمحاولة مرة أخرى"
+          }
         }
       }
     },
-    "Join Chat!": {
+    "live_barrage_text_hint": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2463,10 +3142,16 @@
             "state": "translated",
             "value": "何か言って..."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انضم للدردشة!"
+          }
         }
       }
     },
-    "Please enter room name": {
+    "live_edit_placeholder_text": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2492,10 +3177,16 @@
             "state": "translated",
             "value": "部屋の名前を入力してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى إدخال اسم الغرفة"
+          }
         }
       }
     },
-    "The room you are invited to connect to does not exist": {
+    "live_error_connection_notexit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2521,10 +3212,16 @@
             "state": "translated",
             "value": "招待状リンクが存在しない部屋"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة المدعو للاتصال بها غير موجودة"
+          }
         }
       }
     },
-    "Internal error, it is recommended to try again.": {
+    "live_error_connection_retry": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2550,10 +3247,16 @@
             "state": "translated",
             "value": "内部エラー、再試行することをお勧めします。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ داخلي، يُنصح بالمحاولة مرة أخرى."
+          }
         }
       }
     },
-    "The room types do not match; connections can only be initiated in rooms of the same type.": {
+    "live_error_room_mismatch": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2579,10 +3282,16 @@
             "state": "translated",
             "value": "部屋のタイプが一致しません。接続は同じタイプの部屋でのみ開始できます。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنواع الغرف غير متطابقة؛ يمكن بدء الاتصالات فقط في غرف من نفس النوع."
+          }
         }
       }
     },
-    "animation is not MP4 resource file": {
+    "live_gift_animation_is_not_mp4_file": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2608,10 +3317,16 @@
             "state": "translated",
             "value": "ギフトアニメーションはMP4リソースではありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرسوم المتحركة ليست ملف MP4"
+          }
         }
       }
     },
-    "animation is not svga resource file": {
+    "live_gift_animation_is_not_svga_file": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2637,10 +3352,16 @@
             "state": "translated",
             "value": "ギフトアニメーションはSVGAリソースではありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرسوم المتحركة ليست ملف SVGA"
+          }
         }
       }
     },
-    "Switch to Landscape": {
+    "live_landscape_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2666,10 +3387,16 @@
             "state": "translated",
             "value": "水平面画面に切り替えます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التبديل إلى الوضع الأفقي"
+          }
         }
       }
     },
-    "Music play error": {
+    "live_music_play_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2695,10 +3422,16 @@
             "state": "translated",
             "value": "音楽の再生は失敗しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ في تشغيل الموسيقى"
+          }
         }
       }
     },
-    "On Seat List (xxx)": {
+    "live_on_seat_list": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2724,10 +3457,16 @@
             "state": "translated",
             "value": "MAIリスト（xxx）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة المقاعد (xxx)"
+          }
         }
       }
     },
-    "Switch to Portrait": {
+    "live_portrait_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2753,10 +3492,16 @@
             "state": "translated",
             "value": "垂直画面に切り替えます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التبديل إلى الوضع العمودي"
+          }
         }
       }
     },
-    "Loading more": {
+    "live_room_list_loading_more": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2782,10 +3527,16 @@
             "state": "translated",
             "value": "もっとロードします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاري تحميل المزيد"
+          }
         }
       }
     },
-    "Pull to refresh": {
+    "live_room_list_pull_to_refresh": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2811,10 +3562,16 @@
             "state": "translated",
             "value": "プルダウンして更新します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسحب للتحديث"
+          }
         }
       }
     },
-    "Release to refresh": {
+    "live_room_list_release_to_refresh": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2840,10 +3597,16 @@
             "state": "translated",
             "value": "更新をリリースします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أفلت للتحديث"
+          }
         }
       }
     },
-    "Waiting for link xxx": {
+    "live_waiting_link": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2869,10 +3632,16 @@
             "state": "translated",
             "value": "ツイートxxxを待っています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار الربط xxx"
+          }
         }
       }
     },
-    "Loading...": {
+    "livelist_loading": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2898,10 +3667,16 @@
             "state": "translated",
             "value": "読み込み..."
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاري التحميل..."
+          }
         }
       }
     },
-    "There is no more data": {
+    "livelist_no_more_data": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2927,10 +3702,16 @@
             "state": "translated",
             "value": "これ以上のデータはありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد بيانات إضافية"
+          }
         }
       }
     },
-    "xxx people viewed": {
+    "livelist_viewed_audience_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2956,10 +3737,16 @@
             "state": "translated",
             "value": "xxx人々はそれを見ました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شاهده xxx شخص"
+          }
         }
       }
     },
-    "Live streaming in progress. Please try again later.": {
+    "livelist_exit_float_window_tip": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -2985,10 +3772,16 @@
             "state": "translated",
             "value": "現在放送されています。後でもう一度やり直してください。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البث المباشر قيد التقدم. يرجى المحاولة مرة أخرى لاحقاً."
+          }
         }
       }
     },
-    "Click to enter the live room": {
+    "livelist_click_enter_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3014,10 +3807,16 @@
             "state": "translated",
             "value": "クリックしてライブブロードキャストルームに入ります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انقر لدخول غرفة البث"
+          }
         }
       }
     },
-    "The anchor is in the battle and cannot initiate the battle": {
+    "livestreamcore_battle_error_conflict": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3043,10 +3842,16 @@
             "state": "translated",
             "value": "アンカーはPKにあり、PKを開始できません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المذيع في منافسة ولا يمكنه بدء منافسة أخرى"
+          }
         }
       }
     },
-    "The other error, cannot initiate the battle": {
+    "livestreamcore_battle_error_other": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3072,10 +3877,16 @@
             "state": "translated",
             "value": "PKを開始できない他のエラー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ آخر، لا يمكن بدء المنافسة"
+          }
         }
       }
     },
-    "turn off": {
+    "te_beauty_capabilities_panel_view_switch_turn_off": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3101,10 +3912,16 @@
             "state": "translated",
             "value": "閉鎖"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف"
+          }
         }
       }
     },
-    "Filters": {
+    "te_beauty_panel_menu_view_layout_lut": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3130,10 +3947,16 @@
             "state": "translated",
             "value": "フィルター"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الفلاتر"
+          }
         }
       }
     },
-    "Makeup": {
+    "te_beauty_panel_menu_view_layout_makeup": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3158,6 +3981,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "美容メイク"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المكياج"
           }
         }
       }
@@ -3188,6 +4017,12 @@
             "state": "translated",
             "value": "同意を待っていますpkxxx"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار المنافسة xxx"
+          }
         }
       }
     },
@@ -3216,6 +4051,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "xxxを通過するのを待っています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في الانتظار xxx"
           }
         }
       }
@@ -3246,10 +4087,16 @@
             "state": "translated",
             "value": "xxxファン"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx متابع"
+          }
         }
       }
     },
-    "You are currently co-guesting with other streamers. Would you like to [End Co-guest] or [Exit Live] ?": {
+    "common_audience_end_link_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3275,10 +4122,16 @@
             "state": "translated",
             "value": "現在、接続されているマイク状態で、「接続されたマイクを切断する」または「ライブブロードキャストルームを終了する」必要がありますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت حالياً في بث مشترك. هل تريد [إنهاء البث المشترك] أم [الخروج من البث]؟"
+          }
         }
       }
     },
-    "Exit Live": {
+    "common_exit_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3304,10 +4157,16 @@
             "state": "translated",
             "value": "ライブブロードキャストルームを出ます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الخروج من البث"
+          }
         }
       }
     },
-    "Me": {
+    "common_gift_me": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3333,10 +4192,16 @@
             "state": "translated",
             "value": "私"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنا"
+          }
         }
       }
     },
-    "1080p": {
+    "common_resolution_1080p": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3362,10 +4227,16 @@
             "state": "translated",
             "value": "1080p"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1080p"
+          }
         }
       }
     },
-    "Kicked out of seat by room owner": {
+    "common_voiceroom_kicked_out_of_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3391,10 +4262,16 @@
             "state": "translated",
             "value": "ホストによってマイクをキックオフしました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم طردك من المقعد بواسطة صاحب الغرفة"
+          }
         }
       }
     },
-    "Apply for link mic": {
+    "common_apply_link_mic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3420,10 +4297,16 @@
             "state": "translated",
             "value": "ツイートを申請してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التقدم لربط الميكروفون"
+          }
         }
       }
     },
-    "User is Already in Another Room, Single RoomEngine Instance Only Supports User Entering One Room, To Enter Different Room, Please Leave the Room or Use New RoomEngine Instance": {
+    "common_client_error_already_in_other_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3449,10 +4332,16 @@
             "state": "translated",
             "value": "現在のユーザーは別の部屋にいます。単一のルームエンジンインスタンスは、ユーザーのみが1つの部屋に入るのをサポートします。別の部屋に入りたい場合は、最初にチェックアウトするか、新しいルームエンジンインスタンスを使用してください。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم موجود بالفعل في غرفة أخرى"
+          }
         }
       }
     },
-    "No Camera Device Currently, Please Insert Camera Device to Solve the Problem": {
+    "common_client_error_camera_device_empty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3478,10 +4367,16 @@
             "state": "translated",
             "value": "現在、カメラデバイスはありません。カメラデバイスを挿入して問題を解決してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد جهاز كاميرا حالياً، يرجى إدخال جهاز كاميرا"
+          }
         }
       }
     },
-    "Camera has No System Authorization, Check System Authorization": {
+    "common_client_error_camera_not_authorized": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3507,10 +4402,16 @@
             "state": "translated",
             "value": "カメラにはシステム承認がありません。システム認証を確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الكاميرا ليس لديها إذن النظام، تحقق من إذن النظام"
+          }
         }
       }
     },
-    "Camera is Occupied, Check if Other Process is Using Camera": {
+    "common_client_error_camera_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3536,10 +4437,16 @@
             "state": "translated",
             "value": "カメラが占有されています。カメラを使用して他のプロセスがあるかどうかを確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الكاميرا مشغولة، تحقق مما إذا كانت عملية أخرى تستخدم الكاميرا"
+          }
         }
       }
     },
-    "System Issue, Failed to Open Camera. Check if Camera Device is Normal": {
+    "common_client_error_camera_start_fail": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3565,10 +4472,16 @@
             "state": "translated",
             "value": "システムの問題は、カメラをオンにすることができませんでした。カメラデバイスが正常かどうかを確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشكلة في النظام، فشل فتح الكاميرا. تحقق مما إذا كان جهاز الكاميرا طبيعياً"
+          }
         }
       }
     },
-    "The room you are invited to connect to is already in the invitation list or is already connected.": {
+    "common_client_error_connection_connecting": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3594,10 +4507,16 @@
             "state": "translated",
             "value": "接続するために招待されている部屋は、すでに招待リストに載っているか、接続されています。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة المدعو للاتصال بها موجودة بالفعل في قائمة الدعوات أو متصلة بالفعل."
+          }
         }
       }
     },
-    "Room Owner Does Not Support Leaving the Room, Room Owner Can Only Close the Room": {
+    "common_client_error_exit_not_supported_for_room_owner": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3623,10 +4542,16 @@
             "state": "translated",
             "value": "住宅所有者はチェックアウト操作をサポートしていません、住宅所有者は部屋を解散することしかできません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صاحب الغرفة لا يدعم مغادرة الغرفة، يمكنه فقط إغلاق الغرفة"
+          }
         }
       }
     },
-    "Temporarily Unclassified General Error": {
+    "common_client_error_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3652,10 +4577,16 @@
             "state": "translated",
             "value": "まだ分​​類されていない一般的なエラー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ عام غير مصنف مؤقتاً"
+          }
         }
       }
     },
-    "Request Rate Limited, Please Try Again Later": {
+    "common_client_error_freq_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3681,10 +4612,16 @@
             "state": "translated",
             "value": "リクエストは制限されています。後でもう一度やり直してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تحديد معدل الطلبات، يرجى المحاولة لاحقاً"
+          }
         }
       }
     },
-    "Failed to get screen sharing source (screen and window), check screen recording permissions": {
+    "common_client_error_get_screen_sharing_target_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3710,10 +4647,16 @@
             "state": "translated",
             "value": "画面共有ソース（画面とウィンドウ）を取得し、画面録音の許可を確認できませんでした"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل الحصول على مصدر مشاركة الشاشة، تحقق من أذونات تسجيل الشاشة"
+          }
         }
       }
     },
-    "Passing illegal parameters when calling API, check if the parameters are legal": {
+    "common_client_error_invalid_parameter": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3739,10 +4682,16 @@
             "state": "translated",
             "value": "APIを呼び出すと、合格したパラメーターは違法です。パラメーターが合法かどうかを確認してください。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمرير معلمات غير قانونية عند استدعاء API، تحقق من صحة المعلمات"
+          }
         }
       }
     },
-    "Maximum Seat Exceeds Package Quantity Limit": {
+    "common_client_error_max_seat_count_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3768,10 +4717,16 @@
             "state": "translated",
             "value": "クロワッサンの最大位置は、パッケージパッケージの数の制限を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الحد الأقصى للمقاعد يتجاوز حد الباقة"
+          }
         }
       }
     },
-    "No Mic Device Currently": {
+    "common_client_error_microphone_device_empty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3797,10 +4752,16 @@
             "state": "translated",
             "value": "現在、マイクデバイスはありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد جهاز ميكروفون حالياً"
+          }
         }
       }
     },
-    "Mic has No System Authorization, Check System Authorization": {
+    "common_client_error_microphone_not_authorized": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3826,10 +4787,16 @@
             "state": "translated",
             "value": "マイクにはシステム認証がありません。システム認証を確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الميكروفون ليس لديه إذن النظام"
+          }
         }
       }
     },
-    "Mic is Occupied": {
+    "common_client_error_microphone_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3855,10 +4822,16 @@
             "state": "translated",
             "value": "マイクが占有されました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الميكروفون مشغول"
+          }
         }
       }
     },
-    "System Issue, Failed to Open Mic. Check if Mic Device is Normal": {
+    "common_client_error_microphone_start_fail": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3884,10 +4857,16 @@
             "state": "translated",
             "value": "システムの問題は、マイクをオンにすることができませんでした。マイクデバイスが正常かどうかを確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشكلة في النظام، فشل فتح الميكروفون"
+          }
         }
       }
     },
-    "Need to Apply to Room Owner or Administrator to Open Camera": {
+    "common_client_error_open_camera_need_permission_from_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3913,10 +4892,16 @@
             "state": "translated",
             "value": "住宅所有者または管理者に申請してカメラをオンにする必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب التقدم لصاحب الغرفة أو المسؤول لفتح الكاميرا"
+          }
         }
       }
     },
-    "Current Seat Video is Locked, Need Room Owner to Unlock Mic Seat Before Opening Camera": {
+    "common_client_error_open_camera_need_seat_unlock": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3942,10 +4927,16 @@
             "state": "translated",
             "value": "現在のマイクのビデオはロックされており、住宅所有者はカメラをオンにする前にマイクのロックを解除する必要があります。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو المقعد الحالي مقفل، يحتاج صاحب الغرفة لفتح قفل المقعد"
+          }
         }
       }
     },
-    "Need to Apply to Room Owner or Administrator to Open Mic": {
+    "common_client_error_open_microphone_need_permission_from_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -3971,10 +4962,16 @@
             "state": "translated",
             "value": "住宅所有者または管理者に申請し、マイクをオンにする必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب التقدم لصاحب الغرفة أو المسؤول لفتح الميكروفون"
+          }
         }
       }
     },
-    "Current Seat Audio is Locked": {
+    "common_client_error_open_microphone_need_seat_unlock": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4000,10 +4997,16 @@
             "state": "translated",
             "value": "現在のマイクオーディオがロックされています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت المقعد الحالي مقفل"
+          }
         }
       }
     },
-    "Screen sharing needs to be enabled after applying to the room owner or administrator": {
+    "common_client_error_open_screen_share_need_permission_from_admin": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4029,10 +5032,16 @@
             "state": "translated",
             "value": "住宅所有者または管理者に申請し、画面を開いて共有する必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يجب تفعيل مشاركة الشاشة بعد التقدم لصاحب الغرفة"
+          }
         }
       }
     },
-    "The current microphone position video is locked and needs to be unlocked by the room owner before screen sharing can be enabled": {
+    "common_client_error_open_screen_share_need_seat_unlock": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4058,10 +5067,16 @@
             "state": "translated",
             "value": "現在のマイクビデオがロックされています。住宅所有者は、画面を開いて共有する前にマイクのロックを解除する必要があります。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو موضع الميكروفون الحالي مقفل ويحتاج لفتح القفل من صاحب الغرفة"
+          }
         }
       }
     },
-    "This Feature Can Only Be Used After Entering the Room": {
+    "common_client_error_operation_invalid_before_enter_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4087,10 +5102,16 @@
             "state": "translated",
             "value": "この機能を使用する前に部屋に入る必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يمكن استخدام هذه الميزة فقط بعد دخول الغرفة"
+          }
         }
       }
     },
-    "This Operation is Not Supported in the Current Room Type": {
+    "common_client_error_operation_not_supported_in_current_room_type": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4116,10 +5137,16 @@
             "state": "translated",
             "value": "この操作は現在の部屋の種類ではサポートされていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذه العملية غير مدعومة في نوع الغرفة الحالي"
+          }
         }
       }
     },
-    "Failed to Obtain Permission, Unauthorized Audio/Video Permission, Please Check if Device Permission is Enabled": {
+    "common_client_error_permission_denied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4145,10 +5172,16 @@
             "state": "translated",
             "value": "アクセス許可の取得に失敗し、オーディオ/ビデオ許可は現在許可されていません。デバイスのアクセス許可が有効かどうかを確認してください。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل الحصول على الإذن، تحقق من تفعيل أذونات الجهاز"
+          }
         }
       }
     },
-    "Repeat Operation": {
+    "common_client_error_repeat_operation": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4174,10 +5207,16 @@
             "state": "translated",
             "value": "操作を繰り返します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عملية مكررة"
+          }
         }
       }
     },
-    "Signaling Request ID is Invalid or Has Been Processed": {
+    "common_client_error_request_id_invalid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4203,10 +5242,16 @@
             "state": "translated",
             "value": "信号要求IDが無効であるか、処理されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف طلب الإشارة غير صالح أو تمت معالجته"
+          }
         }
       }
     },
-    "Signal request repetition": {
+    "common_client_error_request_id_repeat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4232,10 +5277,16 @@
             "state": "translated",
             "value": "シグナリングリクエストを繰り返します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تكرار طلب الإشارة"
+          }
         }
       }
     },
-    "No Permission for Signaling Request, e.g. Canceling an Invite Not Initiated by Yourself": {
+    "common_client_error_request_no_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4261,10 +5312,16 @@
             "state": "translated",
             "value": "シグナリングリクエストには、自分で開始されない招待状のキャンセルなど、権限がありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد إذن لطلب الإشارة"
+          }
         }
       }
     },
-    "This feature requires an additional package. Please activate the corresponding package as needed in the TRTC Console": {
+    "common_client_error_require_payment": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4290,10 +5347,16 @@
             "state": "translated",
             "value": "この関数では、追加のパッケージを有効にする必要があります。 Tencent CloudビデオキューブSDKコンソールで必要に応じて、対応するパッケージを有効にしてください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتطلب هذه الميزة باقة إضافية"
+          }
         }
       }
     },
-    "Illegal Custom Room ID, Must Be Printable ASCII Characters (0x20-0x7e), Up to 48 Bytes Long": {
+    "common_client_error_room_id_invalid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4319,10 +5382,16 @@
             "state": "translated",
             "value": "部屋IDの作成は違法であり、カスタムIDは印刷可能なASCII文字（0x20-0x7E）で、最大48バイトである必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة المخصص غير قانوني"
+          }
         }
       }
     },
-    "Illegal Room Name, Maximum 30 Bytes, Must Be UTF-8 Encoding if Contains Chinese Characters": {
+    "common_client_error_room_name_invalid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4348,10 +5417,16 @@
             "state": "translated",
             "value": "部屋の名前は違法で、名前の長さは最大30バイトです。中国語が含まれている場合は、キャラクターエンコードがUTF-8でなければなりません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسم الغرفة غير قانوني"
+          }
         }
       }
     },
-    "The current room does not support preloading": {
+    "common_client_error_room_not_support_preloading": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4377,10 +5452,16 @@
             "state": "translated",
             "value": "プリロードは現在の部屋ではサポートされていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة الحالية لا تدعم التحميل المسبق"
+          }
         }
       }
     },
-    "Not Found SDKAppID, Please Confirm Application Info in TRTC Console": {
+    "common_client_error_sdk_app_id_not_found": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4406,10 +5487,16 @@
             "state": "translated",
             "value": "sdkappidは見つかりませんでした、Tencent CloudビデオキューブSDKコンソールのアプリケーション情報を確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يتم العثور على SDKAppID"
+          }
         }
       }
     },
-    "Not Logged In, Please Call Login API": {
+    "common_client_error_sdk_not_initialized": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4435,10 +5522,16 @@
             "state": "translated",
             "value": "ログインしていないので、ログインインターフェイスに電話してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يتم تسجيل الدخول، يرجى استدعاء API تسجيل الدخول"
+          }
         }
       }
     },
-    "Seat Serial Number Does Not Exist": {
+    "common_client_error_seat_index_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4464,10 +5557,16 @@
             "state": "translated",
             "value": "位置番号は存在しません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رقم المقعد التسلسلي غير موجود"
+          }
         }
       }
     },
-    "All Members Muted in the Current Room": {
+    "common_client_error_send_message_disabled_for_all": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4493,10 +5592,16 @@
             "state": "translated",
             "value": "部屋は禁止されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوت جميع الأعضاء في الغرفة الحالية"
+          }
         }
       }
     },
-    "You Have Been Muted in the Current Room": {
+    "common_client_error_send_message_disabled_for_current": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4522,10 +5627,16 @@
             "state": "translated",
             "value": "あなたは現在の部屋で禁止されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوتك في الغرفة الحالية"
+          }
         }
       }
     },
-    "Failed to Enable Screen Sharing, Check if Someone is Already Screen Sharing in the Room": {
+    "common_client_error_start_screen_sharing_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4551,10 +5662,16 @@
             "state": "translated",
             "value": "画面共有を有効にすることができませんでした、部屋の誰かが画面を共有しているかどうかを確認しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل تفعيل مشاركة الشاشة"
+          }
         }
       }
     },
-    "Operation Successful": {
+    "common_client_error_success": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4580,10 +5697,16 @@
             "state": "translated",
             "value": "操作は成功しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تمت العملية بنجاح"
+          }
         }
       }
     },
-    "Room Owner or Administrator Permission Required for Operation": {
+    "common_client_error_user_need_admin_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4609,10 +5732,16 @@
             "state": "translated",
             "value": "運営するには、住宅所有者または管理者からの許可が必要です"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطلوب إذن صاحب الغرفة أو المسؤول"
+          }
         }
       }
     },
-    "Room Owner Permission Required for Operation": {
+    "common_client_error_user_need_owner_permission": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4638,10 +5767,16 @@
             "state": "translated",
             "value": "運営するには、住宅所有者からの許可が必要です"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطلوب إذن صاحب الغرفة"
+          }
         }
       }
     },
-    "User is not exist": {
+    "common_client_error_user_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4667,10 +5802,16 @@
             "state": "translated",
             "value": "ユーザーは存在しません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم غير موجود"
+          }
         }
       }
     },
-    "Gift service is not enabled yet please check your package version": {
+    "common_server_error_gift_ability_not_enabled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4696,10 +5837,16 @@
             "state": "translated",
             "value": "ギフト機能サービスはまだ有効になっていません。パッケージバージョンを確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خدمة الهدايا غير مفعلة بعد"
+          }
         }
       }
     },
-    "Gift does not exist": {
+    "common_server_error_gift_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4725,10 +5872,16 @@
             "state": "translated",
             "value": "贈り物は存在しません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الهدية غير موجودة"
+          }
         }
       }
     },
-    "Gift server pre-verification failed please check console configuration": {
+    "common_server_error_gift_server_pre_verification_failed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4754,10 +5907,16 @@
             "state": "translated",
             "value": "ギフトサーバーの事前確認が失敗しました。コンソールの構成を確認してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل التحقق المسبق من خادم الهدايا"
+          }
         }
       }
     },
-    "The device operation failed while in a call": {
+    "common_server_error_call_in_progress": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4783,10 +5942,16 @@
             "state": "translated",
             "value": "呼び出しでは、デバイスの操作に失敗しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشلت عملية الجهاز أثناء المكالمة"
+          }
         }
       }
     },
-    "Ear Monitor Volume": {
+    "common_ear_return_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4812,10 +5977,16 @@
             "state": "translated",
             "value": "耳のリベート量"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت سماعة الأذن"
+          }
         }
       }
     },
-    "Clarity": {
+    "live_clarity": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4841,10 +6012,16 @@
             "state": "translated",
             "value": "明確さ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الوضوح"
+          }
         }
       }
     },
-    "Seat": {
+    "common_seat_management": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4870,10 +6047,16 @@
             "state": "translated",
             "value": "マイクロコントローラー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقعد"
+          }
         }
       }
     },
-    "Online audience": {
+    "common_anchor_audience_list_panel_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4899,10 +6082,16 @@
             "state": "translated",
             "value": "オンラインオーディエンス"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الجمهور المتصل"
+          }
         }
       }
     },
-    "Audio": {
+    "common_audio_effect": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4928,10 +6117,16 @@
             "state": "translated",
             "value": "効果音"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الصوت"
+          }
         }
       }
     },
-    "Audio Effect Settings": {
+    "common_audio_effect_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4957,10 +6152,16 @@
             "state": "translated",
             "value": "サウンドエフェクト設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات المؤثرات الصوتية"
+          }
         }
       }
     },
-    "Audio settings": {
+    "common_audio_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -4986,10 +6187,16 @@
             "state": "translated",
             "value": "オーディオ設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الصوت"
+          }
         }
       }
     },
-    "Close": {
+    "common_beauty_item_close": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5015,10 +6222,16 @@
             "state": "translated",
             "value": "閉鎖"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إغلاق"
+          }
         }
       }
     },
-    "Rosy": {
+    "common_beauty_item_ruddy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5044,10 +6257,16 @@
             "state": "translated",
             "value": "バラ色"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وردي"
+          }
         }
       }
     },
-    "Microdermabrasion": {
+    "common_beauty_item_smooth": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5073,10 +6292,16 @@
             "state": "translated",
             "value": "皮膚研削"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تنعيم البشرة"
+          }
         }
       }
     },
-    "Whitening": {
+    "common_beauty_item_whiteness": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5102,10 +6327,16 @@
             "state": "translated",
             "value": "ホワイトニング"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبييض"
+          }
         }
       }
     },
-    "One-click beauty": {
+    "common_beauty_panel_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5131,10 +6362,51 @@
             "state": "translated",
             "value": "ワンクリックの美しさ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجميل بنقرة واحدة"
+          }
         }
       }
     },
-    "Voice changer": {
+    "common_cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キャンセル"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء"
+          }
+        }
+      }
+    },
+    "common_change_voice": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5160,10 +6432,16 @@
             "state": "translated",
             "value": "音声の変化"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مغير الصوت"
+          }
         }
       }
     },
-    "Naughty child": {
+    "common_change_voice_child": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5189,10 +6467,16 @@
             "state": "translated",
             "value": "クマの子供"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طفل مشاغب"
+          }
         }
       }
     },
-    "Ethereal": {
+    "common_change_voice_ethereal": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5218,10 +6502,16 @@
             "state": "translated",
             "value": "空の精神"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أثيري"
+          }
         }
       }
     },
-    "Loli": {
+    "common_change_voice_girl": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5247,10 +6537,16 @@
             "state": "translated",
             "value": "ロリ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لولي"
+          }
         }
       }
     },
-    "Original": {
+    "common_change_voice_none": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5276,10 +6572,16 @@
             "state": "translated",
             "value": "オリジナルのサウンドトラック"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أصلي"
+          }
         }
       }
     },
-    "Uncle": {
+    "common_change_voice_uncle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5305,10 +6607,16 @@
             "state": "translated",
             "value": "叔父"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عم"
+          }
         }
       }
     },
-    "Gift Income": {
+    "common_common_gift_income": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5334,10 +6642,16 @@
             "state": "translated",
             "value": "ギフト収入"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دخل الهدايا"
+          }
         }
       }
     },
-    "Likes Count": {
+    "common_common_like_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5363,10 +6677,16 @@
             "state": "translated",
             "value": "いいね"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد الإعجابات"
+          }
         }
       }
     },
-    "Duration": {
+    "common_common_live_duration": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5392,10 +6712,16 @@
             "state": "translated",
             "value": "ライブブロードキャスト期間"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المدة"
+          }
         }
       }
     },
-    "Total Views": {
+    "common_common_live_people_number": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5421,10 +6747,16 @@
             "state": "translated",
             "value": "累積視聴"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إجمالي المشاهدات"
+          }
         }
       }
     },
-    "Messages": {
+    "common_common_message_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5450,10 +6782,16 @@
             "state": "translated",
             "value": "メッセージの数"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرسائل"
+          }
         }
       }
     },
-    "Gift givers": {
+    "common_common_send_gift_people_count": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5479,10 +6817,16 @@
             "state": "translated",
             "value": "ギフトの数"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقدمو الهدايا"
+          }
         }
       }
     },
-    "Live data": {
+    "common_common_this_live_data": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5508,10 +6852,16 @@
             "state": "translated",
             "value": "ライブブロードキャストデータ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بيانات البث"
+          }
         }
       }
     },
-    "Ear Monitor": {
+    "common_ear_return": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5537,10 +6887,16 @@
             "state": "translated",
             "value": "耳の復帰"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سماعة الأذن"
+          }
         }
       }
     },
-    "Set Cover": {
+    "common_set_cover": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5566,10 +6922,16 @@
             "state": "translated",
             "value": "カバーを変更します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين الغلاف"
+          }
         }
       }
     },
-    "End Co-guest": {
+    "common_end_link": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5595,10 +6957,16 @@
             "state": "translated",
             "value": "接続を切断します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء البث المشترك"
+          }
         }
       }
     },
-    "End Live": {
+    "common_end_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5624,10 +6992,16 @@
             "state": "translated",
             "value": "ライブブロードキャストを終了します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء البث"
+          }
         }
       }
     },
-    "Exit connect": {
+    "common_exit_connect": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5653,10 +7027,16 @@
             "state": "translated",
             "value": "連線終結"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الخروج من الاتصال"
+          }
         }
       }
     },
-    "End": {
+    "common_end_user": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5682,10 +7062,16 @@
             "state": "translated",
             "value": "電話を切る"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء"
+          }
         }
       }
     },
-    "Entered room": {
+    "common_entered_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5711,10 +7097,16 @@
             "state": "translated",
             "value": "部屋に入ります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دخل الغرفة"
+          }
         }
       }
     },
-    "Follow": {
+    "common_follow_anchor": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5740,10 +7132,16 @@
             "state": "translated",
             "value": "焦点を当てる"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متابعة"
+          }
         }
       }
     },
-    "Send Out": {
+    "common_gift_give_gift": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5769,10 +7167,16 @@
             "state": "translated",
             "value": "贈り物"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إرسال"
+          }
         }
       }
     },
-    "Gift": {
+    "common_gift_title": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5798,10 +7202,16 @@
             "state": "translated",
             "value": "贈り物"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هدية"
+          }
         }
       }
     },
-    "Hang Up": {
+    "common_hang_up": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5827,10 +7237,16 @@
             "state": "translated",
             "value": "電話を切る"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء المكالمة"
+          }
         }
       }
     },
-    "Are you sure you want to remove xxx?": {
+    "common_kick_user_confirm_message": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5856,10 +7272,16 @@
             "state": "translated",
             "value": "％sを削除したいですか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد إزالة xxx؟"
+          }
         }
       }
     },
-    "Link Management": {
+    "common_link_mic_manager": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5885,10 +7307,16 @@
             "state": "translated",
             "value": "マイク管理への接続"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إدارة الربط"
+          }
         }
       }
     },
-    "Live broadcast has ended": {
+    "common_live_has_stop": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5914,10 +7342,16 @@
             "state": "translated",
             "value": "ライブブロードキャストは終了しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهى البث المباشر"
+          }
         }
       }
     },
-    "More settings": {
+    "common_more_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5943,10 +7377,16 @@
             "state": "translated",
             "value": "その他の設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المزيد من الإعدادات"
+          }
         }
       }
     },
-    "Music": {
+    "common_music": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -5958,24 +7398,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "音乐模式"
+            "value": "音乐"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "音樂模式"
+            "value": "音樂"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "音楽モード"
+            "value": "音楽"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموسيقى"
           }
         }
       }
     },
-    "Cheerful": {
+    "common_music_cheerful": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6001,10 +7447,16 @@
             "state": "translated",
             "value": "ハッピー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرح"
+          }
         }
       }
     },
-    "Confirm": {
+    "common_music_confirm": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6030,10 +7482,16 @@
             "state": "translated",
             "value": "確認する"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تأكيد"
+          }
         }
       }
     },
-    "Melancholy": {
+    "common_music_melancholy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6059,10 +7517,51 @@
             "state": "translated",
             "value": "憂鬱"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حزين"
+          }
         }
       }
     },
-    "Music volume": {
+    "common_music_tips_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warm Tips"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "温馨提示"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "溫馨提示"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "親切なヒント"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نصائح مفيدة"
+          }
+        }
+      }
+    },
+    "common_music_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6088,10 +7587,16 @@
             "state": "translated",
             "value": "音楽のボリューム"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت الموسيقى"
+          }
         }
       }
     },
-    "Magical World": {
+    "common_music_wonder_world": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6117,10 +7622,16 @@
             "state": "translated",
             "value": "魔法の世界"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عالم سحري"
+          }
         }
       }
     },
-    "Voice volume": {
+    "common_people_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6146,10 +7657,16 @@
             "state": "translated",
             "value": "人間の音量"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت الصوت"
+          }
         }
       }
     },
-    "Accept": {
+    "common_receive": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6175,10 +7692,16 @@
             "state": "translated",
             "value": "受け入れる"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قبول"
+          }
         }
       }
     },
-    "Reject": {
+    "common_reject": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6204,10 +7727,16 @@
             "state": "translated",
             "value": "拒否する"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رفض"
+          }
         }
       }
     },
-    "360p": {
+    "common_resolution_360p": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6233,10 +7762,16 @@
             "state": "translated",
             "value": "360p"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "360p"
+          }
         }
       }
     },
-    "540p": {
+    "common_resolution_540p": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6262,10 +7797,16 @@
             "state": "translated",
             "value": "540p"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "540p"
+          }
         }
       }
     },
-    "720p": {
+    "common_resolution_720p": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6291,10 +7832,16 @@
             "state": "translated",
             "value": "720p"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "720p"
+          }
         }
       }
     },
-    "Reverb": {
+    "common_reverb": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6320,10 +7867,16 @@
             "state": "translated",
             "value": "残響"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدى"
+          }
         }
       }
     },
-    "KTV": {
+    "common_reverb_karaoke": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6349,10 +7902,16 @@
             "state": "translated",
             "value": "KTV"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
         }
       }
     },
-    "Loud": {
+    "common_reverb_loud_and_loud": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6378,10 +7937,16 @@
             "state": "translated",
             "value": "ホン・リアン"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عالي"
+          }
         }
       }
     },
-    "Low": {
+    "common_reverb_low": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6407,10 +7972,16 @@
             "state": "translated",
             "value": "低い"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منخفض"
+          }
         }
       }
     },
-    "Metallic sound": {
+    "common_reverb_metallic_sound": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6436,10 +8007,16 @@
             "state": "translated",
             "value": "メタルサウンド"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت معدني"
+          }
         }
       }
     },
-    "No effect": {
+    "common_reverb_none": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6465,10 +8042,16 @@
             "state": "translated",
             "value": "効果はありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدون تأثير"
+          }
         }
       }
     },
-    "Broadcast has been ended": {
+    "common_room_destroy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6494,10 +8077,16 @@
             "state": "translated",
             "value": "ライブブロードキャストは終了しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهى البث"
+          }
         }
       }
     },
-    "Live Room ID:": {
+    "common_room_info_liveroom_id": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6523,10 +8112,16 @@
             "state": "translated",
             "value": "ライブルームID："
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف غرفة البث:"
+          }
         }
       }
     },
-    "Sent": {
+    "common_sent": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6552,10 +8147,16 @@
             "state": "translated",
             "value": "に与える"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم الإرسال"
+          }
         }
       }
     },
-    "Video Live": {
+    "common_main_item_video_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6581,10 +8182,16 @@
             "state": "translated",
             "value": "オンラインでライブブロードキャスト"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البث المباشر بالفيديو"
+          }
         }
       }
     },
-    "Go Live": {
+    "common_go_live": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6610,10 +8217,16 @@
             "state": "translated",
             "value": "ライブブロードキャストを開始します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابدأ البث"
+          }
         }
       }
     },
-    "Voice Room": {
+    "common_main_item_voice_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6639,10 +8252,51 @@
             "state": "translated",
             "value": "言語チャットルーム"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة الصوت"
+          }
         }
       }
     },
-    "Already on the seat": {
+    "common_main_item_ktv_room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KTV"
+          }
+        }
+      }
+    },
+    "common_server_error_already_on_the_mic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6668,10 +8322,16 @@
             "state": "translated",
             "value": "すでに小麦の上に"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجود بالفعل على المقعد"
+          }
         }
       }
     },
-    "Already on the seat queue": {
+    "common_server_error_already_on_the_mic_queue": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6697,10 +8357,16 @@
             "state": "translated",
             "value": "すでにフェリー状態にあります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجود بالفعل في قائمة انتظار المقاعد"
+          }
         }
       }
     },
-    "The battle does not exist or has ended": {
+    "common_server_error_battle_does_not_exist_or_has_ended": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6726,10 +8392,16 @@
             "state": "translated",
             "value": "戦いは存在しないか、終わっていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المنافسة غير موجودة أو انتهت"
+          }
         }
       }
     },
-    "The battle session has ended": {
+    "common_server_error_battle_session_has_ended": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6755,10 +8427,16 @@
             "state": "translated",
             "value": "戦いは終わりました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت جلسة المنافسة"
+          }
         }
       }
     },
-    "The current connection does not exist or has ended": {
+    "common_server_error_connection_does_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6784,10 +8462,16 @@
             "state": "translated",
             "value": "現在の接続は存在しません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاتصال الحالي غير موجود أو انتهى"
+          }
         }
       }
     },
-    "creating battles too frequently. Wait a moment and try again": {
+    "common_server_error_creating_battles_too_frequently": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6813,10 +8497,16 @@
             "state": "translated",
             "value": "頻繁に戦闘を短時間で開始し、試してみる前に少し待ってください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنشاء المنافسات بشكل متكرر جداً. انتظر لحظة وحاول مرة أخرى"
+          }
         }
       }
     },
-    "creating connections too frequent in a short time. Wait a moment and try again": {
+    "common_server_error_creating_connections_too_frequent": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6842,10 +8532,16 @@
             "state": "translated",
             "value": "短期間で頻繁に接続しすぎて、試してみる前にしばらく待ちます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنشاء الاتصالات بشكل متكرر جداً. انتظر لحظة وحاول مرة أخرى"
+          }
         }
       }
     },
-    "Creating rooms exceeds the frequency limit, the same room ID can only be created once within 1 second": {
+    "common_server_error_creating_rooms_exceeds_the_frequency_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6871,10 +8567,16 @@
             "state": "translated",
             "value": "頻度は制限を超えます。たとえば、部屋の作成は制限を超え、同じ部屋IDは1秒に1回しか作成できません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز إنشاء الغرف حد التردد"
+          }
         }
       }
     },
-    "Exceeds the upper limit, for example, the number of microphone seats, the number of PK match rooms, etc., exceeds the payment limit": {
+    "common_server_error_exceeds_the_upper_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6900,10 +8602,16 @@
             "state": "translated",
             "value": "支払い制限は、クロークの最大数、PKセッションの数などを超えて支払い制限を超えます。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز الحد الأعلى"
+          }
         }
       }
     },
-    "The room number has exceeded the limit in connection or battle": {
+    "common_server_error_has_exceeded_the_limit_in_connection_or_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6929,10 +8637,16 @@
             "state": "translated",
             "value": "接続部屋とバトルルームの最大数を超えました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجاوز رقم الغرفة الحد في الاتصال أو المنافسة"
+          }
         }
       }
     },
-    "The room is already in other battle": {
+    "common_server_error_in_other_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6958,10 +8672,16 @@
             "state": "translated",
             "value": "この部屋は他の戦闘セッションにあります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة موجودة بالفعل في منافسة أخرى"
+          }
         }
       }
     },
-    "You are currently unable to perform this operation (possibly due to lack of permission or scenario restrictions)": {
+    "common_server_error_insufficient_operation_permissions": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -6987,10 +8707,16 @@
             "state": "translated",
             "value": "現在この操作を実行できません（権限がない、またはシナリオの制限などの理由による可能性があります）"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكنك حالياً تنفيذ هذه العملية"
+          }
         }
       }
     },
-    "Invalid room type": {
+    "common_server_error_invalid_room_type": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7016,10 +8742,16 @@
             "state": "translated",
             "value": "無効な部屋の種類"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نوع غرفة غير صالح"
+          }
         }
       }
     },
-    "The current room is connecting with other rooms": {
+    "common_server_error_is_connecting_with_other_rooms": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7045,10 +8777,16 @@
             "state": "translated",
             "value": "現在の部屋は他の部屋に接続されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة الحالية متصلة بغرف أخرى"
+          }
         }
       }
     },
-    "It's not allowed to cancel battle for room in battle": {
+    "common_server_error_is_not_allowed_to_cancel_battle_for_room_in_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7074,10 +8812,16 @@
             "state": "translated",
             "value": "部屋は戦いにあります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يُسمح بإلغاء المنافسة للغرفة في المنافسة"
+          }
         }
       }
     },
-    "There is no valid keys when delete metadata": {
+    "common_server_error_metadata_no_valid_keys": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7103,10 +8847,16 @@
             "state": "translated",
             "value": "ルームメタデータを削除するとき、削除されたキーはどれも存在しません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد مفاتيح صالحة عند حذف البيانات الوصفية"
+          }
         }
       }
     },
-    "The number of keys in the room's Metadata exceeds the limit": {
+    "common_server_error_metadata_number_of_keys_exceeds_the_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7132,10 +8882,16 @@
             "state": "translated",
             "value": "ルームメタデータのキーの数は上限を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد المفاتيح في البيانات الوصفية للغرفة يتجاوز الحد"
+          }
         }
       }
     },
-    "The size of value in the room's Metadata exceeds the maximum byte limit": {
+    "common_server_error_metadata_size_of_value_exceeds_the_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7161,10 +8917,16 @@
             "state": "translated",
             "value": "ルームメタデータの単一キーに対応するVALは、バイト制限の最大数を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حجم القيمة في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "The size of key in the room's Metadata exceeds the maximum byte limit": {
+    "common_server_error_metadata_the_size_of_key_exceeds_the_maximum_byte_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7190,10 +8952,16 @@
             "state": "translated",
             "value": "ルームメタデータのキーサイズは、バイト制限の最大数を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حجم المفتاح في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "The total size of all value in the room's Metadata exceeds the maximum byte limit": {
+    "common_server_error_metadata_total_size_exceeds_the_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7219,10 +8987,16 @@
             "state": "translated",
             "value": "ルームメタデータのすべてのキーに対応するバルの合計は、バイト制限の最大数を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الحجم الإجمالي لجميع القيم في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
         }
       }
     },
-    "The seat is locked. You can try another seat": {
+    "common_server_error_mic_seat_is_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7248,10 +9022,16 @@
             "state": "translated",
             "value": "マットレスの位置がロックされています、マットレスの位置を変更してみることができます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقعد مقفل. يمكنك تجربة مقعد آخر"
+          }
         }
       }
     },
-    "No payment information, you need to purchase a package in the console": {
+    "common_server_error_no_payment_information": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7277,10 +9057,16 @@
             "state": "translated",
             "value": "有料情報はありません、コンソールでパッケージを購入する必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد معلومات دفع، تحتاج لشراء باقة"
+          }
         }
       }
     },
-    "None of the rooms in the battle is valid": {
+    "common_server_error_no_rooms_in_the_battle_is_valid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7306,10 +9092,16 @@
             "state": "translated",
             "value": "開始された戦いには有効な部屋はありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد غرفة صالحة في المنافسة"
+          }
         }
       }
     },
-    "Not a room member": {
+    "common_server_error_not_a_room_member": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7335,10 +9127,16 @@
             "state": "translated",
             "value": "部屋以外のメンバー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس عضواً في الغرفة"
+          }
         }
       }
     },
-    "Not on the seat queue": {
+    "common_server_error_not_on_the_mic_queue": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7364,10 +9162,16 @@
             "state": "translated",
             "value": "配置リストにはありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس في قائمة انتظار المقاعد"
+          }
         }
       }
     },
-    "Not on the seat": {
+    "common_server_error_not_on_the_mic_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7393,10 +9197,16 @@
             "state": "translated",
             "value": "小麦の上ではありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ليس على المقعد"
+          }
         }
       }
     },
-    "The battle has not started yet": {
+    "common_server_error_not_started_yet": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7422,10 +9232,16 @@
             "state": "translated",
             "value": "戦いはまだ始まっていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم تبدأ المنافسة بعد"
+          }
         }
       }
     },
-    "The parameter is illegal. Check whether the request is correct according to the error description": {
+    "common_server_error_param_illegal": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7451,10 +9267,16 @@
             "state": "translated",
             "value": "違法なパラメーターをご覧ください。エラーの説明に従ってリクエストが正しいかどうかを確認してください。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المعلمة غير قانونية"
+          }
         }
       }
     },
-    "The current room requires a password for entry": {
+    "common_server_error_requires_password": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7480,10 +9302,16 @@
             "state": "translated",
             "value": "現在の部屋では、入力するにはパスワードが必要です"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة الحالية تتطلب كلمة مرور للدخول"
+          }
         }
       }
     },
-    "The admin quantity exceeds the upper limit": {
+    "common_server_error_room_admin_quantity_exceeds_the_upper_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7509,10 +9337,16 @@
             "state": "translated",
             "value": "管理者の数は制限を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد المسؤولين يتجاوز الحد الأعلى"
+          }
         }
       }
     },
-    "The room does not exist, or it once existed but has now been dissolved": {
+    "common_server_error_room_does_not_exist": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7538,10 +9372,16 @@
             "state": "translated",
             "value": "部屋は存在せず、存在していませんが、解散しました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة غير موجودة أو تم حلها"
+          }
         }
       }
     },
-    "The room does not support seat ability": {
+    "common_server_error_room_does_not_support_mic_ability": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7567,10 +9407,16 @@
             "state": "translated",
             "value": "この部屋はMSをサポートしていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة لا تدعم ميزة المقاعد"
+          }
         }
       }
     },
-    "Room Entry Password Error": {
+    "common_server_error_room_entry_password_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7596,10 +9442,16 @@
             "state": "translated",
             "value": "部屋に入るためのパスワードが誤っていません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ في كلمة مرور دخول الغرفة"
+          }
         }
       }
     },
-    "The room ID already exists. Please select another room ID": {
+    "common_server_error_room_id_exists": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7625,10 +9477,16 @@
             "state": "translated",
             "value": "部屋IDが使用されました、別の部屋IDを選択してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة موجود بالفعل. يرجى اختيار معرف آخر"
+          }
         }
       }
     },
-    "The room ID has been occupied by Chat. You can use a different room ID or dissolve the group first": {
+    "common_server_error_room_id_has_been_occupied_by_chat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7654,10 +9512,16 @@
             "state": "translated",
             "value": "部屋IDはIMによって占有されています。別の部屋IDで使用するか、最初にIMインターフェイスを介してグループを解散させることができます。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف الغرفة مشغول بواسطة الدردشة"
+          }
         }
       }
     },
-    "The room ID has been used, and the operator is the room owner, it can be used directly": {
+    "common_server_error_room_id_has_been_used": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7683,10 +9547,16 @@
             "state": "translated",
             "value": "部屋IDが使用されており、オペレーターは住宅所有者であり、直接使用できます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم استخدام معرف الغرفة، والمشغل هو صاحب الغرفة"
+          }
         }
       }
     },
-    "The room is full": {
+    "common_server_error_room_is_full": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7712,10 +9582,16 @@
             "state": "translated",
             "value": "部屋のメンバーはいっぱいです"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة ممتلئة"
+          }
         }
       }
     },
-    "The room is already in connection": {
+    "common_server_error_room_is_in_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7741,10 +9617,16 @@
             "state": "translated",
             "value": "部屋はすでに接続されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة متصلة بالفعل"
+          }
         }
       }
     },
-    "The current seat is already occupied": {
+    "common_server_error_seat_is_already_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7770,10 +9652,16 @@
             "state": "translated",
             "value": "現時点ではすでに人がいます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقعد الحالي مشغول بالفعل"
+          }
         }
       }
     },
-    "Signal request conflict": {
+    "common_server_error_signal_request_conflict": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7799,10 +9687,16 @@
             "state": "translated",
             "value": "シグナリングリクエストの競合"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعارض طلب الإشارة"
+          }
         }
       }
     },
-    "Server internal error, please retry": {
+    "common_server_error_system_internal_error": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7828,10 +9722,16 @@
             "state": "translated",
             "value": "内部サーバーエラー、もう一度やり直してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطأ داخلي في الخادم، يرجى إعادة المحاولة"
+          }
         }
       }
     },
-    "Tag quantity Exceeds Upper limit": {
+    "common_server_error_tag_quantity_exceeds_upper_limit": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7857,10 +9757,16 @@
             "state": "translated",
             "value": "タグの数は上限を超えています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد العلامات يتجاوز الحد الأعلى"
+          }
         }
       }
     },
-    "The room isn‘t in the battle": {
+    "common_server_error_the_room_is_not_in_the_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7886,10 +9792,16 @@
             "state": "translated",
             "value": "部屋はもはや戦いにありません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغرفة ليست في المنافسة"
+          }
         }
       }
     },
-    "The seat list is empty": {
+    "common_server_error_the_seat_list_is_empty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7915,10 +9827,16 @@
             "state": "translated",
             "value": "接続されたマイクのリストは空です"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة المقاعد فارغة"
+          }
         }
       }
     },
-    "The seats are all taken.": {
+    "common_server_error_the_seats_are_all_taken": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7944,10 +9862,16 @@
             "state": "translated",
             "value": "座席はいっぱいです"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جميع المقاعد مشغولة."
+          }
         }
       }
     },
-    "There is a pending battle request for this room": {
+    "common_server_error_there_is_a_pending_battle_request": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -7973,10 +9897,16 @@
             "state": "translated",
             "value": "この部屋には、保留中の戦闘リクエストがあります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يوجد طلب منافسة معلق لهذه الغرفة"
+          }
         }
       }
     },
-    "There is a pending connection request for this room": {
+    "common_server_error_there_is_a_pending_connection_request": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8002,10 +9932,16 @@
             "state": "translated",
             "value": "この部屋には保留中の接続リクエストがあります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يوجد طلب اتصال معلق لهذه الغرفة"
+          }
         }
       }
     },
-    "This member has been banned": {
+    "common_server_error_this_member_has_been_banned": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8031,10 +9967,16 @@
             "state": "translated",
             "value": "このメンバーは禁止されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم حظر هذا العضو"
+          }
         }
       }
     },
-    "This member has been muted": {
+    "common_server_error_this_member_has_been_muted": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8060,10 +10002,16 @@
             "state": "translated",
             "value": "このメンバーは禁止されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم كتم صوت هذا العضو"
+          }
         }
       }
     },
-    "The user is already on the seat": {
+    "common_server_error_user_is_already_on_the_mic_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8089,10 +10037,16 @@
             "state": "translated",
             "value": "マイクにはすでにユーザーがいます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدم موجود بالفعل على المقعد"
+          }
         }
       }
     },
-    "Set as background": {
+    "common_set_as_background": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8118,10 +10072,16 @@
             "state": "translated",
             "value": "背景として設定します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كخلفية"
+          }
         }
       }
     },
-    "Set as cover": {
+    "common_set_as_cover": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8147,10 +10107,16 @@
             "state": "translated",
             "value": "カバーとして設定します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كغلاف"
+          }
         }
       }
     },
-    "Settings": {
+    "common_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8176,10 +10142,16 @@
             "state": "translated",
             "value": "設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الإعدادات"
+          }
         }
       }
     },
-    "Background": {
+    "common_settings_bg_image": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8205,10 +10177,16 @@
             "state": "translated",
             "value": "背景"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الخلفية"
+          }
         }
       }
     },
-    "Beauty": {
+    "common_stream_categories_beauty": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8220,24 +10198,30 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "美颜"
+            "value": "颜值"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "美顏"
+            "value": "顏值"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "美化します"
+            "value": "外観"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جمال"
           }
         }
       }
     },
-    "Daily chat": {
+    "common_stream_categories_default": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8263,10 +10247,16 @@
             "state": "translated",
             "value": "毎日のチャット"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دردشة يومية"
+          }
         }
       }
     },
-    "Shopping": {
+    "common_stream_categories_shopping": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8292,10 +10282,16 @@
             "state": "translated",
             "value": "買い物"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تسوق"
+          }
         }
       }
     },
-    "Knowledge Teaching": {
+    "common_stream_categories_teach": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8321,10 +10317,16 @@
             "state": "translated",
             "value": "知識教育"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعليم المعرفة"
+          }
         }
       }
     },
-    "Public": {
+    "common_stream_privacy_status_default": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8350,10 +10352,16 @@
             "state": "translated",
             "value": "公共"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عام"
+          }
         }
       }
     },
-    "Privacy": {
+    "common_stream_privacy_status_privacy": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8379,10 +10387,16 @@
             "state": "translated",
             "value": "プライバシー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خاص"
+          }
         }
       }
     },
-    "Cancel application for link mic": {
+    "common_text_cancel_link_mic_apply": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8408,10 +10422,16 @@
             "state": "translated",
             "value": "電話に接続するためのアプリケーションをキャンセルします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء طلب ربط الميكروفون"
+          }
         }
       }
     },
-    "End Link": {
+    "common_text_close_link_mic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8437,10 +10457,16 @@
             "state": "translated",
             "value": "分隊の終わり"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء الربط"
+          }
         }
       }
     },
-    "Apply for audio link": {
+    "common_text_link_mic_audio": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8466,10 +10492,16 @@
             "state": "translated",
             "value": "音声接続を申請します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التقدم لربط الصوت"
+          }
         }
       }
     },
-    "connect upon host's approval": {
+    "common_text_link_mic_selector": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8495,10 +10527,16 @@
             "state": "translated",
             "value": "接続方法を選択すると、アンカーは接続することに同意します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاتصال بعد موافقة المضيف"
+          }
         }
       }
     },
-    "Apply for video link": {
+    "common_text_link_mic_video": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8524,10 +10562,16 @@
             "state": "translated",
             "value": "ビデオリンクを申請してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التقدم لربط الفيديو"
+          }
         }
       }
     },
-    "The screen effect will automatically take effect after connecting": {
+    "common_tips_apply_link_mic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8553,10 +10597,16 @@
             "state": "translated",
             "value": "画面効果がオンになった後、自動的に有効になります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيتم تطبيق تأثير الشاشة تلقائياً بعد الاتصال"
+          }
         }
       }
     },
-    "Choose Link Mode": {
+    "common_title_link_mic_selector": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8582,10 +10632,16 @@
             "state": "translated",
             "value": "接続する方法を選択してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختر وضع الربط"
+          }
         }
       }
     },
-    "Adjust the video link screen": {
+    "common_title_link_video_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8611,10 +10667,16 @@
             "state": "translated",
             "value": "ビデオ接続画面を調整します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضبط شاشة ربط الفيديو"
+          }
         }
       }
     },
-    "You have submitted a link mic request, please wait for the author approval": {
+    "common_toast_apply_link_mic": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8640,10 +10702,16 @@
             "state": "translated",
             "value": "あなたは電気通信申請書を提出しました、アンカーが同意するのを待ってください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لقد قدمت طلب ربط الميكروفون، يرجى انتظار موافقة المذيع"
+          }
         }
       }
     },
-    "Unfollow": {
+    "common_unfollow_anchor": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8669,10 +10737,16 @@
             "state": "translated",
             "value": "解除してください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء المتابعة"
+          }
         }
       }
     },
-    "Video": {
+    "common_video_config": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8698,10 +10772,16 @@
             "state": "translated",
             "value": "ビデオパラメーター"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فيديو"
+          }
         }
       }
     },
-    "Video Config": {
+    "common_video_params": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8727,10 +10807,51 @@
             "state": "translated",
             "value": "ビデオパラメーター"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الفيديو"
+          }
         }
       }
     },
-    "Flip": {
+    "common_video_settings_item_beauty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beauty"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "美颜"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "美顏"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "美化します"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جمال"
+          }
+        }
+      }
+    },
+    "common_video_settings_item_flip": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8756,10 +10877,16 @@
             "state": "translated",
             "value": "フリップ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قلب"
+          }
         }
       }
     },
-    "Mirror": {
+    "common_video_settings_item_mirror": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8785,10 +10912,16 @@
             "state": "translated",
             "value": "鏡"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرآة"
+          }
         }
       }
     },
-    "Pip": {
+    "common_video_settings_item_pip": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8814,10 +10947,16 @@
             "state": "translated",
             "value": "ピクチャー・イン・ピクチャー"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صورة داخل صورة"
+          }
         }
       }
     },
-    "Pip Toggle": {
+    "common_pip_toggle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8843,10 +10982,16 @@
             "state": "translated",
             "value": "ピクチャーインピクチャーの切り替え"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبديل صورة داخل صورة"
+          }
         }
       }
     },
-    "After enabling, the app will automatically enter picture-in-picture mode when moved to the background": {
+    "common_pip_toggle_description": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8872,10 +11017,16 @@
             "state": "translated",
             "value": "オンにすると、アプリがバックグラウンドに移動したときに自動的にピクチャーインピクチャーモードに入ります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد التفعيل، سيدخل التطبيق تلقائياً وضع صورة داخل صورة عند الانتقال للخلفية"
+          }
         }
       }
     },
-    "No users in the seat, go to invite": {
+    "common_voiceroom_empty_view": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8901,10 +11052,51 @@
             "state": "translated",
             "value": "マイクにはユーザーがいません。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد مستخدمون في المقعد، اذهب للدعوة"
+          }
         }
       }
     },
-    "Seat invitation has been canceled": {
+    "common_voiceroom_invite": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invite"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀请"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邀請"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "招待する"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة"
+          }
+        }
+      }
+    },
+    "common_voiceroom_invite_seat_canceled": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8930,10 +11122,16 @@
             "state": "translated",
             "value": "Shangmaiへの招待状がキャンセルされました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إلغاء دعوة المقعد"
+          }
         }
       }
     },
-    "Seat invitation has been rejected": {
+    "common_voiceroom_invite_seat_rejected": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8959,10 +11157,16 @@
             "state": "translated",
             "value": "Shangmaiへの招待状が拒否されました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم رفض دعوة المقعد"
+          }
         }
       }
     },
-    "Seat invitation timeout": {
+    "common_voiceroom_invite_seat_timeout": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8988,10 +11192,16 @@
             "state": "translated",
             "value": "Shangmaiへの招待状がタイムアウトしました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت مهلة دعوة المقعد"
+          }
         }
       }
     },
-    "Lock Seat": {
+    "common_voiceroom_lock": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9017,10 +11227,16 @@
             "state": "translated",
             "value": "位置をロックします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قفل المقعد"
+          }
         }
       }
     },
-    "Mute": {
+    "common_voiceroom_mute_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9046,10 +11262,16 @@
             "state": "translated",
             "value": "ミュート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم الصوت"
+          }
         }
       }
     },
-    "Require owner's consent to speak": {
+    "common_voiceroom_need_agree": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9075,10 +11297,16 @@
             "state": "translated",
             "value": "住宅所有者は同意する必要があります"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتطلب موافقة صاحب الغرفة للتحدث"
+          }
         }
       }
     },
-    "xxx invites you to take seat": {
+    "common_voiceroom_receive_seat_invitation": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9104,10 +11332,16 @@
             "state": "translated",
             "value": "xxxマイへの招待状を送信します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx يدعوك لأخذ مقعد"
+          }
         }
       }
     },
-    "Take Seat": {
+    "common_voiceroom_take_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9133,10 +11367,16 @@
             "state": "translated",
             "value": "小麦に行きます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أخذ مقعد"
+          }
         }
       }
     },
-    "Take seat application has been rejected": {
+    "common_voiceroom_take_seat_rejected": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9162,10 +11402,16 @@
             "state": "translated",
             "value": "MAIの申請は拒否されました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم رفض طلب أخذ المقعد"
+          }
         }
       }
     },
-    "Take seat application timeout": {
+    "common_voiceroom_take_seat_timeout": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9191,10 +11437,16 @@
             "state": "translated",
             "value": "MSMEタイムアウトを申請します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت مهلة طلب أخذ المقعد"
+          }
         }
       }
     },
-    "Unlock Seat": {
+    "common_voiceroom_unlock": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9220,10 +11472,16 @@
             "state": "translated",
             "value": "マイクのロックを解除します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فتح قفل المقعد"
+          }
         }
       }
     },
-    "Unmute": {
+    "common_voiceroom_unmuted_seat": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9249,10 +11507,16 @@
             "state": "translated",
             "value": "ミュート"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء كتم الصوت"
+          }
         }
       }
     },
-    "Agree": {
+    "live_barrage_agree": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9278,10 +11542,16 @@
             "state": "translated",
             "value": "同意する"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موافق"
+          }
         }
       }
     },
-    "Send": {
+    "live_barrage_btn_send": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9307,10 +11577,16 @@
             "state": "translated",
             "value": "送信"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إرسال"
+          }
         }
       }
     },
-    "Choose Music": {
+    "live_choose_music": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9336,10 +11612,16 @@
             "state": "translated",
             "value": "音楽を選択します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختر الموسيقى"
+          }
         }
       }
     },
-    "Failed to enter room": {
+    "live_failed_to_enter_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9365,10 +11647,16 @@
             "state": "translated",
             "value": "部屋に入ることができませんでした"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشل دخول الغرفة"
+          }
         }
       }
     },
-    "Invalid userId": {
+    "live_invalid_userId": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9394,10 +11682,16 @@
             "state": "translated",
             "value": "違法なユーザーID"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معرف مستخدم غير صالح"
+          }
         }
       }
     },
-    "Music Pitch": {
+    "live_music_pitch": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9423,10 +11717,16 @@
             "state": "translated",
             "value": "上下にミュージカル"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نغمة الموسيقى"
+          }
         }
       }
     },
-    "Video Status": {
+    "common_video_status": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9452,10 +11752,16 @@
             "state": "translated",
             "value": "ビデオステータス"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حالة الفيديو"
+          }
         }
       }
     },
-    "Audio Status": {
+    "common_audio_status": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9481,10 +11787,16 @@
             "state": "translated",
             "value": "オーディオステータス"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حالة الصوت"
+          }
         }
       }
     },
-    "Device Temperature": {
+    "common_device_temp": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9510,10 +11822,16 @@
             "state": "translated",
             "value": "機器の温度"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "درجة حرارة الجهاز"
+          }
         }
       }
     },
-    "Wi-Fi/Mobile Network": {
+    "common_wifi_or_mobile_network": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9539,10 +11857,16 @@
             "state": "translated",
             "value": "Wi-Fi/モバイルネットワーク"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi-Fi/شبكة الجوال"
+          }
         }
       }
     },
-    "Smooth streaming": {
+    "common_video_stream_smooth": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9568,10 +11892,16 @@
             "state": "translated",
             "value": "ブロードキャスト画面は滑らかです"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث سلس"
+          }
         }
       }
     },
-    "Freezing streaming": {
+    "common_video_stream_freezing": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9597,10 +11927,16 @@
             "state": "translated",
             "value": "ブロードキャストの画面が立ち往生しています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث متجمد"
+          }
         }
       }
     },
-    "Video capture disabled": {
+    "common_video_capture_closed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9626,10 +11962,16 @@
             "state": "translated",
             "value": "ビデオコレクションは閉鎖されています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعطيل التقاط الفيديو"
+          }
         }
       }
     },
-    "Proper volume ensures good viewing experience": {
+    "common_audio_tips_proper_volume": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9655,10 +11997,16 @@
             "state": "translated",
             "value": "適切なボリュームは、良い視聴体験を保証します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى الصوت المناسب يضمن تجربة مشاهدة جيدة"
+          }
         }
       }
     },
-    "Regular checks ensure good viewing experience": {
+    "common_audio_tips_regular_checks": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9684,10 +12032,16 @@
             "state": "translated",
             "value": "定期的な検査により、良い視聴体験が保証されます"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الفحوصات المنتظمة تضمن تجربة مشاهدة جيدة"
+          }
         }
       }
     },
-    "Avoid frequent network switching": {
+    "common_network_switch_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9713,10 +12067,16 @@
             "state": "translated",
             "value": "頻繁にネットワークの切り替えを避けてください"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تجنب التبديل المتكرر للشبكة"
+          }
         }
       }
     },
-    "Live Information": {
+    "common_live_info": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9742,10 +12102,51 @@
             "state": "translated",
             "value": "ライブブロードキャスト情報"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معلومات البث"
+          }
         }
       }
     },
-    "Down Loss": {
+    "common_rtt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RTT"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "往返延时"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "往返延時"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "往復遅延"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زمن الذهاب والإياب"
+          }
+        }
+      }
+    },
+    "common_down_loss": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9771,10 +12172,16 @@
             "state": "translated",
             "value": "下流のパケットが失われました"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فقدان التنزيل"
+          }
         }
       }
     },
-    "Up Loss": {
+    "common_up_loss": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9800,10 +12207,16 @@
             "state": "translated",
             "value": "アップリンクパケット損失"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فقدان الرفع"
+          }
         }
       }
     },
-    "normal": {
+    "common_normal": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9829,10 +12242,16 @@
             "state": "translated",
             "value": "普通"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طبيعي"
+          }
         }
       }
     },
-    "close": {
+    "common_close": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9858,10 +12277,16 @@
             "state": "translated",
             "value": "閉鎖"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إغلاق"
+          }
         }
       }
     },
-    "exception": {
+    "common_exception": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9887,10 +12312,16 @@
             "state": "translated",
             "value": "異常な"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استثناء"
+          }
         }
       }
     },
-    "excellent": {
+    "common_excellent": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9916,10 +12347,16 @@
             "state": "translated",
             "value": "素晴らしい"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ممتاز"
+          }
         }
       }
     },
-    "good": {
+    "common_good": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9945,10 +12382,16 @@
             "state": "translated",
             "value": "良い"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جيد"
+          }
         }
       }
     },
-    "poor": {
+    "common_poor": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -9974,10 +12417,16 @@
             "state": "translated",
             "value": "貧しい"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ضعيف"
+          }
         }
       }
     },
-    "bad": {
+    "common_bad": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10003,10 +12452,16 @@
             "state": "translated",
             "value": "違い"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيء"
+          }
         }
       }
     },
-    "veryBad": {
+    "common_verybad": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10032,10 +12487,16 @@
             "state": "translated",
             "value": "非常に悪い"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سيء جداً"
+          }
         }
       }
     },
-    "down": {
+    "common_down": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10061,10 +12522,16 @@
             "state": "translated",
             "value": "切断します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منقطع"
+          }
         }
       }
     },
-    "Default": {
+    "common_audio_mode_default": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10090,10 +12557,16 @@
             "state": "translated",
             "value": "デフォルトモード"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "افتراضي"
+          }
         }
       }
     },
-    "Speech": {
+    "common_audio_mode_speech": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10119,10 +12592,51 @@
             "state": "translated",
             "value": "音声モード"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كلام"
+          }
         }
       }
     },
-    "fair": {
+    "common_audio_mode_music": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Music"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音乐模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂模式"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音楽モード"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموسيقى"
+          }
+        }
+      }
+    },
+    "common_device_temp_fair": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10148,10 +12662,16 @@
             "state": "translated",
             "value": "微熱"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "معتدل"
+          }
         }
       }
     },
-    "serious": {
+    "common_device_temp_serious": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10177,10 +12697,16 @@
             "state": "translated",
             "value": "重度の発熱"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خطير"
+          }
         }
       }
     },
-    "Network lag detected suggestions": {
+    "common_network_bad_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10206,10 +12732,16 @@
             "state": "translated",
             "value": "現在のネットワークはutter音を立てていますが、お勧めします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم اكتشاف تأخر في الشبكة، اقتراحات"
+          }
         }
       }
     },
-    "Switch Network": {
+    "common_switch_network": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10235,10 +12767,16 @@
             "state": "translated",
             "value": "スイッチネットワーク"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبديل الشبكة"
+          }
         }
       }
     },
-    "Conn Wait": {
+    "common_wait_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10264,10 +12802,16 @@
             "state": "translated",
             "value": "接続を待っています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتظار الاتصال"
+          }
         }
       }
     },
-    "Conn Join": {
+    "common_apply_connection": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10293,10 +12837,16 @@
             "state": "translated",
             "value": "接続を申請します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الانضمام للاتصال"
+          }
         }
       }
     },
-    "Template:": {
+    "common_template_select": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10322,10 +12872,16 @@
             "state": "translated",
             "value": "テンプレートの選択："
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "القالب:"
+          }
         }
       }
     },
-    "Dynamic grid layout": {
+    "common_template_dynamic_grid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10351,10 +12907,16 @@
             "state": "translated",
             "value": "動的グリッド"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط شبكة ديناميكي"
+          }
         }
       }
     },
-    "Dynamic float layout": {
+    "common_template_dynamic_float": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10380,10 +12942,16 @@
             "state": "translated",
             "value": "フローティングウィンドウ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط عائم ديناميكي"
+          }
         }
       }
     },
-    "Static grid layout": {
+    "common_template_static_grid": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10409,10 +12977,16 @@
             "state": "translated",
             "value": "静的グリッド"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط شبكة ثابت"
+          }
         }
       }
     },
-    "Static float layout": {
+    "common_template_static_float": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10438,10 +13012,16 @@
             "state": "translated",
             "value": "固定ウィンドウ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط عائم ثابت"
+          }
         }
       }
     },
-    "Layout settings": {
+    "common_template_layout_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10467,10 +13047,16 @@
             "state": "translated",
             "value": "レイアウト設定"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات التخطيط"
+          }
         }
       }
     },
-    "Layout co-guest": {
+    "common_template_layout_co_guest": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10496,10 +13082,16 @@
             "state": "translated",
             "value": "オーディエンスのレイアウトでさえ"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط الضيف المشترك"
+          }
         }
       }
     },
-    "Layout co-host": {
+    "common_template_layout_co_host": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10525,10 +13117,16 @@
             "state": "translated",
             "value": "アンカーPKレイアウト"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تخطيط المضيف المشترك"
+          }
         }
       }
     },
-    "Layout": {
+    "common_template_layout": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10554,10 +13152,16 @@
             "state": "translated",
             "value": "レイアウト"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التخطيط"
+          }
         }
       }
     },
-    "Chat Room": {
+    "karaoke_chat_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10581,12 +13185,18 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chat Room"
+            "value": "チャットルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة الدردشة"
           }
         }
       }
     },
-    "KTV Room": {
+    "karaoke_ktv_room": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10610,12 +13220,18 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "KTV Room"
+            "value": "KTVルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة KTV"
           }
         }
       }
     },
-    "Video settings": {
+    "common_video_settings": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10638,13 +13254,54 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "ビデオ設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الفيديو"
           }
         }
       }
     },
-    "Reduce resolution": {
+    "live_video_resolution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resolution"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清晰度"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清晰度"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解像度"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الدقة"
+          }
+        }
+      }
+    },
+    "live_video_reduce_resolution": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10667,13 +13324,19 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "解像度を下げる"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تقليل الدقة"
           }
         }
       }
     },
-    "resolution changed to": {
+    "live_video_resolution_changed": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10696,13 +13359,19 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "解像度が切り替わりました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تغيير الدقة إلى"
           }
         }
       }
     },
-    "This layout template may display abnormally on certain models. It is recommended to change to another layout template.": {
+    "common_template_601_ui_exception_toast": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10728,10 +13397,16 @@
             "state": "translated",
             "value": "このレイアウトテンプレートは、一部の機種で正常に表示されない場合があります。別のレイアウトテンプレートに変更することをお勧めします。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قد يُعرض قالب التخطيط هذا بشكل غير طبيعي على بعض الطرازات. يُنصح بالتغيير إلى قالب تخطيط آخر."
+          }
         }
       }
     },
-    "Locked": {
+    "seat_locked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10757,10 +13432,16 @@
             "state": "translated",
             "value": "ロックされています"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقفل"
+          }
         }
       }
     },
-    "UnLock Seat": {
+    "seat_unlocked": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10786,10 +13467,16 @@
             "state": "translated",
             "value": "ロックを解除します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فتح قفل المقعد"
+          }
         }
       }
     },
-    "No guests": {
+    "seat_no_guest": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10815,10 +13502,16 @@
             "state": "translated",
             "value": "まだゲストはいません"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد ضيوف"
+          }
         }
       }
     },
-    "In Battle": {
+    "seat_in_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10844,10 +13537,16 @@
             "state": "translated",
             "value": "戦闘中"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في المنافسة"
+          }
         }
       }
     },
-    "Cancel invite": {
+    "seat_cancel_invite": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10873,10 +13572,16 @@
             "state": "translated",
             "value": "招待をキャンセルします"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء الدعوة"
+          }
         }
       }
     },
-    "Request Battle": {
+    "seat_request_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10902,10 +13607,16 @@
             "state": "translated",
             "value": "戦闘を開始します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلب المنافسة"
+          }
         }
       }
     },
-    "Invite Host": {
+    "seat_request_host": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10931,10 +13642,16 @@
             "state": "translated",
             "value": "ホストを招待します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة المضيف"
+          }
         }
       }
     },
-    "Invite Battle": {
+    "seat_invite_battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10960,10 +13677,16 @@
             "state": "translated",
             "value": "戦闘を開始します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة للمنافسة"
+          }
         }
       }
     },
-    "Inviting others you can withdraw the invitation and send a new one": {
+    "seat_repeat_invite_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -10986,13 +13709,19 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "他の人を招待中です。申請を撤回してから再度招待できます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دعوة الآخرين، يمكنك سحب الدعوة وإرسال دعوة جديدة"
           }
         }
       }
     },
-    "End Battle": {
+    "seat_end_Battle": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11018,10 +13747,16 @@
             "state": "translated",
             "value": "戦闘を終了します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء المنافسة"
+          }
         }
       }
     },
-    "In PK": {
+    "seat_in_pk": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11047,10 +13782,16 @@
             "state": "translated",
             "value": "PK中"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في المنافسة"
+          }
         }
       }
     },
-    "Are you sure you want to End Live?": {
+    "live_end_live_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11076,10 +13817,16 @@
             "state": "translated",
             "value": "終了することを確認しますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد إنهاء البث؟"
+          }
         }
       }
     },
-    "Are you sure you want to Exit Live?": {
+    "live_exit_live_tips": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11105,10 +13852,16 @@
             "state": "translated",
             "value": "退出することを確認しますか？"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل أنت متأكد أنك تريد الخروج من البث؟"
+          }
         }
       }
     },
-    "xxx canceled request": {
+    "live_cancel_request": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11131,13 +13884,19 @@
         },
         "ja": {
           "stringUnit": {
-            "state": "needs_review",
-            "value": ""
+            "state": "translated",
+            "value": "xxxが申請をキャンセルしました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx ألغى الطلب"
           }
         }
       }
     },
-    "Auto": {
+    "mirror_type_auto": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11163,10 +13922,16 @@
             "state": "translated",
             "value": "自動"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تلقائي"
+          }
         }
       }
     },
-    "Enable": {
+    "mirror_type_enable": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11192,10 +13957,16 @@
             "state": "translated",
             "value": "有効"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تفعيل"
+          }
         }
       }
     },
-    "Disable": {
+    "mirror_type_disable": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11221,10 +13992,16 @@
             "state": "translated",
             "value": "無効"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعطيل"
+          }
         }
       }
     },
-    "Change to xxx": {
+    "mirror_type_change_to": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11250,10 +14027,51 @@
             "state": "translated",
             "value": "xxxに変更します"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التغيير إلى xxx"
+          }
         }
       }
     },
-    "The connection is successful. Users beyond the first 6 seats have been removed.": {
+    "common_remove": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取り除く"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إزالة"
+          }
+        }
+      }
+    },
+    "common_host_kick_user_after_connect": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11279,10 +14097,16 @@
             "state": "translated",
             "value": "接続に成功しました。先着6席以外のユーザーはマイクを降りました。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم الاتصال بنجاح. تمت إزالة المستخدمين خارج أول 6 مقاعد."
+          }
         }
       }
     },
-    "The connection only displays the first 6 seats. You have been removed.": {
+    "common_audience_kicked_re_apply": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11308,10 +14132,16 @@
             "state": "translated",
             "value": "接続は先着6席のみ表示されます。あなたはマイクから降ろされました。"
           }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يعرض الاتصال أول 6 مقاعد فقط. تمت إزالتك."
+          }
         }
       }
     },
-    "Cannot connect when back 4 seats occupied": {
+    "common_back_seats_occupied": {
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -11336,6 +14166,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "後方4席が占有されており、接続できません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن الاتصال عندما تكون المقاعد الأربعة الخلفية مشغولة"
           }
         }
       }

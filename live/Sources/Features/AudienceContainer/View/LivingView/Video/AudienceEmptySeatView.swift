@@ -75,5 +75,5 @@ class AudienceEmptySeatView: UIView {
 }
 
 fileprivate extension String {
-    static let emptySeatText: String = internalLocalized("Conn Join")
+    static let emptySeatText: String = internalLocalized("common_apply_connection")
 }

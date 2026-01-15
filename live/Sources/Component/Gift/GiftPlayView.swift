@@ -12,6 +12,7 @@ import RTCRoomEngine
 import SVGAPlayer
 import TUICore
 import UIKit
+import AtomicX
 
 public protocol GiftPlayViewDelegate: AnyObject {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo)
@@ -227,7 +228,14 @@ extension GiftPlayView {
 
 private extension GiftPlayView {
     private func playLikeModel(sender: LiveUserInfo) {
-        let startFrame = CGRect(x: (Screen_Width * 5) / 6, y: Screen_Height - Bottom_SafeHeight - 30 - 44, width: 44, height: 44)
+        let xPosition: CGFloat
+        if isRTLLanguage() {
+            xPosition = Screen_Width / 6 - 44
+        } else {
+            xPosition = (Screen_Width * 5) / 6
+        }
+        
+        let startFrame = CGRect(x: xPosition, y: Screen_Height - Bottom_SafeHeight - 30 - 44, width: 44, height: 44)
         let heartImageView = UIImageView(frame: startFrame)
         heartImageView.image = internalImage("live_gift_like_icon")
         
@@ -289,7 +297,13 @@ private extension GiftPlayView {
         let randomY4 = CGFloat.random(in: 240 ... 270)
         let point4 = CGPoint(x: point0.x + randomX4, y: randomY4)
         
-        let randomX3 = CGFloat.random(in: pointOffset3 ... pointOffset3 * 2)
+        let randomX3: CGFloat
+        if isRTLLanguage() {
+            randomX3 = CGFloat.random(in: -pointOffset3 * 2 ... -pointOffset3)
+        } else {
+            randomX3 = CGFloat.random(in: pointOffset3 ... pointOffset3 * 2)
+        }
+        
         let randomY3 = CGFloat.random(in: -30 ... 30)
         let point3 = CGPoint(x: point0.x + randomX3, y: (point4.y + point2.y) / 2 + randomY3)
         
@@ -324,5 +338,5 @@ extension GiftPlayView {
 }
 
 private extension String {
-    static var playFailedText = internalLocalized("Temporarily Unclassified General Error")
+    static var playFailedText = internalLocalized("common_client_error_failed")
 }

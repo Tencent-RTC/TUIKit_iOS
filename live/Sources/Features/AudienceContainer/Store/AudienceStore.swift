@@ -309,6 +309,6 @@ extension AudienceStore {
 }
 
 private extension String {
-    static let takeSeatApplicationRejected = internalLocalized("Take seat application has been rejected")
-    static let takeSeatApplicationTimeout = internalLocalized("Take seat application timeout")
+    static let takeSeatApplicationRejected = internalLocalized("common_voiceroom_take_seat_rejected")
+    static let takeSeatApplicationTimeout = internalLocalized("common_voiceroom_take_seat_timeout")
 }

@@ -34,7 +34,7 @@ public class AnchorPrepareView: UIView {
     
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
-        view.setBackgroundImage(internalImage("live_back_icon"), for: .normal)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
         view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
         return view
     }()
@@ -606,11 +606,11 @@ extension AnchorPrepareView {
 }
 
 private extension String {
-    static let startLivingTitle: String = internalLocalized("Start Live")
-    static let beautyText: String = internalLocalized("Beauty")
-    static let audioText: String = internalLocalized("Audio")
-    static let flipText: String = internalLocalized("Flip")
-    static let layoutText: String = internalLocalized("Layout")
-    static let videoSettingsText: String = internalLocalized("Video settings")
-    static let template601ExceptionText: String = internalLocalized("This layout template may display abnormally on certain models. It is recommended to change to another layout template.")
+    static let startLivingTitle: String = internalLocalized("common_start_live")
+    static let beautyText: String = internalLocalized("common_video_settings_item_beauty")
+    static let audioText: String = internalLocalized("common_audio_effect")
+    static let flipText: String = internalLocalized("common_video_settings_item_flip")
+    static let layoutText: String = internalLocalized("common_template_layout")
+    static let videoSettingsText: String = internalLocalized("common_video_settings")
+    static let template601ExceptionText: String = internalLocalized("common_template_601_ui_exception_toast")
 }

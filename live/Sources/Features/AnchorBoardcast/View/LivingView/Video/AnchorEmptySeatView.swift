@@ -57,5 +57,5 @@ class AnchorEmptySeatView: UIView {
 }
 
 fileprivate extension String {
-    static let emptySeatText: String = internalLocalized("Conn Wait")
+    static let emptySeatText: String = internalLocalized("common_wait_connection")
 }

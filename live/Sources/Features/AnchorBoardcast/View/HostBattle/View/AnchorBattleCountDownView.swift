@@ -212,5 +212,5 @@ class AnchorCountdownTimer {
 
 private extension String {
     static let waitForBattleText: String = internalLocalized("Waiting for battlexxx")
-    static let cancelText: String = internalLocalized("Cancel")
+    static let cancelText: String = internalLocalized("common_cancel")
 }

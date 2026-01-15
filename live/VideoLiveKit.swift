@@ -15,7 +15,10 @@ import TUICore
 public class VideoLiveKit: NSObject {
     private static let sharedInstance = VideoLiveKit()
     
-    override private init() {}
+    override private init() {
+        super.init()
+        enableRTLAlignment()
+    }
     
     private weak var viewController: UIViewController?
     
@@ -137,5 +140,5 @@ extension VideoLiveKit {
 }
 
 private extension String {
-    static let pushingToReturnText = internalLocalized("Live streaming in progress. Please try again later.")
+    static let pushingToReturnText = internalLocalized("livelist_exit_float_window_tip")
 }
