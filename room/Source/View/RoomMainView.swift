@@ -33,7 +33,7 @@ public struct ConnectConfig {
 
 public class RoomMainView: UIView, BaseView {
     // MARK: - Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     private let roomStore: RoomStore = RoomStore.shared
     private let deviceStore: DeviceStore = DeviceStore.shared
     
@@ -97,13 +97,13 @@ public class RoomMainView: UIView, BaseView {
     }
     
     // MARK: - BaseView Implementation
-    func setupViews() {
+    public func setupViews() {
         addSubview(roomView)
         addSubview(topBarView)
         addSubview(bottomBarView)
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         roomView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(topBarView.snp.bottom)
@@ -123,11 +123,11 @@ public class RoomMainView: UIView, BaseView {
         }
     }
     
-    func setupStyles() {
+    public func setupStyles() {
         backgroundColor = RoomColors.inRoomBackground
     }
     
-    func setupBindings() {
+    public func setupBindings() {
         topBarView.delegate = self
         bottomBarView.delegate = self
         listView.delegate = self

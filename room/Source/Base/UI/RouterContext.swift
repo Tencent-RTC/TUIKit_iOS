@@ -10,7 +10,7 @@ import UIKit
 
 /// Router context protocol for navigation and presentation
 /// All custom UIViewControllers must conform to this protocol
-protocol RouterContext: AnyObject {
+public protocol RouterContext: AnyObject {
     /// Current navigation controller
     var navigationController: UINavigationController? { get }
     
@@ -49,25 +49,25 @@ protocol RouterContext: AnyObject {
 // MARK: - Default Implementation for UIViewController
 
 extension RouterContext where Self: UIViewController {
-    func push(_ viewController: UIViewController, animated: Bool = true) {
+    public func push(_ viewController: UIViewController, animated: Bool = true) {
         navigationController?.pushViewController(viewController, animated: animated)
     }
     
     @discardableResult
-    func pop(animated: Bool = true) -> UIViewController? {
+    public func pop(animated: Bool = true) -> UIViewController? {
         return navigationController?.popViewController(animated: animated)
     }
     
     @discardableResult
-    func popToRoot(animated: Bool = true) -> [UIViewController]? {
+    public func popToRoot(animated: Bool = true) -> [UIViewController]? {
         return navigationController?.popToRootViewController(animated: animated)
     }
     
-    func present(_ viewController: UIViewController, animated: Bool = true, completion: (() -> Void)? = nil) {
+    public func present(_ viewController: UIViewController, animated: Bool = true, completion: (() -> Void)? = nil) {
         present(viewController, animated: animated, completion: completion)
     }
     
-    func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
+    public func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
         dismiss(animated: animated, completion: completion)
     }
 }

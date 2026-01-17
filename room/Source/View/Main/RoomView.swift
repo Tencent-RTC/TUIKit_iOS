@@ -24,7 +24,7 @@ struct DataChanges {
 // MARK: - RoomView Component
 public class RoomView: UIView, BaseView {
     // MARK: - BaseView Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     private let roomID: String
     
     private lazy var roomParticipantStore: RoomParticipantStore = {
@@ -95,13 +95,13 @@ public class RoomView: UIView, BaseView {
     }
     
     // MARK: - BaseView Implementation
-    func setupViews() {
+    public func setupViews() {
         addSubview(collectionView)
         addSubview(previousPageButton)
         addSubview(nextPageButton)
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         collectionView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -117,11 +117,11 @@ public class RoomView: UIView, BaseView {
         }
     }
     
-    func setupStyles() {
+    public func setupStyles() {
         backgroundColor = .clear
     }
     
-    func setupBindings() {
+    public func setupBindings() {
         // MARK: - Real Data Binding
         roomParticipantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantList))

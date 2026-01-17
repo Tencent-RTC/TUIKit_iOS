@@ -13,13 +13,13 @@ import UIKit
     
     // MARK: - Properties
     @objc public static let bundle: Bundle = {
-        if let bundlePath = Bundle.main.path(forResource: "TUIRoomKit", ofType: "bundle"),
+        if let bundlePath = Bundle.main.path(forResource: "TUIRoomKitBundle", ofType: "bundle"),
            let bundle = Bundle(path: bundlePath) {
             return bundle
         }
         
         let currentBundle = Bundle(for: ResourceLoader.self)
-        if let bundlePath = currentBundle.path(forResource: "TUIRoomKit", ofType: "bundle"),
+        if let bundlePath = currentBundle.path(forResource: "TUIRoomKitBundle", ofType: "bundle"),
            let bundle = Bundle(path: bundlePath) {
             return bundle
         }

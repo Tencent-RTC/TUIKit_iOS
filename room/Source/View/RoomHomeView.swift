@@ -15,7 +15,7 @@ import Kingfisher
 public class RoomHomeView: UIView, BaseView {
     
     // MARK: - Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     private let roomStore: RoomStore = RoomStore.shared
     private var cancellableSet = Set<AnyCancellable>()
     
@@ -23,8 +23,6 @@ public class RoomHomeView: UIView, BaseView {
     private lazy var backButtonContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleBackButtonTapped))
-        view.addGestureRecognizer(tapGesture)
         view.isUserInteractionEnabled = true
         return view
     }()
@@ -38,8 +36,6 @@ public class RoomHomeView: UIView, BaseView {
     
     private lazy var userAvatarContainerView: UIView = {
         let view = UIView()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleUserAvatarTapped))
-        view.addGestureRecognizer(tapGesture)
         view.isUserInteractionEnabled = true
         return view
     }()
@@ -65,7 +61,6 @@ public class RoomHomeView: UIView, BaseView {
             title: .joinRoom,
             iconName: "join_room"
         )
-        button.addTarget(self, action: #selector(handleJoinRoomButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -74,7 +69,6 @@ public class RoomHomeView: UIView, BaseView {
             title: .createRoom,
             iconName: "create_room"
         )
-        button.addTarget(self, action: #selector(handleCreateRoomButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -95,7 +89,7 @@ public class RoomHomeView: UIView, BaseView {
     
     // MARK: - BaseView Implementation
 
-    func setupViews() {
+    public func setupViews() {
         addSubview(backButtonContainerView)
         backButtonContainerView.addSubview(backButton)
         backButtonContainerView.addSubview(userAvatarContainerView)
@@ -105,7 +99,7 @@ public class RoomHomeView: UIView, BaseView {
         addSubview(createRoomButton)
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         backButtonContainerView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
@@ -153,8 +147,19 @@ public class RoomHomeView: UIView, BaseView {
         }
     }
     
-    func setupStyles() {
+    public func setupStyles() {
         backgroundColor = RoomColors.themeBackground
+    }
+    
+    public func setupBindings() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleBackButtonTapped))
+        backButtonContainerView.addGestureRecognizer(tapGesture)
+        
+        let userAvatarTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleUserAvatarTapped))
+        userAvatarContainerView.addGestureRecognizer(userAvatarTapGesture)
+        
+        createRoomButton.addTarget(self, action: #selector(handleCreateRoomButtonTapped), for: .touchUpInside)
+        joinRoomButton.addTarget(self, action: #selector(handleJoinRoomButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Helper Methods

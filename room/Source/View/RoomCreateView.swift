@@ -14,7 +14,7 @@ import Combine
 public class RoomCreateView: UIView, BaseView {
     
     // MARK: - Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     private var cancellableSet = Set<AnyCancellable>()
     private var connectConfig: ConnectConfig = ConnectConfig()
     
@@ -155,7 +155,7 @@ public class RoomCreateView: UIView, BaseView {
     
     // MARK: - BaseView Implementation
     
-    func setupViews() {
+    public func setupViews() {
         // Add subviews
         addSubview(backButtonContainerView)
         backButtonContainerView.addSubview(backButton)
@@ -181,7 +181,7 @@ public class RoomCreateView: UIView, BaseView {
         addSubview(createRoomButton)
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         // Back button container - expand click area
         backButtonContainerView.snp.makeConstraints { make in
             make.left.equalToSuperview()
@@ -282,14 +282,14 @@ public class RoomCreateView: UIView, BaseView {
         }
     }
     
-    func setupStyles() {
+    public func setupStyles() {
         backgroundColor = RoomColors.g8
         microphoneSwitch.isOn = connectConfig.autoEnableMicrophone
         speakerSwitch.isOn = connectConfig.autoEnableSpeaker
         cameraSwitch.isOn = connectConfig.autoEnableCamera
     }
     
-    func setupBindings() {
+    public func setupBindings() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleBackButtonTapped))
         backButtonContainerView.addGestureRecognizer(tapGesture)
         

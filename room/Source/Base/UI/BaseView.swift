@@ -10,7 +10,7 @@ import UIKit
 
 /// Base view protocol for custom views
 /// All custom views must conform to this protocol
-protocol BaseView: AnyObject {
+public protocol BaseView: AnyObject {
     /// Router context for triggering navigation (weak reference to avoid retain cycles)
     var routerContext: RouterContext? { get set }
     

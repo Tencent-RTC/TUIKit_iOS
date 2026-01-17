@@ -17,7 +17,7 @@ public protocol RoomTopBarViewDelegate: AnyObject {
 
 public class RoomTopBarView: UIView, BaseView {
     // MARK: - BaseView Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     
     // MARK: - Properties
     weak var delegate: RoomTopBarViewDelegate?
@@ -100,7 +100,7 @@ public class RoomTopBarView: UIView, BaseView {
     }
     
     // MARK: - BaseView Implementation
-    func setupViews() {
+    public func setupViews() {
         addSubview(audioSourceButton)
         addSubview(flipCameraButton)
         addSubview(roomInfoContainerView)
@@ -110,7 +110,7 @@ public class RoomTopBarView: UIView, BaseView {
         addSubview(endButton)
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         audioSourceButton.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(RoomSpacing.standard)
             make.centerY.equalToSuperview()
@@ -152,7 +152,7 @@ public class RoomTopBarView: UIView, BaseView {
         }
     }
     
-    func setupBindings() {
+    public func setupBindings() {
         audioSourceButton.addTarget(self, action: #selector(audioSourceButtonTapped), for: .touchUpInside)
         flipCameraButton.addTarget(self, action: #selector(flipCameraButtonTapped), for: .touchUpInside)
         endButton.addTarget(self, action: #selector(endButtonTapped(sender:)), for: .touchUpInside)
@@ -186,7 +186,7 @@ public class RoomTopBarView: UIView, BaseView {
             .store(in: &cancellableSet)
     }
     
-    func setupStyles() {
+    public func setupStyles() {
         // Set content compression resistance to ensure downArrowImageView is always visible
         roomInfoLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         downArrowImageView.setContentCompressionResistancePriority(.required, for: .horizontal)

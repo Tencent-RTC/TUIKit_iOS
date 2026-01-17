@@ -25,34 +25,12 @@ Pod::Spec.new do |spec|
   spec.dependency 'SnapKit'
   spec.dependency 'Kingfisher'
   spec.dependency 'AtomicX'
+  spec.dependency 'AtomicXCore'
   
-  spec.default_subspec = 'Professional'
+  spec.source_files = 'Source/**/*.{swift,h,m}'
+  spec.resource_bundles = {
+    'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings']
+  }
   
-  spec.subspec 'Professional' do |professional|
-    professional.dependency 'RTCRoomEngine/Professional'
-    professional.dependency 'AtomicXCore'
-    
-    professional.source_files = 'Source/**/*.{swift,h,m}'
-    professional.resource_bundles = {
-      'TUIRoomKit' => [
-        'Resources/*.xcassets',
-        'Resources/Localized/*.xcstrings',
-        'Resources/**/*.mp3'
-      ]
-    }
-  end
   
-  spec.subspec 'TRTC' do |trtc|
-    trtc.dependency 'RTCRoomEngine/TRTC'
-    trtc.dependency 'AtomicXCore'
-    
-    trtc.source_files = 'Source/**/*.{swift,h,m}'
-    trtc.resource_bundles = {
-      'TUIRoomKit' => [
-        'Resources/*.xcassets',
-        'Resources/Localized/*.xcstrings',
-        'Resources/**/*.mp3'
-      ]
-    }
-  end
 end

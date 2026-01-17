@@ -18,7 +18,7 @@ public protocol RoomBottomBarViewDelegate: AnyObject {
 // MARK: - RoomBottomBarView Component
 public class RoomBottomBarView: UIView, BaseView {
     // MARK: - BaseView Properties
-    weak var routerContext: RouterContext?
+    public weak var routerContext: RouterContext?
     
     // MARK: - Properties
     public weak var delegate: RoomBottomBarViewDelegate?
@@ -96,7 +96,7 @@ public class RoomBottomBarView: UIView, BaseView {
     }
     
     // MARK: - Setup
-    func setupViews() {
+    public func setupViews() {
         addSubview(buttonStackView)
         buttonStackView.subviews.enumerated().forEach { index, view in
             let button = buttons[index]
@@ -104,7 +104,7 @@ public class RoomBottomBarView: UIView, BaseView {
         }
     }
     
-    func setupConstraints() {
+    public func setupConstraints() {
         buttonStackView.snp.makeConstraints { make in
             make.width.equalTo(200)
             make.centerX.equalToSuperview()
@@ -124,11 +124,9 @@ public class RoomBottomBarView: UIView, BaseView {
         }
     }
     
-    func setupStyles() {
-        
-    }
+    public func setupStyles() {}
     
-    func setupBindings() {
+    public func setupBindings() {
         membersButton.addTarget(self, action: #selector(membersButtonTapped), for: .touchUpInside)
         microphoneButton.addTarget(self, action: #selector(microphoneButtonTapped), for: .touchUpInside)
         cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
