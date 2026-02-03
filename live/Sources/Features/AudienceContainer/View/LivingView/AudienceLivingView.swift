@@ -173,12 +173,7 @@ class AudienceLivingView: RTCBaseView {
                 make.height.equalTo(24.scale375Width())
             }
 
-            rotateScreenButton.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview().offset(-10.scale375Width())
-                make.top.equalToSuperview().offset(475.scale375Height())
-                make.width.equalTo(32.scale375Width())
-                make.height.equalTo(32.scale375Width())
-            }
+            updateRotateScreenButtonLayout()
 
             #if RTCube_APPSTORE
                 reportBtn.snp.remakeConstraints { make in
@@ -254,12 +249,7 @@ class AudienceLivingView: RTCBaseView {
                 make.height.equalTo(24.scale375Width())
             }
 
-            rotateScreenButton.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview().offset(-20.scale375Width())
-                make.top.equalToSuperview().offset(185.scale375Height())
-                make.width.equalTo(32.scale375Width())
-                make.height.equalTo(32.scale375Width())
-            }
+            updateRotateScreenButtonLayout()
 
             #if RTCube_APPSTORE
                 reportBtn.snp.remakeConstraints { make in
@@ -341,6 +331,37 @@ class AudienceLivingView: RTCBaseView {
     func setGiftPureMode(_ isPureMode: Bool) {
         giftDisplayView.onPureModeSet(isPureMode: isPureMode)
     }
+    
+    private func updateRotateScreenButtonLayout() {
+        if !manager.liveListState.currentLive.isEmpty,
+            manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
+            WindowUtils.isPortrait {
+            let coreViewHeight = Screen_Width * 720 / 1280
+            rotateScreenButton.snp.remakeConstraints { make in
+                make.trailing.equalToSuperview().offset(-10.scale375Width())
+                make.top.equalToSuperview().offset(150 + coreViewHeight - 32.scale375Width() - 8)
+                make.width.equalTo(32.scale375Width())
+                make.height.equalTo(32.scale375Width())
+            }
+            return
+        }
+        
+        if WindowUtils.isPortrait {
+            rotateScreenButton.snp.remakeConstraints { make in
+                make.trailing.equalToSuperview().offset(-10.scale375Width())
+                make.top.equalToSuperview().offset(475.scale375Height())
+                make.width.equalTo(32.scale375Width())
+                make.height.equalTo(32.scale375Width())
+            }
+        } else {
+            rotateScreenButton.snp.remakeConstraints { make in
+                make.trailing.equalToSuperview().offset(-20.scale375Width())
+                make.top.equalToSuperview().offset(185.scale375Height())
+                make.width.equalTo(32.scale375Width())
+                make.height.equalTo(32.scale375Width())
+            }
+        }
+    }
 }
 
 extension AudienceLivingView {
@@ -394,6 +415,7 @@ extension AudienceLivingView {
             .sink { [weak self] currentLive in
                 guard let self = self, !currentLive.isEmpty else { return }
                 barrageDisplayView.setOwnerId(currentLive.liveOwner.userID)
+                updateRotateScreenButtonLayout()
             }
             .store(in: &cancellableSet)
     }

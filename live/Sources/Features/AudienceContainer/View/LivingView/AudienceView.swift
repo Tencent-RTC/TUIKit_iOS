@@ -5,13 +5,13 @@
 //  Created by krabyu on 2023/10/19.
 //
 
+import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
 import RTCCommon
 import RTCRoomEngine
 import TUICore
-import AtomicX
 
 public protocol RotateScreenDelegate: AnyObject {
     func rotateScreen(isPortrait: Bool)
@@ -59,15 +59,15 @@ class AudienceView: RTCBaseView {
         return button
     }()
     
+    lazy var blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
+    
     lazy var coverBgView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
-        let effect = UIBlurEffect(style: .light)
-        let blurView = UIVisualEffectView(effect: effect)
+        blurView.isHidden = true
         imageView.addSubview(blurView)
         blurView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        imageView.image = internalImage("live_edit_info_default_cover_image")
         return imageView
     }()
     
@@ -91,6 +91,7 @@ class AudienceView: RTCBaseView {
         super.init(frame: .zero)
         videoView.setLiveID(roomId)
         videoView.videoViewDelegate = self
+        backgroundColor = .black
     }
     
     @available(*, unavailable)
@@ -117,9 +118,7 @@ class AudienceView: RTCBaseView {
         coverBgView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
-        videoView.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        updateCoreViewLayout()
         livingView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -185,11 +184,26 @@ class AudienceView: RTCBaseView {
     
     func relayoutCoreView() {
         addSubview(videoView)
-        videoView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        updateCoreViewLayout()
         sendSubviewToBack(videoView)
         sendSubviewToBack(coverBgView)
+    }
+    
+    private func updateCoreViewLayout() {
+        guard !manager.liveListState.currentLive.isEmpty,
+              manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
+              WindowUtils.isPortrait
+        else {
+            videoView.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+            return
+        }
+        videoView.snp.remakeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalToSuperview().offset(150)
+            make.height.equalTo(Screen_Width * 720 / 1280)
+        }
     }
 }
 
@@ -212,10 +226,15 @@ extension AudienceView {
                 guard let self = self else { return }
                 if currentLive.isEmpty {
                     routeToAudienceView()
-                } else if !currentLive.backgroundURL.isEmpty {
+                    return
+                }
+                updateCoreViewLayout()
+                if !currentLive.backgroundURL.isEmpty {
                     coverBgView.kf.setImage(with: URL(string: currentLive.backgroundURL), placeholder: internalImage("live_edit_info_default_cover_image"))
+                    blurView.isHidden = false
                 } else if !currentLive.coverURL.isEmpty {
                     coverBgView.kf.setImage(with: URL(string: currentLive.coverURL), placeholder: internalImage("live_edit_info_default_cover_image"))
+                    blurView.isHidden = false
                 }
             }
             .store(in: &cancellableSet)
@@ -350,7 +369,7 @@ extension AudienceView {
     }
         
     private func onKickedByAdmin() {
-        manager.toastSubject.send((.kickedOutText,.info))
+        manager.toastSubject.send((.kickedOutText, .info))
         isUserInteractionEnabled = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
