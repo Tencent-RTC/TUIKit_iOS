@@ -16,7 +16,14 @@ enum MultiCallViewMode {
     case collapsed
 }
 
+protocol MultiCallControlsViewDelegate: AnyObject {
+    func multiCallControlsView(_ view: MultiCallControlsView, didChangeModeHeight height: CGFloat)
+}
+
 class MultiCallControlsView: UIView {
+    
+    weak var delegate: MultiCallControlsViewDelegate?
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -616,6 +623,7 @@ extension MultiCallControlsView {
         guard currentMode != .collapsed else { return }
         currentMode = .collapsed
         activateConstraints()
+        delegate?.multiCallControlsView(self, didChangeModeHeight: CallConstants.groupSmallFunctionViewHeight)
         
         let alpha: CGFloat = 0.0
         let scale: CGFloat = 2.0 / 3.0
@@ -668,6 +676,7 @@ extension MultiCallControlsView {
         guard currentMode != .expanded else { return }
         currentMode = .expanded
         activateConstraints()
+        delegate?.multiCallControlsView(self, didChangeModeHeight: CallConstants.groupFunctionViewHeight)
         
         let isCameraOn = deviceStore.state.value.cameraStatus == .on
         switchCameraBtn.isHidden = !isCameraOn

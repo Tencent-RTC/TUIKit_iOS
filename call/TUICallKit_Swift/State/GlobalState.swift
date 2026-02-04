@@ -13,6 +13,7 @@ class GlobalState: NSObject {
     var enableForceUseV2API: Bool = false
     var enableMultiDeviceAbility: Bool = false
     var enablePictureInPicture: Bool = true
+    var enableAITranscriber: Bool = false
     var orientation: Orientation = .portrait
 }
 

@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.dependency 'RTCRoomEngine/Professional'
   s.dependency 'SnapKit'
   s.dependency 'RTCCommon'
-  s.dependency 'TXLiteAVSDK_Professional', '>= 12.8', '< 13.0'
+  s.dependency 'TXLiteAVSDK_Professional', '~> 13.1.20454'
   s.dependency 'TUICore'
   s.dependency 'Kingfisher'
   s.dependency 'AtomicXCore'

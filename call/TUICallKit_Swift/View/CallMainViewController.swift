@@ -13,11 +13,17 @@ import Combine
 import SnapKit
 import RTCCommon
 class CallMainViewController: UIViewController {
-        
-    let mainView = CallView(frame: .zero)
     private var cancellables = Set<AnyCancellable>()
     
-    private let floatWindowButton: UIButton = {
+    private lazy var mainView: CallView = {
+        let view = CallView(frame: .zero)
+        if !TUICallKitImpl.shared.globalState.enableAITranscriber {
+            view.disableFeatures([.aiTranscriber])
+        }
+        return view
+    }()
+    
+    private lazy var floatWindowButton: UIButton = {
         let button = UIButton(type: .system)
         if let image = CallKitBundle.getBundleImage(name: "icon_min_window") {
             button.setBackgroundImage(image, for: .normal)
@@ -61,10 +67,10 @@ class CallMainViewController: UIViewController {
         
         floatWindowButton.snp.makeConstraints { make in
             make.size.equalTo(24.scale375Width())
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12.scale375Height())
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(6.scale375Height())
             make.leading.equalToSuperview().offset(12.scale375Width())
         }
-            
+        
         inviteUserButton.snp.makeConstraints { make in
             make.size.equalTo(24.scale375Width())
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12.scale375Height())
@@ -129,7 +135,7 @@ class CallMainViewController: UIViewController {
     @objc private func floatWindowTapped() {
         WindowManager.shared.showFloatingWindow()
     }
-
+    
     @objc private func inviteUserTapped() {
         let selectGroupMemberVC = SelectGroupMemberViewController()
         selectGroupMemberVC.modalPresentationStyle = .fullScreen
