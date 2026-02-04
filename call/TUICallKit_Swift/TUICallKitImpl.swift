@@ -11,6 +11,13 @@ import UIKit
 import RTCCommon
 import AtomicXCore
 import Combine
+import AtomicX
+
+#if canImport(TXLiteAVSDK_TRTC)
+import TXLiteAVSDK_TRTC
+#elseif canImport(TXLiteAVSDK_Professional)
+import TXLiteAVSDK_Professional
+#endif
 
 // TODO: 移除 RTCRoomEngine 的依赖
 import RTCRoomEngine
@@ -146,6 +153,10 @@ class TUICallKitImpl: TUICallKit {
     
     override func enableIncomingBanner (enable: Bool) {
         globalState.enableIncomingBanner = enable
+    }
+    
+    override func enableAITranscriber(enable: Bool) {
+        globalState.enableAITranscriber = enable
     }
     
     override func callExperimentalAPI(jsonStr: String) {
@@ -432,12 +443,15 @@ extension TUICallKitImpl {
                 hasSetDefaultDeviceState = true
             }
             showCallKitViewController(isCaller: true)
-            
+            if isCaller() && globalState.enableAITranscriber {
+                startRealtimeTranscriber()
+            }
         case let .onCallReceived(callId, _, _):
             KeyMetrics.countUV(eventId: .received, callId: callId)
             showCallKitViewController(isCaller: false)
             
         case let .onCallEnded(callId: _, mediaType: _, reason: reason, userId: userId):
+            TranscriberSettings.reset()
             hasSetDefaultDeviceState = false
             closeCallKitViewController()
             handleCallEnded(reason: reason, userId: userId)
@@ -486,4 +500,42 @@ extension TUICallKitImpl {
         }
     }
 
+}
+
+// MARK: - AI Transcriber
+extension TUICallKitImpl {
+    private static let vadConfigKey = "Liteav.Audio.common.enable.send.eos.packet.in.dtx"
+    
+    private func isCaller() -> Bool {
+        let state = CallStore.shared.state.value
+        return state.selfInfo.id == state.activeCall.inviterId
+    }
+    
+    private func startRealtimeTranscriber() {
+        let config = TranscriberSettings.config
+        AITranscriberStore.shared.startRealtimeTranscriber(config: config, completion: nil)
+        closeVAD()
+    }
+        
+    private func closeVAD() {
+        callExperimentalAPI(withConfig: [
+            "key": Self.vadConfigKey,
+            "action": "reset"
+        ])
+        callExperimentalAPI(withConfig: [
+            "key": Self.vadConfigKey,
+            "value": 0,
+            "default": 0
+        ])
+    }
+    
+    private func callExperimentalAPI(withConfig config: [String: Any]) {
+        let jsonObj: [String: Any] = [
+            "api": "setPrivateConfig",
+            "params": ["configs": [config]]
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: jsonObj),
+              let jsonStr = String(data: data, encoding: .utf8) else { return }
+        TRTCCloud.sharedInstance().callExperimentalAPI(jsonStr)
+    }
 }
