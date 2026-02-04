@@ -5,7 +5,7 @@
 //  Created by yukiwwwang on 2025/9/4.
 //
 
-class CallConstants{
+class CallConstants {
     static let screenSize = UIScreen.main.bounds.size
     static let screenWidth = UIScreen.main.bounds.size.width
     static let screenHeight = UIScreen.main.bounds.size.height

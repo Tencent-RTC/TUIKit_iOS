@@ -12,8 +12,12 @@ import Combine
 import RTCRoomEngine
 import SDWebImage
 
+public enum Feature: String {
+    case aiTranscriber = "aiTranscriber"
+}
+
 public class CallView: UIView {
-    // MARK: Init
+    // MARK: - Init
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -21,20 +25,29 @@ public class CallView: UIView {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black
+        multiCallControlsView.delegate = self
         setupCoreViewStaticResources()
         subscribeCallState()
         updateControlsView()
         updateBackgroundAvatar()
     }
     
-    // MARK: Private
+    public func disableFeatures(_ features: [Feature]?) {
+        if let features = features, features.contains(.aiTranscriber) {
+            callTranscriberView.isEnabled = false
+        }
+    }
+    
+    // MARK: - Private
     private let timerView = TimerView(frame: .zero)
     private let hintView = HintView(frame: .zero)
     private let callCoreView = CallCoreView(frame: .zero)
     private let aiSubtitle = AISubtitle(frame: .zero)
+    private let callTranscriberView = CallTranscriberView(frame: .zero)
     private let waitingParticipantsView = WaitingParticipantsView(frame: .zero)
     private let singleCallControlsView = SingleCallControlsView(frame: .zero)
     private let multiCallControlsView = MultiCallControlsView(frame: .zero)
+    private var multiCallControlsHeight: CGFloat = CallConstants.groupFunctionViewHeight
     
     private lazy var backgroundAvatarView: UIImageView = {
         let imageView = UIImageView()
@@ -44,18 +57,20 @@ public class CallView: UIView {
     }()
     
     private lazy var backgroundBlurView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: .dark)
-        let blurView = UIVisualEffectView(effect: blurEffect)
-        return blurView
+        return UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     }()
     
-    private var isViewReady: Bool = false
+    private var isViewReady = false
     private var cancellables = Set<AnyCancellable>()
     private let deviceStore = DeviceStore.shared
-    private let audioRouteObserver = TRTCAudioRouteObserver.shared
+    
+    private var isGroupCall: Bool {
+        let call = CallStore.shared.state.value.activeCall
+        return !call.chatGroupId.isEmpty || call.inviteeIds.count > 1
+    }
 }
 
-// MARK: Layout
+// MARK: - Layout
 extension CallView {
     public override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -74,6 +89,7 @@ extension CallView {
         addSubview(singleCallControlsView)
         addSubview(multiCallControlsView)
         addSubview(aiSubtitle)
+        addSubview(callTranscriberView)
         addSubview(timerView)
         addSubview(hintView)
     }
@@ -91,7 +107,7 @@ extension CallView {
             make.edges.equalToSuperview()
         }
         
-        waitingParticipantsView.snp.makeConstraints { make in
+        waitingParticipantsView.snp.remakeConstraints { make in
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
             make.height.equalTo(65.scale375Width())
@@ -109,20 +125,28 @@ extension CallView {
         }
         
         let activeCall = CallStore.shared.state.value.activeCall
-        let isGroupCall = !activeCall.chatGroupId.isEmpty || activeCall.inviteeIds.count > 1
         let isSingleAudioCall = !isGroupCall && activeCall.mediaType == .audio
         let aiSubtitleBottomOffset = isSingleAudioCall ? -144.scale375Height() : -270.scale375Height()
         
-        aiSubtitle.snp.makeConstraints { make in
+        aiSubtitle.snp.remakeConstraints { make in
             make.centerX.equalToSuperview()
             make.height.equalTo(200.scale375Height())
             make.width.equalToSuperview().multipliedBy(0.95)
             make.bottom.equalToSuperview().offset(aiSubtitleBottomOffset)
         }
         
+        let singleCallControlsHeight: CGFloat = isSingleAudioCall ? 144.scale375Height() : 260.scale375Height()
+        let controlsHeight = isGroupCall ? multiCallControlsHeight : singleCallControlsHeight
+        
+        callTranscriberView.snp.remakeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.bottom.equalToSuperview().offset(-controlsHeight - 10.scale375Height())
+        }
+        
         if UIWindow.isPortrait {
             timerView.snp.remakeConstraints { make in
-                make.top.equalToSuperview().offset(CallConstants.statusBar_Height + 12.scale375Height())
+                make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(6.scale375Height())
                 make.centerX.equalToSuperview()
                 make.height.equalTo(24.scale375Height())
             }
@@ -154,9 +178,6 @@ extension CallView {
     }
     
     private func updateControlsView() {
-        let activeCall = CallStore.shared.state.value.activeCall
-        let isGroupCall = !activeCall.chatGroupId.isEmpty || activeCall.inviteeIds.count > 1
-        
         singleCallControlsView.isHidden = isGroupCall
         multiCallControlsView.isHidden = !isGroupCall
         
@@ -172,18 +193,10 @@ extension CallView {
     private func checkViewVisibility() {
         let activeCall = CallStore.shared.state.value.activeCall
         let selfInfo = CallStore.shared.state.value.selfInfo
-        
-        let isCaller = selfInfo.id == activeCall.inviterId
-        let isCalledWaiting = !isCaller && selfInfo.status == .waiting
-        let isGroupCall = !activeCall.chatGroupId.isEmpty || activeCall.inviteeIds.count > 1
-        
-        if isGroupCall && isCalledWaiting {
-            waitingParticipantsView.isHidden = false
-            callCoreView.isHidden = true
-        } else {
-            waitingParticipantsView.isHidden = true
-            callCoreView.isHidden = false
-        }
+        let isCalledWaiting = selfInfo.id != activeCall.inviterId && selfInfo.status == .waiting
+        let shouldShowWaitingView = isGroupCall && isCalledWaiting
+        waitingParticipantsView.isHidden = !shouldShowWaitingView
+        callCoreView.isHidden = shouldShowWaitingView
     }
     
     private func updateCamera() {
@@ -207,12 +220,28 @@ extension CallView {
         let avatarURL = selfInfo.avatarURL
         
         if !avatarURL.isEmpty, let url = URL(string: avatarURL) {
-            backgroundAvatarView.sd_setImage(with: url, placeholderImage: CallKitBundle.getBundleImage(name: "default_participant_icon"))
+            backgroundAvatarView.sd_setImage(with: url,
+                                             placeholderImage: CallKitBundle.getBundleImage(name: "default_participant_icon"))
         } else {
             backgroundAvatarView.image = CallKitBundle.getBundleImage(name: "default_participant_icon")
         }
     }
+    
+    private func updateTranscriberViewConstraints() {
+        guard isViewReady, callTranscriberView.superview != nil else { return }
+        
+        callTranscriberView.snp.updateConstraints { make in
+            make.bottom.equalToSuperview().offset(-multiCallControlsHeight - 10.scale375Height())
+        }
+        
+        UIView.animate(withDuration: CallConstants.groupFunctionAnimationDuration) { [weak self] in
+            self?.layoutIfNeeded()
+        }
+    }
+    
 }
+
+// MARK: - Resources
 extension CallView {
     private func setupCoreViewStaticResources() {
         if let defaultImage = CallKitBundle.getBundleImage(name: "default_participant_icon") {
@@ -228,7 +257,9 @@ extension CallView {
         callCoreView.setVolumeLevelIcons(icons: volumeLevelIcons)
         
         var networkQualityIcons: [NetworkQuality: String] = [:]
-        if let path = getAbsolutePathForBundleImage(name: "group_network_low_quality") { networkQualityIcons[.bad] = path }
+        if let path = getAbsolutePathForBundleImage(name: "group_network_low_quality") {
+            networkQualityIcons[.bad] = path
+        }
         callCoreView.setNetworkQualityIcons(icons: networkQualityIcons)
         
         if let bundle = CallKitBundle.getTUICallKitBundle(),
@@ -236,7 +267,7 @@ extension CallView {
             callCoreView.setWaitingAnimation(path: waitingAnimation)
         }
     }
-
+    
     private func handleParticipantsAvatarUpdate(_ participants: [CallParticipantInfo]) {
         var avatarPathsToSet: [String: String] = [:]
         
@@ -244,7 +275,7 @@ extension CallView {
             guard !user.avatarURL.isEmpty, let url = URL(string: user.avatarURL) else { continue }
             
             let cacheKey = SDWebImageManager.shared.cacheKey(for: url)
-
+            
             if let cachePath = SDImageCache.shared.cachePath(forKey: cacheKey),
                FileManager.default.fileExists(atPath: cachePath) {
                 avatarPathsToSet[user.id] = cachePath
@@ -282,9 +313,9 @@ extension CallView {
     }
 }
 
-// MARK: Subscribe
+// MARK: - Subscribe
 extension CallView {
-    func subscribeCallState() {
+    private func subscribeCallState() {
         let callStateSelector = StatePublisherSelector { (state: CallState) -> (CallParticipantStatus, String, String, String, [String]) in
             let selfInfo = CallStore.shared.state.value.selfInfo
             let activeCall = state.activeCall
@@ -323,5 +354,13 @@ extension CallView {
                 self?.handleOrientationChange()
             }
             .store(in: &cancellables)
+    }
+}
+
+// MARK: - MultiCallControlsViewDelegate
+extension CallView: MultiCallControlsViewDelegate {
+    func multiCallControlsView(_ view: MultiCallControlsView, didChangeModeHeight height: CGFloat) {
+        multiCallControlsHeight = height
+        updateTranscriberViewConstraints()
     }
 }
