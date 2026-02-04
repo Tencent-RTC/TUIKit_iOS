@@ -90,6 +90,16 @@ public class TUICallKit: NSObject {
     public func enableIncomingBanner(enable: Bool) {
         return TUICallKitImpl.shared.enableIncomingBanner(enable: enable)
     }
+
+    /**
+     * Enable auto-start AI transcription when call is connected
+     * @param enable true: AI transcription starts automatically when call connects; false: manual control via button
+     * Default value: true
+     */
+    @objc
+    public func enableAITranscriber(enable: Bool) {
+        return TUICallKitImpl.shared.enableAITranscriber(enable: enable)
+    }
     
     @objc
     public func callExperimentalAPI(jsonStr: String) {
@@ -104,4 +114,5 @@ public class TUICallKit: NSObject {
     public func setScreenOrientation(orientation: Int, completion: CompletionClosure?) {
         return TUICallKitImpl.shared.setScreenOrientation(orientation: orientation, completion: completion)
     }
+    
 }
