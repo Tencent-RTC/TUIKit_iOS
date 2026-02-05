@@ -28,6 +28,7 @@ class SettingsConfig {
     var floatWindow: Bool = true
     var enableVirtualBackground: Bool = true
     var enableIncomingBanner: Bool = true
+    var enableAITranscriber: Bool = true
     var intRoomId: UInt32 = 0
     var strRoomId: String = ""
     var timeout: Int = 30
