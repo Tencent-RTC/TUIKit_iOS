@@ -541,6 +541,35 @@
         }
       }
     },
+    "EnableAITranscriber": {
+      "extractionState": "manual",
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "النسخ بالذكاء الاصطناعي"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Transcriber"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI转录"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI文字起こし"
+          }
+        }
+      }
+    },
     "EnableVirtualBackground": {
       "extractionState": "manual",
       "localizations": {

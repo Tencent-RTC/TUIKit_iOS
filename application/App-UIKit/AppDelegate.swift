@@ -77,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         DispatchQueue.main.async {
             TUICallKit.createInstance().enableFloatWindow(enable: SettingsConfig.share.floatWindow)
             TUICallKit.createInstance().enableIncomingBanner(enable: SettingsConfig.share.enableIncomingBanner)
+            TUICallKit.createInstance().enableAITranscriber(enable: SettingsConfig.share.enableAITranscriber)
         }
     }
 }
