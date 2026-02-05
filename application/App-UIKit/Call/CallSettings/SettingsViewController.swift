@@ -98,6 +98,14 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         }
         return customSwitchView
     }()
+    private lazy var aiTranscriberSwitchView: SettingsCustomSwitchView = {
+        let customSwitchView = SettingsCustomSwitchView(title: ("EnableAITranscriber").localized,
+                                                        isOn: SettingsConfig.share.enableAITranscriber)
+        customSwitchView.switchValueChanged = { [weak self] isOn in
+            self?.aiTranscriberSwitchClick(isOn)
+        }
+        return customSwitchView
+    }()
 #endif
     private let callSettingContentView: UIView = {
         let view = UIView(frame: .zero)
@@ -350,6 +358,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
 #if canImport(TUICallKit_Swift)
         scrollContentView.addSubview(virtualBackgroundSwitchView)
         scrollContentView.addSubview(incomingBannerSwitchView)
+        scrollContentView.addSubview(aiTranscriberSwitchView)
 #endif
         
         scrollContentView.addSubview(callSettingContentView)
@@ -471,9 +480,15 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
             make.top.equalTo(virtualBackgroundSwitchView.snp.bottom).offset(20)
             make.height.equalTo(20)
         }
+        aiTranscriberSwitchView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.top.equalTo(incomingBannerSwitchView.snp.bottom).offset(20)
+            make.height.equalTo(20)
+        }
         callSettingContentView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.top.equalTo(incomingBannerSwitchView.snp.bottom).offset(20)
+            make.top.equalTo(aiTranscriberSwitchView.snp.bottom).offset(20)
             make.height.equalTo(30)
         }
 #elseif canImport(TUICallKit)
@@ -738,6 +753,10 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     private func incomingBannerSwitchClick(_ isOn: Bool) {
         SettingsConfig.share.enableIncomingBanner = isOn
         TUICallKit.createInstance().enableIncomingBanner(enable: isOn)
+    }
+    private func aiTranscriberSwitchClick(_ isOn: Bool) {
+        SettingsConfig.share.enableAITranscriber = isOn
+        TUICallKit.createInstance().enableAITranscriber(enable: isOn)
     }
 #endif
     
