@@ -104,35 +104,13 @@ class LoginViewController: UIViewController {
 }
 
 extension LoginViewController: LoginViewDelegate {
-    func testModeSwitchChanged(isOn: Bool) {
-        isTestEnvironment = isOn
-    }
     
     func autoLoginSwitchChanged(isOn: Bool) {
         UserDefaults.standard.set(isOn, forKey: "AutoLoginKey")
     }
     
     func loginDelegate(userId: String) {
-        switchTestEnvironment(enableTest: isTestEnvironment)
         login(userId: userId)
-    }
-    
-    private func switchTestEnvironment(enableTest: Bool) {
-        var jsonObject = [String: Any]()
-        jsonObject["api"] = "setTestEnvironment"
-        var params = [String: Any]()
-        params["enableRoomTestEnv"] = enableTest
-        jsonObject["params"] = params
-        
-        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: []),
-           let jsonString = String(data: jsonData, encoding: .utf8) {
-            TUIRoomEngine.sharedInstance().callExperimentalAPI(jsonStr: jsonString) { _ in }
-        }
-        
-        V2TIMManager.sharedInstance().callExperimentalAPI(
-            api: "setTestEnvironment", 
-            param: NSNumber(value: enableTest)
-        ) { _ in } fail: { _, _ in }
     }
 }
 
