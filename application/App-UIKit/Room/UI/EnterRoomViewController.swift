@@ -131,7 +131,7 @@ extension RoomViewController {
     
     func enterButtonClick(sender: UIButton) {
         if fieldText.count <= 0 {
-            view.makeToast(.enterRoomIdErrorToast)
+            view.showAtomicToast(text: .enterRoomIdErrorToast)
             return
         }
         let roomIDStr = fieldText
@@ -140,7 +140,7 @@ extension RoomViewController {
                                   options: .literal,
                                   range: nil)
         if roomIDStr.count <= 0 {
-            view.makeToast(.enterRoomIdErrorToast)
+            view.showAtomicToast(text: .enterRoomIdErrorToast)
             return
         }
         roomId = roomIDStr
@@ -164,7 +164,7 @@ extension RoomViewController {
 //        guard error != .success else { return }
 //        navigationController?.popViewController(animated: true)
 //        guard !message.isEmpty else { return }
-//        SceneDelegate.getCurrentWindow()?.makeToast(message, duration: 1, position:TUICSToastPositionCenter)
+//        SceneDelegate.getCurrentWindow()?.showAtomicToast(message, duration: 1, position:TUICSToastPositionCenter)
 //    }
 //    
 //    func onConferenceFinished(roomInfo: TUIRoomInfo, reason: ConferenceFinishedReason) {

@@ -109,7 +109,7 @@ class PictureInPictureTogglePanel: RTCBaseView {
         var isEnabled = sender.isOn
         if isEnabled, !hasPictureInPicturePermission() {
             isEnabled = false
-            makeToast(.pipPermissionTitleText)
+            showAtomicToast(text: .pipPermissionTitleText)
         }
         PictureInPictureStore.shared.enablePictureInPicture(enable: isEnabled, liveID: liveID)
     }

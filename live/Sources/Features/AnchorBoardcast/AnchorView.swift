@@ -400,10 +400,10 @@ extension AnchorView {
                     routerManager.router(action: .dismiss(AnchorDismissType.panel, completion: nil))
                 case .onBattleRequestCancelled(battleID: _, inviter: let inviter, invitee: _):
                     routerManager.dismiss(dismissType: .alert, completion: nil)
-                    makeToast(.cancelBattleText.replacingOccurrences(of: "xxx", with: inviter.displayName))
+                    showAtomicToast(text: .cancelBattleText.replacingOccurrences(of: "xxx", with: inviter.displayName), style: .info)
                 case .onBattleRequestTimeout(battleID: _, inviter: _, invitee: _):
                     routerManager.dismiss(dismissType: .alert, completion: nil)
-                    makeToast(.battleRequestTimeoutText)
+                    showAtomicToast(text: .battleRequestTimeoutText, style: .info)
                 case .onBattleRequestReject(battleID: _, inviter: _, invitee: let invitee):
                     showAtomicToast(text: .rejectBattleText.replacingOccurrences(of: "xxx", with: invitee.displayName), style: .info)
                 case .onBattleRequestReceived(battleID: let battleID, inviter: let inviter, invitee: _):

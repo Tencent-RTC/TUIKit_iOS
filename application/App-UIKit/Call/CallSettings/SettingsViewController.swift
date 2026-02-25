@@ -816,8 +816,9 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
             SettingsConfig.share.beautyLevel = Int(text) ?? SettingsConfig.share.beautyLevel
             
             self.beautyLevelTextField.attributedPlaceholder = NSAttributedString(string: String(SettingsConfig.share.beautyLevel))
-        } fail: { code, message in
-            TUITool.makeToast("Error \(code):\(message ?? "")")
+        } fail: {  [weak self] code, message in
+            guard let self = self else {return}
+            self.view.showAtomicToast(text: "Error \(code):\(message ?? "")")
         }
     }
 }

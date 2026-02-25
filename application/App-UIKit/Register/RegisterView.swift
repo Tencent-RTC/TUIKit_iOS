@@ -178,7 +178,6 @@ class RegisterView: UIView {
     
     private func bindInteraction() {
         registBtn.addTarget(self, action: #selector(registerBtnClick), for: .touchUpInside)
-        TUICSToastManager.setDefaultPosition(TUICSToastPositionBottom)
     }
     
     private func updateContent() {

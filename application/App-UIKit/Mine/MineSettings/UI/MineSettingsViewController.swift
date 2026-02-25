@@ -106,7 +106,7 @@ class MineSettingsViewController: UIViewController{
                     self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .none)
                 }
             } fail: { code, err in
-                self.view.makeToast(("profileUpdateFailed").localized)
+                self.view.showAtomicToast(text: ("profileUpdateFailed").localized)
             }
         }
     }
@@ -126,7 +126,7 @@ class MineSettingsViewController: UIViewController{
                     self.tableView.reloadRows(at: [IndexPath(row: 1, section: 0)], with: .none)
                 }
             } fail: { code, err in
-                self.view.makeToast(("profileUpdateFailed").localized)
+                self.view.showAtomicToast(text: ("profileUpdateFailed").localized)
                 debugPrint("updateUserInfoWithUserModel:\(code)==\(String(describing: err))")
             }
         }

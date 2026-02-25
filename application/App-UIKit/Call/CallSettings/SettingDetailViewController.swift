@@ -8,6 +8,7 @@ import Foundation
 import UIKit
 import TUICore
 import RTCRoomEngine
+import AtomicX
 
 #if canImport(TUICallKit_Swift)
 import TUICallKit_Swift
@@ -124,7 +125,7 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
         }
         TUICallKit.createInstance().setCallingBell(filePath: text)
         SettingsConfig.share.ringUrl = text
-        TUITool.makeToast("Set Successful: \(SettingsConfig.share.ringUrl)")
+        view.showAtomicToast(text: "Set Successful: \(SettingsConfig.share.ringUrl)")
     }
     
     private func entendInfoSetting(text: String) {
@@ -132,7 +133,7 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
             return
         }
         SettingsConfig.share.userData = text
-        TUITool.makeToast("Set Successful: \(text)")
+        view.showAtomicToast(text: "Set Successful: \(text)")
     }
     
     private func offlinePushInfoSetting(text: String) {
@@ -140,7 +141,7 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
             return
         }
         setOfflineData(jsonStr: text)
-        TUITool.makeToast("Set Successful: \(SettingsConfig.share.pushInfo)")
+        view.showAtomicToast(text: "Set Successful: \(SettingsConfig.share.pushInfo)")
     }
     
     private func setOfflineData(jsonStr: String) {

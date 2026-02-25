@@ -208,7 +208,6 @@ class LoginView: UIView {
     private func bindInteraction() {
         loginBtn.addTarget(self, action: #selector(loginBtnClick), for: .touchUpInside)
         autoLoginSwitch.addTarget(self, action: #selector(onAutoLoginSwitchValueChanged), for: .valueChanged)
-        TUICSToastManager.setDefaultPosition(TUICSToastPositionCenter)
         userIdTextField.delegate = self
     }
 

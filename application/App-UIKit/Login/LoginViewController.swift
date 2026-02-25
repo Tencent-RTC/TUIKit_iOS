@@ -60,7 +60,7 @@ class LoginViewController: UIViewController {
                     .dropFirst()
                     .sink { [weak self] user in
                         guard let self = self, let user = user else {
-                            TUITool.makeToast("Login failed, user is null")
+                            self?.view.showAtomicToast(text: "Login failed, user is null")
                             if let self = self {
                                 cancelableSet.forEach { $0.cancel() }
                                 cancelableSet.removeAll()
@@ -74,7 +74,7 @@ class LoginViewController: UIViewController {
                     }
                     .store(in: &cancelableSet)
             case .failure(let err):
-                TUITool.makeToast("Login failed, code: \(err.code), error: \(err.message)")
+                    self.view.showAtomicToast(text: "Login failed, code: \(err.code), error: \(err.message)", style: .error)
             }
         }
     }
@@ -84,8 +84,9 @@ class LoginViewController: UIViewController {
         TUILogin.login(Int32(SDKAPPID), userID: userID, userSig: GenerateTestUserSig.genTestUserSig(identifier: userID)) { [weak self] in
             guard let self = self else { return }
             loginSuccess()
-        } fail: { code, message in
-            TUITool.makeToast("Login failed, code: \(code), error: \(message ?? "")")
+        } fail: { [weak self] code, message in
+            guard let self = self else {return}
+            view.showAtomicToast(text: "Login failed, code: \(code), error: \(message ?? "")")
         }
     }
     
@@ -134,7 +135,7 @@ extension LoginViewController {
             let vc = RegisterViewController()
             navigationController?.pushViewController(vc, animated: true)
         } else {
-            self.view.makeToast("Logged In".localized)
+            self.view.showAtomicToast(text: "Logged In".localized)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 appDelegate?.showMainViewController()
             }

@@ -14,6 +14,7 @@ import SensorsAnalyticsSDK
 import Kingfisher
 import AtomicXCore
 import TUIRoomKit
+import TUILiveKit
 
 private let mainMenuItemColors = [
     UIColor(red: 204/255.0, green: 223/255.0, blue: 255/255.0, alpha: 1),
@@ -124,7 +125,6 @@ extension MainViewController {
     }
     
     private func bindInteraction() {
-        TUICSToastManager.setDefaultPosition(TUICSToastPositionCenter)
         collectionView.register(MainCollectionCell.self,forCellWithReuseIdentifier: "MainCollectionCell")
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -149,7 +149,6 @@ extension MainViewController {
         let roomHomeViewController = RoomHomeViewController()
         self.navigationController?.pushViewController(roomHomeViewController, animated: true)
     }
-    
 }
 
 extension MainViewController {

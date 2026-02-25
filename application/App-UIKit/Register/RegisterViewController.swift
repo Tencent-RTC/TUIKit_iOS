@@ -41,15 +41,16 @@ class RegisterViewController: UIViewController {
         V2TIMManager.sharedInstance().setSelfInfo(info: userFullInfo) { [weak self] in
             self?.registerSuccess()
         } fail: { [weak self] code, message in
-            TUITool.makeToast("login failed, code:\(code), message: \(String(describing: message))")
+            guard let self = self else {return}
+            view.showAtomicToast(text: "login failed, code:\(code), message: \(String(describing: message))")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self?.navigationController?.popViewController(animated: true)
+                self.navigationController?.popViewController(animated: true)
             }
         }
     }
     
     private func registerSuccess() {
-        self.view.makeToast("Registered successfully".localized)
+        self.view.showAtomicToast(text: "Registered successfully".localized)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             let appDelegate = UIApplication.shared.delegate as? AppDelegate
             appDelegate?.showMainViewController()

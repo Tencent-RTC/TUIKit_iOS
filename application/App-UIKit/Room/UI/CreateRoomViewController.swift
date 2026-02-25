@@ -133,7 +133,7 @@ extension CreateRoomViewController {
     
     func enterButtonClick(sender: UIButton) {
         guard let roomId = self.roomId else {
-            self.view.makeToast(.generatingRoomIdText)
+            self.view.showAtomicToast(text: .generatingRoomIdText)
             return
         }
         quickStartConference(roomId: roomId)
