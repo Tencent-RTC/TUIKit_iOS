@@ -134,6 +134,7 @@ extension MainViewController {
 extension MainViewController {
     
     func gotoCallView() {
+        observerTUI(type: 1303)
         let enterCallVC = CallViewController()
         enterCallVC.title = "call".localized
         enterCallVC.hidesBottomBarWhenPushed = true
@@ -141,13 +142,32 @@ extension MainViewController {
     }
     
     func gotoLiveView() {
+        observerTUI(type: 1119)
         let enterLiveVC = LiveViewController()
         navigationController?.pushViewController(enterLiveVC, animated: true)
     }
     
     func gotoRoomView() {
+        observerTUI(type: 1205)
         let roomHomeViewController = RoomHomeViewController()
         self.navigationController?.pushViewController(roomHomeViewController, animated: true)
+    }
+    
+    private func observerTUI(type: Int64) {
+        let dictParam: [String: Any] = [
+            "UIComponentType": type
+        ]
+        guard let dataParam = try? JSONSerialization.data(withJSONObject: dictParam, options: []),
+              let strParam = String(data: dataParam, encoding: .utf8)
+        else {
+            return
+        }
+        V2TIMManager.sharedInstance().callExperimentalAPI(
+            api: "reportTUIFeatureUsage",
+            param: strParam as NSObject,
+            succ: { _ in },
+            fail: { _, _ in }
+        )
     }
 }
 

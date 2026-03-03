@@ -55,6 +55,7 @@ class LoginViewController: UIViewController {
             switch result {
             case .success():
                 UserDefaults.standard.set(userId, forKey: self.userIdKey)
+                observerRunDemo()
                 LoginStore.shared.state.subscribe(StatePublisherSelector(keyPath: \LoginState.loginUserInfo))
                     .receive(on: RunLoop.main)
                     .dropFirst()
@@ -77,6 +78,23 @@ class LoginViewController: UIViewController {
                     self.view.showAtomicToast(text: "Login failed, code: \(err.code), error: \(err.message)", style: .error)
             }
         }
+    }
+    
+    private func observerRunDemo() {
+        let dictParam: [String: Any] = [
+            "UIComponentType": 1302
+        ]
+        guard let dataParam = try? JSONSerialization.data(withJSONObject: dictParam, options: []),
+              let strParam = String(data: dataParam, encoding: .utf8)
+        else {
+            return
+        }
+        V2TIMManager.sharedInstance().callExperimentalAPI(
+            api: "reportTUIFeatureUsage",
+            param: strParam as NSObject,
+            succ: { _ in },
+            fail: { _, _ in }
+        )
     }
     
     private func loginTUICore(userID: String) {
