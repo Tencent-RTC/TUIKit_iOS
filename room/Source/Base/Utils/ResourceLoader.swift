@@ -7,29 +7,15 @@
 //
 
 import Foundation
-import UIKit
+import AtomicX
+
+private class RoomBundleToken {}
 
 @objc public class ResourceLoader: NSObject {
     
     // MARK: - Properties
-    @objc public static let bundle: Bundle = {
-        if let bundlePath = Bundle.main.path(forResource: "TUIRoomKitBundle", ofType: "bundle"),
-           let bundle = Bundle(path: bundlePath) {
-            return bundle
-        }
-        
-        let currentBundle = Bundle(for: ResourceLoader.self)
-        if let bundlePath = currentBundle.path(forResource: "TUIRoomKitBundle", ofType: "bundle"),
-           let bundle = Bundle(path: bundlePath) {
-            return bundle
-        }
-        
-        if let resourcePath = currentBundle.resourcePath,
-           let bundle = Bundle(path: resourcePath) {
-            return bundle
-        }
-
-        return Bundle.main
+    @objc public static let bundle: Bundle = {        
+        BundleLoader.moduleBundle(named: "TUIRoomKitBundle", moduleName: "TUIRoomKit", for: RoomBundleToken.self) ?? Bundle.main
     }()
     
     // MARK: - Image Loading

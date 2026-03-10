@@ -15,6 +15,9 @@ public protocol RoomBottomBarViewDelegate: AnyObject {
     func onCameraButtonTapped()
 }
 
+let buttonItemSizeForStandard: CGFloat = 52
+let buttonItemSizeForWebinar: CGFloat = 40
+
 // MARK: - RoomBottomBarView Component
 public class RoomBottomBarView: UIView, BaseView {
     // MARK: - BaseView Properties
@@ -32,30 +35,29 @@ public class RoomBottomBarView: UIView, BaseView {
     private var isAllCameraDisabled: Bool = false
     private var isAllMicrophoneDisabled: Bool = false
     private let roomID: String
+    private let roomType: RoomType
     private var cancellableSet = Set<AnyCancellable>()
     
     // MARK: - UI Components
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView()
-        buttons.forEach { _ in
-            let containerView = UIView()
-            containerView.layer.cornerRadius = 10
-            containerView.backgroundColor = RoomColors.g2
-            stackView.addArrangedSubview(containerView)
-        }
         stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
-        stackView.alignment = .center
+        stackView.alignment = roomType == .standard ? .center : .trailing
+        stackView.spacing = roomType == .standard ? 10 : 8
         return stackView
     }()
     
     private lazy var membersButton: RoomIconButton = {
         let button = RoomIconButton()
         button.setIcon(ResourceLoader.loadImage("room_members"))
-        button.setTitle(.members.localizedReplace("0"))
+        button.setTitle(roomType == .standard ? .members.localizedReplace("0") : .member)
         button.setIconPosition(.top, spacing: RoomSpacing.extraSmall)
         button.setTitleColor(.white)
-        button.setTitleFont(RoomFonts.pingFangSCFont(size: 10, weight: .regular))
+        button.setIconSize(roomType == .standard ? CGSize(width: 24, height: 24) : CGSize(width: 20, height: 20))
+        button.setTitleFont(RoomFonts.pingFangSCFont(size: roomType == .standard ? 10 : 8, weight: .regular))
+        button.layer.cornerRadius = 8
+        button.backgroundColor = RoomColors.g2
         return button
     }()
     
@@ -65,7 +67,10 @@ public class RoomBottomBarView: UIView, BaseView {
         button.setTitle(.mute)
         button.setIconPosition(.top, spacing: RoomSpacing.extraSmall)
         button.setTitleColor(.white)
-        button.setTitleFont(RoomFonts.pingFangSCFont(size: 10, weight: .regular))
+        button.setIconSize(roomType == .standard ? CGSize(width: 24, height: 24) : CGSize(width: 20, height: 20))
+        button.setTitleFont(RoomFonts.pingFangSCFont(size: roomType == .standard ? 10 : 8, weight: .regular))
+        button.layer.cornerRadius = 8
+        button.backgroundColor = RoomColors.g2
         return button
     }()
     
@@ -74,16 +79,21 @@ public class RoomBottomBarView: UIView, BaseView {
         button.setIcon(ResourceLoader.loadImage("camera_open"))
         button.setTitle(.startVideo)
         button.setTitleColor(.white)
-        button.setTitleFont(RoomFonts.pingFangSCFont(size: 10, weight: .regular))
+        button.setIconSize(roomType == .standard ? CGSize(width: 24, height: 24) : CGSize(width: 20, height: 20))
+        button.setTitleFont(RoomFonts.pingFangSCFont(size: roomType == .standard ? 10 : 8, weight: .regular))
         button.setIconPosition(.top, spacing: RoomSpacing.extraSmall)
+        button.layer.cornerRadius = roomType == .standard ? 10 : 8
+        button.backgroundColor = RoomColors.g2
         return button
     }()
     
-    private lazy var buttons: [RoomIconButton] = {[membersButton, microphoneButton, cameraButton]}()
+    private lazy var buttonsForStandard: [RoomIconButton] = {[membersButton, microphoneButton, cameraButton]}()
+    private lazy var buttonsForWebinar: [RoomIconButton] = {[microphoneButton, membersButton]}()
     
     // MARK: - Initialization
-    public init(roomID: String) {
+    public init(roomID: String, roomType: RoomType) {
         self.roomID = roomID
+        self.roomType = roomType
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -98,28 +108,35 @@ public class RoomBottomBarView: UIView, BaseView {
     // MARK: - Setup
     public func setupViews() {
         addSubview(buttonStackView)
-        buttonStackView.subviews.enumerated().forEach { index, view in
-            let button = buttons[index]
-            view.addSubview(button)
+        if roomType == .standard {
+            buttonsForStandard.forEach { [weak self] button in
+                guard let self = self else { return }
+                buttonStackView.addArrangedSubview(button)
+            }
+        } else {
+            buttonsForWebinar.forEach { [weak self] button in
+                guard let self = self else { return }
+                buttonStackView.addArrangedSubview(button)
+            }
         }
     }
     
     public func setupConstraints() {
         buttonStackView.snp.makeConstraints { make in
-            make.width.equalTo(200)
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
+            make.edges.equalToSuperview()
         }
         
-        buttonStackView.subviews.enumerated().forEach { index, view in
-            view.snp.makeConstraints { make in
-                make.size.equalTo(CGSize(width: 52, height: 52))
+        if roomType == .standard {
+            buttonsForStandard.forEach { button in
+                button.snp.makeConstraints { make in
+                    make.size.equalTo(CGSize(width: buttonItemSizeForStandard, height: buttonItemSizeForStandard))
+                }
             }
-            
-            let button = buttons[index]
-            button.snp.makeConstraints { make in
-                make.center.equalToSuperview()
-                make.width.equalTo(52)
+        } else {
+            buttonsForWebinar.forEach { button in
+                button.snp.makeConstraints { make in
+                    make.size.equalTo(CGSize(width: buttonItemSizeForWebinar, height: buttonItemSizeForWebinar))
+                }
             }
         }
     }
@@ -129,7 +146,23 @@ public class RoomBottomBarView: UIView, BaseView {
     public func setupBindings() {
         membersButton.addTarget(self, action: #selector(membersButtonTapped), for: .touchUpInside)
         microphoneButton.addTarget(self, action: #selector(microphoneButtonTapped), for: .touchUpInside)
-        cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
+        if roomType == .standard {
+            cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
+        }
+        
+        participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantList))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] participantList in
+                guard let self = self else { return }
+                guard roomType == .webinar else { return }
+                let userIDList = participantList.map { $0.userID }
+                if userIDList.contains(LoginStore.shared.state.value.loginUserInfo?.userID ?? "") {
+                    microphoneButton.isHidden = false
+                } else {
+                    microphoneButton.isHidden = true
+                }
+            }
+            .store(in: &cancellableSet)
         
         participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .combineLatest(roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom)))
@@ -154,7 +187,9 @@ public class RoomBottomBarView: UIView, BaseView {
             .sink { [weak self] participantCount in
                 guard let self = self else { return }
                 if let participantCount = participantCount {
-                    membersButton.setTitle(.members.localizedReplace("\(participantCount)"))
+                    if roomType == .standard {
+                        membersButton.setTitle(.members.localizedReplace("\(participantCount)"))
+                    }
                 }
             }
             .store(in: &cancellableSet)
@@ -216,4 +251,5 @@ fileprivate extension String {
     static let unmute = "roomkit_unmute".localized
     static let stopVideo = "roomkit_stop_video".localized
     static let startVideo = "roomkit_start_video".localized
+    static let member = "roomkit_member".localized
 }

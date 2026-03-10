@@ -24,7 +24,9 @@ public class RoomTopBarView: UIView, BaseView {
     
     private let deviceStore: DeviceStore = DeviceStore.shared
     private let roomStore: RoomStore = RoomStore.shared
-   
+    private let roomID: String
+    private let roomType: RoomType
+    
     private var timer: Timer?
     private var elapsedSeconds: Int = 0
     private var cancellableSet = Set<AnyCancellable>()
@@ -82,8 +84,10 @@ public class RoomTopBarView: UIView, BaseView {
     }()
     
     // MARK: - Initialization
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
+    public init(roomID: String, roomType: RoomType) {
+        self.roomID = roomID
+        self.roomType = roomType
+        super.init(frame: .zero)
         setupViews()
         setupConstraints()
         setupStyles()
@@ -101,8 +105,10 @@ public class RoomTopBarView: UIView, BaseView {
     
     // MARK: - BaseView Implementation
     public func setupViews() {
-        addSubview(audioSourceButton)
-        addSubview(flipCameraButton)
+        if roomType == .standard {
+            addSubview(audioSourceButton)
+            addSubview(flipCameraButton)
+        }
         addSubview(roomInfoContainerView)
         roomInfoContainerView.addSubview(roomInfoLabel)
         roomInfoContainerView.addSubview(downArrowImageView)
@@ -111,14 +117,16 @@ public class RoomTopBarView: UIView, BaseView {
     }
     
     public func setupConstraints() {
-        audioSourceButton.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(RoomSpacing.standard)
-            make.centerY.equalToSuperview()
-        }
-        
-        flipCameraButton.snp.makeConstraints { make in
-            make.left.equalTo(audioSourceButton.snp.right).offset(RoomSpacing.extraLarge)
-            make.centerY.equalToSuperview()
+        if roomType == .standard {
+            audioSourceButton.snp.makeConstraints { make in
+                make.left.equalToSuperview().offset(RoomSpacing.standard)
+                make.centerY.equalToSuperview()
+            }
+            
+            flipCameraButton.snp.makeConstraints { make in
+                make.left.equalTo(audioSourceButton.snp.right).offset(RoomSpacing.extraLarge)
+                make.centerY.equalToSuperview()
+            }
         }
         
         endButton.snp.makeConstraints { make in
@@ -129,7 +137,11 @@ public class RoomTopBarView: UIView, BaseView {
         roomInfoContainerView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalToSuperview().offset(RoomSpacing.small)
-            make.left.greaterThanOrEqualTo(flipCameraButton.snp.right).offset(RoomSpacing.medium)
+            if roomType == .standard {
+                make.left.greaterThanOrEqualTo(flipCameraButton.snp.right).offset(RoomSpacing.medium)
+            } else {
+                make.left.greaterThanOrEqualToSuperview().offset(RoomSpacing.medium)
+            }
             make.right.lessThanOrEqualTo(endButton.snp.left).offset(-RoomSpacing.medium)
         }
         
@@ -153,8 +165,10 @@ public class RoomTopBarView: UIView, BaseView {
     }
     
     public func setupBindings() {
-        audioSourceButton.addTarget(self, action: #selector(audioSourceButtonTapped), for: .touchUpInside)
-        flipCameraButton.addTarget(self, action: #selector(flipCameraButtonTapped), for: .touchUpInside)
+        if roomType == .standard {
+            audioSourceButton.addTarget(self, action: #selector(audioSourceButtonTapped), for: .touchUpInside)
+            flipCameraButton.addTarget(self, action: #selector(flipCameraButtonTapped), for: .touchUpInside)
+        }
         endButton.addTarget(self, action: #selector(endButtonTapped(sender:)), for: .touchUpInside)
         
         let tap = UITapGestureRecognizer()
@@ -190,6 +204,10 @@ public class RoomTopBarView: UIView, BaseView {
         // Set content compression resistance to ensure downArrowImageView is always visible
         roomInfoLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         downArrowImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        // Ensure endButton width follows content size
+        endButton.setContentHuggingPriority(.required, for: .horizontal)
+        endButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
 }
 

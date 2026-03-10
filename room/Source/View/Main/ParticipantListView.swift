@@ -15,7 +15,7 @@ import Kingfisher
 public protocol ParticipantListViewDelegate: AnyObject {
     func muteAllAudioButtonTapped(disable: Bool)
     func muteAllVideoButtonTapped(disable: Bool)
-    func participantTapped(view: ParticipantListView, participant: RoomParticipant)
+    func participantTapped(view: ParticipantListView, participant: RoomParticipant, isAudience: Bool)
 }
 
 // MARK: - ParticipantListView
@@ -23,7 +23,7 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
     weak public var parentView: UIView?
-    public var backgroundMaskView: PanelMaskView?
+    weak public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
     public var panelHeight: CGFloat {
@@ -38,9 +38,12 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         RoomParticipantStore.create(roomID: roomID)
     }()
     private let roomStore: RoomStore = RoomStore.shared
-    private var allParticipants: [RoomParticipant] = []
+    private var participantList: [RoomParticipant] = []
+    private var audienceList: [RoomParticipant] = []
     private var cancellableSet = Set<AnyCancellable>()
     private let roomID: String
+    private let roomType: RoomType
+    private var isSegmentTapping: Bool = false
     
     // MARK: - UI Components
     private lazy var containerView: UIView = {
@@ -66,14 +69,56 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         return label
     }()
     
-    private lazy var tableView: UITableView = {
+    private lazy var topSegmentView: UISegmentedControl = {
+        let topSegmentView = UISegmentedControl(frame: .zero)
+        topSegmentView.insertSegment(withTitle: .participant.localizedReplace("0"), at: 0, animated: true)
+        topSegmentView.insertSegment(withTitle: .audience.localizedReplace("0"), at: 1, animated: true)
+        topSegmentView.selectedSegmentIndex = 0
+        topSegmentView.selectedSegmentTintColor = RoomColors.g3
+        topSegmentView.setTitleTextAttributes([
+            .foregroundColor: RoomColors.g6,
+            .font: RoomFonts.pingFangSCFont(size: 14, weight: .regular)
+        ], for: .normal)
+
+        topSegmentView.setTitleTextAttributes([
+            .foregroundColor: UIColor.white,
+            .font: RoomFonts.pingFangSCFont(size: 14, weight: .medium)
+        ], for: .selected)
+
+        return topSegmentView
+    }()
+    
+    private lazy var scrollContainerView: UIScrollView = {
+        let scrollView = UIScrollView(frame: .zero)
+        scrollView.isPagingEnabled = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.bounces = false
+        scrollView.delegate = self
+        return scrollView
+    }()
+    
+    private lazy var participantTableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
         tableView.delegate = self
         tableView.dataSource = self
         tableView.showsVerticalScrollIndicator = false
-        tableView.register(ParticipantListCell.self, forCellReuseIdentifier: ParticipantListCell.reuseIdentifier)
+        tableView.tag = 0
+        tableView.register(ParticipantListCell.self, forCellReuseIdentifier: ParticipantListCell.cellReuseIdentifier)
+        return tableView
+    }()
+    
+    private lazy var audienceTableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.showsVerticalScrollIndicator = false
+        tableView.tag = 1
+        tableView.register(AudienceListCell.self, forCellReuseIdentifier: AudienceListCell.cellReuseIdentifier)
         return tableView
     }()
     
@@ -110,8 +155,9 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     }()
     
     // MARK: - Initialization
-    public init(roomID: String) {
+    public init(roomID: String, roomType: RoomType) {
         self.roomID = roomID
+        self.roomType = roomType
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -126,14 +172,20 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     // MARK: - BaseView Implementation
     func setupViews() {
         addSubview(containerView)
-        
         containerView.addSubview(dropButton)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(tableView)
-        containerView.addSubview(bottomBarView)
-        
-        bottomBarView.addSubview(muteAllAudioButton)
-        bottomBarView.addSubview(muteAllVideoButton)
+        if roomType == .standard {
+            containerView.addSubview(titleLabel)
+            containerView.addSubview(participantTableView)
+            
+            containerView.addSubview(bottomBarView)
+            bottomBarView.addSubview(muteAllAudioButton)
+            bottomBarView.addSubview(muteAllVideoButton)
+        } else {
+            containerView.addSubview(topSegmentView)
+            containerView.addSubview(scrollContainerView)
+            scrollContainerView.addSubview(participantTableView)
+            scrollContainerView.addSubview(audienceTableView)
+        }
     }
     
     func setupConstraints() {
@@ -146,35 +198,64 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             make.centerX.equalToSuperview()
         }
         
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
-            make.left.equalToSuperview().offset(RoomSpacing.standard)
-            make.right.equalToSuperview().offset(-RoomSpacing.standard)
-        }
-        
-        bottomBarView.snp.makeConstraints { make in
-            make.left.right.bottom.equalToSuperview()
-            make.height.equalTo(88)
-        }
-        
-        muteAllAudioButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(RoomSpacing.medium)
-            make.right.equalTo(bottomBarView.snp.centerX).offset(-RoomSpacing.large)
-            make.width.equalTo(108)
-            make.height.equalTo(40)
-        }
-        
-        muteAllVideoButton.snp.makeConstraints { make in
-            make.centerY.equalTo(muteAllAudioButton)
-            make.left.equalTo(bottomBarView.snp.centerX).offset(RoomSpacing.medium)
-            make.width.equalTo(muteAllAudioButton)
-            make.height.equalTo(40)
-        }
-        
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(RoomSpacing.medium)
-            make.left.right.equalToSuperview()
-            make.bottom.equalTo(bottomBarView.snp.top)
+        if roomType == .standard {
+            titleLabel.snp.makeConstraints { make in
+                make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
+                make.left.equalToSuperview().offset(RoomSpacing.standard)
+                make.right.equalToSuperview().offset(-RoomSpacing.standard)
+            }
+            
+            participantTableView.snp.makeConstraints { make in
+                make.top.equalTo(titleLabel.snp.bottom).offset(RoomSpacing.medium)
+                make.left.right.equalToSuperview()
+                make.bottom.equalTo(bottomBarView.snp.top)
+            }
+            
+            bottomBarView.snp.makeConstraints { make in
+                make.left.right.bottom.equalToSuperview()
+                make.height.equalTo(88)
+            }
+            
+            muteAllAudioButton.snp.makeConstraints { make in
+                make.top.equalToSuperview().offset(RoomSpacing.medium)
+                make.right.equalTo(bottomBarView.snp.centerX).offset(-RoomSpacing.large)
+                make.width.equalTo(108)
+                make.height.equalTo(40)
+            }
+            
+            muteAllVideoButton.snp.makeConstraints { make in
+                make.centerY.equalTo(muteAllAudioButton)
+                make.left.equalTo(bottomBarView.snp.centerX).offset(RoomSpacing.medium)
+                make.width.equalTo(muteAllAudioButton)
+                make.height.equalTo(40)
+            }
+        } else {
+            topSegmentView.snp.makeConstraints { make in
+                make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
+                make.left.equalToSuperview().offset(RoomSpacing.medium)
+                make.right.equalToSuperview().offset(-RoomSpacing.medium)
+            }
+            
+            scrollContainerView.snp.makeConstraints { make in
+                make.top.equalTo(topSegmentView.snp.bottom).offset(RoomSpacing.medium)
+                make.left.right.equalToSuperview()
+                make.bottom.equalToSuperview()
+            }
+            
+            participantTableView.snp.makeConstraints { make in
+                make.top.bottom.equalToSuperview()
+                make.left.equalToSuperview()
+                make.width.equalTo(scrollContainerView.snp.width)
+                make.height.equalTo(scrollContainerView.snp.height)
+            }
+            
+            audienceTableView.snp.makeConstraints { make in
+                make.top.bottom.equalToSuperview()
+                make.left.equalTo(participantTableView.snp.right)
+                make.width.equalTo(scrollContainerView.snp.width)
+                make.height.equalTo(scrollContainerView.snp.height)
+                make.right.equalToSuperview()
+            }
         }
     }
     
@@ -183,30 +264,43 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     }
     
     func setupBindings() {
-    
         dropButton.addTarget(self, action: #selector(dropButtonTapped), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioButtonTapped), for: .touchUpInside)
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoButtonTapped), for: .touchUpInside)
         
+        if roomType == .standard {
+            bindingStandardState()
+        } else {
+            topSegmentView.addTarget(self, action: #selector(topSegmentViewValueChanged(sender:)), for: .valueChanged)
+            bindingWebinarState()
+        }
+        
         participantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantList))
             .receive(on: RunLoop.main)
-            .sink { [weak self] participants in
+            .sink { [weak self] participantList in
                 guard let self = self else { return }
-                updateParticipants(participants)
+                updateParticipants(participantList)
             }
             .store(in: &cancellableSet)
+    }
+    
+    private func bindingStandardState() {
+        roomStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.currentRoom?.participantCount))
+             .receive(on: RunLoop.main)
+             .sink { [weak self] participantCount in
+                 guard let self = self else { return }
+                 titleLabel.text = .members.localizedReplace("\(participantCount ?? 0)")
+             }
+             .store(in: &cancellableSet)
         
         participantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .receive(on: RunLoop.main)
             .sink { [weak self] participant in
                 guard let self = self else { return }
-                if let participant = participant, (participant.role == .admin || participant.role == .owner) {
-                    bottomBarView.isHidden = false
-                } else {
-                    bottomBarView.isHidden = true
-                }
+                bottomBarView.isHidden = !(participant?.role == .admin || participant?.role == .owner)
             }
             .store(in: &cancellableSet)
         
@@ -228,18 +322,97 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             }
             .store(in: &cancellableSet)
     }
+    
+    private func bindingWebinarState() {
+        roomStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.currentRoom?.participantCount))
+             .receive(on: RunLoop.main)
+             .sink { [weak self] participantCount in
+                 guard let self = self else { return }
+                 topSegmentView.setTitle(.participant.localizedReplace("\(participantCount ?? 0)"), forSegmentAt: 0)
+             }
+             .store(in: &cancellableSet)
+        
+        roomStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.currentRoom?.audienceCount))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] audienceCount in
+                guard let self = self else { return }
+                topSegmentView.setTitle(.audience.localizedReplace("\(audienceCount ?? 0)"), forSegmentAt: 1)
+            }
+            .store(in: &cancellableSet)
+        
+        let adminPublisher = participantStore.state.subscribe(StatePublisherSelector(keyPath: \.adminList))
+        participantStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.audienceList))
+            .combineLatest(adminPublisher)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] audienceList, adminList in
+                guard let self = self else { return }
+                updateAudienceList(audienceList: audienceList, adminList: adminList)
+            }
+            .store(in: &cancellableSet)
+    }
 }
 
 // MARK: - Private Methods
 extension ParticipantListView {
     private func updateParticipants(_ participants: [RoomParticipant]) {
-        allParticipants = participants
-        updateTitle()
-        tableView.reloadData()
+        participantList = sortParticipants(participants)
+        participantTableView.reloadData()
     }
     
-    private func updateTitle() {
-        titleLabel.text = .members.localizedReplace("\(allParticipants.count)")
+    private func updateAudienceList(audienceList: [RoomUser], adminList: [RoomUser]) {
+        let adminUsrIDList = adminList.map { $0.userID }
+        var newAudienceList: [RoomParticipant] = []
+        audienceList.forEach { audience in
+            var participant = RoomParticipant()
+            participant.userID = audience.userID
+            participant.userName = audience.userName
+            participant.avatarURL = audience.avatarURL
+            participant.role = adminUsrIDList.contains(audience.userID) ? .admin : .generalUser
+            newAudienceList.append(participant)
+        }
+        
+        self.audienceList = sortParticipants(newAudienceList)
+        audienceTableView.reloadData()
+    }
+    
+    private func sortParticipants(_ participants: [RoomParticipant]) -> [RoomParticipant] {
+        let localUserID = participantStore.state.value.localParticipant?.userID ?? ""
+        
+        return participants.sorted { p1, p2 in
+            let rolePriority1 = getRolePriority(p1, localUserID: localUserID)
+            let rolePriority2 = getRolePriority(p2, localUserID: localUserID)
+            
+            if rolePriority1 != rolePriority2 {
+                return rolePriority1 < rolePriority2
+            }
+            
+            let devicePriority1 = getDevicePriority(p1)
+            let devicePriority2 = getDevicePriority(p2)
+            
+            if devicePriority1 != devicePriority2 {
+                return devicePriority1 < devicePriority2
+            }
+            
+            return p1.userName < p2.userName
+        }
+    }
+    
+    private func getRolePriority(_ participant: RoomParticipant, localUserID: String) -> Int {
+        if participant.userID == localUserID { return 0 }
+        if participant.role == .owner { return 1 }
+        if participant.role == .admin { return 2 }
+        return 3
+    }
+    
+    private func getDevicePriority(_ participant: RoomParticipant) -> Int {
+        if participant.screenShareStatus == .on { return 0 }
+        if participant.cameraStatus == .on && participant.microphoneStatus == .on { return 1 }
+        if participant.cameraStatus == .on { return 2 }
+        if participant.microphoneStatus == .on { return 3 }
+        return 4
     }
 }
 
@@ -256,23 +429,73 @@ extension ParticipantListView {
     @objc private func muteAllVideoButtonTapped(sender: UIButton) {
         delegate?.muteAllVideoButtonTapped(disable: !sender.isSelected)
     }
+    
+    @objc private func topSegmentViewValueChanged(sender: UISegmentedControl) {
+        isSegmentTapping = true
+        let index = sender.selectedSegmentIndex
+        let offsetX = CGFloat(index) * scrollContainerView.bounds.width
+        scrollContainerView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
+    }
+    
+}
+
+// MARK: - UIScrollViewDelegate
+extension ParticipantListView: UIScrollViewDelegate {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView == scrollContainerView, scrollView.bounds.width > 0, !isSegmentTapping else { return }
+        let offsetX = scrollView.contentOffset.x
+        let pageWidth = scrollView.bounds.width
+        let pageIndex = Int(round(offsetX / pageWidth))
+        if topSegmentView.selectedSegmentIndex != pageIndex {
+            topSegmentView.selectedSegmentIndex = pageIndex
+        }
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        guard scrollView == scrollContainerView else { return }
+        isSegmentTapping = false
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        guard scrollView == scrollContainerView else { return }
+        isSegmentTapping = false
+    }
 }
 
 // MARK: - UITableViewDataSource
 extension ParticipantListView: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return allParticipants .count
+        if tableView == participantTableView {
+            return participantList.count
+        }
+        
+        if tableView == audienceTableView {
+            return audienceList.count
+        }
+        return 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantListCell.reuseIdentifier, for: indexPath) as? ParticipantListCell else {
-            return UITableViewCell()
+        if tableView == participantTableView {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantListCell.cellReuseIdentifier, for: indexPath) as? ParticipantListCell else {
+                return UITableViewCell()
+            }
+            
+            let participant = participantList[indexPath.row]
+            cell.configure(with: participant, roomID: roomID, roomType: roomType)
+            return cell
         }
         
-        let participant = allParticipants[indexPath.row]
-        cell.configure(with: participant, roomID: roomID)
-        
-        return cell
+        if tableView == audienceTableView {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AudienceListCell.cellReuseIdentifier, for: indexPath) as? AudienceListCell else {
+                return UITableViewCell()
+            }
+            
+            let audience = audienceList[indexPath.row]
+            cell.configure(with: audience, roomID: roomID)
+            return cell
+        }
+        return UITableViewCell()
     }
 }
 
@@ -283,11 +506,23 @@ extension ParticipantListView: UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let participant = allParticipants[indexPath.row]
+        var participant: RoomParticipant?
+        var isAudience: Bool = false
+        if tableView == participantTableView {
+            participant = participantList[indexPath.row]
+        }
+        
+        if tableView == audienceTableView {
+            participant = audienceList[indexPath.row]
+            isAudience = true
+        }
+       
+        guard let participant = participant else { return }
+        
         guard canInteractWith(participant: participant) else {
             return
         }
-        participantTapped(for: participant)
+        participantTapped(for: participant, isAudience: isAudience)
     }
     
     private func canInteractWith(participant: RoomParticipant) -> Bool {
@@ -301,25 +536,22 @@ extension ParticipantListView: UITableViewDelegate {
         return false
     }
     
-    private func participantTapped(for participant: RoomParticipant) {
-        delegate?.participantTapped(view: self, participant: participant)
+    private func participantTapped(for participant: RoomParticipant, isAudience: Bool) {
+        delegate?.participantTapped(view: self, participant: participant, isAudience: isAudience)
     }
 }
 
-// MARK: - ParticipantListCell
-private class ParticipantListCell: UITableViewCell {
+// MARK: - BaseParticipantCell
+private class BaseParticipantCell: UITableViewCell {
     // MARK: - Properties
-    static let reuseIdentifier = "ParticipantListCell"
-    private var roomID: String = ""
+    var roomID: String = ""
     
-    private var participant: RoomParticipant?
-    
-    private lazy var participantStore: RoomParticipantStore = {
+    lazy var participantStore: RoomParticipantStore = {
         RoomParticipantStore.create(roomID: roomID)
     }()
     
     // MARK: - UI Components
-    private lazy var avatarImageView: UIImageView = {
+    lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 24
@@ -327,29 +559,153 @@ private class ParticipantListCell: UITableViewCell {
         return imageView
     }()
     
-    private lazy var containerView: UIView = {
+    lazy var containerView: UIView = {
         let view = UIView()
         return view
     }()
     
-    private lazy var nameLabel: UILabel = {
+    lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
         label.textColor = RoomColors.g7
         return label
     }()
     
-    private lazy var roleIcon: UIImageView = {
+    lazy var roleIcon: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
-    private lazy var roleLabel: UILabel = {
+    lazy var roleLabel: UILabel = {
         let label = UILabel()
         label.font = RoomFonts.pingFangSCFont(size: 12, weight: .regular)
         return label
     }()
     
+    lazy var dividerLine: UIView = {
+        let view = UIView()
+        view.backgroundColor = RoomColors.g3.withAlphaComponent(0.3)
+        return view
+    }()
+    
+    // MARK: - Initialization
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupViews()
+        setupConstraints()
+        setupStyles()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup Methods
+    func setupViews() {
+        contentView.addSubview(avatarImageView)
+        contentView.addSubview(containerView)
+        containerView.addSubview(nameLabel)
+        containerView.addSubview(roleIcon)
+        containerView.addSubview(roleLabel)
+        contentView.addSubview(dividerLine)
+    }
+    
+    func setupConstraints() {
+        avatarImageView.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(RoomSpacing.large)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(40)
+        }
+        
+        nameLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview()
+            make.top.equalToSuperview()
+            make.right.equalToSuperview()
+        }
+        
+        roleIcon.snp.makeConstraints { make in
+            make.left.equalToSuperview()
+            make.size.equalTo(CGSize(width: 14, height: 14))
+            make.centerY.equalTo(roleLabel.snp.centerY)
+        }
+        
+        roleLabel.snp.makeConstraints { make in
+            make.left.equalTo(roleIcon.snp.right).offset(2)
+            make.top.equalTo(nameLabel.snp.bottom).offset(2)
+            make.bottom.equalToSuperview()
+            make.right.equalToSuperview()
+        }
+    }
+    
+    func setupStyles() {
+        contentView.backgroundColor = RoomColors.g2
+        backgroundColor = .clear
+        selectionStyle = .none
+    }
+    
+    // MARK: - Common Methods
+    func configureBasicInfo(participant: RoomParticipant, roomID: String) {
+        self.roomID = roomID
+        
+        avatarImageView.kf.setImage(
+            with: URL(string: participant.avatarURL),
+            placeholder: ResourceLoader.loadImage("avatar_placeholder")
+        )
+        
+        let currentUserID = participantStore.state.value.localParticipant?.userID ?? ""
+        nameLabel.text = participant.userID == currentUserID
+            ? "\(participant.name)(\(String.me))"
+            : participant.name
+        
+        updateRoleLabel(role: participant.role)
+    }
+    
+    func updateRoleLabel(role: ParticipantRole) {
+        switch role {
+        case .owner:
+            roleLabel.text = .owner
+            roleLabel.textColor = RoomColors.b1d
+            roleIcon.image = ResourceLoader.loadImage("room_owner_tag")
+            roleLabel.isHidden = false
+            roleIcon.isHidden = false
+        case .admin:
+            roleLabel.text = .administrator
+            roleLabel.textColor = RoomColors.adminTagColor
+            roleIcon.image = ResourceLoader.loadImage("room_admin_tag")
+            roleLabel.isHidden = false
+            roleIcon.isHidden = false
+        default:
+            roleLabel.isHidden = true
+            roleIcon.isHidden = true
+        }
+        
+        if role == .generalUser {
+            nameLabel.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        } else {
+            nameLabel.snp.remakeConstraints { make in
+                make.left.top.right.equalToSuperview()
+            }
+            
+            roleIcon.snp.remakeConstraints { make in
+                make.left.equalToSuperview()
+                make.size.equalTo(CGSize(width: 14, height: 14))
+                make.centerY.equalTo(roleLabel.snp.centerY)
+            }
+            
+            roleLabel.snp.remakeConstraints { make in
+                make.left.equalTo(roleIcon.snp.right).offset(2)
+                make.top.equalTo(nameLabel.snp.bottom).offset(2)
+                make.bottom.right.equalToSuperview()
+            }
+        }
+    }
+}
+
+// MARK: - ParticipantListCell
+private class ParticipantListCell: BaseParticipantCell {
+    // MARK: - Additional UI Components
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -383,46 +739,18 @@ private class ParticipantListCell: UITableViewCell {
         return imageView
     }()
     
-    private lazy var dividerLine: UIView = {
-       let view = UIView()
-        view.backgroundColor = RoomColors.g3.withAlphaComponent(0.3)
-        return view
-    }()
-    
-    // MARK: - Initialization
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupViews()
-        setupConstraints()
-        setupStyles()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - Setup Methods
-    private func setupViews() {
-        contentView.addSubview(avatarImageView)
-        contentView.addSubview(containerView)
-        containerView.addSubview(nameLabel)
-        containerView.addSubview(roleIcon)
-        containerView.addSubview(roleLabel)
-        
+    override func setupViews() {
+        super.setupViews()
         contentView.addSubview(buttonStackView)
         buttonStackView.addArrangedSubview(recordImageView)
         buttonStackView.addArrangedSubview(screenShareImageView)
         buttonStackView.addArrangedSubview(microphoneImageView)
         buttonStackView.addArrangedSubview(cameraImageView)
-        contentView.addSubview(dividerLine)
     }
     
-    private func setupConstraints() {
-        avatarImageView.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(RoomSpacing.large)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(40)
-        }
+    override func setupConstraints() {
+        super.setupConstraints()
         
         containerView.snp.makeConstraints { make in
             make.left.equalTo(avatarImageView.snp.right).offset(RoomSpacing.medium)
@@ -430,44 +758,15 @@ private class ParticipantListCell: UITableViewCell {
             make.right.lessThanOrEqualTo(buttonStackView.snp.left).offset(-5)
         }
         
-        nameLabel.snp.makeConstraints { make in
-            make.left.equalToSuperview()
-            make.top.equalToSuperview()
-            make.right.equalToSuperview()
-        }
-        
-        roleIcon.snp.makeConstraints { make in
-            make.left.equalToSuperview()
-            make.size.equalTo(CGSize(width: 14, height: 14))
-            make.centerY.equalTo(roleLabel.snp.centerY)
-        }
-        
-        roleLabel.snp.makeConstraints { make in
-            make.left.equalTo(roleIcon.snp.right).offset(2)
-            make.top.equalTo(nameLabel.snp.bottom).offset(2)
-            make.bottom.equalToSuperview()
-            make.right.equalToSuperview()
-        }
-        
         buttonStackView.snp.makeConstraints { make in
             make.right.equalToSuperview().offset(-18)
             make.centerY.equalToSuperview()
         }
         
-        recordImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(20)
-        }
-        
-        screenShareImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(20)
-        }
-        
-        microphoneImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(20)
-        }
-        
-        cameraImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(20)
+        [recordImageView, screenShareImageView, microphoneImageView, cameraImageView].forEach { imageView in
+            imageView.snp.makeConstraints { make in
+                make.width.height.equalTo(20)
+            }
         }
         
         dividerLine.snp.makeConstraints { make in
@@ -478,99 +777,45 @@ private class ParticipantListCell: UITableViewCell {
         }
     }
     
-    private func setupStyles() {
-        backgroundColor = .clear
-        selectionStyle = .none
+    // MARK: - Public Methods
+    func configure(with participant: RoomParticipant, roomID: String, roomType: RoomType) {
+        configureBasicInfo(participant: participant, roomID: roomID)
+        
+        if roomType == .standard {
+            screenShareImageView.isHidden = participant.screenShareStatus == .off
+            cameraImageView.image = ResourceLoader.loadImage(participant.cameraStatus == .on ? "room_member_camera_on" : "room_member_camera_off")
+            microphoneImageView.image = ResourceLoader.loadImage(participant.microphoneStatus == .on ? "room_member_unmute" : "room_member_mute")
+        } else {
+            screenShareImageView.isHidden = true
+            cameraImageView.isHidden = true
+            microphoneImageView.image = ResourceLoader.loadImage(participant.microphoneStatus == .on ? "room_member_unmute" : "room_member_mute")
+        }
+    }
+}
+
+// MARK: - AudienceListCell
+private class AudienceListCell: BaseParticipantCell {
+    // MARK: - Setup Methods
+    override func setupConstraints() {
+        super.setupConstraints()
+        
+        containerView.snp.makeConstraints { make in
+            make.left.equalTo(avatarImageView.snp.right).offset(RoomSpacing.medium)
+            make.centerY.equalTo(avatarImageView.snp.centerY)
+            make.right.equalToSuperview().offset(-RoomSpacing.large)
+        }
+        
+        dividerLine.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.left.equalTo(nameLabel.snp.left)
+            make.right.equalTo(containerView.snp.right)
+            make.height.equalTo(1)
+        }
     }
     
     // MARK: - Public Methods
-    func configure(with participant: RoomParticipant, roomID: String) {
-        self.participant = participant
-        self.roomID = roomID
-        
-        avatarImageView.kf.setImage(
-            with: URL(string: participant.avatarURL),
-            placeholder: ResourceLoader.loadImage("avatar_placeholder")
-        )
-        
-        let currentUserID = participantStore.state.value.localParticipant?.userID ?? ""
-        if participant.userID == currentUserID {
-            let meText = String.me
-            nameLabel.text = "\(participant.name)(\(meText))"
-        } else {
-            nameLabel.text = participant.name
-        }
-        
-        updateRoleLabel(role: participant.role)
-        
-        updateScreenShareButton(status: participant.screenShareStatus)
-        updateAudioButton(status: participant.microphoneStatus)
-        updateVideoButton(status: participant.cameraStatus)
-    }
-    
-    // MARK: - Private Methods
-    private func updateRoleLabel(role: ParticipantRole) {
-        switch role {
-        case .owner:
-            roleLabel.text = .owner
-            roleLabel.textColor = RoomColors.b1d
-            roleLabel.isHidden = false
-            
-            roleIcon.image = ResourceLoader.loadImage("room_owner_tag")
-            roleIcon.isHidden = false
-        case .admin:
-            roleLabel.text = .administrator
-            roleLabel.textColor = RoomColors.adminTagColor
-            roleLabel.isHidden = false
-            
-            roleIcon.image = ResourceLoader.loadImage("room_admin_tag")
-            roleIcon.isHidden = false
-        default:
-            roleLabel.isHidden = true
-            roleIcon.isHidden = true
-        }
-        
-        if role == .generalUser {
-            nameLabel.snp.remakeConstraints { make in
-                make.left.equalToSuperview()
-                make.top.equalToSuperview()
-                make.bottom.equalToSuperview()
-                make.right.equalToSuperview()
-            }
-        } else {
-            nameLabel.snp.remakeConstraints { make in
-                make.left.equalToSuperview()
-                make.top.equalToSuperview()
-                make.right.equalToSuperview()
-            }
-            
-            roleIcon.snp.remakeConstraints { make in
-                make.left.equalToSuperview()
-                make.size.equalTo(CGSize(width: 14, height: 14))
-                make.centerY.equalTo(roleLabel.snp.centerY)
-            }
-            
-            roleLabel.snp.remakeConstraints { make in
-                make.left.equalTo(roleIcon.snp.right).offset(2)
-                make.top.equalTo(nameLabel.snp.bottom).offset(2)
-                make.bottom.equalToSuperview()
-                make.right.equalToSuperview()
-            }
-        }
-    }
-    
-    private func updateScreenShareButton(status: DeviceStatus) {
-        screenShareImageView.isHidden = status == .off
-    }
-        
-    private func updateAudioButton(status: DeviceStatus) {
-        let imageName = status == .on ? "room_member_unmute" : "room_member_mute"
-        microphoneImageView.image = ResourceLoader.loadImage(imageName)
-    }
-    
-    private func updateVideoButton(status: DeviceStatus) {
-        let imageName = status == .on ? "room_member_camera_on" : "room_member_camera_off"
-        cameraImageView.image = ResourceLoader.loadImage(imageName)
+    func configure(with audience: RoomParticipant, roomID: String) {
+        configureBasicInfo(participant: audience, roomID: roomID)
     }
 }
 
@@ -584,4 +829,6 @@ fileprivate extension String {
     static let me = "roomkit_me".localized
     static let owner = "roomkit_role_owner".localized
     static let administrator = "roomkit_role_admin".localized
+    static let participant = "roomkit_participant".localized
+    static let audience = "roomkit_audience".localized
 }

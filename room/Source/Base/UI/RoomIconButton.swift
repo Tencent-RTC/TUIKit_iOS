@@ -236,5 +236,14 @@ public class RoomIconButton: UIControl {
                 }
             }
         }
+        
+        invalidateIntrinsicContentSize()
+    }
+    
+    // MARK: - Intrinsic Content Size
+    
+    public override var intrinsicContentSize: CGSize {
+        let stackSize = containerStackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        return stackSize
     }
 }

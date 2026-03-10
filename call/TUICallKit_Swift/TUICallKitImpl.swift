@@ -95,7 +95,7 @@ class TUICallKitImpl: TUICallKit {
              return
         }
 
-        CallStore.shared.calls(participantIds: userIdList, callMediaType: callMediaType, params: params ?? getCallParams(), completion: completion)
+        CallStore.shared.calls(participantIds: userIdList, mediaType: callMediaType, params: params ?? getCallParams(), completion: completion)
     }
     
     override func join(callId: String, completion: CompletionClosure?) {

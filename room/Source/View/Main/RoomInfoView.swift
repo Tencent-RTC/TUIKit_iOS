@@ -10,17 +10,18 @@ import UIKit
 import SnapKit
 import AtomicXCore
 import Combine
+import AtomicX
 
 // MARK: - RoomInfoView
 public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
     weak public var parentView: UIView?
-    public var backgroundMaskView: PanelMaskView?
+    weak public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
     public var panelHeight: CGFloat {
-        return 242 + safeAreaInsets.bottom
+        return 242 + WindowUtils.bottomSafeHeight
     }
     
     // MARK: - Properties
@@ -157,7 +158,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
             guard let self = self else { return }
             if let roomID = roomStore.state.value.currentRoom?.roomID {
                 copyToClipboard(roomID)
-                showToast(.roomIDCopied)
+                showAtomicToast(text: .roomIDCopied, style: .info)
             }
         }
         
@@ -220,7 +221,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
         \(String.roomID): \(roomInfo.roomID)
         """
         copyToClipboard(allInfo)
-        showToast(.roomInfoCopiedSuccess)
+        showAtomicToast(text: .roomInfoCopiedSuccess, style: .info)
     }
 }
 
