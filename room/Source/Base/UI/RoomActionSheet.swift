@@ -71,6 +71,7 @@
 
 import UIKit
 import SnapKit
+import AtomicX
 
 // MARK: - RoomActionSheet
 class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
@@ -100,7 +101,7 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
     weak var parentView: UIView?
-    var backgroundMaskView: PanelMaskView?
+    weak var backgroundMaskView: PanelMaskView?
     
     // MARK: - Properties
     private let message: String?
@@ -154,7 +155,7 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
         let messageContainerHeight: CGFloat = message != nil ? 46 : 0
         let actionHeight: CGFloat = CGFloat(actions.count) * 56
         let actionSpacing: CGFloat = CGFloat(actions.count - 1) * 1
-        let safeAreaBottom = safeAreaInsets.bottom
+        let safeAreaBottom = WindowUtils.bottomSafeHeight
         return dropHeight + messageContainerHeight + actionHeight + actionSpacing + safeAreaBottom
     }
     

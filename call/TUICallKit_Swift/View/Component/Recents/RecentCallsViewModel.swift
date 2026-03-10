@@ -123,7 +123,7 @@ class RecentCallsViewModel: ObservableObject {
         if (callInfo.chatGroupId.isEmpty && userIds.count <= 1) {
             repeatSingleCall(callInfo, userIds)
         } else {
-            CallStore.shared.calls(participantIds: userIds, callMediaType: mediaType, params: nil, completion: nil)
+            CallStore.shared.calls(participantIds: userIds, mediaType: mediaType, params: nil, completion: nil)
         }
     }
     
@@ -138,7 +138,7 @@ class RecentCallsViewModel: ObservableObject {
             guard let userid = otherUserIds.first else { return }
             targetUserId = userid
         }
-        CallStore.shared.calls(participantIds: [targetUserId], callMediaType: mediaType, params: nil, completion: nil)
+        CallStore.shared.calls(participantIds: [targetUserId], mediaType: mediaType, params: nil, completion: nil)
     }
     
     func deleteAllRecordCalls() {

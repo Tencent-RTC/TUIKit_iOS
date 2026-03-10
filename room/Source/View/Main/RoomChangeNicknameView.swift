@@ -20,7 +20,7 @@ public class RoomChangeNicknameView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
     weak public var parentView: UIView?
-    public var backgroundMaskView: PanelMaskView?
+    weak public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
     public var panelHeight: CGFloat {
@@ -152,7 +152,7 @@ extension RoomChangeNicknameView {
     @objc private func confirmButtonTapped() {
         guard let newName = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               !newName.isEmpty else {
-            showToast(.enterNickname)
+            showAtomicToast(text: .enterNickname, style: .error)
             return
         }
         
@@ -186,6 +186,8 @@ extension RoomChangeNicknameView {
         UIView.animate(withDuration: duration, delay: 0, options: .curveEaseInOut) { [weak self] in
             guard let self = self else { return }
             transform = CGAffineTransform(translationX: 0, y: keyboardEndFrameValue.height)
+        } completion: { [weak self] _ in
+            guard let self = self else { return }
             dismiss()
         }
     }

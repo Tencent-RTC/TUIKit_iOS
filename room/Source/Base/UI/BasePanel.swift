@@ -82,31 +82,23 @@ public extension BasePanel where Self: UIView {
         
         parentView.addSubview(self)
         
+        let panelHeight = getPanelHeight()
+        
         self.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalTo(parentView.snp.bottom)
+            make.left.right.bottom.equalToSuperview()
+            make.height.equalTo(panelHeight)
         }
         
         parentView.layoutIfNeeded()
         
         if animated {
+            self.transform = CGAffineTransform(translationX: 0, y: panelHeight)
             maskView.alpha = 0
             
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut) {
                 maskView.alpha = 1
-                
-                self.snp.remakeConstraints { make in
-                    make.left.right.bottom.equalToSuperview()
-                    make.height.equalTo(self.getPanelHeight())
-                }
-                parentView.layoutIfNeeded()
+                self.transform = .identity
             }
-        } else {
-            self.snp.remakeConstraints { make in
-                make.left.right.bottom.equalToSuperview()
-                make.height.equalTo(self.getPanelHeight())
-            }
-            parentView.layoutIfNeeded()
         }
     }
     
@@ -115,10 +107,14 @@ public extension BasePanel where Self: UIView {
     ///   - animated: Whether to animate the dismissal
     ///   - completion: Completion handler called after dismissal
     func dismiss(animated: Bool = true, completion: (() -> Void)? = nil) {
-        guard let parentView = self.parentView else {
+        guard let _ = self.parentView else {
+            backgroundMaskView?.removeFromSuperview()
+            backgroundMaskView = nil
             completion?()
             return
         }
+        
+        let panelHeight = getPanelHeight()
         
         if animated {
             UIView.animate(withDuration: 0.25,
@@ -127,14 +123,10 @@ public extension BasePanel where Self: UIView {
                            animations: { [weak self] in
                 guard let self = self else { return }
                 self.backgroundMaskView?.alpha = 0
-                
-                self.snp.remakeConstraints { make in
-                    make.left.right.equalToSuperview()
-                    make.top.equalTo(parentView.snp.bottom)
-                }
-                parentView.layoutIfNeeded()
+                self.transform = CGAffineTransform(translationX: 0, y: panelHeight)
             }) { [weak self] _ in
                 guard let self = self else { return }
+                self.transform = .identity
                 self.backgroundMaskView?.removeFromSuperview()
                 self.removeFromSuperview()
                 self.parentView = nil

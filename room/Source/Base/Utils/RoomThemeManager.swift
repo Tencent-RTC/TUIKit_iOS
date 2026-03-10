@@ -250,6 +250,21 @@ public struct RoomColors {
         darkHex: "#E5395C"
     )
     
+    public static let selectedSegmentTintColor = RoomThemeManager.dynamicColor(
+        lightHex: "#98A0B4",
+        darkHex: "#98A0B4"
+    )
+    
+    public static let segmentTitleColor = RoomThemeManager.dynamicColor(
+        lightHex: "#D5E0F2",
+        darkHex: "#D5E0F2"
+    )
+    
+    public static let avatarBackgroundColor = RoomThemeManager.dynamicColor(
+        lightHex: "#181A1E",
+        darkHex: "#181A1E"
+    )
+    
     // MARK: - Background Colors (背景色)
     
     /// 主题背景色

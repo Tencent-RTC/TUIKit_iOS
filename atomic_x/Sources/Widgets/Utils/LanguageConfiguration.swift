@@ -25,7 +25,22 @@ public let LRM = "\u{200E}"
 public let RLM = "\u{200F}"
 
 public func getPreferredLanguage() -> String {
-    return Locale.preferredLanguages.first ?? "en"
+    return normalizeLanguageCode(Locale.preferredLanguages.first ?? "en")
+}
+
+private func normalizeLanguageCode(_ code: String) -> String {
+    let components = code.components(separatedBy: "-")
+    guard components.count >= 2 else { return code }
+    
+    let base = components[0]
+    let second = components[1]
+    
+    // BCP 47 standard: UPPERCASE=region(CN/US), Titlecase=script(Hans/Hant), lowercase=language(zh/en)
+    let isScript = second.first?.isUppercase == true && second.dropFirst().allSatisfy { $0.isLowercase }
+    if isScript {
+        return "\(base)-\(second)"
+    }
+    return base
 }
 
 public func isRTLLanguage() -> Bool {

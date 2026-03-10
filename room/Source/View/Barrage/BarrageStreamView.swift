@@ -1,0 +1,246 @@
+//
+//  BarrageStreamView.swift
+//  TUILiveKit
+//
+//  Created by krabyu on 2024/3/19.
+//
+
+import UIKit
+import AtomicX
+import RTCRoomEngine
+import Combine
+import AtomicXCore
+
+public protocol BarrageStreamViewDelegate: AnyObject {
+    func barrageDisplayView(_ barrageDisplayView: BarrageStreamView, createCustomCell barrage: Barrage) -> UIView?
+    func onBarrageClicked(user: LiveUserInfo)
+}
+
+public class BarrageStreamView: UIView {
+    public weak var delegate: BarrageStreamViewDelegate?
+    
+    private let liveID: String
+    private var ownerId: String = ""
+    private var adminIdList: [String] = []
+    private var lastReloadDate: Date?
+    
+    private var dataSource: [Barrage] = []
+    private var reloadWorkItem: DispatchWorkItem?
+    private var cancellableSet = Set<AnyCancellable>()
+    
+    private var isDraging: Bool = false
+
+    private lazy var barrageTableView: UITableView = {
+        let view = UITableView(frame: self.bounds, style: .plain)
+        view.dataSource = self
+        view.delegate = self
+        view.showsVerticalScrollIndicator = false
+        view.backgroundColor = .clear
+        view.separatorStyle = .none
+        view.contentInsetAdjustmentBehavior = .never
+        view.estimatedRowHeight = 30.scale375Height()
+        view.register(BarrageCell.self, forCellReuseIdentifier: BarrageCell.cellReuseIdentifier)
+        return view
+    }()
+
+    public init(liveID: String) {
+        self.liveID = liveID
+        super.init(frame: .zero)
+        initEmotions()
+        
+        BarrageManager.shared.toastSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] msg,style in
+                guard let self = self else { return }
+                superview?.showAtomicToast(text: msg, style: style)
+            }
+            .store(in: &cancellableSet)
+    }
+    
+    public func setOwnerId(_ ownerId: String) {
+        if self.ownerId != ownerId {
+            self.ownerId = ownerId
+            dataSource.removeAll()
+            barrageTableView.reloadData()
+            resetStateListener()
+        }
+    }
+    
+    public func clearAllMessage() {
+        reloadWorkItem?.cancel()
+        dataSource.removeAll()
+        barrageTableView.reloadData()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private var isViewReady = false
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard !isViewReady else { return }
+        constructViewHierarchy()
+        activateConstraints()
+        bindInteraction()
+        isViewReady = true
+    }
+    
+    func reloadBarrages(_ barrages: [Barrage]) {
+        barrageTableView.layer.removeAllAnimations()
+        dataSource = barrages
+        setNeedsReloadData()
+    }
+    
+    public func getBarrageCount() -> Int {
+        // TODO: chengyu summaryData明确后删除
+        return dataSource.count
+    }
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        if view == self || view == barrageTableView {
+            return nil
+        }
+        return view
+    }
+    
+    private func bindInteraction() {
+        setupBarrageListener()
+        setupAdminListListener()
+    }
+    
+    private func resetStateListener() {
+        cancellableSet.forEach { $0.cancel() }
+        cancellableSet.removeAll()
+        
+        BarrageManager.shared.toastSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] msg,style in
+                guard let self = self else { return }
+                superview?.showAtomicToast(text: msg, style: style)
+            }
+            .store(in: &cancellableSet)
+        
+        bindInteraction()
+    }
+}
+
+extension BarrageStreamView: UITableViewDataSource {
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: BarrageCell.cellReuseIdentifier, for: indexPath) as? BarrageCell else {
+            return UITableViewCell()
+        }
+        guard dataSource.count > indexPath.row else { return cell }
+        let barrage = dataSource[indexPath.row]
+        if let view = delegate?.barrageDisplayView(self, createCustomCell: barrage) {
+            cell.setContent(view)
+        } else {
+            cell.setContent(barrage, ownerId: ownerId, adminIdList: adminIdList)
+        }
+        return cell
+    }
+
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return dataSource.count
+    }
+}
+
+extension BarrageStreamView: UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard dataSource.count > indexPath.row else { return }
+        let barrageUser = dataSource[indexPath.row].sender
+        delegate?.onBarrageClicked(user: barrageUser)
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isDraging = true
+    }
+    
+    public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        isDraging = false
+    }
+}
+
+extension BarrageStreamView {
+    var barrageStore: BarrageStore {
+        return BarrageStore.create(liveID: liveID)
+    }
+    
+    var roomStore: RoomStore {
+        return RoomStore.shared
+    }
+    
+    var participantStore: RoomParticipantStore {
+        return RoomParticipantStore.create(roomID: liveID)
+    }
+}
+
+// MARK: - Private functions
+extension BarrageStreamView {
+    private func setupBarrageListener() {
+        barrageStore.state.subscribe(StatePublisherSelector(keyPath: \BarrageState.messageList))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] messageList in
+                guard let self = self else { return }
+                guard !messageList.isEmpty else { return }
+                reloadBarrages(messageList)
+            }
+            .store(in: &cancellableSet)
+    }
+    
+    private func setupAdminListListener() {
+        participantStore.state.subscribe(StatePublisherSelector(keyPath: \.adminList))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] adminList in
+                guard let self = self else { return }
+                let newAdminIdList = adminList.map { $0.userID }
+                guard newAdminIdList != adminIdList else { return }
+                adminIdList = newAdminIdList
+                barrageTableView.reloadData()
+            }
+            .store(in: &cancellableSet)
+    }
+    
+    private func setNeedsReloadData() {
+        let current = Date()
+        if let last = lastReloadDate {
+            let dur = current.timeIntervalSince(last)
+            if dur <= 0.25 {
+                return
+            }
+        }
+        lastReloadDate = current
+        reloadWorkItem?.cancel()
+        reloadWorkItem = DispatchWorkItem(block: { [weak self] in
+            guard let self = self else { return }
+            barrageTableView.reloadData()
+            barrageTableView.layoutIfNeeded()
+            if !isDraging {
+                let indexPath = IndexPath(row: max(dataSource.count - 1, 0), section: 0)
+                barrageTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+            }
+        })
+        if let workItem = reloadWorkItem {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: workItem)
+        }
+    }
+    
+    private func constructViewHierarchy() {
+        addSubview(barrageTableView)
+    }
+    
+    private func activateConstraints() {
+        barrageTableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    private func initEmotions() {
+        EmotionHelper.shared.useDefaultEmotions()
+    }
+}
+
+private extension String {
+    static let comingText: String = "roomkit_entered_room".localized
+}

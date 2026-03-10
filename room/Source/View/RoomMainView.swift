@@ -38,8 +38,7 @@ public class RoomMainView: UIView, BaseView {
     private let deviceStore: DeviceStore = DeviceStore.shared
     
     private lazy var participantStore: RoomParticipantStore = {
-        let store = RoomParticipantStore.create(roomID: roomID)
-        return store
+        RoomParticipantStore.create(roomID: roomID)
     }()
     
     private var cancellableSet = Set<AnyCancellable>()
@@ -47,32 +46,45 @@ public class RoomMainView: UIView, BaseView {
     private let roomID: String
     private let behavior: RoomBehavior
     private let config: ConnectConfig
+    private var roomType: RoomType = .standard
     private var currentRoom: RoomInfo?
     private var localParticipant: RoomParticipant?
     private var managerView: ParticipantManagerView?
-    // MARK: - UI Components
     
+    // MARK: - UI Components
     private lazy var topBarView: RoomTopBarView = {
-        let view = RoomTopBarView(frame: .zero)
+        let view = RoomTopBarView(roomID: roomID, roomType: roomType)
         return view
     }()
     
     private lazy var roomView: RoomView = {
-        let roomView = RoomView(roomID: roomID)
+        let roomView = RoomView(roomID: roomID, roomType: roomType)
         return roomView
+    }()
+    
+    private lazy var bottomBarView: RoomBottomBarView = {
+        let view = RoomBottomBarView(roomID: roomID, roomType: roomType)
+        return view
+    }()
+    
+    private lazy var barrageInputView: BarrageInputView = {
+        let view = BarrageInputView(roomId: roomID)
+        view.layer.cornerRadius = 8
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private lazy var barrageStreamView: BarrageStreamView = {
+        let view = BarrageStreamView(liveID: roomID)
+        return view
     }()
     
     private lazy var participantView: RoomParticipantView = {
         return RoomParticipantView()
     }()
     
-    private lazy var bottomBarView: RoomBottomBarView = {
-        let view = RoomBottomBarView(roomID: roomID)
-        return view
-    }()
-    
     private lazy var listView: ParticipantListView = {
-        let listView = ParticipantListView(roomID: roomID)
+        let listView = ParticipantListView(roomID: roomID, roomType: roomType)
         return listView
     }()
     
@@ -85,6 +97,7 @@ public class RoomMainView: UIView, BaseView {
         self.behavior = behavior
         self.config = config
         super.init(frame: .zero)
+        self.roomType = getRoomType(roomID)
         setupViews()
         setupConstraints()
         setupStyles()
@@ -96,30 +109,84 @@ public class RoomMainView: UIView, BaseView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func getRoomType(_ roomID: String) -> RoomType {
+        return !roomID.hasPrefix("webinar_") ? .standard : .webinar 
+    }
+    
     // MARK: - BaseView Implementation
     public func setupViews() {
-        addSubview(roomView)
+        roomType == .standard ? setupStandardViews() : setupWebinarViews()
+    }
+    
+    private func setupStandardViews() {
         addSubview(topBarView)
+        addSubview(roomView)
+        addSubview(bottomBarView)
+    }
+    
+    private func setupWebinarViews() {
+        addSubview(topBarView)
+        addSubview(roomView)
+        addSubview(barrageStreamView)
+        addSubview(barrageInputView)
         addSubview(bottomBarView)
     }
     
     public func setupConstraints() {
-        roomView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview()
-            make.top.equalTo(topBarView.snp.bottom)
-            make.bottom.equalTo(bottomBarView.snp.top)
-        }
-        
+        roomType == .standard ? setupStandardConstraints() : setupWebinarConstraints()
+    }
+    
+    private func setupStandardConstraints() {
         topBarView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
             make.height.equalTo(53)
         }
         
-        bottomBarView.snp.makeConstraints { make in
+        roomView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
+            make.top.equalTo(topBarView.snp.bottom)
+            make.bottom.equalTo(bottomBarView.snp.top)
+        }
+        
+        bottomBarView.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.height.equalTo(52)
+        }
+    }
+    
+    private func setupWebinarConstraints() {
+        topBarView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(53)
+        }
+        
+        roomView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.top.equalTo(topBarView.snp.bottom).offset(30)
+            make.height.equalTo(roomView.snp.width).multipliedBy(9.0 / 16.0)
+        }
+        
+        barrageStreamView.snp.makeConstraints { make in
+            make.top.equalTo(roomView.snp.bottom).offset(RoomSpacing.large)
+            make.left.equalToSuperview().offset(RoomSpacing.standard)
+            make.right.equalToSuperview().offset(-RoomSpacing.standard)
+            make.bottom.equalTo(barrageInputView.snp.top).offset(-RoomSpacing.large)
+        }
+        
+        barrageInputView.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(RoomSpacing.standard)
+            make.height.equalTo(40)
+            make.width.equalTo(240)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+        
+        bottomBarView.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-RoomSpacing.standard)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.height.equalTo(40)
         }
     }
     
@@ -128,15 +195,18 @@ public class RoomMainView: UIView, BaseView {
     }
     
     public func setupBindings() {
+        listView.delegate = self
         topBarView.delegate = self
         bottomBarView.delegate = self
-        listView.delegate = self
         
         roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom))
             .receive(on: RunLoop.main)
             .sink { [weak self] roomInfo in
                 guard let self = self else { return }
                 currentRoom = roomInfo
+                if let currentRoom = roomInfo {
+                    barrageStreamView.setOwnerId(currentRoom.roomOwner.userID)
+                }
             }
             .store(in: &cancellableSet)
         
@@ -171,6 +241,10 @@ public class RoomMainView: UIView, BaseView {
                     onDeviceInvitationCancelled(request: request)
                 case .onAllDevicesDisabled(let deviceType, let disable, _):
                     handleOnAllDevicesDisabled(deviceType: deviceType, disable: disable)
+                case .onAudiencePromotedToParticipant(userInfo: let user):
+                    handleOnAudiencePromotedToParticipant(userInfo: user)
+                case .onParticipantDemotedToAudience(userInfo: let user):
+                    handleOnParticipantDemotedToAudience(userInfo: user)
                 default: break
                 }
             }
@@ -192,6 +266,7 @@ public class RoomMainView: UIView, BaseView {
 
 extension RoomMainView {
     private func initializeRoom() {
+        RoomDataReporter.setFramework()
         switch behavior {
         case .create(let options):
             createAndJoinRoom(options: options)
@@ -201,42 +276,45 @@ extension RoomMainView {
     }
     
     private func createAndJoinRoom(options: CreateRoomOptions) {
-        roomStore.createAndJoinRoom(roomID: roomID, options: options) { [weak self] result in
+        roomStore.createAndJoinRoom(roomID: roomID, roomType: roomType, options: options) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success():
                 handleDidEnterRoom()
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 routerContext?.pop(animated: true)
             }
         }
     }
     
     private func joinRoom() {
-        roomStore.joinRoom(roomID: roomID, password: nil) { [weak self] result in
+        roomStore.joinRoom(roomID: roomID, roomType: roomType, password: nil) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success():
                 handleDidEnterRoom()
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 routerContext?.pop(animated: true)
             }
         }
     }
     
     private func handleDidEnterRoom() {
-        if config.autoEnableCamera {
-            openLocalCamera()
-        }
-        
-        if config.autoEnableMicrophone {
-            unmuteMicrophone()
+        if roomType == .standard {
+            if config.autoEnableCamera {
+                openLocalCamera()
+            }
+            
+            if config.autoEnableMicrophone {
+                unmuteMicrophone()
+            }
         }
         
         setAudioRoute(route: config.autoEnableSpeaker ? .speakerphone : .earpiece)
         participantStore.getParticipantList(cursor: "", completion: nil)
+        participantStore.getAudienceList(cursor: "", completion: nil)
     }
     
     private func endRoom() {
@@ -245,7 +323,7 @@ extension RoomMainView {
             switch result {
             case .success(): break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
             }
             routerContext?.pop(animated: true)
         }
@@ -257,7 +335,7 @@ extension RoomMainView {
             switch result {
             case .success(): break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
             }
             routerContext?.pop(animated: true)
         }
@@ -271,7 +349,11 @@ extension RoomMainView {
             switch result {
             case .success(): break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                if err.code == RoomError.openCameraNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
+                } else {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
             }
         }
     }
@@ -285,18 +367,18 @@ extension RoomMainView {
     }
     
     private func unmuteMicrophone() {
-        if deviceStore.state.value.microphoneStatus == .off {
-            deviceStore.openLocalMicrophone { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success():
-                    unmuteMicrophoneInner()
-                case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+        deviceStore.openLocalMicrophone { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success():
+                unmuteMicrophoneInner()
+            case .failure(let err):
+                if err.code == RoomError.openMicrophoneNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
+                } else {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
-        } else {
-            unmuteMicrophoneInner()
         }
     }
     
@@ -306,7 +388,11 @@ extension RoomMainView {
             switch result {
             case .success(): break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                if err.code == RoomError.openMicrophoneNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
+                } else {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
             }
         }
     }
@@ -314,7 +400,30 @@ extension RoomMainView {
     private func setAudioRoute(route: AudioRoute) {
         deviceStore.setAudioRoute(route)
     }
+    
+    private func kickOutRoom(userID: String, name: String) {
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel) { view in
+            view.dismiss()
+        }
+        let confirmButtonConfig = AlertButtonConfig(text: .ok, type: .blue) { [weak self] view in
+            guard let self = self else { return }
+            participantStore.kickUser(userID: userID) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success: break
+                case .failure(let err):
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
+            }
+            view.dismiss()
+        }
+        let config = AlertViewConfig(title: String.kickOutConfirm.localizedReplace(name),
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: confirmButtonConfig)
+        AtomicAlertView(config: config).show()
+    }
 }
+
 // MARK: - RoomStore Event
 extension RoomMainView {
     private func handleOnRoomEnd(roomInfo: RoomInfo) {
@@ -332,19 +441,19 @@ extension RoomMainView {
 extension RoomMainView {
     private func handleOnAdminSet(user: RoomUser) {
         if user.userID == localParticipant?.userID {
-            showToast(.becameAdmin)
+            showAtomicToast(text: .becameAdmin, style: .info)
         }
     }
     
     private func handleOnAdminRevoked(user: RoomUser) {
         if user.userID == localParticipant?.userID {
-            showToast(.adminRevoked)
+            showAtomicToast(text: .adminRevoked, style: .info)
         }
     }
     
     private func handleOnOwnerChanged(newUser: RoomUser, oldUser: RoomUser) {
         if newUser.userID == localParticipant?.userID {
-            showToast(.becameHost)
+            showAtomicToast(text: .becameHost, style: .info)
         }
     }
     
@@ -445,26 +554,41 @@ extension RoomMainView {
     private func handleOnAllDevicesDisabled(deviceType: DeviceType, disable: Bool) {
         switch deviceType {
         case .camera:
-            disable ? showToast(.allVideosDisabled) : showToast(.allVideosEnabled)
+            disable ? showAtomicToast(text: .allVideosDisabled, style: .warning) : showAtomicToast(text: .allVideosEnabled, style: .info)
         case .microphone:
-            disable ? showToast(.allAudiosDisabled) : showToast(.allAudiosEnabled)
+            disable ? showAtomicToast(text: .allAudiosDisabled, style: .warning) : showAtomicToast(text: .allAudiosEnabled, style: .info)
         default:break
+        }
+    }
+    
+    private func handleOnParticipantDemotedToAudience(userInfo: RoomUser) {
+        if userInfo.userID == LoginStore.shared.state.value.loginUserInfo?.userID {
+            deviceStore.closeLocalMicrophone()
+            deviceStore.closeLocalCamera()
+        }
+    }
+    
+    private func handleOnAudiencePromotedToParticipant(userInfo: RoomUser) {
+        if userInfo.userID == LoginStore.shared.state.value.loginUserInfo?.userID {
+            showAtomicToast(text: .switchToParticipantBySelf, style: .info)
+        } else {
+            showAtomicToast(text: .switchToParticipant.localizedReplace(userInfo.name), style: .info)
         }
     }
     
     private func handleOnUserMessageDisabled(disable: Bool) {
         let message = disable ? String.bannedFromChat : String.allowedToChat
-        showToast(message)
+        showAtomicToast(text: message, style: disable ? .warning : .info)
     }
     
     private func handleOnParticipantDeviceClosed(deviceType: DeviceType) {
         switch deviceType {
         case .camera:
             closeLocalCamera()
-            showToast(.cameraClosedByHost)
+            showAtomicToast(text: .cameraClosedByHost, style: .warning)
         case .microphone:
             muteMicrophone()
-            showToast(.mutedByHost)
+            showAtomicToast(text: .mutedByHost, style: .warning)
         default: break
         }
     }
@@ -533,21 +657,31 @@ extension RoomMainView: RoomBottomBarViewDelegate {
     
     public func onMicrophoneButtonTapped() {
         guard let localParticipant = localParticipant else { return }
-        localParticipant.microphoneStatus == .off ? unmuteMicrophone() : muteMicrophone()
+        localParticipant.microphoneStatus == .on ? muteMicrophone() : unmuteMicrophone()
+         
     }
     
     public func onCameraButtonTapped() {
         guard let localParticipant = localParticipant else { return }
-        localParticipant.cameraStatus == .off ? openLocalCamera() : closeLocalCamera()
+        localParticipant.cameraStatus == .on ? closeLocalCamera() : openLocalCamera()
     }
-    
 }
 
 extension RoomMainView: ParticipantListViewDelegate {
-    public func participantTapped(view: ParticipantListView, participant: RoomParticipant) {
-        let managerView = ParticipantManagerView(participant: participant, roomID: roomID)
-        managerView.delegate = self
-        managerView.show(in: self, animated: true)
+    public func participantTapped(view: ParticipantListView, participant: RoomParticipant, isAudience: Bool) {
+        if isAudience {
+            var audience = RoomUser()
+            audience.userID = participant.userID
+            audience.userName = participant.userName
+            audience.avatarURL = participant.avatarURL
+            let managerView = AudienceManagerView(audience: audience, roomID: roomID)
+            managerView.delegate = self
+            managerView.show(in: self, animated: true)
+        } else {
+            let managerView = ParticipantManagerView(participant: participant, roomID: roomID, roomType: roomType)
+            managerView.delegate = self
+            managerView.show(in: self, animated: true)
+        }
     }
     
     public func muteAllAudioButtonTapped(disable: Bool) {
@@ -566,7 +700,7 @@ extension RoomMainView: ParticipantListViewDelegate {
                 switch result {
                 case .success(): break
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
             view.dismiss()
@@ -591,7 +725,7 @@ extension RoomMainView: ParticipantListViewDelegate {
                 switch result {
                 case .success(): break
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
             view.dismiss()
@@ -608,33 +742,15 @@ extension RoomMainView: ParticipantManagerViewDelegate {
             switch result {
             case .success: break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
             }
         }
         view.dismiss(animated: true)
-        showToast(device == .camera ? .invitedToOpenVideo : .invitedToOpenAudio)
+        showAtomicToast(text: device == .camera ? .invitedToOpenVideo : .invitedToOpenAudio, style: .info)
     }
     
     public func handleKickOut(view: ParticipantManagerView, participant: RoomParticipant) {
-        let cancelButtonConfig = AlertButtonConfig(text: .cancel) { view in
-            view.dismiss()
-        }
-        let confirmButtonConfig = AlertButtonConfig(text: .ok, type: .blue) { [weak self] view in
-            guard let self = self else { return }
-            participantStore.kickUser(userID: participant.userID) { [weak self] result in
-                guard let self = self else { return }
-                switch result {
-                case .success: break
-                case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
-                }
-            }
-            view.dismiss()
-        }
-        let config = AlertViewConfig(title: String.kickOutConfirm.localizedReplace(participant.name),
-                                     cancelButton: cancelButtonConfig,
-                                     confirmButton: confirmButtonConfig)
-        AtomicAlertView(config: config).show()
+        kickOutRoom(userID: participant.userID, name: participant.name)
     }
     
     public func handleSetAsAdmin(view: ParticipantManagerView, participant: RoomParticipant) {
@@ -643,9 +759,9 @@ extension RoomMainView: ParticipantManagerViewDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success:
-                    showToast(String.setAsAdminSuccess.localizedReplace(participant.name))
+                    showAtomicToast(text: String.setAsAdminSuccess.localizedReplace(participant.name), style: .success)
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
                 view.dismiss(animated: true)
             }
@@ -654,9 +770,9 @@ extension RoomMainView: ParticipantManagerViewDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success:
-                    showToast(String.revokeAdminSuccess.localizedReplace(participant.name))
+                    showAtomicToast(text: String.revokeAdminSuccess.localizedReplace(participant.name), style: .success)
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
                 view.dismiss(animated: true)
             }
@@ -674,15 +790,21 @@ extension RoomMainView: ParticipantManagerViewDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success:
-                    showToast(String.hostTransferredSuccess.localizedReplace(participant.name))
+                    showAtomicToast(text: String.hostTransferredSuccess.localizedReplace(participant.name), style: .success)
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
             view.dismiss()
         }
         let config = AlertViewConfig(title: String.transferHostTitle.localizedReplace(participant.name), content: .transferHostMessage, cancelButton: cancelButtonConfig, confirmButton: confirmButtonConfig)
         AtomicAlertView(config: config).show()
+    }
+}
+
+extension RoomMainView: AudienceManagerViewDelegate {
+    public func handleKickOut(view: AudienceManagerView, audience: RoomUser) {
+        kickOutRoom(userID: audience.userID, name: audience.name)
     }
 }
 
@@ -718,11 +840,6 @@ fileprivate extension String {
     static let leaveRoomConfirm = "roomkit_confirm_leave_room_by_genera_user".localized
     static let leaveRoom = "roomkit_leave_room".localized
     
-    
-    // Device restrictions for general users
-    static let allMutedCannotUnmute = "roomkit_tip_all_muted_cannot_unmute".localized
-    static let allVideoOffCannotTurnOn = "roomkit_tip_all_video_off_cannot_start".localized
-    
     // Mute all audio
     static let muteAllMembersTitle = "roomkit_msg_all_members_will_be_muted".localized
     static let unmuteAllMembersTitle = "roomkit_msg_all_members_will_be_unmuted".localized
@@ -754,4 +871,12 @@ fileprivate extension String {
     static let transferHostMessage = "roomkit_msg_transfer_owner_tip".localized
     static let confirmTransfer = "roomkit_confirm_transfer".localized
     static let hostTransferredSuccess = "roomkit_toast_owner_transferred"
+    
+    // Transfer participant
+    static let switchToParticipant = "roomkit_switch_to_participant"
+    static let switchToParticipantBySelf = "roomkit_switch_to_participant_byself".localized
+    
+    // Transfer audience
+    static let switchToAudience = "roomkit_switch_to_audience"
+    static let switchToAudienceBySelf = "roomkit_switch_to_audience_byself".localized
 }

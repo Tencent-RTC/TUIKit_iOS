@@ -11,9 +11,10 @@ import SnapKit
 import AtomicXCore
 import Kingfisher
 import Combine
+import AtomicX
 
 // MARK: - Action Item
-struct ParticipantActionItem {
+struct ActionItem {
     let icon: UIImage?
     let title: String
     let textColor: UIColor
@@ -39,14 +40,14 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - BasePanel Properties
     weak public var parentView: UIView?
-    public var backgroundMaskView: PanelMaskView?
+    weak public var backgroundMaskView: PanelMaskView?
     
     // MARK: - PanelHeightProvider
     public var panelHeight: CGFloat {
         let headerHeight: CGFloat = 100
         let itemHeight: CGFloat = 56
         let totalItemsHeight = CGFloat(actionItems.count) * itemHeight
-        let bottomSafeArea = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+        let bottomSafeArea = WindowUtils.bottomSafeHeight
         return headerHeight + totalItemsHeight + bottomSafeArea + 20
     }
     
@@ -55,7 +56,8 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     // MARK: - Properties
     private var participant: RoomParticipant
     private let roomID: String
-    private var actionItems: [ParticipantActionItem] = []
+    private let roomType: RoomType
+    private var actionItems: [ActionItem] = []
     private var cancellableSet = Set<AnyCancellable>()
     private lazy var participantStore: RoomParticipantStore = {
         RoomParticipantStore.create(roomID: roomID)
@@ -101,14 +103,15 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
         tableView.dataSource = self
         tableView.showsVerticalScrollIndicator = false
         tableView.isScrollEnabled = false
-        tableView.register(ParticipantManagerCell.self, forCellReuseIdentifier: ParticipantManagerCell.reuseIdentifier)
+        tableView.register(ActionCell.self, forCellReuseIdentifier: ActionCell.cellReuseIdentifier)
         return tableView
     }()
     
     // MARK: - Initialization
-    public init(participant: RoomParticipant, roomID: String) {
+    public init(participant: RoomParticipant, roomID: String, roomType: RoomType) {
         self.participant = participant
         self.roomID = roomID
+        self.roomType = roomType
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -186,14 +189,18 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     
     private func setupActionItems() {
         actionItems.removeAll()
-        setupRemoteActionItems()
+        if roomType == .standard {
+            setupStandardRemoteActionItems()
+        } else {
+            setupWebinarRemoteActionItems()
+        }
         tableView.reloadData()
     }
     
-    private func setupRemoteActionItems() {
+    private func setupStandardRemoteActionItems() {
         if participantStore.state.value.localParticipant?.role == .admin {
             actionItems.append(contentsOf: [
-                ParticipantActionItem(
+                ActionItem(
                     icon: participant.microphoneStatus == .off ?   ResourceLoader.loadImage("room_mic_off_red") :
                         ResourceLoader.loadImage("room_mic_on_big"),
                     title: participant.microphoneStatus == .off ?
@@ -203,7 +210,7 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         guard let self = self else { return }
                         handleAudioDevice(disable: participant.microphoneStatus == .on)
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: participant.cameraStatus == .off ?   ResourceLoader.loadImage("camera_close") :
                         ResourceLoader.loadImage("camera_open"),
                     title: participant.cameraStatus == .off ?
@@ -213,7 +220,7 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         guard let self = self else { return }
                         handleVideoDevice(disable: participant.cameraStatus == .on)
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: ResourceLoader.loadImage("room_kickout"),
                     title: .remove,
                     textColor: RoomColors.endTitleColor) { [weak self] in
@@ -223,7 +230,7 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
             ])
         } else if participantStore.state.value.localParticipant?.role == .owner {
             actionItems.append(contentsOf: [
-                ParticipantActionItem(
+                ActionItem(
                     icon: participant.microphoneStatus == .off ?   ResourceLoader.loadImage("room_mic_off_red") :
                         ResourceLoader.loadImage("room_mic_on_big"),
                     title: participant.microphoneStatus == .off ?
@@ -233,7 +240,7 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         guard let self = self else { return }
                         handleAudioDevice(disable: participant.microphoneStatus == .on)
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: participant.cameraStatus == .off ?   ResourceLoader.loadImage("camera_close") :
                         ResourceLoader.loadImage("camera_open"),
                     title: participant.cameraStatus == .off ?
@@ -243,14 +250,14 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         guard let self = self else { return }
                         handleVideoDevice(disable: participant.cameraStatus == .on)
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: ResourceLoader.loadImage("room_transfer_owner"),
                     title: .makeHost,
                     textColor: RoomColors.g7) { [weak self] in
                         guard let self = self else { return }
                         handleTransferHost()
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: participant.role == .admin ? ResourceLoader.loadImage("room_undo_administrator") :
                         ResourceLoader.loadImage("room_set_admin"),
                     title: participant.role == .admin ?
@@ -260,7 +267,7 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         guard let self = self else { return }
                         handleSetAsAdmin()
                     },
-                ParticipantActionItem(
+                ActionItem(
                     icon: ResourceLoader.loadImage("room_kickout"),
                     title: .remove,
                     textColor: RoomColors.endTitleColor) { [weak self] in
@@ -269,7 +276,37 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                     }
             ])
         }
-        
+    }
+    
+    private func setupWebinarRemoteActionItems() {
+        if participantStore.state.value.localParticipant?.role == .admin {
+            actionItems.append(contentsOf: [
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_members"),
+                    title: .setAudience,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        setAudience()
+                    },
+                ActionItem(
+                    icon: participant.microphoneStatus == .off ?   ResourceLoader.loadImage("room_mic_off_red") :
+                        ResourceLoader.loadImage("room_mic_on_big"),
+                    title: participant.microphoneStatus == .off ?
+                        .askToUnmute :
+                        .mute,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        handleAudioDevice(disable: participant.microphoneStatus == .on)
+                    },
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_kickout"),
+                    title: .remove,
+                    textColor: RoomColors.endTitleColor) { [weak self] in
+                        guard let self = self else { return }
+                        handleKickOut()
+                    }
+            ])
+        }
     }
 }
 
@@ -286,12 +323,24 @@ extension ParticipantManagerView {
                 switch result {
                 case .success: break
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
                 dismiss(animated: true)
             }
         } else {
             delegate?.handleInviteToOpenDevice(view: self, device: .microphone, participant: participant)
+        }
+    }
+    
+    private func setAudience() {
+        participantStore.demoteParticipantToAudience(userID: participant.userID) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success: break
+            case .failure(let err):
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+            }
+            dismiss(animated: true)
         }
     }
     
@@ -302,7 +351,7 @@ extension ParticipantManagerView {
                 switch result {
                 case .success: break
                 case .failure(let err):
-                    showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
                 dismiss(animated: true)
             }
@@ -333,7 +382,7 @@ extension ParticipantManagerView {
             switch result {
             case .success: break
             case .failure(let err):
-                showToast(InternalError(code: err.code, message: err.message).localizedMessage)
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
             }
             dismiss(animated: true)
         }
@@ -351,7 +400,7 @@ extension ParticipantManagerView: UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantManagerCell.reuseIdentifier, for: indexPath) as? ParticipantManagerCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: ActionCell.cellReuseIdentifier, for: indexPath) as? ActionCell else {
             return UITableViewCell()
         }
         
@@ -391,10 +440,7 @@ extension ParticipantManagerView: RoomChangeNicknameViewDelegate {
     }
 }
 
-private class ParticipantManagerCell: UITableViewCell {
-    // MARK: - Properties
-    static let reuseIdentifier = "ParticipantManagerCell"
-    
+class ActionCell: UITableViewCell {
     // MARK: - UI Components
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
@@ -460,7 +506,7 @@ private class ParticipantManagerCell: UITableViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(with item: ParticipantActionItem) {
+    func configure(with item: ActionItem) {
         iconImageView.image = item.icon
         titleLabel.text = item.title
         titleLabel.textColor = item.textColor
@@ -479,4 +525,5 @@ fileprivate extension String {
     static let undoAdministrator = "roomkit_revoke_admin".localized
     static let setAsAdministrator = "roomkit_set_admin".localized
     static let remove = "roomkit_remove_member".localized
+    static let setAudience = "roomkit_set_audience".localized
 }

@@ -523,6 +523,35 @@
         }
       }
     },
+    "roomkit_member": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "成员"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メンバー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأعضاء"
+          }
+        }
+      }
+    },
     "roomkit_expand": {
       "extractionState": "manual",
       "localizations": {
@@ -2698,6 +2727,267 @@
         }
       }
     },
+    "roomkit_participant": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participant(xxx)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "嘉宾(xxx)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参加者(xxx)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشارك(xxx)"
+          }
+        }
+      }
+    },
+    "roomkit_audience": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audience(xxx)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "观众(xxx)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "観衆(xxx)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جمهور(xxx)"
+          }
+        }
+      }
+    },
+    "roomkit_entered_room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entered room"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "进入房间"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入室しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم دخول الغرفة"
+          }
+        }
+      }
+    },
+    "roomkit_switch_to_participant": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx has been set as a participant"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx已被设为嘉宾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxはゲストに設定されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعيين xxx كضيف"
+          }
+        }
+      }
+    },
+    "roomkit_switch_to_audience": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx has been set as an audience"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx已被设为观众"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxは視聴者に設定されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعيين xxx كمشاهد"
+          }
+        }
+      }
+    },
+    "roomkit_switch_to_participant_byself": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been set as a participant"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被设为嘉宾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたはゲストに設定されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعيينك كضيف"
+          }
+        }
+      }
+    },
+    "roomkit_switch_to_audience_byself": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been set as an audience"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被设为观众"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "あなたは視聴者に設定されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعيينك كمشاهد"
+          }
+        }
+      }
+    },
+    "roomkit_set_participant": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set as participant"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设为嘉宾"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゲストに設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كضيف"
+          }
+        }
+      }
+    },
+    "roomkit_set_audience": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set as audience"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设为观众"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "視聴者に設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كمشاهد"
+          }
+        }
+      }
+    },
     "roomkit_err_0_success": {
       "extractionState": "manual",
       "localizations": {
@@ -4647,25 +4937,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The admin quantity exceeds the upper limit"
+            "value": "The administrator list is full"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "管理员数量超过上限"
+            "value": "管理员数量已达上限"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "管理者数が上限を超えています"
+            "value": "管理者の人数が上限に達しました"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "عدد المسؤولين يتجاوز الحد الأعلى"
+            "value": "قائمة المسؤولين ممتلئة"
           }
         }
       }
@@ -4850,25 +5140,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The seats are all taken."
+            "value": "The participant list is full."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "麦位已满"
+            "value": "嘉宾数量已达上限"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "すべての席が埋まっています。"
+            "value": "ゲストの人数が上限に達しました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "جميع المقاعد مشغولة."
+            "value": "قائمة الضيوف ممتلئة."
           }
         }
       }
@@ -4879,25 +5169,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Not on the seat"
+            "value": "Please become a participant first"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "未在麦上"
+            "value": "请先成为嘉宾"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "席についていません"
+            "value": "まずゲストになってください"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "ليس على المقعد"
+            "value": "يرجى أن تصبح ضيفًا أولاً"
           }
         }
       }
@@ -5159,6 +5449,64 @@
           "stringUnit": {
             "state": "translated",
             "value": "معرف مستخدم غير صالح"
+          }
+        }
+      }
+    },
+    "roomkit_barrage_text_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Chat!"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说点什么…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "何か言ってみましょう…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قل شيئاً…"
+          }
+        }
+      }
+    },
+    "roomkit_barrage_btn_send": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送信"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إرسال"
           }
         }
       }

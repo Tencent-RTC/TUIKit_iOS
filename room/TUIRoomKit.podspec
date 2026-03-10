@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name                  = 'TUIRoomKit'
-  spec.version               = '2.0.0'
+  spec.version               = '4.0.0'
   spec.platform              = :ios
   spec.ios.deployment_target = '14.0'
   spec.license               = { :type => 'MIT', :file => 'LICENSE' }
@@ -26,11 +26,9 @@ Pod::Spec.new do |spec|
   spec.dependency 'Kingfisher'
   spec.dependency 'AtomicX'
   spec.dependency 'AtomicXCore'
-  
   spec.source_files = 'Source/**/*.{swift,h,m}'
   spec.resource_bundles = {
     'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings']
   }
-  
   
 end

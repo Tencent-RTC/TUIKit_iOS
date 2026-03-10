@@ -62,7 +62,7 @@ public class RoomJoinView: UIView, BaseView {
         textField.placeholder = .enterRoomID
         textField.font = RoomFonts.pingFangSCFont(size: 16, weight: .medium)
         textField.textColor = RoomColors.g2
-        textField.keyboardType = .numberPad
+        textField.keyboardType = .default
        
         if let placeholder = textField.placeholder {
             textField.attributedPlaceholder = NSAttributedString(
@@ -395,7 +395,7 @@ extension RoomJoinView {
     @objc private func handleJoinRoomButtonTapped() {
         guard let roomID = roomIDTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               !roomID.isEmpty else {
-            showToast(.inputNotEmpty)
+            showAtomicToast(text: .inputNotEmpty, style: .warning)
             return
         }
         
@@ -412,6 +412,15 @@ extension RoomJoinView {
 extension RoomJoinView: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        return true
+    }
+    
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == roomIDTextField {
+            let allowedCharacters = CharacterSet(charactersIn: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
+            let characterSet = CharacterSet(charactersIn: string)
+            return allowedCharacters.isSuperset(of: characterSet)
+        }
         return true
     }
 }

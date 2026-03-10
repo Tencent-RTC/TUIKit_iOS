@@ -5,56 +5,8 @@
 //  Created by adamsfliu on 2025/12/8.
 //
 
-import Foundation
-#if canImport(TXLiteAVSDK_TRTC)
-    import TXLiteAVSDK_TRTC
-#elseif canImport(TXLiteAVSDK_Professional)
-    import TXLiteAVSDK_Professional
-#endif
+import AtomicX
 
-public class RoomKitLog {
-    private static let API = "TuikitLog"
-    private static let LOG_KEY_API = "api"
-    private static let LOG_KEY_PARAMS = "params"
-    private static let LOG_KEY_PARAMS_LEVEL = "level"
-    private static let LOG_KEY_PARAMS_MESSAGE = "message"
-    private static let LOG_KEY_PARAMS_FILE = "file"
-    private static let LOG_KEY_PARAMS_LINE = "line"
-    private static let LOG_KEY_PARAMS_MODULE = "module"
-    private static let LOG_KEY_PARAMS_MODULE_VALUE = "RoomKit"
-
-    private func `init`() {}
-    enum RoomKitLogLevel: Int {
-        case error = 2
-        case warn = 1
-        case info = 0
-    }
-
-    public static func error(file: String = #file, line: Int = #line, _ messages: String...) {
-        log(level: .error, file: file, line: String(line), messages)
-    }
-
-    public static func warn(file: String = #file, line: Int = #line, _ messages: String...) {
-        log(level: .warn, file: file, line: String(line), messages)
-    }
-
-    public static func info(file: String = #file, line: Int = #line, _ messages: String...) {
-        log(level: .info, file: file, line: String(line), messages)
-    }
-
-    private static func log(level: RoomKitLogLevel = .info, file: String, line: String, _ messages: [String]) {
-        let apiParams: [String: Any] = [
-            LOG_KEY_API: API,
-            LOG_KEY_PARAMS: [
-                LOG_KEY_PARAMS_LEVEL: level.rawValue,
-                LOG_KEY_PARAMS_MESSAGE: messages.joined(),
-                LOG_KEY_PARAMS_MODULE: LOG_KEY_PARAMS_MODULE_VALUE,
-                LOG_KEY_PARAMS_FILE: file,
-                LOG_KEY_PARAMS_LINE: Int(line) ?? 0,
-            ],
-        ]
-        let jsonData = try? JSONSerialization.data(withJSONObject: apiParams, options: .prettyPrinted)
-        guard let jsonData = jsonData, let jsonString = String(data: jsonData, encoding: .utf8) else { return }
-        TRTCCloud.sharedInstance().callExperimentalAPI(jsonString)
-    }
+public class RoomKitLog: Loggable {
+    public static var moduleName: String { "TUIRoomKit" }
 }
