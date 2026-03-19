@@ -7,12 +7,12 @@
 
 import UIKit
 import Combine
-import RTCCommon
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
 import TXLiteAVSDK_Professional
 #endif
+import AtomicXCore
 
 public class KtvView: UIView {
     private var initialCenter = CGPoint.zero
@@ -29,6 +29,10 @@ public class KtvView: UIView {
         view.onSongListButtonTapped = { [weak self] in
             guard let self = self else {return }
             self.onSongListButtonTapped()
+        }
+        view.onJoinChorusButtonTapped = { [weak self] joinChorus in
+            guard let self = self else { return }
+            self.onJoinChorusButtonTapped(joinChorus: joinChorus)
         }
         return view
     }()
@@ -118,6 +122,11 @@ public class KtvView: UIView {
             generateStandardPitchModelsFromOnline(state.currentPitchList)
             LyricsView.loadOnlineLyrics(lyricList: state.currentLyricList)
         }
+
+        let playbackState = karaokeManager.karaokeState.playbackState
+        if (playbackState == .start || playbackState == .resume) && !karaokeManager.karaokeState.currentPitchList.isEmpty {
+            pitchView.show()
+        }
     }
 
     private func updateLyricsAndPitch(progress: Int) {
@@ -151,7 +160,9 @@ public class KtvView: UIView {
                 LyricsView.isHidden = false
                 tipsLabel.isHidden = true
                 scoreBoardView.isHidden = true
-                pitchView.show()
+                if !karaokeManager.karaokeState.currentPitchList.isEmpty {
+                    pitchView.show()
+                }
         }
     }
 
@@ -198,8 +209,13 @@ public class KtvView: UIView {
     private func showScoreBoard() {
         guard let songs = karaokeManager.karaokeState.selectedSongs.first else { return }
         let imageURL = songs.requester.avatarUrl
-        let username = songs.requester.userName == "" ? songs.requester.userId : songs.requester.userName
-        if karaokeManager.karaokeState.enableScore && isKTV{
+        let username: String
+        if karaokeManager.karaokeState.chorusRole == .backSinger {
+            username = karaokeManager.userName
+        } else {
+            username = songs.requester.userName == "" ? songs.requester.userId : songs.requester.userName
+        }
+        if karaokeManager.karaokeState.enableScore && isKTV {
             scoreBoardView.isHidden = false
             scoreBoardView.showScoreBoard(imageURl: imageURL,username: username, score: karaokeManager.karaokeState.averageScore)
         } else {
@@ -365,12 +381,17 @@ extension KtvView {
             popupViewController?.present(songListView, animated: true)
         }
     }
+    
+    private func onJoinChorusButtonTapped(joinChorus: Bool) {
+        let role = joinChorus ? TXChorusRole.backSinger : .audience
+        karaokeManager.setChorusRole(chorusRole: role)
+    }
 }
 
 // MARK: subscribe
 extension KtvView {
     private func setupStateSubscriptions() {
-        karaokeManager.subscribe(StateSelector(keyPath: \.playbackState))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.playbackState))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
@@ -379,7 +400,8 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.currentPitchList))
+        karaokeManager
+            .subscribe(StatePublisherSelector(keyPath: \.currentLyricList))
             .removeDuplicates { $0.count == $1.count }
             .dropFirst()
             .receive(on: DispatchQueue.main)
@@ -394,7 +416,7 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.playProgress))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.playProgress))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .dropFirst()
@@ -405,7 +427,7 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.pitch))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.pitch))
             .receive(on: DispatchQueue.main)
             .dropFirst()
             .removeDuplicates()
@@ -416,7 +438,7 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.selectedSongs))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.selectedSongs))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedSongs in
@@ -450,7 +472,7 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.enableRequestMusic))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.enableRequestMusic))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] enableRequestMusic in
@@ -463,7 +485,7 @@ extension KtvView {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.averageScore))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.averageScore))
             .removeDuplicates()
             .dropFirst()
             .removeDuplicates()
@@ -478,7 +500,7 @@ extension KtvView {
 }
 
 fileprivate extension String {
-    static let waitingTipsText = ("karaoke_audience_waiting_tips").localized
-    static let pauseText = ("karaoke_song_pause").localized
+    static let waitingTipsText = ("karaoke_audience_waiting_tips").atomicLocalized
+    static let pauseText = ("karaoke_song_pause").atomicLocalized
 }
 

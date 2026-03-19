@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import RTCCommon
 import AtomicXCore
 import AtomicX
 
@@ -81,8 +80,6 @@ class AudienceSettingPanel: UIView {
         return view
     }()
     
-    private weak var popupViewController: PopupViewController?
-    
     private var isViewReady: Bool = false
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -135,7 +132,7 @@ private extension AudienceSettingPanel {
         }
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().inset(20)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(20)
             make.height.equalTo(80)
             make.leading.trailing.equalToSuperview().inset(16)
         }
@@ -146,30 +143,36 @@ private extension AudienceSettingPanel {
 extension AudienceSettingPanel {
     
     private func selectResolution() {
-        routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
-            guard let self = self else { return }
-            self.routerManager.router(
-                action: .present(.videoQualitySelection(
-                    resolutions: manager.audienceMediaState.playbackQualityList,
-                    selectedClosure: { [weak self] (quality) in
-                        guard let self = self else { return }
-                        self.manager.audienceMediaManager.switchPlaybackQuality(quality: quality)
-                        self.routerManager.router(action: .dismiss())
-                    })))
+        let manager = self.manager
+        let routerManager = self.routerManager
+        routerManager.router(action: .dismiss(.panel, completion: {
+            let qualityPanel = VideoQualitySelectionPanel(
+                resolutions: manager.audienceMediaState.playbackQualityList,
+                selectedClosure: { (quality: VideoQuality) in
+                    manager.audienceMediaManager.switchPlaybackQuality(quality: quality)
+                    routerManager.router(action: .dismiss())
+                })
+            qualityPanel.cancelClosure = {
+                routerManager.router(action: .dismiss())
+            }
+            let routeItem = RouteItem(view: qualityPanel, config: .bottomDefault())
+            routerManager.router(action: .present(routeItem))
         }))
     }
     
     private func selectDashBoard() {
         routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.streamDashboard))
+            let dashboardPanel = StreamDashboardPanel(liveID: manager.liveID)
+            self.routerManager.present(view: dashboardPanel)
         }))
     }
     
     private func selectPip() {
         routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
             guard let self = self else { return }
-            routerManager.router(action: .present(.pip))
+            let pipPanel = PictureInPictureTogglePanel(liveID: manager.liveID)
+            routerManager.present(view: pipPanel)
         }))
     }
 }

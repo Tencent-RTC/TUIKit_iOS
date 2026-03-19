@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 
 protocol LogUploadViewDataSource: AnyObject {
     func numberOfComponents(in logUploadView: LogUploadView) -> Int
@@ -100,7 +100,7 @@ extension LogUploadView {
     }
     
     func activateConstraints() {
-        let containerHeight = ScreenHeight/2
+        let containerHeight = UIScreen.main.bounds.height/2
         containerView.snp.makeConstraints { make in
             make.height.equalTo(containerHeight)
             make.bottom.left.right.equalToSuperview()

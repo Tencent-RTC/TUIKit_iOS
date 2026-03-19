@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import AtomicXCore
 

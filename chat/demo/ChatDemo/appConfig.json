@@ -20,7 +20,8 @@
       "delete",
       "mute",
       "pin",
-      "markUnread"
+      "markUnread",
+      "clearHistory"
     ]
   },
   "messageInput": {

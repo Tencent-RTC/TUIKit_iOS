@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import RTCCommon
+import Combine
 import AtomicX
 
 enum LiveKitClickEvent {
@@ -46,7 +46,7 @@ class FeatureCollectionView: UIView {
     private var config: FeatureCollectionViewDesignConfig
     private var currentSelectedCellIndex: IndexPath?
     
-    let clickEventCallBack: Observable<Any> = Observable(LiveKitClickEvent.default)
+    let clickEventCallBack = PassthroughSubject<Any, Never>()
     init(headerTitle: String = "",
          model: FeatureCollectionViewModel,
          designConfig config: FeatureCollectionViewDesignConfig = FeatureCollectionViewDesignConfig()) {
@@ -111,7 +111,7 @@ class FeatureCollectionView: UIView {
 extension FeatureCollectionView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let actionType =  model.items[indexPath.row].actionType else{ return}
-        clickEventCallBack.value = actionType
+        clickEventCallBack.send(actionType)
         handleCellSelectedState(indexPath)
     }
     

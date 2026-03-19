@@ -5,7 +5,7 @@
 //  Created by vincepzhang on 2025/2/6.
 //
 
-import RTCCommon
+import AtomicX
 
 class ViewState: NSObject {
     let router: Observable<ViewRouter> = Observable(.none)

@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import UIKit
 
 class AudienceBattleMemberInfoView: RTCBaseView {
@@ -102,6 +102,7 @@ class AudienceBattleMemberInfoView: RTCBaseView {
     
     override func bindInteraction() {
         subscribeBattleState()
+        subscribeFloatWindowState()
     }
     
     override var isHidden: Bool {

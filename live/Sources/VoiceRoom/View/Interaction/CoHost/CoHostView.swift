@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 import Combine
 import RTCRoomEngine
 import AtomicXCore
-import AtomicX
 
 class CoHostView: UIView {
     var didTap: (() -> Void)?
@@ -45,7 +44,7 @@ class CoHostView: UIView {
 
     private lazy var userInfoView = UserStatusView(userInfo: seatInfo.userInfo)
 
-    private lazy var soundWaveView = CoHostSoundWaveView()
+    private lazy var soundWaveView = SGSeatSoundWaveView()
 
     var seatStore: LiveSeatStore {
         return LiveSeatStore.create(liveID: LiveListStore.shared.state.value.currentLive.liveID)

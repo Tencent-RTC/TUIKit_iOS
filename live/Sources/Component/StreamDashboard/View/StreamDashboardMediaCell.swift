@@ -7,9 +7,9 @@
 
 import Foundation
 import Combine
-import RTCCommon
 import AtomicXCore
 import AtomicX
+import TUICore
 
 class StreamDashboardMediaCell: UICollectionViewCell {
     static let CellID: String = "StreamDashboardMediaCell"
@@ -341,7 +341,8 @@ class StreamDashboardMediaItemCell: UITableViewCell {
     private func activateConstraints() {
         titleLabel.snp.makeConstraints { make in
             make.centerY.leading.equalToSuperview()
-            make.width.equalTo(LocalizedLanguage.isChinese ? 40.scale375() : 63.scale375())
+
+            make.width.equalTo(TUIGlobalization.getPreferredLanguage() == "en" ? 63.scale375() : 40.scale375())
             make.height.equalTo(20.scale375Height())
         }
         valueLabel.snp.makeConstraints { make in

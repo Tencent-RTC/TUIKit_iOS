@@ -9,7 +9,7 @@ import Foundation
 import SnapKit
 import TUICore
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 import TUICallKit_Swift
 import AtomicXCore
 import Combine
@@ -55,7 +55,6 @@ class LoginViewController: UIViewController {
             switch result {
             case .success():
                 UserDefaults.standard.set(userId, forKey: self.userIdKey)
-                observerRunDemo()
                 LoginStore.shared.state.subscribe(StatePublisherSelector(keyPath: \LoginState.loginUserInfo))
                     .receive(on: RunLoop.main)
                     .dropFirst()
@@ -75,30 +74,13 @@ class LoginViewController: UIViewController {
                     }
                     .store(in: &cancelableSet)
             case .failure(let err):
-                    self.view.showAtomicToast(text: "Login failed, code: \(err.code), error: \(err.message)", style: .error)
+                    self.view.showAtomicToast(text: "Login failed, code: \(err.code), error: \(err.message)")
             }
         }
     }
     
-    private func observerRunDemo() {
-        let dictParam: [String: Any] = [
-            "UIComponentType": 1302
-        ]
-        guard let dataParam = try? JSONSerialization.data(withJSONObject: dictParam, options: []),
-              let strParam = String(data: dataParam, encoding: .utf8)
-        else {
-            return
-        }
-        V2TIMManager.sharedInstance().callExperimentalAPI(
-            api: "reportTUIFeatureUsage",
-            param: strParam as NSObject,
-            succ: { _ in },
-            fail: { _, _ in }
-        )
-    }
-    
     private func loginTUICore(userID: String) {
-        // FIXME: 临时方案 修复RoomKit 1.0版本 在应用内会议相关功能不可用问题， 后续升级到RoomKit 2.0版本 这部分逻辑将删除。
+        // FIXME: 临时方案，这部分逻辑暂时还不可以删除，Callkit 依赖 TUICore 的 InitSdkSuccess 通知启动服务
         TUILogin.login(Int32(SDKAPPID), userID: userID, userSig: GenerateTestUserSig.genTestUserSig(identifier: userID)) { [weak self] in
             guard let self = self else { return }
             loginSuccess()

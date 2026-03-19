@@ -6,39 +6,29 @@
 //
 
 import Combine
-import RTCCommon
-import RTCRoomEngine
-import RTCCommon
 import AtomicX
+import AtomicXCore
+import RTCRoomEngine
 
 class VRRouterControlCenter {
     
-    private var rootRoute: VRRoute
     private var routerManager: VRRouterManager
     private let liveID: String
     private var toastService: VRToastService
     
     private weak var rootViewController: UIViewController?
     private var cancellableSet = Set<AnyCancellable>()
-    private var presentedRouteStack: [VRRoute] = []
-    private var presentedViewControllerMap: [VRRoute: UIViewController] = [:]
+    private var presentedRouteStack: [RouteItem] = []
+    private var presentedViewControllerMap: [RouteItem: UIViewController] = [:]
     
     init(liveID: String,
          rootViewController: UIViewController,
-         rootRoute: VRRoute,
          routerManager: VRRouterManager,
          toastService: VRToastService) {
         self.liveID = liveID
         self.rootViewController = rootViewController
-        self.rootRoute = rootRoute
         self.routerManager = routerManager
         self.toastService = toastService
-        routerManager.setRootRoute(route: rootRoute)
-    }
-    
-    func updateRootRoute(rootRoute: VRRoute) {
-        self.rootRoute = rootRoute
-        routerManager.setRootRoute(route: rootRoute)
     }
     
     deinit {
@@ -49,12 +39,23 @@ class VRRouterControlCenter {
 // MARK: - Subscription
 extension VRRouterControlCenter {
     func subscribeRouter() {
-        routerManager.subscribeRouterState(StateSelector(keyPath: \VRRouterState.routeStack))
+        routerManager.subscribeRouterState(StatePublisherSelector(keyPath: \VRRouterState.routeStack))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] routeStack in
                 guard let self = self else { return }
                 self.comparePresentedVCWith(routeStack: routeStack)
+            }
+            .store(in: &cancellableSet)
+
+        routerManager.subscribeRouterState(StatePublisherSelector(keyPath: \VRRouterState.shouldExit))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] shouldExit in
+                guard let self = self else { return }
+                if shouldExit {
+                    self.handleExitAction()
+                }
             }
             .store(in: &cancellableSet)
     }
@@ -69,13 +70,25 @@ extension VRRouterControlCenter {
 
 // MARK: - Route Handler
 extension VRRouterControlCenter {
-    private func comparePresentedVCWith(routeStack: [VRRoute]) {
-        if routeStack.isEmpty {
-            handleExitAction()
+    private func comparePresentedVCWith(routeStack: [RouteItem]) {
+        if routerManager.routerState.shouldExit {
+            if !presentedRouteStack.isEmpty {
+                handleDismissAllPanels()
+                DispatchQueue.main.async { [weak self] in
+                    self?.handleExitAction()
+                }
+            } else {
+                handleExitAction()
+            }
             return
         }
         
-        if routeStack.count > presentedRouteStack.count + 1 {
+        if routeStack.isEmpty && !presentedRouteStack.isEmpty {
+            handleDismissAllPanels()
+            return
+        }
+        
+        if routeStack.count > presentedRouteStack.count {
             if let lastRoute = routeStack.last {
                 handleRouteAction(route: lastRoute)
             }
@@ -83,6 +96,20 @@ extension VRRouterControlCenter {
         }
         
         handleDismisAndRouteToAction(routeStack: routeStack)
+    }
+    
+    private func handleDismissAllPanels() {
+        if routerManager.routerState.dismissEvent != nil {
+            handleDismisAndRouteToAction(routeStack: [])
+            return
+        }
+
+        while !presentedRouteStack.isEmpty {
+            if let route = presentedRouteStack.popLast(), let vc = presentedViewControllerMap[route] {
+                vc.dismiss(animated: false)
+                presentedViewControllerMap.removeValue(forKey: route)
+            }
+        }
     }
     
     private func handleExitAction() {
@@ -99,26 +126,17 @@ extension VRRouterControlCenter {
         }
     }
     
-    private func handleRouteAction(route: VRRoute) {
-        if route == rootRoute {
-            rootViewController?.presentedViewController?.dismiss(animated: true)
-        }
-        
+    private func handleRouteAction(route: RouteItem) {
         if tryToPresentCachedViewController(route: route) {
             return
         }
         
         if let view = getRouteDefaultView(route: route) {
             var presentedViewController: UIViewController = UIViewController()
-            switch route {
-            case .custom(let item):
-                if let alertView = item.view as? AtomicAlertView {
-                    presentedViewController = presentAtomicAlert(alert: alertView, config: item.config)
-                } else {
-                    presentedViewController = presentPopover(view: item.view, config: item.config)
-                }
-            default:
-                presentedViewController = presentPopover(view: view, config: .bottomDefault())
+            if let alertView = view as? AtomicAlertView {
+                presentedViewController = presentAtomicAlert(alert: alertView, config: route.config)
+            } else {
+                presentedViewController = presentPopover(view: view, config: route.config)
             }
             presentedRouteStack.append(route)
             presentedViewControllerMap[route] = presentedViewController
@@ -127,7 +145,7 @@ extension VRRouterControlCenter {
         }
     }
     
-    private func tryToPresentCachedViewController(route: VRRoute) -> Bool {
+    private func tryToPresentCachedViewController(route: RouteItem) -> Bool {
         var isSuccess = false
         if presentedViewControllerMap.keys.contains(route) {
             if let rootViewController = rootViewController,
@@ -141,7 +159,7 @@ extension VRRouterControlCenter {
         return isSuccess
     }
     
-    private func handleDismisAndRouteToAction(routeStack: [VRRoute]) {
+    private func handleDismisAndRouteToAction(routeStack: [RouteItem]) {
         while routeStack.last != presentedRouteStack.last {
             if presentedRouteStack.isEmpty {
                 break
@@ -149,16 +167,16 @@ extension VRRouterControlCenter {
             
             if let route = presentedRouteStack.popLast(), let vc = presentedViewControllerMap[route] {
                 if let dismissEvent = routerManager.routerState.dismissEvent {
-                    vc.dismiss(animated: false) { [weak self] in
+                    vc.dismiss(animated: true) { [weak self] in
                         guard let self = self else { return }
                         dismissEvent()
                         self.routerManager.clearDismissEvent()
                     }
+                    presentedViewControllerMap.removeValue(forKey: route)
+                    return
                 } else {
                     vc.dismiss(animated: false)
-                }
-                if isTempPanel(route: route) {
-                    presentedViewControllerMap[route] = nil
+                    presentedViewControllerMap.removeValue(forKey: route)
                 }
             }
         }
@@ -179,71 +197,8 @@ extension VRRouterControlCenter {
 
 // MARK: - Default Route View
 extension VRRouterControlCenter {
-    private func getRouteDefaultView(route: VRRoute) -> UIView? {
-        if case .custom(let item) = route {
-            return item.view
-        }
-        var view: UIView?
-        switch route {
-        case .voiceLinkControl:
-            view = VRSeatManagerPanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
-        case .linkInviteControl(let index):
-            view = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: index)
-        case .userControl(let imStore, let seatInfo):
-            view = VRUserManagerPanel(liveID: liveID, imStore: imStore, toastService: toastService, routerManager: routerManager, seatInfo: seatInfo)
-        case .featureSetting(let settingPanelModel):
-            view = VRSettingPanel(settingPanelModel: settingPanelModel)
-        case .audioEffect:
-            let audioEffect = AudioEffectView()
-            audioEffect.backButtonClickClosure = { [weak self] _ in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            view = audioEffect
-        case .systemImageSelection(let imageType, let sceneType):
-            let imageConfig = VRSystemImageFactory.getImageAssets(imageType: imageType)
-            let systemImageSelectionPanel = VRImageSelectionPanel(configs: imageConfig,
-                                                                  panelMode: imageType == .cover ? .cover : .background,
-                                                                  sceneType: sceneType)
-            systemImageSelectionPanel.backButtonClickClosure = { [weak self] in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            view = systemImageSelectionPanel
-        case .prepareSetting(let prepareStore):
-            view = VRPrepareSettingPanel(prepareStore: prepareStore, routerManager: routerManager)
-        case .alert(let info,let second):
-                view = VRAlertPanel(alertInfo: info,autoDismissAfter: second)
-        case .giftView:
-            view = GiftListPanel(roomId: liveID)
-        case .layout(let prepareStore):
-            view = VRLayoutPanel(prepareStore: prepareStore, routerManager: routerManager)
-        case .connectionControl:
-                let panel = interactionInvitePanel(liveID: liveID,toastService: toastService,routerManager: routerManager)
-            panel.onClickBack = { [weak self] in
-                guard let self = self else { return }
-                routerManager.router(action: .dismiss())
-            }
-            view = panel
-        case .coHostUserControl(let seatInfo,let type):
-            let panel = CoHostViewManagerPanel(liveID: liveID,seatInfo: seatInfo, routerManager: routerManager, type: type, toastService: toastService)
-            view = panel
-        default:
-            break
-        }
-        return view
-    }
-}
-
-// MARK: - Route Staus
-extension VRRouterControlCenter {
-    private func isTempPanel(route: VRRoute) -> Bool {
-        switch route {
-            case .alert, .userControl, .coHostUserControl:
-            return true
-        default:
-            return false
-        }
+    private func getRouteDefaultView(route: RouteItem) -> UIView? {
+        return route.view
     }
 }
 

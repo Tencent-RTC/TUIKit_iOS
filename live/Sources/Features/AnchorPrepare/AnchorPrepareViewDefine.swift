@@ -5,7 +5,7 @@
 //  Created by gg on 2025/5/15.
 //
 
-import Foundation
+import AtomicXCore
 
 public class PrepareState {
     public var roomName: String
@@ -31,4 +31,19 @@ public enum Feature {
 public protocol AnchorPrepareViewDelegate: AnyObject {
     func onClickStartButton(state: PrepareState)
     func onClickBackButton()
+}
+
+extension LiveTemplateMode {
+    func toSeatLayoutTemplate() -> SeatLayoutTemplate {
+        switch self {
+        case .verticalGridDynamic:
+            return .videoDynamicGrid9Seats
+        case .verticalFloatDynamic:
+            return .videoDynamicFloat7Seats
+        case .verticalGridStatic:
+            return .videoFixedGrid9Seats
+        case .verticalFloatStatic:
+            return .videoFixedFloat7Seats
+        }
+    }
 }

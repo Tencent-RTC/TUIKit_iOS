@@ -7,9 +7,8 @@
 import UIKit
 import RTCRoomEngine
 import Combine
-import RTCCommon
-import AtomicXCore
 import AtomicX
+import AtomicXCore
 import TUICore
 
 protocol VoiceRoomPrepareViewDelegate: AnyObject {
@@ -76,28 +75,41 @@ class VoiceRoomPrepareView: RTCBaseView {
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.systemImageSelection(.background, .prepare(self.prepareStore))))
+            let configs = VRSystemImageFactory.getImageAssets(imageType: .background)
+            let imagePanel = VRImageSelectionPanel(configs: configs, panelMode: .background, sceneType: .prepare(self.prepareStore))
+            imagePanel.backButtonClickClosure = { [weak self] in
+                guard let self = self else { return }
+                self.routerManager.router(action: .dismiss())
+            }
+            self.routerManager.present(view: imagePanel, config: .bottomDefault())
         }))
         model.items.append(VRFeatureItem(normalTitle: .audioEffectsText,
                                        normalImage: internalImage("live_prepare_audio_icon"),
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.audioEffect))
+            let audioPanel = AudioEffectView()
+            audioPanel.backButtonClickClosure = { [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.router(action: .dismiss())
+            }
+            self.routerManager.present(view: audioPanel, config: .bottomDefault())
         }))
         model.items.append(VRFeatureItem(normalTitle: .settingText,
                                        normalImage: internalImage("live_prepare_setting_icon"),
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.prepareSetting(prepareStore)))
+            let settingPanel = VRPrepareSettingPanel(prepareStore: prepareStore, routerManager: routerManager)
+            self.routerManager.present(view: settingPanel, config: .bottomDefault())
         }))
         model.items.append(VRFeatureItem(normalTitle: .layoutText,
                                          normalImage: internalImage("ktv_layout"),
                                          designConfig: designConfig,
                                          actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.layout(prepareStore)))
+            let layoutPanel = VRLayoutPanel(prepareStore: prepareStore, routerManager: routerManager)
+            self.routerManager.present(view: layoutPanel, config: .bottomDefault())
         }))
         let featureClickPanel = VRFeatureClickPanel(model: model)
         return featureClickPanel
@@ -210,7 +222,7 @@ class VoiceRoomPrepareView: RTCBaseView {
 // MARK: - subscribe view state.
 extension VoiceRoomPrepareView {
     private func subscribeRoomBackgroundState() {
-        prepareStore.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.backgroundURL))
+        prepareStore.subscribeState(StatePublisherSelector(keyPath: \VoiceRoomPrepareState.liveInfo.backgroundURL))
             .filter { !$0.isEmpty }
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
@@ -221,7 +233,7 @@ extension VoiceRoomPrepareView {
     }
 
     private func subscribeRoomLayoutState() {
-        prepareStore.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.layoutType))
+        prepareStore.subscribeState(StatePublisherSelector(keyPath: \VoiceRoomPrepareState.layoutType))
             .receive(on: RunLoop.main)
             .dropFirst()
             .sink { [weak self] layoutType in

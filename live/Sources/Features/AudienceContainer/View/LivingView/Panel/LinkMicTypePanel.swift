@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import RTCCommon
 import AtomicX
+import AtomicXCore
 
 class LinkMicTypePanel: UIView {
     
@@ -19,12 +19,16 @@ class LinkMicTypePanel: UIView {
     let routerManager: AudienceRouterManager
     let manager: AudienceStore
     let seatIndex: Int
+    private weak var coreView: LiveCoreView?
+    private let videoLinkSettingPanel: VideoLinkSettingPanel
     
-    init(data: [LinkMicTypeCellData], routerManager: AudienceRouterManager, manager: AudienceStore, seatIndex: Int) {
+    init(data: [LinkMicTypeCellData], routerManager: AudienceRouterManager, manager: AudienceStore, seatIndex: Int, coreView: LiveCoreView) {
         self.data = data
         self.routerManager = routerManager
         self.manager = manager
         self.seatIndex = seatIndex
+        self.coreView = coreView
+        self.videoLinkSettingPanel = VideoLinkSettingPanel(manager: manager, routerManager: routerManager, coreView: coreView, seatIndex: seatIndex)
         super.init(frame: .zero)
     }
     
@@ -123,14 +127,14 @@ extension LinkMicTypePanel {
             }
             make.top.equalTo(tipsLabel.snp.bottom).offset(20.scale375Height())
             make.width.equalToSuperview()
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
     }
 }
 
 extension LinkMicTypePanel {
     @objc func videoSettingImageViewAction() {
-        routerManager.router(action: .present(.linkSetting(seatIndex: seatIndex)))
+        routerManager.present(view: videoLinkSettingPanel)
     }
 }
 

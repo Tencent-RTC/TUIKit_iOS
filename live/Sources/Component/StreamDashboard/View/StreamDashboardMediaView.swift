@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class StreamDashboardMediaView: UIView {

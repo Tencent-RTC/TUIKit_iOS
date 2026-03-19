@@ -9,10 +9,9 @@ import Combine
 import Kingfisher
 import SnapKit
 import TUICore
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import AtomicXCore
-import AtomicX
 
 protocol VoiceRoomRootViewDelegate: AnyObject {
     func rootView(_ view: VoiceRoomRootView, showEndView endInfo: [String:Any], isAnchor: Bool)
@@ -53,6 +52,10 @@ class VoiceRoomRootView: RTCBaseView {
     
     private var ktvView: KtvView?
     
+    private var isKTVMode: Bool {
+        return liveListStore.state.value.currentLive.seatLayoutTemplateID == 50
+    }
+
     private var selfInfo: UserProfile {
         LoginStore.shared.state.value.loginUserInfo ?? UserProfile(userID: "")
     }
@@ -71,8 +74,7 @@ class VoiceRoomRootView: RTCBaseView {
         let view = VRBottomMenuView(liveID: liveID, routerManager: routerManager, viewStore: viewStore, toastService: toastService, isOwner: isOwner)
         view.songListButtonAction = { [weak self] in
             guard let self = self , let vc = WindowUtils.getCurrentWindowViewController() else { return }
-            let isKTV = prepareStore.state.layoutType == .KTVRoom
-            let songListView = SongListViewController(karaokeManager: self.karaokeManager,isOwner: isOwner,isKTV: isKTV)
+            let songListView = SongListViewController(karaokeManager: self.karaokeManager,isOwner: isOwner,isKTV: self.isKTVMode)
             vc.present(songListView, animated: true)
         }
         return view
@@ -265,7 +267,8 @@ extension VoiceRoomRootView {
         var liveInfo = prepareStore.state.liveInfo
         let params = prepareStore.roomParams
         liveInfo.seatMode = TakeSeatMode(from: params.seatMode)
-        liveInfo.maxSeatCount = params.maxSeatCount
+        let seatCount = params.maxSeatCount > 0 ? params.maxSeatCount : defaultMaxSeatCount
+        liveInfo.seatTemplate = SeatLayoutTemplate(seatLayoutTemplateID: liveInfo.seatLayoutTemplateID, maxSeatCount: seatCount)
         
         liveListStore.createLive(liveInfo) { [weak self] result in
             guard let self = self else { return }
@@ -340,65 +343,45 @@ extension VoiceRoomRootView {
     }
 
     func handleRoomLayoutType() {
-        func setupKTVView(isOwner: Bool, isKTV: Bool) {
-            ktvView = KtvView(
-                karaokeManager: karaokeManager,
-                isOwner: isOwner,
-                isKTV: isKTV
-            )
+        setupKTVView(isOwner: isOwner, isKTV: isKTVMode)
+    }
 
-            guard let ktvView = ktvView else { return }
-            addSubview(ktvView)
+    private func setupKTVView(isOwner: Bool, isKTV: Bool) {
+        ktvView = KtvView(
+            karaokeManager: karaokeManager,
+            isOwner: isOwner,
+            isKTV: isKTV
+        )
 
-            if isKTV {
-                seatGridView.snp.remakeConstraints { make in
-                    make.top.equalTo(ktvView.snp.bottom).offset(20.scale375())
-                    make.height.equalTo(230.scale375())
-                    make.left.right.equalToSuperview()
-                }
+        guard let ktvView = ktvView else { return }
+        addSubview(ktvView)
 
-                ktvView.snp.remakeConstraints { make in
-                    make.top.equalTo(topView.snp.bottom).offset(20.scale375())
-                    make.height.equalTo(168.scale375())
-                    make.left.equalToSuperview().offset(16.scale375())
-                    make.right.equalToSuperview().offset(-16.scale375())
-                }
-            } else {
-                seatGridView.snp.remakeConstraints { make in
-                    make.top.equalTo(topView.snp.bottom).offset(40.scale375())
-                    make.height.equalTo(230.scale375())
-                    make.left.right.equalToSuperview()
-                }
-
-                ktvView.snp.remakeConstraints { make in
-                    make.top.equalTo(seatGridView.snp.bottom).offset(20.scale375())
-                    make.trailing.equalToSuperview().inset(20.scale375())
-                    make.width.equalTo(160.scale375())
-                    make.height.equalTo(137.scale375())
-                }
+        if isKTV {
+            seatGridView.snp.remakeConstraints { make in
+                make.top.equalTo(ktvView.snp.bottom).offset(20.scale375())
+                make.height.equalTo(230.scale375())
+                make.left.right.equalToSuperview()
             }
-        }
 
-        if isOwner {
-            let isKTV = prepareStore.state.layoutType == .KTVRoom
-            let layoutType = isKTV ? "KTVRoom" : "ChatRoom"
-            let metadata = ["LayoutType": layoutType]
+            ktvView.snp.remakeConstraints { make in
+                make.top.equalTo(topView.snp.bottom).offset(20.scale375())
+                make.height.equalTo(168.scale375())
+                make.left.equalToSuperview().offset(16.scale375())
+                make.right.equalToSuperview().offset(-16.scale375())
+            }
+        } else {
+            seatGridView.snp.remakeConstraints { make in
+                make.top.equalTo(topView.snp.bottom).offset(40.scale375())
+                make.height.equalTo(230.scale375())
+                make.left.right.equalToSuperview()
+            }
 
-            TUIRoomEngine.sharedInstance().setRoomMetadataByAdmin(metadata, onSuccess: { [weak self] in
-                guard let self = self else { return }
-                setupKTVView(isOwner: true, isKTV: isKTV)
-            }, onError: { error, message in
-            })
-        }
-        else {
-            TUIRoomEngine.sharedInstance().getRoomMetadata(["LayoutType"], onSuccess: { [weak self] response in
-                guard let self = self else { return }
-                guard let layoutType = response["LayoutType"] else {
-                    return
-                }
-                setupKTVView(isOwner: false, isKTV: layoutType == "KTVRoom")
-            }, onError: { error, message in
-            })
+            ktvView.snp.remakeConstraints { make in
+                make.top.equalTo(seatGridView.snp.bottom).offset(20.scale375())
+                make.trailing.equalToSuperview().inset(20.scale375())
+                make.width.equalTo(160.scale375())
+                make.height.equalTo(137.scale375())
+            }
         }
     }
 
@@ -422,14 +405,12 @@ extension VoiceRoomRootView {
     }
 }
 
-// MARK: - Audience Route
+// MARK: - Dismiss All Panels
 extension VoiceRoomRootView {
-    private func routeToAudienceView() {
-        routerManager.router(action: .routeTo(.audience))
-    }
-    
-    private func routeToAnchorView() {
-        routerManager.router(action: .routeTo(.anchor))
+    private func dismissAllPanels() {
+        while routerManager.routerState.routeStack.count > 0 {
+            routerManager.router(action: .dismiss())
+        }
     }
 }
 
@@ -665,10 +646,10 @@ extension VoiceRoomRootView {
                                                           cancelButton: cancelButton,
                                                           confirmButton: confirmButton,
                                                           countdownDuration: 10) { [weak self] _ in
-                            guard let self = self else { return }
-                            self.routerManager.dismiss(dismissType: .alert)
-                        }
-                        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
+                        guard let self = self else { return }
+                        self.routerManager.dismiss(dismissType: .alert)
+                    }
+                    routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
                     case .onCoHostRequestRejected(let invitee):
                         toastService.showToast(String.localizedReplace(.requestRejectedText, replace: invitee.userName.isEmpty ? invitee.userID : invitee.userName), toastStyle: .info)
                     case .onCoHostRequestTimeout(let inviter,_):
@@ -705,10 +686,10 @@ extension VoiceRoomRootView {
                     karaokeManager.exit()
                 } else {
                     if ktvView != nil { return }
-                    ktvView = KtvView(karaokeManager: karaokeManager, isOwner: isOwner, isKTV: prepareStore.state.layoutType == .KTVRoom)
+                    ktvView = KtvView(karaokeManager: karaokeManager, isOwner: isOwner, isKTV: isKTVMode)
                     guard let ktvView = ktvView else { return }
                     addSubview(ktvView)
-                    if prepareStore.state.layoutType == .KTVRoom {
+                    if isKTVMode {
                         seatGridView.snp.remakeConstraints { make in
                             make.top.equalTo(ktvView.snp.bottom).offset(20.scale375())
                             make.height.equalTo(230.scale375())
@@ -775,10 +756,10 @@ extension VoiceRoomRootView {
                                                           cancelButton: cancelButton,
                                                           confirmButton: confirmButton,
                                                           countdownDuration: 10) { [weak self] _ in
-                            guard let self = self else { return }
-                            self.routerManager.dismiss(dismissType: .alert)
-                        }
-                        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
+                        guard let self = self else { return }
+                        self.routerManager.dismiss(dismissType: .alert)
+                    }
+                    routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
                     case .onBattleRequestReject(battleID: _, let inviter, let invitee):
                         if inviter.userID == selfId {
                             let message = String.localizedReplace(.battleInvitationRejectText, replace: invitee.userName)
@@ -839,9 +820,10 @@ extension VoiceRoomRootView: VRTopViewDelegate {
                 audienceLeaveButtonClick()
             }
         case .roomInfo:
-            routerManager.router(action: .present(.roomInfo))
+            break
         case .audienceList:
-            routerManager.router(action: .present(.recentViewer))
+            let audiencePanel = VRSeatManagerPanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
+            routerManager.present(view: audiencePanel, config: .bottomDefault())
         }
     }
     
@@ -890,7 +872,7 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             let alertConfig = AlertViewConfig(title: .confirmEndLiveText,
                                               cancelButton: cancelButton,
                                               confirmButton: confirmButton)
-            routerManager.present(view: AtomicAlertView(config: alertConfig))
+            routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
             return
         }
 
@@ -917,13 +899,13 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             self.routerManager.dismiss()
         }
         items.append(cancelItem)
-    
+
         let alertConfig = AlertViewConfig(title: title, items: items)
-        routerManager.present(view: AtomicAlertView(config: alertConfig))
-    }
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
+}
 
 
-    private func audienceLeaveButtonClick() {
+private func audienceLeaveButtonClick() {
         let selfUserId = TUIRoomEngine.getSelfInfo().userId
         if !seatStore.state.value.seatList.contains(where: { $0.userInfo.userID == selfUserId }) {
             leaveRoom()
@@ -959,12 +941,12 @@ extension VoiceRoomRootView: VRTopViewDelegate {
             self.routerManager.dismiss()
         }
         items.append(cancelItem)
-        
+
         let alertConfig = AlertViewConfig(title: title, items: items)
-        routerManager.present(view: AtomicAlertView(config: alertConfig))
-    }
-    
-    private func leaveRoom() {
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
+}
+
+private func leaveRoom() {
         liveListStore.leaveLive { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -1048,7 +1030,7 @@ extension VoiceRoomRootView {
     
     private func onKickedOutOfRoom(roomId: String, reason: LiveKickedOutReason, message: String) {
         guard reason != .byLoggedOnOtherDevice else { return }
-        isOwner ? routeToAnchorView() : routeToAudienceView()
+        dismissAllPanels()
         handleErrorMessage(.kickedOutText)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             guard let self = self else { return }
@@ -1057,11 +1039,11 @@ extension VoiceRoomRootView {
     }
     
     private func onRoomDismissed(roomId: String) {
+        dismissAllPanels()
+        karaokeManager.exit()
         if isOwner {
-            routeToAnchorView()
             showAnchorEndView()
         } else {
-            routeToAudienceView()
             showAudienceEndView()
         }
     }
@@ -1136,7 +1118,7 @@ extension VoiceRoomRootView {
             guard let self = self else { return }
             self.routerManager.dismiss(dismissType: .alert, completion: nil)
         }
-        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .center)
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
     }
     
     func onSeatRequestCancelled(type: SGRequestType, userInfo: LiveUserInfo) {
@@ -1161,7 +1143,7 @@ extension VoiceRoomRootView: SeatGridViewObserver {
         }
         
         let alertConfig = AlertViewConfig(items: alertItems)
-        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .bottomDefault())
     }
 }
 
@@ -1184,7 +1166,8 @@ extension VoiceRoomRootView {
                     guard let self = self else { return }
                     routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                         guard let self = self else { return }
-                        routerManager.router(action: .present(.linkInviteControl(seat.index)))
+                        let invitePanel = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: seat.index)
+                        routerManager.present(view: invitePanel, config: .bottomDefault())
                     }))
                 }
                 items.append(inviteItem)
@@ -1200,7 +1183,14 @@ extension VoiceRoomRootView {
         } else {
             let isSelf = seat.userId == selfInfo.userID
             if !isSelf {
-                routerManager.router(action: .present(.userControl(imStore, seat)))
+                let userPanel = VRUserManagerPanel(
+                    liveID: liveID,
+                    imStore: imStore,
+                    toastService: toastService,
+                    routerManager: routerManager,
+                    seatInfo: seat
+                )
+                routerManager.present(view: userPanel, config: .bottomDefault())
             }
         }
         
@@ -1237,7 +1227,14 @@ extension VoiceRoomRootView {
             }
             items.append(cancelItem)
         } else if !(seat.userId ?? "").isEmpty && seat.userId != selfInfo.userID {
-            routerManager.router(action: .present(.userControl(imStore, seat)))
+            let userPanel = VRUserManagerPanel(
+                liveID: liveID,
+                imStore: imStore,
+                toastService: toastService,
+                routerManager: routerManager,
+                seatInfo: seat
+            )
+            routerManager.present(view: userPanel, config: .bottomDefault())
         }
         
         return items
@@ -1366,8 +1363,15 @@ extension VoiceRoomRootView: TUIRoomObserver {
 }
 
 extension VoiceRoomRootView: SGHostAndBattleViewDelegate {
-    func onClickCoHostView(seatInfo: SeatInfo,type: CoHostViewManagerPanelType) {
-        routerManager.router(action: .present(.coHostUserControl(seatInfo,type)))
+    func onClickCoHostView(seatInfo: SeatInfo, type: CoHostViewManagerPanelType) {
+        let coHostPanel = CoHostViewManagerPanel(
+            liveID: liveID,
+            seatInfo: seatInfo,
+            routerManager: routerManager,
+            type: type,
+            toastService: toastService
+        )
+        routerManager.present(view: coHostPanel, config: .bottomDefault())
     }
 
     func createCoHostView(seatInfo: SeatInfo, isInvite: Bool) -> UIView? {
@@ -1382,12 +1386,12 @@ extension VoiceRoomRootView: SGHostAndBattleViewDelegate {
                 if isOwner {
                     self.onClickCoHostView(seatInfo: seatInfo,type: .inviteAndLockSeat)
                 } else if !seatInfo.isLocked{
-                    let alertItems = generateNormalUserSeatAlertItems(seat: TUISeatInfo(from: seatInfo))
-                    
-                    guard !alertItems.isEmpty else { return }
-                    
-                    let alertConfig = AlertViewConfig(items: alertItems)
-                    routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
+                let alertItems = generateNormalUserSeatAlertItems(seat: TUISeatInfo(from: seatInfo))
+                
+            guard !alertItems.isEmpty else { return }
+            
+            let alertConfig = AlertViewConfig(items: alertItems)
+            routerManager.present(view: AtomicAlertView(config: alertConfig), config: .bottomDefault())
                 }
             }
             return view

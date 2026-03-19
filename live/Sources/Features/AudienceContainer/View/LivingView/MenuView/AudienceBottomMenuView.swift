@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import SnapKit
 import Combine
 import AtomicXCore
@@ -117,7 +117,8 @@ class AudienceBottomMenuView: RTCBaseView {
         var settingItem = AudienceButtonMenuInfo(normalIcon: "live_more_btn_icon")
         settingItem.tapAction = { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.featureSetting))
+            let panel = AudienceSettingPanel(manager: manager, routerManager: routerManager)
+            self.routerManager.present(view: panel)
         }
         let settingButton = createButtonFromMenuItem(index: menus.count, item: settingItem, isOwner: isOwner)
         settingButton.addTarget(self, action: #selector(menuTapAction(sender:)), for: .touchUpInside)

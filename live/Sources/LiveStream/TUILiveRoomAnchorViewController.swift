@@ -11,7 +11,7 @@ import TUICore
 import RTCRoomEngine
 import Combine
 import AtomicXCore
-import RTCCommon
+import AtomicX
 
 @objcMembers
 public class TUILiveRoomAnchorViewController: UIViewController {
@@ -91,7 +91,6 @@ public class TUILiveRoomAnchorViewController: UIViewController {
     }
     
     deinit {
-        StateCache.shared.clear()
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
         BaseBeautyStore.shared.reset()

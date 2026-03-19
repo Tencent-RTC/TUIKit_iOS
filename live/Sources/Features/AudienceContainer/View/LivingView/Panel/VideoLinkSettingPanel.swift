@@ -8,7 +8,7 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
+import AtomicX
 import TUICore
 
 class VideoLinkSettingPanel: RTCBaseView {
@@ -48,11 +48,12 @@ class VideoLinkSettingPanel: RTCBaseView {
         items.append(AudienceFeatureItem(normalTitle: .beautyText,
                                          normalImage: internalImage("live_video_setting_beauty"),
                                          designConfig: designConfig,
-                                         actionClosure: { [weak self] _ in
-                                             guard let self = self else { return }
-                                             self.routerManager.router(action: .present(.beauty))
-                                             let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
-                                             DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
+                                        actionClosure: { [weak self] _ in
+                                            guard let self = self else { return }
+                                            let beautyPanel = BeautyView.shared()
+                                            self.routerManager.present(view: beautyPanel)
+                                            let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
+                                            DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
                                                  Constants.DataReport.kDataReportPanelShowLiveRoomBeauty)
                                          }))
         items.append(AudienceFeatureItem(normalTitle: .flipText,
@@ -146,7 +147,7 @@ class VideoLinkSettingPanel: RTCBaseView {
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
             make.height.equalTo(17.scale375Height())
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
     }
     
@@ -197,7 +198,7 @@ extension VideoLinkSettingPanel {
             }
         cancelable.store(in: &cancellableSet)
         lastApplyHashValue = cancelable.hashValue
-        routerManager.router(action: .routeTo(.audience))
+        routerManager.router(action: .dismiss())
     }
     
     private func clearLastApplyHashValue() {
@@ -210,12 +211,12 @@ extension VideoLinkSettingPanel {
     }
     
     private func subscribeCurrentRoute() {
-        routerManager.subscribeRouterState(StateSelector(keyPath: \AudienceRouterState.routeStack))
+        routerManager.subscribeRouterState(StatePublisherSelector(keyPath: \AudienceRouterState.routeStack))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] routeStack in
                 guard let self = self else { return }
-                if case .linkSetting = routeStack.last {
+                if routeStack.last?.view is VideoLinkSettingPanel {
                     manager.deviceStore.switchCamera(isFront: true)
                     manager.deviceStore.startCameraTest(cameraView: previewView) { [weak self] result in
                         guard let self = self else { return }
@@ -227,7 +228,7 @@ extension VideoLinkSettingPanel {
                             manager.onError(error)
                         }
                     }
-                } else if !routeStack.contains(where: { if case .linkSetting = $0 { true } else { false } }) {
+                } else if !routeStack.contains(where: { $0.view is VideoLinkSettingPanel }) {
                     if needCloseCameraWhenViewDisappear {
                         manager.deviceStore.stopCameraTest()
                         needCloseCameraWhenViewDisappear = false

@@ -7,7 +7,7 @@
 
 import TUICore
 import UIKit
-import RTCCommon
+import AtomicX
 
 class AnchorEndStatisticsView: UIView {
     private var isViewReady: Bool = false

@@ -9,7 +9,7 @@ import Foundation
 import TUICore
 import Combine
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class UserStatusView: UIView {

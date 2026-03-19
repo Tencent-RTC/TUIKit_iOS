@@ -7,11 +7,11 @@
 
 import Foundation
 
-private let imageDomain = "https://liteav-test-1252463788.cos.ap-guangzhou.myqcloud.com/voice_room/"
+private let imageDomain = "https://liteav-test-1252463788.cos.ap-guangzhou.myqcloud.com/live/"
 
 enum VRImageType: String {
-    case cover = "voice_room_cover"
-    case background = "voice_room_background"
+    case cover = "live_cover"
+    case background = "voice_room_bg"
 }
 
 struct VRSystemImageModel {
@@ -28,7 +28,7 @@ struct VRSystemImageModel {
 
 class VRSystemImageFactory {
     static func getImageAssets(imageType: VRImageType) -> [VRSystemImageModel] {
-        let index = imageType == .cover ? 12 : 3
+        let index = imageType == .cover ? 5 : 3
         var imageAssets: [VRSystemImageModel] = []
         for index in 1...index {
             let imagePath = imageType.rawValue + "\(index).png"
@@ -74,11 +74,7 @@ class VRSystemImageCell: UICollectionViewCell {
     var model: VRSystemImageModel? {
         didSet {
             guard let model = model else { return }
-            if model.imageType == .cover {
-                imageView.kf.setImage(with: model.imageUrl, placeholder: UIImage.placeholderImage)
-            } else {
-                imageView.kf.setImage(with: model.thumbnailImageUrl, placeholder: UIImage.placeholderImage)
-            }
+            imageView.kf.setImage(with: model.thumbnailImageUrl, placeholder: UIImage.placeholderImage)
         }
     }
     

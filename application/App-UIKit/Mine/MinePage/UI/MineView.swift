@@ -10,7 +10,7 @@ import Kingfisher
 import UIKit
 import TUICore
 import AtomicXCore
-import RTCCommon
+import AtomicX
 
 protocol MineViewDelegate: NSObjectProtocol {
     func didTapBackOnMine()
@@ -20,7 +20,7 @@ protocol MineViewDelegate: NSObjectProtocol {
 }
 
 class MineView: UIView {
-        
+    private let screenWidth = UIScreen.main.bounds.width
     let viewModel: MineViewModel
     weak var delegate: MineViewController?
     

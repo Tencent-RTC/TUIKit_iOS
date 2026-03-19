@@ -7,7 +7,7 @@
 
 import Foundation
 import TUICore
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -95,7 +95,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
                 navigationView.leadingAnchor.constraint(equalTo: superview.leadingAnchor),
                 navigationView.trailingAnchor.constraint(equalTo: superview.trailingAnchor),
                 navigationView.topAnchor.constraint(equalTo: superview.topAnchor),
-                navigationView.heightAnchor.constraint(equalToConstant: StatusBar_Height + 44)
+                navigationView.bottomAnchor.constraint(equalTo: centerLabel.bottomAnchor)
             ])
         }
         
@@ -112,7 +112,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
         centerLabel.translatesAutoresizingMaskIntoConstraints = false
         if let superview = centerLabel.superview {
             NSLayoutConstraint.activate([
-                centerLabel.topAnchor.constraint(equalTo: superview.topAnchor, constant: StatusBar_Height),
+                centerLabel.topAnchor.constraint(equalTo: superview.safeAreaLayoutGuide.topAnchor),
                 centerLabel.centerXAnchor.constraint(equalTo: superview.centerXAnchor),
                 centerLabel.widthAnchor.constraint(equalToConstant: Screen_Width * 2 / 3),
                 centerLabel.heightAnchor.constraint(equalToConstant: 44)
@@ -199,7 +199,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
         
         let currentParticipantCount = CallStore.shared.state.value.allParticipants.count
         if userIds.count + currentParticipantCount >=  MAX_USER {
-            Toast.showToast(TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit"))
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit") ?? "")
             return
         }
         
@@ -258,4 +258,15 @@ extension SelectGroupMemberViewController {
         }
         selectTableView.reloadData()
     }
+    
+    private func showErrorToast(message: String) {
+        view.showAtomicToast(
+            text: message,
+            customIcon: UIImage.atomicXBundleImage(named: "toast_error"),
+            style: .error,
+            position: .center,
+            duration: .long
+        )
+    }
+
 }

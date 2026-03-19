@@ -8,14 +8,14 @@ import UIKit
 import SnapKit
 import Combine
 import Kingfisher
-import RTCCommon
 import RTCRoomEngine
+import AtomicXCore
 
 class SelectedSongCell: UITableViewCell {
     private let indexLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        label.textColor = UIColor(white: 1, alpha: 0.9)
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.9)
         label.textAlignment = .center
         return label
     }()
@@ -39,14 +39,14 @@ class SelectedSongCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        label.textColor = UIColor(white: 1, alpha: 0.9)
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.9)
         return label
     }()
 
     private let userNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 12)
-        label.textColor = UIColor(white: 1, alpha: 0.55)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
         label.textAlignment = .center
         label.baselineAdjustment = .alignCenters
         return label
@@ -158,7 +158,7 @@ class SelectedSongCell: UITableViewCell {
             make.bottom.equalToSuperview().offset(-16)
         }
 
-        backgroundColor = UIColor("1F2024")
+        backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         selectionStyle = .none
     }
 
@@ -195,7 +195,7 @@ class SelectedSongCell: UITableViewCell {
                 playPauseButton.isHidden = false
                 nextButton.isHidden = false
 
-                karaokeManager?.subscribe(StateSelector(keyPath: \.playbackState))
+                karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.playbackState))
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] _ in
                         guard let self = self else {return}

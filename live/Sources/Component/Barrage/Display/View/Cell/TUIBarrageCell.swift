@@ -5,11 +5,10 @@
 //  Created by krabyu on 2024/3/19.
 //
 
-import RTCCommon
+import AtomicX
 import SnapKit
 import UIKit
 import AtomicXCore
-import AtomicX
 
 private let cellMargin: CGFloat = 6.scale375Height()
 private let barrageContentMaxWidth: CGFloat = 240.scale375Width()
@@ -63,7 +62,7 @@ class BarrageDefaultCell: UIView {
 
     private lazy var anchorTagImage: UIImage = {
         let button = UIButton()
-        button.backgroundColor = UIColor(hex: "#4D8EFF")
+        button.backgroundColor = UIColor("4D8EFF")
         button.layer.cornerRadius = 7
         button.setTitle(.anchorText, for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -155,7 +154,7 @@ class BarrageDefaultCell: UIView {
         let userName = barrage.sender.userName
         let displayName = userName.isEmpty ? barrage.sender.userID : userName
         let userNameAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor.lightBlueColor,
+            .foregroundColor: UIColor("80BEF6"),
             .font: UIFont.customFont(ofSize: 12, weight: .semibold)
         ]
         result.append(NSAttributedString(string: FSI + displayName + PDI + "：", attributes: userNameAttributes))

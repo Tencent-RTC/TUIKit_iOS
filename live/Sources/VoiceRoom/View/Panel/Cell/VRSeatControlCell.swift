@@ -301,10 +301,12 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
         
         if isSelected {
             inviteButton.setVariant(.outlined)
-            inviteButton.setColorType(.danger)
+            inviteButton.setColorType(.secondary)
+            inviteButton.setButtonContent(.textOnly(text: .cancelText))
         } else {
             inviteButton.setVariant(.filled)
             inviteButton.setColorType(.primary)
+            inviteButton.setButtonContent(.textOnly(text: .inviteText))
         }
         
         inviteButton.isSelected = isSelected
@@ -336,7 +338,7 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
 
 fileprivate extension String {
     static let endTitleText = internalLocalized("common_end_user")
-    static let approveText = internalLocalized("live_barrage_agree")
+    static let approveText = internalLocalized("common_accept")
     static let rejectText = internalLocalized("common_reject")
     static let inviteText = internalLocalized("common_voiceroom_invite")
     static let cancelText = internalLocalized("common_cancel")

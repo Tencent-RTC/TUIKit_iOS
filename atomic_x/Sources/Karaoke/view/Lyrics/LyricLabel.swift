@@ -55,7 +55,7 @@ class KaraokeLyricLabel: UILabel {
                     style.alignment = self.textAlignment
                     let attributes: [NSAttributedString.Key: Any] = [
                         .font: font,
-                        .foregroundColor:  UIColor("00ABD6"),
+                        .foregroundColor: ThemeStore.shared.colorTokens.tagColorLevel1,
                         .paragraphStyle: style
                     ]
                     (text as NSString).draw(in: rect, withAttributes: attributes)

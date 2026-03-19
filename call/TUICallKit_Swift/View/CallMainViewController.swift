@@ -11,7 +11,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import SnapKit
-import RTCCommon
 class CallMainViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     
@@ -44,7 +43,6 @@ class CallMainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        KeyMetrics.countUV(eventId: .wakeup, callId: CallStore.shared.state.value.activeCall.callId)
         
         view.addSubview(mainView)
         view.addSubview(floatWindowButton)

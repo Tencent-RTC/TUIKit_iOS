@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 import RTCRoomEngine
 #if canImport(TXLiteAVSDK_TRTC)
@@ -173,19 +173,21 @@ class DefaultBeautyPanel: UIView {
         let model = FeatureCollectionViewModel()
         model.items = featureItems
         var collectionView = FeatureCollectionView(model: model, designConfig: config)
-        collectionView.clickEventCallBack.addObserver(self) { [weak self] action, _ in
-            guard let actionType = action as? BeautyTypeEvent else{ return}
-            switch actionType {
+        collectionView.clickEventCallBack
+            .sink { [weak self] action in
+                guard let self = self, let actionType = action as? BeautyTypeEvent else { return }
+                switch actionType {
                 case .closeClick:
-                    self?.closeBeauty()
+                    self.closeBeauty()
                 case .buffingClick:
-                    self?.enableBuffing()
+                    self.enableBuffing()
                 case .whitenessClick:
-                    self?.enableWhiteness()
+                    self.enableWhiteness()
                 case .ruddyClick:
-                    self?.enableRuddy()
+                    self.enableRuddy()
+                }
             }
-        }
+            .store(in: &cancellableSet)
         return collectionView
     }()
     
@@ -297,7 +299,7 @@ extension DefaultBeautyPanel {
             make.top.equalTo(sliderLabel.snp.bottom).offset(16.scale375Height())
             make.leading.trailing.equalToSuperview().inset(24.scale375())
             make.height.equalTo(min(height, 238).scale375Height())
-            make.bottom.equalToSuperview().offset(-20.scale375Height())
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-20.scale375Height())
         }
     }
 }

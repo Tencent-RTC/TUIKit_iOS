@@ -5,9 +5,8 @@
 //  Created by jeremiawang on 2025/4/16.
 //
 
-import RTCCommon
-import AtomicXCore
 import AtomicX
+import AtomicXCore
 
 class DoubleColumnWidgetView: RTCBaseView {
     private var liveInfo: LiveInfo

@@ -18,6 +18,7 @@ target 'App-UIKit' do
   pod 'AtomicXCore'
   pod 'Kingfisher'
 
+  pod 'SVGAPlayer', '~> 2.3'
 end
 
 post_install do |installer|

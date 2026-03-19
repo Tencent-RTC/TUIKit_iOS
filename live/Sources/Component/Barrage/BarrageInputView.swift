@@ -5,9 +5,8 @@
 //  Created by krabyu on 2024/3/19.
 //
 
-import TUICore
 import UIKit
-import RTCCommon
+import AtomicX
 
 public class BarrageInputView: UIView {
         

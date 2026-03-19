@@ -92,6 +92,7 @@ public extension BasePanel where Self: UIView {
         parentView.layoutIfNeeded()
         
         if animated {
+            // 设置初始位置（屏幕外）
             self.transform = CGAffineTransform(translationX: 0, y: panelHeight)
             maskView.alpha = 0
             

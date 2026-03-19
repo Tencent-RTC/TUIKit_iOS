@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 
 enum VRFeatureItemType {
     case singleImage

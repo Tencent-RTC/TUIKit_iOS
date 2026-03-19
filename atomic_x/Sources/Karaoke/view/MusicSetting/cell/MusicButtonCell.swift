@@ -25,8 +25,8 @@ class MusicButtonCell: UITableViewCell {
     let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = UIColor("D5E0F2")
+        label.font = ThemeStore.shared.typographyTokens.Medium16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
     }()
     
@@ -34,8 +34,8 @@ class MusicButtonCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.layer.cornerRadius = 10.0
         button.layer.masksToBounds = true
-        button.titleLabel?.font = .customFont(ofSize: 16)
-        button.setBackgroundImage(UIColor.lightGreenColor.trans2Image(), for: .normal)
+        button.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
+        button.setBackgroundImage(ThemeStore.shared.colorTokens.textColorSuccess.trans2Image(), for: .normal)
         return button
     }()
     

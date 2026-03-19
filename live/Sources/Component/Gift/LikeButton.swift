@@ -6,7 +6,6 @@
 //
 
 import AtomicXCore
-import TUICore
 import UIKit
 
 public class LikeButton: UIButton {

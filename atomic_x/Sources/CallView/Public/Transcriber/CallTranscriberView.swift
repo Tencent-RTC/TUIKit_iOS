@@ -83,8 +83,7 @@ extension CallTranscriberView {
 
 extension CallTranscriberView {
     @objc private func transcriberButtonTapped() {
-        transcriberButton.isSelected.toggle()
-        updateTranscriberState()
+        CallViewStore.shared.toggleTranscriberPanel()
     }
 }
 
@@ -99,21 +98,31 @@ extension CallTranscriberView {
                 self?.handleCallAcceptStateChanged(isAccepted)
             }
             .store(in: &cancellables)
+        
+        CallViewStore.shared.observerState
+            .subscribe(StatePublisherSelector(keyPath: \.isShowTranscriberPanel))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.updateTranscriberState()
+            }
+            .store(in: &cancellables)
     }
 }
 
 extension CallTranscriberView {
     private func handleCallAcceptStateChanged(_ isAccepted: Bool) {
         isCallAccepted = isAccepted
-        transcriberButton.isSelected = isAccepted && isEnabled
         updateTranscriberState()
     }
     
     private func updateTranscriberState() {
+        let isShow = CallViewStore.shared.state.isShowTranscriberPanel
         let shouldShowButton = isCallAccepted && isEnabled
-        let shouldShowTranscriber = shouldShowButton && transcriberButton.isSelected
+        let shouldShowTranscriber = shouldShowButton && isShow
         
         transcriberButton.isHidden = !shouldShowButton
+        transcriberButton.isSelected = isShow
         transcriberView.isHidden = !shouldShowTranscriber
     }
 }

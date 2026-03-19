@@ -7,7 +7,7 @@
 
 import SnapKit
 import UIKit
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import ImSDK_Plus
 import TUICore
@@ -34,7 +34,7 @@ class LoginView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = UIFont.systemFont(ofSize: 32)
-        label.textColor = UIColor(hex: "333333") ?? .black
+        label.textColor = UIColor("333333") ?? .black
         label.text = "Tencent Real-Time Communication".localized
         label.numberOfLines = 0
         return label
@@ -62,7 +62,7 @@ class LoginView: UIView {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.white
         textField.font = UIFont(name: "PingFangSC-Regular", size: 20)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string: "userId")
         return textField
     }()
@@ -91,9 +91,9 @@ class LoginView: UIView {
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle("Log In".localized, for: .normal)
         btn.adjustsImageWhenHighlighted = false
-        btn.setBackgroundImage(UIColor(hex: "006EFF")?.trans2Image(), for: .normal)
+        btn.setBackgroundImage(UIColor("006EFF").trans2Image(), for: .normal)
         btn.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 20)
-        btn.layer.shadowColor = UIColor(hex: "006EFF")?.cgColor ?? UIColor.blue.cgColor
+        btn.layer.shadowColor = UIColor("006EFF").cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
         btn.layer.masksToBounds = true
         btn.layer.cornerRadius = 10

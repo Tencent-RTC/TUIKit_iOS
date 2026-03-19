@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RTCCommon
 import AtomicX
 
 class AudienceEndStatisticsView: UIView {

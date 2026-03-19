@@ -14,7 +14,8 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 import TUICore
-import RTCCommon
+import AtomicX
+import AtomicXCore
 
 let TUICore_TEBeautyExtension_GetBeautyPanel = "TUICore_TEBeautyExtension_GetBeautyPanel"
 let TUICore_TEBeautyService = "TUICore_TEBeautyService"
@@ -41,6 +42,9 @@ class BeautyView: UIView {
         instance = view
         return view
     }
+    static func releaseSharedInstance() {
+        instance = nil
+    }
     private static var instance: BeautyView?
     
     var backClosure: (()->Void)?
@@ -49,7 +53,7 @@ class BeautyView: UIView {
     private let roomEngine: TUIRoomEngine
     private lazy var trtcCloud = roomEngine.getTRTCCloud()
     private var cancellableSet = Set<AnyCancellable>()
-    private var beautyPanel: UIView = UIView()
+    private weak var beautyPanel: UIView?
     
     private let Screen_Width = UIScreen.main.bounds.size.width
     private let Screen_Height = UIScreen.main.bounds.size.height
@@ -65,12 +69,16 @@ class BeautyView: UIView {
     }
     
     private func subscribe() {
-        StateCache.shared.subscribeToObjectRemoval(key: BeautyView.stateKey) {
-            BeautyView.instance = nil
-            DispatchQueue.main.async {
-                BeautyView.shared().subscribe()
+        LiveListStore.shared.state.subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { currentLive in
+                if currentLive.isEmpty {
+                    BeautyView.instance = nil
+                }
             }
-        }
+            .store(in: &cancellableSet)
     }
     
     required init?(coder: NSCoder) {
@@ -91,18 +99,20 @@ class BeautyView: UIView {
     }
     
     private func constructViewHierarchy() {
+        let panel: UIView
         if let advancedBeautyPanel = getAdvancedBeautyPanel() {
-            beautyPanel = advancedBeautyPanel
+            panel = advancedBeautyPanel
             setBeautyMode(isAdvanced: true)
         } else {
-            beautyPanel = DefaultBeautyPanel()
+            panel = DefaultBeautyPanel()
             setBeautyMode(isAdvanced: false)
         }
-        addSubview(beautyPanel)
+        addSubview(panel)
+        beautyPanel = panel
     }
     
     private func activateConstraints() {
-        beautyPanel.snp.makeConstraints { make in
+        beautyPanel?.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -119,7 +129,7 @@ class BeautyView: UIView {
     private func getAdvancedBeautyPanel() -> UIView? {
         let beautyPanelList = TUICore.getExtensionList(TUICore_TEBeautyExtension_GetBeautyPanel,
                                                        param: ["width":Screen_Width,
-                                                               "height":CGFloat(205),
+                                                               "height":CGFloat(250),
                                                                "resetBeautyEffect":resetBeautyEffectForAdvancedBeauty])
         if beautyPanelList.count == 0 {
             return nil

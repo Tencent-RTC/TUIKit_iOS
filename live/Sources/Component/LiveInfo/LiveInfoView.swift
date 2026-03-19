@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import RTCCommon
 import RTCRoomEngine
 import AtomicXCore
 import AtomicX
@@ -154,7 +153,7 @@ public class LiveInfoView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] avatarUrl in
                 guard let self = self else { return }
-                self.avatarView.setContent(.url(avatarUrl, placeholder: avatarPlaceholderImage))
+                self.avatarView.setContent(.url(avatarUrl, placeholder: UIImage.avatarPlaceholderImage))
             }
             .store(in: &cancellableSet)
         
@@ -221,14 +220,22 @@ extension LiveInfoView {
         if !WindowUtils.isPortrait { return }
         if let vc = WindowUtils.getCurrentWindowViewController() {
             popupViewController = vc
-            let menuContainerView = MenuContainerView(contentView: roomInfoPanelView)
-            menuContainerView.blackAreaClickClosure = { [weak self] in
-                guard let self = self else { return }
-                popupViewController?.dismiss(animated: true)
-                popupViewController = nil
-            }
-            let viewController = PopupViewController(contentView: menuContainerView)
-            popupViewController?.present(viewController, animated: true)
+
+            let popover = AtomicPopover(
+                contentView: roomInfoPanelView,
+                configuration: .init(
+                    position: .bottom,
+                    height: .wrapContent,
+                    animation: .slideFromBottom,
+                    backgroundColor: .custom(ThemeStore.shared.colorTokens.bgColorOperate),
+                    onBackdropTap: { [weak self] in
+                        guard let self = self else { return }
+                        self.popupViewController?.dismiss(animated: true)
+                        self.popupViewController = nil
+                    }
+                )
+            )
+            popupViewController?.present(popover, animated: true)
         }
     }
 }

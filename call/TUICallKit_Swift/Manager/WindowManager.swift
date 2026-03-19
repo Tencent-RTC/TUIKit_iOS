@@ -4,13 +4,16 @@
 //
 //  Created by vincepzhang on 2025/2/21.
 //
-import RTCCommon
+import AtomicX
 import AtomicXCore
+import Combine
+import TUICore
 
 class WindowManager: NSObject {
     static let shared = WindowManager()
 
     private var floatWindowBeganPoint: CGPoint = .zero
+    private var cancellables = Set<AnyCancellable>()
     private let window: UIWindow = {
         let callWindow = UIWindow()
         callWindow.windowLevel = .alert + 1
@@ -81,7 +84,7 @@ class WindowManager: NSObject {
         window.rootViewController = CallKitNavigationController(rootViewController: CallMainViewController())
         window.isHidden = false
         window.backgroundColor = UIColor.black
-        window.t_makeKeyAndVisible()
+        window.makeKeyAndVisibleWithScene()
     }
     
     // MARK: show Floating Window
@@ -110,7 +113,8 @@ class WindowManager: NSObject {
         window.isHidden = false
         window.backgroundColor = UIColor.clear
         window.frame = getBannerWindowFrame()
-        window.t_makeKeyAndVisible()
+        window.makeKeyAndVisibleWithScene()
+        subscribeCallStateForBanner()
     }
     
     // MARK: close windows
@@ -118,6 +122,7 @@ class WindowManager: NSObject {
         TUICallKitImpl.shared.viewState.router.value = .none
         window.rootViewController = nil
         window.isHidden = true
+        cancellables.removeAll()
     }
     
     func hideFloatingWindow() {
@@ -186,5 +191,23 @@ class WindowManager: NSObject {
     func getBannerWindowFrame() -> CGRect {
         return CGRect(x: 8.scale375Width(), y: StatusBar_Height + 10,
                       width: currentScreenWidth - 16.scale375Width(), height: 92.scale375Width())
+    }
+    
+    func subscribeCallStateForBanner() {
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector<CallState, CallParticipantStatus>(keyPath: \.selfInfo.status))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] newStatus in
+                guard let self = self else { return }
+                if newStatus == .accept && TUICallKitImpl.shared.viewState.router.value == .banner {
+                    self.showCallingWindow()
+                    TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
+                                        subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_START,
+                                        object: nil,
+                                        param: nil)
+                }
+            }
+            .store(in: &cancellables)
     }
 }

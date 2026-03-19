@@ -8,7 +8,7 @@
 import Foundation
 import TUICore
 import UIKit
-import RTCCommon
+import AtomicX
 import AtomicXCore
 import Combine
 import AtomicX
@@ -32,10 +32,11 @@ class TUICallKitImpl: TUICallKit {
     let callingVibratorFeature = CallingVibratorFeature()
     let callingBellFeature = CallingBellFeature()
     let voipDataSyncHandler = VoIPDataSyncHandler()
-    var pictureInPictureFeature: PictureInPictureFeature?
-
+    let pictureInPictureFeature = PictureInPictureFeature()
+    
     override init() {
         super.init()
+        setupCallEngine()
         subscribeCallState()
         addNotificationObserver()
         setupCallEventListener()
@@ -48,11 +49,10 @@ class TUICallKitImpl: TUICallKit {
         cancellables.removeAll()
     }
     
-        
     // MARK: Implementation of external interface for TUICallKit
     override func setScreenOrientation(orientation: Int, completion: CompletionClosure?) {
         guard let targetOrientation = Orientation(rawValue: orientation) else {
-            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "Invalid screen orientation value")))
+            completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "Invalid screen orientation value")))
             return
         }
         globalState.orientation = Orientation(rawValue: orientation) ?? .portrait
@@ -66,40 +66,73 @@ class TUICallKitImpl: TUICallKit {
         LoginStore.shared.setSelfInfo(userProfile: userProfile ?? UserProfile(userID: LoginStore.shared.state.value.loginUserInfo?.userID ?? ""), completion: completion)
     }
     
-    override func calls(userIdList: [String], callMediaType: CallMediaType, params: CallParams?, completion: CompletionClosure?) {
+    override func calls(userIdList: [String], mediaType: CallMediaType, params: CallParams?, completion: CompletionClosure?) {
         if LoginStore.shared.state.value.loginUserInfo?.userID == nil {
-            completion?(.failure(ErrorInfo(code: ERROR_INIT_FAIL, message: "call failed, please login")))
+            completion?(.failure(ErrorInfo(code: Int(ERROR_INIT_FAIL), message: "call failed, please login")))
             return
         }
         
         if userIdList.count == 1 && userIdList.first == LoginStore.shared.state.value.loginUserInfo?.userID {
-            Toast.showToast(TUICallKitLocalize(key: "TUICallKit.calNotCallYourself"))
-            completion?(.failure(ErrorInfo(code: ERROR_INIT_FAIL, message: "call failed, not to call self")))
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.calNotCallYourself") ?? "")
+            completion?(.failure(ErrorInfo(code: Int(ERROR_INIT_FAIL), message: "call failed, not to call self")))
             return
         }
         
         let userIdList = userIdList.filter { $0 != LoginStore.shared.state.value.loginUserInfo?.userID }
         
         if userIdList.isEmpty {
-            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "call failed, invalid params 'userIdList'")))
+            completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "call failed, invalid params 'userIdList'")))
             return
         }
         
         if userIdList.count >= MAX_USER {
-            Toast.showToast(TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit"))
-            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "groupCall failed, currently supports call with up to 9 people")))
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit") ?? "")
+            completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "groupCall failed, currently supports call with up to 9 people")))
             return
         }
         
-        if !Permission.hasPermission(callMediaType: callMediaType, completion: nil) {
-             return
+        if CallStore.shared.state.value.selfInfo.status != .none {
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls") ?? "")
+            completion?(.failure(ErrorInfo(code: Int(ERROR_REQUEST_REFUSED), message: "calls failed: Status: Waiting/Accept. Do not call repeatedly.")))
+            return
         }
-
-        CallStore.shared.calls(participantIds: userIdList, mediaType: callMediaType, params: params ?? getCallParams(), completion: completion)
+        
+        if !Permission.hasPermission(callMediaType: mediaType, completion: nil) {
+            return
+        }
+        
+        CallStore.shared.calls(participantIds: userIdList, mediaType: mediaType, params: params ?? getCallParams()) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                completion?(.success(()))
+            case .failure(let error):
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    self?.showIMErrorMessage(code: Int32(error.code), message: error.message)
+                }
+                completion?(.failure(error))
+            }
+        }
     }
     
     override func join(callId: String, completion: CompletionClosure?) {
-        CallStore.shared.join(callId: callId, completion: completion)
+        let selfStatus = CallStore.shared.state.value.selfInfo.status
+        if selfStatus != .none {
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls") ?? "")
+            completion?(.failure(ErrorInfo(code: Int(ERROR_REQUEST_REFUSED), message: "join failed: Status: Waiting/Accept. Do not call repeatedly.")))
+            return
+        }
+        
+        CallStore.shared.join(callId: callId) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                completion?(.success(()))
+            case .failure(let error):
+                self.showIMErrorMessage(code: Int32(error.code), message: error.message)
+                completion?(.failure(error))
+            }
+        }
     }
     
     override func setCallingBell(filePath: String) {
@@ -144,6 +177,9 @@ class TUICallKitImpl: TUICallKit {
     
     override func enableFloatWindow(enable: Bool) {
         globalState.enableFloatWindow = enable
+        if !enable {
+            pictureInPictureFeature.closePictureInPicture()
+        }
     }
     
     override func enableVirtualBackground (enable: Bool) {
@@ -179,7 +215,10 @@ class TUICallKitImpl: TUICallKit {
 // MARK: Subscribe
 extension TUICallKitImpl {
     func addNotificationObserver() {
-        NotificationCenter.default.addObserver(self, selector: #selector(loginSuccess(_:)),
+        NotificationCenter.default.addObserver(self, selector: #selector(setupCallEngine),
+                                               name: Notification.Name.TUIInitSdkSuccess,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loginSuccess),
                                                name: Notification.Name.TUILoginSuccess,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
@@ -200,9 +239,10 @@ extension TUICallKitImpl {
     }
     
     func removeNotificationObserver() {
-        NotificationCenter.default.removeObserver(Notification.Name.TUILoginSuccess)
-        NotificationCenter.default.removeObserver(Notification.Name.TUILogoutSuccess)
-        NotificationCenter.default.removeObserver(UIApplication.willTerminateNotification)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name.TUIInitSdkSuccess, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name.TUILoginSuccess, object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name.TUILogoutSuccess, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willTerminateNotification, object: nil)
     }
     
     func subscribeCallState() {
@@ -300,29 +340,30 @@ extension TUICallKitImpl {
     
     @objc func handleShowToast(_ notification: Notification) {
         guard let data = notification.object as? String else { return }
-        Toast.shared.showToast(message: data)
+        showInfoToast(message: data)
+    }
+    
+    @objc func setupCallEngine() {
+        TUICallEngine.createInstance().`init`(TUILogin.getSdkAppID(), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "") { [weak self] in
+            guard let self = self else { return }
+            self.enableVirtualBackground(enable: self.globalState.enableVirtualBackground)
+            if !self.globalState.enableFloatWindow {
+                self.pictureInPictureFeature.closePictureInPicture()
+            }
+        } fail: { code, message in
+            Logger.error("TUICallKitImpl initEngine failed. code: \(code), message: \(message ?? "")")
+        }
+    }
+    
+    @objc func loginSuccess() {
+        LoginStore.shared.login(sdkAppID: TUILogin.getSdkAppID(), userID: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "", completion: nil)
+        setFramework()
+        setExcludeFromHistoryMessage()
     }
     
     @objc func logoutSuccess() {
         CallStore.shared.hangup(completion: nil)
         TUICallEngine.destroyInstance()
-    }
-    
-    @objc func loginSuccess(_ notification: Notification) {
-        //TODO: CallEngine 的 init 方法下沉至 Store 中完成
-        LoginStore.shared.login(sdkAppID: TUILogin.getSdkAppID(), userID: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "", completion: nil)
-        TUICallEngine.createInstance().`init`(TUILogin.getSdkAppID(), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "") { [weak self] in
-            guard let self = self else { return }
-            self.enableVirtualBackground(enable: self.globalState.enableVirtualBackground)
-            if globalState.enablePictureInPicture {
-                pictureInPictureFeature = PictureInPictureFeature()
-            }
-        } fail: { code, message in
-            Logger.error("TUICallKitImpl initEngine failed. code: \(code), message: \(message)")
-        }
-        
-        setFramework()
-        setExcludeFromHistoryMessage()
     }
     
     @objc func applicationWillTerminate() {
@@ -427,7 +468,6 @@ extension TUICallKitImpl {
 extension TUICallKitImpl {
     func setupCallEventListener() {
         CallStore.shared.callEventPublisher
-            .receive(on: RunLoop.main)
             .sink { [weak self] event in
                 guard let self = self else { return }
                 self.handleCallEvent(event)
@@ -476,6 +516,8 @@ extension TUICallKitImpl {
             messageKey = "TUICallKit.lineBusy"
         case .noResponse:
             messageKey = "TUICallKit.otherPartyNoResponse"
+        case .canceled:
+            messageKey = "TUICallKit.otherPartyCanceled"
         default:
             messageKey = nil
         }
@@ -489,9 +531,9 @@ extension TUICallKitImpl {
         let activeCall = CallStore.shared.state.value.activeCall
         let mediaType = activeCall.mediaType
         let deviceStore = DeviceStore.shared
-
+        
         deviceStore.openLocalMicrophone(completion: nil)
-
+        
         if mediaType == .audio {
             deviceStore.setAudioRoute(.earpiece)
         } else {
@@ -499,7 +541,85 @@ extension TUICallKitImpl {
             deviceStore.openLocalCamera(isFront: true, completion: nil)
         }
     }
-
+    
+    func showIMErrorMessage(code: Int32, message: String?) {
+        let errorMessage = TUITool.convertIMError(Int(code), msg: convertCallKitError(code: code, message: message))
+        let eventId = getToastEventId(for: code)
+        showErrorToast(message: errorMessage ?? "", eventId: eventId)
+    }
+    
+    private func convertCallKitError(code: Int32, message: String?) -> String {
+        var errorMessage: String? = message
+        if code == ERROR_PACKAGE_NOT_PURCHASED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.purchased")
+        } else if code == ERROR_PACKAGE_NOT_SUPPORTED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.support")
+        } else if code == ERR_SVR_MSG_IN_PEER_BLACKLIST.rawValue {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorInPeerBlacklist")
+        } else if code == ERROR_INIT_FAIL {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorInvalidLogin")
+        } else if code == ERROR_PARAM_INVALID {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorParameterInvalid")
+        } else if code == ERROR_REQUEST_REFUSED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.UnableToRestartTheCall")
+        } else if code == ERROR_REQUEST_REPEATED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorRequestRepeated")
+        } else if code == ERROR_SCENE_NOT_SUPPORTED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorSceneNotSupport")
+        } else if code == ERR_TRTC_ENTER_ROOM_FAILED.rawValue {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorTRTCEnterRoomFailed")
+        } else if code == ERROR_PERMISSION_DENIED {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorPermissonDenied")
+        } else if code == ERR_CAMERA_OCCUPY.rawValue {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorCameraOccupied")
+        } else if code == ERR_MIC_OCCUPY.rawValue {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorMicOccupied")
+        } else if code == IM_CODE_INVALID_PARAMETERS {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorInvalidUserId")
+        }
+        return errorMessage ?? ""
+    }
+    
+    private func getToastEventId(for code: Int32) -> Int? {
+        if code == ERROR_PACKAGE_NOT_PURCHASED {
+            return ToastEventId.packageNotPurchased
+        } else if code == ERROR_PACKAGE_NOT_SUPPORTED {
+            return ToastEventId.packageNotSupported
+        } else if code == ERROR_PERMISSION_DENIED {
+            return ToastEventId.permissionDenied
+        } else if code == ERR_CAMERA_OCCUPY.rawValue {
+            return ToastEventId.cameraOccupied
+        } else if code == ERR_MIC_OCCUPY.rawValue {
+            return ToastEventId.micOccupied
+        } else if code == ERROR_REQUEST_REFUSED {
+            return ToastEventId.userBusy
+        } else if code == ERROR_INIT_FAIL {
+            return ToastEventId.notLogin
+        } else if code == ERR_TRTC_ENTER_ROOM_FAILED.rawValue {
+            return ToastEventId.enterRoomFailed
+        }
+        return nil
+    }
+    
+    private func showErrorToast(message: String, eventId: Int? = nil) {
+        UIApplication.shared.keyWindow?.showAtomicToast(
+            eventId: eventId,
+            text: message,
+            customIcon: UIImage.atomicXBundleImage(named: "toast_error"),
+            style: .error,
+            position: .center,
+            duration: .long
+        )
+    }
+    
+    private func showInfoToast(message: String) {
+        UIApplication.shared.keyWindow?.showAtomicToast(
+            text: message,
+            style: .info,
+            position: .center,
+            duration: .short
+        )
+    }
 }
 
 // MARK: - AI Transcriber

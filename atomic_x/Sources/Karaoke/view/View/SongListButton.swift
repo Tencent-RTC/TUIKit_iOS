@@ -13,8 +13,8 @@ class SongListButton: UIControl {
     private let gradient : CAGradientLayer = {
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor("8157FF").cgColor,
-            UIColor("00ABD6").cgColor
+            ThemeStore.shared.colorTokens.tagColorLevel3.cgColor,
+            ThemeStore.shared.colorTokens.tagColorLevel1.cgColor
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
@@ -33,7 +33,7 @@ class SongListButton: UIControl {
         let titleLbl = UILabel()
         titleLbl.text = .songText
         titleLbl.font = UIFont(name: "PingFangSC-Medium", size: 14)
-        titleLbl.textColor = UIColor.white.withAlphaComponent(0.9)
+        titleLbl.textColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.9)
         titleLbl.numberOfLines = 1
         titleLbl.lineBreakMode = .byClipping
         titleLbl.setContentHuggingPriority(.required, for: .horizontal)
@@ -85,5 +85,5 @@ class SongListButton: UIControl {
 }
 
 fileprivate extension String {
-    static var songText = ("karaoke_order_song").localized
+    static var songText = ("karaoke_order_song").atomicLocalized
 }

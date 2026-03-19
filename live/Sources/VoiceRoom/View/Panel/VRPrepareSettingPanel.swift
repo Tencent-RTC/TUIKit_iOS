@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import RTCCommon
+import AtomicX
 
 class VRPrepareSettingPanel: UIView {
     private let routerManager: VRRouterManager
@@ -111,7 +111,8 @@ extension VRPrepareSettingPanel {
         }
         
         settingTableView.snp.remakeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
         }
     }

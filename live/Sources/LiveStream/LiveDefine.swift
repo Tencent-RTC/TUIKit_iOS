@@ -5,7 +5,7 @@
 //  Created by aby on 2024/3/15.
 //
 
-import RTCCommon
+import AtomicX
 
 public enum LiveStreamPrivacyStatus: NSInteger, CaseIterable {
     case `public` = 0

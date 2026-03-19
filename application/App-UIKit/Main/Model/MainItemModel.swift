@@ -6,7 +6,7 @@
 //
 import Foundation
 import UIKit
-import RTCCommon
+import AtomicX
 
 let imageWidth: CGFloat = 172
 let titleFontSize: CGFloat = 17

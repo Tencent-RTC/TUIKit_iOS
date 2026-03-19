@@ -6,7 +6,7 @@
 //
 
 import Combine
-import RTCCommon
+import AtomicX
 
 class VRPrepareSelectionModel {
     var textLeftDiff:Float = 8.0

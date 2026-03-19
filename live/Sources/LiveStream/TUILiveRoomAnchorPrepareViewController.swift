@@ -5,11 +5,10 @@
 //  Created by gg on 2025/4/17.
 //
 
+import AtomicX
 import AtomicXCore
 import Combine
-import RTCCommon
 import RTCRoomEngine
-import TUICore
 
 public class TUILiveRoomAnchorPrepareViewController: UIViewController {
     private let roomId: String
@@ -26,25 +25,13 @@ public class TUILiveRoomAnchorPrepareViewController: UIViewController {
 #endif
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private let coreView: LiveCoreView = {
-        let jsonObject: [String: Any] = [
-            "api": "component",
-            "component": 21
-        ]
-        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: []),
-           let jsonString = String(data: jsonData, encoding: .utf8)
-        {
-            LiveCoreView.callExperimentalAPI(jsonString)
-        }
-        return LiveCoreView(viewType: .pushView)
-    }()
-    
     private lazy var rootView: AnchorPrepareView = {
-        let view = AnchorPrepareView(roomId: roomId, coreView: coreView)
+        let view = AnchorPrepareView(roomId: roomId)
         view.delegate = self
         return view
     }()
@@ -75,6 +62,14 @@ public class TUILiveRoomAnchorPrepareViewController: UIViewController {
     }
 }
 
+let transitionWindow: UIWindow = {
+    let window = UIWindow(frame: UIScreen.main.bounds)
+    window.windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+    window.windowLevel = .statusBar - 1
+    window.backgroundColor = .clear
+    return window
+}()
+
 extension TUILiveRoomAnchorPrepareViewController: AnchorPrepareViewDelegate {
     public func onClickBackButton() {
         if let nav = navigationController {
@@ -82,39 +77,41 @@ extension TUILiveRoomAnchorPrepareViewController: AnchorPrepareViewDelegate {
         } else {
             dismiss(animated: true)
         }
-        StateCache.shared.clear()
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
         BaseBeautyStore.shared.reset()
     }
     
     public func onClickStartButton(state: PrepareState) {
-        guard let rootVC = TUITool.applicationKeywindow().rootViewController else { return }
+        guard let rootVC = WindowUtils.getCurrentWindow()?.rootViewController else { return }
         let tmpView: UIView
         if let snapshot = rootView.snapshotView(afterScreenUpdates: true) {
             tmpView = snapshot
         } else {
             tmpView = rootView
         }
-        rootVC.view.addSubview(tmpView)
-        tmpView.frame = rootView.bounds
+        transitionWindow.addSubview(tmpView)
+        tmpView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        transitionWindow.alpha = 1
+        transitionWindow.isHidden = false
         
-        dismiss(animated: false) { [weak self, weak tmpView, weak rootVC] in
-            guard let self = self, let tmpView = tmpView, let rootVC = rootVC else { return }
+        dismiss(animated: false) { [weak self, weak rootVC] in
+            guard let self = self, let rootVC = rootVC else { return }
             
             let param = LiveParams(liveID: roomId, prepareState: state)
-            let anchorVC = TUILiveRoomAnchorViewController(liveParams: param, coreView: coreView, behavior: .createRoom)
+            let anchorVC = TUILiveRoomAnchorViewController(liveParams: param, coreView: rootView.getCoreView(), behavior: .createRoom)
             anchorVC.modalPresentationStyle = .fullScreen
 
             willStartLive?(anchorVC)
             
-            rootVC.present(anchorVC, animated: false) { [weak tmpView, weak rootVC] in
-                guard let tmpView = tmpView, let rootVC = rootVC else { return }
-                rootVC.view.bringSubviewToFront(tmpView)
+            rootVC.present(anchorVC, animated: false) {
                 UIView.animate(withDuration: 0.3) {
-                    tmpView.alpha = 0
+                    transitionWindow.alpha = 0
                 } completion: { _ in
-                    tmpView.safeRemoveFromSuperview()
+                    transitionWindow.subviews.forEach { $0.safeRemoveFromSuperview() }
+                    transitionWindow.isHidden = true
                 }
             }
         }

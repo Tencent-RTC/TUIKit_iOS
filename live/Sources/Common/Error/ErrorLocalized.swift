@@ -9,7 +9,7 @@ import Foundation
 import RTCRoomEngine
 import Combine
 import ImSDK_Plus
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 public protocol LocalizedError: Error {

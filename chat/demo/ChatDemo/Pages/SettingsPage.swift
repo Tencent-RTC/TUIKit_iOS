@@ -55,7 +55,9 @@ struct SettingsPage: View {
     @State private var primaryColorListExpanded = false
     @State private var languageListExpanded = false
     @State private var approveListExpanded = false
+    @State private var translateLanguageListExpanded = false
     @State private var showProfileDetail = false
+    @AppStorage("com.atomicx.enableReadReceipt") private var enableReadReceipt: Bool = false
 
     // State variables for real-time updates
     @State private var nickname: String? = nil
@@ -103,13 +105,18 @@ struct SettingsPage: View {
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
-                .listRowBackground(themeState.colors.listColorDefault)
-                Section(header: Text(LocalizedChatString("Settings")).foregroundColor(themeState.colors.textColorSecondary)) {
-                    AddMeApproveView()
+                .listRowBackground(themeState.colors.bgColorTopBar)
+                Section(header: Text(LocalizedChatString("Style")).foregroundColor(themeState.colors.textColorSecondary)) {
                     themeSelectionView()
                     languageSelectionView()
                 }
-                .listRowBackground(themeState.colors.listColorDefault)
+                .listRowBackground(themeState.colors.bgColorTopBar)
+                Section(header: Text(LocalizedChatString("Settings")).foregroundColor(themeState.colors.textColorSecondary)) {
+                    AddMeApproveView()
+                    readReceiptToggleView()
+                    translateLanguageSelectionView()
+                }
+                .listRowBackground(themeState.colors.bgColorTopBar)
                 Section {
                     Button(action: {
                         loginManager.logout { success in
@@ -120,13 +127,15 @@ struct SettingsPage: View {
                     }) {
                         Text(LocalizedChatString("logout"))
                             .foregroundColor(themeState.colors.textColorError)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
-                .listRowBackground(themeState.colors.listColorDefault)
+                .listRowBackground(themeState.colors.bgColorTopBar)
             }
-            .background(themeState.colors.bgColorDefault)
+            .modifier(ListBackgroundModifier(backgroundColor: themeState.colors.bgColorOperate))
             .listStyle(InsetGroupedListStyle())
         }
+        .background(themeState.colors.bgColorOperate.ignoresSafeArea(edges: .top))
         .id("SettingsPage-\(languageState.currentLanguage)")
         .onReceive(loginStore.state.subscribe(StatePublisherSelector(keyPath: \LoginState.loginUserInfo?.allowType))) { allowType in
             self.allowType = allowType
@@ -439,13 +448,122 @@ struct SettingsPage: View {
         .buttonStyle(PlainButtonStyle())
     }
 
+    @ViewBuilder
+    private func readReceiptToggleView() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(LocalizedChatString("MessageReadReceipt"))
+                    .foregroundColor(themeState.colors.textColorPrimary)
+                Spacer()
+                Toggle("", isOn: $enableReadReceipt)
+                    .labelsHidden()
+                    .onChange(of: enableReadReceipt) { newValue in
+                        AppBuilderConfig.shared.enableReadReceipt = newValue
+                    }
+            }
+
+            Text(getReadReceiptDescription())
+                .font(.caption)
+                .foregroundColor(themeState.colors.textColorSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func getReadReceiptDescription() -> String {
+        if enableReadReceipt {
+            return LocalizedChatString("MessageReadReceiptEnabledDesc")
+        } else {
+            return LocalizedChatString("MessageReadReceiptDisabledDesc")
+        }
+    }
+
+    // MARK: - Translate Language Selection
+
+    private let translateLanguageOptions: [(code: String, name: String)] = [
+        ("zh", "简体中文"),
+        ("zh-TW", "繁體中文"),
+        ("en", "English"),
+        ("ja", "日本語"),
+        ("ko", "한국어"),
+        ("fr", "Français"),
+        ("es", "Español"),
+        ("it", "Italiano"),
+        ("de", "Deutsch"),
+        ("tr", "Türkçe"),
+        ("ru", "Русский"),
+        ("pt", "Português"),
+        ("vi", "Tiếng Việt"),
+        ("id", "Bahasa Indonesia"),
+        ("th", "ภาษาไทย"),
+        ("ms", "Bahasa Melayu"),
+        ("hi", "हिन्दी")
+    ]
+
+    private func getCurrentTranslateLanguageDisplayName() -> String {
+        var currentCode = AppBuilderConfig.shared.translateTargetLanguage
+        // Map system language codes to SDK language codes
+        if currentCode == "zh-Hans" {
+            currentCode = "zh"
+        } else if currentCode == "zh-Hant" {
+            currentCode = "zh-TW"
+        }
+        return translateLanguageOptions.first { $0.code == currentCode }?.name ?? currentCode
+    }
+
+    @ViewBuilder
+    private func translateLanguageSelectionView() -> some View {
+        Button(action: { withAnimation { translateLanguageListExpanded.toggle() } }) {
+            HStack {
+                Text(LocalizedChatString("TranslateMessage"))
+                    .foregroundColor(themeState.colors.textColorPrimary)
+                Spacer()
+                Text(getCurrentTranslateLanguageDisplayName())
+                    .foregroundColor(themeState.colors.textColorSecondary)
+                Image(systemName: translateLanguageListExpanded ? "chevron.up" : "chevron.down")
+                    .foregroundColor(.gray)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+        if translateLanguageListExpanded {
+            Group {
+                ForEach(translateLanguageOptions, id: \.code) { option in
+                    createTranslateLanguageOption(code: option.code, name: option.name)
+                }
+            }
+            .transition(.opacity.combined(with: .move(edge: .top)))
+        }
+    }
+
+    @ViewBuilder
+    private func createTranslateLanguageOption(code: String, name: String) -> some View {
+        Button(action: {
+            AppBuilderConfig.shared.translateTargetLanguage = code
+            UserDefaults.standard.set(code, forKey: "com.atomicx.translateTargetLanguage")
+            translateLanguageListExpanded = false
+        }) {
+            HStack {
+                Text(name)
+                    .foregroundColor(themeState.colors.textColorSecondary)
+                Spacer()
+                if AppBuilderConfig.shared.translateTargetLanguage == code {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.accentColor)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+
     private var headerView: some View {
         HStack {
             Text(LocalizedChatString("TabSettings"))
                 .font(.system(size: 34, weight: .semibold))
                 .tracking(0.3)
                 .foregroundColor(themeState.colors.textColorPrimary)
-                .background(themeState.colors.listColorDefault)
+                .background(themeState.colors.clearColor)
                 .padding(.leading, 16)
             Spacer()
         }
@@ -569,7 +687,7 @@ struct ProfileDetailView: View {
                         Text(loginManager.currentUserID)
                             .foregroundColor(themeState.colors.textColorSecondary)
                     }
-                    .listRowBackground(themeState.colors.listColorDefault)
+                    .listRowBackground(themeState.colors.bgColorTopBar)
 
                     Button(action: {
                         showingSignatureSheet = true
@@ -583,7 +701,7 @@ struct ProfileDetailView: View {
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .listRowBackground(themeState.colors.listColorDefault)
+                    .listRowBackground(themeState.colors.bgColorTopBar)
 
                     Button(action: {
                         showingGenderActionSheet = true
@@ -599,7 +717,7 @@ struct ProfileDetailView: View {
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .listRowBackground(themeState.colors.listColorDefault)
+                    .listRowBackground(themeState.colors.bgColorTopBar)
 
                     Button(action: {
                         if let birthday = loginStore.state.value.loginUserInfo?.birthday {
@@ -618,12 +736,16 @@ struct ProfileDetailView: View {
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .listRowBackground(themeState.colors.listColorDefault)
+                    .listRowBackground(themeState.colors.bgColorTopBar)
                 }
             }
+            .modifier(ListBackgroundModifier(backgroundColor: themeState.colors.bgColorOperate))
             .listStyle(InsetGroupedListStyle())
         }
-        .background(themeState.colors.bgColorDefault)
+        .background(
+            themeState.colors.bgColorOperate
+                .ignoresSafeArea()
+        )
         .navigationBarTitle(LocalizedChatString("ProfileDetails"), displayMode: .inline)
         .onReceive(loginStore.state.subscribe(StatePublisherSelector(keyPath: \LoginState.loginUserInfo?.avatarURL))) { avatarURL in
             self.avatar = avatarURL
@@ -775,6 +897,7 @@ private struct selfSignatureEditSheet: View {
 private struct birthdayEditSheet: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var languageState: LanguageState
+    @EnvironmentObject var themeState: ThemeState
     @State private var selectedDate: Date
     let currentDate: Date
     let onSave: (Date) -> Void
@@ -791,7 +914,7 @@ private struct birthdayEditSheet: View {
                 Button(LocalizedChatString("Cancel")) {
                     presentationMode.wrappedValue.dismiss()
                 }
-                .foregroundColor(.secondary)
+                .foregroundColor(themeState.colors.textColorLink)
 
                 Spacer()
 
@@ -799,7 +922,7 @@ private struct birthdayEditSheet: View {
                     onSave(selectedDate)
                     presentationMode.wrappedValue.dismiss()
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(themeState.colors.textColorLink)
             }
             .padding(.horizontal)
 
@@ -820,34 +943,16 @@ private struct GenderActionSheetModifier: ViewModifier {
     let onGenderSelected: (Int) -> Void
 
     func body(content: Content) -> some View {
-        if #available(iOS 15.0, *) {
-            content
-                .confirmationDialog(LocalizedChatString("ProfileEditGender"), isPresented: $isPresented, titleVisibility: .visible) {
-                    Button(LocalizedChatString("Male")) {
-                        onGenderSelected(1)
-                    }
-                    Button(LocalizedChatString("Female")) {
-                        onGenderSelected(2)
-                    }
-                    Button(LocalizedChatString("Cancel"), role: .cancel) {}
+        content
+            .confirmationDialog(LocalizedChatString("ProfileEditGender"), isPresented: $isPresented, titleVisibility: .visible) {
+                Button(LocalizedChatString("Male")) {
+                    onGenderSelected(1)
                 }
-        } else {
-            content
-                .actionSheet(isPresented: $isPresented) {
-                    ActionSheet(
-                        title: Text(LocalizedChatString("ProfileEditGender")),
-                        buttons: [
-                            .default(Text(LocalizedChatString("Male"))) {
-                                onGenderSelected(1)
-                            },
-                            .default(Text(LocalizedChatString("Female"))) {
-                                onGenderSelected(2)
-                            },
-                            .cancel(Text(LocalizedChatString("Cancel")))
-                        ]
-                    )
+                Button(LocalizedChatString("Female")) {
+                    onGenderSelected(2)
                 }
-        }
+                Button(LocalizedChatString("Cancel"), role: .cancel) {}
+            }
     }
 }
 
@@ -860,6 +965,24 @@ private struct SheetModifier: ViewModifier {
                 .interactiveDismissDisabled(false)
         } else {
             content
+        }
+    }
+}
+
+private struct ListBackgroundModifier: ViewModifier {
+    let backgroundColor: Color
+
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content
+                .scrollContentBackground(.hidden)
+                .background(backgroundColor)
+        } else {
+            content
+                .onAppear {
+                    UITableView.appearance().backgroundColor = .clear
+                }
+                .background(backgroundColor)
         }
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import TUICore
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 

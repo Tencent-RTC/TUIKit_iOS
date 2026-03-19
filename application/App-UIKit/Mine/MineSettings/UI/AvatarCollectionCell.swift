@@ -64,7 +64,7 @@ class AvatarCollectionCell: UICollectionViewCell {
     }
     
     private func setupMaskView() {
-        bgView.backgroundColor = UIColor(hex: "cccccc")
+        bgView.backgroundColor = UIColor("cccccc")
         bgView.isHidden = true
         imageView.addSubview(bgView)
         

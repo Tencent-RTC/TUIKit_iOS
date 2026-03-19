@@ -7,7 +7,6 @@
 
 import Foundation
 import AtomicXCore
-import RTCCommon
 import AtomicX
 
 class AudienceMemberCell: UITableViewCell {
@@ -25,7 +24,7 @@ class AudienceMemberCell: UITableViewCell {
                 return
             }
             
-            avatarView.setContent(.url(user.avatarURL, placeholder: avatarPlaceholderImage))
+            avatarView.setContent(.url(user.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
             
             nameLabel.text = user.userName.isEmpty ? user.userID : user.userName
         }
@@ -33,7 +32,7 @@ class AudienceMemberCell: UITableViewCell {
     
     private lazy var avatarView: AtomicAvatar = {
         let avatar = AtomicAvatar(
-            content: .url("", placeholder: avatarPlaceholderImage),
+            content: .url("", placeholder: UIImage.avatarPlaceholderImage),
             size: .m,
             shape: .round
         )

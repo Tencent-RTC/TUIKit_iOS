@@ -5,9 +5,9 @@
 //  Created by jeremiawang on 2024/11/20.
 //
 
-import RTCCommon
 import Combine
 import AtomicX
+import AtomicXCore
 
 class AnchorRouterManager {
     let observerState = ObservableState<AnchorRouterState>(initialState: AnchorRouterState())
@@ -15,7 +15,7 @@ class AnchorRouterManager {
         observerState.state
     }
     
-    func subscribeRouterState<Value>(_ selector: StateSelector<AnchorRouterState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeRouterState<Value>(_ selector: StatePublisherSelector<AnchorRouterState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
     
@@ -44,13 +44,8 @@ extension AnchorRouterManager {
                 if let currentRoute = routerState.routeStack.last {
                     var shouldDismiss = false
                     
-                    switch currentRoute {
-                    case .custom(let item):
-                        if item.view is AtomicAlertView {
-                            shouldDismiss = true
-                        }
-                    default:
-                        break
+                    if currentRoute.view is AtomicAlertView {
+                        shouldDismiss = true
                     }
                     
                     if shouldDismiss {
@@ -62,19 +57,8 @@ extension AnchorRouterManager {
             }
         case .exit:
             update { routerState in
+                routerState.shouldExit = true
                 routerState.routeStack = []
-            }
-        }
-    }
-    
-    func setRootRoute(route: AnchorRoute) {
-        if routerState.routeStack.count >= 1 {
-            update { routerState in
-                routerState.routeStack[0] = route
-            }
-        } else {
-            update { routerState in
-                routerState.routeStack.append(route)
             }
         }
     }
@@ -89,7 +73,7 @@ extension AnchorRouterManager {
         update { routerState in
             routerState.dismissEvent = completion
         }
-        if routerState.routeStack.count > 1 {
+        if routerState.routeStack.count > 0 {
             update { routerState in
                 let _ = routerState.routeStack.popLast()
             }
@@ -105,10 +89,9 @@ extension AnchorRouterManager {
 
 extension AnchorRouterManager {
     
-    func present(view: UIView, position: ViewPosition = .center) {
-        let item = RouteItem(view: view, position: position)
-        let route = AnchorRoute.custom(item)
-        self.router(action: .present(route))
+    func present(view: UIView, config: RouteItemConfig = .bottomDefault()) {
+        let item = RouteItem(view: view, config: config)
+        self.router(action: .present(item))
     }
     
     func dismiss(dismissType: AnchorDismissType = .panel, completion: (() -> Void)? = nil) {

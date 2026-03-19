@@ -8,7 +8,7 @@ import RTCRoomEngine
 import SnapKit
 import Combine
 import AtomicXCore
-import RTCCommon
+import AtomicX
 
 class LocalCoHostEmptyView: UIView {
     var didTap: (() -> Void)?
@@ -33,7 +33,6 @@ class LocalCoHostEmptyView: UIView {
         userInfo = seatInfo
         super.init(frame: .zero)
 
-        setupGradientBackground()
         layer.borderWidth = 1
         layer.borderColor = UIColor.white.withAlphaComponent(0.14).cgColor
 
@@ -57,27 +56,12 @@ class LocalCoHostEmptyView: UIView {
         addGestureRecognizer(tap)
     }
 
-    private func setupGradientBackground() {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor.b1.withAlphaComponent(0.2).cgColor,
-            UIColor.b1.withAlphaComponent(0.1).cgColor
-        ]
-
-        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
-        gradientLayer.endPoint   = CGPoint(x: 0.5, y: 1)
-        gradientLayer.frame = bounds
-        gradientLayer.cornerRadius = layer.cornerRadius
-
-        layer.insertSublayer(gradientLayer, at: 0)
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        if let gradientLayer = layer.sublayers?.first(where: { $0 is CAGradientLayer }) as? CAGradientLayer {
-            gradientLayer.frame = bounds
-            gradientLayer.cornerRadius = layer.cornerRadius
-        }
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        self.gradient(colors: [
+            UIColor.b1.withAlphaComponent(0.2),
+            UIColor.b1.withAlphaComponent(0.1)
+        ], isVertical: true)
     }
 
     @objc private func handleTap() {

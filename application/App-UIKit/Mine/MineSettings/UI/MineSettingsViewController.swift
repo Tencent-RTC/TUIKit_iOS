@@ -7,7 +7,7 @@
 
 import UIKit
 import SnapKit
-import RTCCommon
+import AtomicX
 import TUICore
 
 class MineSettingsViewController: UIViewController{
@@ -188,7 +188,9 @@ extension MineSettingsViewController: UITableViewDelegate {
 extension MineSettingsViewController: LanguageSelectViewControllerDelegate {
     func onSelectLanguage(cellModel: LanguageSelectCellModel) {
         DispatchQueue.main.async {
-            guard let appDelegate = ApplicationUtils.shared.appDelegate as? AppDelegate else{ return}
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                return
+            }
             appDelegate.showMainViewController()
         }
     }

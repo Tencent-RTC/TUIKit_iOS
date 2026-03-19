@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import UIKit
 
 class AudienceBattleInfoView: RTCBaseView {
@@ -164,7 +164,7 @@ class AudienceBattleInfoView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribeState(StateSelector(keyPath: \AudienceBattleState.durationCountDown))
+        manager.subscribeState(StatePublisherSelector(keyPath: \AudienceBattleState.durationCountDown))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] duration in

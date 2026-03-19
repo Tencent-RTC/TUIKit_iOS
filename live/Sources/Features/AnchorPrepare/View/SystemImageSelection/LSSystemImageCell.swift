@@ -7,7 +7,7 @@
 
 import Foundation
 
-private let imageDomain = "https://liteav-test-1252463788.cos.ap-guangzhou.myqcloud.com/voice_room/"
+private let imageDomain = "https://liteav-test-1252463788.cos.ap-guangzhou.myqcloud.com/live/"
 
 struct LSSystemImageModel {
     var imagePath: String
@@ -22,10 +22,9 @@ struct LSSystemImageModel {
 
 class LSSystemImageFactory {
     static func getImageAssets() -> [LSSystemImageModel] {
-        let index = 12
         var imageAssets: [LSSystemImageModel] = []
-        for index in 1...index {
-            let imagePath = "voice_room_cover" + "\(index).png"
+        for index in 1...5 {
+            let imagePath = "live_cover" + "\(index).png"
             imageAssets.append(LSSystemImageModel(imagePath: imagePath))
         }
         return imageAssets
@@ -67,7 +66,7 @@ class LSSystemImageCell: UICollectionViewCell {
     var model: LSSystemImageModel? {
         didSet {
             guard let model = model else { return }
-            imageView.kf.setImage(with: model.imageUrl, placeholder: UIImage.placeholderImage)
+            imageView.kf.setImage(with: model.thumbnailImageUrl, placeholder: UIImage.placeholderImage)
         }
     }
     

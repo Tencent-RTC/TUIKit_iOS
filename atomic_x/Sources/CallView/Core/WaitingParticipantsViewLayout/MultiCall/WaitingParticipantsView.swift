@@ -37,7 +37,7 @@ class WaitingParticipantsView: UIView, UICollectionViewDelegate, UICollectionVie
     }()
     private let callerNameLabel: UILabel = {
         let participantNameLabel = UILabel(frame: CGRect.zero)
-        participantNameLabel.textColor = UIColor(hex: "#D5E0F2")
+        participantNameLabel.textColor = UIColor("D5E0F2")
         participantNameLabel.font = UIFont.boldSystemFont(ofSize: 18.0)
         participantNameLabel.backgroundColor = UIColor.clear
         participantNameLabel.textAlignment = .center
@@ -48,7 +48,7 @@ class WaitingParticipantsView: UIView, UICollectionViewDelegate, UICollectionVie
     private let describeLabel: UILabel = {
         let describeLabel = UILabel()
         describeLabel.font = UIFont.systemFont(ofSize: 12.0)
-        describeLabel.textColor = UIColor(hex: "#D5E0F2")
+        describeLabel.textColor = UIColor("D5E0F2")
         describeLabel.textAlignment = .center
         describeLabel.isUserInteractionEnabled = false
         describeLabel.text = CallKitLocalization.localized("calleeTip")

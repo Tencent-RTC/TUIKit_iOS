@@ -7,6 +7,7 @@
 
 import AVFoundation
 import AtomicXCore
+import RTCRoomEngine
 
 enum AuthorizationDeniedType: Int {
     case audio
@@ -17,13 +18,13 @@ class Permission: NSObject {
     static func hasPermission(callMediaType: CallMediaType, completion: CompletionClosure?) -> Bool {
         if Permission.checkAuthorizationStatusIsDenied(mediaType: .audio) {
             Permission.showAuthorizationAlert(mediaType: .audio)
-            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "call failed, authorization status is denied")))
+            completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "call failed, authorization status is denied")))
             return false
         }
 
         if callMediaType == .video && Permission.checkAuthorizationStatusIsDenied(mediaType: .video){
             Permission.showAuthorizationAlert(mediaType: .video)
-            completion?(.failure(ErrorInfo(code: ERROR_PARAM_INVALID, message: "call failed, authorization status is denied")))
+            completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "call failed, authorization status is denied")))
             return false
         }
         
@@ -68,15 +69,21 @@ class Permission: NSObject {
         var laterMessage: String
         var openSettingMessage: String
         
+        let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String 
+                   ?? Bundle.main.infoDictionary?["CFBundleName"] as? String 
+                   ?? "App"
+        
         switch deniedType {
         case .audio:
             title = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Title") ?? ""
-            message = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Tips") ?? ""
+            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Tips") ?? ""
+            message = String(format: messageTemplate, appName)
             laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Later") ?? ""
             openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Enable") ?? ""
         case .video:
             title = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Title") ?? ""
-            message = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Tips") ?? ""
+            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Tips") ?? ""
+            message = String(format: messageTemplate, appName)
             laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Later") ?? ""
             openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Enable") ?? ""
         }

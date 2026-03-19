@@ -8,7 +8,6 @@
 import Foundation
 import RTCRoomEngine
 import ImSDK_Plus
-import TUICore
 import AtomicXCore
 
 class LiveInfoService: NSObject {

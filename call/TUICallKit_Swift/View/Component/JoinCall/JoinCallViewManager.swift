@@ -192,21 +192,21 @@ class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     }
     
     func joinCall() {
-        hiddenJoinGroupCallView() 
         guard !callId.isEmpty else { return }
-        TUICallKit.createInstance().join(callId: callId, completion: nil)
+        TUICallKit.createInstance().join(callId: callId) { [weak self] result in
+            switch result {
+            case .success:
+                self?.hiddenJoinGroupCallView()
+            case .failure:
+                break
+            }
+        }
     }
     
     // MARK: - V2TIMGroupListener
     func onGroupAttributeChanged(_ groupID: String!, attributes: NSMutableDictionary!) {
         guard let attributes = attributes as? [String: String],
               groupId == groupID else {
-            return
-        }
-        
-        let selfStatus = CallStore.shared.state.value.selfInfo.status
-        if selfStatus != .none {
-            self.hiddenJoinGroupCallView()
             return
         }
         processGroupAttributeData(attributes)
@@ -223,6 +223,7 @@ extension JoinCallViewManager {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] newStatus in
                 guard let self = self else { return }
+                guard self.joinGroupCallView.isHidden else { return }
                 if newStatus == .none && !self.groupId.isEmpty {
                     self.getGroupAttributes(self.groupId)
                 }

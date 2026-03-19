@@ -10,6 +10,7 @@
 - ✅ **灵活高度**：支持自适应内容高度和屏幕比例高度
 - ✅ **丰富动画**：滑入、淡入、缩放等多种动画效果
 - ✅ **主题自适应**：自动跟随系统主题（深色/浅色模式）
+- ✅ **安全区域填充**：自动填充顶部/底部安全区域，无缝贴合屏幕边缘
 - ✅ **交互友好**：支持自定义背景点击行为、横屏自动关闭
 - ✅ **易于使用**：一行代码即可弹出，配置简单直观
 
@@ -81,12 +82,14 @@ public struct AtomicPopoverConfig {
     public var position: PopoverPosition
     public var height: PopoverHeight
     public var animation: PopoverAnimation
+    public var backgroundColor: PopoverColor
     public var onBackdropTap: (() -> Void)?
     
     public init(
         position: PopoverPosition = .bottom,
         height: PopoverHeight = .wrapContent,
         animation: PopoverAnimation = .slideFromBottom,
+        backgroundColor: PopoverColor = .defaultThemeColor,
         onBackdropTap: (() -> Void)? = nil
     )
 }
@@ -108,37 +111,33 @@ public enum PopoverPosition {
 
 #### 位置特性
 
-| 位置 | 宽度 | 圆角位置 | 适用场景 |
-|------|------|---------|---------|
-| `.bottom` | 全屏宽度 | 仅顶部圆角 | 底部菜单、选择器、操作面板 |
-| `.center` | 屏幕宽度 × 0.8 | 四角圆角 | 对话框、Alert、表单 |
-| `.top` | 全屏宽度 | 仅底部圆角 | 顶部通知、下拉菜单 |
+| 位置 | 宽度 | 圆角位置 | 安全区域处理 | 适用场景 |
+|------|------|---------|------------|---------|
+| `.bottom` | 全屏宽度 | 仅顶部圆角 | 自动填充底部安全区域 | 底部菜单、选择器、操作面板 |
+| `.center` | 屏幕宽度 × 0.9 | 四角圆角 | 不填充（悬浮显示） | 对话框、Alert、表单 |
+| `.top` | 全屏宽度 | 仅底部圆角 | 自动填充顶部安全区域 | 顶部通知、下拉菜单 |
 
 #### 视觉效果
 
 ```
-┌─────────────────────┐
-│                     │
-│                     │
+█████████████████████  ← 顶部安全区域自动填充
 ├─────────────────────┤  ← Top 位置（全宽）
 │    Top Popover      │
 ╰─────────────────────╯
 
 ┌─────────────────────┐
 │                     │
-│   ╭─────────────╮   │  ← Center 位置（80% 宽）
-│   │   Center    │   │     左右留白，视觉优雅
-│   │   Popover   │   │
-│   ╰─────────────╯   │
+│  ╭──────────────╮   │  ← Center 位置（90% 宽）
+│  │   Center     │   │     左右留白，视觉优雅
+│  │   Popover    │   │     不填充安全区域
+│  ╰──────────────╯   │
 │                     │
 └─────────────────────┘
 
 ╭─────────────────────╮
 │  Bottom Popover     │  ← Bottom 位置（全宽）
 ├─────────────────────┤
-│                     │
-│                     │
-└─────────────────────┘
+█████████████████████  ← 底部安全区域自动填充
 ```
 
 #### 使用示例
@@ -226,13 +225,20 @@ public enum PopoverAnimation {
 
 #### 动画详情
 
-| 动画类型 | 入场效果 | 出场效果 | 时长 | 推荐搭配位置 |
-|---------|---------|---------|------|------------|
-| `.slideFromBottom` | 从底部滑入 | 滑出到底部 | 0.3s | `.bottom` |
-| `.slideFromTop` | 从顶部滑入 | 滑出到顶部 | 0.3s | `.top` |
-| `.fade` | 淡入 (透明度 0→1) | 淡出 (透明度 1→0) | 0.3s | `.center` |
-| `.scale` | 缩放 + 淡入 (0.8→1.0) | 缩放 + 淡出 (1.0→0.9) | 0.3s | `.center` |
-| `.none` | 直接显示 | 直接消失 | 无 | 所有位置 |
+| 动画类型 | 入场效果 | 出场效果 | 时长 | 动画曲线 | 推荐搭配位置 |
+|---------|---------|---------|------|----------|------------|
+| `.slideFromBottom` | 从底部滑入 + 淡入 | 滑出到底部 + 淡出 | 0.35s / 0.28s | Spring (damping: 0.85) | `.bottom` |
+| `.slideFromTop` | 从顶部滑入 + 淡入 | 滑出到顶部 + 淡出 | 0.35s / 0.28s | Spring (damping: 0.85) | `.top` |
+| `.fade` | 淡入 (透明度 0→1) | 淡出 (透明度 1→0) | 0.35s / 0.28s | Spring (damping: 0.85) | `.center` |
+| `.scale` | 缩放 + 淡入 (0.8→1.0) | 缩放 + 淡出 (1.0→0.9) | 0.35s / 0.28s | Spring (damping: 0.85) | `.center` |
+| `.none` | 直接显示 | 直接消失 | 无 | - | 所有位置 |
+
+**动画特性：**
+- ✅ **弹簧动画**：使用 Spring 动画替代线性动画，视觉更自然
+- ✅ **入场时长**：0.35s，更从容的展示效果
+- ✅ **出场时长**：0.28s，快速响应用户操作
+- ✅ **安全区域同步**：safeAreaFillView 与 containerView 同步淡入淡出，无突兀感
+- ✅ **允许交互**：动画过程中允许用户继续交互（`.allowUserInteraction`）
 
 #### 最佳实践
 
@@ -257,6 +263,56 @@ let badConfig = AtomicPopover.AtomicPopoverConfig(
 
 ---
 
+### PopoverColor - 背景颜色
+
+控制弹窗容器的背景颜色。
+
+```swift
+public enum PopoverColor {
+    case defaultThemeColor  // 默认主题色（默认）
+    case custom(UIColor)    // 自定义颜色
+}
+```
+
+#### 颜色说明
+
+**`.defaultThemeColor`** - 默认主题色
+- 使用 `theme.tokens.color.bgColorDialog`
+- 自动跟随系统主题切换（深色/浅色模式）
+- 推荐用于大部分场景
+
+**`.custom(UIColor)`** - 自定义颜色
+- 使用指定的 UIColor
+- 不会随主题切换而变化
+- 适用于需要特定颜色的场景（如透明、半透明、品牌色）
+
+#### 使用示例
+
+```swift
+// 默认主题色
+let config = AtomicPopover.AtomicPopoverConfig(
+    backgroundColor: .defaultThemeColor
+)
+
+// 自定义颜色
+let config = AtomicPopover.AtomicPopoverConfig(
+    backgroundColor: .custom(.bgOperateColor)
+)
+
+// 半透明效果
+let config = AtomicPopover.AtomicPopoverConfig(
+    backgroundColor: .custom(UIColor.black.withAlphaComponent(0.8))
+)
+```
+
+**注意**：`backgroundColor` 会同时应用于：
+- `containerView`（内容容器）
+- `safeAreaFillView`（安全区域填充视图）
+
+这样可以确保整个弹窗视觉一致，无缝贴合屏幕边缘。
+
+---
+
 ### onBackdropTap - 背景点击回调
 
 控制点击蒙层背景时的行为。
@@ -267,12 +323,12 @@ public var onBackdropTap: (() -> Void)?  // 默认 nil
 
 #### 使用场景
 
-**`nil` (默认)** - 点击背景时自动调用 `dismiss()`
-- 常规菜单、选择器
-- 非强制性的弹窗
-- 用户可随时取消的场景
+**`nil` (默认)** - 点击背景时无操作
+- 需要用户必须通过特定操作关闭的弹窗（如填写表单后点击确认）
+- 不允许随意关闭的场景
 
 **自定义闭包** - 执行自定义逻辑
+- 点击背景时关闭弹窗（最常见的用法）
 - 点击背景时需要特殊处理（如保存数据、显示确认对话框）
 - 通过路由系统管理的弹窗（调用路由的 dismiss）
 - 需要额外逻辑的场景
@@ -280,9 +336,16 @@ public var onBackdropTap: (() -> Void)?  // 默认 nil
 #### 示例
 
 ```swift
-// 默认行为：点击背景自动关闭
+// 禁止点击背景关闭
 let config = AtomicPopover.AtomicPopoverConfig(
     onBackdropTap: nil  // 或直接不设置
+)
+
+// 点击背景直接关闭（最常见用法）
+let config = AtomicPopover.AtomicPopoverConfig(
+    onBackdropTap: { [weak self] in
+        self?.dismiss(animated: false)
+    }
 )
 
 // 自定义行为：通过路由系统关闭
@@ -301,9 +364,6 @@ let config = AtomicPopover.AtomicPopoverConfig(
         }
     }
 )
-
-// 禁止点击背景关闭：不添加闭包且不设置手势
-// （需要手动处理，当前实现会自动 dismiss，如需禁止需要修改组件）
 ```
 
 ---
@@ -324,20 +384,58 @@ let config = AtomicPopover.AtomicPopoverConfig(
 ### 2. 宽度
 
 - **`.bottom` / `.top`**：屏幕全宽（左右贴边）
-- **`.center`**：屏幕宽度的 80%（居中显示，两侧留白 10%）
+- **`.center`**：屏幕宽度的 90%（居中显示，两侧留白 5%）
 
-### 3. 背景蒙层
+### 3. 安全区域处理
+
+- **`.bottom`**：
+  - 底部约束到屏幕底部（`view.snp.bottom`）
+  - 顶部限制不超出顶部安全区域（`>= safeAreaLayoutGuide.top`）
+  - 使用 `clipsToBounds = true` 裁剪内容
+  - 圆角区域内的内容会被自然裁剪
+  
+- **`.top`**：
+  - 顶部约束到屏幕顶部（`view.snp.top`）
+  - 底部限制不超出底部安全区域（`<= safeAreaLayoutGuide.bottom`）
+  - 使用 `clipsToBounds = true` 裁剪内容
+  - 圆角区域内的内容会被自然裁剪
+  
+- **`.center`**：
+  - 居中在安全区域内（`centerY = safeAreaLayoutGuide.centerY`）
+  - 不会被安全区域遮挡
+
+**效果示例：**
+
+```
+iPhone X 及以上机型：
+
+底部弹出 (.bottom)：
+╭─────────────────────╮  ← 顶部圆角
+│  Content (内容区域)   │  ← containerView
+│                     │     内容被 clipsToBounds 裁剪
+├─────────────────────┤  ← containerView 底部 = 屏幕底部
+                          底部内容被圆角自然裁剪
+
+顶部弹出 (.top)：
+├─────────────────────┤  ← containerView 顶部 = 屏幕顶部
+│  Content (内容区域)   │  ← containerView
+│                     │     内容被 clipsToBounds 裁剪
+╰─────────────────────╯  ← 底部圆角
+                          顶部内容被圆角自然裁剪
+```
+
+### 4. 背景蒙层
 
 - **颜色**：`theme.tokens.color.bgColorMask`（自动跟随主题）
 - **透明度**：入场动画时从 0 → 1
 
-### 4. 主题适配
+### 5. 主题适配
 
 - 自动订阅 `ThemeStore`
-- 主题切换时自动更新背景色、蒙层色、圆角
+- 主题切换时自动更新背景色、蒙层色、圆角、安全区域填充色
 - 无需手动处理
 
-### 5. 横屏行为
+### 6. 横屏行为
 
 - 检测到设备旋转至横屏时，自动调用 `dismiss(animated: true)`
 - 适用场景：视频播放、游戏等需要全屏的场景
@@ -356,7 +454,10 @@ func showCityPicker() {
     let config = AtomicPopover.AtomicPopoverConfig(
         position: .bottom,
         height: .ratio(0.5),
-        animation: .slideFromBottom
+        animation: .slideFromBottom,
+        onBackdropTap: { [weak self] in
+            self?.dismiss(animated: false)
+        }
     )
     
     let popover = AtomicPopover(contentView: pickerView, configuration: config)
@@ -381,7 +482,10 @@ func showConfirmDialog() {
     let config = AtomicPopover.AtomicPopoverConfig(
         position: .center,
         height: .wrapContent,
-        animation: .scale
+        animation: .scale,
+        onBackdropTap: { [weak self] in
+            self?.dismiss(animated: false)
+        }
     )
     
     let popover = AtomicPopover(contentView: dialogView, configuration: config)
@@ -391,7 +495,7 @@ func showConfirmDialog() {
 
 **效果：**
 - 居中显示
-- 宽度为屏幕的 80%
+- 宽度为屏幕的 90%
 - 缩放动画进场
 - 高度自适应内容
 
@@ -485,7 +589,11 @@ class LiveRoomViewController: UIViewController {
         let config = AtomicPopover.AtomicPopoverConfig(
             position: .bottom,
             height: .ratio(0.6),
-            animation: .slideFromBottom
+            animation: .slideFromBottom,
+            onBackdropTap: { [weak self] in
+                self?.giftPopover?.dismiss(animated: false)
+                self?.giftPopover = nil
+            }
         )
         
         giftPopover = AtomicPopover(contentView: giftView, configuration: config)
@@ -700,6 +808,28 @@ class MyContentView: UIView {
 }
 ```
 
+**重要**：内容视图的约束应该直接约束到 `superview`，不要使用 `safeAreaLayoutGuide`。安全区域的填充由 `AtomicPopover` 自动处理。
+
+```swift
+// ✅ 推荐
+class MyPanelView: UIView {
+    private func setupConstraints() {
+        backgroundView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()  // 直接约束到 superview
+        }
+    }
+}
+
+// ❌ 避免
+class MyPanelView: UIView {
+    private func setupConstraints() {
+        backgroundView.snp.makeConstraints { make in
+            make.edges.equalTo(safeAreaLayoutGuide)  // 会造成底部空隙
+        }
+    }
+}
+```
+
 ### 2. 横屏自动关闭
 
 组件默认在横屏时自动关闭。如果你的应用不支持横屏，无需担心此特性。
@@ -804,21 +934,33 @@ AtomicPopover (UIViewController)
 ├── modalPresentationStyle = .overFullScreen
 ├── view
 │   ├── backdropView (背景蒙层)
-│   └── containerView (内容容器)
+│   └── containerView (内容容器，带圆角，clipsToBounds = true)
 │       └── contentView (用户内容)
 └── AtomicPopoverConfig
     ├── position (位置)
     ├── height (高度)
     ├── animation (动画)
+    ├── backgroundColor (背景色)
     └── onBackdropTap (背景点击回调)
 ```
+
+**布局层级说明：**
+
+- `backdropView`: 全屏蒙层，透明黑色，接收背景点击手势
+- `containerView`: 内容容器，带圆角和背景色
+  - `clipsToBounds = true`：内容会被圆角裁剪
+  - 底部/顶部弹窗约束到屏幕边缘
+  - 内容通过圆角自然裁剪
+- `contentView`: 用户提供的自定义内容视图
 
 ### 性能
 
 - ✅ 轻量级：ViewController-based，符合 iOS 设计模式
 - ✅ 主题响应：使用 Combine 订阅，自动更新
 - ✅ 内存优化：dismiss 后自动释放
-- ✅ 动画流畅：使用 Spring 动画，视觉自然
+- ✅ 动画流畅：使用 Spring 动画，入场 0.35s（damping: 0.85），出场 0.28s（damping: 1.0）
+- ✅ 交互优化：动画过程中允许用户交互，响应更快
+- ✅ 视觉简洁：使用 clipsToBounds 裁剪内容，无需额外的 layer 管理
 
 ---
 
@@ -852,7 +994,9 @@ popover.dismiss(animated: false) {
 
 ### Q: onBackdropTap 为 nil 时会发生什么？
 
-A: 点击背景时会自动调用 `dismiss()`，等同于：
+A: 点击背景时**不会有任何操作**，弹窗保持显示状态。用户必须通过其他方式关闭弹窗（如点击内部的按钮）。
+
+如果需要点击背景关闭，需要显式设置：
 
 ```swift
 let config = AtomicPopover.AtomicPopoverConfig(
@@ -864,7 +1008,89 @@ let config = AtomicPopover.AtomicPopoverConfig(
 
 ### Q: 如何禁止点击背景关闭？
 
-A: 当前实现中，如果 `onBackdropTap` 为 `nil`，会自动 dismiss。如需完全禁止，需要在闭包中不调用任何关闭逻辑，或者修改组件源码。
+A: 将 `onBackdropTap` 设置为 `nil`（或不设置），这样点击背景时不会有任何操作。
+
+```swift
+let config = AtomicPopover.AtomicPopoverConfig(
+    onBackdropTap: nil  // 禁止点击背景关闭
+)
+```
+
+### Q: 底部弹窗的内容会被安全区域遮挡吗？
+
+A: 不会。`AtomicPopover` 会自动限制 containerView 不超出顶部安全区域（`top >= safeAreaLayoutGuide.top`），同时底部约束到屏幕底部（`bottom = view.bottom`），内容通过 `clipsToBounds = true` 被圆角自然裁剪。
+
+### Q: 内容视图需要处理安全区域吗？
+
+A: **不需要**。内容视图的约束应该直接约束到 `superview`（即 containerView）。`AtomicPopover` 已经处理好了安全区域的限制和裁剪。
+
+### Q: 如何让头像等元素溢出容器边界？
+
+A: 内容视图可以自由布局，包括让元素溢出边界。只需在内容视图中将元素约束到负的 offset：
+
+```swift
+class RoomInfoPanelView: UIView {
+    private func setupConstraints() {
+        // 头像溢出顶部 29pt
+        avatarView.snp.makeConstraints { make in
+            make.top.equalToSuperview()  // 从容器顶部开始
+            make.centerX.equalToSuperview()
+        }
+        
+        // 背景视图从头像中部开始
+        backgroundView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(29)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+}
+```
+
+### Q: 动画参数可以自定义吗？
+
+A: 当前版本的动画参数已经过优化：
+- **入场动画**：0.35s，Spring damping 0.85，初速度 0.6
+- **出场动画**：0.28s，Spring damping 1.0，初速度 0.3
+- 这些参数经过调试，提供了最佳的视觉体验
+
+如需完全自定义动画，可使用 `.none` 动画类型，然后手动实现动画。
+
+### Q: clipsToBounds 会影响性能吗？
+
+A: 不会。`clipsToBounds = true` 是 iOS 系统层面的优化，对性能影响可以忽略不计。相比之前使用额外的 layer 填充方案，当前方案更简洁高效。
+
+---
+
+## 更新日志
+
+### Version 3.0 (2026-01-20)
+
+#### 🎨 架构优化
+- ✅ **移除 safeAreaFillLayer**：不再使用额外的 CALayer 填充安全区域
+- ✅ **改用 clipsToBounds**：使用 `containerView.clipsToBounds = true` 实现内容裁剪
+- ✅ **简化实现**：减少代码复杂度，移除 `updateSafeAreaFillLayer()` 方法
+- ✅ **约束优化**：底部/顶部弹窗约束到屏幕边缘（`view.snp.bottom`/`view.snp.top`）
+
+#### 🔧 布局改进
+- ✅ 底部弹窗：`containerView.bottom = view.bottom`，内容被圆角自然裁剪
+- ✅ 顶部弹窗：`containerView.top = view.top`，内容被圆角自然裁剪
+- ✅ 居中弹窗：保持原有逻辑，居中在安全区域内
+
+#### 📚 文档更新
+- ✅ 更新架构说明，反映最新实现
+- ✅ 更新安全区域处理说明
+- ✅ 更新 FAQ，移除 safeAreaFillView 相关问题
+- ✅ 添加 clipsToBounds 性能说明
+
+### Version 2.0 (2026-01-13)
+
+#### 🎨 动画优化
+- ✅ 优化入场动画时长：从 0.3s 提升到 0.35s，展示更从容
+- ✅ 优化出场动画时长：从 0.25s 提升到 0.28s，响应更自然
+- ✅ 改进弹簧动画参数：
+  - 入场：damping 0.85（更稳定），初速度 0.6（更有冲力）
+  - 出场：damping 1.0（无弹跳），初速度 0.3（轻微初速度）
+- ✅ 添加 `.allowUserInteraction` 选项：动画过程中允许用户交互
 
 ---
 

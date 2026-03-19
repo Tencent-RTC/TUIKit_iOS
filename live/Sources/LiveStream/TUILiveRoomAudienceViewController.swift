@@ -6,6 +6,7 @@
 //
 import UIKit
 import AtomicXCore
+import AtomicX
 import RTCRoomEngine
 
 public class TUILiveRoomAudienceViewController: UIViewController {
@@ -174,6 +175,7 @@ extension TUILiveRoomAudienceViewController: AudienceContainerViewDelegate {
         let audienceEndView = AudienceEndStatisticsView(roomId: roomId, avatarUrl: avatarUrl, userName: userName)
         audienceEndView.delegate = self
         view.addSubview(audienceEndView)
+        view.showAtomicToast(text: .liveHasStopText, style: .info)
         audienceEndView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -196,4 +198,8 @@ extension TUILiveRoomAudienceViewController: RotateScreenDelegate {
 
 extension Notification.Name {
     static let TUILiveKitRotateScreenNotification = Notification.Name("TUILiveKitRotateScreenNotification")
+}
+
+fileprivate extension String {
+    static let liveHasStopText = internalLocalized("common_live_has_stop")
 }

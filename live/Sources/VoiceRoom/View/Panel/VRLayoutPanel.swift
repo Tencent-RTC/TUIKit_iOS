@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 import AtomicX
-import RTCCommon
 
 class VRLayoutPanel: UIView {
     // MARK: - UI Components
@@ -89,13 +88,14 @@ class VRLayoutPanel: UIView {
         constructViewHierarchy()
         activateConstraints()
         setupView()
-        updateSelection(selectedView: chatBackgroundView)
+        let selectedView = prepareStore.state.layoutType == .KTVRoom ? ktvBackgroundView : chatBackgroundView
+        updateSelection(selectedView: selectedView)
     }
 
     // MARK: - Private Methods
     private func setupView() {
         [chatBackgroundView, ktvBackgroundView].forEach {
-            $0.backgroundColor = UIColor(hex: "2B2C30")
+            $0.backgroundColor = UIColor("2B2C30")
             $0.layer.cornerRadius = 8
             $0.layer.borderWidth = 0
             $0.layer.borderColor = UIColor.clear.cgColor

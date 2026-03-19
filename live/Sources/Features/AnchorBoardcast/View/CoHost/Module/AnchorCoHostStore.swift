@@ -9,7 +9,6 @@ import AtomicXCore
 import AtomicX
 import Combine
 import Foundation
-import RTCCommon
 
 class AnchorCoHostStore {
     let toastSubject: PassthroughSubject<(String, ToastStyle), Never>
@@ -67,16 +66,12 @@ class AnchorCoHostStore {
     }
     
     func getUserList(candidates: [SeatUserInfo], connected: [SeatUserInfo], invitees: [SeatUserInfo]) -> (connected: [AnchorCoHostUserInfo], recommended: [AnchorCoHostUserInfo]) {
-        let connectedLiveList = candidates.filter { candidates in
-            let ownerID = candidates.userID
-            let liveID = candidates.liveID
-            return connected.contains(where: { $0.liveID == liveID && $0.userID == ownerID })
-        }
+        let connectedLiveIDs = Set(connected.map { $0.liveID })
+        
+        let connectedUsers = connected.map { AnchorCoHostUserInfo(userInfo: $0, connectionStatus: .connected) }
         
         let recommendedUsers: [AnchorCoHostUserInfo] = candidates.filter { candidate in
-            let ownerID = candidate.userID
-            let liveID = candidate.liveID
-            return !connectedLiveList.contains(where: { $0.liveID == liveID && $0.userID == ownerID })
+            return !connectedLiveIDs.contains(candidate.liveID)
         }.map {
             let liveInfo = $0
             let connectionStatus: AnchorConnectionStatus
@@ -87,7 +82,7 @@ class AnchorCoHostStore {
             }
             return AnchorCoHostUserInfo(userInfo: $0, connectionStatus: connectionStatus)
         }
-        return (connected: connectedLiveList.map { AnchorCoHostUserInfo(userInfo: $0, connectionStatus: .connected) }, recommended: recommendedUsers)
+        return (connected: connectedUsers, recommended: recommendedUsers)
     }
 }
 
@@ -98,7 +93,7 @@ extension AnchorCoHostStore {
         toastSubject.send((error.localizedMessage,.error))
     }
     
-    func subscribeCoHostState<Value>(_ selector: StateSelector<AnchorCoHostState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeCoHostState<Value>(_ selector: StatePublisherSelector<AnchorCoHostState, Value>) -> AnyPublisher<Value, Never> {
         return observableState.subscribe(selector)
     }
 }

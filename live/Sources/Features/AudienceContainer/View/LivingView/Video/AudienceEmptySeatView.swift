@@ -15,13 +15,22 @@ class AudienceEmptySeatView: UIView {
     private let routerManager: AudienceRouterManager
     private let creator: AudienceRootMenuDataCreator
     private let seatInfo: SeatInfo
+    private weak var coreView: LiveCoreView?
     private var cancellableSet = Set<AnyCancellable>()
+    private let linkMicTypePanel: LinkMicTypePanel
 
-    init(seatInfo: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
+    init(seatInfo: SeatInfo,
+         manager: AudienceStore,
+         routerManager: AudienceRouterManager,
+         coreView: LiveCoreView,
+         menuCreator: AudienceRootMenuDataCreator) {
         self.seatInfo = seatInfo
         self.manager = manager
         self.routerManager = routerManager
-        self.creator = AudienceRootMenuDataCreator(coreView: coreView, manager: manager, routerManager: routerManager)
+        self.coreView = coreView
+        self.creator = menuCreator
+        let data = menuCreator.generateLinkTypeMenuData(seatIndex: seatInfo.index)
+        self.linkMicTypePanel = LinkMicTypePanel(data: data, routerManager: routerManager, manager: manager, seatIndex: seatInfo.index, coreView: coreView)
         super.init(frame: .zero)
         
         backgroundColor = .bgOperateColor
@@ -65,8 +74,7 @@ class AudienceEmptySeatView: UIView {
         if manager.coGuestState.connected.isOnSeat() {
             return
         }
-        let data = creator.generateLinkTypeMenuData(seatIndex: seatInfo.index)
-        routerManager.router(action: .present(.linkType(data, seatIndex: seatInfo.index)))
+        routerManager.present(view: linkMicTypePanel)
     }
     
     required init?(coder: NSCoder) {

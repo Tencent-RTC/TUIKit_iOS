@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		16EAAEE22EEC0CAE00286EA3 /* ChatNavPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */; };
 		4AE6172335A14D917199DD62 /* Pods_ChatDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */; };
 		A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DB2E6EC0050075F614 /* SettingsPage.swift */; };
 		A32424E82E6EC0050075F614 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E32E6EC0050075F614 /* SceneDelegate.swift */; };
 		A32424E92E6EC0050075F614 /* StyleSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E42E6EC0050075F614 /* StyleSettings.swift */; };
-		A32424EA2E6EC0050075F614 /* ChatPageWithNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424D82E6EC0050075F614 /* ChatPageWithNavigation.swift */; };
 		A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DE2E6EC0050075F614 /* AppDelegate.swift */; };
 		A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424D92E6EC0050075F614 /* HomePage.swift */; };
 		A32424ED2E6EC0050075F614 /* TUIKitDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E52E6EC0050075F614 /* TUIKitDemoApp.swift */; };
@@ -24,9 +24,9 @@
 
 /* Begin PBXFileReference section */
 		0CB983487A575C830063379D /* Pods-TUIKitDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TUIKitDemo.debug.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatNavPage.swift; sourceTree = "<group>"; };
 		8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		A30527642E6EC1B700276146 /* ChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A32424D82E6EC0050075F614 /* ChatPageWithNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPageWithNavigation.swift; sourceTree = "<group>"; };
 		A32424D92E6EC0050075F614 /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
 		A32424DA2E6EC0050075F614 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		A32424DB2E6EC0050075F614 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 		A32424DC2E6EC0050075F614 /* Pages */ = {
 			isa = PBXGroup;
 			children = (
-				A32424D82E6EC0050075F614 /* ChatPageWithNavigation.swift */,
+				16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */,
 				A32424D92E6EC0050075F614 /* HomePage.swift */,
 				A32424DA2E6EC0050075F614 /* LoginPage.swift */,
 				A32424DB2E6EC0050075F614 /* SettingsPage.swift */,
@@ -262,9 +262,9 @@
 				A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */,
 				A32424E82E6EC0050075F614 /* SceneDelegate.swift in Sources */,
 				A32424E92E6EC0050075F614 /* StyleSettings.swift in Sources */,
-				A32424EA2E6EC0050075F614 /* ChatPageWithNavigation.swift in Sources */,
 				A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */,
 				A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */,
+				16EAAEE22EEC0CAE00286EA3 /* ChatNavPage.swift in Sources */,
 				A32424ED2E6EC0050075F614 /* TUIKitDemoApp.swift in Sources */,
 				A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */,
 				A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */,
@@ -284,7 +284,7 @@
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = FN2V63AD2J;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -374,7 +374,7 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

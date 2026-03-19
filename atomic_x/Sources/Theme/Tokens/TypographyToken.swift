@@ -9,77 +9,106 @@
 import UIKit
 
 public struct TypographyToken {
-    public var fontFamilyName: String?
     
-    public init(fontFamilyName: String? = nil) {
-        self.fontFamilyName = fontFamilyName
+    // MARK: - Configuration Types
+    
+    public typealias FontResolver = (UIFont.Weight) -> String
+    
+    // MARK: - Properties
+    
+    private let fontResolver: FontResolver
+    private let fontScaleFactor: CGFloat
+    
+    // MARK: - Initialization
+    
+    public init(fontScaleFactor: CGFloat = 1.0, resolver: @escaping FontResolver) {
+        self.fontResolver = resolver
+        self.fontScaleFactor = fontScaleFactor
     }
-    // MARK: - Factory
+
+    // MARK: - Core Factory
     
     public func font(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
-        if let family = fontFamilyName, !family.isEmpty {
-            
-            let fontName = getFontName(family: family, weight: weight)
-            
-            if let customFont = UIFont(name: fontName, size: size) {
-                return customFont
-            }
-            print("Warning: Custom font '\(fontName)' not found. Falling back to system font.")
+        let finalSize = floor(size * fontScaleFactor)
+        
+        let fontName = fontResolver(weight)
+        
+        if let customFont = UIFont(name: fontName, size: finalSize) {
+            return customFont
         }
         
-        return UIFont.systemFont(ofSize: size, weight: weight)
+        return UIFont.systemFont(ofSize: finalSize, weight: weight)
+    }
+}
+
+// MARK: - Presets
+
+extension TypographyToken {
+    // Pingfang-SC
+    public static var pingFangSC: TypographyToken {
+        return TypographyToken { weight in
+            switch weight {
+            case .regular:         return "PingFangSC-Regular"
+            case .medium:          return "PingFangSC-Medium"
+            case .semibold, .bold: return "PingFangSC-Semibold"
+            default:               return "PingFangSC-Regular"
+            }
+        }
     }
     
-    private func getFontName(family: String, weight: UIFont.Weight) -> String {
-        switch weight {
-        case .regular: return "\(family)-Regular"
-        case .medium:  return "\(family)-Medium"
-        case .bold:    return "\(family)-Semibold"
-        default:       return "\(family)-Regular"
+    // System Font
+    public static var system: TypographyToken {
+        return TypographyToken { _ in
+            return ""
         }
     }
 }
 
+// MARK: - Semantic / Primitive Tokens
+
 extension TypographyToken {
-    // MARK: - Bold Series
-    public var Bold40: UIFont { font(size: 40, weight: .bold) }
-    public var Bold36: UIFont { font(size: 36, weight: .bold) }
-    public var Bold34: UIFont { font(size: 34, weight: .bold) }
-    public var Bold32: UIFont { font(size: 32, weight: .bold) }
-    public var Bold28: UIFont { font(size: 28, weight: .bold) }
-    public var Bold24: UIFont { font(size: 24, weight: .bold) }
-    public var Bold20: UIFont { font(size: 20, weight: .bold) }
-    public var Bold18: UIFont { font(size: 18, weight: .bold) }
-    public var Bold16: UIFont { font(size: 16, weight: .bold) }
-    public var Bold14: UIFont { font(size: 14, weight: .bold) }
-    public var Bold12: UIFont { font(size: 12, weight: .bold) }
-    public var Bold10: UIFont { font(size: 10, weight: .bold) }
-
+    private func bold(_ size: CGFloat) -> UIFont { font(size: size, weight: .bold) }
+    private func medium(_ size: CGFloat) -> UIFont { font(size: size, weight: .medium) }
+    private func regular(_ size: CGFloat) -> UIFont { font(size: size, weight: .regular) }
+    
+    public var Bold40: UIFont { bold(40) }
+    public var Bold36: UIFont { bold(36) }
+    public var Bold34: UIFont { bold(34) }
+    public var Bold32: UIFont { bold(32) }
+    public var Bold28: UIFont { bold(28) }
+    public var Bold24: UIFont { bold(24) }
+    public var Bold20: UIFont { bold(20) }
+    public var Bold18: UIFont { bold(18) }
+    public var Bold16: UIFont { bold(16) }
+    public var Bold14: UIFont { bold(14) }
+    public var Bold12: UIFont { bold(12) }
+    public var Bold10: UIFont { bold(10) }
+    
     // MARK: - Medium Series
-    public var Medium40: UIFont { font(size: 40, weight: .medium) }
-    public var Medium36: UIFont { font(size: 36, weight: .medium) }
-    public var Medium34: UIFont { font(size: 34, weight: .medium) }
-    public var Medium32: UIFont { font(size: 32, weight: .medium) }
-    public var Medium28: UIFont { font(size: 28, weight: .medium) }
-    public var Medium24: UIFont { font(size: 24, weight: .medium) }
-    public var Medium20: UIFont { font(size: 20, weight: .medium) }
-    public var Medium18: UIFont { font(size: 18, weight: .medium) }
-    public var Medium16: UIFont { font(size: 16, weight: .medium) }
-    public var Medium14: UIFont { font(size: 14, weight: .medium) }
-    public var Medium12: UIFont { font(size: 12, weight: .medium) }
-    public var Medium10: UIFont { font(size: 10, weight: .medium) }
-
+    public var Medium40: UIFont { medium(40) }
+    public var Medium36: UIFont { medium(36) }
+    public var Medium34: UIFont { medium(34) }
+    public var Medium32: UIFont { medium(32) }
+    public var Medium28: UIFont { medium(28) }
+    public var Medium24: UIFont { medium(24) }
+    public var Medium20: UIFont { medium(20) }
+    public var Medium18: UIFont { medium(18) }
+    public var Medium16: UIFont { medium(16) }
+    public var Medium14: UIFont { medium(14) }
+    public var Medium12: UIFont { medium(12) }
+    public var Medium10: UIFont { medium(10) }
+    
     // MARK: - Regular Series
-    public var Regular40: UIFont { font(size: 40, weight: .regular) }
-    public var Regular36: UIFont { font(size: 36, weight: .regular) }
-    public var Regular34: UIFont { font(size: 34, weight: .regular) }
-    public var Regular32: UIFont { font(size: 32, weight: .regular) }
-    public var Regular28: UIFont { font(size: 28, weight: .regular) }
-    public var Regular24: UIFont { font(size: 24, weight: .regular) }
-    public var Regular20: UIFont { font(size: 20, weight: .regular) }
-    public var Regular18: UIFont { font(size: 18, weight: .regular) }
-    public var Regular16: UIFont { font(size: 16, weight: .regular) }
-    public var Regular14: UIFont { font(size: 14, weight: .regular) }
-    public var Regular12: UIFont { font(size: 12, weight: .regular) }
-    public var Regular10: UIFont { font(size: 10, weight: .regular) }
+    public var Regular40: UIFont { regular(40) }
+    public var Regular36: UIFont { regular(36) }
+    public var Regular34: UIFont { regular(34) }
+    public var Regular32: UIFont { regular(32) }
+    public var Regular28: UIFont { regular(28) }
+    public var Regular24: UIFont { regular(24) }
+    public var Regular20: UIFont { regular(20) }
+    public var Regular18: UIFont { regular(18) }
+    public var Regular16: UIFont { regular(16) }
+    public var Regular14: UIFont { regular(14) }
+    public var Regular12: UIFont { regular(12) }
+    public var Regular10: UIFont { regular(10) }
 }

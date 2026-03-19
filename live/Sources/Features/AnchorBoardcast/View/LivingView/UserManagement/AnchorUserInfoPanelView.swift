@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import RTCCommon
 import ImSDK_Plus
 import AtomicXCore
 import AtomicX

@@ -41,7 +41,7 @@ class KaraokeState {
     var EarMonitor: Bool = false
     var enableScore: Bool = true
     var publishVolume: Int = 60
-    var playoutVolume: Int = 95
+    var playoutVolume: Int = 60
     var musicPitch: Float = 0.0
     var reverbType: MusicReverbType = .none
     var enableRequestMusic: Bool = true

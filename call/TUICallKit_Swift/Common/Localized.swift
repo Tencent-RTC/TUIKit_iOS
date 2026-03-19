@@ -33,8 +33,24 @@ func TUICallKitLocalizedBundle() -> Bundle? {
 }
 
 func TUICallKitLocalizeFromTable(key: String, table: String) -> String? {
-    guard let bundlePath = TUICallKitLocalizedBundle()?.path(forResource: TUIGlobalization.getPreferredLanguage() ?? "",
-                                                    ofType: "lproj") else { return nil}
+    let localizedBundle = TUICallKitLocalizedBundle()
+    var preferredLanguage = TUIGlobalization.getPreferredLanguage() ?? ""
+    
+    if preferredLanguage.contains("-") {
+        let components = preferredLanguage.components(separatedBy: "-")
+        if components.count >= 2 {
+            preferredLanguage = components[0] + "-" + components[1]
+        }
+    }
+    
+    guard let bundlePath = localizedBundle?.path(forResource: preferredLanguage, ofType: "lproj") else {
+        if let fallbackPath = localizedBundle?.path(forResource: "en", ofType: "lproj") {
+            let bundle = Bundle(path: fallbackPath)
+            return bundle?.localizedString(forKey: key, value: "", table: table)
+        }
+        return nil
+    }
+    
     let bundle = Bundle(path: bundlePath)
     return bundle?.localizedString(forKey: key, value: "", table: table)
 }

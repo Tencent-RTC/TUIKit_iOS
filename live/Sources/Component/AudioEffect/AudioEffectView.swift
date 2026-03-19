@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import RTCCommon
 import AtomicX
 #if canImport(TXLiteAVSDK_TRTC)
     import TXLiteAVSDK_TRTC
@@ -102,7 +101,7 @@ extension AudioEffectView {
             make.height.equalTo(24.scale375())
         }
         tableView.snp.remakeConstraints { make in
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.trailing.equalToSuperview().offset(-16)
             make.leading.equalToSuperview().offset(16)
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
@@ -117,7 +116,7 @@ extension AudioEffectView {
     }
     
     func setupViewStyle() {
-        backgroundColor = .g2
+        backgroundColor = .clear
     }
     
     var height: CGFloat {

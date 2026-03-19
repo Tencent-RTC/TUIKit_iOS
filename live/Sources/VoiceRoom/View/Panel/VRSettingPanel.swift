@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import RTCCommon
 import AtomicX
 
 class VRSettingPanel: UIView {
@@ -85,6 +84,7 @@ private extension VRSettingPanel {
         featureClickPanel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(32.scale375Height())
             make.centerX.equalToSuperview()
+            make.bottom.lessThanOrEqualTo(safeAreaLayoutGuide.snp.bottom).offset(-16.scale375Height())
         }
     }
 }

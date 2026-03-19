@@ -6,12 +6,10 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 import RTCRoomEngine
-import AtomicXCore
-import AtomicX
 
 class VRSeatManagerPanel: RTCBaseView {
     private let liveID: String
@@ -181,7 +179,8 @@ class VRSeatManagerPanel: RTCBaseView {
         }
         
         tableView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.height.equalTo(575.scale375Height())
             make.top.equalTo(separatorLine.snp.bottom)
         }
@@ -226,8 +225,9 @@ class VRSeatManagerPanel: RTCBaseView {
                     return !($0.userInfo.userID).isEmpty && $0.userInfo.userID != selfId
                 }
                 self.onTheSeatList = seatList.filter{$0.userInfo.liveID == self.liveID}
-                let seatListCount = seatStore.state.value.seatList.count
-                self.onTheSeatHeaderLabel.text = .localizedReplace(.onSeatListText, replace: "\(onTheSeatList.count) / \(seatListCount - 1)")
+                let isInConnection = !coHostStore.state.value.connected.isEmpty
+                let maxSeatCount = isInConnection ? KSGConnectMaxSeatCount : seatStore.state.value.seatList.count
+                self.onTheSeatHeaderLabel.text = .localizedReplace(.onSeatListText, replace: "\(onTheSeatList.count) / \(maxSeatCount - 1)")
                 self.tableView.reloadData()
             }
             .store(in: &cancellableSet)
@@ -255,7 +255,7 @@ class VRSeatManagerPanel: RTCBaseView {
                 let onSeatList = seatList.filter{ [weak self] in
                     guard let self = self else { return true }
                     return !($0.userInfo.userID).isEmpty && $0.userInfo.userID != selfId
-                }
+                }.filter { $0.userInfo.liveID == self.liveID }
                 self.inviteContentView.isHidden = (onSeatList.count != 0 || applicationSeatList.count != 0)
             }
             .store(in: &cancellableSet)
@@ -305,11 +305,13 @@ extension VRSeatManagerPanel {
     
     @objc
     private func inviteImageButtonClick() {
-        routerManager.router(action: .present(.linkInviteControl(-1)))
+        let invitePanel = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: -1)
+        routerManager.present(view: invitePanel, config: .bottomDefault())
     }
     
     private func inviteButtonClick() {
-        routerManager.router(action: .present(.linkInviteControl(-1)))
+        let invitePanel = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: -1)
+        routerManager.present(view: invitePanel, config: .bottomDefault())
     }
     
     @objc private func backButtonClick(_ sender: UIButton) {

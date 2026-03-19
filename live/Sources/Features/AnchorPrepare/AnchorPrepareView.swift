@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import RTCCommon
 import TUICore
 import AtomicXCore
 import AtomicX
@@ -14,12 +13,24 @@ import AtomicX
 public class AnchorPrepareView: UIView {
     public weak var delegate: AnchorPrepareViewDelegate?
     
-    private let coreView: LiveCoreView
+    private let coreView: LiveCoreView = {
+        let jsonObject: [String: Any] = [
+            "api": "component",
+            "component": 21
+        ]
+        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8)
+        {
+            LiveCoreView.callExperimentalAPI(jsonString)
+        }
+        return LiveCoreView(viewType: .pushView)
+    }()
+    
     private var isPortrait: Bool = {
         WindowUtils.isPortrait
     }()
     
-    private weak var popupViewController: PopupViewController?
+    private weak var popupViewController: UIViewController?
     
     private lazy var topGradientView: UIView = {
         var view = UIView()
@@ -27,8 +38,7 @@ public class AnchorPrepareView: UIView {
     }()
     
     private lazy var bottomGradientView: UIView = {
-        var view = UIView(frame: CGRect(x: 0, y: 0, width: self.mm_w, height: 300.scale375()))
-        view.gradient(colors: [.g1.withAlphaComponent(0), .g1,], isVertical: true)
+        var view = UIView()
         return view
     }()
     
@@ -127,8 +137,7 @@ public class AnchorPrepareView: UIView {
         isViewReady = true
     }
     
-    public init(roomId: String, coreView: LiveCoreView) {
-        self.coreView = coreView
+    public init(roomId: String) {
         super.init(frame: .zero)
         coreView.setLiveID(roomId)
         registerObserver()
@@ -231,6 +240,10 @@ extension AnchorPrepareView {
 }
 
 extension AnchorPrepareView {
+    public func getCoreView() -> LiveCoreView {
+        return coreView
+    }
+    
     public func disableFeatureMenu(_ isDisable: Bool) {
         if isDisable {
             currentPanelModelItems = []
@@ -334,6 +347,19 @@ extension AnchorPrepareView {
         addSubview(startButton)
     }
     
+    public override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        topGradientView.gradient(colors: [
+            UIColor.g1.withAlphaComponent(0.5),
+            UIColor.g1.withAlphaComponent(0)
+        ], isVertical: true)
+        
+        bottomGradientView.gradient(colors: [
+            UIColor.g1.withAlphaComponent(0),
+            UIColor.g1
+        ], isVertical: true)
+    }
+    
     func activateConstraints() {
         coreView.snp.makeConstraints({ make in
             make.leading.trailing.equalToSuperview()
@@ -353,14 +379,6 @@ extension AnchorPrepareView {
             make.bottom.equalToSuperview()
             make.height.equalTo((isPortrait ? 300 : 160).scale375())
             make.width.equalToSuperview()
-        }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.topGradientView.gradient(colors: [.g1.withAlphaComponent(0.5),
-                                                   .g1.withAlphaComponent(0),], isVertical: true)
-            self.bottomGradientView.gradient(colors: [.g1.withAlphaComponent(0),
-                                                      .g1,], isVertical: true)
         }
         
         backButton.snp.remakeConstraints { make in
@@ -439,6 +457,7 @@ extension AnchorPrepareView {
             isUserInteractionEnabled = true
         }
         DeviceStore.shared.reset()
+        BeautyView.releaseSharedInstance()
         delegate?.onClickBackButton()
     }
     
@@ -498,16 +517,24 @@ extension AnchorPrepareView {
             guard let self = self else { return }
             self.popupViewController?.dismiss(animated: true)
         }
-        let safeBottomViewBackgroundColor = UIColor.bgOperateColor
-        let menuContainerView = MenuContainerView(contentView: beautyView, safeBottomViewBackgroundColor: safeBottomViewBackgroundColor)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        
+        let popover = AtomicPopover(
+            contentView: beautyView,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(ThemeStore.shared.colorTokens.bgColorOperate),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: true)
+        self.popupViewController = popover
         
         let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
         DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
@@ -520,16 +547,24 @@ extension AnchorPrepareView {
             guard let self = self else { return }
             self.popupViewController?.dismiss(animated: true)
         }
-        let menuContainerView = MenuContainerView(contentView: audioEffect, safeBottomViewBackgroundColor: .g2)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: true)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
-        guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
         
+        let popover = AtomicPopover(
+            contentView: audioEffect,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(ThemeStore.shared.colorTokens.bgColorOperate),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
+        guard let presentingViewController = getCurrentViewController() else { return }
+        presentingViewController.present(popover, animated: true)
+        self.popupViewController = popover
     }
     
     private func flipClick() {
@@ -554,15 +589,24 @@ extension AnchorPrepareView {
             guard let self = self else { return }
             self.popupViewController?.dismiss(animated: true)
         }
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: .bgOperateColor)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        
+        let popover = AtomicPopover(
+            contentView: view,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(ThemeStore.shared.colorTokens.bgColorOperate),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: true)
+        self.popupViewController = popover
     }
     
     private func showTemplate601ExceptionToastIfNeeded(mode: LiveTemplateMode, from view: UIView) {
@@ -574,15 +618,23 @@ extension AnchorPrepareView {
     }
     
     private func videoSettingsClick() {
-        let menuContainerView = MenuContainerView(contentView: videoSettingPanel, safeBottomViewBackgroundColor: .bgOperateColor)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        let popover = AtomicPopover(
+            contentView: videoSettingPanel,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(ThemeStore.shared.colorTokens.bgColorOperate),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: true)
+        self.popupViewController = popover
     }
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 import Combine
-import RTCCommon
+import AtomicX
 import Network
 import RTCRoomEngine
 import AtomicXCore
@@ -164,7 +164,7 @@ extension NetWorkInfoManager {
 
 // MARK: - State Subscription Extension
 extension NetWorkInfoManager {
-    func subscribe<Value>(_ selector: StateSelector<NetWorkInfoState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribe<Value>(_ selector: StatePublisherSelector<NetWorkInfoState, Value>) -> AnyPublisher<Value, Never> {
         return state.subscribe(selector)
     }
 }

@@ -7,7 +7,7 @@
 
 import UIKit
 import SnapKit
-import RTCCommon
+import AtomicX
 
 #if DEV_MODE
 class TestToolWindow: UIWindow {
@@ -28,11 +28,11 @@ class TestToolWindow: UIWindow {
     private func initUI() {
         let wh: CGFloat = 32
         frame = CGRect(x: 0, y: 0, width: wh, height: wh)
-        center = CGPoint(x: ScreenWidth - wh * 0.5, y: screenHeight * 0.5)
+        center = CGPoint(x: UIScreen.main.bounds.width - wh * 0.5, y: UIScreen.main.bounds.height * 0.5)
         
         windowLevel = .statusBar - 1
         
-        t_makeKeyAndVisible()
+        makeKeyAndVisibleWithScene()
         isHidden = true
         
         addSubview(imageView)

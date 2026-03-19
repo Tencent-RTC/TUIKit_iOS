@@ -46,7 +46,7 @@ class VideoLiveViewController: UIViewController {
             make.edges.equalToSuperview()
         }
         goLiveButton.snp.makeConstraints { make in
-            make.bottom.equalTo(-(15.scale375Height() + kDeviceSafeBottomHeight))
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-15.scale375Height())
             make.centerX.equalToSuperview()
             make.height.equalTo(48.scale375())
             make.width.equalTo(154.scale375())

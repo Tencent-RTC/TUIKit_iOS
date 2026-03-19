@@ -9,7 +9,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 
 public typealias InternalErrorBlock = (_ error: InternalError) -> Void
 
@@ -259,10 +258,6 @@ extension AnchorStore {
     func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
         context.subscribeState(selector)
     }
-
-    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        context.subscribeState(selector)
-    }
 }
 
 extension AnchorStore.Context {
@@ -325,17 +320,11 @@ extension AnchorStore.Context {
             return audienceStore.state.subscribe(sel)
         } else if let sel = selector as? StatePublisherSelector<BarrageState, Value> {
             return barrageStore.state.subscribe(sel)
-        }
-        assertionFailure("Input failed State class")
-        return Empty<Value, Never>().eraseToAnyPublisher()
-    }
-
-    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        if let sel = selector as? StateSelector<AnchorMediaState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AnchorMediaState, Value> {
             return anchorMediaManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AnchorBattleState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AnchorBattleState, Value> {
             return anchorBattleObservableState.subscribe(sel)
-        } else if let sel = selector as? StateSelector<AnchorCoHostState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AnchorCoHostState, Value> {
             return anchorCoHostManager.subscribeCoHostState(sel)
         }
         assertionFailure("Input failed State class")

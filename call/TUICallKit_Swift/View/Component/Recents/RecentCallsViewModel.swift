@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import RTCRoomEngine
 import TUICore
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 
@@ -55,12 +55,9 @@ class RecentCallsViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] callInfos in
                 guard let self = self else { return }
-                var viewModelList: [RecentCallsCellViewModel] = []
-                callInfos.forEach { callInfo in
-                    let viewModel = RecentCallsCellViewModel(callInfo)
-                    viewModelList.append(viewModel)
-                }
-                self.updateDataSource(viewModelList.reversed())
+                let sortedCallInfos = callInfos.sorted { $0.startTime > $1.startTime }
+                let viewModelList = sortedCallInfos.map { RecentCallsCellViewModel($0) }
+                self.updateDataSource(viewModelList)
             }
             .store(in: &cancellables)
         }
@@ -123,7 +120,7 @@ class RecentCallsViewModel: ObservableObject {
         if (callInfo.chatGroupId.isEmpty && userIds.count <= 1) {
             repeatSingleCall(callInfo, userIds)
         } else {
-            CallStore.shared.calls(participantIds: userIds, mediaType: mediaType, params: nil, completion: nil)
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.Recents.groupCallNotSupported") ?? "Group calls cannot be initiated from call history")
         }
     }
     
@@ -211,7 +208,7 @@ class RecentCallsViewModel: ObservableObject {
             getUserOrFriendProfileVCWithUserID(userId: userId) { viewController in
                 navigationController.pushViewController(viewController, animated: true)
             } fail: { code, desc in
-                Toast.showToast("error:\(Int(code)), msg: \(desc)")
+                self.showErrorToast(message: "error:\(Int(code)), msg: \(desc)")
             }
         }
     }
@@ -230,5 +227,15 @@ class RecentCallsViewModel: ObservableObject {
             TUICore.createObject(TUICore_TUIContactObjectFactory_Minimalist,
                                  key: TUICore_TUIContactObjectFactory_GetUserOrFriendProfileVCMethod, param: param as? [AnyHashable : Any])
         }
+    }
+    
+    private func showErrorToast(message: String) {
+        UIApplication.shared.keyWindow?.showAtomicToast(
+            text: message,
+            customIcon: UIImage.atomicXBundleImage(named: "toast_error"),
+            style: .error,
+            position: .center,
+            duration: .long
+        )
     }
 }

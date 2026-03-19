@@ -7,7 +7,7 @@
 
 import SnapKit
 import AtomicXCore
-import RTCCommon
+import AtomicX
 import Combine
 
 protocol LiveListViewDataSource: AnyObject {
@@ -118,7 +118,7 @@ class LiveListPagerView: UIView {
     }
     
     private func subscribeAudienceConfig() {
-        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StatePublisherSelector(keyPath:
                                                                 \AudienceContainerConfig.disableSliding))
         .receive(on: RunLoop.main)
         .removeDuplicates()
@@ -220,7 +220,7 @@ extension LiveListPagerView: UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return screenHeight
+        return UIScreen.main.bounds.height
     }
 }
 

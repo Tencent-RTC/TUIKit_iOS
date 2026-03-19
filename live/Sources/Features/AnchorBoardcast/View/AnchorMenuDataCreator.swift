@@ -8,9 +8,8 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
-import TUICore
 import AtomicX
+import TUICore
 
 class AnchorMenuDataCreator {
     private weak var coreView: LiveCoreView?
@@ -68,7 +67,12 @@ extension AnchorMenuDataCreator {
                     store.coGuestState.applicants.count > 0 {
                     return
                 } else {
-                    routerManager.router(action: .present(.connectionControl))
+                    let connectionPanel = AnchorCoHostManagerPanel(store: store)
+                    connectionPanel.onClickBack = { [weak self] in
+                        guard let self = self else { return }
+                        routerManager.router(action: .dismiss())
+                    }
+                    routerManager.present(view: connectionPanel, config: .bottomDefault())
                 }
             }
             
@@ -152,7 +156,7 @@ extension AnchorMenuDataCreator {
                 let selfUserId = store.selfUserID
                 let battleUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
                 let connectedUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
-                let displayResultPublisher = store.subscribeState(StateSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
+                let displayResultPublisher = store.subscribeState(StatePublisherSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
               
                 battleUsersPublisher
                     .removeDuplicates()
@@ -196,11 +200,12 @@ extension AnchorMenuDataCreator {
         if features.contains(.coGuest) {
             var linkMic = AnchorButtonMenuInfo(normalIcon: "live_link_icon", animateIcon: ["live_link_animate1_icon", "live_link_animate2_icon", "live_link_animate3_icon"], normalTitle: .coGuestText)
             linkMic.tapAction = { [weak self] _ in
-                guard let self = self else { return }
+                guard let self = self, let coreView = coreView else { return }
                 if !store.coHostState.connected.isEmpty {
                     return
                 }
-                routerManager.router(action: .present(.liveLinkControl))
+                let panel = AnchorLinkControlPanel(store: store, routerManager: routerManager, coreView: coreView)
+                routerManager.present(view: panel, config: .bottomDefault())
             }
             linkMic.bindStateClosure = { [weak self] button, cancellableSet in
                 guard let self = self else { return }
@@ -234,7 +239,8 @@ extension AnchorMenuDataCreator {
         setting.tapAction = { [weak self] _ in
             guard let self = self else { return }
             let settingModel = generateSettingModel(features: features)
-            routerManager.router(action: .present(.featureSetting(settingModel)))
+            let panel = AnchorSettingPanel(settingPanelModel: settingModel)
+            routerManager.present(view: panel, config: .bottomDefault())
         }
         menus.append(setting)
         return menus
@@ -246,12 +252,12 @@ extension AnchorMenuDataCreator {
             guard let self = self else { return }
             let cancelButton = AlertButtonConfig(text: String.cancelText, type: .grey) { [weak self] _ in
                 guard let self = self else { return }
-                routerManager.router(action: .routeTo(.anchor))
+                routerManager.router(action: .dismiss())
             }
             let confirmButton = AlertButtonConfig(text: String.confirmEndBattleText, type: .red) { [weak self] _ in
                 guard let self = self else { return }
                 store.battleStore.exitBattle(battleID: store.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
-                routerManager.router(action: .routeTo(.anchor))
+                routerManager.router(action: .dismiss())
             }
             let alertConfig = AlertViewConfig(title: String.endBattleAlertText,
                                               cancelButton: cancelButton,
@@ -259,7 +265,7 @@ extension AnchorMenuDataCreator {
             routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                 guard let self = self else { return }
                 let alertView = AtomicAlertView(config: alertConfig)
-                routerManager.present(view: alertView)
+                routerManager.present(view: alertView, config: .centerDefault())
                 presentedExitBattleAlertView = alertView
             }))
         }
@@ -273,7 +279,7 @@ extension AnchorMenuDataCreator {
         
         let alertConfig = AlertViewConfig(items: items)
         let alertView = AtomicAlertView(config: alertConfig)
-        routerManager.present(view: alertView, position: .bottom)
+        routerManager.present(view: alertView, config: .centerDefault())
         presentedExitBattleAlertView = alertView
     }
     
@@ -295,7 +301,8 @@ extension AnchorMenuDataCreator {
                                                      guard let self = self else { return }
                                                      routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                                                          guard let self = self else { return }
-                                                         routerManager.router(action: .present(.beauty))
+                                                         let beautyPanel = BeautyView.shared()
+                                                         routerManager.present(view: beautyPanel, config: .bottomDefault())
                                                      }))
                                                      let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
                                                      DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
@@ -303,13 +310,21 @@ extension AnchorMenuDataCreator {
                                                  }))
         }
         if features.contains(.soundEffect) {
-            model.items.append(AnchorFeatureItem(normalTitle: .audioEffectsText,
-                                                 normalImage: internalImage("live_setting_audio_effects")?.withTintColor(.textPrimaryColor),
-                                                 designConfig: designConfig,
-                                                 actionClosure: { [weak self] _ in
+        model.items.append(AnchorFeatureItem(normalTitle: .audioEffectsText,
+                                             normalImage: internalImage("live_setting_audio_effects")?.withTintColor(.textPrimaryColor),
+                                             designConfig: designConfig,
+                                             actionClosure: { [weak self] _ in
+                                                 guard let self = self else { return }
+                                                 routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                                                      guard let self = self else { return }
-                                                     routerManager.router(action: .present(.audioEffect))
+                                                     let audioPanel = AudioEffectView()
+                                                     audioPanel.backButtonClickClosure = { [weak self] _ in
+                                                         guard let self = self else { return }
+                                                         routerManager.dismiss()
+                                                     }
+                                                     routerManager.present(view: audioPanel, config: .bottomDefault())
                                                  }))
+                                             }))
         }
         model.items.append(AnchorFeatureItem(normalTitle: .flipText,
                                              normalImage: internalImage("live_video_setting_flip")?.withTintColor(.textPrimaryColor),
@@ -326,7 +341,18 @@ extension AnchorMenuDataCreator {
                                                  guard let self = self else { return }
                                                  routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                                                      guard let self = self else { return }
-                                                     routerManager.router(action: .present(.mirror))
+                                                     let dataSource: [MirrorType] = [.auto, .enable, .disable]
+                                                     let panel = BaseSelectionPanel(dataSource: dataSource.map { $0.toString() })
+                                                     panel.selectedClosure = { [weak self] index in
+                                                         guard let self = self else { return }
+                                                         store.deviceStore.switchMirror(mirrorType: dataSource[index])
+                                                         routerManager.router(action: .dismiss())
+                                                     }
+                                                     panel.cancelClosure = { [weak self] in
+                                                         guard let self = self else { return }
+                                                         routerManager.router(action: .dismiss())
+                                                     }
+                                                     routerManager.present(view: panel, config: .bottomDefault())
                                                  }))
                                              }))
         model.items.append(AnchorFeatureItem(normalTitle: .streamDashboardText,
@@ -336,7 +362,8 @@ extension AnchorMenuDataCreator {
                                                  guard let self = self else { return }
                                                  routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
                                                      guard let self = self else { return }
-                                                     routerManager.router(action: .present(.streamDashboard))
+                                                     let dashboardPanel = StreamDashboardPanel(liveID: store.liveID)
+                                                     routerManager.present(view: dashboardPanel, config: .bottomDefault())
                                                  }))
                                              }))
         return model

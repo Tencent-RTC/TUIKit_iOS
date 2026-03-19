@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 import RTCRoomEngine
 
@@ -18,9 +18,9 @@ enum VoiceRoomLayoutType: NSInteger {
 
 struct VoiceRoomPrepareState {
     var liveInfo: AtomicLiveInfo = {
-        var info = AtomicLiveInfo()
-        info.coverURL = "https://liteav-test-1252463788.cos.ap-guangzhou.myqcloud.com/voice_room/voice_room_cover1.png"
-        info.backgroundURL = "http://dldir1.qq.com/hudongzhibo/TRTC/TUIKit/VoiceRoom/picture/livekit_voiceroom_background.png"
+        var info = AtomicLiveInfo(seatTemplate: .audioSalon(seatCount: 0))
+        info.coverURL = Constants.URL.defaultCover
+        info.backgroundURL = Constants.URL.defaultBackground
         info.isSeatEnabled = true
         info.keepOwnerOnSeat = true
         info.seatLayoutTemplateID = 70
@@ -74,6 +74,14 @@ class VoiceRoomPrepareStore {
     func onSetlayoutType(layoutType: VoiceRoomLayoutType) {
         update { state in
             state.layoutType = layoutType
+            switch layoutType {
+            case .KTVRoom:
+                state.liveInfo.seatLayoutTemplateID = 50
+                state.liveInfo.seatTemplate = .karaoke(seatCount: 0)
+            case .chatRoom:
+                state.liveInfo.seatLayoutTemplateID = 70
+                state.liveInfo.seatTemplate = .audioSalon(seatCount: 0)
+            }
         }
     }
     
@@ -83,7 +91,7 @@ class VoiceRoomPrepareStore {
 }
 
 extension VoiceRoomPrepareStore {
-    func subscribeState<Value>(_ selector: StateSelector<VoiceRoomPrepareState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeState<Value>(_ selector: StatePublisherSelector<VoiceRoomPrepareState, Value>) -> AnyPublisher<Value, Never> {
         observerState.subscribe(selector)
     }
 }

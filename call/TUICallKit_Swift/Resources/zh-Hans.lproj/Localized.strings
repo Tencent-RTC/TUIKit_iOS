@@ -13,13 +13,18 @@
 "TUICallKit.Group.inviteToGroupCall" = "邀请你加入多人通话";
 "TUICallKit.Group.waitAccept" = "等待接听";
 "TUICallKit.determine" = "确定";
-"TUICallKit.lineBusy" = "对方忙";
+"TUICallKit.lineBusy" = "对方正在通话中，请稍后再试";
 "TUICallKit.userHangup" = "\%@ 结束通话";
 "TUICallKit.userReject" = "\%@ 拒绝了通话请求";
 "TUICallKit.otherPartyHangup" = "对方已挂断，通话结束";
-"TUICallKit.otherPartyReject" = "对方拒绝了通话请求";
-"TUICallKit.otherPartyNoResponse" = "对方未响应";
-"TUICallKit.calNotCallYourself" = "不能呼叫自己";
+"TUICallKit.otherPartyReject" = "对方拒绝了你的通话请求";
+"TUICallKit.otherPartyNoResponse" = "对方未接听，请稍后再试";
+"TUICallKit.otherPartyCanceled" = "对方已取消通话";
+"TUICallKit.calNotCallYourself" = "无法向自己发起呼叫";
+"TUICallKit.youHaveMissedCalls" = "您正在通话中，无法再次发起通话";
+"TUICallKit.Recents.noCall" = "暂无通话记录";
+"TUICallKit.Recents.noMissedCall" = "暂无未接来电";
+"TUICallKit.ErrorInvalidUserId" = "用户不存在，请确认该用户是否已注册或是否输入非法字符";
 
 "TUICallKit.switchCamera" = "翻转";
 "TUICallKit.blurBackground" = "模糊背景";
@@ -31,32 +36,36 @@
 "TUICallKit.calleeTip" = "参与通话的还有：";
 "TUICallKit.FloatingWindow.waitAccept" = "等待接听";
 
-"TUICallKit.User.Exceed.Limit" = "暂支持最多9人通话。如需多人会议，请使用TUIRoom";
-"TUICallKit.UnableToRestartTheCall" = "正在通话中，无法再次发起";
+"TUICallKit.User.Exceed.Limit" = "当前通话最多支持 9 人同时在线";
+"TUICallKit.UnableToRestartTheCall" = "您当前正在通话中，请结束通话后再拨打";
 
-"TUICallKit.purchased" = "您当前未购买音视频通话能力套餐，请前往IM 控制台开通免费体验或加购正式版";
-"TUICallKit.support" = "您当前购买的音视频通话能力套餐不支持该功能，建议您升级套餐类型";
+"TUICallKit.purchased" = "此功能需要音视频通话能力套餐支持，为不影响您的使用，建议您前往腾讯云·实时音视频控制台，开通免费体验或选购正式套餐";
+"TUICallKit.support" = "您当前的套餐类型暂不支持此功能，为解锁更多能力，建议您前往腾讯云·实时音视频控制台升级套餐";
 "TUICallKit.ErrorInPeerBlacklist" = "发起通话失败，用户在黑名单中，禁止发起！";
-"TUICallKit.ErrorInvalidLogin" = "登录失败,请重新登录";
+"TUICallKit.ErrorInvalidLogin" = "发起通话失败，请检查登录状态后重试";
 "TUICallKit.ErrorParameterInvalid" = "参数错误";
 "TUICallKit.ErrorRequestRefused" = "当前状态不支持调用";
 "TUICallKit.ErrorRequestRepeated" = "当前方法正在执行中，请勿重复调用";
 "TUICallKit.ErrorSceneNotSupport" = "当前通话场景，不支持该功能";
+"TUICallKit.ErrorTRTCEnterRoomFailed" = "加入通话失败";
+"TUICallKit.ErrorCameraOccupied" = "当前摄像头被系统电话占用";
+"TUICallKit.ErrorMicOccupied" = "当前麦克风被系统电话占用";
+"TUICallKit.ErrorPermissonDenied" = "权限获取失败，请检查设备权限设置";
 
 "TUICallKit.FailedToGetCameraPermission.Title" = "相机权限未开启";
-"TUICallKit.FailedToGetCameraPermission.Tips"  = "无法使用视频通话功能，点击\"去开启\"打开相机权限";
+"TUICallKit.FailedToGetCameraPermission.Tips"  = "相机权限未开启，无法开启视频通话，前往「设置 > %@」中打开相机权限";
 "TUICallKit.FailedToGetCameraPermission.Later" = "以后再说";
 "TUICallKit.FailedToGetCameraPermission.Enable" = "去开启";
 
 "TUICallKit.FailedToGetMicrophonePermission.Title" = "麦克风权限未开启";
-"TUICallKit.FailedToGetMicrophonePermission.Tips"  = "无法使用发送音视频通话功能，点击\"去开启\"打开麦克风权限";
+"TUICallKit.FailedToGetMicrophonePermission.Tips"  = "麦克风权限未开启，无法开启音视频通话，前往「设置 > %@」中打开麦克风权限";
 "TUICallKit.FailedToGetMicrophonePermission.Later" = "以后再说";
 "TUICallKit.FailedToGetMicrophonePermission.Enable" = "去开启";
 
 "TUICallKit.have.new.invitation" = "您有一个新的通话";
 
 "TUICallKit.Recents.all" = "所有通话";
-"TUICallKit.Recents.missed" = "未接通话";
+"TUICallKit.Recents.missed" = "未接";
 "TUICallKit.Recents.calls" = "通话记录";
 "TUICallKit.Recents.clear" = "清除";
 "TUICallKit.Recents.done" = "完成";
@@ -66,6 +75,7 @@
 "TUICallKit.Recents.clear.cancel" = "取消";
 "TUICallKit.Recents.incoming" = "来电";
 "TUICallKit.Recents.outgoing" = "去电";
+"TUICallKit.Recents.groupCallNotSupported" = "多人通话记录不支持重呼";
 
 "TUICallKit.unmuted" = "麦克风已开";
 "TUICallKit.muted" = "麦克风已关";

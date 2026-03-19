@@ -5,7 +5,7 @@
 //  Created by aby on 2024/4/3.
 //
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 protocol AudioEffectMenuDateGenerator {

@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class VideoQualitySelectionPanel: UIView {
@@ -96,7 +96,7 @@ private extension VideoQualitySelectionPanel {
         }
         cancelButton.snp.makeConstraints { make in
             make.top.equalTo(lineView.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().offset(-20)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-20)
             make.leading.trailing.equalToSuperview()
         }
     }

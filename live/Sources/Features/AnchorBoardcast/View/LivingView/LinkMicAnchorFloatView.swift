@@ -7,7 +7,6 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
 import SnapKit
 import UIKit
 import AtomicX
@@ -50,6 +49,7 @@ class AnchorUserImageCell: UICollectionViewCell {
 class LinkMicAnchorFloatView: UIView {
     private let store: AnchorStore
     private let routerManager: AnchorRouterManager
+    private weak var coreView: LiveCoreView?
     private var cancellableSet = Set<AnyCancellable>()
 
     private var applyList: [LiveUserInfo] = []
@@ -80,9 +80,10 @@ class LinkMicAnchorFloatView: UIView {
         return collectionView
     }()
 
-    init(store: AnchorStore, routerManager: AnchorRouterManager) {
+    init(store: AnchorStore, routerManager: AnchorRouterManager, coreView: LiveCoreView) {
         self.store = store
         self.routerManager = routerManager
+        self.coreView = coreView
         super.init(frame: .zero)
     }
 
@@ -190,7 +191,9 @@ extension LinkMicAnchorFloatView: UICollectionViewDataSource {
 
 extension LinkMicAnchorFloatView {
     @objc func tapAction() {
-        routerManager.router(action: .present(.liveLinkControl))
+        guard let coreView = coreView else {return }
+        let panel = AnchorLinkControlPanel(store: store, routerManager: routerManager, coreView: coreView)
+        routerManager.present(view: panel, config: .bottomDefault())
     }
 }
 

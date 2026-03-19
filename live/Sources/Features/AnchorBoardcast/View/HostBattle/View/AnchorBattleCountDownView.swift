@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import UIKit
 
 class AnchorBattleCountDownView: UIView {
@@ -74,7 +74,7 @@ class AnchorBattleCountDownView: UIView {
     private let cancelButton: UIButton = {
         let button = UIButton()
         button.setTitle(.cancelText, for: .normal)
-        button.setTitleColor(.warningTextColor, for: .normal)
+        button.setTitleColor(.flowKitRed, for: .normal)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = .customFont(ofSize: 12, weight: .medium)
         return button

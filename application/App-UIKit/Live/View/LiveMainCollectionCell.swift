@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import AtomicX
 
 class LiveMainCollectionCell: UICollectionViewCell {
 
@@ -16,7 +17,7 @@ class LiveMainCollectionCell: UICollectionViewCell {
         let label = UILabel(frame: .zero)
         label.textColor = .white
         label.textAlignment = .left
-        label.font = .customFont(ofSize: 20, weight: .semibold)
+        label.font = ThemeStore.shared.typographyTokens.Bold20
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5
         return label
@@ -30,7 +31,7 @@ class LiveMainCollectionCell: UICollectionViewCell {
     
     private lazy var descLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.font = .customFont(ofSize: 10)
+        label.font = ThemeStore.shared.typographyTokens.Regular10
         label.textColor = .white.withAlphaComponent(0.75)
         label.textAlignment = .left
         label.numberOfLines = 0

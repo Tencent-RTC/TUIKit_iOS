@@ -7,12 +7,10 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
-import SVGAPlayer
 import TUICore
 import UIKit
-import AtomicX
 
 public protocol GiftPlayViewDelegate: AnyObject {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo)
@@ -27,6 +25,7 @@ let Bottom_SafeHeight = WindowUtils.bottomSafeHeight
 public class GiftPlayView: UIView {
     public weak var delegate: GiftPlayViewDelegate?
     
+    private(set)var giftBulletBottomAnchorY: CGFloat = 0
     private let liveId: String
     private var giftStore: GiftStore {
         GiftStore.create(liveID: liveId)
@@ -36,13 +35,16 @@ public class GiftPlayView: UIView {
         LikeStore.create(liveID: liveId)
     }
 
-    private var giftCacheKey = ""
+    private let normalChannelCount = 2
+    private var activeBulletViews: [String: TUIGiftBulletView] = [:]
+    private var channelOccupancy: [Int: String] = [:]
+    
     private let animationView: AnimationViewWrapper = .init()
     private var isPureMode: Bool = false
     private var cancellableSet: Set<AnyCancellable> = []
     
     private lazy var normalAnimationManager: TUIGiftAnimationManager = {
-        let manager = TUIGiftAnimationManager(simulcastCount: 99)
+        let manager = TUIGiftAnimationManager(simulcastCount: normalChannelCount)
         manager.dequeueClosure = { [weak self] giftData in
             guard let self = self else { return }
             self.showNormalAnimation(giftData)
@@ -54,7 +56,6 @@ public class GiftPlayView: UIView {
         let manager = TUIGiftAnimationManager(simulcastCount: 1)
         manager.dequeueClosure = { [weak self] giftData in
             guard let self = self else { return }
-            self.giftCacheKey = giftData.giftInfo.giftID
             self.showAdvancedAnimation(giftData: giftData)
         }
         return manager
@@ -95,6 +96,16 @@ public class GiftPlayView: UIView {
         advancedAnimationManager.clearData()
     }
     
+    private func cleanupAnimations() {
+        clearData()
+        for (_, bulletView) in activeBulletViews {
+            bulletView.stop()
+        }
+        activeBulletViews.removeAll()
+        channelOccupancy.removeAll()
+        animationView.stopCurrentAnimation()
+    }
+    
     deinit {
         removeObserver()
     }
@@ -108,7 +119,7 @@ public class GiftPlayView: UIView {
                 case .onReceiveGift(liveID: let liveId, gift: let gift, count: let count, sender: let sender):
                     guard liveId == self.liveId else { return }
                     delegate?.giftPlayView(self, onReceiveGift: gift, giftCount: Int(count), sender: sender)
-                    playGift(TUIGiftData(count, giftInfo: gift, sender: sender))
+                    dispatchGift(TUIGiftData(count, giftInfo: gift, sender: sender))
                 }
             }
             .store(in: &cancellableSet)
@@ -140,13 +151,22 @@ public class GiftPlayView: UIView {
             .store(in: &cancellableSet)
     }
     
-    private func playGift(_ gift: TUIGiftData) {
+    private func dispatchGift(_ gift: TUIGiftData) {
         if gift.isAdvanced {
             advancedAnimationManager.enqueue(giftData: gift)
         } else {
-            normalAnimationManager.enqueue(giftData: gift)
+            handleNormalGift(gift)
         }
     }
+    
+    private func handleNormalGift(_ giftData: TUIGiftData) {
+       let key = giftData.comboKey
+       if let existingView = activeBulletViews[key] {
+           existingView.addGiftCount(giftData.giftCount)
+           return
+       }
+       normalAnimationManager.enqueue(giftData: giftData)
+   }
     
     private func removeObserver() {
         cancellableSet.forEach { $0.cancel() }
@@ -170,6 +190,16 @@ public extension GiftPlayView {
     func onPureModeSet(isPureMode: Bool) {
         self.isPureMode = isPureMode
     }
+    
+    func startObserving() {
+        removeObserver()
+        addObserver()
+    }
+    
+    func stopObserving() {
+        removeObserver()
+        cleanupAnimations()
+    }
 }
 
 // MARK: Layout
@@ -191,27 +221,64 @@ extension GiftPlayView {
 extension GiftPlayView {
     private func showNormalAnimation(_ giftData: TUIGiftData) {
         DataReporter.reportEventData(eventKey: getReportKey())
-        let beginY = mm_h * 0.3
-        for view in subviews {
-            if let bulletView = view as? TUIGiftBulletView {
-                UIView.animate(withDuration: 0.1) {
-                    bulletView.mm_y = bulletView.mm_y - (bulletView.mm_h + 10)
-                }
-                if (beginY - (bulletView.mm_h + 10) * 2) > bulletView.mm_y {
-                    bulletView.stop()
-                }
+        let key = giftData.comboKey
+        if let existingView = activeBulletViews[key] {
+            existingView.addGiftCount(giftData.giftCount)
+            normalAnimationManager.finishPlay()
+            return
+        }
+        
+        guard let trackIndex = getFreeTrackIndex() else {
+            return
+        }
+        
+        channelOccupancy[trackIndex] = key
+        
+        let bulletView = TUIGiftBulletView(frame: .zero)
+        bulletView.setGiftData(giftData)
+        addSubview(bulletView)
+        
+        bulletView.snp.makeConstraints { make in
+            make.leading.equalTo(safeAreaLayoutGuide).offset(10)
+            make.top.equalToSuperview().offset(bulletYPosition(for: trackIndex))
+            make.height.equalTo(44)
+            make.width.greaterThanOrEqualTo(100)
+        }
+        
+        activeBulletViews[key] = bulletView
+        
+        bulletView.play { [weak self] (finished, finishedKey) in
+            guard let self = self else { return }
+            
+            self.activeBulletViews.removeValue(forKey: finishedKey)
+            self.channelOccupancy.removeValue(forKey: trackIndex)
+            
+            self.normalAnimationManager.finishPlay()
+        }
+    }
+    
+    private func getFreeTrackIndex() -> Int? {
+        for i in 0..<normalChannelCount {
+            if channelOccupancy[i] == nil {
+                return i
             }
         }
-        let all = TUIGiftBulletView(frame: CGRect.zero)
-        all.mm_y = beginY
-        all.mm_x = 20
-        all.giftData = giftData
-        addSubview(all)
-        
-        all.play(isPureMode: isPureMode) { [weak self, weak all] _ in
-            guard let self = self else { return }
-            all?.safeRemoveFromSuperview()
-            self.normalAnimationManager.finishPlay()
+        return nil
+    }
+    
+    private func bulletYPosition(for trackIndex: Int) -> CGFloat {
+        let trackHeight: CGFloat = 54
+        let anchorY = giftBulletBottomAnchorY > 0 ? giftBulletBottomAnchorY : (self.mm_h - 365)
+        return anchorY - CGFloat(trackIndex + 1) * trackHeight
+    }
+    
+    public func updateBulletViewsLayout(bottomAnchorY: CGFloat) {
+        giftBulletBottomAnchorY = bottomAnchorY
+        for (trackIndex, key) in channelOccupancy {
+            guard let bulletView = activeBulletViews[key] else { continue }
+            bulletView.snp.updateConstraints { make in
+                make.top.equalToSuperview().offset(bulletYPosition(for: trackIndex))
+            }
         }
     }
 }

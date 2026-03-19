@@ -5,7 +5,7 @@
 //  Created by vincepzhang on 2025/2/25.
 //
 
-import RTCCommon
+import AtomicX
 import AtomicXCore
 import Combine
 
@@ -34,7 +34,7 @@ class IncomingBannerViewController: UIViewController {
     }()
     private lazy var callStatusTipView: UILabel = {
         let callStatusTipLabel = UILabel(frame: CGRect.zero)
-        callStatusTipLabel.textColor = UIColor(hex: "#C5CCDB")
+        callStatusTipLabel.textColor = UIColor("C5CCDB")
         callStatusTipLabel.font = UIFont.boldSystemFont(ofSize: 12.0)
         callStatusTipLabel.textAlignment = .left
         callStatusTipLabel.text = self.getCallStatusTipText()
@@ -64,7 +64,7 @@ class IncomingBannerViewController: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super .init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         view.layer.cornerRadius = 10.0
-        view.backgroundColor = UIColor(hex: "#22262E")
+        view.backgroundColor = UIColor("22262E")
         let tap = UITapGestureRecognizer(target: self, action: #selector(showCallView(sender:)))
         view.addGestureRecognizer(tap)
     }

@@ -8,7 +8,7 @@
 import Foundation
 import Kingfisher
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class AnchorCoGuestView: UIView {
@@ -72,7 +72,9 @@ class AnchorCoGuestView: UIView {
         let isOnlyUserOnSeat = store.coGuestState.connected.count == 1
         if !isSelfOwner && isOnlyUserOnSeat && !isSelfView { return }
         let type: AnchorUserManagePanelType = !isSelfOwner && !isSelfView ? .userInfo : .mediaAndSeat
-        routerManager.router(action: .present(.userManagement(seatInfo, type: type)))
+        let liveUserInfo = LiveUserInfo(seatUserInfo: seatInfo.userInfo)
+        let panel = AnchorUserManagePanelView(user: liveUserInfo, store: store, routerManager: routerManager, type: type)
+        routerManager.present(view: panel, config: .bottomDefault())
     }
 }
 

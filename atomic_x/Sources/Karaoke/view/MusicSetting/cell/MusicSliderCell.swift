@@ -26,16 +26,16 @@ class MusicSliderCell: UITableViewCell {
     let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = .g7
+        label.font = ThemeStore.shared.typographyTokens.Medium16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
     }()
     
     let valueLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0)
-        label.textColor = .white
+        label.font = ThemeStore.shared.typographyTokens.Regular16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         label.textAlignment = .right
         label.backgroundColor = .clear
         return label
@@ -43,7 +43,7 @@ class MusicSliderCell: UITableViewCell {
     
     let configSlider: UISlider = {
         let view = UISlider()
-        view.tintColor = UIColor("1C66E5")
+        view.tintColor = ThemeStore.shared.colorTokens.sliderColorFilled
         view.setThumbImage(UIImage.atomicXBundleImage(named: "ktv_slider"), for: .normal)
         return view
     }()

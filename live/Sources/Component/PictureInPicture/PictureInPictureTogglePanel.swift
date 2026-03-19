@@ -8,7 +8,7 @@
 import AtomicXCore
 import AVKit
 import Combine
-import RTCCommon
+import AtomicX
 import UIKit
 
 class PictureInPictureTogglePanel: RTCBaseView {

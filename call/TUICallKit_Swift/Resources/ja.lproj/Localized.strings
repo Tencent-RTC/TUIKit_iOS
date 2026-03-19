@@ -13,13 +13,18 @@
 "TUICallKit.Group.inviteToGroupCall" = "グループ通話に招待します";
 "TUICallKit.Group.waitAccept" = "待機中";
 "TUICallKit.determine" = "もちろん";
-"TUICallKit.lineBusy" = "回線ビジー";
+"TUICallKit.lineBusy" = "相手は通話中です。しばらくしてからもう一度お試しください";
 "TUICallKit.userHangup" = "\%@ 通話終了";
 "TUICallKit.userReject" = "\%@ は通話を拒否しました";
 "TUICallKit.otherPartyHangup" = "相手が切断、通話終了";
-"TUICallKit.otherPartyReject" = "相手による通話拒否";
-"TUICallKit.otherPartyNoResponse" = "呼び出しタイムアウト";
-"TUICallKit.calNotCallYourself" = "自分自身に電話をかけることはできません";
+"TUICallKit.otherPartyReject" = "相手があなたの通話リクエストを拒否しました";
+"TUICallKit.otherPartyNoResponse" = "相手が応答しませんでした。しばらくしてからもう一度お試しください";
+"TUICallKit.otherPartyCanceled" = "相手が通話をキャンセルしました";
+"TUICallKit.calNotCallYourself" = "自分自身に通話を開始できません";
+"TUICallKit.youHaveMissedCalls" = "通話中のため、別の通話を開始できません";
+"TUICallKit.Recents.noCall" = "通話履歴がありません";
+"TUICallKit.Recents.noMissedCall" = "不在着信がありません";
+"TUICallKit.ErrorInvalidUserId" = "ユーザーが存在しません。登録済みか、または不正な文字が入力されていないかご確認ください";
 
 "TUICallKit.switchCamera" = "切り替え";
 "TUICallKit.blurBackground" = "背景をぼかす";
@@ -30,25 +35,29 @@
 "TUICallKit.calleeTip" = "通話に参加している人物";
 "TUICallKit.FloatingWindow.waitAccept" = "応答を待っています...";
 
-"TUICallKit.User.Exceed.Limit" = "一時的に最大9人の通話をサポートします。多人数の会議が必要な場合は、TUIRoomを使用してください";
-"TUICallKit.UnableToRestartTheCall" = "通話中のため、再度発信できません";
+"TUICallKit.User.Exceed.Limit" = "現在の通話は最大9人まで同時にオンラインをサポートします";
+"TUICallKit.UnableToRestartTheCall" = "現在通話中です。通話を終了してから再度発信してください";
 
-"TUICallKit.purchased" = "TUICallKit パッケージを購入していません。コンソールで無料トライアル版をアクティブ化するか、正式版を購入してください。";
-"TUICallKit.support" = "購入したTUICallKitパッケージはこの機能をサポートしていません。パッケージタイプをアップグレードすることをお勧めします。";
+"TUICallKit.purchased" = "この機能には音声・ビデオ通話機能パッケージのサポートが必要です。ご利用に影響を与えないよう、Tencent Cloud・リアルタイムコミュニケーションコンソールにアクセスして、無料体験を有効にするか、正式パッケージを購入することをお勧めします";
+"TUICallKit.support" = "現在のパッケージタイプはこの機能をサポートしていません。より多くの機能をアンロックするには、Tencent Cloud・リアルタイムコミュニケーションコンソールにアクセスしてパッケージをアップグレードすることをお勧めします";
 "TUICallKit.ErrorInPeerBlacklist" = "通話の開始に失敗しました。ユーザーがブラックリストに登録されているため、発信が禁止されています！";
-"TUICallKit.ErrorInvalidLogin" = "ログイン失敗しました。もう一度ログインしてください";
+"TUICallKit.ErrorInvalidLogin" = "通話の開始に失敗しました。ログイン状態を確認して再試行してください";
 "TUICallKit.ErrorParameterInvalid" = "パラメータエラー";
 "TUICallKit.ErrorRequestRefused" = "現在の状態では、この機能の呼び出しはサポートされていません";
 "TUICallKit.ErrorRequestRepeated" = "現在実行中のメソッドを呼び出すことはできません";
 "TUICallKit.ErrorSceneNotSupport" = "現在の通話シーンでは、この機能はサポートしていません";
+"TUICallKit.ErrorTRTCEnterRoomFailed" = "通話への参加に失敗しました";
+"TUICallKit.ErrorCameraOccupied" = "カメラは現在システム通話によって占有されています";
+"TUICallKit.ErrorMicOccupied" = "マイクは現在システム通話によって占有されています";
+"TUICallKit.ErrorPermissonDenied" = "権限の取得に失敗しました。デバイスの権限設定を確認してください";
 
 "TUICallKit.FailedToGetCameraPermission.Title" = "カメラの権限が開かれていません";
-"TUICallKit.FailedToGetCameraPermission.Tips" = "ビデオ通話機能が使用できません。\"開く\"をクリックしてカメラの権限を開きます";
+"TUICallKit.FailedToGetCameraPermission.Tips" = "カメラの権限が開かれていないため、ビデオ通話を開始できません。設定 > %@ でカメラの権限を開いてください";
 "TUICallKit.FailedToGetCameraPermission.Later" = "後で言う";
 "TUICallKit.FailedToGetCameraPermission.Enable" = "開く";
 
 "TUICallKit.FailedToGetMicrophonePermission.Title" = "マイクの権限が開かれていません";
-"TUICallKit.FailedToGetMicrophonePermission.Tips" = "音声・ビデオ通話機能が使用できません。\"開く\"をクリックしてマイクの権限を開きます";
+"TUICallKit.FailedToGetMicrophonePermission.Tips" = "マイクの権限が開かれていないため、音声・ビデオ通話を開始できません。設定 > %@ でマイクの権限を開いてください";
 "TUICallKit.FailedToGetMicrophonePermission.Later" = "後で言う";
 "TUICallKit.FailedToGetMicrophonePermission.Enable" = "開く";
 
@@ -65,6 +74,7 @@
 "TUICallKit.Recents.clear.cancel" = "キャンセル";
 "TUICallKit.Recents.incoming" = "着信";
 "TUICallKit.Recents.outgoing" = "発信";
+"TUICallKit.Recents.groupCallNotSupported" = "グループ通話履歴のリダイヤルには対応していません";
 
 "TUICallKit.unmuted" = "マイクオン";
 "TUICallKit.muted" = "マイクオフ";

@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        loadThemeConfiguration()
         initKaraokeConfig()
 
         NotificationCenter.default.addObserver(self,
@@ -34,6 +35,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         TUIGlobalization.enableLanguageHook()
         
         return true
+    }
+
+    private func loadThemeConfiguration() {
+       let success = ThemeConfigLoader.shared.loadFromMainBundle(fileName: "appConfig")
+       
+       if success {
+           let theme = ThemeStore.shared.currentTheme
+       } else {
+           ThemeStore.shared.setMode(.dark)
+           ThemeStore.shared.setPrimaryColor("1C66E5")
+       }
     }
 
     // MARK: UISceneSession Lifecycle

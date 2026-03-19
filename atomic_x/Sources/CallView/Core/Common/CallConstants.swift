@@ -32,7 +32,7 @@ class CallConstants {
     static let kControlBtnSize = CGSize(width: 100.scale375Width(), height: 94.scale375Width())
     static let kBtnLargeSize = CGSize(width: 64.scale375Width(), height: 64.scale375Width())
     static let kBtnSmallSize = CGSize(width: 60.scale375Width(), height: 60.scale375Width())
-    static let Color_White = UIColor(hex: "#FFFFFF")
+    static let Color_White = UIColor("FFFFFF")
     static let kCallKitSingleSmallStreamViewWidth = 100.0
     static let horizontalOffset = 110.scale375Width()
     

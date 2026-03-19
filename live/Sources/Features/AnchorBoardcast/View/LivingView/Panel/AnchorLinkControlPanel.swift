@@ -8,7 +8,6 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import AtomicX
 
 class AnchorLinkControlPanel: UIView {
@@ -136,9 +135,10 @@ extension AnchorLinkControlPanel {
         }
 
         userListTableView.snp.remakeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.height.equalTo(screenHeight * 2 / 3)
+            make.height.equalTo(UIScreen.main.bounds.height * 2 / 3)
         }
     }
 }

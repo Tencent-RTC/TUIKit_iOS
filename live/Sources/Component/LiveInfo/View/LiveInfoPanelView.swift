@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import RTCCommon
 import RTCRoomEngine
 import AtomicX
 
@@ -32,7 +31,6 @@ class RoomInfoPanelView: RTCBaseView {
     
     private let backgroundView: UIView = {
         let view = UIView()
-        view.backgroundColor = .g2
         view.layer.cornerRadius = 12.scale375()
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return view

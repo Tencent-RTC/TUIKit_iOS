@@ -8,20 +8,22 @@
 import Foundation
 import Kingfisher
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class AudienceCoGuestView: UIView {
     private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
+    private weak var coreView: LiveCoreView?
     private var cancellableSet = Set<AnyCancellable>()
     private var isViewReady: Bool = false
     private var seatInfo: SeatInfo
     
-    init(seatInfo: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager) {
+    init(seatInfo: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager, coreView: LiveCoreView) {
         self.seatInfo = seatInfo
         self.manager = manager
         self.routerManager = routerManager
+        self.coreView = coreView
         super.init(frame: .zero)
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap))
         addGestureRecognizer(tapGestureRecognizer)
@@ -72,7 +74,9 @@ class AudienceCoGuestView: UIView {
         let isOnlyUserOnSeat = manager.coGuestState.connected.count == 1
         if !isSelfOwner && isOnlyUserOnSeat && !isSelfView { return }
         let type: AudienceUserManagePanelType = !isSelfOwner && !isSelfView ? .userInfo : .mediaAndSeat
-        routerManager.router(action: .present(.userManagement(seatInfo, type: type)))
+        guard let coreView = coreView else { return }
+        let panel = AudienceUserManagePanelView(user: seatInfo, manager: manager, routerManager: routerManager, coreView: coreView, type: type)
+        routerManager.present(view: panel)
     }
     
     private func isEnteredRoom() -> Bool {

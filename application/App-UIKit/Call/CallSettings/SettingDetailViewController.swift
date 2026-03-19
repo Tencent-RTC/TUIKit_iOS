@@ -37,7 +37,7 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
         let view = UITextView(frame: .zero)
         view.backgroundColor = UIColor.clear
         view.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        view.textColor = UIColor(hex: "333333")
+        view.textColor = UIColor("333333")
         view.textAlignment = .left
         view.isScrollEnabled = true
         return view

@@ -7,7 +7,6 @@
 
 import Combine
 import RTCRoomEngine
-import RTCCommon
 import AtomicXCore
 import AtomicX
 
@@ -177,7 +176,7 @@ extension VRImageSelectionPanel {
         
         confirmButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(34.scale375Height())
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(12.scale375Height())
             make.height.equalTo(confirmButton.mm_h)
             make.width.equalTo(confirmButton.mm_w)
         }

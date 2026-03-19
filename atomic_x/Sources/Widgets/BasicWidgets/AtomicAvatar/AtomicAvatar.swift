@@ -46,7 +46,7 @@ public enum AtomicAvatarSize {
     }
 
     public var textFont: UIFont {
-        let typography = ThemeStore.shared.typography
+        let typography = ThemeStore.shared.typographyTokens
         switch self {
         case .xxs: return typography.Medium10
         case .xs:  return typography.Medium12
@@ -400,7 +400,7 @@ private final class BadgeView: UIView {
         static let textHeight: CGFloat = 16
         static let textHorizontalPadding: CGFloat = ThemeStore.shared.space.space4
         static let textCornerRadius: CGFloat = ThemeStore.shared.borderRadius.radius8
-        static let textFont: UIFont = ThemeStore.shared.typography.Medium12
+        static let textFont: UIFont = ThemeStore.shared.typographyTokens.Medium12
     }
     
     // MARK: - Types
@@ -459,7 +459,7 @@ private final class BadgeView: UIView {
     }
 
     private func setColors() {
-        let colors = ThemeStore.shared.color
+        let colors = ThemeStore.shared.colorTokens
         backgroundLayer.fillColor = colors.textColorError.cgColor
         textLabel?.textColor = colors.textColorButton
     }

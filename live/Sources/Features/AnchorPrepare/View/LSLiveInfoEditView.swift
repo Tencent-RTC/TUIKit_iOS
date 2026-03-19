@@ -10,9 +10,8 @@ import Kingfisher
 import SnapKit
 import TUICore
 import Combine
-import RTCCommon
-import AtomicXCore
 import AtomicX
+import AtomicXCore
 
 class LSLiveInfoEditView: UIView {
     private var cancellableSet = Set<AnyCancellable>()

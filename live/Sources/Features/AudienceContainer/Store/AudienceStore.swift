@@ -9,7 +9,6 @@ import AtomicXCore
 import AtomicX
 import Combine
 import Foundation
-import RTCCommon
 
 class AudienceStore {
     class Context {
@@ -199,10 +198,6 @@ extension AudienceStore {
     func subscribeState<State, Value>(_ selector: StatePublisherSelector<State, Value>) -> AnyPublisher<Value, Never> {
         context.subscribeState(selector)
     }
-
-    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        context.subscribeState(selector)
-    }
 }
 
 extension AudienceStore.Context {
@@ -257,17 +252,11 @@ extension AudienceStore.Context {
             return loginStore.state.subscribe(sel)
         } else if let sel = selector as? StatePublisherSelector<LiveSeatState, Value> {
             return seatStore.state.subscribe(sel)
-        }
-        assertionFailure("Input failed State class")
-        return Empty<Value, Never>().eraseToAnyPublisher()
-    }
-
-    func subscribeState<State, Value>(_ selector: StateSelector<State, Value>) -> AnyPublisher<Value, Never> {
-        if let sel = selector as? StateSelector<AudienceMediaState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AudienceMediaState, Value> {
             return audienceMediaManager.subscribeState(sel)
-        } else if let sel = selector as? StateSelector<AudienceState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AudienceState, Value> {
             return audienceObservableState.subscribe(sel)
-        } else if let sel = selector as? StateSelector<AudienceBattleState, Value> {
+        } else if let sel = selector as? StatePublisherSelector<AudienceBattleState, Value> {
             return audienceBattleObservableState.subscribe(sel)
         }
         assertionFailure("Input failed State class")
@@ -295,7 +284,7 @@ extension AudienceStore {
         }
     }
 
-    static func subscribeAudienceConfig<Value>(_ selector: StateSelector<AudienceContainerConfig, Value>) -> AnyPublisher<Value, Never> {
+    static func subscribeAudienceConfig<Value>(_ selector: StatePublisherSelector<AudienceContainerConfig, Value>) -> AnyPublisher<Value, Never> {
         return observerAudienceConfig.subscribe(selector)
     }
 }

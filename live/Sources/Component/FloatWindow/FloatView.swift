@@ -9,7 +9,7 @@ import Foundation
 import SnapKit
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 
 protocol FloatViewDelegate: AnyObject {
     func onResume()

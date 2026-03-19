@@ -86,8 +86,8 @@ public class RoomThemeManager {
     /// - Returns: 动态颜色
     public static func dynamicColor(lightHex: String, darkHex: String) -> UIColor {
         return dynamicColor(
-            light: UIColor(hex: lightHex),
-            dark: UIColor(hex: darkHex)
+            light: UIColor( lightHex),
+            dark: UIColor( darkHex)
         )
     }
     

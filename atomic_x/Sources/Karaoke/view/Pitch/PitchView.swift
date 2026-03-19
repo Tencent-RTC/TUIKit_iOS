@@ -7,7 +7,7 @@
 import UIKit
 import SnapKit
 import Combine
-import RTCCommon
+import AtomicXCore
 
 class PitchView: UIView {
 
@@ -37,7 +37,7 @@ class PitchView: UIView {
     private var lastMusicProgress: Int = 0
 
     private var timingTrigger: DispatchSourceTimer?
-    private var currentScore: String = .score.localized
+    private var currentScore: String = .score.atomicLocalized
     private var scoreUpdateCounter: Int = 0
 
     init(manager: KaraokeManager,isKTV: Bool) {
@@ -78,12 +78,12 @@ class PitchView: UIView {
             canvas.setBackgroundImage(UIImage.atomicXBundleImage(named: "ktv_canvas"))
         }
 
-        manager?.subscribe(StateSelector(keyPath: \.enableScore))
+        manager?.subscribe(StatePublisherSelector(keyPath: \.enableScore))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] enableScore in
                 guard let self = self ,let manager = manager else {return}
-                if manager.karaokeState.selectedSongs.count > 0{
+                if manager.karaokeState.selectedSongs.count > 0 && !manager.karaokeState.currentPitchList.isEmpty {
                     self.setScoreComponentVisible(enableScore)
                 } else {
                     self.setScoreComponentVisible(false)
@@ -91,13 +91,14 @@ class PitchView: UIView {
             }
             .store(in: &cancellables)
 
-        manager?.subscribe(StateSelector(keyPath: \.currentScore))
+        manager?.subscribe(StatePublisherSelector(keyPath: \.currentScore))
             .receive(on: DispatchQueue.main)
+            .dropFirst()
             .removeDuplicates()
             .sink { [weak self] currentScore in
                 guard let self = self ,let manager = manager else {return}
                 DispatchQueue.main.async {
-                    if currentScore == -1001 {
+                    if currentScore == -1001 || currentScore < 0  {
                         self.scoreButtonLayer?.string = String.score
                     } else {
                         self.setScore(String(currentScore))
@@ -194,7 +195,7 @@ class PitchView: UIView {
         textLayer.string = currentScore
         textLayer.fontSize = 12
         textLayer.alignmentMode = .center
-        textLayer.backgroundColor = UIColor.flowKitWhite.cgColor
+        textLayer.backgroundColor = ThemeStore.shared.colorTokens.textColorPrimary.cgColor
         textLayer.cornerRadius = 5
         textLayer.frame = CGRect(x: 0, y: 0, width: 28, height: 18)
         textLayer.contentsScale = UIScreen.main.scale
@@ -441,5 +442,5 @@ extension PitchView: PitchCanvasDelegate {
 }
 
 fileprivate extension String {
-    static var score: String = ("karaoke_score").localized
+    static var score: String = ("karaoke_score").atomicLocalized
 }

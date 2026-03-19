@@ -8,32 +8,17 @@ public struct ContactsPage: View {
     @State private var showAddFriend = false
     @State private var showJoinGroup = false
     private let contactStore: ContactListStore
-    let onShowMessage: ((ConversationInfo) -> Void)?
     let onContactClick: ((AZOrderedListItem) -> Void)?
     let onGroupClick: ((AZOrderedListItem) -> Void)?
-    let onNewFriendsClick: (() -> Void)?
-    let onGroupApplicationsClick: (() -> Void)?
-    let onGroupListClick: (() -> Void)?
-    let onBlackListClick: (() -> Void)?
 
     public init(
         contactStore: ContactListStore = ContactListStore.create(),
-        onShowMessage: ((ConversationInfo) -> Void)? = nil,
         onContactClick: ((AZOrderedListItem) -> Void)? = nil,
-        onGroupClick: ((AZOrderedListItem) -> Void)? = nil,
-        onNewFriendsClick: (() -> Void)? = nil,
-        onGroupApplicationsClick: (() -> Void)? = nil,
-        onGroupListClick: (() -> Void)? = nil,
-        onBlackListClick: (() -> Void)? = nil
+        onGroupClick: ((AZOrderedListItem) -> Void)? = nil
     ) {
         self.contactStore = contactStore
-        self.onShowMessage = onShowMessage
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
-        self.onNewFriendsClick = onNewFriendsClick
-        self.onGroupApplicationsClick = onGroupApplicationsClick
-        self.onGroupListClick = onGroupListClick
-        self.onBlackListClick = onBlackListClick
     }
 
     public var body: some View {
@@ -41,15 +26,11 @@ public struct ContactsPage: View {
             headerView
             ContactList(
                 contactStore: contactStore,
-                onShowMessage: onShowMessage,
                 onContactClick: onContactClick,
-                onGroupClick: onGroupClick,
-                onNewFriendsClick: onNewFriendsClick,
-                onGroupApplicationsClick: onGroupApplicationsClick,
-                onGroupListClick: onGroupListClick,
-                onBlackListClick: onBlackListClick
+                onGroupClick: onGroupClick
             )
         }
+        .background(themeState.colors.bgColorOperate.ignoresSafeArea(edges: .top))
         .overlay(
             Group {
                 if showAddContactMenu {

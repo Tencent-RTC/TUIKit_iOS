@@ -36,7 +36,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     
     private let basicSettingContentView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "AAAAAA")
+        view.backgroundColor = UIColor("AAAAAA")
         return view
     }()
     private lazy var basicSettingLabel: UILabel = {
@@ -55,7 +55,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         let place: String = SettingsConfig.share.ringUrl.isEmpty ?
         ("NotSet").localized : SettingsConfig.share.ringUrl
         let view = createLabel(textSize: 16, text: place)
-        view.textColor = UIColor(hex: "AAAAAA")
+        view.textColor = UIColor("AAAAAA")
         view.textAlignment = .right
         return view
     }()
@@ -109,7 +109,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
 #endif
     private let callSettingContentView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "AAAAAA")
+        view.backgroundColor = UIColor("AAAAAA")
         return view
     }()
     private lazy var callSettingLabel: UILabel = {
@@ -169,7 +169,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     private lazy var extendedInfo: UILabel = {
         let place = SettingsConfig.share.userData.isEmpty ? ("NotSet").localized : SettingsConfig.share.userData
         let view = createLabel(textSize: 16, text: place)
-        view.textColor = UIColor(hex: "AAAAAA")
+        view.textColor = UIColor("AAAAAA")
         view.textAlignment = .right
         return view
     }()
@@ -190,7 +190,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     }()
     private lazy var offlinePushInfo: UILabel = {
         let view = createLabel(textSize: 16, text: ("GoToSettings").localized)
-        view.textColor = UIColor(hex: "AAAAAA")
+        view.textColor = UIColor("AAAAAA")
         view.textAlignment = .right
         return view
     }()
@@ -203,7 +203,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     
     private let videoSettingContentView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "AAAAAA")
+        view.backgroundColor = UIColor("AAAAAA")
         return view
     }()
     private lazy var videoSettingLabel: UILabel = {
@@ -847,7 +847,7 @@ extension SettingsViewController {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.clear
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string: text)
         textField.textAlignment = .right
         textField.delegate = self
@@ -859,9 +859,9 @@ extension SettingsViewController {
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle(("Settings").localized, for: .normal)
         btn.adjustsImageWhenHighlighted = false
-        btn.setBackgroundImage(UIColor(hex: "006EFF")?.trans2Image(), for: .normal)
+        btn.setBackgroundImage(UIColor("006EFF").trans2Image(), for: .normal)
         btn.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 15)
-        btn.layer.shadowColor = UIColor(hex: "006EFF")?.cgColor ?? UIColor.blue.cgColor
+        btn.layer.shadowColor = UIColor("006EFF").cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
         btn.layer.shadowRadius = 16
         btn.layer.shadowOpacity = 0.4

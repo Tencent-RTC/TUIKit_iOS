@@ -10,7 +10,6 @@ import AtomicXCore
 import Combine
 import Foundation
 import MJRefresh
-import RTCCommon
 import RTCRoomEngine
 import TUICore
 
@@ -37,15 +36,18 @@ class AnchorCoHostManagerPanel: RTCBaseView {
     
     private let disconnectButton: UIButton = {
         let button = UIButton()
-        button.titleLabel?.font = UIFont.customFont(ofSize: 14)
-        button.setTitleColor(.warningTextColor, for: .normal)
+        button.titleLabel?.font = UIFont(name: "PingFang SC", size: 14)
+        button.setTitleColor(.flowKitRed, for: .normal)
         button.setTitle(.disconnectText, for: .normal)
-        button.setImage(internalImage("live_connection_disconnect"), for: .normal)
+        button.setImage(internalImage("voice_connection_disconnect"), for: .normal)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -2, bottom: 0, right: 2)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: -2)
         button.backgroundColor = .clear
+        button.contentHorizontalAlignment = .right
         button.isHidden = true
         return button
     }()
-    
+
     private lazy var backButton: UIButton = {
         let view = UIButton(type: .system)
         view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
@@ -147,6 +149,7 @@ extension AnchorCoHostManagerPanel {
         footer.ignoredScrollViewContentInsetBottom = tableView.contentInset.bottom
         footer.setTitle(.loadingMoreText, for: .pulling)
         footer.setTitle(.loadingText, for: .refreshing)
+        footer.setTitle(.noMoreDataText, for: .noMoreData)
         tableView.mj_footer = footer
     }
     
@@ -156,9 +159,9 @@ extension AnchorCoHostManagerPanel {
     }
     
     private func subscribeConnectionState() {
-        store.subscribeState(StateSelector(keyPath: \AnchorCoHostState.connectedUsers))
+        store.subscribeState(StatePublisherSelector(keyPath: \AnchorCoHostState.connectedUsers))
             .removeDuplicates()
-            .combineLatest(store.subscribeState(StateSelector(keyPath: \AnchorCoHostState.recommendedUsers)).removeDuplicates(),
+            .combineLatest(store.subscribeState(StatePublisherSelector(keyPath: \AnchorCoHostState.recommendedUsers)).removeDuplicates(),
                            store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.candidatesCursor)).removeDuplicates())
             .receive(on: RunLoop.main)
             .sink { [weak self] connected, recommended, cursor in
