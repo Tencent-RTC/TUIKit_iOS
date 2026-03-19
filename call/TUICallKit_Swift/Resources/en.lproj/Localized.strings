@@ -13,13 +13,18 @@
 "TUICallKit.Group.inviteToGroupCall" = "invites you to a group call";
 "TUICallKit.Group.waitAccept" = "Waiting";
 "TUICallKit.determine" = "OK";
-"TUICallKit.lineBusy" = "Line Busy";
+"TUICallKit.lineBusy" = "The other party is on a call, please try again later";
 "TUICallKit.userHangup" = "\%@ end the call.";
 "TUICallKit.userReject" = "\%@ rejected call";
 "TUICallKit.otherPartyHangup" = "Other party hung up, call ended";
-"TUICallKit.otherPartyReject" = "Call rejected by other party";
-"TUICallKit.otherPartyNoResponse" = "The other party did not respond";
-"TUICallKit.calNotCallYourself" = "You can't call yourself";
+"TUICallKit.otherPartyReject" = "The other party rejected your call request";
+"TUICallKit.otherPartyNoResponse" = "The other party did not answer, please try again later";
+"TUICallKit.otherPartyCanceled" = "The other party canceled the call";
+"TUICallKit.calNotCallYourself" = "Unable to call yourself";
+"TUICallKit.youHaveMissedCalls" = "You are on a call and cannot initiate another call";
+"TUICallKit.Recents.noCall" = "No Calls";
+"TUICallKit.Recents.noMissedCall" = "No Missed Calls";
+"TUICallKit.ErrorInvalidUserId" = "User does not exist. Please verify if the user is registered or if invalid characters were entered";
 
 "TUICallKit.switchCamera" = "Switch";
 "TUICallKit.blurBackground" = "Blur Background";
@@ -30,25 +35,29 @@
 "TUICallKit.calleeTip" = "Also on the call:";
 "TUICallKit.FloatingWindow.waitAccept" = "Waiting";
 
-"TUICallKit.User.Exceed.Limit" = "TUICalling currently supports call with up to 9 people.For larger conference calls,try using TUIRoom";
-"TUICallKit.UnableToRestartTheCall" = "Unable to restart the call";
+"TUICallKit.User.Exceed.Limit" = "Current call supports up to 9 people online simultaneously";
+"TUICallKit.UnableToRestartTheCall" = "You are currently in a call, please end the call before dialing again";
 
-"TUICallKit.purchased" = "You do not have TUICallKit package, please open the free experience in the console or purchase the official package";
-"TUICallKit.support" = "The package you purchased does not support this ability";
+"TUICallKit.purchased" = "This feature requires audio-video call capability package support. To avoid affecting your usage, it is recommended to go to Tencent Cloud · Real-Time Communication Console to activate free trial or purchase official package";
+"TUICallKit.support" = "Your current package type does not support this feature. To unlock more capabilities, it is recommended to go to Tencent Cloud · Real-Time Communication Console to upgrade your package";
 "TUICallKit.ErrorInPeerBlacklist" = "The identifier is in blacklist. Failed to send this message!";
-"TUICallKit.ErrorInvalidLogin" = "Invalid login, please login again";
+"TUICallKit.ErrorInvalidLogin" = "Failed to initiate call, please check login status and try again";
 "TUICallKit.ErrorParameterInvalid" = "Parameter error";
 "TUICallKit.ErrorRequestRefused" = "The current status can not use this function";
 "TUICallKit.ErrorRequestRepeated" = "The current status is waiting/accept, please do not call it repeatedly";
 "TUICallKit.ErrorSceneNotSupport" = "The current scene does not support this function";
+"TUICallKit.ErrorTRTCEnterRoomFailed" = "Failed to join the call";
+"TUICallKit.ErrorCameraOccupied" = "Camera is currently occupied by system call";
+"TUICallKit.ErrorMicOccupied" = "Microphone is currently occupied by system call";
+"TUICallKit.ErrorPermissonDenied" = "Permission denied, please check device settings";
 
 "TUICallKit.FailedToGetCameraPermission.Title" = "No access to camera";
-"TUICallKit.FailedToGetCameraPermission.Tips"  = "Unable to use the video call function, click \"Authorize Now\" to open the camera permission.";
+"TUICallKit.FailedToGetCameraPermission.Tips"  = "Camera permission not enabled, unable to start video call. Go to Settings > %@ to enable camera permission";
 "TUICallKit.FailedToGetCameraPermission.Later" = "Later";
 "TUICallKit.FailedToGetCameraPermission.Enable" = "Authorize Now";
 
 "TUICallKit.FailedToGetMicrophonePermission.Title" = "No access to microphone";
-"TUICallKit.FailedToGetMicrophonePermission.Tips"  = "Unable to use the function of sending audio and video calls, click \"Authorize Now\" to open the microphone permission";
+"TUICallKit.FailedToGetMicrophonePermission.Tips"  = "Microphone permission not enabled, unable to start audio/video call. Go to Settings > %@ to enable microphone permission";
 "TUICallKit.FailedToGetMicrophonePermission.Later" = "Later";
 "TUICallKit.FailedToGetMicrophonePermission.Enable" = "Authorize Now";
 
@@ -65,6 +74,7 @@
 "TUICallKit.Recents.clear.cancel" = "Cancel";
 "TUICallKit.Recents.incoming" = "Incoming";
 "TUICallKit.Recents.outgoing" = "Outgoing";
+"TUICallKit.Recents.groupCallNotSupported" = "Redial not supported for group call history";
 
 "TUICallKit.unmuted" = "Unmuted";
 "TUICallKit.muted" = "Muted";

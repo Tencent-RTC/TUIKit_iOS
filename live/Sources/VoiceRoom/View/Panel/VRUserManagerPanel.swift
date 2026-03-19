@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import RTCCommon
 import Combine
 import RTCRoomEngine
 import AtomicXCore
@@ -129,7 +128,7 @@ class VRUserManagerPanel: RTCBaseView {
         avatarView.snp.makeConstraints { make in
             make.leading.top.equalToSuperview().offset(24.scale375())
             if !isOwner {
-                make.bottom.equalToSuperview().offset(-24.scale375())
+                make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-24.scale375())
             }
         }
         
@@ -159,7 +158,7 @@ class VRUserManagerPanel: RTCBaseView {
             featureClickPanel.snp.makeConstraints { make in
                 make.top.equalTo(avatarView.snp.bottom).offset(30.scale375Height())
                 make.leading.equalTo(avatarView.snp.leading)
-                make.bottom.equalToSuperview().offset(-24.scale375())
+                make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-24.scale375())
             }
         }
     }
@@ -184,7 +183,7 @@ class VRUserManagerPanel: RTCBaseView {
 
 extension VRUserManagerPanel {
     private func subscribeMyFollowListState() {
-        imStore.subscribeState(StateSelector(keyPath: \VoiceRoomIMState.myFollowingUserList))
+        imStore.subscribeState(StatePublisherSelector(keyPath: \VoiceRoomIMState.myFollowingUserList))
             .receive(on: RunLoop.main)
             .sink { [weak self] followUserList in
                 guard let self = self else { return }

@@ -6,7 +6,6 @@
 //
 import UIKit
 import SnapKit
-import RTCCommon
 import Combine
 import AtomicX
 
@@ -57,7 +56,7 @@ class NetWorkInfoItemCell: UITableViewCell {
 
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(hex: "#48494F")
+        view.backgroundColor = UIColor("48494F")
         return view
     }()
 

@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import RTCCommon
 import SnapKit
 
 class MusicButtonCollectionCell: UICollectionViewCell {
@@ -22,7 +21,7 @@ class MusicButtonCollectionCell: UICollectionViewCell {
     
     let containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .g3.withAlphaComponent(0.3)
+        view.backgroundColor = ThemeStore.shared.colorTokens.bgColorEntryCard.withAlphaComponent(0.3)
         view.layer.cornerRadius = 10
         view.layer.masksToBounds = true
         return view
@@ -38,8 +37,8 @@ class MusicButtonCollectionCell: UICollectionViewCell {
     
     private lazy var titleLabel: UILabel = {
         let view = UILabel()
-        view.font = .customFont(ofSize: 12)
-        view.textColor = .flowKitWhite
+        view.font = ThemeStore.shared.typographyTokens.Regular12
+        view.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         view.textAlignment = .center
         self.contentView.addSubview(view)
         return view
@@ -82,7 +81,7 @@ class MusicButtonCollectionCell: UICollectionViewCell {
     }
     
     private func updateBorder() {
-        containerView.layer.borderColor = isSelected ? UIColor.b1.cgColor : UIColor.transparent.cgColor
+        containerView.layer.borderColor = isSelected ? ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor : ThemeStore.shared.colorTokens.clearColor.cgColor
         containerView.layer.borderWidth = isSelected ? 2 : 0
     }
     

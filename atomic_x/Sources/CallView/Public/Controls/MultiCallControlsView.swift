@@ -86,7 +86,7 @@ class MultiCallControlsView: UIView {
     }()
     
     private func setup() {
-        containerView.backgroundColor = UIColor(hex: "#4F586B")
+        containerView.backgroundColor = UIColor("4F586B")
         containerView.isUserInteractionEnabled = true
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         containerView.addGestureRecognizer(panGesture)

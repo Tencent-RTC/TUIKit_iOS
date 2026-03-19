@@ -121,7 +121,7 @@ class CreateRoomView: UIView {
         }
         
         enterButton.snp.makeConstraints { make in
-            make.bottom.equalToSuperview().offset(-40 - kDeviceSafeBottomHeight)
+            make.bottom.equalToSuperview().offset(-40 - safeAreaInsets.bottom)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.4)
             make.height.equalTo(50)

@@ -8,19 +8,18 @@
 
 import Foundation
 import Combine
-import RTCCommon
-
-// MARK: - Theme model
 
 public struct Theme {
     public let id: String
-    public let displayName: String
+    public let mode: ThemeMode
+    public let primaryColor: String
     public let tokens: DesignTokenSet
     
-    public init(id: String, displayName: String, tokens: DesignTokenSet) {
-        self.id = id
-        self.displayName = displayName
+    public init(mode: ThemeMode, primaryColor: String, tokens: DesignTokenSet) {
+        self.mode = mode
+        self.primaryColor = primaryColor
         self.tokens = tokens
+        self.id = "\(mode.rawValue)_\(primaryColor.hash)"
     }
     
     public var color: ColorTokens {
@@ -40,22 +39,24 @@ public struct Theme {
     }
 }
 
-
-extension Theme: Identifiable {}
-
-extension Theme: Equatable {
+extension Theme: Identifiable, Equatable {
     public static func == (lhs: Theme, rhs: Theme) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
 extension Theme {
-    public static var defaultTheme: Theme {
-        return Theme(
-            id: "default",
-            displayName: "Default",
-            tokens: DesignTokenSet.placeholder
-        )
+    public static var lightTheme: Theme {
+        return makeTheme(mode: .light, primaryColor: "1C66E5")
+    }
+    
+    public static var darkTheme: Theme {
+        return makeTheme(mode: .dark, primaryColor: "4086FF")
+    }
+    
+    static func makeTheme(mode: ThemeMode, primaryColor: String) -> Theme {
+        let tokenSet = DesignTokenSet(mode: mode, primaryColor: primaryColor)
+        return Theme(mode: mode, primaryColor: primaryColor, tokens: tokenSet)
     }
 }
 

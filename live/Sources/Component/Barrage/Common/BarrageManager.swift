@@ -5,13 +5,13 @@
 //  Created by gg on 2025/3/11.
 //
 import AtomicX
+import AtomicXCore
 import RTCRoomEngine
 import Combine
-import RTCCommon
 
 class BarrageManager: NSObject {
     static let shared = BarrageManager()
-    
+    private var cancellableSet = Set<AnyCancellable>()
     private static let stateKey = "__kBarrageManager_state_key__"
     private override init() {
         super.init()
@@ -19,12 +19,16 @@ class BarrageManager: NSObject {
     }
     
     private func subscribe() {
-        StateCache.shared.subscribeToObjectRemoval(key: BarrageManager.stateKey) {
-            BarrageManager.shared.inputString = ""
-            DispatchQueue.main.async {
-                BarrageManager.shared.subscribe()
+        LiveListStore.shared.state.subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .removeDuplicates()
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { currentLive in
+                if currentLive.isEmpty {
+                    BarrageManager.shared.inputString = ""
+                }
             }
-        }
+            .store(in: &cancellableSet)
     }
     
     var inputString: String = ""

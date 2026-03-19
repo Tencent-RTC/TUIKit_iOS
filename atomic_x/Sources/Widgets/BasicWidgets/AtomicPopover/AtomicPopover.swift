@@ -131,6 +131,10 @@ public final class AtomicPopover: UIViewController {
         animatePresentation()
     }
     
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+    }
+    
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
@@ -148,7 +152,6 @@ public final class AtomicPopover: UIViewController {
     private func setupViews() {
         view.addSubview(backdropView)
         view.addSubview(containerView)
-        
         containerView.addSubview(contentView)
     }
     
@@ -158,15 +161,12 @@ public final class AtomicPopover: UIViewController {
         }
 
         contentView.snp.makeConstraints { make in
-            make.top.equalTo(containerView.safeAreaLayoutGuide.snp.top)
-            make.left.equalToSuperview()
-            make.right.equalToSuperview()
-            make.bottom.equalTo(containerView.safeAreaLayoutGuide.snp.bottom)
+            make.edges.equalToSuperview()
         }
 
         updateContainerConstraints(animated: false)
     }
-    
+
     private func updateContainerConstraints(animated: Bool, isInitialSetup: Bool = false) {
         let screenSize = view.bounds.size
         let safeAreaInsets = view.safeAreaInsets
@@ -216,12 +216,12 @@ public final class AtomicPopover: UIViewController {
 
             switch configuration.position {
             case .bottom:
-                containerViewBottomConstraint = make.bottom.equalToSuperview().offset(initialOffset).constraint
+                containerViewBottomConstraint = make.bottom.equalTo(view.snp.bottom).offset(initialOffset).constraint
                 make.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.top)
             case .center:
                 containerViewCenterYConstraint = make.centerY.equalTo(view.safeAreaLayoutGuide.snp.centerY).offset(initialOffset).constraint
             case .top:
-                containerViewTopConstraint = make.top.equalToSuperview().offset(initialOffset).constraint
+                containerViewTopConstraint = make.top.equalTo(view.snp.top).offset(initialOffset).constraint
                 make.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide.snp.bottom)
             }
         }
@@ -237,10 +237,13 @@ public final class AtomicPopover: UIViewController {
         let theme = ThemeStore.shared.currentTheme
         backdropView.backgroundColor = theme.tokens.color.bgColorMask
 
+        let backgroundColor: UIColor
         switch configuration.backgroundColor {
         case .defaultThemeColor:
-            containerView.backgroundColor = theme.tokens.color.bgColorDialog
+            backgroundColor = theme.tokens.color.bgColorDialog
+            containerView.backgroundColor = backgroundColor
         case .custom(let color):
+            backgroundColor = color
             containerView.backgroundColor = color
         }
         
@@ -260,11 +263,14 @@ public final class AtomicPopover: UIViewController {
     private func updateAppearance(theme: Theme) {
         backdropView.backgroundColor = theme.tokens.color.bgColorMask
         
+        let backgroundColor: UIColor
         switch configuration.backgroundColor {
         case .defaultThemeColor:
-            containerView.backgroundColor = theme.tokens.color.bgColorDialog
-        case .custom:
-            break
+            backgroundColor = theme.tokens.color.bgColorDialog
+            containerView.backgroundColor = backgroundColor
+        case .custom(let color):
+            backgroundColor = color
+            containerView.backgroundColor = color
         }
         
         let cornerRadius = theme.tokens.borderRadius.radius20
@@ -288,15 +294,15 @@ public final class AtomicPopover: UIViewController {
         
         containerView.layer.cornerCurve = .continuous
     }
-    
+
     // MARK: - Animation
     
     private func animatePresentation() {
         updateContainerConstraints(animated: false, isInitialSetup: true)
-        
+
+        view.layoutIfNeeded()
+
         switch configuration.animation {
-        case .slideFromBottom, .slideFromTop:
-            break
         case .fade:
             containerView.alpha = 0
         case .scale:
@@ -306,16 +312,16 @@ public final class AtomicPopover: UIViewController {
             backdropView.alpha = 1
             updateConstraintsToFinalPosition()
             return
+        case .slideFromBottom, .slideFromTop:
+            break
         }
-        
-        view.layoutIfNeeded()
 
         UIView.animate(
-            withDuration: 0.3,
+            withDuration: 0.35,
             delay: 0,
-            usingSpringWithDamping: 0.8,
-            initialSpringVelocity: 0.5,
-            options: [.curveEaseOut]
+            usingSpringWithDamping: 0.85,
+            initialSpringVelocity: 0.6,
+            options: [.curveEaseOut, .allowUserInteraction]
         ) { [weak self] in
             guard let self = self else { return }
             
@@ -324,14 +330,12 @@ public final class AtomicPopover: UIViewController {
             self.updateConstraintsToFinalPosition()
             
             switch self.configuration.animation {
-            case .slideFromBottom, .slideFromTop:
-                break
             case .fade:
                 self.containerView.alpha = 1
             case .scale:
                 self.containerView.alpha = 1
                 self.containerView.transform = .identity
-            case .none:
+            case .slideFromBottom, .slideFromTop, .none:
                 break
             }
             
@@ -354,9 +358,11 @@ public final class AtomicPopover: UIViewController {
         let screenSize = view.bounds.size
         
         UIView.animate(
-            withDuration: 0.25,
+            withDuration: 0.28,
             delay: 0,
-            options: [.curveEaseIn]
+            usingSpringWithDamping: 1.0,
+            initialSpringVelocity: 0.3,
+            options: [.curveEaseIn, .allowUserInteraction]
         ) { [weak self] in
             guard let self = self else { return }
             
@@ -370,10 +376,12 @@ public final class AtomicPopover: UIViewController {
                 exitOffset = -screenSize.height
             case .fade:
                 self.containerView.alpha = 0
+                self.view.layoutIfNeeded()
                 return
             case .scale:
                 self.containerView.alpha = 0
                 self.containerView.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+                self.view.layoutIfNeeded()
                 return
             case .none:
                 return

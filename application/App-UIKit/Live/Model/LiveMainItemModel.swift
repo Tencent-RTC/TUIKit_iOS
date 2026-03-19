@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import RTCCommon
+import AtomicX
 
 struct LiveMainItemModel {
     let imageName: String

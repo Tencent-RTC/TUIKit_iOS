@@ -11,13 +11,14 @@ import Combine
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
 import TXLiteAVSDK_Professional
-import RTCCommon
 import TUICore
 #endif
+import AtomicXCore
 
 class MusicControlView: UIView {
     weak var karaokeManager: KaraokeManager?
     var onSongListButtonTapped: (() -> Void)?
+    var onJoinChorusButtonTapped: ((Bool) -> Void)?
     private let isOwner: Bool
     private let isKTV: Bool
     private var totalTime: TimeInterval = 0
@@ -38,6 +39,21 @@ class MusicControlView: UIView {
     private let songListButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage.atomicXBundleImage(named: "ktv_selectSong"), for: .normal)
+        return button
+    }()
+    
+    private let buttonBar: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 10.scale375()
+        stackView.alignment = .center
+        return stackView
+    }()
+
+    private let joinChorusButton: JoinChorusButton = {
+        let button = JoinChorusButton()
+        button.isHidden = true
+        button.setContentCompressionResistancePriority(.required, for: .horizontal)
         return button
     }()
 
@@ -69,7 +85,7 @@ class MusicControlView: UIView {
     private let progressLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFang SC", size: 9)
-        label.textColor = UIColor(white: 1, alpha: 0.42)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.42)
         label.text = "00:00 / 00:00"
         label.textAlignment = .left
         return label
@@ -85,7 +101,10 @@ class MusicControlView: UIView {
         let label = UILabel()
         label.frame = CGRect(x: 14, y: 0, width: 48, height: 17)
         label.font = UIFont(name: "PingFang SC", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.9)
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.9)
+        label.lineBreakMode = .byTruncatingTail
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
     }()
 
@@ -128,10 +147,14 @@ class MusicControlView: UIView {
         addSubview(titleLabel)
         addSubview(backgroundView)
         addSubview(songListButton)
-        addSubview(originalButton)
-        addSubview(regulateButton)
-        addSubview(nextButton)
-        addSubview(playButton)
+        addSubview(buttonBar)
+        if isKTV {
+            buttonBar.addArrangedSubview(joinChorusButton)
+        }
+        buttonBar.addArrangedSubview(playButton)
+        buttonBar.addArrangedSubview(nextButton)
+        buttonBar.addArrangedSubview(regulateButton)
+        buttonBar.addArrangedSubview(originalButton)
         addSubview(progressLabel)
     }
 
@@ -147,6 +170,7 @@ class MusicControlView: UIView {
             titleLabel.snp.makeConstraints { make in
                 make.left.equalTo(musicIcon.snp.right).offset(2.scale375())
                 make.top.equalToSuperview().offset(4.scale375())
+                make.right.lessThanOrEqualTo(buttonBar.snp.left).offset(-10.scale375())
             }
 
             progressLabel.snp.makeConstraints { make in
@@ -155,31 +179,31 @@ class MusicControlView: UIView {
                 make.left.equalToSuperview()
                 make.top.equalTo(musicIcon.snp.top).offset(17.scale375())
             }
+            
+            buttonBar.snp.makeConstraints { make in
+                make.right.equalToSuperview()
+                make.top.equalToSuperview()
+            }
 
             originalButton.snp.makeConstraints { make in
-                make.right.equalToSuperview()
-                make.top.equalToSuperview().offset(8.scale375())
                 make.width.height.equalTo(20.scale375())
             }
 
             regulateButton.snp.makeConstraints { make in
-                make.right.equalTo(originalButton.snp.left).offset(-10.scale375())
-                make.top.equalToSuperview().offset(8.scale375())
                 make.width.height.equalTo(20.scale375())
             }
 
             nextButton.snp.makeConstraints { make in
-                make.right.equalTo(regulateButton.snp.left).offset(-10.scale375())
-                make.top.equalToSuperview().offset(8.scale375())
                 make.width.height.equalTo(20.scale375())
             }
 
             playButton.snp.makeConstraints { make in
-                make.right.equalTo(nextButton.snp.left).offset(-10.scale375())
-                make.top.equalToSuperview().offset(8.scale375())
                 make.width.height.equalTo(20.scale375())
             }
 
+            joinChorusButton.snp.makeConstraints { make in
+                make.height.equalTo(24.scale375())
+            }
         } else {
             musicIcon.isHidden = true
             titleLabel.isHidden = true
@@ -195,28 +219,25 @@ class MusicControlView: UIView {
                 make.width.height.equalTo(32.scale375())
                 make.centerY.equalToSuperview()
             }
-
-            originalButton.snp.makeConstraints { make in
+            
+            buttonBar.snp.makeConstraints { make in
                 make.right.equalTo(songListButton.snp.left).offset(-10.scale375())
                 make.centerY.equalTo(songListButton).offset(2.scale375())
+            }
+
+            originalButton.snp.makeConstraints { make in
                 make.width.height.equalTo(16.scale375())
             }
 
             regulateButton.snp.makeConstraints { make in
-                make.right.equalTo(originalButton.snp.left).offset(-10.scale375())
-                make.centerY.equalTo(songListButton).offset(2.scale375())
                 make.width.height.equalTo(16.scale375())
             }
 
             nextButton.snp.makeConstraints { make in
-                make.right.equalTo(regulateButton.snp.left).offset(-10.scale375())
-                make.centerY.equalTo(songListButton).offset(2.scale375())
                 make.width.height.equalTo(16.scale375())
             }
 
             playButton.snp.makeConstraints { make in
-                make.right.equalTo(nextButton.snp.left).offset(-10.scale375())
-                make.centerY.equalTo(songListButton).offset(2.scale375())
                 make.width.height.equalTo(16.scale375())
             }
         }
@@ -228,8 +249,9 @@ class MusicControlView: UIView {
         playButton.addTarget(self, action: #selector(onPlayButtonClicked), for: .touchUpInside)
         originalButton.addTarget(self, action: #selector(onOriginalButtonClicked), for: .touchUpInside)
         songListButton.addTarget(self, action: #selector(onSongListButtonClicked), for: .touchUpInside)
+        joinChorusButton.addTarget(self, action: #selector(onJoinChorusButtonClicked), for: .touchUpInside)
 
-        karaokeManager?.subscribe(StateSelector(keyPath: \.playbackState))
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.playbackState))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] _ in
@@ -238,7 +260,7 @@ class MusicControlView: UIView {
             }
             .store(in: &cancellables)
 
-        karaokeManager?.subscribe(StateSelector(keyPath: \.selectedSongs))
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.selectedSongs))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] selectedSongs in
@@ -266,7 +288,22 @@ class MusicControlView: UIView {
             }
             .store(in: &cancellables)
 
-        karaokeManager?.subscribe(StateSelector(keyPath: \.musicTrackType))
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.songLibrary))
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] songLibrary in
+                guard let self = self,
+                      let karaokeManager = karaokeManager,
+                      let firstSong = karaokeManager.karaokeState.selectedSongs.first,
+                      let musicInfo = songLibrary.first(where: { $0.musicId == firstSong.songId }) else { return }
+                self.titleLabel.text = "\(musicInfo.musicName) - \(musicInfo.artist)"
+                let chorusRole = karaokeManager.karaokeState.chorusRole
+                self.showByChorusRole(chorusRole: chorusRole)
+            }
+            .store(in: &cancellables)
+
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.musicTrackType))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] musicTrackType in
@@ -279,7 +316,7 @@ class MusicControlView: UIView {
             }
             .store(in: &cancellables)
 
-        karaokeManager?.subscribe(StateSelector(keyPath: \.playProgress))
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.playProgress))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .dropFirst()
@@ -290,12 +327,22 @@ class MusicControlView: UIView {
             .store(in: &cancellables)
 
         karaokeManager?
-            .subscribe(StateSelector(keyPath: \.currentMusicTotalDuration))
+            .subscribe(StatePublisherSelector(keyPath: \.currentMusicTotalDuration))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] currentMusicTotalDuration in
                 guard let self = self else {return}
                 totalTime = currentMusicTotalDuration
+            }
+            .store(in: &cancellables)
+        
+        karaokeManager?.subscribe(StatePublisherSelector(keyPath: \.chorusRole))
+            .receive(on: DispatchQueue.main)
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] chorusRole in
+                guard let self = self else {return}
+                self.showByChorusRole(chorusRole: chorusRole)
             }
             .store(in: &cancellables)
     }
@@ -306,15 +353,19 @@ class MusicControlView: UIView {
         regulateButton.isHidden = true
         originalButton.isHidden = true
         backgroundView.isHidden = true
+        joinChorusButton.isHidden = true
     }
 
     private func showByChorusRole(chorusRole: TXChorusRole) {
         let isLeadSinger = (chorusRole == .leadSinger)
         nextButton.isHidden = !isLeadSinger
         playButton.isHidden = !isLeadSinger
-        regulateButton.isHidden = !isLeadSinger
-        originalButton.isHidden = !isLeadSinger
-        backgroundView.isHidden = !isLeadSinger
+        joinChorusButton.isHidden = isLeadSinger || karaokeManager?.state.state.selectedSongs.count == 0
+
+        let isSinger = (chorusRole == .leadSinger || chorusRole == .backSinger)
+        regulateButton.isHidden = !isSinger
+        originalButton.isHidden = !isSinger
+        backgroundView.isHidden = !isSinger
     }
 
     private func updateProgress(current: TimeInterval) {
@@ -372,6 +423,18 @@ class MusicControlView: UIView {
         self.onSongListButtonTapped?()
     }
 
+    @objc private func onJoinChorusButtonClicked() {
+        guard let karaokeManager = karaokeManager else { return }
+        let currentRole = karaokeManager.karaokeState.chorusRole
+        if currentRole == .backSinger { 
+            self.joinChorusButton.isSelected = false
+            self.onJoinChorusButtonTapped?(false)
+        } else {
+            self.joinChorusButton.isSelected = true
+            self.onJoinChorusButtonTapped?(true)
+        }
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
     }
@@ -379,5 +442,5 @@ class MusicControlView: UIView {
 
 
 fileprivate extension String {
-    static var noSongText: String = ("karaoke_no_song").localized
+    static var noSongText: String = ("karaoke_no_song").atomicLocalized
 }

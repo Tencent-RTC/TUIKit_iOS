@@ -10,6 +10,7 @@ import AtomicXCore
 public protocol AudienceContainerViewDelegate: AnyObject {
     func onClickFloatWindow()
     func onLiveEnded(roomId: String, avatarUrl: String, userName: String)
+    func onCreateCoreView(for liveInfo: LiveInfo) -> LiveCoreView?
 }
 
 public protocol AudienceContainerViewDataSource: AnyObject {

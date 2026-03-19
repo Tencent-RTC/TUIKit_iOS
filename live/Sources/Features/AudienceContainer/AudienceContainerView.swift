@@ -6,9 +6,9 @@
 //
 
 import AtomicXCore
-import RTCCommon
-import TUICore
 import AtomicX
+import TUICore
+
 public enum AudienceViewFeature {
     case sliding
     case floatWin
@@ -49,8 +49,7 @@ public class AudienceContainerView: UIView {
     private let fetchCount = 20
     private let routerManager = AudienceRouterManager()
     private lazy var routerCenter: AudienceRouterControlCenter = {
-        let rootRoute: AudienceRoute = .audience
-        let routerCenter = AudienceRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), rootRoute: rootRoute, routerManager: routerManager)
+        let routerCenter = AudienceRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), routerManager: routerManager)
         return routerCenter
     }()
     
@@ -72,7 +71,6 @@ public class AudienceContainerView: UIView {
     }
     
     deinit {
-        StateCache.shared.clear()
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
         BaseBeautyStore.shared.reset()
@@ -209,7 +207,7 @@ extension AudienceContainerView: LiveListViewDataSource {
         if let liveInfo = liveInfo {
             return liveInfo
         } else {
-            var firstLiveInfo = LiveInfo()
+            var firstLiveInfo = LiveInfo(seatTemplate: .videoDynamicGrid9Seats)
             firstLiveInfo.liveID = liveID
             return firstLiveInfo
         }
@@ -218,7 +216,11 @@ extension AudienceContainerView: LiveListViewDataSource {
 
 extension AudienceContainerView: LiveListViewDelegate {
     public func onCreateView(liveInfo: LiveInfo) -> UIView {
-        let audienceCell = AudienceSliderCell(liveInfo: liveInfo, routerManager: routerManager, routerCenter: routerCenter)
+        let customCoreView = delegate?.onCreateCoreView(for: liveInfo)
+        let audienceCell = AudienceSliderCell(liveInfo: liveInfo,
+                                              coreView: customCoreView,
+                                              routerManager: routerManager,
+                                              routerCenter: routerCenter)
         audienceCell.delegate = self
         audienceCell.rotateScreenDelegate = self
         return audienceCell
@@ -325,5 +327,11 @@ extension AudienceContainerView: RotateScreenDelegate {
         disableSliding(!isPortrait)
 
         rotateScreenDelegate?.rotateScreen(isPortrait: isPortrait)
+    }
+}
+
+public extension AudienceContainerViewDelegate {
+    func onCreateCoreView(for liveInfo: LiveInfo) -> LiveCoreView? {
+        return nil
     }
 }

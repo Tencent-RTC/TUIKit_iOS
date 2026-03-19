@@ -9,7 +9,7 @@ public enum RootPage {
 }
 
 struct ContentView: View {
-    @StateObject private var themeState = ThemeState()
+    @StateObject private var themeState = ThemeState.shared
     @StateObject private var appStyleSettings = AppStyleSettings()
     @StateObject private var languageState = LanguageState()
     @State private var currentPage: RootPage = .login
@@ -38,7 +38,7 @@ struct ContentView: View {
             setupLoginStatusObserver()
         }
     }
-    
+
     private func getPreferredColorScheme() -> ColorScheme? {
         switch themeState.currentMode {
         case .light:
@@ -48,19 +48,18 @@ struct ContentView: View {
         case .system:
             if themeState.isDarkMode {
                 return .dark
-            }
-            else {
+            } else {
                 return .light
             }
         }
     }
-    
+
     private func getLayoutDirection() -> LayoutDirection {
         // Right-to-left languages
         let rtlLanguages = ["ar", "he", "fa", "ur"]
         return rtlLanguages.contains(languageState.currentLanguage) ? .rightToLeft : .leftToRight
     }
-    
+
     private func setupLoginStatusObserver() {
         let currentLoginStatus = LoginStore.shared.state.value.loginStatus
         if currentLoginStatus == .logined {

@@ -7,7 +7,7 @@
 
 import UIKit
 import SnapKit
-import RTCCommon
+import AtomicX
 
 #if DEV_MODE
 class TestToolListWindow: UIWindow {
@@ -40,11 +40,11 @@ class TestToolListWindow: UIWindow {
     private func initUI() {
         let w: CGFloat = 200
         let h: CGFloat = 300
-        frame = CGRect(x: screenWidth - 50 - w, y: ScreenHeight * 0.5 - h * 0.5, width: w, height: h)
+        frame = CGRect(x: UIScreen.main.bounds.width - 50 - w, y: UIScreen.main.bounds.height * 0.5 - h * 0.5, width: w, height: h)
         
         windowLevel = .statusBar - 1
         
-        t_makeKeyAndVisible()
+        makeKeyAndVisibleWithScene()
         isHidden = true
         
         addSubview(tableView)

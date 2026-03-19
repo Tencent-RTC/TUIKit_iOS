@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import Combine
 import RTCRoomEngine
 import TUICore
@@ -50,8 +50,12 @@ public class TUIVoiceRoomViewController: UIViewController {
     private var isShowingRootView = false
     
     private lazy var routerCenter: VRRouterControlCenter = {
-        let rootRoute: VRRoute = behavior == .join ? .audience : .anchor
-        let routerCenter = VRRouterControlCenter(liveID: roomId, rootViewController: self, rootRoute: rootRoute, routerManager: routerManager, toastService: toastService)
+        let routerCenter = VRRouterControlCenter(
+            liveID: roomId,
+            rootViewController: self,
+            routerManager: routerManager,
+            toastService: toastService
+        )
         return routerCenter
     }()
     
@@ -115,7 +119,6 @@ public class TUIVoiceRoomViewController: UIViewController {
         UIApplication.shared.isIdleTimerDisabled = false
         cancellableSet.forEach { $0.cancel() }
         cancellableSet.removeAll()
-        StateCache.shared.clear()
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
         BaseBeautyStore.shared.reset()
@@ -191,6 +194,8 @@ public class TUIVoiceRoomViewController: UIViewController {
         audienceEndView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+
+        view.showAtomicToast(text: .liveHasStopText, style: .info)
     }
 }
 
@@ -254,4 +259,8 @@ extension TUIVoiceRoomViewController {
         navigationController.setNavigationBarHidden(false, animated: true)
         needRestoreNavigationBarHiddenState = false
     }
+}
+
+fileprivate extension String {
+    static let liveHasStopText = internalLocalized("common_live_has_stop")
 }

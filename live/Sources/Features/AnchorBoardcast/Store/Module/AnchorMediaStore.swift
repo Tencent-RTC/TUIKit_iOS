@@ -9,7 +9,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import RTCRoomEngine
 import TUICore
 
@@ -75,13 +74,6 @@ extension AnchorMediaStore {
         service.enableGravitySensor(enable: true)
     }
     
-    func updateVideoQuality(quality: VideoQuality) {
-        service.updateVideoQuality(quality)
-        observerState.update { state in
-            state.videoQuality = quality
-        }
-    }
-    
     func onLeaveLive() {
         enableMultiPlaybackQuality(false)
         unInitVideoAdvanceSettings()
@@ -90,7 +82,7 @@ extension AnchorMediaStore {
         }
     }
     
-    func subscribeState<Value>(_ selector: StateSelector<AnchorMediaState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeState<Value>(_ selector: StatePublisherSelector<AnchorMediaState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
 }

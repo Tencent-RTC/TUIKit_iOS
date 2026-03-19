@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 import Combine
-import RTCCommon
+import AtomicX
 
 class AudienceSingleBattleScoreView: UIView {
     private var leftScore: Int = 0

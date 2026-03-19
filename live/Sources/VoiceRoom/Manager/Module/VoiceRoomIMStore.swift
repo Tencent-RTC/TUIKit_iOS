@@ -8,8 +8,9 @@
 import Foundation
 import RTCRoomEngine
 import ImSDK_Plus
-import RTCCommon
+import AtomicX
 import Combine
+import AtomicXCore
 
 struct VoiceRoomIMState {
     var myFollowingUserList: Set<TUIUserInfo> = []
@@ -31,7 +32,7 @@ class VoiceRoomIMStore: NSObject {
         imManager?.addFriendListener(listener: self)
     }
     
-    func subscribeState<Value>(_ selector: StateSelector<VoiceRoomIMState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeState<Value>(_ selector: StatePublisherSelector<VoiceRoomIMState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
     

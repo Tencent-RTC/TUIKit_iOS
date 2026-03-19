@@ -9,7 +9,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import RTCRoomEngine
 import TUICore
 
@@ -28,22 +27,16 @@ public struct LiveParams {
     var liveID: String
     var prepareState: PrepareState
     var liveInfo: LiveInfo {
-        var liveInfo = LiveInfo()
+        var liveInfo = LiveInfo(seatTemplate: prepareState.templateMode.toSeatLayoutTemplate())
         liveInfo.liveID = liveID
         liveInfo.liveName = prepareState.roomName
         liveInfo.coverURL = prepareState.coverUrl
         liveInfo.isPublicVisible = prepareState.privacyMode == .public
-        liveInfo.seatLayoutTemplateID = UInt(prepareState.templateMode.rawValue)
         // Default set background image to cover
         liveInfo.backgroundURL = prepareState.coverUrl
         
         // Default setting
-        liveInfo.isSeatEnabled = true
         liveInfo.seatMode = .apply
-        liveInfo.keepOwnerOnSeat = true
-        if liveInfo.seatLayoutTemplateID == 0 {
-            liveInfo.maxSeatCount = 9
-        }
         
         return liveInfo
     }
@@ -60,9 +53,9 @@ public class AnchorView: UIView {
         
     private let store: AnchorStore
     private lazy var routerManager: AnchorRouterManager = .init()
-    private lazy var routerCenter = AnchorRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), rootRoute: .anchor, routerManager: routerManager, store: store, coreView: videoView)
+    private lazy var routerCenter = AnchorRouterControlCenter(rootViewController: getCurrentViewController() ?? (TUITool.applicationKeywindow().rootViewController ?? UIViewController()), routerManager: routerManager, store: store, coreView: videoView)
     
-    private lazy var isInWaitingPublisher = store.subscribeState(StateSelector(keyPath: \AnchorBattleState.isInWaiting))
+    private lazy var isInWaitingPublisher = store.subscribeState(StatePublisherSelector(keyPath: \AnchorBattleState.isInWaiting))
     private var cancellableSet = Set<AnyCancellable>()
     
     private let videoView: LiveCoreView
@@ -85,6 +78,7 @@ public class AnchorView: UIView {
     }()
     
     private var needPresentAlertConfig: AlertViewConfig?
+    private var defaultVideoViewDelegate: AnchorVideoDelegate?
     
     public init(liveInfo: LiveInfo, coreView: LiveCoreView, behavior: RoomBehavior = .createRoom) {
         self.liveInfo = liveInfo
@@ -107,7 +101,12 @@ public class AnchorView: UIView {
     private func initialize(behavior: RoomBehavior) {
         videoView.setLiveID(liveID)
         backgroundColor = .black
-        videoView.videoViewDelegate = self
+        
+        if videoView.videoViewDelegate == nil {
+            let defaultDelegate = AnchorVideoDelegate(store: store, routerManager: routerManager)
+            defaultVideoViewDelegate = defaultDelegate
+            videoView.videoViewDelegate = defaultDelegate
+        }
         
         switch behavior {
         case .createRoom:
@@ -143,10 +142,17 @@ public class AnchorView: UIView {
         routerCenter.subscribeRouter()
     }
     
-    override public func layoutSubviews() {
-        super.layoutSubviews()
-        topGradientView.gradient(colors: [.g1.withAlphaComponent(0.3), .clear], isVertical: true)
-        bottomGradientView.gradient(colors: [.clear, .g1.withAlphaComponent(0.3)], isVertical: true)
+    override public func draw(_ rect: CGRect) {
+        super.draw(rect)
+        topGradientView.gradient(colors: [
+            UIColor.g1.withAlphaComponent(0.3),
+            UIColor.clear
+        ], isVertical: true)
+        
+        bottomGradientView.gradient(colors: [
+            UIColor.clear,
+            UIColor.g1.withAlphaComponent(0.3)
+        ], isVertical: true)
     }
     
     func updateRootViewOrientation(isPortrait: Bool) {
@@ -155,12 +161,28 @@ public class AnchorView: UIView {
     
     func relayoutCoreView() {
         addSubview(videoView)
-        videoView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalToSuperview().inset(36.scale375Height())
-            make.bottom.equalToSuperview().inset(96.scale375Height())
-        }
+        updateCoreViewLayout()
         sendSubviewToBack(videoView)
+    }
+    
+    private func updateCoreViewLayout() {
+        guard !store.liveListState.currentLive.isEmpty,
+              store.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
+              WindowUtils.isPortrait,
+              videoView.superview != nil
+        else {
+            videoView.snp.remakeConstraints { make in
+                make.leading.trailing.equalToSuperview()
+                make.top.equalToSuperview().inset(36.scale375Height())
+                make.bottom.equalToSuperview().inset(96.scale375Height())
+            }
+            return
+        }
+        videoView.snp.remakeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalToSuperview().offset(150)
+            make.height.equalTo(Screen_Width * 720 / 1280)
+        }
     }
 }
 
@@ -207,11 +229,7 @@ extension AnchorView {
     }
     
     private func activateConstraints() {
-        videoView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalToSuperview().inset(36.scale375Height())
-            make.bottom.equalToSuperview().inset(96.scale375Height())
-        }
+        updateCoreViewLayout()
         
         livingView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -229,6 +247,7 @@ extension AnchorView {
     }
     
     private func bindInteraction() {
+        subscribeState()
         subscribeCoHostState()
         subscribeBattleState()
         subscribeSubjects()
@@ -288,6 +307,18 @@ extension AnchorView {
         }
     }
     
+    private func subscribeState() {
+        store.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .dropFirst()
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
+                guard let self = self, !currentLive.isEmpty else { return }
+                updateCoreViewLayout()
+            }
+            .store(in: &cancellableSet)
+    }
+    
     private func subscribeCoHostState() {
         store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.applicant))
             .receive(on: RunLoop.main)
@@ -339,7 +370,7 @@ extension AnchorView {
                         needPresentAlertConfig = alertConfig
                     } else {
                         let alertView = AtomicAlertView(config: alertConfig)
-                        routerManager.present(view: alertView)
+                        routerManager.present(view: alertView, config: .centerDefault())
                     }
                 } else {
                     routerManager.dismiss(dismissType: .alert, completion: nil)
@@ -453,7 +484,7 @@ extension AnchorView {
             .sink { [weak self] isShow in
                 guard let self = self, !isShow, let alertConfig = needPresentAlertConfig else { return }
                 let alertView = AtomicAlertView(config: alertConfig)
-                routerManager.present(view: alertView)
+                routerManager.present(view: alertView, config: .centerDefault())
                 needPresentAlertConfig = nil
             }
             .store(in: &cancellableSet)
@@ -497,64 +528,21 @@ extension AnchorView {
             needPresentAlertConfig = alertConfig
         } else {
             let alertView = AtomicAlertView(config: alertConfig)
-            routerManager.present(view: alertView)
+            routerManager.present(view: alertView, config: .centerDefault())
         }
     }
     
     private func onInWaitingChanged(inWaiting: Bool) {
         if inWaiting {
-            routerManager.router(action: .present(.battleCountdown(anchorBattleRequestTimeout)))
+            let countdownPanel = AnchorBattleCountDownView(countdownTime: anchorBattleRequestTimeout, store: store)
+            routerManager.present(view: countdownPanel, config: .centerTransparent())
         } else {
-            let topRoute = routerManager.routerState.routeStack.last
-            switch topRoute {
-            case .battleCountdown:
+            if let topRoute = routerManager.routerState.routeStack.last,
+               topRoute.view is AnchorBattleCountDownView
+            {
                 routerManager.router(action: .dismiss())
-            default:
-                break
             }
         }
-    }
-}
-
-extension AnchorView: VideoViewDelegate {
-    public func createCoGuestView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
-        switch viewLayer {
-        case .foreground:
-            if !seatInfo.userInfo.userID.isEmpty {
-                return AnchorCoGuestView(seatInfo: seatInfo, store: store, routerManager: routerManager)
-            }
-            return AnchorEmptySeatView(seatInfo: seatInfo)
-        case .background:
-            if !seatInfo.userInfo.userID.isEmpty {
-                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
-            }
-            return nil
-        }
-    }
-    
-    public func createCoHostView(seatInfo: SeatInfo, viewLayer: ViewLayer) -> UIView? {
-        switch viewLayer {
-        case .foreground:
-            if !seatInfo.userInfo.userID.isEmpty {
-                return AnchorCoHostView(seatInfo: seatInfo, store: store)
-            }
-            return AnchorEmptySeatView(seatInfo: seatInfo)
-        case .background:
-            if !seatInfo.userInfo.userID.isEmpty {
-                return AnchorBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
-            }
-            return nil
-        }
-    }
-    
-    public func createBattleView(seatInfo: SeatInfo) -> UIView? {
-        let battleView = AnchorBattleMemberInfoView(store: store, userId: seatInfo.userInfo.userID)
-        battleView.isUserInteractionEnabled = false
-        return battleView
-    }
-    
-    public func createBattleContainerView() -> UIView? {
-        return AnchorBattleInfoView(store: store, routerManager: routerManager)
     }
 }
 

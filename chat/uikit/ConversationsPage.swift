@@ -26,24 +26,31 @@ public struct ConversationsPage: View {
     @State private var showChatsMenu = false
     @State var friendList: [ContactInfo] = []
 
-    var onShowMessage: ((NavigationInfo) -> Void)?
+    var onConversationClick: ((NavigationInfo) -> Void)?
     private var contactListStore: ContactListStore
 
-    public init(onShowMessage: ((NavigationInfo) -> Void)? = nil) {
+    public init(onConversationClick: ((NavigationInfo) -> Void)? = nil) {
         self.contactListStore = ContactListStore.create()
-        self.onShowMessage = onShowMessage
+        self.onConversationClick = onConversationClick
     }
 
     public var body: some View {
         VStack(spacing: 0) {
             headerView
+
+            SearchBar(onTapItem: { result in
+                handleSearchResult(result)
+            })
+            .padding(.vertical, 8)
+
             ConversationList(
                 onConversationClick: { conversation in
-                    onShowMessage?(NavigationInfo(conversation: conversation))
+                    onConversationClick?(NavigationInfo(conversation: conversation))
                 }
             )
             .environmentObject(themeState)
         }
+        .background(themeState.colors.bgColorOperate.ignoresSafeArea(edges: .top))
         .onReceive(contactListStore.state.subscribe(StatePublisherSelector(keyPath: \ContactListState.friendList))) { friendList in
             if self.friendList != friendList {
                 self.friendList = friendList
@@ -65,7 +72,7 @@ public struct ConversationsPage: View {
                 onUserSelected: { user in
                     showStartConversation = false
                     let conversation = createConversationFromUser(user)
-                    onShowMessage?(NavigationInfo(conversation: conversation))
+                    onConversationClick?(NavigationInfo(conversation: conversation))
                 }
             )
         }
@@ -87,15 +94,16 @@ public struct ConversationsPage: View {
                 contactListStore: contactListStore,
                 onComplete: { createdGroupID, groupName, conversationId in
                     showConfigSheet = false
-                    if let groupID = createdGroupID, 
+                    if let groupID = createdGroupID,
                        let name = groupName,
-                       let convId = conversationId {
+                       let convId = conversationId
+                    {
                         let conversation = createConversationFromGroupInfo(
                             groupID: groupID,
                             groupName: name,
                             conversationId: convId
                         )
-                        onShowMessage?(NavigationInfo(conversation: conversation))
+                        onConversationClick?(NavigationInfo(conversation: conversation))
                     }
                 },
                 onBack: {
@@ -111,7 +119,7 @@ public struct ConversationsPage: View {
                 .font(.system(size: 34, weight: .semibold))
                 .tracking(0.3)
                 .foregroundColor(themeState.colors.textColorPrimary)
-                .background(themeState.colors.listColorDefault)
+                .background(themeState.colors.clearColor)
                 .padding(.leading, 16)
             Spacer()
             if AppBuilderConfig.shared.enableCreateConversation {
@@ -132,6 +140,53 @@ public struct ConversationsPage: View {
     }
 
     // MARK: - Helper Methods
+
+    private func handleSearchResult(_ result: Any) {
+        if let friendInfo = result as? FriendSearchInfo {
+            // Navigate to C2C conversation
+            let conversationID = ChatUtil.getC2CConversationID(friendInfo.userID)
+            var conversation = ConversationInfo(conversationID: conversationID)
+            conversation.type = .c2c
+            conversation.title = friendInfo.friendRemark ?? friendInfo.userInfo.nickname
+            conversation.avatarURL = friendInfo.userInfo.avatarURL
+            onConversationClick?(NavigationInfo(conversation: conversation))
+        } else if let groupInfo = result as? GroupSearchInfo {
+            // Navigate to group conversation
+            let conversationID = ChatUtil.getGroupConversationID(groupInfo.groupID)
+            var conversation = ConversationInfo(conversationID: conversationID)
+            conversation.type = .group
+            conversation.title = groupInfo.groupName
+            conversation.avatarURL = groupInfo.groupAvatarURL
+            onConversationClick?(NavigationInfo(conversation: conversation))
+        } else if let messageDict = result as? [String: Any],
+                  let messageInfo = messageDict["message"] as? MessageInfo,
+                  let conversationID = messageDict["conversationID"] as? String
+        {
+            // Navigate to conversation with message location (from search detail view)
+            var conversation = ConversationInfo(conversationID: conversationID)
+            if conversationID.hasPrefix("c2c_") {
+                conversation.type = .c2c
+            } else {
+                conversation.type = .group
+            }
+            conversation.title = messageDict["conversationName"] as? String
+            conversation.avatarURL = messageDict["conversationAvatar"] as? String
+            onConversationClick?(NavigationInfo(conversation: conversation, locateMessage: messageInfo))
+        } else if let conversationDict = result as? [String: Any],
+                  let conversationID = conversationDict["conversationID"] as? String
+        {
+            // Navigate to conversation from detail view
+            var conversation = ConversationInfo(conversationID: conversationID)
+            if conversationID.hasPrefix("c2c_") {
+                conversation.type = .c2c
+            } else {
+                conversation.type = .group
+            }
+            conversation.title = conversationDict["conversationName"] as? String
+            conversation.avatarURL = conversationDict["conversationAvatar"] as? String
+            onConversationClick?(NavigationInfo(conversation: conversation))
+        }
+    }
 
     private func createConversationFromUser(_ user: AZOrderedListItem) -> ConversationInfo {
         var conversation = ConversationInfo(conversationID: ChatUtil.getC2CConversationID(user.id))
@@ -155,6 +210,7 @@ public struct ConversationsPage: View {
         conversation.avatarURL = nil
         return conversation
     }
+
     private func createConversationFromGroupInfo(groupID: String, groupName: String, conversationId: String) -> ConversationInfo {
         var conversation = ConversationInfo(conversationID: conversationId)
         conversation.type = .group
@@ -177,7 +233,6 @@ struct ChatsMenuOverlay: View {
                         Spacer()
                         PopMenu(menuItems: [
                             PopMenuInfo(
-                                icon: "message",
                                 title: LocalizedChatString("ChatsNewChatText"),
                                 onClick: {
                                     showChatsMenu = false
@@ -185,13 +240,12 @@ struct ChatsMenuOverlay: View {
                                 }
                             ),
                             PopMenuInfo(
-                                icon: "person.3.fill",
                                 title: LocalizedChatString("ChatsNewGroupText"),
                                 onClick: {
                                     showChatsMenu = false
                                     showUserPicker = true
                                 }
-                            )
+                            ),
                         ])
                         .padding(.trailing, 16)
                         .padding(.top, 50)
@@ -213,6 +267,7 @@ struct ChatsMenuOverlay: View {
 
 struct StartConversationSheet: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var themeState: ThemeState
     @State private var friendList: [ContactInfo] = []
     @State private var isLoading = true
     let contactListStore: ContactListStore
@@ -240,7 +295,8 @@ struct StartConversationSheet: View {
             .navigationBarTitle(LocalizedChatString("ChatsNewChatText"), displayMode: .inline)
             .navigationBarItems(leading: Button(LocalizedChatString("Cancel")) {
                 presentationMode.wrappedValue.dismiss()
-            })
+            }
+            .foregroundColor(themeState.colors.textColorLink))
         }
         .onAppear {
             loadFriendList()
@@ -251,10 +307,10 @@ struct StartConversationSheet: View {
             }
         }
     }
-    
+
     private func loadFriendList() {
         isLoading = true
-        
+
         let currentFriendList = contactListStore.state.value.friendList
         if !currentFriendList.isEmpty {
             DispatchQueue.main.async {
@@ -262,7 +318,7 @@ struct StartConversationSheet: View {
                 self.isLoading = false
             }
         }
-        
+
         contactListStore.fetchFriendList(completion: { result in
             DispatchQueue.main.async {
                 switch result {
@@ -275,7 +331,7 @@ struct StartConversationSheet: View {
             }
         })
     }
-    
+
     private var orderedListItems: [AZOrderedListItem] {
         return friendList.map { contact in
             AZOrderedListItem(
@@ -285,17 +341,17 @@ struct StartConversationSheet: View {
             )
         }
     }
-    
 }
 
 // MARK: - UserPickerSheet
+
 struct UserPickerSheet: View {
     let contactListStore: ContactListStore
     @ObservedObject var selectedUsersContainer: SelectedUsersContainer
     @Binding var showUserPicker: Bool
     @Binding var showConfigSheet: Bool
     @State private var friendList: [ContactInfo] = []
-    
+
     var body: some View {
         NavigationView {
             UserPicker(
@@ -312,14 +368,14 @@ struct UserPickerSheet: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
-            contactListStore.fetchFriendList(completion: { result in
+            contactListStore.fetchFriendList(completion: { _ in
             })
         }
         .onReceive(contactListStore.state.subscribe(StatePublisherSelector(keyPath: \ContactListState.friendList))) { newFriendList in
             self.friendList = newFriendList
         }
     }
-    
+
     // Computed property that always reflects current friendList state
     private var userPickerItems: [UserPickerItem] {
         let items = friendList.map { contact in
@@ -332,4 +388,3 @@ struct UserPickerSheet: View {
         return items
     }
 }
-

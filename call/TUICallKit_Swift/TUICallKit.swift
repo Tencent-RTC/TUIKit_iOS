@@ -33,11 +33,11 @@ public class TUICallKit: NSObject {
      * calls
      *
      * @param userIdList    List of userId
-     * @param callMediaType Call type
+     * @param mediaType Call type
      * @param params        Extension param: eg: offlinePushInfo
      */
-    public func calls(userIdList: [String], callMediaType: CallMediaType, params: CallParams?, completion: CompletionClosure?) {
-        return TUICallKitImpl.shared.calls(userIdList: userIdList, callMediaType: callMediaType, params: params, completion: completion)
+    public func calls(userIdList: [String], mediaType: CallMediaType, params: CallParams?, completion: CompletionClosure?) {
+        return TUICallKitImpl.shared.calls(userIdList: userIdList, mediaType: mediaType, params: params, completion: completion)
     }
   
     /**

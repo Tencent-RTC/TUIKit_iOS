@@ -33,7 +33,7 @@ class TUICallKitExtension: NSObject, TUIExtensionProtocol {
     func startCall(groupID: String, userIDs: [String], callingType: CallMediaType) {        
         var params = CallParams()
         params.chatGroupId = groupID
-        TUICallKit.createInstance().calls(userIdList: userIDs, callMediaType: callingType, params: params, completion: nil)
+        TUICallKit.createInstance().calls(userIdList: userIDs, mediaType: callingType, params: params, completion: nil)
     }
     
     func doResponseInputViewExtension(param: [String: Any], type: CallMediaType, isClassic: Bool) {

@@ -12,6 +12,13 @@ class LiveViewController: UIViewController {
 
     private var menuItems: [LiveMainItemModel] = []
 
+    private let backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "back"), for: .normal)
+        button.tintColor = .black
+        return button
+    }()
+
     private lazy var collectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.sectionInset = UIEdgeInsets(top: 20.scale375Height(), left: 20.scale375(), bottom: 0, right: 20.scale375())
@@ -65,6 +72,15 @@ extension LiveViewController {
 
     private func setupNavigation() {
         navigationItem.title = .liveTitle
+        navigationController?.navigationBar.titleTextAttributes = [
+            .font: UIFont.systemFont(ofSize: 20, weight: .medium),
+        ]
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        backButton.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
+    }
+
+    @objc private func backButtonClick() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

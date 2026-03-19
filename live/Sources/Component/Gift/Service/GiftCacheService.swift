@@ -24,7 +24,7 @@ public class GiftCacheService {
     
     public func request(withURL url: URL, completion: ((Int, String) -> Void)?) {
         let key = url.lastPathComponent
-        
+                                                                                                                          
         if let cachedFilePath = getCachedFilePath(forKey: key) {
             completion?(0, cachedFilePath)
             return

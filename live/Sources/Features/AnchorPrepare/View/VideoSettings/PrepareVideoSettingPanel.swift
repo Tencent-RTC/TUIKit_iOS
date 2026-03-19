@@ -8,9 +8,9 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import RTCRoomEngine
 import UIKit
+import AtomicX
 
 class PrepareVideoSettingPanel: UIView {
     enum VideoSettingType {
@@ -49,9 +49,9 @@ class PrepareVideoSettingPanel: UIView {
     }()
     
     private var mirrorType: MirrorType = .auto
-    private var videoQuality: VideoQuality = .quality1080P
+    private var videoQuality: VideoQuality = .quality720P
     private var items: [VideoSettingType] = [.mirror, .resolution]
-    private weak var popupViewController: PopupViewController?
+    private weak var popupViewController: UIViewController?
     
     init(coreView: LiveCoreView) {
         self.coreView = coreView
@@ -91,7 +91,7 @@ private extension PrepareVideoSettingPanel {
         }
         tableView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.bottom.equalToSuperview().inset(16)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(16)
             make.height.equalTo(112)
             make.leading.trailing.equalToSuperview().inset(16)
         }
@@ -109,20 +109,29 @@ private extension PrepareVideoSettingPanel {
         }
         view.selectedClosure = { [weak self] quality in
             guard let self = self else { return }
-            TUIRoomEngine.sharedInstance().updateVideoQuality(quality.tuiType())
+            DeviceStore.shared.updateVideoQuality(quality)
             self.videoQuality = quality
             self.tableView.reloadData()
             self.popupViewController?.dismiss(animated: true)
         }
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: .bgOperateColor)
-        let popupViewController = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            self.popupViewController?.dismiss(animated: true)
-        }
+        
+        let popover = AtomicPopover(
+            contentView: view,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(.bgOperateColor),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupViewController, animated: true)
-        self.popupViewController = popupViewController
+        presentingViewController.present(popover, animated: true)
+        self.popupViewController = popover
     }
     
     func selectMirrorType() {
@@ -139,15 +148,24 @@ private extension PrepareVideoSettingPanel {
             guard let self = self else { return }
             popupViewController?.dismiss(animated: true)
         }
-        let menuContainerView = MenuContainerView(contentView: view, safeBottomViewBackgroundColor: .bgOperateColor)
-        let popupVC = PopupViewController(contentView: menuContainerView, supportBlurView: false)
-        menuContainerView.blackAreaClickClosure = { [weak self] in
-            guard let self = self else { return }
-            popupViewController?.dismiss(animated: true)
-        }
+        
+        let popover = AtomicPopover(
+            contentView: view,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(.bgOperateColor),
+                onBackdropTap: { [weak self] in
+                    guard let self = self else { return }
+                    self.popupViewController?.dismiss(animated: true)
+                }
+            )
+        )
+        
         guard let presentingViewController = getCurrentViewController() else { return }
-        presentingViewController.present(popupVC, animated: true)
-        popupViewController = popupVC
+        presentingViewController.present(popover, animated: true)
+        popupViewController = popover
     }
 }
 
@@ -260,7 +278,9 @@ class PrepareVideoSettingPullDownCell: UITableViewCell {
     }
     
     private func bindInteraction() {
-        pullDownView.addTapGesture(target: self, action: #selector(clickAction(sender:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickAction(sender:)))
+        pullDownView.isUserInteractionEnabled = true
+        pullDownView.addGestureRecognizer(tapGesture)
     }
     
     private func setupStyle() {

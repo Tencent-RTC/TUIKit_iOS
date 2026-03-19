@@ -20,7 +20,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
     
     private let line1View: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "EEEEEE")
+        view.backgroundColor = UIColor("EEEEEE")
         return view
     }()
     private let groupIdContentView: UIView = {
@@ -40,7 +40,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.clear
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string: ("InputGroupId").localized)
         textField.textAlignment = .right
         textField.keyboardType = .asciiCapable
@@ -62,7 +62,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.clear
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string:("InputUserIds").localized)
         textField.textAlignment = .right
         textField.keyboardType = .asciiCapable
@@ -73,7 +73,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
     
     private let line2View: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "EEEEEE")
+        view.backgroundColor = UIColor("EEEEEE")
         return view
     }()
     private let mediaTypeContentView: UIView = {
@@ -136,9 +136,9 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle(("App_Call").localized, for: .normal)
         btn.adjustsImageWhenHighlighted = false
-        btn.setBackgroundImage(UIColor(hex: "006EFF")?.trans2Image(), for: .normal)
+        btn.setBackgroundImage(UIColor("006EFF").trans2Image(), for: .normal)
         btn.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 20)
-        btn.layer.shadowColor = UIColor(hex: "006EFF")?.cgColor ?? UIColor.blue.cgColor
+        btn.layer.shadowColor = UIColor("006EFF").cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
         btn.layer.shadowRadius = 16
         btn.layer.shadowOpacity = 0.4
@@ -344,7 +344,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
             params.chatGroupId = groupId
         }
         
-        TUICallKit.createInstance().calls(userIdList: userIds, callMediaType: callType, params: params, completion: nil)
+        TUICallKit.createInstance().calls(userIdList: userIds, mediaType: callType, params: params, completion: nil)
     }
     
     @objc private func backButtonClick() {

@@ -5,9 +5,9 @@
 //  Created by krabyu on 2024/11/18.
 //
 
-import RTCCommon
-import Combine
 import AtomicX
+import Combine
+import AtomicXCore
 
 class VRRouterManager {
     let observerState = ObservableState<VRRouterState>(initialState: VRRouterState())
@@ -15,7 +15,7 @@ class VRRouterManager {
         observerState.state
     }
     
-    func subscribeRouterState<Value>(_ selector: StateSelector<VRRouterState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeRouterState<Value>(_ selector: StatePublisherSelector<VRRouterState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
     
@@ -44,13 +44,8 @@ extension VRRouterManager {
                 if let currentRoute = routerState.routeStack.last {
                     var shouldDismiss = false
                     
-                    switch currentRoute {
-                    case .custom(let item):
-                        if item.view is AtomicAlertView {
-                            shouldDismiss = true
-                        }
-                    default:
-                        break
+                    if currentRoute.view is AtomicAlertView {
+                        shouldDismiss = true
                     }
                     
                     if shouldDismiss {
@@ -62,19 +57,8 @@ extension VRRouterManager {
             }
         case .exit:
             update { routerState in
+                routerState.shouldExit = true
                 routerState.routeStack = []
-            }
-        }
-    }
-    
-    func setRootRoute(route: VRRoute) {
-        if routerState.routeStack.count >= 1 {
-            update { routerState in
-                routerState.routeStack[0] = route
-            }
-        } else {
-            update { routerState in
-                routerState.routeStack.append(route)
             }
         }
     }
@@ -89,7 +73,7 @@ extension VRRouterManager {
         update { routerState in
             routerState.dismissEvent = completion
         }
-        if routerState.routeStack.count > 1 {
+        if routerState.routeStack.count > 0 {
             update { routerState in
                 let _ = routerState.routeStack.popLast()
             }
@@ -105,10 +89,9 @@ extension VRRouterManager {
 
 extension VRRouterManager {
     
-    func present(view: UIView, position: ViewPosition = .center) {
-        let item = RouteItem(view: view, position: position)
-        let route = VRRoute.custom(item)
-        self.router(action: .present(route))
+    func present(view: UIView, config: RouteItemConfig = .bottomDefault()) {
+        let item = RouteItem(view: view, config: config)
+        self.router(action: .present(item))
     }
     
     func dismiss(dismissType: VRDismissType = .panel, completion: (() -> Void)? = nil) {

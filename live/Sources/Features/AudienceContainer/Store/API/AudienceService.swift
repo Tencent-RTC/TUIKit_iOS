@@ -30,10 +30,6 @@ extension AudienceService {
         roomEngine.enableGravitySensor(enable: enable)
     }
     
-    func updateVideoQuality(_ quality: VideoQuality) {
-        roomEngine.updateVideoQuality(quality.tuiType())
-    }
-    
     func setBeautyStyle(_ style: TXBeautyStyle) {
         trtcCloud.getBeautyManager().setBeautyStyle(style)
     }

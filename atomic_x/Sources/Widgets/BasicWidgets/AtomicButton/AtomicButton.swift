@@ -77,10 +77,10 @@ public enum ButtonSize {
     }
     public var iconSize: CGFloat {
         switch self {
-        case .xsmall: return 14
-        case .small:  return 16
-        case .medium: return 20
-        case .large:  return 20
+        case .xsmall: return 12
+        case .small:  return 14
+        case .medium: return 17
+        case .large:  return 17
         }
     }
     public var spacing: CGFloat { return 6.0 }

@@ -311,6 +311,28 @@ extension CallView {
         }
         return fullPath
     }
+    
+    private func handleDeviceEvent(_ event: DeviceEvent) {
+        if event == .onSmartCellularSwitchRecommended {
+            let recommendationView = SmartCellularSwitchRecommendationView()
+            recommendationView.onEnableSmartCellular = { DeviceStore.shared.enableSmartCellularSwitchMode(enable: true) }
+            recommendationView.show()
+            return
+        }
+    }
+    
+    private func handleNetworkTypeChanged(_ newType: NetworkType) {
+        var toastString = ""
+        switch newType {
+        case .cellular:
+            toastString = CallKitLocalization.localized("SmartCellular.SwitchedToCellular")
+        case .wifi:
+            toastString = CallKitLocalization.localized("SmartCellular.SwitchedToWiFi")
+        case .unknown:
+            return
+        }
+        showAtomicToast(text: toastString)
+    }
 }
 
 // MARK: - Subscribe
@@ -354,6 +376,23 @@ extension CallView {
                 self?.handleOrientationChange()
             }
             .store(in: &cancellables)
+        
+        DeviceStore.shared.deviceEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                self.handleDeviceEvent(event)
+            }
+            .store(in: &cancellables)
+        
+        DeviceStore.shared.state.subscribe(StatePublisherSelector<DeviceState, NetworkType>(keyPath: \.networkType))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] newType in
+                guard let self = self else { return }
+                self.handleNetworkTypeChanged(newType)
+
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -361,6 +400,15 @@ extension CallView {
 extension CallView: MultiCallControlsViewDelegate {
     func multiCallControlsView(_ view: MultiCallControlsView, didChangeModeHeight height: CGFloat) {
         multiCallControlsHeight = height
+        
+        multiCallControlsView.snp.updateConstraints { make in
+            make.height.equalTo(height)
+        }
+        
+        UIView.animate(withDuration: 0.3) {
+            self.layoutIfNeeded()
+        }
+        
         updateTranscriberViewConstraints()
     }
 }

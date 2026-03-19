@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import UIKit
 
 class AnchorBattleMemberInfoView: RTCBaseView {

@@ -8,7 +8,6 @@
 import UIKit
 import SnapKit
 import Combine
-import RTCCommon
 import RTCRoomEngine
 import AtomicXCore
 import AtomicX
@@ -281,37 +280,37 @@ class NetWorkInfoView: UIView {
             .store(in: &cancellableSet)
         
         guard let manager = manager else { return }
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.deviceTemperature))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.deviceTemperature))
             .sink { [weak self] temperature in
                 self?.onTemperatureChanged(temperature)
             }
             .store(in: &cancellableSet)
 
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.audioState))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.audioState))
             .sink { [weak self] audioState in
                 self?.onAudioStateChanged(audioState)
             }
             .store(in: &cancellableSet)
         
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.audioQuality))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.audioQuality))
             .sink { [weak self] audioQuality in
                 self?.onAudioQualityChanged(audioQuality)
             }
             .store(in: &cancellableSet)
         
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.videoState))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.videoState))
             .sink { [weak self] videoState in
                 self?.onVideoStateChanged(videoState)
             }
             .store(in: &cancellableSet)
         
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.videoResolution))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.videoResolution))
             .sink { [weak self] videoResolution in
                 self?.onVideoResolutionChanged(videoResolution: videoResolution)
             }
             .store(in: &cancellableSet)
         
-        manager.subscribe(StateSelector(keyPath: \NetWorkInfoState.volume))
+        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.volume))
             .sink { [weak self] volume in
                 self?.onVolumeChanged(volume)
             }
@@ -564,21 +563,29 @@ class NetWorkInfoView: UIView {
     }
     
     private func presentAudioQualityPanel() {
+        weak var popoverRef: UIViewController?
+        let manager = self.manager
+        
+        let dismissPopover = {
+            popoverRef?.dismiss(animated: false)
+            popoverRef = nil
+        }
+        
         let items = [
-            AlertButtonConfig(text: .AudioQualityDefault, type: .primary) { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.default)
-                self?.dismissPanel()
+            AlertButtonConfig(text: .AudioQualityDefault, type: .primary) { _ in
+                manager?.onAudioQualityChanged(TUIAudioQuality.default)
+                dismissPopover()
             },
-            AlertButtonConfig(text: .AudioQualityMusic, type: .primary) { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.music)
-                self?.dismissPanel()
+            AlertButtonConfig(text: .AudioQualityMusic, type: .primary) { _ in
+                manager?.onAudioQualityChanged(TUIAudioQuality.music)
+                dismissPopover()
             },
-            AlertButtonConfig(text: .AudioQualitySpeech, type: .primary) { [weak self] _ in
-                self?.manager?.onAudioQualityChanged(TUIAudioQuality.speech)
-                self?.dismissPanel()
+            AlertButtonConfig(text: .AudioQualitySpeech, type: .primary) { _ in
+                manager?.onAudioQualityChanged(TUIAudioQuality.speech)
+                dismissPopover()
             },
-            AlertButtonConfig(text: .cancelText, type: .primary) { [weak self] _ in
-                self?.dismissPanel()
+            AlertButtonConfig(text: .cancelText, type: .primary) { _ in
+                dismissPopover()
             }
         ]
         
@@ -589,8 +596,8 @@ class NetWorkInfoView: UIView {
             position: .bottom,
             height: .wrapContent,
             animation: .slideFromBottom,
-            onBackdropTap: { [weak self] in
-                self?.dismissPanel()
+            onBackdropTap: {
+                dismissPopover()
             }
         )
         
@@ -600,6 +607,7 @@ class NetWorkInfoView: UIView {
             popupViewController = vc
             vc.present(popover, animated: false)
             presentedPanelController = popover
+            popoverRef = popover
         }
     }
 

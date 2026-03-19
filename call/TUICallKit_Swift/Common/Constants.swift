@@ -59,8 +59,8 @@ let kFloatWindowButtonSize = CGSize(width: 30, height: 30)
 let kInviteUserButtonSize = CGSize(width: 30, height: 30)
 
 // MARK: Color
-let Color_OweWhite = UIColor(hex: "#D5E0F2")
-let Color_White = UIColor(hex: "#FFFFFF")
+let Color_OweWhite = UIColor("D5E0F2")
+let Color_White = UIColor("FFFFFF")
 
 // MARK: TUICore & IM
 let TMoreCell_Image_Size = CGSize(width: 65, height: 65)
@@ -106,12 +106,18 @@ class FrameworkConstants{
     static var language: Int = callLanguageSwift
 }
 
-let ERROR_SUCCESS = 0
-let ERROR_PARAM_INVALID = -1001
-let ERROR_INIT_FAIL = -1002
-let ERROR_REQUEST_REFUSED = -1003
-let ERROR_REQUEST_REPEATED = -1004
-let ERROR_SCENE_NOT_SUPPORTED = -1005
-let ERROR_PACKAGE_NOT_PURCHASED = -1006
-let ERROR_PACKAGE_NOT_SUPPORTED = -1007
-let ERR_SVR_MSG_IN_PEER_BLACKLIST = 60020
+// MARK: - IM Error Codes
+let IM_CODE_INVALID_PARAMETERS: Int32 = 6017
+
+// MARK: - Toast Event IDs
+struct ToastEventId {
+    static let packageNotPurchased: Int = 172001
+    static let packageNotSupported: Int = 172002
+    static let permissionDenied: Int = 172003
+    static let cameraOccupied: Int = 172004
+    static let micOccupied: Int = 172005
+    static let userBusy: Int = 172006
+    static let notLogin: Int = 172007
+    static let enterRoomFailed: Int = 172008
+}
+

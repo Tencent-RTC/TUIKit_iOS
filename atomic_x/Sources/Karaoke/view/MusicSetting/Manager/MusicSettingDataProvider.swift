@@ -5,12 +5,12 @@
 //  Created by aby on 2024/4/3.
 //
 import Combine
-import RTCCommon
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
 import TXLiteAVSDK_Professional
 #endif
+import AtomicXCore
 
 protocol MusicSettingMenuDateGenerator {
     typealias Section = Int
@@ -63,7 +63,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
             
             let targetTrack: TXChorusMusicTrack = isOpened ? .originalSong : .accompaniment
             if !manager.isTrackAvailable(targetTrack) {
-                manager.errorSubject.send(.trackSwitchNotSupported)
+                manager.errorSubject.send(.trackSwitchNotSupportedText)
                 return
             }
 
@@ -73,7 +73,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
         original.subscribeState = { [weak self] cell, cancellableSet in
             guard let self = self, let manager = self.manager else { return }
 
-            manager.subscribe(StateSelector(keyPath: \.musicTrackType))
+            manager.subscribe(StatePublisherSelector(keyPath: \.musicTrackType))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] musicTrackType in
                     if musicTrackType == .accompaniment {
@@ -96,7 +96,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
         }
         enableScore.subscribeState = { [weak self] cell, cancellableSet in
             guard let self = self else { return }
-            self.manager?.subscribe(StateSelector(keyPath: \.enableScore))
+            self.manager?.subscribe(StatePublisherSelector(keyPath: \.enableScore))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] enableScore in
                     if !enableScore {
@@ -124,7 +124,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
         }
         microphoneVolume.subscribeState = { [weak self] cell, cancellableSet in
             guard let self = self else { return }
-            self.manager?.subscribe(StateSelector(keyPath: \.publishVolume))
+            self.manager?.subscribe(StatePublisherSelector(keyPath: \.publishVolume))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] value in
                     guard let sliderCell = cell else { return }
@@ -144,7 +144,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
         }
         musicVolume.subscribeState = { [weak self] cell, cancellableSet in
             guard let self = self else { return }
-            self.manager?.subscribe(StateSelector(keyPath: \.playoutVolume))
+            self.manager?.subscribe(StatePublisherSelector(keyPath: \.playoutVolume))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] value in
                     guard let sliderCell = cell else { return }
@@ -165,7 +165,7 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
 
         pitchAdjustment.subscribeState = { [weak self] cell, cancellableSet in
             guard let self = self else { return }
-            self.manager?.subscribe(StateSelector(keyPath: \.musicPitch))
+            self.manager?.subscribe(StatePublisherSelector(keyPath: \.musicPitch))
                 .receive(on: DispatchQueue.main)
                 .sink { [weak cell] value in
                     cell?.valueLabel.text = String(format: "%.1f", value)
@@ -180,43 +180,43 @@ extension MusicSettingDataProvider: MusicSettingMenuDateGenerator {
 }
 
 fileprivate extension String {
-    static var voiceEarMonitor: String = ("karaoke_setting_ear_return").localized
+    static var voiceEarMonitor: String = ("karaoke_setting_ear_return").atomicLocalized
 
-    static var audioSetting: String = ("karaoke_setting_audio").localized
+    static var audioSetting: String = ("karaoke_setting_audio").atomicLocalized
 
-    static var captureVolume: String = ("karaoke_setting_capture_volume").localized
+    static var captureVolume: String = ("karaoke_setting_capture_volume").atomicLocalized
 
-    static var playoutVolume: String = ("karaoke_setting_playback_volume").localized
+    static var playoutVolume: String = ("karaoke_setting_playback_volume").atomicLocalized
 
-    static var voicePitch: String = ("karaoke_setting_music_pitch").localized
+    static var voicePitch: String = ("karaoke_setting_music_pitch").atomicLocalized
 
-    static var reverb: String = ("karaoke_change_reverb").localized
+    static var reverb: String = ("karaoke_change_reverb").atomicLocalized
 
-    static var Original: String = ("karaoke_original").localized
+    static var Original: String = ("karaoke_original").atomicLocalized
 
-    static var child: String = ("karaoke_voice_child").localized
+    static var child: String = ("karaoke_voice_child").atomicLocalized
 
-    static var girl: String = ("karaoke_voice_girl").localized
+    static var girl: String = ("karaoke_voice_girl").atomicLocalized
 
-    static var uncle: String = ("karaoke_voice_uncle").localized
+    static var uncle: String = ("karaoke_voice_uncle").atomicLocalized
 
-    static var ethereal: String = ("karaoke_voice_ethereal").localized
+    static var ethereal: String = ("karaoke_voice_ethereal").atomicLocalized
 
-    static var withoutEffect: String = ("karaoke_reverb_none").localized
+    static var withoutEffect: String = ("karaoke_reverb_none").atomicLocalized
 
-    static var karaoke: String = ("karaoke_reverb_ktv").localized
+    static var karaoke: String = ("karaoke_reverb_ktv").atomicLocalized
 
-    static var metal: String = ("karaoke_reverb_metallic").localized
+    static var metal: String = ("karaoke_reverb_metallic").atomicLocalized
 
-    static var low: String = ("karaoke_reverb_low").localized
+    static var low: String = ("karaoke_reverb_low").atomicLocalized
 
-    static var loud: String = ("karaoke_reverb_loud").localized
+    static var loud: String = ("karaoke_reverb_loud").atomicLocalized
 
-    static var done: String = ("karaoke_setting_done").localized
+    static var done: String = ("karaoke_setting_done").atomicLocalized
 
-    static var score: String = ("karaoke_score").localized
+    static var score: String = ("karaoke_score").atomicLocalized
 
-    static var pitchSetting: String = ("karaoke_setting_pitch_shift").localized
+    static var pitchSetting: String = ("karaoke_setting_pitch_shift").atomicLocalized
 
-    static var trackSwitchNotSupported = ("karaoke_cant_switch_tracks").localized
+    static var trackSwitchNotSupportedText = ("karaoke_cant_switch_tracks").atomicLocalized
 }

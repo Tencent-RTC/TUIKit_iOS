@@ -6,14 +6,13 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 import Combine
 import TUICore
 import MJRefresh
 import AtomicXCore
 import RTCRoomEngine
 import SnapKit
-import AtomicX
 
 class interactionInvitePanel: RTCBaseView {
 
@@ -49,7 +48,7 @@ class interactionInvitePanel: RTCBaseView {
     private lazy var battleButton: UIButton = {
         let button = UIButton()
         button.setTitle(.requestBattleText, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        button.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 16)
         button.setTitleColor(.defaultTextColor, for: .normal)
         button.addTarget(self, action: #selector(switchToPK), for: .touchUpInside)
         return button
@@ -63,8 +62,8 @@ class interactionInvitePanel: RTCBaseView {
 
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.textColor = UIColor(hex: "#FFFFFF")
-        label.font = UIFont(name: "PingFang SC", size: 16)
+        label.textColor = UIColor("FFFFFF")
+        label.font = UIFont(name: "PingFangSC-Medium", size: 16)
         label.text = .connectionTitleText
         return label
     }()
@@ -72,10 +71,11 @@ class interactionInvitePanel: RTCBaseView {
     private let disconnectButton: UIButton = {
         let button = UIButton()
         button.titleLabel?.font = UIFont(name: "PingFang SC", size: 14)
-        button.setTitleColor(.warningTextColor, for: .normal)
+        button.setTitleColor(.flowKitRed, for: .normal)
         button.setTitle(.disconnectText, for: .normal)
-        button.setImage(internalImage("live_connection_disconnect"), for: .normal)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
+        button.setImage(internalImage("voice_connection_disconnect"), for: .normal)
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -2, bottom: 0, right: 2)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: -2)
         button.backgroundColor = .clear
         button.contentHorizontalAlignment = .right
         button.isHidden = true
@@ -293,6 +293,7 @@ extension interactionInvitePanel {
             }
         })
         footer.ignoredScrollViewContentInsetBottom = tableView.contentInset.bottom
+        footer.setTitle("", for: .idle)
         footer.setTitle(.loadingMoreText, for: .pulling)
         footer.setTitle("", for: .noMoreData)
         footer.setTitle(.loadingText, for: .refreshing)
@@ -388,13 +389,13 @@ extension interactionInvitePanel {
         let confirmButton = AlertButtonConfig(text: String.disconnectAlertDisconnectText, type: .red) { [weak self] _ in
             guard let self = self else { return }
             coHostStore.exitHostConnection()
-            routerManager.dismiss()
-        }
-        let alertConfig = AlertViewConfig(title: .disconnectAlertText,
-                                          cancelButton: cancelButton,
-                                          confirmButton: confirmButton)
-        routerManager.present(view: AtomicAlertView(config: alertConfig))
+        routerManager.dismiss()
     }
+    let alertConfig = AlertViewConfig(title: .disconnectAlertText,
+                                      cancelButton: cancelButton,
+                                      confirmButton: confirmButton)
+    routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
+}
 
     @objc
     private func disconnectBattle() {
@@ -408,13 +409,13 @@ extension interactionInvitePanel {
             guard let self = self else { return }
             let battleID = battleStore.state.value.currentBattleInfo?.battleID ?? ""
             battleStore.exitBattle(battleID: battleID, completion: {_ in})
-            routerManager.router(action: .dismiss())
-        }
-        let alertConfig = AlertViewConfig(title: .endBattleText,
-                                          cancelButton: cancelButton,
-                                          confirmButton: confirmButton)
-        routerManager.present(view: AtomicAlertView(config: alertConfig))
+        routerManager.router(action: .dismiss())
     }
+    let alertConfig = AlertViewConfig(title: .endBattleText,
+                                      cancelButton: cancelButton,
+                                      confirmButton: confirmButton)
+    routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
+}
 
     private func handleConnectionError(_ error: ErrorInfo) {
         switch error.code {
@@ -554,7 +555,7 @@ fileprivate extension SeatUserInfo {
 
 fileprivate extension String {
     static let connectionTitleText = internalLocalized("common_connection")
-    static let connectedTitleText = internalLocalized("common_battle_connecting")
+    static let connectedTitleText = internalLocalized("seat_in_connection")
     static let recommendedTitleText = internalLocalized("common_recommended_list")
     static let disconnectText = internalLocalized("common_exit_connect")
 

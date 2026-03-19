@@ -24,13 +24,13 @@ class PitchViewConfig: NSObject {
     
     // MARK: - 颜色相关
     // 竖线颜色
-    var verticalLineColor: UIColor = UIColor.white.withAlphaComponent(0.45)
+    var verticalLineColor: UIColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.45)
     // 标准音调颜色
-    var standardRectColor: UIColor = UIColor.white.withAlphaComponent(0.7)
+    var standardRectColor: UIColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.7)
     // 击中音调颜色
-    var hitRectColor: UIColor = UIColor("FF6A4C")
+    var hitRectColor: UIColor = ThemeStore.shared.colorTokens.textColorError
     // 音调指示器颜色
-    var pitchIndicatorColor: UIColor = .white
+    var pitchIndicatorColor: UIColor = ThemeStore.shared.colorTokens.textColorPrimary
     // 分数文本颜色
-    var scoreTextColor: UIColor = UIColor("FF6A4C")
+    var scoreTextColor: UIColor = ThemeStore.shared.colorTokens.textColorError
 }

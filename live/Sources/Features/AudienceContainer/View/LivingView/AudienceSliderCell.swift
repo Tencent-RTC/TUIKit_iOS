@@ -8,7 +8,6 @@
 import AtomicXCore
 import AtomicX
 import Combine
-import RTCCommon
 import TUICore
 
 protocol AudienceListCellDelegate: AnyObject {
@@ -30,38 +29,22 @@ class AudienceSliderCell: UIView {
     private var isCurrentShowCell = false
     private weak var routerCenter: AudienceRouterControlCenter?
     
-    private lazy var coreView: LiveCoreView = {
-        func setComponent() {
-            do {
-                let jsonObject: [String: Any] = [
-                    "api": "component",
-                    "component": 21
-                ]
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    LiveCoreView.callExperimentalAPI(jsonString)
-                }
-            } catch {
-                LiveKitLog.error("\(#file)", "\(#line)", "dataReport: \(error.localizedDescription)")
-            }
-        }
-        setComponent()
-        let view = LiveCoreView(viewType: .playView)
-        view.setLiveID(liveID)
-        return view
-    }()
-
+    private let coreView: LiveCoreView
     private lazy var manager = AudienceStore(liveID: liveID)
     private let routerManager: AudienceRouterManager
     private var cancellableSet = Set<AnyCancellable>()
     private var isStartedPreload = false
     private var currentLiveOwner: LiveUserInfo?
     
-    init(liveInfo: LiveInfo, routerManager: AudienceRouterManager, routerCenter: AudienceRouterControlCenter) {
+    init(liveInfo: LiveInfo,
+         coreView: LiveCoreView?,
+         routerManager: AudienceRouterManager,
+         routerCenter: AudienceRouterControlCenter) {
         self.liveID = liveInfo.liveID
         self.routerManager = routerManager
         self.routerCenter = routerCenter
         self.currentLiveOwner = liveInfo.liveOwner
+        self.coreView = Self.initializeCoreView(coreView, liveInfo: liveInfo)
         super.init(frame: .zero)
         // TODO: gg check this
 //        manager.onAudienceSliderCellInit(liveInfo: liveInfo)
@@ -71,6 +54,33 @@ class AudienceSliderCell: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private static func initializeCoreView(_ coreView: LiveCoreView?, liveInfo: LiveInfo) -> LiveCoreView {
+        let videoView: LiveCoreView
+        if let view = coreView {
+            videoView = view
+        } else {
+            videoView = LiveCoreView(viewType: .playView)
+        }
+        videoView.setLiveID(liveInfo.liveID)
+        reportComponent()
+        return videoView
+    }
+    
+    private static func reportComponent() {
+        do {
+            let jsonObject: [String: Any] = [
+                "api": "component",
+                "component": 21 // 21 代表观众端组件
+            ]
+            let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                LiveCoreView.callExperimentalAPI(jsonString)
+            }
+        } catch {
+            LiveKitLog.error("\(#file)", "\(#line)", "dataReport: \(error.localizedDescription)")
+        }
     }
     
     private lazy var audienceView: AudienceView = {
@@ -100,6 +110,7 @@ class AudienceSliderCell: UIView {
     func onViewDidSlideIn() {
         LiveKitLog.info("\(#file)", "\(#line)", "onViewDidSlideIn roomId: \(liveID)")
         enterRoom()
+        audienceView.livingView.startGiftObserving()
         isCurrentShowCell = true
     }
     
@@ -114,14 +125,11 @@ class AudienceSliderCell: UIView {
     
     func onViewDidSlideOut() {
         LiveKitLog.info("\(#file)", "\(#line)", "onViewDidSlideOut roomId: \(liveID)")
+        audienceView.livingView.stopGiftObserving()
         if !FloatWindow.shared.isShowingFloatWindow() {
             coreView.stopPreviewLiveStream(roomId: liveID)
             if isCurrentShowCell {
-                manager.liveListStore.leaveLive(completion: nil)
-                TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
-                                    subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
-                                    object: nil,
-                                    param: nil)
+                audienceView.leaveRoom()
             }
             isStartedPreload = false
         }
@@ -190,7 +198,7 @@ extension AudienceSliderCell {
     private func subscribeState() {
         manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
             .removeDuplicates()
-            .combineLatest(manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
+            .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
             .receive(on: RunLoop.main)
             .dropFirst()
             .sink { [weak self] connected, isApplying in
@@ -220,7 +228,7 @@ extension AudienceSliderCell {
     }
     
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
+        manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] videoStreamIsLandscape in

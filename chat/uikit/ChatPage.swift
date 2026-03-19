@@ -34,10 +34,7 @@ extension MessageInfo {
 public struct ChatPage: View {
     @EnvironmentObject var themeState: ThemeState
     @StateObject private var toast = Toast()
-    @State private var messageText: String = ""
-    @State private var inputAreaHeight: CGFloat = 60
-    let listStyle: MessageListConfigProtocol
-    let inputStyle: MessageInputConfigProtocol
+    @State private var multiSelectBottomBar: AnyView? = nil
     let onBack: (() -> Void)?
     let onUserAvatarClick: ((String) -> Void)?
     let onNavigationAvatarClick: (() -> Void)?
@@ -46,16 +43,12 @@ public struct ChatPage: View {
 
     public init(
         conversation: ConversationInfo,
-        listStyle: MessageListConfigProtocol = ChatMessageStyle(),
-        inputStyle: MessageInputConfigProtocol = ChatMessageInputStyle(),
         locateMessage: MessageInfo? = nil,
         onBack: (() -> Void)? = nil,
         onUserAvatarClick: ((String) -> Void)? = nil,
         onNavigationAvatarClick: (() -> Void)? = nil
     ) {
         self.conversation = conversation
-        self.listStyle = listStyle
-        self.inputStyle = inputStyle
         self.locateMessage = locateMessage
         self.onBack = onBack
         self.onUserAvatarClick = onUserAvatarClick
@@ -63,39 +56,39 @@ public struct ChatPage: View {
     }
 
     public var body: some View {
-        if #available(iOS 15.0, *) {
-            let _ = Self._printChanges()
-        } else {
-            // Fallback on earlier versions
-        }
-
         return VStack(spacing: 0) {
             self.navigationBarView
 
             Divider()
                 .background(self.themeState.colors.strokeColorPrimary)
 
-            VStack(spacing: 0) {
-                MessageList(
-                    conversationID: self.conversation.id,
-                    listStyle: self.listStyle,
-                    locateMessage: self.locateMessage,
-                    onUserClick: { userID in
-                        onUserAvatarClick?(userID)
-                    }
-                )
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    MessageList(
+                        conversationID: self.conversation.id,
+                        locateMessage: self.locateMessage,
+                        onUserClick: { userID in
+                            onUserAvatarClick?(userID)
+                        },
+                        onMultiSelectModeChange: { isMultiSelect, bottomBar in
+                            self.multiSelectBottomBar = bottomBar
+                        }
+                    )
 
-                self.messageInputAreaView
+                    if let bottomBar = multiSelectBottomBar {
+                        bottomBar
+                    } else {
+                        self.messageInputAreaView
+                    }
+                }
+                .ignoresSafeArea(.keyboard)
             }
-            .ignoresSafeArea(.keyboard)
         }
+        .background(
+            themeState.colors.bgColorOperate
+                .ignoresSafeArea()
+        )
         .toast(toast)
-        .onAppear {
-//            self.setupNotificationObservers()
-        }
-        .onDisappear {
-//            self.removeNotificationObservers()
-        }
     }
 
     private var navigationBarView: some View {
@@ -143,12 +136,7 @@ public struct ChatPage: View {
     private var messageInputAreaView: some View {
         VStack(spacing: 0) {
             MessageInput(
-                text: $messageText,
-                conversationID: conversation.id,
-                style: inputStyle,
-                onHeightChange: { height in
-                    self.inputAreaHeight = height
-                }
+                conversationID: conversation.id
             )
             .padding(.bottom, 8)
         }
@@ -176,13 +164,7 @@ public struct ChatPage: View {
         NotificationCenter.default.removeObserver(self)
     }
 
-    private func handleKeyboardShow(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
-        else {
-            return
-        }
-    }
+    private func handleKeyboardShow(_ notification: Notification) {}
 
     private func handleKeyboardHide(_ notification: Notification) {}
 }

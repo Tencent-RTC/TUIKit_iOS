@@ -21,44 +21,44 @@ class SongListCell: UITableViewCell {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Medium", size: 14)
-        label.textColor = UIColor(white: 1, alpha: 0.9)
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary.withAlphaComponent(0.9)
         return label
     }()
 
     private lazy var artistLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(white: 1, alpha: 0.55)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
         return label
     }()
 
     private lazy var actionButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor("1c66E5")
+        button.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
         button.layer.cornerRadius = 12
         button.setTitle(.SongText, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(ThemeStore.shared.colorTokens.textColorButton, for: .normal)
         button.addTarget(self, action: #selector(selectSongButtonTapped), for: .touchUpInside)
         return button
     }()
 
     private lazy var originalButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor("4086FF").withAlphaComponent(0.1)
+        button.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.withAlphaComponent(0.1)
         button.setTitle(.originalText, for: .normal)
         button.titleLabel?.font = UIFont(name: "Roboto", size: 10) ?? UIFont.systemFont(ofSize: 10)
-        button.setTitleColor(UIColor("4086FF"), for: .normal)
+        button.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         button.layer.cornerRadius = 4
         return button
     }()
 
     private lazy var scoreButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor("38A673").withAlphaComponent(0.1)
+        button.backgroundColor = ThemeStore.shared.colorTokens.textColorSuccess.withAlphaComponent(0.1)
         button.setTitle(.scoreText, for: .normal)
         button.titleLabel?.font = UIFont(name: "Roboto", size: 10) ?? UIFont.systemFont(ofSize: 10)
-        button.setTitleColor(UIColor("38A673"), for: .normal)
+        button.setTitleColor(ThemeStore.shared.colorTokens.textColorSuccess, for: .normal)
         button.layer.cornerRadius = 4
         return button
     }()
@@ -119,7 +119,7 @@ class SongListCell: UITableViewCell {
             make.height.equalTo(16.scale375())
         }
 
-        backgroundColor = UIColor("1F2024")
+        backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         selectionStyle = .none
     }
 
@@ -177,14 +177,14 @@ class SongListCell: UITableViewCell {
             actionButton.setTitle(.orderedText, for: .normal)
             actionButton.backgroundColor = .clear
             actionButton.layer.borderWidth = 1
-            actionButton.layer.borderColor = UIColor("3A3C42").cgColor
-            actionButton.setTitleColor(UIColor(white: 1, alpha: 0.5), for: .normal)
+            actionButton.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor
+            actionButton.setTitleColor(ThemeStore.shared.colorTokens.textColorSecondary, for: .normal)
             actionButton.removeTarget(self, action: #selector(selectSongButtonTapped), for: .touchUpInside)
         } else {
             actionButton.setTitle(.SongText, for: .normal)
-            actionButton.backgroundColor = UIColor("1c66E5")
+            actionButton.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
             actionButton.layer.borderWidth = 0
-            actionButton.setTitleColor(.white, for: .normal)
+            actionButton.setTitleColor(ThemeStore.shared.colorTokens.textColorButton, for: .normal)
             actionButton.addTarget(self, action: #selector(selectSongButtonTapped), for: .touchUpInside)
         }
     }
@@ -212,11 +212,11 @@ class SongListCell: UITableViewCell {
 }
 
 fileprivate extension String {
-    static var orderedText: String = ("karaoke_ordered").localized
-    static var orderedCountText: String = ("karaoke_ordered_count").localized
-    static var exitOrder: String = ("karaoke_exit_order").localized
-    static var SongText: String = ("karaoke_order_song").localized
-    static var originalText: String = ("karaoke_original").localized
-    static var scoreText: String = ("karaoke_score").localized
+    static var orderedText: String = ("karaoke_ordered").atomicLocalized
+    static var orderedCountText: String = ("karaoke_ordered_count").atomicLocalized
+    static var exitOrder: String = ("karaoke_exit_order").atomicLocalized
+    static var SongText: String = ("karaoke_order_song").atomicLocalized
+    static var originalText: String = ("karaoke_original").atomicLocalized
+    static var scoreText: String = ("karaoke_score").atomicLocalized
 }
 

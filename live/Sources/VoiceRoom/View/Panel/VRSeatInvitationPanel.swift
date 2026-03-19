@@ -5,13 +5,11 @@
 //  Created by adamsfliu on 2024/7/25.
 //
 
-import RTCCommon
+import AtomicX
 import Combine
 import TUICore
 import AtomicXCore
 import RTCRoomEngine
-import AtomicXCore
-import AtomicX
 
 class VRSeatInvitationPanel: RTCBaseView {
     private let liveID: String
@@ -77,8 +75,9 @@ class VRSeatInvitationPanel: RTCBaseView {
         }
         
         tableView.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(screenHeight * 2 / 3)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.height.equalTo(UIScreen.main.bounds.height * 2 / 3)
             make.top.equalTo(subTitleLabel.snp.bottom)
         }
     }
@@ -181,15 +180,16 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
                     guard let self = self else { return }
                     switch result {
                     case .success(()):
-                        inviteTakeSeatCell.updateButtonView(isSelected: true)
+                        break
                     case .failure(let error):
+                        inviteTakeSeatCell.updateButtonView(isSelected: false)
                         let err = InternalError(errorInfo: error)
                         toastService.showToast(err.localizedMessage, toastStyle: .error)
                     }
                 }
                 
                 if self.seatIndex != -1 {
-                    self.routerManager.router(action: .routeTo(.anchor))
+                    self.routerManager.router(action: .dismiss())
                 }
             }
             inviteTakeSeatCell.cancelEventClosure = { [weak self] user in
@@ -198,9 +198,9 @@ extension VRSeatInvitationPanel: UITableViewDataSource {
                     guard let self = self else { return }
                     switch result {
                     case .success(()):
-                            toastService.showToast(.inviteSeatCancelText, toastStyle: .success)
-                        inviteTakeSeatCell.updateButtonView(isSelected: false)
+                       break
                     case .failure(let error):
+                        inviteTakeSeatCell.updateButtonView(isSelected: true)
                         let err = InternalError(errorInfo: error)
                             toastService.showToast(err.localizedMessage, toastStyle: .error)
                     }
@@ -233,7 +233,6 @@ extension VRSeatInvitationPanel {
 fileprivate extension String {
     static let inviteText = internalLocalized("common_voiceroom_invite")
     static let onlineAudienceText = internalLocalized("common_anchor_audience_list_panel_title")
-    static let inviteSeatCancelText = internalLocalized("common_voiceroom_invite_seat_canceled")
     static let seatAllTokenText = internalLocalized("common_server_error_the_seats_are_all_taken")
     static let requestRejectedText = internalLocalized("common_request_rejected")
     static let requestTimeoutText = internalLocalized("common_connect_invitation_timeout")

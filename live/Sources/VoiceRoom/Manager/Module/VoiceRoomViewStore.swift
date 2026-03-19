@@ -6,8 +6,9 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 import Combine
+import AtomicXCore
 
 struct VRViewState {
     var isApplyingToTakeSeat: Bool = false
@@ -20,7 +21,7 @@ class VoiceRoomViewStore {
     
     private let observerState = ObservableState<VRViewState>(initialState: VRViewState())
     
-    func subscribeState<Value>(_ selector: StateSelector<VRViewState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeState<Value>(_ selector: StatePublisherSelector<VRViewState, Value>) -> AnyPublisher<Value, Never> {
         observerState.subscribe(selector)
     }
     

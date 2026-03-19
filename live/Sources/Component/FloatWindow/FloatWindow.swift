@@ -6,8 +6,8 @@
 
 import SnapKit
 import Foundation
-import TUICore
 import AtomicXCore
+import AtomicX
 import Combine
 import RTCRoomEngine
 
@@ -90,7 +90,7 @@ extension FloatWindow {
         LiveKitLog.info("\(#file)", "\(#line)", "FloatWindow resume")
         dataSource.relayoutCoreView()
         controller.modalPresentationStyle = .fullScreen
-        TUITool.applicationKeywindow().rootViewController?.present(controller, animated: true)
+        WindowUtils.getCurrentWindow()?.rootViewController?.present(controller, animated: true)
         dismiss()
         return true
     }
@@ -152,7 +152,7 @@ extension FloatWindow: FloatViewDelegate {
     func onResume() {
         if let nav = controller?.navigationController {
             resumeLive(atViewController: nav)
-        } else if let vc = TUITool.applicationKeywindow().rootViewController {
+        } else if let vc = WindowUtils.getCurrentWindow()?.rootViewController {
             resumeLive(atViewController: vc)
         } else {
             LiveKitLog.info("\(#file)", "\(#line)","FloatWindow onResume cant found controller to present")

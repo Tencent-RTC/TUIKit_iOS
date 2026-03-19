@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import MJRefresh
-import RTCCommon
+import AtomicX
 import UIKit
 
 public class LiveListView: UIView {
@@ -225,7 +225,7 @@ extension LiveListView {
             self.liveList.removeAll()
         }
         self.cursor = cursor
-        self.liveList.append(contentsOf: liveList)
+        self.liveList = liveList
         isFirstFetch = false
         guard isOnCurrentView else { return }
         collectionView.reloadData()

@@ -12,23 +12,62 @@ import SnapKit
 import TUICore
 import AtomicX
 
-public class GiftListView: UIView {
-    private let liveId: String
-    private var store: GiftStore {
-        GiftStore.create(liveID: liveId)
-    }
+public protocol GiftListViewDelegate: AnyObject {
+    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> UICollectionViewCell.Type?
+    
+    func giftListView(_ view: GiftListView, configureCustomCell cell: UICollectionViewCell, for gift: Gift)
+    
+    func giftListViewHeaderRightView(_ view: GiftListView) -> UIView?
+    
+    func giftListViewBottomView(_ view: GiftListView) -> UIView?
+    
+    func giftListView(_ view: GiftListView, didSelect gift: Gift)
+    
+    func giftListView(_ view: GiftListView, didSend gift: Gift, count: UInt, result: Result<Void, ErrorInfo>)
+}
 
-    // MARK: - 数据源
+public extension GiftListViewDelegate {
+    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> UICollectionViewCell.Type? { return nil }
+    func giftListView(_ view: GiftListView, configureCustomCell cell: UICollectionViewCell, for gift: Gift) {}
+    func giftListViewHeaderRightView(_ view: GiftListView) -> UIView? { return nil }
+    func giftListViewBottomView(_ view: GiftListView) -> UIView? { return nil }
+    func giftListView(_ view: GiftListView, didSelect gift: Gift) {}
+    func giftListView(_ view: GiftListView, didSend gift: Gift, count: Int, result: Result<Void, Error>) {}
+}
+
+public class GiftListView: UIView {
+    
+    // MARK: - Public Properties
+    public weak var delegate: GiftListViewDelegate? {
+        didSet {
+            refreshSlots()
+        }
+    }
+    
+    // MARK: - Private Properties
+    private let liveId: String
+    private lazy var store: GiftStore = {
+        return GiftStore.create(liveID: liveId)
+    }()
+    
+    // Data Source
     private var giftCategories: [GiftCategory] = []
     private var currentSelectedCategoryIndex: Int = 0
     private var currentSelectedCellIndex: IndexPath = .init(row: 0, section: 0)
     private var cancellableSet: Set<AnyCancellable> = []
-
-    // MARK: - UI配置
+    
+    // Layout Config
     private var rows: Int = 2
     private var itemSize: CGSize = .init(width: 74, height: 74 + 53)
-
-    // MARK: - UI组件
+    
+    // MARK: - UI Components
+    
+    private lazy var topContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private lazy var categoryTabView: UICollectionView = {
         let layout = GiftCollectionViewLayout()
         layout.scrollDirection = .horizontal
@@ -43,13 +82,19 @@ public class GiftListView: UIView {
         view.dataSource = self
         return view
     }()
-
+    
+    private lazy var headerRightContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private lazy var separatorLine: UIView = {
         let view = UIView()
         view.backgroundColor = .flowKitWhite.withAlphaComponent(0.25)
         return view
     }()
-
+    
     private lazy var flowLayout: TUIGiftSideslipLayout = {
         let layout = TUIGiftSideslipLayout()
         layout.scrollDirection = .vertical
@@ -57,13 +102,12 @@ public class GiftListView: UIView {
         layout.rows = rows
         return layout
     }()
-
+    
     private lazy var collectionView: UICollectionView = {
         let view = UICollectionView(frame: self.bounds, collectionViewLayout: self.flowLayout)
         if #available(iOS 11.0, *) {
             view.contentInsetAdjustmentBehavior = .never
         }
-        view.register(TUIGiftCell.self, forCellWithReuseIdentifier: TUIGiftCell.cellReuseIdentifier)
         view.isPagingEnabled = false
         view.scrollsToTop = true
         view.delegate = self
@@ -73,7 +117,15 @@ public class GiftListView: UIView {
         view.backgroundColor = .clear
         return view
     }()
-
+    
+    private lazy var bottomContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    // MARK: - Init
+    
     public init(roomId: String) {
         self.liveId = roomId
         super.init(frame: .zero)
@@ -126,18 +178,31 @@ public extension GiftListView {
 
 extension GiftListView {
     private func setupUI() {
-        addSubview(categoryTabView)
+        addSubview(topContainer)
+        topContainer.addSubview(categoryTabView)
+        topContainer.addSubview(headerRightContainer)
+        
         addSubview(separatorLine)
         addSubview(collectionView)
+        addSubview(bottomContainer)
         
-        categoryTabView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.leading.trailing.equalToSuperview().offset(10)
+        topContainer.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(44)
         }
         
+        headerRightContainer.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-12)
+            make.centerY.equalToSuperview()
+        }
+        
+        categoryTabView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().offset(10)
+        }
+        
         separatorLine.snp.makeConstraints { make in
-            make.top.equalTo(categoryTabView.snp.bottom)
+            make.top.equalTo(topContainer.snp.bottom)
             make.leading.trailing.equalToSuperview()
             make.height.equalTo(0.5)
         }
@@ -145,63 +210,71 @@ extension GiftListView {
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(separatorLine.snp.bottom).offset(10)
             make.leading.trailing.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.height.equalTo(200.scale375())
+        }
+        
+        bottomContainer.snp.makeConstraints { make in
+            make.bottom.leading.trailing.equalToSuperview()
+            make.height.equalTo(0)
         }
         
         addSwipeGestures()
     }
     
-    private func addSwipeGestures() {
-        let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
-        leftSwipeGesture.direction = .left
-        collectionView.addGestureRecognizer(leftSwipeGesture)
-        
-        let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
-        rightSwipeGesture.direction = .right
-        collectionView.addGestureRecognizer(rightSwipeGesture)
-    }
-    
-    @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
-        guard !giftCategories.isEmpty else { return }
-        
-        switch gesture.direction {
-        case .left:
-            let nextIndex = min(currentSelectedCategoryIndex + 1, giftCategories.count - 1)
-            if nextIndex != currentSelectedCategoryIndex {
-                selectCategory(at: nextIndex)
+    private func refreshSlots() {
+        headerRightContainer.subviews.forEach { $0.removeFromSuperview() }
+        if let rightView = delegate?.giftListViewHeaderRightView(self) {
+            headerRightContainer.addSubview(rightView)
+            rightView.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
             }
-        case .right:
-            let prevIndex = max(currentSelectedCategoryIndex - 1, 0)
-            if prevIndex != currentSelectedCategoryIndex {
-                selectCategory(at: prevIndex)
+        }
+        
+        bottomContainer.subviews.forEach { $0.removeFromSuperview() }
+        bottomContainer.snp.remakeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            if let bottomView = delegate?.giftListViewBottomView(self) {
+                bottomContainer.addSubview(bottomView)
+                bottomView.snp.makeConstraints { make in
+                    make.edges.equalToSuperview()
+                }
+            } else {
+                make.height.equalTo(0)
             }
-        default:
-            break
         }
     }
-
+    
+    // MARK: - Data Logic
+    
     private func addObserver() {
         store.state.subscribe(StatePublisherSelector(keyPath: \GiftState.usableGifts))
             .receive(on: RunLoop.main)
             .sink { [weak self] categories in
                 guard let self = self else { return }
-                giftCategories = categories
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    categoryTabView.reloadData()
-                    collectionView.reloadData()
-                    collectionView.layoutIfNeeded()
-                    
-                    if !giftCategories.isEmpty {
-                        selectCategory(at: 0)
-                    }
-                }
+                self.giftCategories = categories
+                self.handleDataUpdate()
             }
             .store(in: &cancellableSet)
     }
-
+    
+    
     private func removeObserver() {
         cancellableSet.forEach { $0.cancel() }
         cancellableSet.removeAll()
+    }
+    
+    private func handleDataUpdate() {
+        categoryTabView.reloadData()
+        collectionView.reloadData()
+        
+        if !giftCategories.isEmpty {
+            if currentSelectedCategoryIndex >= giftCategories.count {
+                selectCategory(at: 0)
+            } else {
+                selectCategory(at: currentSelectedCategoryIndex)
+            }
+        }
     }
     
     private func selectCategory(at index: Int) {
@@ -217,86 +290,117 @@ extension GiftListView {
         categoryTabView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
         
         collectionView.reloadData()
-        collectionView.layoutIfNeeded()
-        
-        if !currentGiftList.isEmpty {
-            collectionView.selectItem(at: currentSelectedCellIndex, animated: false, scrollPosition: [])
-        }
     }
     
     private var currentGiftList: [Gift] {
         guard currentSelectedCategoryIndex < giftCategories.count else { return [] }
         return giftCategories[currentSelectedCategoryIndex].giftList
     }
+    
+    // MARK: - Swipe Gestures
+    
+    private func addSwipeGestures() {
+        let left = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
+        left.direction = .left
+        collectionView.addGestureRecognizer(left)
+        
+        let right = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
+        right.direction = .right
+        collectionView.addGestureRecognizer(right)
+    }
+    
+    @objc private func handleSwipeGesture(_ gesture: UISwipeGestureRecognizer) {
+        guard !giftCategories.isEmpty else { return }
+        
+        switch gesture.direction {
+        case .left:
+            let nextIndex = min(currentSelectedCategoryIndex + 1, giftCategories.count - 1)
+            if nextIndex != currentSelectedCategoryIndex { selectCategory(at: nextIndex) }
+        case .right:
+            let prevIndex = max(currentSelectedCategoryIndex - 1, 0)
+            if prevIndex != currentSelectedCategoryIndex { selectCategory(at: prevIndex) }
+        default: break
+        }
+    }
 }
 
-// MARK: UICollectionViewDelegate
+// MARK: - UICollectionViewDataSource
+
+extension GiftListView: UICollectionViewDataSource {
+    
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView == categoryTabView { return giftCategories.count }
+        return currentGiftList.count
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if collectionView == categoryTabView {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: GiftCategoryTabCell.reuseIdentifier, for: indexPath) as! GiftCategoryTabCell
+            if indexPath.item < giftCategories.count {
+                cell.configure(with: giftCategories[indexPath.item], isSelected: indexPath.item == currentSelectedCategoryIndex)
+            }
+            return cell
+        }
+        
+        else {
+            let gift = currentGiftList[indexPath.row]
+            
+            var cellClass = delegate?.giftListView(self, cellClassFor: gift)
+
+            if cellClass == nil {
+                let isAdvanced = !gift.resourceURL.isEmpty
+                
+                if isAdvanced {
+                    cellClass = GiftSingleCell.self
+                } else {
+                    cellClass = GiftComboCell.self
+                }
+            }
+            
+            let finalClass = cellClass ?? GiftSingleCell.self
+            let reuseIdentifier = finalClass.cellReuseIdentifier
+            
+            collectionView.register(finalClass, forCellWithReuseIdentifier: reuseIdentifier)
+            
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
+            
+            if let baseCell = cell as? GiftBaseCell {
+                baseCell.giftInfo = gift
+                baseCell.delegate = self
+                baseCell.isSelected = (indexPath == currentSelectedCellIndex)
+                
+                delegate?.giftListView(self, configureCustomCell: baseCell, for: gift)
+            }
+            
+            return cell
+        }
+    }
+}
+
+// MARK: - UICollectionViewDelegate
 
 extension GiftListView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == categoryTabView {
             selectCategory(at: indexPath.item)
-        } else {
-            let preSelectedCellIndex = currentSelectedCellIndex
-            currentSelectedCellIndex = indexPath
-            if let cell = collectionView.cellForItem(at: preSelectedCellIndex) as? TUIGiftCell {
-                cell.isSelected = false
-            }
-            if let cell = collectionView.cellForItem(at: currentSelectedCellIndex) as? TUIGiftCell {
-                cell.isSelected = true
-            }
+            return
         }
-    }
-}
-
-// MARK: UICollectionViewDataSource
-
-extension GiftListView: UICollectionViewDataSource {
-    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == categoryTabView {
-            return giftCategories.count
-        } else {
-            return currentGiftList.count
+        
+        if indexPath == currentSelectedCellIndex {
+            return
         }
-    }
-
-    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == categoryTabView {
-            let reuseCell = collectionView.dequeueReusableCell(withReuseIdentifier: GiftCategoryTabCell.reuseIdentifier, for: indexPath)
-            guard let cell = reuseCell as? GiftCategoryTabCell else { return reuseCell }
-            
-            if indexPath.item < giftCategories.count {
-                let category = giftCategories[indexPath.item]
-                cell.configure(with: category, isSelected: indexPath.item == currentSelectedCategoryIndex)
-            }
-            
-            return cell
-        } else {
-            let reuseCell = collectionView.dequeueReusableCell(withReuseIdentifier: TUIGiftCell.cellReuseIdentifier, for: indexPath)
-            guard let cell = reuseCell as? TUIGiftCell else { return reuseCell }
-            
-            if indexPath.row < currentGiftList.count {
-                let giftInfo = currentGiftList[indexPath.row]
-                cell.giftInfo = giftInfo
-                cell.sendBlock = { [weak self, weak cell] giftInfo in
-                    if let self = self {
-                        DataReporter.reportEventData(eventKey: getReportKey())
-                        store.sendGift(giftID: giftInfo.giftID, count: 1) { [weak self] result in
-                            guard let self = self else { return }
-                            switch result {
-                            case .failure(let error):
-                                let err = InternalError(code: error.code, message: error.message)
-                                GiftManager.shared.toastSubject.send((err.localizedMessage,.error))
-                            default: break
-                            }
-                        }
-                    }
-                    if let cell = cell {
-                        cell.isSelected = false
-                    }
-                }
-            }
-            return cell
+        
+        let preIndex = currentSelectedCellIndex
+        currentSelectedCellIndex = indexPath
+        
+        if let oldCell = collectionView.cellForItem(at: preIndex) {
+            oldCell.isSelected = false
+        }
+        
+        let gift = currentGiftList[indexPath.row]
+        if let newCell = collectionView.cellForItem(at: currentSelectedCellIndex) {
+            newCell.isSelected = true
+            delegate?.giftListView(self, didSelect: gift)
         }
     }
 }
@@ -308,10 +412,29 @@ extension GiftListView: UICollectionViewDelegateFlowLayout {
         if collectionView == categoryTabView {
             let category = giftCategories[indexPath.item]
             let font = UIFont(name: "PingFangSC-Regular", size: 14) ?? .systemFont(ofSize: 14)
-            let textWidth = category.name.size(withAttributes: [.font: font]).width
-            return CGSize(width: max(textWidth + 20, 50), height: 44)
+            let width = category.name.size(withAttributes: [.font: font]).width
+            return CGSize(width: max(width + 20, 50), height: 44)
         } else {
             return itemSize
+        }
+    }
+}
+
+// MARK: - GiftCellDelegate 实现
+
+extension GiftListView: GiftCellDelegate {
+    
+    public func cell(_ cell: UICollectionViewCell, onSend gift: Gift, count: UInt) {
+        DataReporter.reportEventData(eventKey: getReportKey())
+        
+        store.sendGift(giftID: gift.giftID, count: UInt(count)) { [weak self] result in
+            guard let self = self else { return }
+            
+            self.delegate?.giftListView(self, didSend: gift, count: count, result: result)
+            
+            if case .failure(let error) = result {
+                 print("Send Gift Error: \(error.localizedDescription)")
+            }
         }
     }
 }
@@ -329,6 +452,8 @@ private extension GiftListView {
         case .voiceRoom:
             key = isSupportEffectPlayer ? Constants.DataReport.kDataReportVoiceGiftEffectSendCount :
                 Constants.DataReport.kDataReportVoiceGiftSVGASendCount
+        default:
+            break
         }
         return key
     }

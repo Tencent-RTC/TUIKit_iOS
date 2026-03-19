@@ -1,8 +1,6 @@
 // Copyright (c) 2024 Tencent. All rights reserved.
 // Author: krabyu
 //
-// Copyright (c) 2024 Tencent.
-//
 //  TUIEffectPlayerService.m
 //  TCEffectPlayerKit
 //

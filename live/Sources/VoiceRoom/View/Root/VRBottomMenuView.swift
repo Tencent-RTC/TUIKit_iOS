@@ -6,12 +6,11 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import SnapKit
 import Combine
 import AtomicXCore
 import RTCRoomEngine
-import AtomicXCore
 
 class VRBottomMenuView: UIView {
     var cancellableSet = Set<AnyCancellable>()
@@ -38,12 +37,6 @@ class VRBottomMenuView: UIView {
         view.alignment = .center
         view.distribution = .fillProportionally
         return view
-    }()
-    private let designConfig: ActionItemDesignConfig = {
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
-        return designConfig
     }()
     
     private var buttons: [UIButton] = []
@@ -278,8 +271,8 @@ extension VRBottomMenuView {
         var connectionControl = VRButtonMenuInfo(normalIcon: "seat_battle")
         connectionControl.tapAction = { [weak self] sender in
             guard let self = self else { return }
-            let settingItems = self.generateOwnerSettingModel()
-            self.routerManager.router(action: .present(.connectionControl))
+            let connectionPanel = interactionInvitePanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
+            self.routerManager.present(view: connectionPanel, config: .bottomDefault())
         }
 
         connectionControl.bindStateClosure = { [weak self] button, cancellableSet in
@@ -302,7 +295,8 @@ extension VRBottomMenuView {
         setting.tapAction = { [weak self] sender in
             guard let self = self else { return }
             let settingItems = self.generateOwnerSettingModel()
-            self.routerManager.router(action: .present(.featureSetting(settingItems)))
+            let settingPanel = VRSettingPanel(settingPanelModel: settingItems)
+            self.routerManager.present(view: settingPanel, config: .bottomDefault())
         }
         menus.append(setting)
         var songListButton = VRButtonMenuInfo(normalIcon: "ktv_songList")
@@ -317,7 +311,8 @@ extension VRBottomMenuView {
         var linkMic = VRButtonMenuInfo(normalIcon: "live_link_voice_room", normalTitle: "")
         linkMic.tapAction = { [weak self] sender in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.voiceLinkControl))
+            let linkPanel = VRSeatManagerPanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
+            self.routerManager.present(view: linkPanel, config: .bottomDefault())
         }
         
         linkMic.bindStateClosure = { [weak self] button, cancellableSet in
@@ -347,14 +342,27 @@ extension VRBottomMenuView {
                                        designConfig: designConfig,
                                          actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.systemImageSelection(.background,.voice(liveListStore))))
+            let configs = VRSystemImageFactory.getImageAssets(imageType: .background)
+            let imagePanel = VRImageSelectionPanel(configs: configs, panelMode: .background, sceneType: .voice(liveListStore))
+            imagePanel.backButtonClickClosure = { [weak self] in
+                guard let self = self else { return }
+                self.routerManager.router(action: .dismiss())
+            }
+            let routeItem = RouteItem(view: imagePanel, config: .bottomDefault())
+            self.routerManager.router(action: .present(routeItem))
         }))
         model.items.append(VRFeatureItem(normalTitle: .audioEffectsText,
                                        normalImage: internalImage("live_setting_audio_effects"),
                                        designConfig: designConfig,
                                          actionClosure: { [weak self] _ in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.audioEffect))
+            let audioPanel = AudioEffectView()
+            audioPanel.backButtonClickClosure = { [weak self] _ in
+                guard let self = self else { return }
+                self.routerManager.router(action: .dismiss())
+            }
+            let routeItem = RouteItem(view: audioPanel, config: .bottomDefault())
+            self.routerManager.router(action: .present(routeItem))
         }))
         return model
     }
@@ -364,7 +372,9 @@ extension VRBottomMenuView {
         var gift = VRButtonMenuInfo(normalIcon: "live_gift_icon", normalTitle: "")
         gift.tapAction = { [weak self] sender in
             guard let self = self else { return }
-            self.routerManager.router(action: .present(.giftView))
+            let giftPanel = GiftListView(roomId: liveID)
+            let routeItem = RouteItem(view: giftPanel, config: .bottomDefault())
+            self.routerManager.router(action: .present(routeItem))
         }
         menus.append(gift)
         
@@ -420,7 +430,7 @@ extension VRBottomMenuView {
         linkMic.bindStateClosure = { [weak self] button, cancellableSet in
             guard let self = self else { return }
             
-            viewStore.subscribeState(StateSelector(keyPath: \VRViewState.isApplyingToTakeSeat))
+            viewStore.subscribeState(StatePublisherSelector(keyPath: \VRViewState.isApplyingToTakeSeat))
                 .sink { isApplying in
                     DispatchQueue.main.async {
                         button.isSelected = isApplying

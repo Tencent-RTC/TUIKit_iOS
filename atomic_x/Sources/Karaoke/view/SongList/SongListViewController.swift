@@ -6,10 +6,10 @@
 //
 
 import UIKit
-import RTCCommon
 import SnapKit
 import Combine
 import RTCRoomEngine
+import AtomicXCore
 
 public class SongListViewController: UIViewController {
     enum ListType {
@@ -34,7 +34,7 @@ public class SongListViewController: UIViewController {
 
     private let tabContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor("1F2024")
+        view.backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         return view
     }()
 
@@ -71,7 +71,7 @@ public class SongListViewController: UIViewController {
     private let backLabel: UILabel = {
         let label = UILabel()
         label.text = .exitOrder
-        label.textColor = UIColor.redColor
+        label.textColor = ThemeStore.shared.colorTokens.textColorError
         label.font = UIFont(name: "PingFangSC-Semibold", size: 14) ?? .systemFont(ofSize: 14, weight: .regular)
         return label
     }()
@@ -84,7 +84,7 @@ public class SongListViewController: UIViewController {
         tableView.dataSource = self
         tableView.rowHeight = 64
         tableView.separatorStyle = .none
-        tableView.backgroundColor = UIColor("1F2024")
+        tableView.backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         return tableView
     }()
 
@@ -110,7 +110,7 @@ public class SongListViewController: UIViewController {
     
     private func setupStateSubscriptions() {
         guard let karaokeManager = karaokeManager else {return}
-        karaokeManager.subscribe(StateSelector(keyPath: \.songLibrary))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.songLibrary))
             .receive(on: DispatchQueue.main)
             .removeDuplicates()
             .sink { [weak self] songs in
@@ -120,7 +120,7 @@ public class SongListViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.selectedSongs))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.selectedSongs))
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedSongs in
@@ -130,7 +130,7 @@ public class SongListViewController: UIViewController {
             }
             .store(in: &cancellables)
 
-        karaokeManager.subscribe(StateSelector(keyPath: \.currentMusicId))
+        karaokeManager.subscribe(StatePublisherSelector(keyPath: \.currentMusicId))
             .removeDuplicates()
             .dropFirst()
             .receive(on: DispatchQueue.main)
@@ -151,15 +151,15 @@ public class SongListViewController: UIViewController {
 
         karaokeManager.errorSubject
             .receive(on: RunLoop.main)
-            .sink { [weak self] errorMessage in
+            .sink { [weak self] message in
                 guard let self = self else { return }
-                self.view.showAtomicToast(text: errorMessage, style: .error)
+                view.showAtomicToast(text: message, style: .error)
             }
             .store(in: &cancellables)
     }
 
     private func constructViewHierarchy() {
-        contentView.backgroundColor = UIColor("1F2024")
+        contentView.backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         view.addSubview(contentView)
         contentView.addSubview(tabContainer)
         tabContainer.addSubview(songListButton)
@@ -225,7 +225,10 @@ public class SongListViewController: UIViewController {
     private func bindInteraction() {
         selectedListButton.addTarget(self, action: #selector(onSelectedListButtonTapped), for: .touchUpInside)
         songListButton.addTarget(self, action: #selector(onSongListButtonTapped), for: .touchUpInside)
-        backView.addTapGesture(target: self, action: #selector(onBackViewTapped))
+        
+        let backViewTap = UITapGestureRecognizer(target: self, action: #selector(onBackViewTapped))
+        backView.isUserInteractionEnabled = true
+        backView.addGestureRecognizer(backViewTap)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(onBackButtonClickedClosure(_:)))
         self.view.addGestureRecognizer(tap)
@@ -277,7 +280,7 @@ public class SongListViewController: UIViewController {
 
     private func setupViewStyle() {
         view.backgroundColor = .clear
-        tableView.backgroundColor = UIColor("1F2024")
+        tableView.backgroundColor = ThemeStore.shared.colorTokens.bgColorDialog
         tableView.separatorStyle = .none
     }
     
@@ -323,14 +326,16 @@ extension SongListViewController: UITableViewDataSource, UITableViewDelegate{
 
     private func updateSelectedCount() {
         guard let karaokeManager = karaokeManager else {return}
-        selectedListButton.setTitle(.orderedCountText.localized(replace: "\(karaokeManager.karaokeState.selectedSongs.count)"),for: .normal)
+        selectedListButton.setTitle(.orderedCountText(karaokeManager.karaokeState.selectedSongs.count), for: .normal)
     }
 
 }
 
 fileprivate extension String {
-    static var orderedText: String = ("karaoke_ordered").localized
-    static var songText: String = ("karaoke_order_song").localized
-    static var orderedCountText: String = ("karaoke_ordered_count").localized
-    static var exitOrder: String = ("karaoke_exit_order").localized
+    static var orderedText: String = ("karaoke_ordered").atomicLocalized
+    static var songText: String = ("karaoke_order_song").atomicLocalized
+    static var exitOrder: String = ("karaoke_exit_order").atomicLocalized
+    static func orderedCountText(_ count: Int) -> String {
+        return ("karaoke_ordered_count").atomicLocalized(replaces: count)
+    }
 }

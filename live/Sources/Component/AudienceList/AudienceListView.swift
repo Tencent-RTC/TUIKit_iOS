@@ -8,20 +8,19 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import SnapKit
 import AtomicX
 
 class UserInfoCell: UICollectionViewCell {
     var userInfo: LiveUserInfo? {
         didSet {
-            avatarView.setContent(.url(userInfo?.avatarURL ?? "", placeholder: avatarPlaceholderImage))
+            avatarView.setContent(.url(userInfo?.avatarURL ?? "", placeholder: UIImage.avatarPlaceholderImage))
         }
     }
 
     private lazy var avatarView: AtomicAvatar = {
         let avatar = AtomicAvatar(
-            content: .url("", placeholder: avatarPlaceholderImage),
+            content: .url("", placeholder: UIImage.avatarPlaceholderImage),
             size: .xs,
             shape: .round
         )
@@ -219,19 +218,28 @@ extension AudienceListView {
             let audienceListPanel = AudienceListPanelView(liveId: liveId)
             audienceListPanel.onUserManageButtonClicked = onUserManageButtonClicked
             popupViewController = vc
-            let menuContainerView = MenuContainerView(contentView: audienceListPanel)
+            
             audienceListPanel.onBackButtonClickedClosure = { [weak self] in
                 guard let self = self else { return }
                 popupViewController?.dismiss(animated: true)
                 popupViewController = nil
             }
-            menuContainerView.blackAreaClickClosure = { [weak self] in
-                guard let self = self else { return }
-                popupViewController?.dismiss(animated: true)
-                popupViewController = nil
-            }
-            let viewController = PopupViewController(contentView: menuContainerView)
-            popupViewController?.present(viewController, animated: true)
+            
+            let popover = AtomicPopover(
+                contentView: audienceListPanel,
+                configuration: .init(
+                    position: .bottom,
+                    height: .wrapContent,
+                    animation: .slideFromBottom,
+                    backgroundColor: .defaultThemeColor,
+                    onBackdropTap: { [weak self] in
+                        guard let self = self else { return }
+                        self.popupViewController?.dismiss(animated: true)
+                        self.popupViewController = nil
+                    }
+                )
+            )
+            popupViewController?.present(popover, animated: true)
         }
     }
 }

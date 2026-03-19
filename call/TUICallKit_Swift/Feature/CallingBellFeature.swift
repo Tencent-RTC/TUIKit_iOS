@@ -8,7 +8,7 @@
 import Foundation
 import AVFAudio
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 import TUICore
@@ -180,7 +180,7 @@ class CallingBellFeature: NSObject, AVAudioPlayerDelegate {
     private func setAudioSessionWith(category: AVAudioSession.Category) {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(category, options: [.allowBluetooth, .allowBluetoothA2DP, .mixWithOthers])
+            try audioSession.setCategory(category, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.setActive(true)
         } catch {
             Logger.error("Error setting up audio session: \(error)")
@@ -190,7 +190,7 @@ class CallingBellFeature: NSObject, AVAudioPlayerDelegate {
     private func setAudioSessionForRingtone() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.playback, options: [.allowBluetooth, .allowBluetoothA2DP, .mixWithOthers])
+            try audioSession.setCategory(.playback, options: [.allowBluetooth, .allowBluetoothA2DP])
             try audioSession.overrideOutputAudioPort(.speaker)
             try audioSession.setActive(true)
         } catch {

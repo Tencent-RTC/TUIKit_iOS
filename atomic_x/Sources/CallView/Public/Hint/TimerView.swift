@@ -28,7 +28,7 @@ class TimerView: UIView {
         timerLabel.font = UIFont.boldSystemFont(ofSize: 15.0)
         timerLabel.backgroundColor = UIColor.clear
         timerLabel.textAlignment = .center
-        timerLabel.textColor = UIColor(hex: "#D5E0F2")
+        timerLabel.textColor = UIColor("D5E0F2")
         return timerLabel
     }()
     

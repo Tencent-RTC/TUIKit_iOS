@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import UIKit
 
@@ -172,7 +172,7 @@ class AnchorBattleInfoView: RTCBaseView {
             }
             .store(in: &cancellableSet)
         
-        store.subscribeState(StateSelector(keyPath: \AnchorBattleState.durationCountDown))
+        store.subscribeState(StatePublisherSelector(keyPath: \AnchorBattleState.durationCountDown))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] duration in

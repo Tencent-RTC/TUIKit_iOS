@@ -10,10 +10,9 @@ import AtomicX
 import Combine
 import Foundation
 import RTCRoomEngine
-import TUICore
 
 public class TUIGiftData {
-    public let giftCount: UInt8
+    public var giftCount: UInt8
     public let giftInfo: Gift
     public let sender: LiveUserInfo
 
@@ -21,6 +20,10 @@ public class TUIGiftData {
         giftInfo.resourceURL.count > 0
     }
 
+    public var comboKey: String {
+        return "\(sender.userID)_\(giftInfo.giftID)"
+    }
+    
     public init(_ giftCount: UInt8, giftInfo: Gift, sender: LiveUserInfo) {
         self.giftCount = giftCount
         self.giftInfo = giftInfo

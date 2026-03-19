@@ -11,7 +11,6 @@ import AtomicX
 import ImSDK_Plus
 import Combine
 import RTCRoomEngine
-import RTCCommon
 import TUICore
 
 enum CoHostViewManagerPanelType {
@@ -175,7 +174,7 @@ class CoHostViewManagerPanel: UIView{
         featureClickPanel.snp.makeConstraints{ make in
             make.top.equalTo(userInfoView.snp.bottom).offset(21.scale375())
             make.leading.equalTo(userInfoView)
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-16.scale375())
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(20.scale375())
@@ -545,15 +544,9 @@ extension CoHostViewManagerPanel {
         routerManager.router(action: .dismiss())
     }
 
-    private func actionItemDesignConfig() -> ActionItemDesignConfig {
-        let designConfig = ActionItemDesignConfig(lineWidth: 1, titleColor: .g2)
-        designConfig.backgroundColor = .white
-        designConfig.lineColor = .g8
-        return designConfig
-    }
-
     private func invite() {
-        routerManager.router(action:.present(.linkInviteControl(seatInfo.index)))
+        let invitePanel = VRSeatInvitationPanel(liveID: liveID, toastService: toastService, routerManager: routerManager, seatIndex: seatInfo.index)
+        routerManager.present(view: invitePanel, config: .bottomDefault())
     }
 }
 

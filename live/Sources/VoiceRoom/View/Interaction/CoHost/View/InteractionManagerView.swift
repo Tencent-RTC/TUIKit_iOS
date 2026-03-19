@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 import Combine
 import TUICore
 import MJRefresh
 import AtomicXCore
-import AtomicX
 import RTCRoomEngine
 import SnapKit
 
@@ -272,7 +271,7 @@ class VRCoHostCardView: UIView {
     private let userNameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.customFont(ofSize: 16)
-        label.textColor = .grayColor
+        label.textColor = .g7
         return label
     }()
 

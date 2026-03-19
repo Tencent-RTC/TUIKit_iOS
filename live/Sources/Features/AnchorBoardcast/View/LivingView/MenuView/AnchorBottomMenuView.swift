@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import SnapKit
 import Combine
 import AtomicXCore

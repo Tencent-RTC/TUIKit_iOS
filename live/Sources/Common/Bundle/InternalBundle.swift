@@ -7,23 +7,14 @@
 
 import Foundation
 
-let internalBundle: Bundle = Bundle.moduleBundle(for: VideoLiveKit.self, bundleName: "TUILiveKitBundle", moduleName: "TUILiveKit") ?? .main
-
-func internalLocalized(_ key: String) -> String {
-    return .localized(key, inBundle: internalBundle, table: "TUILiveKitLocalized")
+var internalBundle: Bundle {
+    return Bundle.liveBundle
 }
 
-func sgLocalized(_ key: String) -> String {
-    return .localized(key, inBundle: internalBundle, table: "SeatGridViewLocalized")
+func internalLocalized(_ key: String, replaces: CVarArg...) -> String {
+    return .liveLocalizedReplace(key, replaces: replaces)
 }
 
 func internalImage(_ named: String, rtlFlipped: Bool = false) -> UIImage? {
-    let image = UIImage(named: named, in: internalBundle, with: nil) ?? UIImage(named: named)
-    if rtlFlipped {
-        return image?.rtlFlipped()
-    } else {
-        return image
-    }
+    return .liveBundleImage(named, rtlFlipped: rtlFlipped)
 }
-
-let avatarPlaceholderImage: UIImage? = UIImage(named: "live_seat_placeholder_avatar", in: internalBundle, with: nil)

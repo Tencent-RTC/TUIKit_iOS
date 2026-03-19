@@ -8,7 +8,6 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import RTCRoomEngine
 import TUICore
 import AtomicX
@@ -43,7 +42,8 @@ class AnchorLivingView: UIView {
         let view = AudienceListView()
         view.onUserManageButtonClicked = { [weak self] user in
             guard let self = self else { return }
-            routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .messageAndKickOut)))
+            let panel = AnchorUserManagePanelView(user: user, store: store, routerManager: routerManager, type: .messageAndKickOut)
+            routerManager.present(view: panel, config: .bottomDefault())
         }
         return view
     }()
@@ -54,7 +54,7 @@ class AnchorLivingView: UIView {
     }()
     
     private lazy var floatView: LinkMicAnchorFloatView = {
-        let view = LinkMicAnchorFloatView(store: store, routerManager: routerManager)
+        let view = LinkMicAnchorFloatView(store: store, routerManager: routerManager, coreView: coreView)
         view.isHidden = true
         return view
     }()
@@ -90,7 +90,12 @@ class AnchorLivingView: UIView {
         let button = NetworkInfoButton(liveId: store.liveID)
         button.onNetWorkInfoButtonClicked = { [weak self] in
             guard let self = self else { return }
-            routerManager.router(action: .present(.netWorkInfo(netWorkInfoManager, isAudience: !store.liveListState.currentLive.keepOwnerOnSeat)))
+            let panel = NetWorkInfoView(liveID: store.liveID, manager: netWorkInfoManager, isAudience: !store.liveListState.currentLive.keepOwnerOnSeat)
+            panel.onRequestDismissNetworkPanel = { [weak self] completion in
+                guard let self = self else { return }
+                routerManager.dismiss(completion: completion)
+            }
+            routerManager.present(view: panel, config: .bottomDefault())
         }
         return button
     }()
@@ -176,7 +181,7 @@ class AnchorLivingView: UIView {
             .store(in: &cancellableSet)
 
         netWorkInfoManager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.showToast))
+            .subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.showToast))
             .receive(on: RunLoop.main)
             .sink { [weak self] showToast in
                 guard let self = self else { return }
@@ -220,9 +225,12 @@ class AnchorLivingView: UIView {
                 switch event {
                     case .onLiveEnded(let liveID, let liveEndedReason, let message):
                         if liveEndedReason == .endedByServer && liveID == store.liveID{
-                            onLiveEndedByService()
+                            onLiveEnded()
                         }
                     case .onKickedOutOfLive(let liveID, let reason, let message):
+                        if liveID == store.liveID {
+                            onLiveEnded()
+                        }
                         break
                 }
             }
@@ -434,7 +442,7 @@ extension AnchorLivingView {
             let alertConfig = AlertViewConfig(title: .confirmEndLiveText,
                                               cancelButton: cancelButton,
                                               confirmButton: confirmButton)
-            routerManager.present(view: AtomicAlertView(config: alertConfig))
+            routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
             return
         }
         
@@ -455,9 +463,9 @@ extension AnchorLivingView {
         items.append(cancelItem)
 
         let alertConfig = AlertViewConfig(title: title, items: items)
-        routerManager.present(view: AtomicAlertView(config: alertConfig))
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
     }
-    
+
     private func exitBattle() {
         store.battleStore.exitBattle(battleID: store.battleState.currentBattleInfo?.battleID ?? "", completion: nil)
     }
@@ -509,7 +517,7 @@ extension AnchorLivingView {
         }
     }
 
-    func onLiveEndedByService() {
+    func onLiveEnded() {
         let date = store.summaryStore.state.value.summaryData
         anchorObserverState.update { [weak self] state in
             guard let self = self else { return }
@@ -547,7 +555,8 @@ extension AnchorLivingView: BarrageStreamViewDelegate {
 
     func onBarrageClicked(user: LiveUserInfo) {
         if user.userID == store.selfUserID { return }
-        routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .messageAndKickOut)))
+        let panel = AnchorUserManagePanelView(user: user, store: store, routerManager: routerManager, type: .messageAndKickOut)
+        routerManager.present(view: panel, config: .bottomDefault())
     }
 }
 

@@ -9,7 +9,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import TUICore
 
 class AudienceRootMenuDataCreator {
@@ -18,6 +17,16 @@ class AudienceRootMenuDataCreator {
     private let routerManager: AudienceRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
     private var lastApplyHashValue: Int?
+    private lazy var linkMicTypePanel: LinkMicTypePanel = {
+        let panel = LinkMicTypePanel(
+            data: generateLinkTypeMenuData(),
+            routerManager: routerManager,
+            manager: manager,
+            seatIndex: -1,
+            coreView: coreView ?? LiveCoreView(viewType: .playView)
+        )
+        return panel
+    }()
 
     init(coreView: LiveCoreView, manager: AudienceStore, routerManager: AudienceRouterManager) {
         self.coreView = coreView
@@ -106,7 +115,8 @@ extension AudienceRootMenuDataCreator {
         var gift = AudienceButtonMenuInfo(normalIcon: "live_gift_icon", normalTitle: "")
         gift.tapAction = { [weak self] _ in
             guard let self = self else { return }
-            routerManager.router(action: .present(.giftView))
+            let giftPanel = GiftListView(roomId: manager.liveID)
+            routerManager.present(view: giftPanel)
         }
         menus.append(gift)
         if !isDisableCoGuest {
@@ -138,13 +148,14 @@ extension AudienceRootMenuDataCreator {
                     }
                     
                     let alertConfig = AlertViewConfig(items: [cancelRequestItem, cancelItem])
-                    routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
+                    let alertView = AtomicAlertView(config: alertConfig)
+                    let routeItem = RouteItem(view: alertView, config: .bottomDefault())
+                    routerManager.router(action: .present(routeItem))
                 } else {
                     if manager.coGuestState.connected.isOnSeat() {
                         confirmToTerminateCoGuest()
                     } else {
-                        let data = generateLinkTypeMenuData()
-                        routerManager.router(action: .present(.linkType(data, seatIndex: -1)))
+                        routerManager.present(view: linkMicTypePanel)
                     }
                 }
             }
@@ -153,7 +164,7 @@ extension AudienceRootMenuDataCreator {
                 manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
                     .removeDuplicates()
                     .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates(),
-                                   manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
+                                   manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
                     .receive(on: RunLoop.main)
                     .sink { [weak self] connected, users, isApplying in
                         guard let self = self else { return }
@@ -194,15 +205,17 @@ extension AudienceRootMenuDataCreator {
                         default: break
                         }
                     }
-                    routerManager.router(action: .routeTo(.audience))
+                    routerManager.router(action: .dismiss())
                 },
                 AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
                     guard let self = self else { return }
-                    routerManager.router(action: .routeTo(.audience))
+                    routerManager.router(action: .dismiss())
                 }
             ]
         )
-        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
+        let alertView = AtomicAlertView(config: alertConfig)
+        let routeItem = RouteItem(view: alertView, config: .bottomDefault())
+        routerManager.router(action: .present(routeItem))
     }
 }
 

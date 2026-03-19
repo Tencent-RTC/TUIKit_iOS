@@ -7,29 +7,25 @@
 
 import Combine
 import TUICore
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import AtomicXCore
-import AtomicX
 
 class AnchorRouterControlCenter {
     private var coreView: LiveCoreView?
-    private var rootRoute: AnchorRoute
     private var routerManager: AnchorRouterManager
     private var store: AnchorStore?
     
     private weak var rootViewController: UIViewController?
     private var cancellableSet = Set<AnyCancellable>()
-    private var presentedRouteStack: [AnchorRoute] = []
-    private var presentedViewControllerMap: [AnchorRoute: UIViewController] = [:]
+    private var presentedRouteStack: [RouteItem] = []
+    private var presentedViewControllerMap: [RouteItem: UIViewController] = [:]
 
-    init(rootViewController: UIViewController, rootRoute: AnchorRoute, routerManager: AnchorRouterManager, store: AnchorStore? = nil, coreView: LiveCoreView? = nil) {
+    init(rootViewController: UIViewController, routerManager: AnchorRouterManager, store: AnchorStore? = nil, coreView: LiveCoreView? = nil) {
         self.rootViewController = rootViewController
-        self.rootRoute = rootRoute
         self.routerManager = routerManager
         self.store = store
         self.coreView = coreView
-        routerManager.setRootRoute(route: rootRoute)
     }
     
     func handleScrollToNewRoom(store: AnchorStore, coreView: LiveCoreView) {
@@ -46,7 +42,7 @@ class AnchorRouterControlCenter {
 // MARK: - Subscription
 extension AnchorRouterControlCenter {
     func subscribeRouter() {
-        routerManager.subscribeRouterState(StateSelector(keyPath: \AnchorRouterState.routeStack))
+        routerManager.subscribeRouterState(StatePublisherSelector(keyPath: \AnchorRouterState.routeStack))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] routeStack in
@@ -54,18 +50,41 @@ extension AnchorRouterControlCenter {
                 self.comparePresentedVCWith(routeStack: routeStack)
             }
             .store(in: &cancellableSet)
+        
+        routerManager.subscribeRouterState(StatePublisherSelector(keyPath: \AnchorRouterState.shouldExit))
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] shouldExit in
+                guard let self = self else { return }
+                if shouldExit {
+                    self.handleExitAction()
+                }
+            }
+            .store(in: &cancellableSet)
     }
 }
 
 // MARK: - Route Handler
 extension AnchorRouterControlCenter {
-    private func comparePresentedVCWith(routeStack: [AnchorRoute]) {
-        if routeStack.isEmpty {
-            handleExitAction()
+    private func comparePresentedVCWith(routeStack: [RouteItem]) {
+        if routerManager.routerState.shouldExit {
+            if !presentedRouteStack.isEmpty {
+                handleDismissAllPanels()
+                DispatchQueue.main.async { [weak self] in
+                    self?.handleExitAction()
+                }
+            } else {
+                handleExitAction()
+            }
             return
         }
         
-        if routeStack.count > presentedRouteStack.count + 1 {
+        if routeStack.isEmpty && !presentedRouteStack.isEmpty {
+            handleDismissAllPanels()
+            return
+        }
+        
+        if routeStack.count > presentedRouteStack.count {
             if let lastRoute = routeStack.last {
                 handleRouteAction(route: lastRoute)
             }
@@ -73,6 +92,20 @@ extension AnchorRouterControlCenter {
         }
         
         handleDismisAndRouteToAction(routeStack: routeStack)
+    }
+    
+    private func handleDismissAllPanels() {
+        if routerManager.routerState.dismissEvent != nil {
+            handleDismisAndRouteToAction(routeStack: [])
+            return
+        }
+
+        while !presentedRouteStack.isEmpty {
+            if let route = presentedRouteStack.popLast(), let vc = presentedViewControllerMap[route] {
+                vc.dismiss(animated: false)
+                presentedViewControllerMap.removeValue(forKey: route)
+            }
+        }
     }
     
     private func handleExitAction() {
@@ -89,30 +122,17 @@ extension AnchorRouterControlCenter {
         }
     }
     
-    private func handleRouteAction(route: AnchorRoute) {
-        if route == rootRoute {
-            rootViewController?.presentedViewController?.dismiss(animated: true)
-        }
-        
+    private func handleRouteAction(route: RouteItem) {
         if tryToPresentCachedViewController(route: route) {
             return
         }
                 
         if let view = getRouteDefaultView(route: route) {
             var presentedViewController: UIViewController = UIViewController()
-            switch route {
-                case .custom(let item):
-                    if let alertView = item.view as? AtomicAlertView {
-                        presentedViewController = presentAtomicAlert(alert: alertView, config: item.config)
-                    } else {
-                        presentedViewController = presentPopover(view: item.view, config: item.config)
-                    }
-                case .battleCountdown:
-                    let config = RouteItemConfig.centerTransparent()
-                    presentedViewController = presentPopover(view: view, config: config)
-                default:
-                    let config = RouteItemConfig.bottomDefault()
-                    presentedViewController = presentPopover(view: view, config: config)
+            if let alertView = view as? AtomicAlertView {
+                presentedViewController = presentAtomicAlert(alert: alertView, config: route.config)
+            } else {
+                presentedViewController = presentPopover(view: view, config: route.config)
             }
             presentedRouteStack.append(route)
             presentedViewControllerMap[route] = presentedViewController
@@ -121,7 +141,7 @@ extension AnchorRouterControlCenter {
         }
     }
     
-    private func tryToPresentCachedViewController(route: AnchorRoute) -> Bool {
+    private func tryToPresentCachedViewController(route: RouteItem) -> Bool {
         var isSuccess = false
         if presentedViewControllerMap.keys.contains(route) {
             if let rootViewController = rootViewController,
@@ -135,24 +155,24 @@ extension AnchorRouterControlCenter {
         return isSuccess
     }
     
-    private func handleDismisAndRouteToAction(routeStack: [AnchorRoute]) {
+    private func handleDismisAndRouteToAction(routeStack: [RouteItem]) {
         while routeStack.last != presentedRouteStack.last {
             if presentedRouteStack.isEmpty {
                 break
             }
-            
+
             if let route = presentedRouteStack.popLast(), let vc = presentedViewControllerMap[route] {
                 if let dismissEvent = routerManager.routerState.dismissEvent {
-                    vc.dismiss(animated: false) { [weak self] in
+                    vc.dismiss(animated: true) { [weak self] in
                         guard let self = self else { return }
                         dismissEvent()
                         self.routerManager.clearDismissEvent()
                     }
+                    presentedViewControllerMap.removeValue(forKey: route)
+                    return
                 } else {
                     vc.dismiss(animated: false)
-                }
-                if isTempPanel(route: route) {
-                    presentedViewControllerMap[route] = nil
+                    presentedViewControllerMap.removeValue(forKey: route)
                 }
             }
         }
@@ -172,107 +192,8 @@ extension AnchorRouterControlCenter {
 
 // MARK: - Default Route View
 extension AnchorRouterControlCenter {
-    private func getRouteDefaultView(route: AnchorRoute) -> UIView? {
-        if case .custom(let item) = route {
-            return item.view
-        }
-        guard let coreView = coreView, let store = store else { return nil }
-        var view: UIView?
-        switch route {
-        case .liveLinkControl:
-            view = AnchorLinkControlPanel(store: store, routerManager: routerManager, coreView: coreView)
-        case .connectionControl:
-            let panel = AnchorCoHostManagerPanel(store: store)
-            panel.onClickBack = { [weak self] in
-                guard let self = self else { return }
-                routerManager.router(action: .dismiss())
-            }
-            view = panel
-        case .featureSetting(let settingPanelModel):
-            view = AnchorSettingPanel(settingPanelModel: settingPanelModel)
-        case .audioEffect:
-            let audioEffect = AudioEffectView()
-            audioEffect.backButtonClickClosure = { [weak self] _ in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            view = audioEffect
-        case .battleCountdown(let countdownTime):
-            let countdownView = AnchorBattleCountDownView(countdownTime: countdownTime, store: store)
-            countdownView.timeEndClosure = { [weak self] in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            countdownView.cancelClosure = { [weak self] in
-                guard let self = self else { return }
-                self.routerManager.router(action: .dismiss())
-            }
-            view = countdownView
-        case .streamDashboard:
-            view = StreamDashboardPanel(liveID: store.liveID)
-        case .beauty:
-            if BeautyView.checkIsNeedDownloadResource() {
-                return nil
-            }
-            let beautyView = BeautyView.shared()
-            beautyView.backClosure = { [weak self] in
-                guard let self = self else { return }
-                routerManager.router(action: .dismiss())
-            }
-            view = beautyView
-        case .giftView:
-            view = GiftListPanel(roomId: store.liveID)
-        case .userManagement(let user, let type):
-            if type == .userInfo {
-                view = AnchorUserInfoPanelView(user: LiveUserInfo(seatUserInfo: user.userInfo), store: store)
-            } else {
-                view = AnchorUserManagePanelView(user: LiveUserInfo(seatUserInfo: user.userInfo), store: store, routerManager: routerManager, type: type)
-            }
-        case .netWorkInfo(let networkInfoManager, let isAudience):
-            let netWorkInfoView = NetWorkInfoView(
-                liveID: store.liveID,
-                manager: networkInfoManager,
-                isAudience: isAudience
-            )
-            netWorkInfoView.onRequestDismissNetworkPanel = { [weak self] completion in
-                self?.routerManager.router(action: .dismiss(.panel, completion: completion))
-            }
-            view = netWorkInfoView
-        case .mirror:
-            let dataSource: [MirrorType] = [.auto, .enable, .disable]
-            let panel = BaseSelectionPanel(dataSource: dataSource.map { $0.toString() })
-            panel.selectedClosure = { [weak self] index in
-                guard let self = self else { return }
-                DeviceStore.shared.switchMirror(mirrorType: dataSource[index])
-                routerManager.router(action: .dismiss())
-            }
-            panel.cancelClosure = { [weak self] in
-                guard let self = self else { return }
-                routerManager.router(action: .dismiss())
-            }
-            view = panel
-        case .pip:
-            view = PictureInPictureTogglePanel(liveID: store.liveID)
-        default:
-            break
-        }
-        return view
-    }
-}
-
-// MARK: - Route Staus
-extension AnchorRouterControlCenter {
-    private func isTempPanel(route: AnchorRoute) -> Bool {
-        switch route {
-        case .battleCountdown(_),
-                .streamDashboard,
-                .pip,
-                .featureSetting(_),
-                .userManagement(_, _):
-            return true
-        default:
-            return false
-        }
+    private func getRouteDefaultView(route: RouteItem) -> UIView? {
+        return route.view
     }
 }
 

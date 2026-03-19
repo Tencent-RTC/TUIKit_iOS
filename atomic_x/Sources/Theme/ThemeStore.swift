@@ -10,64 +10,65 @@ import Foundation
 import Combine
 import UIKit
 
-enum ThemePreference: String {
-    case manual
-    case followSystem
+public enum ThemeMode: String, Codable, CaseIterable {
+    case system
+    case light
+    case dark
 }
 
-/// ThemeStore - Singleton for managing global theme state
 public final class ThemeStore {
     
-    // MARK: - Singleton
     public static let shared = ThemeStore()
     
     // MARK: - Published State
-    @Published public private(set) var currentTheme: Theme = Theme.darkTheme
+    @Published public private(set) var currentTheme: Theme
     
-    // MARK: - Private Properties
-    private let userDefaultsHelper = UserDefaultsHelper()
+    private var settings: ThemeSettings
     private var cancellables = Set<AnyCancellable>()
-    private var debounceWorkItem: DispatchWorkItem?
-    private let debounceDelay: TimeInterval = 0.3
     
-    // MARK: - Initialization
     private init() {
-        loadPersistedTheme()
-        observeSystemAppearanceChanges()
+        self.settings = ThemeSettings.load()
+        
+        let concreteMode = ThemeStore.resolveConcreteMode(from: settings.mode)
+        
+        self.currentTheme = ThemeStore.resolveTheme(
+            mode: concreteMode,
+            customColor: settings.primaryColor
+        )
+        
+        observeSystemAppearance()
     }
     
     // MARK: - Public Methods
     
-    public func setTheme(_ theme: Theme) {
-        debounceWorkItem?.cancel()
-        
-        let workItem = DispatchWorkItem { [weak self] in
-            guard let self = self else { return }
-            self.currentTheme = theme
-            self.persistTheme(theme)
-        }
-        
-        debounceWorkItem = workItem
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + debounceDelay, execute: workItem)
+    public func setMode(_ mode: ThemeMode) {
+        guard mode != settings.mode else { return }
+        updateTheme(mode: mode, customColor: settings.primaryColor)
+    }
+    
+    public func setPrimaryColor(_ hex: String) {
+        guard hex != settings.primaryColor else { return }
+        updateTheme(mode: settings.mode, customColor: hex)
     }
     
     // MARK: - Token Accessors (便捷访问器)
+    public var currentMode: ThemeMode {
+        return settings.mode
+    }
     
     public var space: SpaceTokens {
         return currentTheme.tokens.space
     }
     
-    public var color: ColorTokens {
+    public var colorTokens: ColorTokens {
         return currentTheme.tokens.color
     }
     
-
     public var borderRadius: BorderRadiusToken {
         return currentTheme.tokens.borderRadius
     }
     
-    public var typography: TypographyToken {
+    public var typographyTokens: TypographyToken {
         return currentTheme.tokens.typography
     }
     
@@ -75,107 +76,95 @@ public final class ThemeStore {
         return currentTheme.tokens.shadows
     }
     
-    // MARK: - Persistence
+    // MARK: - Core Logic
     
-    private func loadPersistedTheme() {
-        switch userDefaultsHelper.getThemePreference() {
-        case .manual:
-            if let themeId = userDefaultsHelper.getCurrentThemeId() {
-                loadTheme(byId: themeId)
-            }
-        case .followSystem:
-            loadThemeBasedOnSystemAppearance()
+    private func updateTheme(mode: ThemeMode, customColor: String?) {
+        self.settings = ThemeSettings(mode: mode, primaryColor: customColor)
+        self.settings.save()
+        
+        let concreteMode = ThemeStore.resolveConcreteMode(from: mode)
+        
+        let newTheme = ThemeStore.resolveTheme(mode: concreteMode, customColor: customColor)
+        
+        if newTheme != currentTheme {
+            self.currentTheme = newTheme
         }
     }
     
-    private func persistTheme(_ theme: Theme) {
-        userDefaultsHelper.setCurrentThemeId(theme.id)
-        userDefaultsHelper.setThemePreference(.manual)
-    }
-    
-    private func loadTheme(byId themeId: String) {
-        let loadedTheme: Theme
-        switch themeId {
-        case "light":
-            loadedTheme = .lightTheme
-        case "dark":
-            loadedTheme = .darkTheme
-        default:
-            loadedTheme = .defaultTheme
+    private static func resolveTheme(mode: ThemeMode, customColor: String?) -> Theme {
+        if let color = customColor {
+            return Theme.makeTheme(mode: mode, primaryColor: color)
         }
-        currentTheme = loadedTheme
-    }
-    
-    private func loadThemeBasedOnSystemAppearance() {
-        let loadedTheme: Theme
-        switch UITraitCollection.current.userInterfaceStyle {
+        
+        switch mode {
         case .dark:
-            loadedTheme = .darkTheme
-        case .light, .unspecified:
-            loadedTheme = .lightTheme
-        @unknown default:
-            loadedTheme = .darkTheme
+            return Theme.darkTheme
+        case .light, .system:
+            return Theme.lightTheme
         }
-
-        currentTheme = loadedTheme
     }
     
-    private func observeSystemAppearanceChanges() {
-        if #available(iOS 13.0, *) {
-            NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-                .sink { [weak self] _ in
-                    guard let self = self else { return }
-                    
-                    if self.userDefaultsHelper.getThemePreference() == .followSystem {
-                        self.loadThemeBasedOnSystemAppearance()
-                    }
-                }
-                .store(in: &cancellables)
+    private static func resolveConcreteMode(from mode: ThemeMode) -> ThemeMode {
+        switch mode {
+        case .light: return .light
+        case .dark: return .dark
+        case .system:
+            return UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
+        }
+    }
+    
+    // MARK: - System Observation
+    
+    private func observeSystemAppearance() {
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.refreshSystemThemeIfNeeded()
+            }
+            .store(in: &cancellables)
+    }
+    
+    public func refreshSystemThemeIfNeeded() {
+        guard settings.mode == .system else { return }
+        
+        let newConcreteMode = ThemeStore.resolveConcreteMode(from: .system)
+        
+        if newConcreteMode != currentTheme.mode {
+            let newTheme = ThemeStore.resolveTheme(
+                mode: newConcreteMode,
+                customColor: settings.primaryColor
+            )
+            currentTheme = newTheme
         }
     }
 }
 
-final class UserDefaultsHelper {
+// MARK: - Helper: Persistence
+fileprivate struct ThemeSettings {
+    var mode: ThemeMode
+    var primaryColor: String?
     
-    private let defaults: UserDefaults
+    private static let keyMode = "com.theme.store.mode"
+    private static let keyColor = "com.theme.store.primaryColor"
     
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
+    static func load() -> ThemeSettings {
+        let defaults = UserDefaults.standard
+        
+        let modeRaw = defaults.string(forKey: keyMode) ?? ThemeMode.dark.rawValue
+        let mode = ThemeMode(rawValue: modeRaw) ?? .dark
+        
+        let color = defaults.string(forKey: keyColor)
+        
+        return ThemeSettings(mode: mode, primaryColor: color)
     }
     
-    // MARK: - Read
-    
-    func getCurrentThemeId() -> String? {
-        return defaults.string(forKey: .currentThemeId)
-    }
-    
-    func getThemePreference() -> ThemePreference {
-        guard let raw = defaults.string(forKey: .themePreference),
-              let preference = ThemePreference(rawValue: raw) else {
-            return .manual
+    func save() {
+        let defaults = UserDefaults.standard
+        defaults.set(mode.rawValue, forKey: ThemeSettings.keyMode)
+        
+        if let color = primaryColor {
+            defaults.set(color, forKey: ThemeSettings.keyColor)
+        } else {
+            defaults.removeObject(forKey: ThemeSettings.keyColor)
         }
-        return preference
     }
-    
-    // MARK: - Write
-    
-    func setCurrentThemeId(_ themeId: String) {
-        defaults.set(themeId, forKey: .currentThemeId)
-    }
-    
-    func setThemePreference(_ preference: ThemePreference) {
-        defaults.set(preference.rawValue, forKey: .themePreference)
-    }
-    
-    // MARK: - Clear
-    
-    func clearThemePreferences() {
-        defaults.removeObject(forKey: .currentThemeId)
-        defaults.removeObject(forKey: .themePreference)
-    }
-}
-
-fileprivate extension String {
-    static let currentThemeId = "com.theme.currentThemeId"
-    static let themePreference = "com.theme.preference"
 }

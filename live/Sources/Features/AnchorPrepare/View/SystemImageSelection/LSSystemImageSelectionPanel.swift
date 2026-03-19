@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import RTCRoomEngine
-import RTCCommon
 import AtomicX
 
 class LSSystemImageSelectionPanel: UIView {
@@ -140,7 +139,7 @@ extension LSSystemImageSelectionPanel {
         
         confirmButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(34.scale375Height())
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(12.scale375Height())
             make.height.equalTo(52.scale375())
             make.width.equalTo(200.scale375())
         }

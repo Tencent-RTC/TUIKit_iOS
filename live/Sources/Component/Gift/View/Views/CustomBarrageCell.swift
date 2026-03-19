@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import TUICore
 import Kingfisher
 import AtomicXCore
 
@@ -15,7 +14,7 @@ public class GiftBarrageCell: UIView {
     
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor(hex: "#0F1014")?.withAlphaComponent(0.4)
+        view.backgroundColor = UIColor("0F1014").withAlphaComponent(0.4)
         view.layer.cornerRadius = 13
         view.layer.masksToBounds = true
         return view

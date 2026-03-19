@@ -7,7 +7,7 @@
 
 import UIKit
 import Kingfisher
-import RTCCommon
+import AtomicX
 import TUICore
 
 class MainCollectionCell: UICollectionViewCell {
@@ -49,7 +49,7 @@ class MainCollectionCell: UICollectionViewCell {
     
     private let uiComIconView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "73A1F0")
+        view.backgroundColor = UIColor("73A1F0")
         view.layer.cornerRadius = 2
         view.layer.masksToBounds = true
         return view
@@ -151,9 +151,7 @@ class MainCollectionCell: UICollectionViewCell {
 
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        let gradientLayer = containerView.gradient(colors: gradientColors)
-        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+        containerView.gradient(colors: gradientColors, isVertical: true)
     }
 }
 

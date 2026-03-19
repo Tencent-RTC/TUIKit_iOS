@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 

@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 
@@ -146,7 +146,7 @@ class RecentCallsCell: UITableViewCell {
         timeLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             timeLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            timeLabel.trailingAnchor.constraint(equalTo: moreButton.leadingAnchor, constant: -4),
+            timeLabel.trailingAnchor.constraint(equalTo: moreButton.leadingAnchor, constant: -12),
             timeLabel.widthAnchor.constraint(equalToConstant: 100)
         ])
 
@@ -154,8 +154,8 @@ class RecentCallsCell: UITableViewCell {
         NSLayoutConstraint.activate([
             moreButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             moreButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            moreButton.widthAnchor.constraint(equalToConstant: 24),
-            moreButton.heightAnchor.constraint(equalToConstant: 24)
+            moreButton.widthAnchor.constraint(equalToConstant: 16),
+            moreButton.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
     

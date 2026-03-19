@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import RTCCommon
+import AtomicX
 
 protocol EmotionBoardViewDelegate: AnyObject {
     func emotionView(emotionBoardView: EmotionBoardView, didSelectEmotion emotion: Emotion, atIndex index: Int)

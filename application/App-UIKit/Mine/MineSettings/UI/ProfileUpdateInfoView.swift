@@ -7,7 +7,7 @@
 
 import UIKit
 import SnapKit
-import RTCCommon
+import AtomicX
 
 
 class ProfileUpdateInfoView: UIView {
@@ -30,13 +30,13 @@ class ProfileUpdateInfoView: UIView {
     
     private let intervalView:UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "E7ECF6")
+        view.backgroundColor = UIColor("E7ECF6")
         return view
     }()
     
     private let inputBackView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "F5F5F5")
+        view.backgroundColor = UIColor("F5F5F5")
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         return view
@@ -52,7 +52,7 @@ class ProfileUpdateInfoView: UIView {
     private let inputLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        label.textColor = UIColor(hex: "4E5461")
+        label.textColor = UIColor("4E5461")
         return label
     }()
     
@@ -60,14 +60,14 @@ class ProfileUpdateInfoView: UIView {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 12)
         label.text = ("EditAliasDesc").localized
-        label.textColor = UIColor(hex: "888888")
+        label.textColor = UIColor("888888")
         return label
     }()
     
     private let submitButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setBackgroundImage(UIColor(hex: "1C66E5")?.trans2Image(), for: .normal)
-        button.layer.shadowColor = UIColor(hex: "1C66E5")?.cgColor ?? UIColor.blue.cgColor
+        button.setBackgroundImage(UIColor("1C66E5").trans2Image(), for: .normal)
+        button.layer.shadowColor = UIColor("1C66E5").cgColor
         button.layer.cornerRadius = 8
         button.layer.masksToBounds = true
         button.setTitle(("OK").localized, for: .normal)
@@ -203,8 +203,8 @@ extension ProfileUpdateInfoView {
     @objc func show (in viewController: UIViewController) {
         self.frame = CGRect(x: 0,
                             y: 0,
-                            width: screenWidth,
-                            height: ScreenHeight)
+                            width: UIScreen.main.bounds.width,
+                            height: UIScreen.main.bounds.height)
         self.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
         viewController.view.window?.addSubview(self)
         viewController.view.window?.bringSubviewToFront(self)

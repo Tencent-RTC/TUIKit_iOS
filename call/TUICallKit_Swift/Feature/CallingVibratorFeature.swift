@@ -7,7 +7,7 @@
 
 import AudioToolbox
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 

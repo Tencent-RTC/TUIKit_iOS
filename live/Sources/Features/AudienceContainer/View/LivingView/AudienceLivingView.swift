@@ -7,7 +7,7 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import TUICore
 import UIKit
@@ -99,7 +99,12 @@ class AudienceLivingView: RTCBaseView {
         let button = NetworkInfoButton(liveId: manager.liveID)
         button.onNetWorkInfoButtonClicked = { [weak self] in
             guard let self = self, WindowUtils.isPortrait else { return }
-            routerManager.router(action: .present(AudienceRoute.netWorkInfo(netWorkInfoManager, isAudience: !manager.coGuestState.connected.isOnSeat())))
+            let panel = NetWorkInfoView(liveID: manager.liveID, manager: netWorkInfoManager, isAudience: !manager.coGuestState.connected.isOnSeat())
+            panel.onRequestDismissNetworkPanel = { [weak self] completion in
+                guard let self = self else { return }
+                routerManager.dismiss(completion: completion)
+            }
+            routerManager.present(view: panel)
         }
         return button
     }()
@@ -229,10 +234,10 @@ class AudienceLivingView: RTCBaseView {
             }
         } else {
             barrageDisplayView.snp.remakeConstraints { make in
-                make.leading.equalToSuperview().offset(12.scale375() + kDeviceSafeTopHeight)
-                make.bottom.equalTo(barrageSendView.snp.top).offset(-12.scale375Height())
+                make.leading.equalTo(safeAreaLayoutGuide).offset(12.scale375())
                 make.width.equalTo(305.scale375Width())
-                make.height.equalTo(212.scale375Height())
+                make.top.equalTo(snp.bottom).multipliedBy(0.45)
+                make.bottom.equalToSuperview().offset(-12.scale375Height())
             }
 
             liveInfoView.snp.remakeConstraints { make in
@@ -270,20 +275,7 @@ class AudienceLivingView: RTCBaseView {
                     make.leading.greaterThanOrEqualTo(liveInfoView.snp.trailing).offset(20.scale375())
                 }
             #endif
-
-            barrageSendView.snp.remakeConstraints { make in
-                make.leading.equalToSuperview().offset(12.scale375())
-                make.width.equalTo(124.scale375())
-                make.height.equalTo(40.scale375Height())
-                make.bottom.equalToSuperview().offset(-38.scale375Height())
-            }
-
-            bottomMenu.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview()
-                make.height.equalTo(36.scale375Height())
-                make.centerY.equalTo(barrageSendView)
-            }
-
+            
             floatView.snp.remakeConstraints { make in
                 make.top.equalTo(audienceListView.snp.bottom).offset(34.scale375Width())
                 make.height.width.equalTo(86.scale375())
@@ -304,6 +296,13 @@ class AudienceLivingView: RTCBaseView {
                 make.height.equalTo(40.scale375())
             }
         }
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let anchorY = barrageDisplayView.convert(CGPoint.zero, to: giftDisplayView).y
+        guard anchorY != giftDisplayView.giftBulletBottomAnchorY else { return }
+        giftDisplayView.updateBulletViewsLayout(bottomAnchorY: anchorY)
     }
 
     override func bindInteraction() {
@@ -330,6 +329,14 @@ class AudienceLivingView: RTCBaseView {
 
     func setGiftPureMode(_ isPureMode: Bool) {
         giftDisplayView.onPureModeSet(isPureMode: isPureMode)
+    }
+    
+    func startGiftObserving() {
+        giftDisplayView.startObserving()
+    }
+    
+    func stopGiftObserving() {
+        giftDisplayView.stopObserving()
     }
     
     private func updateRotateScreenButtonLayout() {
@@ -375,7 +382,7 @@ extension AudienceLivingView {
     }
 
     private func subscribeRoomState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
+        manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.roomVideoStreamIsLandscape))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] videoStreamIsLandscape in
@@ -394,7 +401,7 @@ extension AudienceLivingView {
     }
 
     private func subscribeMediaState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceMediaState.playbackQuality))
+        manager.subscribeState(StatePublisherSelector(keyPath: \AudienceMediaState.playbackQuality))
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] playbackQuality in
@@ -422,7 +429,7 @@ extension AudienceLivingView {
 
     private func subscribeNetWorkInfoSubject() {
         netWorkInfoManager
-            .subscribe(StateSelector(keyPath: \NetWorkInfoState.showToast))
+            .subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.showToast))
             .receive(on: RunLoop.main)
             .sink { [weak self] showToast in
                 guard let self = self else { return }
@@ -436,7 +443,7 @@ extension AudienceLivingView {
     }
 
     private func subscribeAudienceConfig() {
-        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StatePublisherSelector(keyPath:
             \AudienceContainerConfig.disableHeaderFloatWin))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -454,7 +461,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StatePublisherSelector(keyPath:
             \AudienceContainerConfig.disableHeaderLiveData))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -465,7 +472,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StatePublisherSelector(keyPath:
             \AudienceContainerConfig.disableHeaderVisitorCnt))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -476,7 +483,7 @@ extension AudienceLivingView {
             }
             .store(in: &cancellableSet)
 
-        AudienceStore.subscribeAudienceConfig(StateSelector(keyPath:
+        AudienceStore.subscribeAudienceConfig(StatePublisherSelector(keyPath:
             \AudienceContainerConfig.disableFooterCoGuest))
             .receive(on: RunLoop.main)
             .removeDuplicates()
@@ -549,7 +556,9 @@ extension AudienceLivingView: BarrageStreamViewDelegate {
 
     func onBarrageClicked(user: LiveUserInfo) {
         if user.userID == manager.loginState.loginUserInfo?.userID { return }
-        routerManager.router(action: .present(.userManagement(SeatInfo(userInfo: user), type: .userInfo)))
+        let seatInfo = SeatInfo(userInfo: user)
+        let panel = AudienceUserManagePanelView(user: seatInfo, manager: manager, routerManager: routerManager, coreView: coreView, type: .userInfo)
+        routerManager.present(view: panel)
     }
 }
 

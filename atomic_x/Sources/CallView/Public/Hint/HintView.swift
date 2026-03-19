@@ -27,7 +27,7 @@ class HintView: UIView {
     // MARK: Private
     private let callStatusLabel: UILabel = {
         let callStatusLabel = UILabel(frame: CGRect.zero)
-        callStatusLabel.textColor = UIColor(hex: "#FFFFFF")
+        callStatusLabel.textColor = UIColor("FFFFFF")
         callStatusLabel.font = UIFont.systemFont(ofSize: 15.0)
         callStatusLabel.backgroundColor = UIColor.clear
         callStatusLabel.textAlignment = .center

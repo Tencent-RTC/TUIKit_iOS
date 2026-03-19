@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import RTCCommon
 #if canImport(TXLiteAVSDK_TRTC)
     import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)
@@ -27,7 +26,7 @@ public class MusicSettingViewController: UIViewController {
     private let doneButton: UIButton = {
         let button = UIButton()
         button.setTitle(.doneText, for: .normal)
-        button.setTitleColor(.b1, for: .normal)
+        button.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         button.titleLabel?.font = UIFont(name: "PingFangSC-Semibold", size: 16)
         return button
     }()
@@ -35,8 +34,8 @@ public class MusicSettingViewController: UIViewController {
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.contentMode = .center
-        label.font = .customFont(ofSize: 16, weight: .medium)
-        label.textColor = .g7
+        label.font = ThemeStore.shared.typographyTokens.Medium16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         label.text = .MusicSettingTitle
         label.sizeToFit()
         return label
@@ -139,14 +138,14 @@ extension MusicSettingViewController {
             .receive(on: RunLoop.main)
             .sink { [weak self] errorMessage in
                 guard let self = self else { return }
-                self.view.showAtomicToast(text: errorMessage, style: .error)
+                self.view.showAtomicToast(text: errorMessage)
             }
             .store(in: &cancellables)
     }
 
     func setupViewStyle() {
         view.backgroundColor = .clear
-        contentView.backgroundColor = .g2
+        contentView.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
     }
 }
 
@@ -158,8 +157,8 @@ extension MusicSettingViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16)
-        label.textColor = .whiteColor
+        label.font = ThemeStore.shared.typographyTokens.Regular16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         label.textAlignment = .left
         label.text = titles[section]
         return label
@@ -234,12 +233,12 @@ extension MusicSettingViewController: UITableViewDataSource {
         cell.backgroundColor = .clear
         let layer = CAShapeLayer()
         layer.path = bezierPath.cgPath
-        layer.fillColor = UIColor.g3.withAlphaComponent(0.3).cgColor
+        layer.fillColor = ThemeStore.shared.colorTokens.bgColorEntryCard.withAlphaComponent(0.3).cgColor
         
         let lineLayer = CALayer()
         let lineHeight = 1.0
         lineLayer.frame = CGRect(x: 16.0, y: bounds.height - lineHeight, width: bounds.width - 32.0, height: lineHeight)
-        lineLayer.backgroundColor = UIColor.g6.withAlphaComponent(0.2).cgColor
+        lineLayer.backgroundColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.2).cgColor
         if indexPath.row != numberOfRows - 1 {
             layer.addSublayer(lineLayer)
         }
@@ -271,6 +270,6 @@ extension MusicSettingViewController: UIGestureRecognizerDelegate {
 }
 
 fileprivate extension String {
-    static let MusicSettingTitle: String = ("karaoke_setting_tune").localized
-    static let doneText: String = ("karaoke_setting_done").localized
+    static let MusicSettingTitle: String = ("karaoke_setting_tune").atomicLocalized
+    static let doneText: String = ("karaoke_setting_done").atomicLocalized
 }

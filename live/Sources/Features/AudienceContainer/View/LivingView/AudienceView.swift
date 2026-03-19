@@ -9,7 +9,6 @@ import AtomicX
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
 import RTCRoomEngine
 import TUICore
 
@@ -27,6 +26,7 @@ class AudienceView: RTCBaseView {
     private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private var cancellableSet: Set<AnyCancellable> = []
+    private let creator: AudienceRootMenuDataCreator
     
     // MARK: - property: view
 
@@ -88,6 +88,7 @@ class AudienceView: RTCBaseView {
         self.manager = manager
         self.routerManager = routerManager
         self.videoView = coreView
+        self.creator = AudienceRootMenuDataCreator(coreView: coreView, manager: manager, routerManager: routerManager)
         super.init(frame: .zero)
         videoView.setLiveID(roomId)
         videoView.videoViewDelegate = self
@@ -104,6 +105,11 @@ class AudienceView: RTCBaseView {
         LiveKitLog.info("\(#file)", "\(#line)", "deinit AudienceView \(self)")
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let view = super.hitTest(point, with: event)
+        return view == self ? nil : view
+    }
+
     override func constructViewHierarchy() {
         addSubview(coverBgView)
         addSubview(videoView)
@@ -155,31 +161,28 @@ class AudienceView: RTCBaseView {
                 make.bottom.equalToSuperview().inset(40.scale375())
                 make.width.height.equalTo(40.scale375())
             }
-            topGradientView.snp.remakeConstraints { make in
-                make.top.leading.trailing.equalToSuperview()
-                make.height.equalTo(142.scale375())
-            }
-            bottomGradientView.snp.remakeConstraints { make in
-                make.bottom.leading.trailing.equalToSuperview()
-                make.height.equalTo(246.scale375())
-            }
         }
     }
     
     override func bindInteraction() {
         subscribeOrientationChange()
-        subscribeRoomState()
-        subscribeMediaState()
-        subscribeEvent()
+        subscribeStates()
         setupSlideToClear()
         leaveButton.addTarget(self, action: #selector(leaveButtonClick), for: .touchUpInside)
         restoreClearButton.addTarget(self, action: #selector(restoreLivingView), for: .touchUpInside)
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        topGradientView.gradient(colors: [.g1.withAlphaComponent(0.3), .clear], isVertical: true)
-        bottomGradientView.gradient(colors: [.clear, .g1.withAlphaComponent(0.3)], isVertical: true)
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        topGradientView.gradient(colors: [
+            UIColor.g1.withAlphaComponent(0.3),
+            UIColor.clear
+        ], isVertical: true)
+        
+        bottomGradientView.gradient(colors: [
+            UIColor.clear,
+            UIColor.g1.withAlphaComponent(0.3)
+        ], isVertical: true)
     }
     
     func relayoutCoreView() {
@@ -192,7 +195,8 @@ class AudienceView: RTCBaseView {
     private func updateCoreViewLayout() {
         guard !manager.liveListState.currentLive.isEmpty,
               manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
-              WindowUtils.isPortrait
+              WindowUtils.isPortrait,
+              videoView.superview != nil
         else {
             videoView.snp.remakeConstraints { make in
                 make.edges.equalToSuperview()
@@ -216,7 +220,13 @@ extension AudienceView {
             object: nil
         )
     }
-
+    
+    private func subscribeStates() {
+        subscribeRoomState()
+        subscribeMediaState()
+        subscribeEvent()
+    }
+    
     private func subscribeRoomState() {
         manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
             .removeDuplicates()
@@ -228,6 +238,7 @@ extension AudienceView {
                     routeToAudienceView()
                     return
                 }
+                guard currentLive.liveID == manager.liveID else { return }
                 updateCoreViewLayout()
                 if !currentLive.backgroundURL.isEmpty {
                     coverBgView.kf.setImage(with: URL(string: currentLive.backgroundURL), placeholder: internalImage("live_edit_info_default_cover_image"))
@@ -365,7 +376,7 @@ extension AudienceView {
     }
     
     private func routeToAudienceView() {
-        routerManager.router(action: .routeTo(.audience))
+        routerManager.router(action: .dismiss())
     }
         
     private func onKickedByAdmin() {
@@ -380,13 +391,15 @@ extension AudienceView {
     
     @objc func handleOrientationChange() {
         activateConstraints()
+        topGradientView.isHidden = !WindowUtils.isPortrait
+        bottomGradientView.isHidden = !WindowUtils.isPortrait
     }
     
     @objc func leaveButtonClick() {
         rotateScreenDelegate?.rotateScreen(isPortrait: true)
 
         if !manager.coGuestState.connected.isOnSeat() {
-            leaveRoom()
+            leaveRoom(exitController: true)
             return
         }
         var items: [AlertButtonConfig] = []
@@ -410,7 +423,7 @@ extension AudienceView {
         let endLiveItem = AlertButtonConfig(text: .confirmCloseText, type: .primary) { [weak self] _ in
             guard let self = self else { return }
             routerManager.dismiss()
-            leaveRoom()
+            leaveRoom(exitController: true)
         }
         items.append(endLiveItem)
         
@@ -424,10 +437,13 @@ extension AudienceView {
         routerManager.present(view: alertView)
     }
     
-    func leaveRoom() {
-        videoView.stopPreviewLiveStream(roomId: roomId)
+    func leaveRoom(exitController: Bool = false) {
         manager.liveListStore.leaveLive(completion: nil)
-        routerManager.router(action: .exit)
+        cancellableSet.removeAll()
+        if exitController {
+            videoView.stopPreviewLiveStream(roomId: roomId)
+            routerManager.router(action: .exit)
+        }
         TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
                             subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
                             object: nil,
@@ -518,6 +534,7 @@ extension AudienceView {
                 bigImage: internalImage(imageName) ?? UIImage(),
                 smallImage: internalImage("live_muteImage_small") ?? UIImage()
             )
+        subscribeStates()
         LiveListStore.shared.joinLive(liveID: roomId) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -543,9 +560,9 @@ extension AudienceView: VideoViewDelegate {
         switch viewLayer {
         case .foreground:
             if !seatInfo.userInfo.userID.isEmpty {
-                return AudienceCoGuestView(seatInfo: seatInfo, manager: manager, routerManager: routerManager)
+                return AudienceCoGuestView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
             }
-            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView, menuCreator: creator)
         case .background:
             if !seatInfo.userInfo.userID.isEmpty {
                 return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)
@@ -560,7 +577,7 @@ extension AudienceView: VideoViewDelegate {
             if !seatInfo.userInfo.userID.isEmpty {
                 return AudienceCoHostView(seatInfo: seatInfo, manager: manager)
             }
-            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView)
+            return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: videoView, menuCreator: creator)
         case .background:
             if !seatInfo.userInfo.userID.isEmpty {
                 return AudienceBackgroundWidgetView(avatarUrl: seatInfo.userInfo.avatarURL)

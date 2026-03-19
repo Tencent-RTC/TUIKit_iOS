@@ -3437,31 +3437,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "On Seat List (xxx)"
+            "value": "Connected (xxx)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "麦上列表 (xxx)"
+            "value": "已连线（xxx）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "麥上列表 (xxx)"
+            "value": "已連線（xxx）"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "MAIリスト（xxx）"
+            "value": "接続済み（xxx）"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "قائمة المقاعد (xxx)"
+            "value": "متصل (xxx)"
           }
         }
       }
@@ -7662,6 +7662,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "مستوى صوت الصوت"
+          }
+        }
+      }
+    },
+    "common_accept": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accept"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同意する"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قبول"
           }
         }
       }
@@ -13546,6 +13581,41 @@
         }
       }
     },
+    "seat_in_connection": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Connection"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在连线"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在連線"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接続中"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قيد الاتصال"
+          }
+        }
+      }
+    },
     "seat_cancel_invite": {
       "extractionState": "manual",
       "localizations": {
@@ -14172,6 +14242,111 @@
           "stringUnit": {
             "state": "translated",
             "value": "لا يمكن الاتصال عندما تكون المقاعد الأربعة الخلفية مشغولة"
+          }
+        }
+      }
+    },
+    "common_game_live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game Live"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手游直播"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手遊直播"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマホゲーム実況"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث مباشر للألعاب"
+          }
+        }
+      }
+    },
+    "common_live_game": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Game"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在游戏直播中"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遊戲直播中"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゲームライブ配信中"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث مباشر للعبة"
+          }
+        }
+      }
+    },
+    "common_gift_combo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Combo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连击"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連擊"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンボ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متتالي"
           }
         }
       }

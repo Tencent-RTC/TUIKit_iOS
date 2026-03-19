@@ -8,6 +8,7 @@ MajorVersion=${MajorVersion-0}
 MinorVersion=${MinorVersion-0}
 FixVersion=${FixVersion-0}
 BuildNo=${BuildNo-0}
+AtomicXCoreZipName=${AtomicXCoreZipName:-AtomicXCore.zip}
 
 ######################## 1、变量赋值 ########################
 export SDK_VERSION=${MajorVersion}.${MinorVersion}.${BuildNo}
@@ -138,6 +139,18 @@ function modifyRTCRoomEnginePaths() {
         # 如果存在排除规则，将其注释掉
         sed -i "" "s/^[[:space:]]*'src\/platform_adapter\/oc\/call\/\*\.{h,mm,cc}',/            # 'src\/platform_adapter\/oc\/call\/*.{h,mm,cc}', # 注释掉以解决 TUICallEngine 链接问题/" "${podspec_path}"
         
+        # 7. Add CoreTelephony framework dependency
+        if ! grep -q "CoreTelephony" "${podspec_path}"; then
+            echo "Adding CoreTelephony framework..."
+            if grep -q "spec.frameworks" "${podspec_path}"; then
+                # frameworks already exists, append CoreTelephony
+                sed -i "" "s/spec.frameworks.*=.*'/spec.frameworks = 'CoreTelephony', '/g" "${podspec_path}"
+            else
+                # no frameworks, add after requires_arc
+                awk '/spec.requires_arc/ { print; print "  spec.frameworks = '\''CoreTelephony'\''"; next } { print }' "${podspec_path}" > "${podspec_path}.tmp" && mv "${podspec_path}.tmp" "${podspec_path}"
+            fi
+        fi
+
         echo "RTCRoomEngine.podspec modifications completed:"
         echo "  ✓ Cloud paths configured"
         echo "  ✓ Module name added"
@@ -184,10 +197,15 @@ function setupAtomicXCore() {
     mkdir -p ${ATOMICX_TEMP_DIR}
     
     # 使用 curl 下载 AtomicXCore.zip
-    echo "Downloading AtomicXCore.zip from bkrepo..."
-    ATOMICX_ZIP_PATH="${ATOMICX_TEMP_DIR}/AtomicXCore.zip"
+    echo "Downloading ${AtomicXCoreZipName} from bkrepo..."
+    ATOMICX_ZIP_PATH="${ATOMICX_TEMP_DIR}/${AtomicXCoreZipName}"
     
-    curl -L --user yiliangwang:920dbf8df42f87226887636c2510416e "https://bkrepo.woa.com/generic/timsdk-ios/custom/atomicxcore_iOS/AtomicXCore.zip" -o "${ATOMICX_ZIP_PATH}"
+    curl -L --user yiliangwang:920dbf8df42f87226887636c2510416e "https://bkrepo.woa.com/generic/timsdk-ios/custom/atomicxcore_iOS/${AtomicXCoreZipName}" -o "${ATOMICX_ZIP_PATH}"
+
+    # echo "Downloading AtomicXCore.zip from bkrepo..."
+    # ATOMICX_ZIP_PATH="${ATOMICX_TEMP_DIR}/AtomicXCore.zip"
+    
+    # curl -L --user yiliangwang:920dbf8df42f87226887636c2510416e "https://bkrepo.woa.com/generic/timsdk-ios/custom/atomicxcore_iOS/AtomicXCore.zip" -o "${ATOMICX_ZIP_PATH}"
     
     if [[ $? -ne 0 ]] || [[ ! -f "${ATOMICX_ZIP_PATH}" ]]; then
         echo "Error: Failed to download AtomicXCore.zip"

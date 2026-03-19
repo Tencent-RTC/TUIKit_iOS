@@ -13,7 +13,6 @@ import TXLiteAVSDK_Professional
 #endif
 import RTCRoomEngine
 import Combine
-import RTCCommon
 import TUICore
 import AtomicXCore
 
@@ -23,7 +22,11 @@ public class KaraokeManager: NSObject {
     let kickedOutSubject = PassthroughSubject<Void, Never>()
     public let errorSubject = PassthroughSubject<String, Never>()
     var karaokeState: KaraokeState { state.state }
-
+    var userName: String {
+        return TUIRoomEngine.getSelfInfo().userName.isEmpty
+            ? TUIRoomEngine.getSelfInfo().userId
+            : TUIRoomEngine.getSelfInfo().userName
+    }
     private let roomId: String
     private let trtcCloud = TRTCCloud.sharedInstance()
     private let roomEngine = TUIRoomEngine.sharedInstance()
@@ -61,7 +64,7 @@ public class KaraokeManager: NSObject {
         super.init()
         
         setupObservers()
-        setupAudioEffect()
+        setAudioEffect()
         loadMusicCatalog()
 
         getWaitingList(cursor: "")
@@ -76,10 +79,6 @@ public class KaraokeManager: NSObject {
     private func setupObservers() {
         roomEngine.addObserver(self)
         trtcCloud.setAudioFrameDelegate(self)
-    }
-    
-    private func setupAudioEffect() {
-        setAudioEffect()
     }
     
     private func loadMusicCatalog() {
@@ -102,7 +101,8 @@ public class KaraokeManager: NSObject {
     func setChorusRole(chorusRole: TXChorusRole) {
         let bgmParams = createBGMParams()
         chorusMusicPlayer.setChorusRole(chorusRole, trtcParamsForPlayer: bgmParams)
-        
+        setAudioEffect()
+
         state.update { state in
             state.chorusRole = chorusRole
         }
@@ -151,6 +151,7 @@ public class KaraokeManager: NSObject {
                 )
             },
             onFailure: { [weak self] code, desc in
+                self?.isLoadingMusic = false
                 self?.errorSubject.send(.loadFailedText)
             }
         ))
@@ -420,6 +421,13 @@ public class KaraokeManager: NSObject {
     // MARK: - Score & Metadata Management
     
     func enableScore(enable: Bool) {
+        if karaokeState.chorusRole == .backSinger {
+            state.update { state in
+                state.enableScore = enable
+            }
+            return
+        }
+        
         guard let data = try? JSONEncoder().encode(enable),
               let jsonString = String(data: data, encoding: .utf8) else {
             return
@@ -530,6 +538,9 @@ public class KaraokeManager: NSObject {
               let isEnabled = try? JSONDecoder().decode(Bool.self, from: data) else {
             return
         }
+        if karaokeState.chorusRole == .backSinger {
+            return
+        }
         
         state.update { state in
             state.enableScore = isEnabled
@@ -548,7 +559,7 @@ public class KaraokeManager: NSObject {
         }
     }
 
-    func subscribe<Value>(_ selector: StateSelector<KaraokeState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribe<Value>(_ selector: StatePublisherSelector<KaraokeState, Value>) -> AnyPublisher<Value, Never> {
         return state.subscribe(selector)
     }
 }
@@ -579,7 +590,7 @@ extension KaraokeManager {
                 "configs": [
                     [
                         "key": "Liteav.Audio.common.smart.3a.strategy.flag",
-                        "value": "16",
+                        "value": "32",
                         "default": "1"
                     ]
                 ]
@@ -640,6 +651,8 @@ extension KaraokeManager {
            let jsonString = String(data: jsonData, encoding: .utf8) {
             trtcCloud.callExperimentalAPI(jsonString)
         }
+        trtcCloud.setSystemVolumeType(.media)
+        trtcCloud.setAudioQuality(.music)
     }
 
     func setReverb(enable: Bool) {
@@ -754,6 +767,18 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
 
         isLoadingMusic = false
 
+        if !isLocalMusic && (lyricList.isEmpty || pitchList.isEmpty) {
+            eraseMusic(musicId: musicId)
+            state.update { state in
+                state.currentMusicId = ""
+                state.currentMusicTotalDuration = 0
+                state.currentLyricList = []
+                state.currentPitchList = []
+            }
+            errorSubject.send(.loadFailedText)
+            return
+        }
+
         start()
         state.update { state in
             state.currentMusicId = musicId
@@ -770,6 +795,10 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
     }
 
     public func onChorusRequireLoadMusic(_ musicId: String) {
+        guard karaokeState.selectedSongs.contains(where: { $0.songId == musicId }) else {
+            isLoadingMusic = false
+            return
+        }
         releaseScorePanelTimer()
         isLoadingMusic = true
 
@@ -788,6 +817,7 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
     }
 
     public func onMusicProgressUpdated(_ progressMs: Int64, durationMs: Int64) {
+        guard karaokeState.playbackState != .stop else { return }
         state.update { state in
             state.playProgress = TimeInterval(progressMs) / 1000.0
             state.currentMusicTotalDuration = TimeInterval(durationMs) / 1000.0
@@ -800,6 +830,7 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
     }
 
     public func onChorusError(_ errCode: TXChorusError, errMsg: String) {
+        isLoadingMusic = false
         if errCode == TXChorusError.musicLoadFailed {
             state.update { state in
                 if !state.selectedSongs.isEmpty { self.eraseMusic(musicId: state.selectedSongs.first?.songId ?? "")}
@@ -823,6 +854,7 @@ extension KaraokeManager: ITXChorusPlayerDelegate {
     }
 
     public func onChorusStopped() {
+        isLoadingMusic = false
         if self.karaokeState.chorusRole == .leadSinger {
             setReverb(enable: false)
         }
@@ -957,6 +989,9 @@ extension KaraokeManager: TRTCAudioFrameDelegate {
         guard let extraData = frame.extraData else {
             return
         }
+        if karaokeState.chorusRole == .backSinger {
+            return
+        }
 
         do {
             let dataMap = try JSONSerialization.jsonObject(with: extraData) as? [String: Any]
@@ -1009,7 +1044,8 @@ extension KaraokeManager: TRTCAudioFrameDelegate {
 
 // MARK: - String Localization
 fileprivate extension String {
-    static let loadFailedText = ("karaoke_music_loading_error").localized
-    static let trackSwitchNotSupportedText = ("karaoke_cant_switch_tracks").localized
-    static let freqLimitText = ("common_client_error_freq_limit").localized}
+    static let loadFailedText = ("karaoke_music_loading_error").atomicLocalized
+    static let trackSwitchNotSupportedText = ("karaoke_cant_switch_tracks").atomicLocalized
+    static let freqLimitText = ("common_client_error_freq_limit").atomicLocalized
+}
 

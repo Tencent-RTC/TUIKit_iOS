@@ -5,6 +5,22 @@
 //  Created by yukiwwwang on 2025/8/20.
 //
 
+//  Description:
+//  This extension provides utility methods for String manipulation and conversion.
+//
+//  Features:
+//  1. addIntervalSpace: Inserts a separator string at regular intervals
+//     - Useful for formatting phone numbers, card numbers, ID numbers, etc.
+//     - Example: "13812345678".addIntervalSpace(intervalStr: " ", interval: 3)
+//       → "138 123 456 78"
+//
+//  2. convertToDic: Converts a JSON string to a Dictionary
+//     - Parses JSON formatted strings into [String: Any] dictionaries
+//     - Returns nil if parsing fails
+//     - Example: "{\"name\":\"John\"}".convertToDic()
+//       → ["name": "John"]
+//
+
 import Foundation
 
 extension String {

@@ -6,7 +6,6 @@
 //
 
 import SnapKit
-import RTCCommon
 import AtomicX
 
 class TemplateSelectionView: UIView {
@@ -26,7 +25,7 @@ class TemplateSelectionView: UIView {
         
         super.init(frame: frame)
         
-        backgroundColor = UIColor(hex: "#1F2024")
+        backgroundColor = UIColor("1F2024")
         layer.cornerRadius = 16
         clipsToBounds = true
         
@@ -90,8 +89,8 @@ class TemplateSelectionView: UIView {
     
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: (ScreenWidth - margin * 2) * 0.5 - margin, height: 56)
-        layout.headerReferenceSize = CGSize(width: ScreenWidth, height: 20 + 12)
+        layout.itemSize = CGSize(width: (UIScreen.main.bounds.width - margin * 2) * 0.5 - margin, height: 56)
+        layout.headerReferenceSize = CGSize(width: UIScreen.main.bounds.width, height: 20 + 12)
         layout.minimumInteritemSpacing = margin
         layout.minimumLineSpacing = margin
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -164,7 +163,7 @@ extension TemplateSelectionView: UICollectionViewDataSource, UICollectionViewDel
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        dataSource[section] == .seat ? .zero : CGSize(width: ScreenWidth, height: 25)
+        dataSource[section] == .seat ? .zero : CGSize(width: UIScreen.main.bounds.width, height: 25)
     }
 }
 
@@ -191,11 +190,11 @@ class TemplateSelectionViewCell: UICollectionViewCell {
     var isSelectMode: Bool = false {
         didSet {
             if isSelectMode {
-                bgView.backgroundColor = UIColor(hex: "#243047")
+                bgView.backgroundColor = UIColor("243047")
                 bgView.layer.borderWidth = 2
-                bgView.layer.borderColor = UIColor(hex: "#2B6AD6")?.cgColor
+                bgView.layer.borderColor = UIColor("2B6AD6").cgColor
             } else {
-                bgView.backgroundColor = UIColor(hex: "#2B2C30")
+                bgView.backgroundColor = UIColor("2B2C30")
                 bgView.layer.borderWidth = 0
             }
         }
@@ -222,7 +221,7 @@ class TemplateSelectionViewCell: UICollectionViewCell {
     
     private lazy var bgView: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "#2B2C30")
+        view.backgroundColor = UIColor("2B2C30")
         view.layer.cornerRadius = 8
         view.clipsToBounds = true
         return view

@@ -8,7 +8,7 @@
 import AtomicXCore
 import Combine
 import Foundation
-import RTCCommon
+import AtomicX
 import TUICore
 import RTCRoomEngine
 
@@ -69,13 +69,6 @@ extension AudienceMediaStore {
         service.enableGravitySensor(enable: true)
     }
     
-    func updateVideoQuality(quality: VideoQuality) {
-        service.updateVideoQuality(quality)
-        update { state in
-            state.videoQuality = quality
-        }
-    }
-    
     private func onJoinLive(liveInfo: LiveInfo) {
         getMultiPlaybackQuality(roomId: liveInfo.liveID)
     }
@@ -86,7 +79,7 @@ extension AudienceMediaStore {
         }
     }
     
-    func subscribeState<Value>(_ selector: StateSelector<AudienceMediaState, Value>) -> AnyPublisher<Value, Never> {
+    func subscribeState<Value>(_ selector: StatePublisherSelector<AudienceMediaState, Value>) -> AnyPublisher<Value, Never> {
         return observerState.subscribe(selector)
     }
 }

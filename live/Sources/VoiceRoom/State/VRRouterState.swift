@@ -8,7 +8,6 @@
 import Foundation
 import AtomicXCore
 import RTCRoomEngine
-import RTCCommon
 import AtomicX
 
 enum VRDismissType {
@@ -17,130 +16,16 @@ enum VRDismissType {
 }
 
 enum VRRouterAction {
-    case routeTo(_ route: VRRoute)
-    case present(_ route: VRRoute)
+    case routeTo(_ route: RouteItem)
+    case present(_ route: RouteItem)
     case dismiss(_ type: VRDismissType = .panel, completion: (() -> Void)? = nil)
     case exit
 }
 
-enum VRRoute {
-    case anchor
-    case audience
-    case roomInfo
-    case recentViewer
-    case voiceLinkControl
-    case linkInviteControl(_ index: Int)
-    case userControl(_ imStore: VoiceRoomIMStore, _ user: TUISeatInfo)
-    case featureSetting(_ settingModel: VRFeatureClickPanelModel)
-    case audioEffect
-    case giftView
-    case systemImageSelection(_ imageType: VRImageType, _ sceneType: VRImageSelectionPanel.SceneType)
-    case prepareSetting(_ prepareStore: VoiceRoomPrepareStore)
-    case alert(info: VRAlertInfo,_ second: Int = 0)
-    case layout(_ prepareStore: VoiceRoomPrepareStore)
-    case connectionControl
-    case coHostUserControl(_ seatInfo: SeatInfo,_ type: CoHostViewManagerPanelType)
-    case custom(_ item: RouteItem)
-}
-
-extension VRRoute: Equatable {
-    static func == (lhs: VRRoute, rhs: VRRoute) -> Bool {
-        switch (lhs, rhs) {
-            case (.anchor,.anchor),
-                (.audience,.audience),
-                (.roomInfo,.roomInfo),
-                (.recentViewer,.recentViewer),
-                (.voiceLinkControl,.voiceLinkControl),
-                (.audioEffect,.audioEffect),
-                (.giftView, .giftView),
-                (.prepareSetting, .prepareSetting),
-                (.layout, .layout),
-                (.connectionControl, .connectionControl):
-                return true
-            case let (.featureSetting(l), .featureSetting(r)):
-                return l == r
-            case let (.systemImageSelection(l1, l2), .systemImageSelection(r1, r2)):
-                return l1 == r1 && l2 == r2
-            case let (.linkInviteControl(l), .linkInviteControl(r)):
-                return l == r
-            case let (.userControl(l1,l2), .userControl(r1,r2)):
-                return l1 == r1 && l2 == r2
-            case let (.coHostUserControl(l1,l2), .coHostUserControl(r1,r2)):
-                return l1 == r1 && l2 == r2
-            case let (.alert(l1,l2), .alert(r1, r2)):
-                return l1 == r1 && l2 == r2
-            case let (.custom(l), .custom(r)):
-                return l == r
-            case (.anchor, _),
-                (.audience, _),
-                (.roomInfo, _),
-                (.recentViewer, _),
-                (.voiceLinkControl, _),
-                (.linkInviteControl, _),
-                (.userControl, _),
-                (.featureSetting, _),
-                (.audioEffect, _),
-                (.giftView, _),
-                (.systemImageSelection, _),
-                (.prepareSetting, _),
-                (.alert, _),
-                (.layout,_),
-                (.coHostUserControl,_),
-                (.connectionControl,_),
-                (.custom, _):
-                return false
-            default:
-                break
-        }
-    }
-}
-
-extension VRRoute: Hashable {
-    func convertToString() -> String {
-        switch self {
-            case .anchor:
-                return "anchor"
-            case .audience:
-                return "audience"
-            case .roomInfo:
-                return "roomInfo"
-            case .recentViewer:
-                return "recentViewer"
-            case .voiceLinkControl:
-                return "voiceLinkControl"
-            case .linkInviteControl(let index):
-                return "linkInviteControl \(index)"
-            case .userControl(let imStore, let seatInfo):
-                return "linkInviteControl \(seatInfo.userId ?? "")"
-            case .featureSetting(let settingModel):
-                return "featureSetting" + settingModel.id.uuidString
-            case .audioEffect:
-                return "audioEffect"
-            case .giftView:
-                return "giftView"
-            case .systemImageSelection(let imageType, let sceneType):
-                return "systemImageSelection \(imageType.rawValue) \(sceneType)"
-            case .prepareSetting:
-                return "prepareSetting"
-            case .alert(let alertInfo,_):
-                return "alert \(alertInfo.description)"
-            case .layout:
-                return "VoiceRoomlayout"
-            case .connectionControl:
-                return "connectionControl"
-            case .coHostUserControl(let seatInfo,_):
-                return "coHostUserControl \(seatInfo.userInfo.userID)"
-            case let .custom(item):
-                return "custom_\(item.id)"
-        }
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(self.convertToString())
-    }
-}
+typealias VRRoute = RouteItem
 
 struct VRRouterState {
-    var routeStack: [VRRoute] = []
+    var routeStack: [RouteItem] = []
     var dismissEvent: (() -> Void)?
+    var shouldExit: Bool = false
 }

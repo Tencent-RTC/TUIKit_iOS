@@ -118,6 +118,7 @@ struct LoginPage: View {
             .padding(.horizontal, 32)
             Spacer()
         }
+        .background(themeState.colors.bgColorOperate.ignoresSafeArea())
     }
 
     private func login() {

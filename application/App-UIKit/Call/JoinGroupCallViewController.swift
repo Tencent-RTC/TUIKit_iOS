@@ -20,7 +20,7 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
     private var isIntRoom = true
     private let line1View: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "EEEEEE")
+        view.backgroundColor = UIColor("EEEEEE")
         return view
     }()
     
@@ -40,7 +40,7 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.clear
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string: SettingsConfig.share.is1VN ? "请输入 CallID" : ("InputGroupId").localized)
         textField.textAlignment = .right
         textField.keyboardType = .asciiCapable
@@ -67,7 +67,7 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
         let textField = UITextField(frame: .zero)
         textField.backgroundColor = UIColor.clear
         textField.font = UIFont(name: "PingFangSC-Regular", size: 16)
-        textField.textColor = UIColor(hex: "333333")
+        textField.textColor = UIColor("333333")
         textField.attributedPlaceholder = NSAttributedString(string: ("InputRoomId").localized)
         textField.textAlignment = .right
         return textField
@@ -77,7 +77,7 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
     
     private let line2View: UIView = {
         let view = UIView(frame: .zero)
-        view.backgroundColor = UIColor(hex: "EEEEEE")
+        view.backgroundColor = UIColor("EEEEEE")
         return view
     }()
     
@@ -115,9 +115,9 @@ class JoinGroupCallViewController: UIViewController, UITextFieldDelegate {
         btn.setTitleColor(.white, for: .normal)
         btn.setTitle(("Call").localized, for: .normal)
         btn.adjustsImageWhenHighlighted = false
-        btn.setBackgroundImage(UIColor(hex: "006EFF")?.trans2Image(), for: .normal)
+        btn.setBackgroundImage(UIColor("006EFF").trans2Image(), for: .normal)
         btn.titleLabel?.font = UIFont(name: "PingFangSC-Medium", size: 20)
-        btn.layer.shadowColor = UIColor(hex: "006EFF")?.cgColor ?? UIColor.blue.cgColor
+        btn.layer.shadowColor = UIColor("006EFF").cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
         btn.layer.shadowRadius = 16
         btn.layer.shadowOpacity = 0.4

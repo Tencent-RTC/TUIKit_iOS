@@ -8,7 +8,7 @@
 import UIKit
 import ImSDK_Plus
 import TUICore
-import RTCCommon
+import AtomicX
 import TUICallKit_Swift
 import SensorsAnalyticsSDK
 import Kingfisher
@@ -79,6 +79,15 @@ class MainViewController: UIViewController {
                                   self.gotoRoomView()
                                   self.trackSensorData("conference")
                               }),
+//            MainMenuItemModel(imageName: "debug",
+//                              title: "性能测试",
+//                              content: "SVGA vs PAG 性能对比",
+//                              gradientColors: mainMenuItemColors,
+//                              selectHandle: { [weak self] in
+//                                  guard let self = self else { return }
+//                                  self.gotoPerformanceTest()
+//                                  self.trackSensorData("performance_test")
+//                              }),
         ]
     }
     
@@ -134,7 +143,6 @@ extension MainViewController {
 extension MainViewController {
     
     func gotoCallView() {
-        observerTUI(type: 1303)
         let enterCallVC = CallViewController()
         enterCallVC.title = "call".localized
         enterCallVC.hidesBottomBarWhenPushed = true
@@ -142,33 +150,22 @@ extension MainViewController {
     }
     
     func gotoLiveView() {
-        observerTUI(type: 1119)
         let enterLiveVC = LiveViewController()
         navigationController?.pushViewController(enterLiveVC, animated: true)
     }
     
     func gotoRoomView() {
-        observerTUI(type: 1205)
         let roomHomeViewController = RoomHomeViewController()
         self.navigationController?.pushViewController(roomHomeViewController, animated: true)
     }
     
-    private func observerTUI(type: Int64) {
-        let dictParam: [String: Any] = [
-            "UIComponentType": type
-        ]
-        guard let dataParam = try? JSONSerialization.data(withJSONObject: dictParam, options: []),
-              let strParam = String(data: dataParam, encoding: .utf8)
-        else {
-            return
-        }
-        V2TIMManager.sharedInstance().callExperimentalAPI(
-            api: "reportTUIFeatureUsage",
-            param: strParam as NSObject,
-            succ: { _ in },
-            fail: { _, _ in }
-        )
-    }
+//    func gotoPerformanceTest() {
+//        let testVC = AnimationPerformanceTestVC()
+//        testVC.title = "动画性能测试"
+//        testVC.hidesBottomBarWhenPushed = true
+//        navigationController?.pushViewController(testVC, animated: true)
+//    }
+    
 }
 
 extension MainViewController {

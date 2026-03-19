@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import RTCCommon
 import AtomicX
 
 class AnchorSettingPanel: UIView {
@@ -93,7 +92,7 @@ private extension AnchorSettingPanel {
 
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(20.scale375Height())
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.leading.trailing.equalToSuperview()
         }
     }

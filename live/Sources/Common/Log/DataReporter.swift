@@ -9,15 +9,10 @@ import Foundation
 import RTCRoomEngine
 
 public class DataReporter {
-    
-    public enum ComponentType: Int {
-        case liveRoom = 21
-        case voiceRoom = 22
-    }
-    
     private static let framework: Int = 1
     private static let language: Int = 3
-    public static var componentType: ComponentType = .liveRoom
+    public static var componentType: Constants.ComponentType = .liveRoom
+    
     static func reportFramework() {
         let apiParams: [String : Any] = [
             "api": "setFramework",
@@ -38,6 +33,10 @@ public class DataReporter {
             ],
         ]
         callExperimentalAPI(params: apiParams)
+    }
+    
+    static func reportEventData(event: Constants.DataReport.SGMetricsEvent) {
+        reportEventData(eventKey: event.rawValue)
     }
     
     private static func callExperimentalAPI(params: [String : Any]) {

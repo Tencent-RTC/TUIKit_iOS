@@ -10,7 +10,7 @@ import UIKit
 import RTCRoomEngine
 import ImSDK_Plus
 import TUICore
-import RTCCommon
+import AtomicX
 import Combine
 import AtomicXCore
 
@@ -161,10 +161,15 @@ class RecentCallsCellViewModel: ObservableObject {
     }
     
     private func configTime(_ callInfo: CallInfo) {
-        let beginTime: TimeInterval = callInfo.startTime
+        var beginTime: TimeInterval = callInfo.startTime
         if beginTime <= 0 {
             return
         }
+        
+        if beginTime > 10_000_000_000 {
+            beginTime = beginTime / 1000
+        }
+        
         timeLabelStr = TUITool.convertDate(toStr: Date(timeIntervalSince1970: beginTime))
     }
     

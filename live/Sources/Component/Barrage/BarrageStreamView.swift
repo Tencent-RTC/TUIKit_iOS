@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 import RTCRoomEngine
 import Combine
 import AtomicXCore
@@ -95,6 +95,11 @@ public class BarrageStreamView: UIView {
         return dataSource.count
     }
     
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        updateContentInset()
+    }
+
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let view = super.hitTest(point, with: event)
         if view == self || view == barrageTableView {

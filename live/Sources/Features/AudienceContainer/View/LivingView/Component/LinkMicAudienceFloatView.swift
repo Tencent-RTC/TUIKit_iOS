@@ -7,9 +7,8 @@
 
 import AtomicXCore
 import Combine
-import RTCCommon
-import TUICore
 import AtomicX
+import TUICore
 
 class AudienceUserImageCell: UICollectionViewCell {
     var user: UserProfile? {
@@ -70,7 +69,7 @@ class LinkMicAudienceFloatView: UIView {
     }
 
     private func subscribeViewState() {
-        manager.subscribeState(StateSelector(keyPath: \AudienceState.isApplying))
+        manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.isApplying))
             .receive(on: RunLoop.main)
             .sink { [weak self] isApplying in
                 guard let self = self else { return }
@@ -236,13 +235,13 @@ extension LinkMicAudienceFloatView {
                     routerManager.router(action: .dismiss())
                 },
                 AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
-                    guard let self = self else { return }
-                    routerManager.router(action: .dismiss())
-                }
-            ]
-        )
-        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
-    }
+                guard let self = self else { return }
+                routerManager.router(action: .dismiss())
+            }
+        ]
+    )
+    routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
+}
 }
 
 private extension String {

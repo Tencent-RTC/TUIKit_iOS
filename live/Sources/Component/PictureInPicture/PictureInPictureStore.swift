@@ -8,7 +8,7 @@
 import AtomicXCore
 import Combine
 import RTCRoomEngine
-import RTCCommon
+import AtomicX
 
 class PictureInPictureStore {
     static let shared = PictureInPictureStore()

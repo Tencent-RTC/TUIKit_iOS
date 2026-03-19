@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import RTCCommon
+import AtomicX
 
 class FileModel {
     var fileName: String
@@ -56,7 +56,7 @@ public class LogUploadManager: NSObject {
     
     private lazy var logUploadView: LogUploadView = {
         let uploadView = LogUploadView()
-        uploadView.frame = CGRect(x: 0, y: 0, width: ScreenWidth, height: screenHeight)
+        uploadView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         uploadView.delegate = self
         uploadView.dataSource = self
         uploadView.isHidden = true

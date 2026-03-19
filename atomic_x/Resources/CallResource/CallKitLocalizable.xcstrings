@@ -358,6 +358,142 @@
         }
       }
     },
+    "SmartCellular.cellularGood" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cellular network is good"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "蜂窝网络良好"
+          }
+        }
+      }
+    },
+    "SmartCellular.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current WiFi network is unstable, switch to cellular data to improve call quality.\\n(Data charges may apply, depending on your plan)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前 WiFi 网络不稳定，切换至蜂窝数据改善通话质量。\\n(可能产生流量费用，具体取决于您的套餐)"
+          }
+        }
+      }
+    },
+    "SmartCellular.improve" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Improve call quality"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改善通话质量"
+          }
+        }
+      }
+    },
+    "SmartCellular.keepWifi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep using WiFi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "继续使用 WiFi"
+          }
+        }
+      }
+    },
+    "SmartCellular.SwitchedToCellular" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network switched to cellular data"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网络已切换至蜂窝数据"
+          }
+        }
+      }
+    },
+    "SmartCellular.SwitchedToWiFi" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network switched to WiFi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网络已切换至 WiFi"
+          }
+        }
+      }
+    },
+    "SmartCellular.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Improve call quality?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "改善通话质量?"
+          }
+        }
+      }
+    },
+    "SmartCellular.wifiPoor" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi network is poor"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "WiFi 网络较差"
+          }
+        }
+      }
+    },
     "speakerPhone" : {
       "extractionState" : "manual",
       "localizations" : {

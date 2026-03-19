@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import RTCCommon
+import AtomicX
 import AtomicXCore
 
 class AudienceListPanelView: UIView {
@@ -115,9 +115,10 @@ extension AudienceListPanelView {
         }
         
         userListTableView.snp.remakeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.top.equalTo(backButton.snp.bottom).offset(32)
-            make.height.equalTo(screenHeight * 2 / 3)
+            make.height.equalTo(UIScreen.main.bounds.height * 2 / 3)
         }
     }
 }

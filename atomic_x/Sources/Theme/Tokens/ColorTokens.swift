@@ -107,12 +107,12 @@ public struct ColorTokens {
     public let clearColor: UIColor
     
     /// Create light mode semantic tokens from color palettes
-    public static func light(from primaryColor: String = "#1C66E5") -> ColorTokens {
+    public static func light(from primaryColor: String = "1C66E5") -> ColorTokens {
         let colorPalettes = ColorPalettes(
-            primaryColor: BrandColorToken.generate(from: primaryColor, themeId: "light"),
-            successColor: BrandColorToken.generate(from: "#0ABF77", themeId: "light"),
-            errorColor: BrandColorToken.generate(from: "#E54545", themeId: "light"),
-            warningColor: BrandColorToken.generate(from: "#FF7200", themeId: "light"),
+            primaryColor: BrandColorToken.generate(from: primaryColor, themeMode: .light),
+            successColor: BrandColorToken.generate(from: "0ABF77", themeMode: .light),
+            errorColor: BrandColorToken.generate(from: "E54545", themeMode: .light),
+            warningColor: BrandColorToken.generate(from: "FF7200", themeMode: .light),
             neutralColor: NeutralColorToken.generate(),
             whiteColor: .standard,
             blackColor: .standard,
@@ -219,12 +219,12 @@ public struct ColorTokens {
     }
     
     /// Create dark mode semantic tokens from color palettes
-    public static func dark(from primaryColor: String = "#4086FF") -> ColorTokens {
+    public static func dark(from primaryColor: String = "4086FF") -> ColorTokens {
         let colorPalettes = ColorPalettes(
-            primaryColor: BrandColorToken.generate(from: primaryColor, themeId: "dark"),
-            successColor: BrandColorToken.generate(from: "#38A673", themeId: "dark"),
-            errorColor: BrandColorToken.generate(from: "#E6594C", themeId: "dark"),
-            warningColor: BrandColorToken.generate(from: "#E37F32", themeId: "dark"),
+            primaryColor: BrandColorToken.generate(from: primaryColor, themeMode: .dark),
+            successColor: BrandColorToken.generate(from: "38A673", themeMode: .dark),
+            errorColor: BrandColorToken.generate(from: "E6594C",themeMode: .dark),
+            warningColor: BrandColorToken.generate(from: "E37F32", themeMode: .dark),
             neutralColor: NeutralColorToken.generate(),
             whiteColor: .standard,
             blackColor: .standard,
@@ -327,22 +327,6 @@ public struct ColorTokens {
             tabColorOption: colorPalettes.neutralColor.grayDark4,
             // clear
             clearColor: .clear
-        )
-    }
-}
-
-// MARK: - Placeholder
-
-extension DesignTokenSet {
-    static var placeholder: DesignTokenSet {
-        return DesignTokenSet(
-            id: "placeholder",
-            displayName: "Placeholder",
-            color: ColorTokens.light(),
-            space: .standard,
-            borderRadius: .standard,
-            typography: TypographyToken(fontFamilyName: "PingFang"),
-            shadows: .standard
         )
     }
 }

@@ -9,9 +9,8 @@ import Kingfisher
 import SnapKit
 import TUICore
 import Combine
-import RTCCommon
-import AtomicXCore
 import AtomicX
+import AtomicXCore
 
 class VRLiveInfoEditView: UIView {
     private let store: VoiceRoomPrepareStore
@@ -170,7 +169,14 @@ extension VRLiveInfoEditView {
 extension VRLiveInfoEditView {
     @objc func coverButtonClick() {
         inputTextField.resignFirstResponder()
-        routerManager.router(action: .present(.systemImageSelection(.cover, .prepare(store))))
+        let configs = VRSystemImageFactory.getImageAssets(imageType: .cover)
+        let imagePanel = VRImageSelectionPanel(configs: configs, panelMode: .cover, sceneType: .prepare(store))
+        imagePanel.backButtonClickClosure = { [weak self] in
+            guard let self = self else { return }
+            self.routerManager.router(action: .dismiss())
+        }
+        let routeItem = RouteItem(view: imagePanel, config: .bottomDefault())
+        routerManager.router(action: .present(routeItem))
     }
 
     @objc func editIconClick() {
@@ -195,7 +201,7 @@ extension VRLiveInfoEditView {
         }
         
         let alertConfig = AlertViewConfig(items: alertItems)
-        routerManager.present(view: AtomicAlertView(config: alertConfig), position: .bottom)
+        routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
     }
 }
 
@@ -232,7 +238,7 @@ extension VRLiveInfoEditView: UITextFieldDelegate {
 // MARK: - subscribeRoomState
 extension VRLiveInfoEditView {
     private func subscribeRoomState() {
-        store.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.coverURL))
+        store.subscribeState(StatePublisherSelector(keyPath: \VoiceRoomPrepareState.liveInfo.coverURL))
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
                 guard let self = self else { return }
@@ -242,7 +248,7 @@ extension VRLiveInfoEditView {
             }
             .store(in: &cancellableSet)
         
-        store.subscribeState(StateSelector(keyPath: \VoiceRoomPrepareState.liveInfo.isPublicVisible))
+        store.subscribeState(StatePublisherSelector(keyPath: \VoiceRoomPrepareState.liveInfo.isPublicVisible))
             .receive(on: RunLoop.main)
             .sink { [weak self] isPublicVisible in
                 guard let self = self else { return }

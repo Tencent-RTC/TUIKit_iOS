@@ -7,7 +7,7 @@
 
 import Foundation
 import TUICore
-import RTCCommon
+import AtomicX
 import UIKit
 import AtomicXCore
 
@@ -26,7 +26,7 @@ class VoIPDataSyncHandler {
                 audioPlaybackDevice = .speakerphone
             }
             
-            TRTCLog.info("VoIPDataSyncHandler - onCall - selectAudioPlaybackDevice. route:\(audioPlaybackDevice)")
+            Logger.info("VoIPDataSyncHandler - onCall - selectAudioPlaybackDevice. route:\(audioPlaybackDevice)")
             DeviceStore.shared.setAudioRoute(audioPlaybackDevice)
             
         } else if method == TUICore_TUICallingService_SetIsMicMuteMethod {
@@ -35,28 +35,28 @@ class VoIPDataSyncHandler {
             }
 
             if isMicMute {
-                TRTCLog.info("VoIPDataSyncHandler - onCall - closeMicrophone")
+                Logger.info("VoIPDataSyncHandler - onCall - closeMicrophone")
                 DeviceStore.shared.closeLocalMicrophone()
             } else {
-                TRTCLog.info("VoIPDataSyncHandler - onCall - openMicrophone")
+                Logger.info("VoIPDataSyncHandler - onCall - openMicrophone")
                 DeviceStore.shared.openLocalMicrophone(completion: nil)
             }
         } else if method == TUICore_TUICallingService_HangupMethod {
             if CallStore.shared.state.value.selfInfo.status == .accept {
-                TRTCLog.info("VoIPDataSyncHandler - onCall - hangup")
+                Logger.info("VoIPDataSyncHandler - onCall - hangup")
                 CallStore.shared.hangup(completion: nil)
             } else {
-                TRTCLog.info("VoIPDataSyncHandler - onCall - reject")
+                Logger.info("VoIPDataSyncHandler - onCall - reject")
                 CallStore.shared.reject(completion: nil)
             }
         } else if  method == TUICore_TUICallingService_AcceptMethod {
-            TRTCLog.info("VoIPDataSyncHandler - onCall - accept")
+            Logger.info("VoIPDataSyncHandler - onCall - accept")
             CallStore.shared.accept(completion: nil)
         }
     }
         
     func setVoIPMute(_ mute: Bool) {
-        TRTCLog.info("VoIPDataSyncHandler - setVoIPMute. mute:\(mute)")
+        Logger.info("VoIPDataSyncHandler - setVoIPMute. mute:\(mute)")
         TUICore.notifyEvent(TUICore_TUIVoIPExtensionNotify,
                             subKey: TUICore_TUICore_TUIVoIPExtensionNotify_MuteSubKey,
                             object: nil,
@@ -65,7 +65,7 @@ class VoIPDataSyncHandler {
     }
     
     func closeVoIP() {
-        TRTCLog.info("VoIPDataSyncHandler - closeVoIP")
+        Logger.info("VoIPDataSyncHandler - closeVoIP")
         TUICore.notifyEvent(TUICore_TUIVoIPExtensionNotify,
                             subKey: TUICore_TUICore_TUIVoIPExtensionNotify_EndSubKey,
                             object: nil,
@@ -73,7 +73,7 @@ class VoIPDataSyncHandler {
     }
     
     func callBegin() {
-        TRTCLog.info("VoIPDataSyncHandler - callBegin")
+        Logger.info("VoIPDataSyncHandler - callBegin")
         TUICore.notifyEvent(TUICore_TUIVoIPExtensionNotify,
                             subKey: TUICore_TUICore_TUIVoIPExtensionNotify_ConnectedKey,
                             object: nil,
@@ -81,7 +81,7 @@ class VoIPDataSyncHandler {
     }
     
     func updateCallInfo(callerId: String, calleeList: [String], groupId: String, mediaType: CallMediaType?) {
-        TRTCLog.info("VoIPDataSyncHandler - updateCallInfo")
+        Logger.info("VoIPDataSyncHandler - updateCallInfo")
         let mediaTypeVal = mediaType?.rawValue ?? 2
         TUICore.notifyEvent(TUICore_TUIVoIPExtensionNotify,
                             subKey: TUICore_TUICore_TUIVoIPExtensionNotify_UpdateInfoSubKey,

@@ -8,7 +8,6 @@
 import AtomicXCore
 import Combine
 import ImSDK_Plus
-import RTCCommon
 import AtomicX
 
 class AudienceUserManagePanelView: RTCBaseView {
@@ -158,7 +157,7 @@ class AudienceUserManagePanelView: RTCBaseView {
         featureClickPanel.snp.makeConstraints { make in
             make.top.equalTo(userInfoView.snp.bottom).offset(21.scale375())
             make.leading.equalTo(userInfoView)
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-16.scale375())
         }
     }
     

@@ -5,14 +5,13 @@
 //  Created by ssc on 2025/8/27.
 //
 import UIKit
-import RTCCommon
 
 class ScoreBoardView: UIView {
     private lazy var scoreLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "DIN-Bold", size: 40) ?? .boldSystemFont(ofSize: 40)
         label.textAlignment = .center
-        label.textColor = UIColor("FF6A4C")
+        label.textColor = ThemeStore.shared.colorTokens.textColorError
         label.text = "75.1"
         return label
     }()
@@ -21,7 +20,7 @@ class ScoreBoardView: UIView {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Medium", size: 16) ?? .systemFont(ofSize: 16, weight: .medium)
         label.textAlignment = .right
-        label.textColor = UIColor("FF6A4C")
+        label.textColor = ThemeStore.shared.colorTokens.textColorError
         label.text = .pointText
         return label
     }()
@@ -38,7 +37,7 @@ class ScoreBoardView: UIView {
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 12)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
         label.text = "1212"
         return label
     }()
@@ -46,7 +45,7 @@ class ScoreBoardView: UIView {
     private lazy var textLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont(name: "PingFangSC-Regular", size: 10)
-        label.textColor = UIColor.white.withAlphaComponent(0.55)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
         label.text = .songingScoreText
         return label
     }()
@@ -112,6 +111,6 @@ class ScoreBoardView: UIView {
 }
 
 fileprivate extension String {
-    static var songingScoreText: String = ("karaoke_singing_score").localized
-    static var pointText: String = ("karaoke_point").localized
+    static var songingScoreText: String = ("karaoke_singing_score").atomicLocalized
+    static var pointText: String = ("karaoke_point").atomicLocalized
 }

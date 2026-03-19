@@ -67,7 +67,7 @@ extension StreamDashboardPanel {
         mediaView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
             make.top.equalTo(networkInfoView.snp.bottom).offset(8.scale375Height())
-            make.bottom.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
     }
     

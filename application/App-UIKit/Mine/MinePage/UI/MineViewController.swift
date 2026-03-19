@@ -4,12 +4,9 @@
 //
 //  Created by yukiwwwang on 2025/8/8.
 //
-
-import UIKit
-
 import UIKit
 import ImSDK_Plus
-import RTCCommon
+import AtomicX
 import TUICore
 import AtomicXCore
 

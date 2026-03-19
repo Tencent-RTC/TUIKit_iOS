@@ -7,9 +7,7 @@
 
 import AtomicXCore
 
-struct AnchorMediaState {
-    var videoQuality: VideoQuality = .quality1080P
-    
+struct AnchorMediaState {    
     var videoAdvanceSettings: AnchorVideoAdvanceSetting = AnchorVideoAdvanceSetting()
 }
 

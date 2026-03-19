@@ -9,21 +9,16 @@ import UIKit
 import TUICore
 import TUILiveKit
 import AtomicXCore
+import AtomicX
 
 class VoiceRoomViewController: UIViewController {
 
-    private lazy var goLiveButton: UIButton = {
-        let button = UIButton()
-        button.layer.cornerRadius = 26.scale375()
-        button.setImage(UIImage(named: "create_live"), for: .normal)
-        button.setTitle(.goLiveText, for: .normal)
+    private lazy var goLiveButton = {
+        let button = AtomicButton(variant: .filled,
+            colorType: .primary,
+            size: .large,
+            content: .iconLeading(text: .goLiveText, icon: UIImage(named: "livekit_ic_add")))
         button.addTarget(self, action: #selector(goLiveClick), for: .touchUpInside)
-        button.titleLabel?.font = UIFont(name: "PingFangSC-Semibold", size: 20)
-        button.backgroundColor = UIColor("1C66E5")
-
-        let spacing: CGFloat = 8
-        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -spacing / 2, bottom: 0, right: spacing / 2)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing / 2, bottom: 0, right: -spacing / 2)
         return button
     }()
 
@@ -53,7 +48,7 @@ class VoiceRoomViewController: UIViewController {
             make.edges.equalToSuperview()
         }
         goLiveButton.snp.makeConstraints { make in
-            make.bottom.equalTo(-(15.scale375Height() + kDeviceSafeBottomHeight))
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-15.scale375Height())
             make.centerX.equalToSuperview()
             make.height.equalTo(48.scale375())
             make.width.equalTo(154.scale375())
@@ -87,11 +82,12 @@ extension VoiceRoomViewController {
         helpItem.tintColor = .black
         navigationItem.rightBarButtonItem = helpItem
 
-        let titleView = UILabel()
-        titleView.text = .voiceRoomTitle
-        titleView.textColor = .black
-        titleView.textAlignment = .center
-        titleView.font = UIFont.boldSystemFont(ofSize: 17)
+        let titleView = AtomicLabel(.voiceRoomTitle) { theme in
+            return LabelAppearance(textColor: theme.tokens.color.textColorAntiPrimary,
+                                   backgroundColor: theme.tokens.color.clearColor,
+                                   font: theme.tokens.typography.Medium20,
+                                   cornerRadius: 0.0)
+        }
         titleView.adjustsFontSizeToFitWidth = true
         let width = titleView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude,
                                                   height: CGFloat.greatestFiniteMagnitude)).width

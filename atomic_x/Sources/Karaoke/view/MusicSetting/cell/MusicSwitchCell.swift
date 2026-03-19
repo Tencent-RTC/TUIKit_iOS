@@ -25,14 +25,14 @@ class MusicSwitchCell: UITableViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.textAlignment = .center
-        label.font = .customFont(ofSize: 16.0, weight: .medium)
-        label.textColor = .g7
+        label.font = ThemeStore.shared.typographyTokens.Medium16
+        label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
     }()
     
     private let configSwitch: UISwitch = {
         let view = UISwitch()
-        view.onTintColor = .b1
+        view.onTintColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
         return view
     }()
     

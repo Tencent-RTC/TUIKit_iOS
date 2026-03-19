@@ -106,6 +106,41 @@
         }
       }
     },
+    "karaoke_exit_chorus": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exit Chorus"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出合唱"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出合唱"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合唱を退出"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اترك الجوقة"
+          }
+        }
+      }
+    },
     "karaoke_exit_order": {
       "extractionState": "manual",
       "localizations": {
@@ -137,6 +172,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "الخروج من الطلب"
+          }
+        }
+      }
+    },
+    "karaoke_join_chorus": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join Chorus"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入合唱"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入合唱"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "合唱に参加"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انضم إلى الكورال"
           }
         }
       }
@@ -567,31 +637,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Capture Volume"
+            "value": "Music Streaming Volume"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "采集音量"
+            "value": "音乐推流音量"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "採集音量"
+            "value": "音樂推流音量"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ボリュームを収集します"
+            "value": "音楽ストリーミング音量"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مستوى صوت الالتقاط"
+            "value": "مستوى صوت بث الموسيقى"
           }
         }
       }
@@ -742,31 +812,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Playout Volume"
+            "value": "Music Playback Volume"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放音量"
+            "value": "音乐播放音量"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放音量"
+            "value": "音樂播放音量"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ボリュームを再生します"
+            "value": "音楽再生音量"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مستوى صوت التشغيل"
+            "value": "مستوى صوت تشغيل الموسيقى"
           }
         }
       }
