@@ -1,0 +1,231 @@
+/* Login View */
+"login.title" = "LiveKit API Example";
+"login.subtitle" = "Login to start";
+"login.userID.placeholder" = "Enter User ID";
+"login.userSig.placeholder" = "User Sig (Auto-generated)";
+"login.button" = "Login";
+"login.status.notLoggedIn" = "Not logged in";
+"login.status.loggingIn" = "Logging in...";
+"login.status.loggedIn" = "Logged in";
+"login.error.emptyUserID" = "Please enter User ID";
+"login.error.loginFailed" = "Login failed: %@";
+"login.debug.tip" = "UserSig will be generated locally (debug mode only)";
+"login.error.kickedOffline" = "You have been kicked offline, please login again";
+"login.error.loginExpired" = "Login expired, please login again";
+
+/* Profile Setup */
+"profile.title" = "Profile Setup";
+"profile.header" = "Set Up Your Profile";
+"profile.subtitle" = "Set your nickname and avatar so others can recognize you";
+"profile.nickname.placeholder" = "Enter nickname";
+"profile.confirm" = "Done";
+"profile.skip" = "Skip";
+"profile.status.saved" = "Profile saved successfully";
+"profile.error.emptyNickname" = "Please enter a nickname";
+"profile.error.saveFailed" = "Save failed: %@";
+
+/* Feature List */
+"featureList.title" = "Features";
+"featureList.section.header" = "Select Feature";
+"featureList.language" = "Switch Language";
+
+/* Role Select */
+"roleSelect.title" = "Select Role";
+"roleSelect.subtitle" = "Choose your experience role";
+"roleSelect.anchor" = "Anchor";
+"roleSelect.anchor.desc" = "Can create live, initiate co-host, start PK";
+"roleSelect.audience" = "Audience";
+"roleSelect.audience.desc" = "Can watch live, send barrage, send gifts, apply for co-host";
+
+/* Live ID Input */
+"liveIDInput.title.anchor" = "Enter Room ID";
+"liveIDInput.title.audience" = "Enter Room ID";
+"liveIDInput.message.anchor" = "A random Room ID has been generated, you can modify or randomize it";
+"liveIDInput.message.audience" = "Please enter the Room ID to join";
+"liveIDInput.placeholder" = "9-digit Room ID";
+"liveIDInput.random" = "🎲 Randomize";
+"liveIDInput.error.empty" = "Room ID cannot be empty";
+
+/* Feature Stages */
+"stage.basicStreaming" = "Basic Streaming";
+"stage.basicStreaming.desc" = "start/join live";
+"stage.interactive" = "Interactive";
+"stage.interactive.desc" = "Barrage, gifts, likes, beauty, sound effects";
+"stage.coGuest" = "Co-Guest";
+"stage.coGuest.desc" = "Audience list, guest connection request, host invitation, seat management";
+"stage.livePK" = "Live PK";
+"stage.livePK.desc" = "Cross-room host connection, PK battle, score display";
+
+/* BasicStreaming */
+"basicStreaming.title" = "Basic Streaming";
+"basicStreaming.startLive" = "Start Live";
+"basicStreaming.status.creating" = "Creating live...";
+"basicStreaming.status.ending" = "Ending live...";
+"basicStreaming.status.joining" = "Joining live...";
+"basicStreaming.status.created" = "Live created: %@";
+"basicStreaming.status.joined" = "Joined live: %@";
+"basicStreaming.status.ended" = "Live ended";
+"basicStreaming.status.failed" = "Failed: %@";
+"basicStreaming.endLive.confirm.title" = "End Live";
+"basicStreaming.endLive.confirm.message" = "Are you sure you want to end the live?";
+
+/* Interactive */
+"interactive.title" = "Interactive";
+"interactive.settings.title" = "Settings";
+"interactive.barrage.title" = "Barrage";
+"interactive.barrage.description" = "Send and receive barrage messages";
+"interactive.barrage.placeholder" = "Say something...";
+"interactive.barrage.send" = "Send Barrage";
+"interactive.gift.title" = "Gifts";
+"interactive.gift.description" = "Send and receive gifts";
+"interactive.gift.send" = "Send";
+"interactive.gift.sent" = "sent";
+"interactive.like.title" = "Likes";
+"interactive.like.description" = "Send and receive likes";
+"interactive.like.send" = "Send Like";
+"interactive.beauty.title" = "Beauty";
+"interactive.beauty.description" = "Enable beauty effects";
+"interactive.beauty.smooth" = "Smooth";
+"interactive.beauty.whiteness" = "Whiteness";
+"interactive.beauty.ruddy" = "Ruddy";
+"interactive.beauty.reset" = "Reset All";
+"interactive.audioEffect.title" = "Audio Effects";
+"interactive.audioEffect.changer.title" = "Voice Changer";
+"interactive.audioEffect.changer.none" = "None";
+"interactive.audioEffect.changer.child" = "Child";
+"interactive.audioEffect.changer.littleGirl" = "Girl";
+"interactive.audioEffect.changer.man" = "Uncle";
+"interactive.audioEffect.changer.ethereal" = "Ethereal";
+"interactive.audioEffect.reverb.title" = "Reverb";
+"interactive.audioEffect.reverb.none" = "None";
+"interactive.audioEffect.reverb.ktv" = "KTV";
+"interactive.audioEffect.reverb.smallRoom" = "Room";
+"interactive.audioEffect.reverb.auditorium" = "Hall";
+"interactive.audioEffect.reverb.metallic" = "Metallic";
+"interactive.audioEffect.earMonitor" = "Ear Monitor";
+"interactive.audioEffect.earMonitorVolume" = "Monitor Volume";
+"interactive.audioEffect.reset" = "Reset All";
+"interactive.error.emptyContent" = "Please enter barrage content";
+"interactive.success.gift" = "Gift sent successfully";
+"interactive.success.like" = "Like sent successfully";
+
+/* MultiConnect / CoGuest */
+"multiConnect.title" = "Co-Guest";
+
+/* CoGuest - Audience List */
+"coGuest.audienceList.title" = "Online Audience";
+"coGuest.audienceList.empty" = "No audience online";
+"coGuest.audienceList.invite" = "Connect";
+"coGuest.audienceList.inviting" = "Inviting";
+"coGuest.audienceList.connected" = "Connected";
+"coGuest.audienceCount" = "%lu Online";
+
+/* CoGuest - Connection Status */
+"coGuest.status.applying" = "Applying for connection...";
+"coGuest.status.cancelled" = "Connection request cancelled";
+"coGuest.status.connected" = "Connected successfully";
+"coGuest.status.disconnected" = "Disconnected";
+"coGuest.status.invited" = "Connection invitation sent";
+
+/* CoGuest - Application Alert (Anchor Side) */
+"coGuest.application.title" = "Connection Request";
+"coGuest.application.message" = "%@ is requesting to connect";
+"coGuest.application.accept" = "Accept";
+"coGuest.application.reject" = "Reject";
+
+/* CoGuest - Invitation Alert (Audience Side) */
+"coGuest.invitation.title" = "Connection Invitation";
+"coGuest.invitation.message" = "Host %@ is inviting you to connect";
+"coGuest.invitation.accept" = "Accept";
+"coGuest.invitation.reject" = "Reject";
+
+/* CoGuest - Event Notifications */
+"coGuest.event.inviteAccepted" = "%@ accepted the connection invitation";
+"coGuest.event.inviteRejected" = "%@ rejected the connection invitation";
+"coGuest.event.applicationCancelled" = "%@ cancelled the connection request";
+"coGuest.event.applicationRejected" = "%@ rejected your connection request";
+"coGuest.event.applicationTimeout" = "Connection request timed out, please try again";
+"coGuest.event.kickedOff" = "You have been removed from the connection";
+"coGuest.event.invitationCancelled" = "Host cancelled the connection invitation";
+
+/* CoGuest - Device Management Alert (Anchor manages co-guest) */
+"coGuest.manage.title" = "Manage %@";
+"coGuest.manage.openCamera" = "Request to open camera";
+"coGuest.manage.closeCamera" = "Close camera";
+"coGuest.manage.openMic" = "Request to open microphone";
+"coGuest.manage.closeMic" = "Close microphone";
+"coGuest.manage.kickOff" = "Remove from connection";
+
+/* CoGuest - Device Management Alert (Audience manages self) */
+"coGuest.selfManage.title" = "Device Settings";
+"coGuest.selfManage.disconnect" = "Disconnect";
+"coGuest.selfManage.openCamera" = "Turn On Camera";
+"coGuest.selfManage.closeCamera" = "Turn Off Camera";
+"coGuest.selfManage.openMic" = "Turn On Microphone";
+"coGuest.selfManage.closeMic" = "Turn Off Microphone";
+
+/* CoGuest - Remote Device Request (Audience receives admin request) */
+"coGuest.device.cameraRequest.title" = "Turn On Camera";
+"coGuest.device.cameraRequest.message" = "The host requests you to turn on your camera";
+"coGuest.device.micRequest.title" = "Turn On Microphone";
+"coGuest.device.micRequest.message" = "The host requests you to turn on your microphone";
+"coGuest.device.cameraClosed" = "Host has turned off your camera";
+"coGuest.device.micClosed" = "Host has turned off your microphone";
+
+/* LivePK */
+"livePK.title" = "Live PK";
+
+/* LivePK - Co-Host Connection */
+"livePK.coHost.connect" = "Connect";
+"livePK.coHost.disconnect" = "Disconnect";
+"livePK.coHost.connecting" = "Connecting...";
+"livePK.coHost.connected" = "Connected";
+"livePK.coHost.disconnected" = "Disconnected";
+"livePK.coHost.selectHost" = "Select Host";
+"livePK.coHost.emptyList" = "No other live rooms available";
+"livePK.coHost.request.received" = "%@ requests to connect";
+"livePK.coHost.request.accepted" = "%@ accepted the connection";
+"livePK.coHost.request.rejected" = "%@ rejected the connection";
+"livePK.coHost.request.timeout" = "Connection request timed out";
+"livePK.coHost.request.cancelled" = "Connection request cancelled";
+"livePK.coHost.userLeft" = "%@ left the connection";
+"livePK.coHost.confirm.disconnect" = "Are you sure you want to disconnect?";
+
+/* LivePK - PK Battle */
+"livePK.battle.title" = "PK Battle";
+"livePK.battle.start" = "Start PK";
+"livePK.battle.end" = "End PK";
+"livePK.battle.requesting" = "PK requesting...";
+"livePK.battle.started" = "PK Started!";
+"livePK.battle.ended" = "PK Ended";
+"livePK.battle.request.received" = "%@ challenges you to PK";
+"livePK.battle.request.accepted" = "PK accepted";
+"livePK.battle.request.rejected" = "PK rejected";
+"livePK.battle.request.timeout" = "PK request timed out";
+"livePK.battle.duration" = "PK Duration: %d seconds";
+"livePK.battle.score" = "%d : %d";
+"livePK.battle.win" = "🏆 Win";
+"livePK.battle.lose" = "Lose";
+"livePK.battle.draw" = "Draw";
+"livePK.battle.me" = "Me";
+"livePK.battle.confirm.end" = "Are you sure you want to end PK?";
+
+/* LivePK - Status */
+"livePK.status.idle" = "Waiting to connect";
+"livePK.status.coHostConnected" = "Connected · Ready for PK";
+"livePK.status.battling" = "PK in progress";
+
+/* Device Setting Panel */
+"deviceSetting.title" = "Device Settings";
+"deviceSetting.camera" = "Camera";
+"deviceSetting.microphone" = "Microphone";
+"deviceSetting.frontCamera" = "Front Camera";
+"deviceSetting.mirror" = "Mirror Mode";
+"deviceSetting.videoQuality" = "Video Quality";
+
+/* Common */
+"common.cancel" = "Cancel";
+"common.confirm" = "OK";
+"common.error" = "Error";
+"common.success" = "Success";
+"common.warning" = "Warning";
