@@ -1,0 +1,42 @@
+platform :ios, '16.0'
+
+target 'AtomicXCoreExample' do
+  use_frameworks!
+
+  # LiveKit AtomicXCore SDK
+  pod 'AtomicXCore'
+
+  # UI 布局
+  pod 'SnapKit', '~> 5.6'
+
+  # Toast 提示
+  pod 'Toast-Swift', '~> 5.1.1'
+
+  # 图片加载
+  pod 'Kingfisher', '~> 8.0'
+
+  # 下拉刷新 & 上拉加载
+  pod 'MJRefresh', '~> 3.7'
+
+  # SVGA 动画播放
+  pod 'SVGAPlayer', '2.5.7'
+
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
+
+      # 禁止 Pod targets 签名，避免 archive 时因缺少 Provisioning Profile 导致打包失败
+      config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
+      config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
+      config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
+
+      # SVGAPlayer 使用了已废弃的 OSAtomic 函数，需要强制引入头文件并抑制相关错误
+      if target.name == 'SVGAPlayer'
+        config.build_settings['OTHER_CFLAGS'] = '$(inherited) -include libkern/OSAtomic.h -Wno-implicit-function-declaration -Wno-incompatible-function-pointer-types'
+      end
+    end
+  end
+end

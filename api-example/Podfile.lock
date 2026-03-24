@@ -1,0 +1,64 @@
+PODS:
+  - AtomicXCore (4.0.3):
+    - RTCRoomEngine/Professional (>= 4.0.0)
+    - TXLiteAVSDK_Professional (>= 13.0.20278)
+  - Kingfisher (8.8.0)
+  - MJRefresh (3.7.9)
+  - Protobuf (3.29.6)
+  - RTCRoomEngine/Professional (4.0.0):
+    - TXIMSDK_Plus_iOS_XCFramework (>= 8.4.6676)
+    - TXLiteAVSDK_Professional (>= 12.8.0.19666)
+  - SnapKit (5.7.1)
+  - SSZipArchive (2.6.0)
+  - SVGAPlayer (2.5.7):
+    - SVGAPlayer/Core (= 2.5.7)
+    - SVGAPlayer/ProtoFiles (= 2.5.7)
+  - SVGAPlayer/Core (2.5.7):
+    - SSZipArchive (>= 1.8.1)
+    - SVGAPlayer/ProtoFiles
+  - SVGAPlayer/ProtoFiles (2.5.7):
+    - Protobuf (~> 3.4)
+  - Toast-Swift (5.1.1)
+  - TXIMSDK_Plus_iOS_XCFramework (8.9.7511)
+  - TXLiteAVSDK_Professional (13.1.20476):
+    - TXLiteAVSDK_Professional/Professional (= 13.1.20476)
+  - TXLiteAVSDK_Professional/Professional (13.1.20476)
+
+DEPENDENCIES:
+  - AtomicXCore
+  - Kingfisher (~> 8.0)
+  - MJRefresh (~> 3.7)
+  - SnapKit (~> 5.6)
+  - SVGAPlayer (= 2.5.7)
+  - Toast-Swift (~> 5.1.1)
+
+SPEC REPOS:
+  trunk:
+    - AtomicXCore
+    - Kingfisher
+    - MJRefresh
+    - Protobuf
+    - RTCRoomEngine
+    - SnapKit
+    - SSZipArchive
+    - SVGAPlayer
+    - Toast-Swift
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+
+SPEC CHECKSUMS:
+  AtomicXCore: 2e563b7f2c21e40b4eae224c6e061de74632a311
+  Kingfisher: beeaf65ed57dfa710d416aea4093277e8a9b1968
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
+  Protobuf: 8d5596f7468be5400861a6bbfb2dfe9d0d1cde34
+  RTCRoomEngine: 0c233711ab09f0024caad25c7b1083cbb96afee6
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  SSZipArchive: 8a6ee5677c8e304bebc109e39cf0da91ccef22ea
+  SVGAPlayer: 318b85a78b61292d6ae9dfcd651f3f0d1cdadd86
+  Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
+  TXIMSDK_Plus_iOS_XCFramework: 10893791aa5c27b2b689ae3547878d10aeea9b7b
+  TXLiteAVSDK_Professional: 9ecc756f4222a2667e4a5d852dd006ee7af9b0ac
+
+PODFILE CHECKSUM: 51c06c8f583d975aa8ceb82a28c5cca7cb619cdd
+
+COCOAPODS: 1.16.2
