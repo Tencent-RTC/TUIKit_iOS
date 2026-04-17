@@ -166,7 +166,6 @@ class AudienceView: RTCBaseView {
     
     override func bindInteraction() {
         subscribeOrientationChange()
-        subscribeStates()
         setupSlideToClear()
         leaveButton.addTarget(self, action: #selector(leaveButtonClick), for: .touchUpInside)
         restoreClearButton.addTarget(self, action: #selector(restoreLivingView), for: .touchUpInside)
@@ -193,6 +192,9 @@ class AudienceView: RTCBaseView {
     }
     
     private func updateCoreViewLayout() {
+        if videoView.superview == nil {
+            insertSubview(videoView, aboveSubview: coverBgView)
+        }
         guard !manager.liveListState.currentLive.isEmpty,
               manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
               WindowUtils.isPortrait,

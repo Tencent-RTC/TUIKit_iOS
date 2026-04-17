@@ -8,6 +8,60 @@
 import AtomicXCore
 import RTCRoomEngine
 
+extension LiveCoreView {
+    private static var cacheMap: [String: LiveCoreView] = [:]
+    private static var cacheOrder: [String] = []
+    private static let cacheMaxCount = 10
+
+    static func getCachedCoreView(liveID: String, type: CoreViewType) -> LiveCoreView {
+        if let view = cacheMap[liveID] {
+            if let index = cacheOrder.firstIndex(of: liveID) {
+                cacheOrder.remove(at: index)
+            }
+            cacheOrder.append(liveID)
+            return view
+        } else {
+            if cacheMap.count >= cacheMaxCount {
+                if FloatWindow.shared.isShowingFloatWindow(), let floatLiveID = FloatWindow.shared.getCurrentRoomId() {
+                    if let index = cacheOrder.firstIndex(of: floatLiveID) {
+                        cacheOrder.remove(at: index)
+                        cacheOrder.append(floatLiveID)
+                    }
+                }
+                if let evictKey = cacheOrder.first {
+                    cacheOrder.removeFirst()
+                    if let evictedView = cacheMap.removeValue(forKey: evictKey) {
+                        evictedView.stopPreviewLiveStream(roomId: evictKey)
+                        evictedView.safeRemoveFromSuperview()
+                    }
+                }
+            }
+            let view = LiveCoreView(viewType: type)
+            view.setLiveID(liveID)
+            cacheMap[liveID] = view
+            cacheOrder.append(liveID)
+            return view
+        }
+    }
+
+    static func removeCachedView(liveID: String) {
+        if let view = cacheMap.removeValue(forKey: liveID) {
+            view.stopPreviewLiveStream(roomId: liveID)
+            view.safeRemoveFromSuperview()
+        }
+        cacheOrder.removeAll(where: { $0 == liveID })
+    }
+
+    static func removeAllCachedViews() {
+        for item in cacheMap {
+            item.value.stopPreviewLiveStream(roomId: item.key)
+            item.value.safeRemoveFromSuperview()
+        }
+        cacheMap.removeAll()
+        cacheOrder.removeAll()
+    }
+}
+
 extension [SeatUserInfo] {
     func isOnSeat(userID: String? = nil) -> Bool {
         if let userID = userID {
