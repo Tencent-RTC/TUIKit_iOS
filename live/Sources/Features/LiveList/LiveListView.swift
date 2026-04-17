@@ -5,9 +5,9 @@
 //  Created by jeremiawang on 2025/4/15.
 //
 
+import AtomicX
 import AtomicXCore
 import MJRefresh
-import AtomicX
 import UIKit
 
 public class LiveListView: UIView {
@@ -31,6 +31,7 @@ public class LiveListView: UIView {
         guard currentStyle != style else { return }
         LiveKitLog.info("\(#file)", "\(#line)", "setColumnStyle style: \(style)")
         currentStyle = style
+        isSwitchingLayout = true
         collectionView.contentInsetAdjustmentBehavior = currentStyle == .doubleColumn ? .automatic : .never
         activateConstraints()
         layoutIfNeeded()
@@ -72,6 +73,7 @@ public class LiveListView: UIView {
                 setLiveInfoView(cell: cell, info: liveInfo)
             }
         }
+        isSwitchingLayout = false
         DispatchQueue.main.async {
             self.preloadTopFullyVisibleRow()
         }
@@ -91,15 +93,8 @@ public class LiveListView: UIView {
         } onError: { [weak self] _ in
             guard let self = self else { return }
             isFetchingLiveList = false
+            updateWillEnterRoomIndexPath()
             preloadTopFullyVisibleRow()
-        }
-        if FloatWindow.shared.isShowingFloatWindow(),
-           let floatRoomId = FloatWindow.shared.getCurrentRoomId(),
-           let item = liveList.firstIndex(where: { $0.liveID == floatRoomId })
-        {
-            willEnterRoomIndexPath = IndexPath(item: item, section: 0)
-        } else {
-            willEnterRoomIndexPath = nil
         }
         isOnCurrentView = true
     }
@@ -127,6 +122,7 @@ public class LiveListView: UIView {
     private var doublePlayingIndexPaths = Set<IndexPath>()
     private var willEnterRoomIndexPath: IndexPath?
     private var isOnCurrentView = true
+    private var isSwitchingLayout = false
     
     private let singleLiveInfoViewTag = 1001
     private let doubleLiveInfoViewTag = 1002
@@ -175,6 +171,7 @@ public class LiveListView: UIView {
                 liveCell.stopPreload()
             }
         }
+        LiveCoreView.removeAllCachedViews()
     }
 }
 
@@ -201,6 +198,17 @@ extension LiveListView {
         collectionView.delegate = self
     }
     
+    private func updateWillEnterRoomIndexPath() {
+        if FloatWindow.shared.isShowingFloatWindow(),
+           let floatRoomId = FloatWindow.shared.getCurrentRoomId(),
+           let item = liveList.firstIndex(where: { $0.liveID == floatRoomId })
+        {
+            willEnterRoomIndexPath = IndexPath(item: item, section: 0)
+        } else {
+            willEnterRoomIndexPath = nil
+        }
+    }
+
     private func fetchLiveList() {
         guard !isFetchingLiveList else { return }
         isFetchingLiveList = true
@@ -231,6 +239,7 @@ extension LiveListView {
         collectionView.reloadData()
         collectionView.layoutIfNeeded()
         preloadTopFullyVisibleRow()
+        updateWillEnterRoomIndexPath()
     }
     
     private func preloadTopFullyVisibleRow() {
@@ -332,15 +341,21 @@ extension LiveListView {
 
 extension LiveListView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? LiveListViewCell, isOnCurrentView else { return }
+        guard let cell = cell as? LiveListViewCell, isOnCurrentView, !isSwitchingLayout else { return }
         if currentStyle == .singleColumn {
             let isMute = currentPageInSingleStyle != indexPath.item
             cell.startPreload(roomId: liveList[indexPath.item].liveID, isMuteAudio: isMute)
+            if let singleInfoView = cell.contentView.viewWithTag(singleLiveInfoViewTag) {
+                singleInfoView.isHidden = false
+            }
         }
     }
 
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let cell = cell as? LiveListViewCell, indexPath.item < liveList.count, isOnCurrentView else { return }
+        guard let cell = cell as? LiveListViewCell, indexPath.item < liveList.count, isOnCurrentView, !isSwitchingLayout else { return }
+        if indexPath == willEnterRoomIndexPath {
+            return
+        }
         cell.stopPreload()
         doublePlayingIndexPaths.remove(indexPath)
     }
@@ -348,6 +363,9 @@ extension LiveListView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard indexPath.item < liveList.count, let cell = collectionView.cellForItem(at: indexPath) as? LiveListViewCell else { return }
         let originFrame = cell.convert(cell.bounds, to: window)
+        if let singleInfoView = cell.contentView.viewWithTag(singleLiveInfoViewTag) {
+            singleInfoView.isHidden = true
+        }
         itemClickDelegate?.onItemClick(liveInfo: liveList[indexPath.item], frame: originFrame)
         willEnterRoomIndexPath = indexPath
     }

@@ -61,7 +61,7 @@ class AudienceSliderCell: UIView {
         if let view = coreView {
             videoView = view
         } else {
-            videoView = LiveCoreView(viewType: .playView)
+            videoView = LiveCoreView.getCachedCoreView(liveID: liveInfo.liveID, type: .playView)
         }
         videoView.setLiveID(liveInfo.liveID)
         reportComponent()
