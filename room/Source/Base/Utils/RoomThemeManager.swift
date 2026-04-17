@@ -285,6 +285,12 @@ public struct RoomColors {
         darkHex: "#0F1014"
     )
     
+    /// 停止屏幕分享按钮背景色
+    public static let stopScreenShareBackground = RoomThemeManager.dynamicColor(
+        lightHex: "#CC3D47",
+        darkHex: "#CC3D47"
+    )
+    
 }
 
 // MARK: - RoomFonts (预定义字体)

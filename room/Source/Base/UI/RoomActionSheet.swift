@@ -9,63 +9,27 @@
 //  Usage:
 //  ```swift
 //  // Example 1: Simple action sheet with message
-//  let action1 = RoomActionSheet.Action(
-//      title: TUIRoomKitLocalized("LeaveRoom"),
-//      style: .default,
-//      handler: { _ in
-//          print("Leave room")
-//      }
-//  )
-//  
-//  let action2 = RoomActionSheet.Action(
-//      title: TUIRoomKitLocalized("EndRoom"),
-//      style: .destructive,
-//      handler: { _ in
-//          print("End room")
-//      }
-//  )
-//  
 //  let actionSheet = RoomActionSheet(
 //      message: TUIRoomKitLocalized("ConfirmLeaveRoom"),
-//      actions: [action1, action2]
+//      actions: [
+//          RoomActionSheet.Action(title: "Leave Room") { _ in print("Leave") },
+//          RoomActionSheet.Action(title: "End Room", titleColor: RoomColors.destructiveActionButtonTitleColor) { _ in print("End") },
+//      ]
 //  )
 //  actionSheet.show(in: self.view, animated: true)
-//  
-//  // Example 2: Action sheet without message
-//  let shareAction = RoomActionSheet.Action(
-//      title: TUIRoomKitLocalized("ShareRoom"),
-//      style: .default,
-//      handler: { _ in
-//          print("Share room")
-//      }
+//
+//  // Example 2: Custom appearance and per-action font/color
+//  var appearance = RoomActionSheet.Appearance()
+//  appearance.backgroundColor = .white
+//
+//  let sheet = RoomActionSheet(
+//      actions: [
+//          RoomActionSheet.Action(title: "Option A", titleColor: .black, titleFont: RoomFonts.pingFangSCFont(size: 16, weight: .regular)) { _ in },
+//          RoomActionSheet.Action(title: "Option B", titleColor: .systemBlue) { _ in },
+//      ],
+//      appearance: appearance
 //  )
-//  
-//  let inviteAction = RoomActionSheet.Action(
-//      title: TUIRoomKitLocalized("InviteMembers"),
-//      style: .default,
-//      handler: { _ in
-//          print("Invite members")
-//      }
-//  )
-//  
-//  let sheet = RoomActionSheet(actions: [shareAction, inviteAction])
 //  sheet.show(in: self.view, animated: true)
-//  
-//  // Example 3: Custom text color (using action styles)
-//  let normalAction = RoomActionSheet.Action(
-//      title: "Normal Action",
-//      style: .default  // Uses brand color (blue)
-//  )
-//  
-//  let dangerAction = RoomActionSheet.Action(
-//      title: "Danger Action",
-//      style: .destructive  // Uses error color (red)
-//  )
-//  
-//  let cancelAction = RoomActionSheet.Action(
-//      title: "Cancel Action",
-//      style: .cancel  // Uses primary text color (gray)
-//  )
 //  ```
 //
 
@@ -77,24 +41,26 @@ import AtomicX
 class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     // MARK: - Nested Types
     
-    /// Action style
-    enum ActionStyle {
-        case `default`
-        case destructive
-        case cancel
+    /// Appearance configuration for the action sheet
+    struct Appearance {
+        var backgroundColor: UIColor = RoomColors.g2
+        var separatorColor: UIColor = RoomColors.g3.withAlphaComponent(0.3)
     }
     
     /// Action model
     struct Action {
         let title: String
-        let style: ActionStyle
+        let titleColor: UIColor
+        let titleFont: UIFont
         let handler: ((Action) -> Void)?
         
-        init(title: String, 
-             style: ActionStyle = .default,
+        init(title: String,
+             titleColor: UIColor = RoomColors.defaultActionButtonTitleColor,
+             titleFont: UIFont = RoomFonts.pingFangSCFont(size: 18, weight: .medium),
              handler: ((Action) -> Void)? = nil) {
             self.title = title
-            self.style = style
+            self.titleColor = titleColor
+            self.titleFont = titleFont
             self.handler = handler
         }
     }
@@ -106,10 +72,10 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     // MARK: - Properties
     private let message: String?
     private let actions: [Action]
+    private let appearance: Appearance
     
     private let contentView: UIView = {
         let view = UIView()
-        view.backgroundColor = RoomColors.g2
         view.layer.cornerRadius = 16
         view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.clipsToBounds = true
@@ -139,7 +105,6 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     
     private lazy var messageSeparatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = RoomColors.g3.withAlphaComponent(0.3)
         return view
     }()
     
@@ -160,9 +125,10 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     }
     
     // MARK: - Initialization
-    init(message: String? = nil, actions: [Action]) {
+    init(message: String? = nil, actions: [Action], appearance: Appearance = Appearance()) {
         self.message = message
         self.actions = actions
+        self.appearance = appearance
         super.init(frame: .zero)
         
         // Fix AutoLayout constraint conflict
@@ -199,7 +165,7 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
             // Add separator between actions
             if index < actions.count - 1 {
                 let separator = UIView()
-                separator.backgroundColor = RoomColors.g3.withAlphaComponent(0.3)
+                separator.backgroundColor = appearance.separatorColor
                 actionStackView.addArrangedSubview(separator)
                 separator.snp.makeConstraints { make in
                     make.height.equalTo(1)
@@ -255,6 +221,8 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     
     private func setupStyles() {
         backgroundColor = .clear
+        contentView.backgroundColor = appearance.backgroundColor
+        messageSeparatorView.backgroundColor = appearance.separatorColor
         messageLabel.text = message
     }
     
@@ -266,20 +234,11 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
     private func createActionButton(for action: Action, index: Int) -> UIButton {
         let button = UIButton(type: .system)
         button.setTitle(action.title, for: .normal)
-        button.titleLabel?.font = RoomFonts.pingFangSCFont(size: 18, weight: .medium)
-        button.backgroundColor = RoomColors.g2
+        button.setTitleColor(action.titleColor, for: .normal)
+        button.titleLabel?.font = action.titleFont
+        button.backgroundColor = appearance.backgroundColor
         button.tag = index
         button.addTarget(self, action: #selector(actionButtonTapped(_:)), for: .touchUpInside)
-        
-        // Set button color based on style
-        switch action.style {
-        case .default:
-            button.setTitleColor(RoomColors.defaultActionButtonTitleColor, for: .normal)
-        case .destructive:
-            button.setTitleColor(RoomColors.destructiveActionButtonTitleColor, for: .normal)
-        case .cancel:
-            button.setTitleColor(RoomColors.brandBlue, for: .normal)
-        }
         
         button.snp.makeConstraints { make in
             make.height.equalTo(56)
