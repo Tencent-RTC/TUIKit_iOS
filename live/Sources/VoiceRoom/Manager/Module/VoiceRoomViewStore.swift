@@ -10,8 +10,14 @@ import AtomicX
 import Combine
 import AtomicXCore
 
+struct PendingBattleContext: Equatable {
+    let battleID: String
+    let inviteeUserIDs: [String]
+}
+
 struct VRViewState {
     var isApplyingToTakeSeat: Bool = false
+    var pendingBattle: PendingBattleContext? = nil
 }
 
 class VoiceRoomViewStore {
@@ -26,22 +32,34 @@ class VoiceRoomViewStore {
     }
     
     func onSentTakeSeatRequest() {
-        update { seatState in
-            seatState.isApplyingToTakeSeat = true
+        update { state in
+            state.isApplyingToTakeSeat = true
         }
     }
     
     func onRespondedTakeSeatRequest() {
-        update { seatState in
-            seatState.isApplyingToTakeSeat = false
+        update { state in
+            state.isApplyingToTakeSeat = false
+        }
+    }
+
+    func onBattleRequestSent(battleID: String, inviteeUserIDs: [String]) {
+        update { state in
+            state.pendingBattle = PendingBattleContext(battleID: battleID, inviteeUserIDs: inviteeUserIDs)
+        }
+    }
+
+    func onBattleRequestCleared() {
+        update { state in
+            state.pendingBattle = nil
         }
     }
 }
 
 extension VoiceRoomViewStore {
-    private typealias SeatStateUpdateClosure = (inout VRViewState) -> Void
+    private typealias StateUpdateClosure = (inout VRViewState) -> Void
 
-    private func update(closure: SeatStateUpdateClosure) {
+    private func update(closure: StateUpdateClosure) {
         observerState.update(reduce: closure)
     }
 }

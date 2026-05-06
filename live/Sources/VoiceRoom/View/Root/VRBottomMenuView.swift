@@ -271,7 +271,7 @@ extension VRBottomMenuView {
         var connectionControl = VRButtonMenuInfo(normalIcon: "seat_battle")
         connectionControl.tapAction = { [weak self] sender in
             guard let self = self else { return }
-            let connectionPanel = interactionInvitePanel(liveID: liveID, toastService: toastService, routerManager: routerManager)
+            let connectionPanel = interactionInvitePanel(liveID: liveID, toastService: toastService, routerManager: routerManager, viewStore: viewStore)
             self.routerManager.present(view: connectionPanel, config: .bottomDefault())
         }
 

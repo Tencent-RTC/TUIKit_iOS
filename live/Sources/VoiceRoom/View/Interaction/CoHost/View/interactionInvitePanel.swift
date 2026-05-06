@@ -28,6 +28,7 @@ class interactionInvitePanel: RTCBaseView {
     private var recommendedList: [SeatUserInfo] = []
     private let toastService: VRToastService
     private let routerManager: VRRouterManager
+    private let viewStore: VoiceRoomViewStore
     private var cancellableSet: Set<AnyCancellable> = []
 
     private lazy var buttonContainer: UIView = {
@@ -102,15 +103,16 @@ class interactionInvitePanel: RTCBaseView {
     private let liveID: String
 
     private lazy var connectedView: InteractionManagerView = {
-        let view = InteractionManagerView(liveID: liveID,toastService: toastService)
+        let view = InteractionManagerView(liveID: liveID, toastService: toastService, viewStore: viewStore)
         view.isHidden = true
         return view
     }()
 
-    init(liveID: String, toastService: VRToastService ,routerManager: VRRouterManager) {
+    init(liveID: String, toastService: VRToastService, routerManager: VRRouterManager, viewStore: VoiceRoomViewStore) {
         self.liveID = liveID
         self.toastService = toastService
         self.routerManager = routerManager
+        self.viewStore = viewStore
         super.init(frame: .zero)
         backgroundColor = .bgOperateColor
         layer.cornerRadius = 16

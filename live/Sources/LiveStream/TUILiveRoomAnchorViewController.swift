@@ -16,8 +16,6 @@ import AtomicX
 @objcMembers
 public class TUILiveRoomAnchorViewController: UIViewController {
     
-    public var startLiveBlock:(()->Void)?
-
     // MARK: - private property.
     private var cancellableSet = Set<AnyCancellable>()
     private let coreView: LiveCoreView
@@ -33,18 +31,7 @@ public class TUILiveRoomAnchorViewController: UIViewController {
         if let coreView = coreView {
             self.coreView = coreView
         } else {
-            do {
-                let jsonObject: [String: Any] = [
-                    "api": "component",
-                    "component": 21
-                ]
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    LiveCoreView.callExperimentalAPI(jsonString)
-                }
-            } catch {
-                LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
-            }
+            KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)
             self.coreView = LiveCoreView(viewType: .pushView)
         }
         self.anchorView = AnchorView(liveInfo: liveInfo, coreView: self.coreView, behavior: behavior)
@@ -58,18 +45,7 @@ public class TUILiveRoomAnchorViewController: UIViewController {
         if let coreView = coreView {
             self.coreView = coreView
         } else {
-            do {
-                let jsonObject: [String: Any] = [
-                    "api": "component",
-                    "component": 21
-                ]
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    LiveCoreView.callExperimentalAPI(jsonString)
-                }
-            } catch {
-                LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
-            }
+            KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)
             self.coreView = LiveCoreView(viewType: .pushView)
         }
         self.anchorView = AnchorView(liveParams: liveParams, coreView: self.coreView, behavior: behavior)
@@ -83,7 +59,6 @@ public class TUILiveRoomAnchorViewController: UIViewController {
         }
         
         anchorView.delegate = self
-        anchorView.startLiveBlock = startLiveBlock
     }
     
     required init?(coder: NSCoder) {
@@ -114,18 +89,6 @@ public class TUILiveRoomAnchorViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.setNavigationBarHidden(true, animated: true)
-        startLiveBlock?()
-        
-#if DEV_MODE
-        let liveData = TestCaseItemModel(title: "禁用房间信息", view: anchorView, sel: #selector(AnchorView.disableHeaderLiveDataForTest(_:)))
-        let visitor = TestCaseItemModel(title: "禁用观众列表", view: anchorView, sel: #selector(AnchorView.disableHeaderVisitorCntForTest(_:)))
-        let coGuest = TestCaseItemModel(title: "禁用连麦按钮", view: anchorView, sel: #selector(AnchorView.disableFooterCoGuestForTest(_:)))
-        let coHost = TestCaseItemModel(title: "禁用连线按钮", view: anchorView, sel: #selector(AnchorView.disableFooterCoHostForTest(_:)))
-        let battle = TestCaseItemModel(title: "禁用PK按钮", view: anchorView, sel: #selector(AnchorView.disableFooterBattleForTest(_:)))
-        let soundEffect = TestCaseItemModel(title: "禁用音效按钮", view: anchorView, sel: #selector(AnchorView.disableFooterSoundEffectForTest(_:)))
-        let model = TestCaseModel(list: [liveData, visitor, coGuest, coHost, battle, soundEffect], obj: self)
-        TestTool.shared.registerCase(model)
-#endif
     }
     
     public override func loadView() {
@@ -169,14 +132,17 @@ extension TUILiveRoomAnchorViewController: AnchorViewDelegate {
         FloatWindow.shared.showFloatWindow(controller: self, provider: self)
     }
     
+    public func onStartLiving() {}
+    
     public func onEndLiving(state: AnchorState) {
         let liveDataModel = AnchorEndStatisticsViewInfo(roomId: liveInfo.liveID,
-                                                        liveDuration: state.duration,
-                                                        viewCount: state.viewCount,
-                                                        messageCount: state.messageCount,
-                                                        giftTotalCoins: state.giftTotalCoins,
-                                                        giftTotalUniqueSender: state.giftTotalUniqueSender,
-                                                        likeTotalUniqueSender: state.likeTotalUniqueSender)
+                                                        liveDuration: state.totalDuration,
+                                                        viewCount: state.totalViewers,
+                                                        messageCount: state.totalMessageSent,
+                                                        giftTotalCoins: state.totalGiftCoins,
+                                                        giftTotalUniqueSender: state.totalGiftUniqueSenders,
+                                                        likeTotalUniqueSender: state.totalLikesReceived,
+                                                        liveEndedReason: state.liveEndedReason)
         let anchorEndView = AnchorEndStatisticsView(endViewInfo: liveDataModel)
         anchorEndView.delegate = self
         view.addSubview(anchorEndView)
@@ -209,7 +175,7 @@ extension TUILiveRoomAnchorViewController: FloatWindowProvider {
 }
 
 extension TUILiveRoomAnchorViewController: AnchorEndStatisticsViewDelegate {
-    func onCloseButtonClick() {
+    public func onCloseButtonClick() {
         if let nav = navigationController {
             nav.popViewController(animated: true)
         } else {

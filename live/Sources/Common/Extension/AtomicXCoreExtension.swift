@@ -10,18 +10,21 @@ import RTCRoomEngine
 
 extension LiveCoreView {
     private static var cacheMap: [String: LiveCoreView] = [:]
-    private static var cacheOrder: [String] = []
+    private static var cacheOrder: [String] = [] // LRU 顺序，尾部为最近使用
     private static let cacheMaxCount = 10
 
     static func getCachedCoreView(liveID: String, type: CoreViewType) -> LiveCoreView {
         if let view = cacheMap[liveID] {
+            // 命中缓存，将 key 移到尾部（标记为最近使用）
             if let index = cacheOrder.firstIndex(of: liveID) {
                 cacheOrder.remove(at: index)
             }
             cacheOrder.append(liveID)
             return view
         } else {
+            // 缓存未命中，淘汰最久未使用的缓存项
             if cacheMap.count >= cacheMaxCount {
+                // 悬浮窗的房间不能删
                 if FloatWindow.shared.isShowingFloatWindow(), let floatLiveID = FloatWindow.shared.getCurrentRoomId() {
                     if let index = cacheOrder.firstIndex(of: floatLiveID) {
                         cacheOrder.remove(at: index)
@@ -53,12 +56,13 @@ extension LiveCoreView {
     }
 
     static func removeAllCachedViews() {
-        for item in cacheMap {
+        let floatLiveID: String? = FloatWindow.shared.isShowingFloatWindow() ? FloatWindow.shared.getCurrentRoomId() : nil
+        for item in cacheMap where item.key != floatLiveID {
             item.value.stopPreviewLiveStream(roomId: item.key)
             item.value.safeRemoveFromSuperview()
         }
-        cacheMap.removeAll()
-        cacheOrder.removeAll()
+        cacheMap = cacheMap.filter { $0.key == floatLiveID }
+        cacheOrder.removeAll(where: { $0 != floatLiveID })
     }
 }
 

@@ -52,6 +52,9 @@ class RecentCallsViewModel: ObservableObject {
     private func subscribeRecentCalls() {
         let selector = StatePublisherSelector(keyPath: \CallState.recentCalls)
         CallStore.shared.state.subscribe(selector)
+            .removeDuplicates { old, new in
+                old.map { $0.callId } == new.map { $0.callId }
+            }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] callInfos in
                 guard let self = self else { return }

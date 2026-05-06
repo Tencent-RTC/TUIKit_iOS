@@ -40,7 +40,6 @@ public class GiftPlayView: UIView {
     private var channelOccupancy: [Int: String] = [:]
     
     private let animationView: AnimationViewWrapper = .init()
-    private var isPureMode: Bool = false
     private var cancellableSet: Set<AnyCancellable> = []
     
     private lazy var normalAnimationManager: TUIGiftAnimationManager = {
@@ -187,10 +186,6 @@ public extension GiftPlayView {
         }
     }
     
-    func onPureModeSet(isPureMode: Bool) {
-        self.isPureMode = isPureMode
-    }
-    
     func startObserving() {
         removeObserver()
         addObserver()
@@ -220,7 +215,7 @@ extension GiftPlayView {
 
 extension GiftPlayView {
     private func showNormalAnimation(_ giftData: TUIGiftData) {
-        DataReporter.reportEventData(eventKey: getReportKey())
+        KeyMetrics.reportEventData(eventKey: getReportKey())
         let key = giftData.comboKey
         if let existingView = activeBulletViews[key] {
             existingView.addGiftCount(giftData.giftCount)
@@ -388,10 +383,10 @@ extension GiftPlayView {
     private func getReportKey() -> Int {
         let isSupportEffectPlayer = isSupportEffectPlayer()
         var key = Constants.DataReport.kDataReportLiveGiftSVGAPlayCount
-        if DataReporter.componentType == .liveRoom {
+        if KeyMetrics.componentType == .liveRoom {
             key = isSupportEffectPlayer ? Constants.DataReport.kDataReportLiveGiftEffectPlayCount :
                 Constants.DataReport.kDataReportLiveGiftSVGAPlayCount
-        } else if DataReporter.componentType == .voiceRoom {
+        } else if KeyMetrics.componentType == .voiceRoom {
             key = isSupportEffectPlayer ? Constants.DataReport.kDataReportVoiceGiftEffectPlayCount :
                 Constants.DataReport.kDataReportVoiceGiftSVGAPlayCount
         }

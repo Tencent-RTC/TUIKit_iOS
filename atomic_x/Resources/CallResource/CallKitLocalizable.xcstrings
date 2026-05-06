@@ -13,7 +13,7 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "已接听"
+            "value" : "已接通"
           }
         }
       }
@@ -575,6 +575,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "等待对方接受邀请"
+          }
+        }
+      }
+    },
+    "ai_transcriber_empty_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI Real-time Subtitles"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 实时字幕"
           }
         }
       }

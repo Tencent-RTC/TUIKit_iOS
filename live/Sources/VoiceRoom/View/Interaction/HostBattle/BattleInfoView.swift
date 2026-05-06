@@ -201,43 +201,54 @@ class BattleInfoView: UIView {
     }
         
     private func onBattleStart() {
-        timeLable.text = ""
         battleResultImageView.isHidden = true
         self.isHidden = false
         self.startBattleImageView.isHidden = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.startBattleImageView.isHidden = true
         }
     }
 
     private func startTimer(startTime: TimeInterval) {
-        timer?.invalidate()
+        cleanupTimer()
 
         guard let duration = battleStore.state.value.currentBattleInfo?.config.duration else {
             return
         }
 
-        let elapsedTime = Date().timeIntervalSince1970 - startTime
-        guard elapsedTime < duration else {
+        let startTimeMillis = Int64(startTime * 1000)
+        let durationMillis = Int64(duration * 1000)
+        let nowMillis = Int64(Date().timeIntervalSince1970 * 1000)
+        let elapsedTimeMillis = nowMillis - startTimeMillis
+
+        guard elapsedTimeMillis < durationMillis else {
+            updateTime(0)
             return
         }
 
-        remainingTime = duration - elapsedTime
+        let rawRemainingMillis = durationMillis - elapsedTimeMillis
+        let remainingTimeMillis = max(0, min(rawRemainingMillis, durationMillis))
+        remainingTime = TimeInterval(remainingTimeMillis) / 1000.0
 
-        updateTime(Int(remainingTime))
+        let initialSeconds = Int(remainingTimeMillis / 1000)
+        updateTime(initialSeconds)
 
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
 
-            self.remainingTime -= 1
-            self.updateTime(Int(self.remainingTime))
+            let currentMillis = Int64(Date().timeIntervalSince1970 * 1000)
+            let rawCurrentRemainingMillis = durationMillis - (currentMillis - startTimeMillis)
+            let currentRemainingMillis = max(0, min(rawCurrentRemainingMillis, durationMillis))
 
-            guard self.remainingTime > 0 else {
-                self.timer?.invalidate()
-                self.timer = nil
+            if currentRemainingMillis <= 0 {
+                self.remainingTime = 0
+                self.cleanupTimer()
                 self.onBattleEnd()
                 return
             }
+
+            self.remainingTime = TimeInterval(currentRemainingMillis) / 1000.0
+            self.updateTime(Int(currentRemainingMillis / 1000))
         }
     }
 

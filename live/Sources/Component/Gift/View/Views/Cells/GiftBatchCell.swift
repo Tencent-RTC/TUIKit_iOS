@@ -85,7 +85,6 @@ public class GiftBatchCell: GiftBaseCell {
         performScaleAnimation()
     }
     
-    // 核心算法：策略 B (智能阶梯)
     private func getStep(for current: UInt) -> UInt {
         if current < 10 {
             return 1       // 1-9: 个位递增
@@ -176,7 +175,7 @@ public class GiftBatchCell: GiftBaseCell {
     public override func performSendAction() {
         guard let gift = giftInfo, selectedCount > 0 else { return }
         
-        delegate?.cell(self, onSend: gift, count: selectedCount)
+        sendGift(count: selectedCount)
         
         selectedCount = 1
         updateBadgeUI(animate: true)

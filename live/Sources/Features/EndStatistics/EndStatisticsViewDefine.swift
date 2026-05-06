@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import AtomicXCore
 
-class AnchorEndStatisticsViewInfo {
+public class AnchorEndStatisticsViewInfo {
     let roomId: String
     let liveDuration: Int
     var viewCount: Int
@@ -15,8 +16,9 @@ class AnchorEndStatisticsViewInfo {
     let giftTotalCoins: Int
     let giftTotalUniqueSender: Int
     let likeTotalUniqueSender: Int
-    
-    init(roomId: String, liveDuration: Int, viewCount: Int, messageCount: Int, giftTotalCoins: Int, giftTotalUniqueSender: Int, likeTotalUniqueSender: Int) {
+    let liveEndedReason: LiveEndedReason
+
+    public init(roomId: String, liveDuration: Int, viewCount: Int, messageCount: Int, giftTotalCoins: Int, giftTotalUniqueSender: Int, likeTotalUniqueSender: Int, liveEndedReason: LiveEndedReason) {
         self.roomId = roomId
         self.liveDuration = liveDuration
         self.viewCount = viewCount
@@ -24,13 +26,14 @@ class AnchorEndStatisticsViewInfo {
         self.giftTotalCoins = giftTotalCoins
         self.giftTotalUniqueSender = giftTotalUniqueSender
         self.likeTotalUniqueSender = likeTotalUniqueSender
+        self.liveEndedReason = liveEndedReason
     }
 }
 
-protocol AnchorEndStatisticsViewDelegate: AnyObject {
+public protocol AnchorEndStatisticsViewDelegate: AnyObject {
     func onCloseButtonClick()
 }
 
-protocol AudienceEndStatisticsViewDelegate: AnyObject {
+public protocol AudienceEndStatisticsViewDelegate: AnyObject {
     func onCloseButtonClick()
 }

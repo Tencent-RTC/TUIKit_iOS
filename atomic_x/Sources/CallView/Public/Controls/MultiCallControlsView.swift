@@ -60,6 +60,9 @@ class MultiCallControlsView: UIView {
         setContainerViewCorner()
     }
     
+    // MARK: Internal
+    var enableVirtualBackground: Bool = true
+    
     // MARK: Private Properties
     private var cancellables = Set<AnyCancellable>()
     private let deviceStore = DeviceStore.shared
@@ -127,7 +130,7 @@ class MultiCallControlsView: UIView {
         let isCalledWaiting = !isCaller && CallStore.shared.state.value.selfInfo.status == .waiting
         if !isCalledWaiting && currentMode == .expanded {
             switchCameraBtn.isHidden = !open
-            virtualBackgroundBtn.isHidden = !open
+            virtualBackgroundBtn.isHidden = !open || !enableVirtualBackground
         }
     }
     
@@ -285,7 +288,7 @@ extension MultiCallControlsView {
             
             let isCameraOn = deviceStore.state.value.cameraStatus == .on
             switchCameraBtn.isHidden = !isCameraOn
-            virtualBackgroundBtn.isHidden = !isCameraOn
+            virtualBackgroundBtn.isHidden = !isCameraOn || !enableVirtualBackground
             
             if AudioRouteManager.isBluetoothHeadsetConnected() {
                 audioRoutePickerView.isHidden = false
@@ -680,7 +683,7 @@ extension MultiCallControlsView {
         
         let isCameraOn = deviceStore.state.value.cameraStatus == .on
         switchCameraBtn.isHidden = !isCameraOn
-        virtualBackgroundBtn.isHidden = !isCameraOn
+        virtualBackgroundBtn.isHidden = !isCameraOn || !enableVirtualBackground
         
         UIView.animate(withDuration: CallConstants.groupFunctionAnimationDuration, animations: {
             self.muteMicBtn.titleLabel.alpha = 1

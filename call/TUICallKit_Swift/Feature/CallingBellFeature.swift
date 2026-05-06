@@ -236,6 +236,8 @@ extension CallingBellFeature {
             }
         case .onCallEnded(_, _, _, _):
             stopPlayMusic()
+        default:
+            break
         }
     }
 }

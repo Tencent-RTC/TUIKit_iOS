@@ -13,10 +13,8 @@ import TUICore
 import AtomicX
 
 public protocol GiftListViewDelegate: AnyObject {
-    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> UICollectionViewCell.Type?
-    
-    func giftListView(_ view: GiftListView, configureCustomCell cell: UICollectionViewCell, for gift: Gift)
-    
+    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> GiftBaseCell.Type?
+        
     func giftListViewHeaderRightView(_ view: GiftListView) -> UIView?
     
     func giftListViewBottomView(_ view: GiftListView) -> UIView?
@@ -27,8 +25,7 @@ public protocol GiftListViewDelegate: AnyObject {
 }
 
 public extension GiftListViewDelegate {
-    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> UICollectionViewCell.Type? { return nil }
-    func giftListView(_ view: GiftListView, configureCustomCell cell: UICollectionViewCell, for gift: Gift) {}
+    func giftListView(_ view: GiftListView, cellClassFor gift: Gift) -> GiftBaseCell.Type? { return nil }
     func giftListViewHeaderRightView(_ view: GiftListView) -> UIView? { return nil }
     func giftListViewBottomView(_ view: GiftListView) -> UIView? { return nil }
     func giftListView(_ view: GiftListView, didSelect gift: Gift) {}
@@ -59,6 +56,7 @@ public class GiftListView: UIView {
     // Layout Config
     private var rows: Int = 2
     private var itemSize: CGSize = .init(width: 74, height: 74 + 53)
+    private var bottomContainerHeightConstraint: Constraint?
     
     // MARK: - UI Components
     
@@ -209,14 +207,15 @@ extension GiftListView {
         
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(separatorLine.snp.bottom).offset(10)
-            make.leading.trailing.bottom.equalToSuperview()
-            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.leading.trailing.equalToSuperview()
             make.height.equalTo(200.scale375())
         }
         
         bottomContainer.snp.makeConstraints { make in
-            make.bottom.leading.trailing.equalToSuperview()
-            make.height.equalTo(0)
+            make.top.equalTo(collectionView.snp.bottom)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            bottomContainerHeightConstraint = make.height.equalTo(0).constraint
         }
         
         addSwipeGestures()
@@ -232,16 +231,14 @@ extension GiftListView {
         }
         
         bottomContainer.subviews.forEach { $0.removeFromSuperview() }
-        bottomContainer.snp.remakeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            if let bottomView = delegate?.giftListViewBottomView(self) {
-                bottomContainer.addSubview(bottomView)
-                bottomView.snp.makeConstraints { make in
-                    make.edges.equalToSuperview()
-                }
-            } else {
-                make.height.equalTo(0)
+        if let bottomView = delegate?.giftListViewBottomView(self) {
+            bottomContainer.addSubview(bottomView)
+            bottomView.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
             }
+            bottomContainerHeightConstraint?.deactivate()
+        } else {
+            bottomContainerHeightConstraint?.activate()
         }
     }
     
@@ -340,13 +337,10 @@ extension GiftListView: UICollectionViewDataSource {
                 cell.configure(with: giftCategories[indexPath.item], isSelected: indexPath.item == currentSelectedCategoryIndex)
             }
             return cell
-        }
-        
-        else {
+        } else {
             let gift = currentGiftList[indexPath.row]
             
             var cellClass = delegate?.giftListView(self, cellClassFor: gift)
-
             if cellClass == nil {
                 let isAdvanced = !gift.resourceURL.isEmpty
                 
@@ -359,7 +353,6 @@ extension GiftListView: UICollectionViewDataSource {
             
             let finalClass = cellClass ?? GiftSingleCell.self
             let reuseIdentifier = finalClass.cellReuseIdentifier
-            
             collectionView.register(finalClass, forCellWithReuseIdentifier: reuseIdentifier)
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath)
@@ -368,8 +361,6 @@ extension GiftListView: UICollectionViewDataSource {
                 baseCell.giftInfo = gift
                 baseCell.delegate = self
                 baseCell.isSelected = (indexPath == currentSelectedCellIndex)
-                
-                delegate?.giftListView(self, configureCustomCell: baseCell, for: gift)
             }
             
             return cell
@@ -425,7 +416,7 @@ extension GiftListView: UICollectionViewDelegateFlowLayout {
 extension GiftListView: GiftCellDelegate {
     
     public func cell(_ cell: UICollectionViewCell, onSend gift: Gift, count: UInt) {
-        DataReporter.reportEventData(eventKey: getReportKey())
+        KeyMetrics.reportEventData(eventKey: getReportKey())
         
         store.sendGift(giftID: gift.giftID, count: UInt(count)) { [weak self] result in
             guard let self = self else { return }
@@ -445,7 +436,7 @@ private extension GiftListView {
     private func getReportKey() -> Int {
         let isSupportEffectPlayer = isSupportEffectPlayer()
         var key = Constants.DataReport.kDataReportLiveGiftSVGASendCount
-        switch DataReporter.componentType {
+        switch KeyMetrics.componentType {
         case .liveRoom:
             key = isSupportEffectPlayer ? Constants.DataReport.kDataReportLiveGiftEffectSendCount :
                 Constants.DataReport.kDataReportLiveGiftSVGASendCount

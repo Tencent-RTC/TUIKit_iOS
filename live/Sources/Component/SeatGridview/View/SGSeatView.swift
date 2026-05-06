@@ -17,7 +17,7 @@ class SGSeatView: UIView {
     private var userId: String {
         seatInfo.userId ?? ""
     }
-    private let ownerId: String
+    private(set) var ownerId: String
     private var isViewReady: Bool = false
     private var cancellableSet = Set<AnyCancellable>()
     private(set) var seatIndex: Int = -1
@@ -253,6 +253,14 @@ extension SGSeatView {
             make.trailing.equalToSuperview()
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
+        }
+    }
+
+    func updateOwnerId(_ newOwnerId: String) {
+        guard newOwnerId != ownerId else { return }
+        ownerId = newOwnerId
+        if let userId = seatInfo.userId, !userId.isEmpty {
+            toUserOnSeatStyle()
         }
     }
 

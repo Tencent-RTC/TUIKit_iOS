@@ -6,6 +6,7 @@
 //
 
 import Combine
+import ImSDK_Plus
 import Kingfisher
 import SnapKit
 import TUICore
@@ -191,7 +192,7 @@ class VoiceRoomRootView: RTCBaseView {
         barrageDisplayView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(16)
             make.bottom.equalTo(barrageButton.snp.top).offset(-20)
-            make.width.equalTo(305.scale375())
+            make.trailing.equalToSuperview().offset(-56.scale375())
             make.height.equalTo(212.scale375Height())
         }
         barrageButton.snp.makeConstraints { make in
@@ -270,7 +271,8 @@ extension VoiceRoomRootView {
         let seatCount = params.maxSeatCount > 0 ? params.maxSeatCount : defaultMaxSeatCount
         liveInfo.seatTemplate = SeatLayoutTemplate(seatLayoutTemplateID: liveInfo.seatLayoutTemplateID, maxSeatCount: seatCount)
         
-        liveListStore.createLive(liveInfo) { [weak self] result in
+        KeyMetrics.reportAtomicMetrics(platform: Constants.DataReport.kDataReportLiveIntegrationSuccessful)
+        liveListStore.startLive(liveInfo) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(_):
@@ -284,6 +286,7 @@ extension VoiceRoomRootView {
     }
     
     private func join(roomId: String) {
+        KeyMetrics.reportAtomicMetrics(platform: Constants.DataReport.kDataReportLiveIntegrationSuccessful)
         liveListStore.joinLive(liveID: roomId) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -335,6 +338,7 @@ extension VoiceRoomRootView {
                                 param: nil)
         } else {
             currentLiveOwner = liveListStore.state.value.currentLive.liveOwner
+            refreshLiveOwnerInfo()
         }
         initComponentView()
         karaokeManager.synchronizeMetadata(isOwner: isOwner)
@@ -424,7 +428,7 @@ extension VoiceRoomRootView {
             switch result {
             case .success(_):
                 karaokeManager.exit()
-                showAnchorEndView()
+                showAnchorEndView(liveEndedReason: .endedByHost)
             case .failure(let error):
                 let err = InternalError(errorInfo: error)
                 handleErrorMessage(err.localizedMessage)
@@ -432,15 +436,18 @@ extension VoiceRoomRootView {
         }
     }
     
-    private func showAnchorEndView() {
+    private func showAnchorEndView(liveEndedReason: LiveEndedReason) {
         let summaryData = summaryStore.state.value.summaryData
+        let rawDuration = Int(summaryData.totalDuration / 1000)
+        let liveDuration = (rawDuration > 0 && rawDuration < 86400 * 30) ? rawDuration : 0
         let liveDataModel = AnchorEndStatisticsViewInfo(roomId: liveID,
-                                                        liveDuration: Int(summaryData.totalDuration / 1000),
+                                                        liveDuration: liveDuration,
                                                         viewCount: Int(summaryData.totalViewers),
                                                         messageCount: Int(summaryData.totalMessageSent),
                                                         giftTotalCoins: Int(summaryData.totalGiftCoins),
                                                         giftTotalUniqueSender: Int(summaryData.totalGiftUniqueSenders),
-                                                        likeTotalUniqueSender: Int(summaryData.totalLikesReceived))
+                                                        likeTotalUniqueSender: Int(summaryData.totalLikesReceived),
+                                                        liveEndedReason: liveEndedReason)
         delegate?.rootView(self, showEndView: ["data": liveDataModel], isAnchor: true)
     }
     
@@ -453,6 +460,25 @@ extension VoiceRoomRootView {
             ]
             delegate?.rootView(self, showEndView: info, isAnchor: false)
         }
+    }
+}
+
+// MARK: - Refresh Live Owner Info
+
+extension VoiceRoomRootView {
+    private func refreshLiveOwnerInfo() {
+        guard let ownerID = currentLiveOwner?.userID, !ownerID.isEmpty else { return }
+        V2TIMManager.sharedInstance().getUsersInfo([ownerID]) { [weak self] infoList in
+            guard let self = self, let userInfo = infoList?.first else { return }
+            let newName = userInfo.nickName ?? ""
+            let newAvatar = userInfo.faceURL ?? ""
+            if !newName.isEmpty {
+                self.currentLiveOwner?.userName = newName
+            }
+            if !newAvatar.isEmpty {
+                self.currentLiveOwner?.avatarURL = newAvatar
+            }
+        } fail: { _, _ in }
     }
 }
 
@@ -600,7 +626,7 @@ extension VoiceRoomRootView {
                             }
                             self.routerManager.dismiss(dismissType: .alert)
                         }
-                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
+                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .blue) { [weak self] _ in
                             guard let self = self else { return }
                             
                             let seatList = seatStore.state.value.seatList
@@ -685,6 +711,7 @@ extension VoiceRoomRootView {
                     }
                     karaokeManager.exit()
                 } else {
+                    cancelPendingBattleIfNeeded()
                     if ktvView != nil { return }
                     ktvView = KtvView(karaokeManager: karaokeManager, isOwner: isOwner, isKTV: isKTVMode)
                     guard let ktvView = ktvView else { return }
@@ -737,7 +764,7 @@ extension VoiceRoomRootView {
                             }
                             self.routerManager.dismiss(dismissType: .alert)
                         }
-                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
+                        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .blue) { [weak self] _ in
                             guard let self = self else { return }
                             battleStore.acceptBattle(battleID: battleID) { [weak self] result in
                                 guard let self = self else { return }
@@ -793,6 +820,13 @@ extension VoiceRoomRootView {
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
+                    case .onAudienceJoined(audience: let audience):
+                        var barrage = Barrage()
+                        barrage.liveID = liveID
+                        barrage.sender = audience
+                        barrage.textContent = " \(String.comingText)"
+                        barrage.timestampInSecond = Date().timeIntervalSince1970
+                        barrageStore.appendLocalTip(message: barrage)
                     case .onAudienceMessageDisabled(audience: let user, isDisable: let isDisable):
                         guard user.userID == selfInfo.userID else { break }
                         if isDisable {
@@ -959,6 +993,20 @@ private func leaveRoom() {
         }
     }
 
+    private func cancelPendingBattleIfNeeded() {
+        guard let pending = viewStore.state.pendingBattle else { return }
+        battleStore.cancelBattleRequest(battleId: pending.battleID, userIdList: pending.inviteeUserIDs) { [weak self] result in
+            guard let self else { return }
+            switch result {
+                case .success():
+                    viewStore.onBattleRequestCleared()
+                case .failure(_):
+                    break
+            }
+        }
+        viewStore.onBattleRequestCleared()
+    }
+
     private func requestBattle(userIdList: [String]) {
         let config = BattleConfig(duration: 30, needResponse: false, extensionInfo: "")
         battleStore.requestBattle(config: config, userIDList: userIdList, timeout: 0) { [weak self] result in
@@ -1018,9 +1066,9 @@ extension VoiceRoomRootView {
                 guard let self = self else { return }
                 
                 switch event {
-                case .onLiveEnded(liveID: let liveID, reason: _, message: _):
+                case .onLiveEnded(liveID: let liveID, reason: let reason, message: _):
                     guard self.liveID == liveID else { return }
-                    onRoomDismissed(roomId: liveID)
+                    onRoomDismissed(roomId: liveID, liveEndedReason: reason)
                 case  .onKickedOutOfLive(liveID: let liveID, reason: let reason, message: let message):
                     onKickedOutOfRoom(roomId: liveID, reason: reason, message: message)
                 }
@@ -1038,11 +1086,11 @@ extension VoiceRoomRootView {
         }
     }
     
-    private func onRoomDismissed(roomId: String) {
+    private func onRoomDismissed(roomId: String, liveEndedReason: LiveEndedReason) {
         dismissAllPanels()
         karaokeManager.exit()
         if isOwner {
-            showAnchorEndView()
+            showAnchorEndView(liveEndedReason: liveEndedReason)
         } else {
             showAudienceEndView()
         }
@@ -1096,7 +1144,7 @@ extension VoiceRoomRootView {
             }
         }
         
-        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .primary) { [weak self] _ in
+        let confirmButton = AlertButtonConfig(text: String.acceptText, type: .blue) { [weak self] _ in
             guard let self = self else { return }
             coGuestStore.acceptInvitation(inviterID: userInfo.userID) { [weak self] result in
                 guard let self = self else { return }

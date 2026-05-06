@@ -42,4 +42,17 @@ public class RoomMainViewController: UIViewController, RouterContext {
         super.viewDidDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
     }
+    
+    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
+    
+    public override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return .portrait
+    }
 }

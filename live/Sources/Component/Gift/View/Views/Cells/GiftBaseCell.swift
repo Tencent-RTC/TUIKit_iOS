@@ -24,12 +24,17 @@ public protocol GiftCellDelegate: AnyObject {
 }
 
 public class GiftBaseCell: UICollectionViewCell {
-    public weak var delegate: GiftCellDelegate?
+    internal weak var delegate: GiftCellDelegate?
     public var giftInfo: Gift? {
         didSet {
             guard let gift = giftInfo else { return }
             updateContent(gift: gift)
         }
+    }
+    
+    public final func sendGift(count: UInt = 1) {
+        guard let gift = giftInfo, count > 0 else { return }
+        delegate?.cell(self, onSend: gift, count: count)
     }
     
     var config = GiftCellConfiguration()
@@ -57,7 +62,6 @@ public class GiftBaseCell: UICollectionViewCell {
         let view = UIView()
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
-        //view.backgroundColor = .bgOperateColor // 默认背景色
         view.backgroundColor = .clear
         return view
     }()
@@ -192,8 +196,7 @@ public class GiftBaseCell: UICollectionViewCell {
     }
     
     open func performSendAction() {
-        guard let gift = giftInfo else { return }
-        delegate?.cell(self, onSend: gift, count: 1)
+        sendGift(count: 1)
     }
     
     open func updateContent(gift: Gift) {
@@ -218,13 +221,10 @@ public class GiftBaseCell: UICollectionViewCell {
         
         imageBgView.backgroundColor = isSelected ? .bgEntrycardColor : .clear
         
-        //nameLabel.isHidden = showAction
         sendButton.isHidden = !showAction
         
-        // 强制布局更新
         selectedView.isHidden = false
         imageBgView.isHidden = false
-        //priceLabel.isHidden = false
     }
 }
 

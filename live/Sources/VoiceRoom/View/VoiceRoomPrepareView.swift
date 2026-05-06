@@ -84,7 +84,7 @@ class VoiceRoomPrepareView: RTCBaseView {
             self.routerManager.present(view: imagePanel, config: .bottomDefault())
         }))
         model.items.append(VRFeatureItem(normalTitle: .audioEffectsText,
-                                       normalImage: internalImage("live_prepare_audio_icon"),
+                                       normalImage: internalImage("voice_prepare_audio_icon"),
                                        designConfig: designConfig,
                                        actionClosure: { [weak self] _ in
             guard let self = self else { return }

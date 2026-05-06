@@ -11,13 +11,25 @@ import AtomicX
 import AtomicXCore
 import Combine
 import SnapKit
+import RTCRoomEngine
+
+private let TUICore_TEBeautyService = "TUICore_TEBeautyService"
+
 class CallMainViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
-    
+    private weak var beautyPopover: UIViewController?
+
     private lazy var mainView: CallView = {
         let view = CallView(frame: .zero)
+        var disabledFeatures: [Feature] = []
         if !TUICallKitImpl.shared.globalState.enableAITranscriber {
-            view.disableFeatures([.aiTranscriber])
+            disabledFeatures.append(.aiTranscriber)
+        }
+        if !TUICallKitImpl.shared.globalState.enableVirtualBackground {
+            disabledFeatures.append(.virtualBackground)
+        }
+        if !disabledFeatures.isEmpty {
+            view.disableFeatures(disabledFeatures)
         }
         return view
     }()
@@ -40,6 +52,17 @@ class CallMainViewController: UIViewController {
         button.isHidden = true
         return button
     }()
+
+    private lazy var beautyButton: UIButton = {
+        let button = UIButton(type: .custom)
+        if let image = CallKitBundle.getBundleImage(name: "icon_beauty") {
+            button.setImage(image, for: .normal)
+        }
+        button.imageView?.contentMode = .scaleAspectFit
+        button.isHidden = true
+        button.addTarget(self, action: #selector(beautyButtonTapped), for: .touchUpInside)
+        return button
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +70,7 @@ class CallMainViewController: UIViewController {
         view.addSubview(mainView)
         view.addSubview(floatWindowButton)
         view.addSubview(inviteUserButton)
+        view.addSubview(beautyButton)
         
         activateConstraints()
         bindInteraction()
@@ -73,6 +97,12 @@ class CallMainViewController: UIViewController {
             make.size.equalTo(24.scale375Width())
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(12.scale375Height())
             make.trailing.equalToSuperview().offset(-12.scale375Width())
+        }
+
+        beautyButton.snp.makeConstraints { make in
+            make.size.equalTo(CGSize(width: 36.scale375Width(), height: 36.scale375Width()))
+            make.bottom.equalToSuperview().offset(-86.scale375Height())
+            make.centerX.equalToSuperview().offset(-(110.scale375Width() + 50.scale375Width()))
         }
     }
     
@@ -128,6 +158,64 @@ class CallMainViewController: UIViewController {
                 self.inviteUserButton.isHidden = !isMultiCall
             }
             .store(in: &cancellables)
+
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector(keyPath: \.selfInfo.status))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] status in
+                guard let self = self else { return }
+                let activeCall = CallStore.shared.state.value.activeCall
+                let isVideoCall = activeCall.mediaType == .video
+                let isSingleCall = activeCall.chatGroupId.isEmpty && activeCall.inviteeIds.count <= 1
+                let hasBeautyService = TUICore.getService(TUICore_TEBeautyService) != nil
+                let shouldShowBeauty = status == .accept && isVideoCall && isSingleCall && hasBeautyService
+                self.beautyButton.isHidden = !shouldShowBeauty
+
+                if status != .accept {
+                    self.dismissBeautyPanel()
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Beauty Panel
+
+    @objc private func beautyButtonTapped() {
+        if beautyPopover != nil {
+            dismissBeautyPanel()
+            return
+        }
+        showBeautyPanel()
+    }
+
+    private func showBeautyPanel() {
+        let beautyView = TEBeautyView.shared()
+        beautyView.backClosure = { [weak self] in
+            self?.dismissBeautyPanel()
+        }
+
+        let beautyPanelBackgroundColor = UIColor("#1F2024")
+
+        let popover = AtomicPopover(
+            contentView: beautyView,
+            configuration: .init(
+                position: .bottom,
+                height: .wrapContent,
+                animation: .slideFromBottom,
+                backgroundColor: .custom(beautyPanelBackgroundColor),
+                onBackdropTap: { [weak self] in
+                    self?.dismissBeautyPanel()
+                }
+            )
+        )
+        beautyPopover = popover
+        present(popover, animated: true)
+    }
+
+    private func dismissBeautyPanel() {
+        beautyPopover?.dismiss(animated: true)
+        beautyPopover = nil
     }
     
     @objc private func floatWindowTapped() {

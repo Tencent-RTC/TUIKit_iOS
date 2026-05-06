@@ -13,7 +13,7 @@ import libpag
 #endif
 // MARK: - PAGAnimationEngine
 
-final class PAGAnimationEngine: NSObject, GiftAnimationEngine {
+final class PAGAnimationEngine: GiftAnimationEngine {
 
     // MARK: - Properties
 
@@ -50,8 +50,7 @@ final class PAGAnimationEngine: NSObject, GiftAnimationEngine {
 
     // MARK: - Init
 
-    override init() {
-        super.init()
+    init() {
         #if canImport(libpag)
         pagView.add(self)
         #endif

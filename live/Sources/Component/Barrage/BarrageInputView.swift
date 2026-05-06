@@ -106,8 +106,9 @@ extension BarrageInputView {
 
         placeholderLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12.scale375())
-            make.centerY.equalToSuperview()
-            make.trailing.equalTo(emojiButton.snp.leading).offset(-6.scale375())
+            make.top.equalToSuperview().offset(8.scale375())
+            make.bottom.equalToSuperview().offset(-8.scale375())
+            make.trailing.equalTo(emojiButton.snp.leading).offset(-12.scale375())
             make.height.equalTo(24.scale375Width())
         }
     }

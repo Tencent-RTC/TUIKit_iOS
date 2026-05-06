@@ -61,6 +61,24 @@ public class AudioRouteManager {
         return nil
     }
     
+    public static func syncAudioRouteFromSystem() {
+        guard isEnableiOSAvroutePickerViewMode else { return }
+        let audioSession = AVAudioSession.sharedInstance()
+        guard let output = audioSession.currentRoute.outputs.first else { return }
+        switch output.portType {
+        case .builtInSpeaker:
+            if deviceStore.state.value.currentAudioRoute != .speakerphone {
+                deviceStore.setAudioRoute(.speakerphone)
+            }
+        case .builtInReceiver:
+            if deviceStore.state.value.currentAudioRoute != .earpiece {
+                deviceStore.setAudioRoute(.earpiece)
+            }
+        default:
+            break
+        }
+    }
+
     public static func enableiOSAvroutePickerViewMode(_ enable: Bool) {
         if isEnableiOSAvroutePickerViewMode == enable { return }
         isEnableiOSAvroutePickerViewMode = enable
@@ -86,11 +104,7 @@ public class AudioRouteManager {
         
         if !enable {
             let currentRoute = deviceStore.state.value.currentAudioRoute
-            if currentRoute == .earpiece {
-                deviceStore.setAudioRoute(.speakerphone)
-            } else {
-                deviceStore.setAudioRoute(.earpiece)
-            }
+            deviceStore.setAudioRoute(currentRoute)
         }
         TUICallEngine.createInstance().getTRTCCloudInstance().callExperimentalAPI(paramsString)
     }

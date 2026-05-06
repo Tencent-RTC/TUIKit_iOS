@@ -11,8 +11,8 @@ import RTCRoomEngine
 
 public class TUILiveRoomAudienceViewController: UIViewController {
     
-    private lazy var audienceContainerView: AudienceContainerView = {
-        let view = AudienceContainerView(roomId: roomId)
+    private lazy var audienceView: AudienceView = {
+        let view = AudienceView(roomId: roomId)
         view.delegate = self
         view.rotateScreenDelegate = self
         return view
@@ -37,15 +37,11 @@ public class TUILiveRoomAudienceViewController: UIViewController {
     
     deinit {
         LiveKitLog.info("\(#file)", "\(#line)", "deinit TUILiveRoomAudienceViewController \(self)")
-        
-#if DEV_MODE
-        TestTool.shared.unregisterCaseFrom(self)
-#endif
         unregisterApplicationObserver()
     }
     
     public func leaveLive(onSuccess: (() -> Void)?, onError: ((ErrorInfo) -> Void)?) {
-        audienceContainerView.leaveLive(onSuccess: onSuccess, onError: onError)
+        audienceView.leaveLive(onSuccess: onSuccess, onError: onError)
     }
     
     public override func viewDidLoad() {
@@ -53,16 +49,6 @@ public class TUILiveRoomAudienceViewController: UIViewController {
         constructViewHierarchy()
         activateConstraints()
         registerApplicationObserver()
-        
-#if DEV_MODE
-        let scrolling = TestCaseItemModel(title: "禁用滑动", view: audienceContainerView, sel: #selector(AudienceContainerView.disableSlidingForTest(_:)))
-        let floatWin = TestCaseItemModel(title: "禁用悬浮窗按钮", view: audienceContainerView, sel: #selector(AudienceContainerView.disableHeaderFloatWinForTest(_:)))
-        let liveData = TestCaseItemModel(title: "禁用房间信息", view: audienceContainerView, sel: #selector(AudienceContainerView.disableHeaderLiveDataForTest(_:)))
-        let visitor = TestCaseItemModel(title: "禁用观众列表", view: audienceContainerView, sel: #selector(AudienceContainerView.disableHeaderVisitorCntForTest(_:)))
-        let coGuest = TestCaseItemModel(title: "禁用连麦按钮", view: audienceContainerView, sel: #selector(AudienceContainerView.disableFooterCoGuestForTest(_:)))
-        let model = TestCaseModel(list: [scrolling, floatWin, liveData, visitor, coGuest], obj: self)
-        TestTool.shared.registerCase(model)
-#endif
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -82,7 +68,14 @@ public class TUILiveRoomAudienceViewController: UIViewController {
     }
     
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return [.portrait, .landscapeRight, .landscapeLeft]
+        switch orientation {
+        case .landscapeRight:
+            return .landscapeRight
+        case .landscapeLeft:
+            return .landscapeLeft
+        default:
+            return .portrait
+        }
     }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
@@ -90,25 +83,27 @@ public class TUILiveRoomAudienceViewController: UIViewController {
     }
         
     public func forceLandscapeMode() {
+        orientation = .landscapeRight
         if #available(iOS 16.0, *) {
+            setNeedsUpdateOfSupportedInterfaceOrientations()
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
                 return
             }
-            let preferences = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .landscape)
+            let preferences = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .landscapeRight)
             scene.requestGeometryUpdate(preferences) { error in
                 debugPrint("forceLandscapeMode: \(error.localizedDescription)")
             }
         } else {
-            let orientation: UIDeviceOrientation = .landscapeRight
-            UIDevice.current.setValue(orientation.rawValue, forKey: "orientation")
+            let orientationValue: UIDeviceOrientation = .landscapeRight
+            UIDevice.current.setValue(orientationValue.rawValue, forKey: "orientation")
             UIViewController.attemptRotationToDeviceOrientation()
         }
-        
-        orientation = .landscapeRight
     }
     
     public func forcePortraitMode() {
+        orientation = .portrait
         if #available(iOS 16.0, *) {
+            setNeedsUpdateOfSupportedInterfaceOrientations()
             guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
                 return
             }
@@ -117,12 +112,10 @@ public class TUILiveRoomAudienceViewController: UIViewController {
                 debugPrint("forcePortraitMode: \(error.localizedDescription)")
             }
         } else {
-            let orientation: UIDeviceOrientation = .portrait
-            UIDevice.current.setValue(orientation.rawValue, forKey: "orientation")
+            let orientationValue: UIDeviceOrientation = .portrait
+            UIDevice.current.setValue(orientationValue.rawValue, forKey: "orientation")
             UIViewController.attemptRotationToDeviceOrientation()
         }
-        
-        orientation = .portrait
     }
 
     @objc private func applicationWillEnterForeground() {
@@ -136,11 +129,11 @@ public class TUILiveRoomAudienceViewController: UIViewController {
 
 extension TUILiveRoomAudienceViewController {
     private func constructViewHierarchy() {
-        view.addSubview(audienceContainerView)
+        view.addSubview(audienceView)
     }
     
     private func activateConstraints() {
-        audienceContainerView.snp.remakeConstraints { make in
+        audienceView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -161,7 +154,7 @@ extension TUILiveRoomAudienceViewController {
 
 // MARK: - AudienceEndStatisticsViewDelegate
 extension TUILiveRoomAudienceViewController: AudienceEndStatisticsViewDelegate {
-    func onCloseButtonClick() {
+    public func onCloseButtonClick() {
         if let nav = navigationController {
             nav.popViewController(animated: true)
         } else {
@@ -170,8 +163,8 @@ extension TUILiveRoomAudienceViewController: AudienceEndStatisticsViewDelegate {
     }
 }
 
-extension TUILiveRoomAudienceViewController: AudienceContainerViewDelegate {
-    public func onLiveEnded(roomId: String, avatarUrl: String, userName: String) {
+extension TUILiveRoomAudienceViewController: AudienceViewDelegate {
+    public func onLiveEnded(roomId: String, ownerName userName: String, ownerAvatarUrl avatarUrl: String) {
         let audienceEndView = AudienceEndStatisticsView(roomId: roomId, avatarUrl: avatarUrl, userName: userName)
         audienceEndView.delegate = self
         view.addSubview(audienceEndView)
@@ -182,7 +175,8 @@ extension TUILiveRoomAudienceViewController: AudienceContainerViewDelegate {
     }
     
     public func onClickFloatWindow() {
-        FloatWindow.shared.showFloatWindow(controller: self, provider: audienceContainerView)
+        forcePortraitMode()
+        FloatWindow.shared.showFloatWindow(controller: self, provider: audienceView)
     }
 }
 

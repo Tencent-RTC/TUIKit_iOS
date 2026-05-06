@@ -37,6 +37,7 @@ class BaseSelectionPanel: UIView {
         view.dataSource = self
         view.delegate = self
         view.backgroundColor = .clear
+        view.rowHeight = kCellRowHeight
         view.sectionFooterHeight = 0
         view.sectionHeaderHeight = 0
         view.showsVerticalScrollIndicator = false

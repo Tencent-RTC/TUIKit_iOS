@@ -25,6 +25,7 @@
 "TUICallKit.Recents.noCall" = "暫無通話記錄";
 "TUICallKit.Recents.noMissedCall" = "暫無未接來電";
 "TUICallKit.ErrorInvalidUserId" = "用戶不存在，請確認該用戶是否已註冊或是否輸入非法字符";
+"TUICallKit.ErrorGroupHasActiveCall" = "該群組已有通話正在進行中";
 
 "TUICallKit.switchCamera" = "翻轉";
 "TUICallKit.blurBackground" = "模糊背景";

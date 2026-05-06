@@ -29,6 +29,13 @@ public struct Constants {
         public static let kDataReportVoiceGiftEffectSendCount = 191_023
         public static let kDataReportVoiceGiftEffectPlayCount = 191_024
         
+        public static let kDataReportLiveIntegrationSuccessful = 1_120
+        
+        public static let kDataReportDemoLoginSuccess = 1_302
+        public static let kDataReportDemoClickCall = 1_303
+        public static let kDataReportDemoClickLive = 1_119
+        public static let kDataReportDemoClickRoom = 1_205
+        
         enum SGMetricsEvent: Int {
             case panelShowSeatGridView = 191026
             case panelHideSeatGridView = 191027

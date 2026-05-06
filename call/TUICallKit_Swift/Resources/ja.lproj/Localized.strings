@@ -25,6 +25,7 @@
 "TUICallKit.Recents.noCall" = "通話履歴がありません";
 "TUICallKit.Recents.noMissedCall" = "不在着信がありません";
 "TUICallKit.ErrorInvalidUserId" = "ユーザーが存在しません。登録済みか、または不正な文字が入力されていないかご確認ください";
+"TUICallKit.ErrorGroupHasActiveCall" = "このグループではすでに通話が進行中です";
 
 "TUICallKit.switchCamera" = "切り替え";
 "TUICallKit.blurBackground" = "背景をぼかす";

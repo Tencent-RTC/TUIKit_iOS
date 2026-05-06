@@ -31,4 +31,18 @@ public class RoomJoinViewController: UIViewController, RouterContext {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
+    
+    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
+    
+    public override var shouldAutorotate: Bool {
+        return false
+    }
+    
+    
+    public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return .portrait
+    }
 }

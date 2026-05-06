@@ -182,7 +182,6 @@ public class GiftComboCell: GiftBaseCell {
         if isComboActive {
             selectedView.isHidden = true
             sendButton.isHidden = true
-            //imageBgView.backgroundColor = .clear
             imageBgView.isHidden = true
         }
         comboContainerView.isHidden = !isComboActive
@@ -191,6 +190,7 @@ public class GiftComboCell: GiftBaseCell {
     
     public override func performSendAction() {
         triggerCombo()
+        updateSelectionState()
     }
     
     public override func handleHitWhenSelected() {
@@ -235,11 +235,10 @@ public class GiftComboCell: GiftBaseCell {
     // MARK: - Core Combo Logic
     
     private func triggerCombo() {
-        guard isSelected else { return }
+        guard isSelected, let gift = giftInfo else { return }
         
         if !isComboActive {
             isComboActive = true
-            updateSelectionState()
         }
         
         currentComboCount += 1
@@ -261,7 +260,8 @@ public class GiftComboCell: GiftBaseCell {
                        options: [.curveEaseOut, .allowUserInteraction, .beginFromCurrentState]) {
             self.badgeContainer.transform = .identity
         }
-        delegate?.cell(self, onSend: giftInfo!, count: 1)
+
+        sendGift(count: 1)
         
         startComboCountdown()
     }

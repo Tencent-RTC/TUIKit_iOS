@@ -86,7 +86,10 @@ class PictureInPictureFeature: NSObject {
     override init() {
         super.init()
         subscribeCallState()
-        let params = PictureInPictureParams(enable: true, cameraBackgroundCapture: true)
+    }
+    
+    func enablePictureInPicture(_ enable: Bool) {
+        let params = PictureInPictureParams(enable: enable, cameraBackgroundCapture: enable)
         sendPictureInPictureRequest(params)
     }
     
@@ -117,11 +120,7 @@ class PictureInPictureFeature: NSObject {
         downloadAvatars(for: userList)
     }
     
-    func closePictureInPicture() {
-        let params = PictureInPictureParams(enable: false)
-        sendPictureInPictureRequest(params)
-    }
-    
+
     private func downloadAvatars(for users: [CallParticipantInfo]) {
         let userIDs = users.map { $0.id }
         
@@ -319,7 +318,7 @@ extension PictureInPictureFeature {
                 if status == .accept {
                     self.handleParticipantsChanged()
                 } else if status == .none {
-                    self.closePictureInPicture()
+                    self.enablePictureInPicture(false)
                 }
             }
             .store(in: &cancellables)
@@ -331,7 +330,7 @@ extension PictureInPictureFeature {
         
         if participants.isEmpty {
             if let currentRequest = self.currentRequest, currentRequest.params.enable {
-                closePictureInPicture()
+                enablePictureInPicture(false)
             }
             return
         }

@@ -165,7 +165,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "XXXの接続を切断したいですか？"
+            "value": "xxxの接続を切断したいですか？"
           }
         },
         "ar": {
@@ -1961,6 +1961,41 @@
         }
       }
     },
+    "common_mute_audio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静音"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "靜音"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كتم الصوت"
+          }
+        }
+      }
+    },
     "common_mute_audio_by_master": {
       "extractionState": "manual",
       "localizations": {
@@ -2622,6 +2657,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "قام المذيع بتفعيل الفيديو الخاص بك"
+          }
+        }
+      }
+    },
+    "common_unmute_audio": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除静音"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除靜音"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュート"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء كتم الصوت"
           }
         }
       }
@@ -4557,31 +4627,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Temporarily Unclassified General Error"
+            "value": "Server is having a hiccup, please try again later"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂未归类的通用错误"
+            "value": "服务器开小差啦，请稍后重试"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "暫未歸類的通用錯誤"
+            "value": "伺服器開小差啦，請稍後重試"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "まだ分​​類されていない一般的なエラー"
+            "value": "サーバーが一時的に不調です。しばらくしてから再試行してください"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "خطأ عام غير مصنف مؤقتاً"
+            "value": "الخادم يواجه مشكلة مؤقتة، يرجى المحاولة لاحقاً"
           }
         }
       }
@@ -11656,6 +11726,41 @@
         }
       }
     },
+    "live_cohost_application_expired": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The application has expired."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该申请已失效"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該申請已失效"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この申請は無効です"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهت صلاحية التطبيق"
+          }
+        }
+      }
+    },
     "live_failed_to_enter_room": {
       "extractionState": "manual",
       "localizations": {
@@ -14347,6 +14452,146 @@
           "stringUnit": {
             "state": "translated",
             "value": "متتالي"
+          }
+        }
+      }
+    },
+    "common_end_live_by_server": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The live stream was shut down due to violations of regulations."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直播内容违规已被强制关播"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直播內容違規已強制關播"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "規則違反のため、ライブ配信は停止されました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم إيقاف البث المباشر بسبب انتهاكات للوائح."
+          }
+        }
+      }
+    },
+    "common_go_to_enable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go to Enable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去开启"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去開啟"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効にする"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الذهاب للتفعيل"
+          }
+        }
+      }
+    },
+    "common_live_screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Screen"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直播屏幕"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直播螢幕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面をライブ配信"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث الشاشة مباشرةً"
+          }
+        }
+      }
+    },
+    "common_select_app_to_live": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select App and Start Live"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择应用并开始直播"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇應用並開始直播"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリを選択してライブを開始"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بث مباشر للعبةاختر التطبيق وابدأ البث المباشر"
           }
         }
       }

@@ -36,7 +36,7 @@ Pod::Spec.new do |spec|
       'TUILiveKitBundle' => [
         'Resources/*.xcassets',
         'Resources/Localized/**/*.xcstrings',
-        'Sources/**/*.metal'
+        'Resources/Shaders/**/*.metal',
       ]
     }
   end
@@ -51,7 +51,7 @@ Pod::Spec.new do |spec|
       'TUILiveKitBundle' => [
         'Resources/*.xcassets',
         'Resources/Localized/**/*.xcstrings',
-        'Sources/**/*.metal'
+        'Resources/Shaders/**/*.metal',
       ]
     }
   end

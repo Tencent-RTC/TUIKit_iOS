@@ -177,9 +177,7 @@ class TUICallKitImpl: TUICallKit {
     
     override func enableFloatWindow(enable: Bool) {
         globalState.enableFloatWindow = enable
-        if !enable {
-            pictureInPictureFeature.closePictureInPicture()
-        }
+        pictureInPictureFeature.enablePictureInPicture(enable)
     }
     
     override func enableVirtualBackground (enable: Bool) {
@@ -346,10 +344,6 @@ extension TUICallKitImpl {
     @objc func setupCallEngine() {
         TUICallEngine.createInstance().`init`(TUILogin.getSdkAppID(), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "") { [weak self] in
             guard let self = self else { return }
-            self.enableVirtualBackground(enable: self.globalState.enableVirtualBackground)
-            if !self.globalState.enableFloatWindow {
-                self.pictureInPictureFeature.closePictureInPicture()
-            }
         } fail: { code, message in
             Logger.error("TUICallKitImpl initEngine failed. code: \(code), message: \(message ?? "")")
         }
@@ -493,8 +487,11 @@ extension TUICallKitImpl {
         case let .onCallEnded(callId: _, mediaType: _, reason: reason, userId: userId):
             TranscriberSettings.reset()
             hasSetDefaultDeviceState = false
+            TEBeautyView.releaseSharedInstance()
             closeCallKitViewController()
             handleCallEnded(reason: reason, userId: userId)
+        default:
+            break
         }
     }
     
@@ -576,6 +573,8 @@ extension TUICallKitImpl {
             errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorMicOccupied")
         } else if code == IM_CODE_INVALID_PARAMETERS {
             errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorInvalidUserId")
+        } else if code == ERR_SVR_GROUP_HAS_ACTIVE_CALL {
+            errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorGroupHasActiveCall")
         }
         return errorMessage ?? ""
     }

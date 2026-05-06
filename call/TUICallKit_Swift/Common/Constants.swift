@@ -109,6 +109,9 @@ class FrameworkConstants{
 // MARK: - IM Error Codes
 let IM_CODE_INVALID_PARAMETERS: Int32 = 6017
 
+// MARK: - Call Server Error Codes
+let ERR_SVR_GROUP_HAS_ACTIVE_CALL: Int32 = 101012
+
 // MARK: - Toast Event IDs
 struct ToastEventId {
     static let packageNotPurchased: Int = 172001

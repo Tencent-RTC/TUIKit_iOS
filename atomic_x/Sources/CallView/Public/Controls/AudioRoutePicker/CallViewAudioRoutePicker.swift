@@ -50,6 +50,7 @@ class CallViewAudioRoutePicker: AVRoutePickerView {
 
     @objc private func handleSystemRouteChange() {
         DispatchQueue.main.async {
+            AudioRouteManager.syncAudioRouteFromSystem()
             self.updateChangeSpeakerButtonTitle()
         }
     }

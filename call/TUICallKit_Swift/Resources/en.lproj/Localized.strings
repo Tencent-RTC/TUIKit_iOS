@@ -25,6 +25,7 @@
 "TUICallKit.Recents.noCall" = "No Calls";
 "TUICallKit.Recents.noMissedCall" = "No Missed Calls";
 "TUICallKit.ErrorInvalidUserId" = "User does not exist. Please verify if the user is registered or if invalid characters were entered";
+"TUICallKit.ErrorGroupHasActiveCall" = "This group already has an active call";
 
 "TUICallKit.switchCamera" = "Switch";
 "TUICallKit.blurBackground" = "Blur Background";

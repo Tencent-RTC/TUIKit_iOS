@@ -28,6 +28,7 @@ class NetWorkInfoView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
     private weak var presentedPanelController: UIViewController?
     private let isAudience: Bool
+    private let isScreenShareLive: Bool
     private weak var manager: NetWorkInfoManager?
     private weak var popupViewController: UIViewController?
     
@@ -138,12 +139,15 @@ class NetWorkInfoView: UIView {
     private var items: [NetWorkInfoItemViewType] = []
     private let liveID: String
     
-    init(liveID: String, manager: NetWorkInfoManager, isAudience: Bool = false) {
+    init(liveID: String, manager: NetWorkInfoManager, isAudience: Bool = false, isScreenShareLive: Bool = false) {
         self.liveID = liveID
         self.manager = manager
         self.isAudience = isAudience
+        self.isScreenShareLive = isScreenShareLive
         if isAudience == false {
-            items.append(.video)
+            if !isScreenShareLive {
+                items.append(.video)
+            }
             items.append(.audio)
         }
         items.append(.temperature)

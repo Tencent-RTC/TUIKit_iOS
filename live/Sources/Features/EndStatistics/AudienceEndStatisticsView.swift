@@ -8,7 +8,7 @@
 import UIKit
 import AtomicX
 
-class AudienceEndStatisticsView: UIView {
+public class AudienceEndStatisticsView: UIView {
     private let roomId: String
     private let avatarUrl: String
     private let userName: String
@@ -47,9 +47,9 @@ class AudienceEndStatisticsView: UIView {
         return label
     }()
     
-    weak var delegate: AudienceEndStatisticsViewDelegate?
+    public weak var delegate: AudienceEndStatisticsViewDelegate?
     
-    init(roomId: String, avatarUrl: String, userName: String) {
+    public init(roomId: String, avatarUrl: String, userName: String) {
         self.roomId = roomId
         self.avatarUrl = avatarUrl
         self.userName = userName
@@ -62,7 +62,7 @@ class AudienceEndStatisticsView: UIView {
     }
     
     private var isViewReady = false
-    override func didMoveToWindow() {
+    public override func didMoveToWindow() {
         super.didMoveToWindow()
         constructViewHierarchy()
         activateConstraints()

@@ -21,6 +21,7 @@ final class CallTranscriberView: UIView {
     
     private var cancellables = Set<AnyCancellable>()
     private var isCallAccepted = false
+    private var isTranscriberEmpty = true
     
     private lazy var transcriberButton: UIButton = {
         let button = UIButton(type: .custom)
@@ -32,7 +33,21 @@ final class CallTranscriberView: UIView {
         return button
     }()
     
-    private let transcriberView = TranscriberView(frame: .zero)
+    private lazy var emptyHintLabel: UILabel = {
+        let label = UILabel()
+        label.text = CallKitBundle.localizedString(forKey: "ai_transcriber_empty_hint")
+        label.textColor = UIColor(0xFFFFFF, alpha: 0.6)
+        label.font = .systemFont(ofSize: 18)
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
+    }()
+    
+    private lazy var transcriberView: TranscriberView = {
+        let transcriberView = TranscriberView(frame: .zero)
+        transcriberView.isHidden = true
+        return transcriberView
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -63,6 +78,7 @@ final class CallTranscriberView: UIView {
 extension CallTranscriberView {
     private func constructViewHierarchy() {
         addSubview(transcriberView)
+        addSubview(emptyHintLabel)
         addSubview(transcriberButton)
     }
     
@@ -71,6 +87,11 @@ extension CallTranscriberView {
             make.centerX.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.95)
             make.bottom.equalToSuperview()
+        }
+        
+        emptyHintLabel.snp.makeConstraints { make in
+            make.center.equalTo(transcriberView)
+            make.leading.trailing.equalTo(transcriberView).inset(12)
         }
         
         transcriberButton.snp.makeConstraints { make in
@@ -107,6 +128,16 @@ extension CallTranscriberView {
                 self?.updateTranscriberState()
             }
             .store(in: &cancellables)
+        
+        AITranscriberStore.shared.state
+            .subscribe(StatePublisherSelector(keyPath: \.realtimeMessageList))
+            .map { $0.isEmpty }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isEmpty in
+                self?.isTranscriberEmpty = isEmpty
+                self?.updateTranscriberState()
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -117,12 +148,13 @@ extension CallTranscriberView {
     }
     
     private func updateTranscriberState() {
-        let isShow = CallViewStore.shared.state.isShowTranscriberPanel
+        let isShowPanel = CallViewStore.shared.state.isShowTranscriberPanel
         let shouldShowButton = isCallAccepted && isEnabled
-        let shouldShowTranscriber = shouldShowButton && isShow
+        let shouldShowContent = shouldShowButton && isShowPanel
         
         transcriberButton.isHidden = !shouldShowButton
-        transcriberButton.isSelected = isShow
-        transcriberView.isHidden = !shouldShowTranscriber
+        transcriberButton.isSelected = isShowPanel
+        transcriberView.isHidden = !shouldShowContent
+        emptyHintLabel.isHidden = !(shouldShowContent && isTranscriberEmpty)
     }
 }

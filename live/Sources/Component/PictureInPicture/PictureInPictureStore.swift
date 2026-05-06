@@ -30,47 +30,50 @@ class PictureInPictureStore {
 
     let state = ObservableState(initialState: PictureInPictureState())
 
-    func enablePictureInPicture(enable: Bool, liveID: String) {
-        if liveID != state.state.liveID {
-            callEnablePictureInPicture(enable: false, liveID: state.state.liveID)
-        }
+    func enablePictureInPicture(enable: Bool, liveID: String, isLandscape: Bool = false) {
         state.update {
             $0.enablePictureInPictureToggle = enable
             $0.liveID = liveID
         }
-        callEnablePictureInPicture(enable: enable, liveID: liveID)
+        callEnablePictureInPicture(enable: enable, liveID: liveID, isLandscape: isLandscape)
     }
 
     private func reset() {
-        if !state.state.liveID.isEmpty {
-            callEnablePictureInPicture(enable: false, liveID: state.state.liveID)
-        }
         state.update {
             $0.liveID = ""
             $0.enablePictureInPictureToggle = false
         }
     }
 
-    private func callEnablePictureInPicture(enable: Bool, liveID: String) {
+    private func callEnablePictureInPicture(enable: Bool, liveID: String, isLandscape: Bool = false) {
+        let canvasWidth: CGFloat = 720
+        let canvasHeight: CGFloat = 1280
+        
+        let w: CGFloat = 1.0
+        let h: CGFloat = isLandscape ? (9.0 / 16.0 * canvasWidth / canvasHeight) : 1.0
+        let x: CGFloat = 0.0
+        let y: CGFloat = isLandscape ? ((1.0 - h) / 2.0) : 0.0
+        
         let jsonObject: [String: Any] = [
             "api": "enablePictureInPicture",
             "params": [
                 "enable": enable,
                 "room_id": liveID,
+                "camBackgroundCapture": true,
                 "canvas": [
-                    "width": 720,
-                    "height": 1280,
-                    "backgroundColor": "#0f1014"
+                    "width": canvasWidth,
+                    "height": canvasHeight,
+                    "backgroundColor": "#000000"
                 ],
                 "regions": [
                     [
                         "userId": "",
                         "userName": "",
-                        "backgroundColor": "",
-                        "width": 1.0,
-                        "height": 1.0,
-                        "x": 0.0,
-                        "y": 0.0,
+                        "backgroundColor": "#000000",
+                        "width": w,
+                        "height": h,
+                        "x": x,
+                        "y": y,
                         "fillMode": 1,
                         "streamType": "high",
                         "backgroundImage": ""

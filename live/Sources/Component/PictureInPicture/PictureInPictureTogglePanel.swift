@@ -111,7 +111,9 @@ class PictureInPictureTogglePanel: RTCBaseView {
             isEnabled = false
             showAtomicToast(text: .pipPermissionTitleText)
         }
-        PictureInPictureStore.shared.enablePictureInPicture(enable: isEnabled, liveID: liveID)
+        let currentLive = liveListStore.state.value.currentLive
+        let isScreenShareLive = currentLive.seatTemplate == .videoLandscape4Seats && currentLive.keepOwnerOnSeat
+        PictureInPictureStore.shared.enablePictureInPicture(enable: isEnabled, liveID: liveID, isLandscape: isScreenShareLive)
     }
     
     private func hasPictureInPicturePermission() -> Bool {

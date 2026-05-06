@@ -12,9 +12,6 @@ import Combine
 import AtomicXCore
 import RTCRoomEngine
 
-private let containerHeight = 36.0
-private let componentHeight = 32.0
-
 protocol VRTopViewDelegate: AnyObject {
     func topView(_ topView: VRTopView, tap event: VRTopView.TapEvent, sender: Any?) -> Void
 }
@@ -36,9 +33,7 @@ class VRTopView: UIView {
    
     private let liveInfoView: LiveInfoView = {
         let view = LiveInfoView()
-        view.mm_h = Int(componentHeight).scale375()
         view.backgroundColor = UIColor.g2.withAlphaComponent(0.4)
-        view.layer.cornerRadius = view.mm_h * 0.5
         return view
     }()
     
@@ -103,8 +98,6 @@ class VRTopView: UIView {
     
     private func activeViewConstraint() {
         liveInfoView.snp.remakeConstraints { make in
-            make.centerY.equalToSuperview()
-            make.height.equalTo(liveInfoView.mm_h)
             make.leading.equalToSuperview().inset(16.scale375())
             make.top.bottom.equalToSuperview()
         }

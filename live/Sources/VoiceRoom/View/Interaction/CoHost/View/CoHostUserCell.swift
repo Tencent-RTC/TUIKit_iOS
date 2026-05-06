@@ -84,7 +84,7 @@ class CoHostUserCell: UITableViewCell {
         userNameLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
-            make.width.lessThanOrEqualTo(120.scale375())
+            make.trailing.lessThanOrEqualTo(inviteButton.snp.leading).offset(-12.scale375())
         }
         
         inviteButton.snp.makeConstraints { make in

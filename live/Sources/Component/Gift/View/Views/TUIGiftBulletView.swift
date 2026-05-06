@@ -16,7 +16,7 @@ class TUIGiftBulletView: UIView {
     
     // MARK: - Properties
     private var giftData: TUIGiftData?
-    private var currentGiftCount: UInt8 = 0
+    private var currentGiftCount: UInt = 0
     private var comboKey: String = ""
     private var completionBlock: TUIGiftAnimationCompletionBlock?
     private var dismissTimer: Timer?
@@ -44,6 +44,8 @@ class TUIGiftBulletView: UIView {
     private let giftIconView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
+        view.layer.cornerRadius = 20
+        view.layer.masksToBounds = true
         return view
     }()
 
@@ -51,6 +53,8 @@ class TUIGiftBulletView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         label.textColor = .white
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
 
@@ -58,6 +62,8 @@ class TUIGiftBulletView: UIView {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 10)
         label.textColor = UIColor.white.withAlphaComponent(0.8)
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
@@ -101,7 +107,7 @@ class TUIGiftBulletView: UIView {
         updateDigitLabel()
     }
     
-    func addGiftCount(_ count: UInt8) {
+    func addGiftCount(_ count: UInt) {
         currentGiftCount += count
         updateDigitLabel()
         
@@ -189,13 +195,13 @@ class TUIGiftBulletView: UIView {
         nickNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(avatarView.snp.trailing).offset(8)
             make.top.equalTo(avatarView).offset(2)
-            make.width.lessThanOrEqualTo(100)
+            make.width.lessThanOrEqualTo(80)
         }
         
         giveDescLabel.snp.makeConstraints { make in
             make.leading.equalTo(nickNameLabel)
             make.bottom.equalTo(avatarView).offset(-2)
-            make.width.lessThanOrEqualTo(100)
+            make.width.lessThanOrEqualTo(80)
         }
         
         giftIconView.snp.makeConstraints { make in

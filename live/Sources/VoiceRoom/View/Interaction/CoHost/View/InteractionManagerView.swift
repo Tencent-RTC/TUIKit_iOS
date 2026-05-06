@@ -18,6 +18,7 @@ class InteractionManagerView: UIView {
     private var isInvite: Bool = false
     private var liveID: String
     private var battleID = ""
+    private var battleRequestUserIds: [String] = []
     private let topCard = VRCoHostCardView()
     private let bottomCard = VRCoHostCardView()
     private var cancellableSet: Set<AnyCancellable> = []
@@ -45,9 +46,12 @@ class InteractionManagerView: UIView {
         return view
     }()
 
-    init(liveID: String,toastService: VRToastService) {
+    private let viewStore: VoiceRoomViewStore
+
+    init(liveID: String, toastService: VRToastService, viewStore: VoiceRoomViewStore) {
         self.liveID = liveID
         self.toastService = toastService
+        self.viewStore = viewStore
         super.init(frame: .zero)
         backgroundColor = .bgOperateColor
     }
@@ -125,20 +129,36 @@ class InteractionManagerView: UIView {
                 switch event {
                     case .onBattleRequestReject(battleID: _, let inviter, _):
                         if inviter.userID == selfId {
+                            viewStore.onBattleRequestCleared()
                             setPKButtonIsEnable(isEnable: true)
                         }
                     case .onBattleRequestTimeout(_, let inviter, _):
                         if inviter.userID == selfId {
+                            viewStore.onBattleRequestCleared()
                             setPKButtonIsEnable(isEnable: true)
                         }
                     case .onBattleRequestCancelled(_, _, let invitee):
                         if invitee.userID == selfId {
+                            viewStore.onBattleRequestCleared()
                             setPKButtonIsEnable(isEnable: true)
                         }
                     case .onBattleEnded(_, _):
+                        viewStore.onBattleRequestCleared()
                         setPKButtonIsEnable(isEnable: true)
                     default:
                         break
+                }
+            }
+            .store(in: &cancellableSet)
+
+        coHostStore.state.subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .dropFirst()
+            .sink { [weak self] connected in
+                guard let self = self else { return }
+                if connected.isEmpty && isInvite && !battleID.isEmpty {
+                    cancelBattleRequest()
                 }
             }
             .store(in: &cancellableSet)
@@ -148,11 +168,13 @@ class InteractionManagerView: UIView {
         let selfLiveID = liveListStore.state.value.currentLive.liveID
         let config = BattleConfig(duration: 30, needResponse: true, extensionInfo: "")
         let requestUserIds = coHostState.connected.filter { $0.liveID != selfLiveID}.map(\.userID)
+        battleRequestUserIds = requestUserIds
         battleStore.requestBattle(config: config, userIDList: requestUserIds, timeout: 10) { [weak self] result in
             guard let self else { return }
             switch result {
                 case .success(let (battleInfo,_)):
                     self.battleID = battleInfo.battleID
+                    self.viewStore.onBattleRequestSent(battleID: battleInfo.battleID, inviteeUserIDs: requestUserIds)
                     setPKButtonIsEnable(isEnable: false)
                 case .failure(_):
                     break
@@ -166,17 +188,19 @@ class InteractionManagerView: UIView {
     }
 
     private func cancelBattleRequest() {
-        let selfUserId = TUIRoomEngine.getSelfInfo().userId
-        let userIdList = coHostState.connected.map { $0.userID }.filter({ $0 != selfUserId })
+        let userIdList = battleRequestUserIds
+        guard !userIdList.isEmpty else { return }
         battleStore.cancelBattleRequest(battleId: battleID, userIdList: userIdList, completion: {[weak self] result in
             guard let self else { return }
             switch result {
                 case .success():
+                    viewStore.onBattleRequestCleared()
                     setPKButtonIsEnable(isEnable: true)
                 case .failure(_):
                     break
             }
         })
+        battleRequestUserIds = []
     }
 
     private func setPKButtonIsEnable(isEnable: Bool) {
@@ -316,7 +340,7 @@ class VRCoHostCardView: UIView {
         userNameLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
-            make.width.lessThanOrEqualTo(120.scale375())
+            make.trailing.lessThanOrEqualTo(battleLable.snp.leading).offset(-12.scale375())
         }
 
         battleLable.snp.makeConstraints { make in

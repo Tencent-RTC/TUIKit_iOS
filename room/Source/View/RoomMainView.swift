@@ -35,6 +35,7 @@ public class RoomMainView: UIView, BaseView {
     // MARK: - Properties
     public weak var routerContext: RouterContext?
     private let roomStore: RoomStore = RoomStore.shared
+    private let deviceStore: DeviceStore = DeviceStore.shared
     
     private lazy var participantStore: RoomParticipantStore = {
         RoomParticipantStore.create(roomID: roomID)
@@ -46,8 +47,9 @@ public class RoomMainView: UIView, BaseView {
     private let behavior: RoomBehavior
     private let config: ConnectConfig
     private var roomType: RoomType = .standard
+    private var currentRoom: RoomInfo?
     private var localParticipant: RoomParticipant?
-    private let deviceOperator = DeviceOperator()
+    private var managerView: ParticipantManagerView?
     
     // MARK: - UI Components
     private lazy var topBarView: RoomTopBarView = {
@@ -67,7 +69,7 @@ public class RoomMainView: UIView, BaseView {
     
     private lazy var barrageInputView: BarrageInputView = {
         let view = BarrageInputView(roomId: roomID)
-        view.layer.cornerRadius = 20
+        view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         return view
     }()
@@ -77,20 +79,13 @@ public class RoomMainView: UIView, BaseView {
         return view
     }()
     
-    private lazy var screenShareOverlay: RoomScreenShareOverlayView = {
-        let overlayView = RoomScreenShareOverlayView()
-        overlayView.isHidden = true
-        return overlayView
+    private lazy var participantView: RoomParticipantView = {
+        return RoomParticipantView()
     }()
     
     private lazy var listView: ParticipantListView = {
         let listView = ParticipantListView(roomID: roomID, roomType: roomType)
         return listView
-    }()
-    
-    private lazy var handsUpView: HandsUpListView = {
-        let view = HandsUpListView(roomID: roomID)
-        return view
     }()
     
     private var inviteCameraAlertView: AtomicAlertView?
@@ -120,16 +115,28 @@ public class RoomMainView: UIView, BaseView {
     
     // MARK: - BaseView Implementation
     public func setupViews() {
+        roomType == .standard ? setupStandardViews() : setupWebinarViews()
+    }
+    
+    private func setupStandardViews() {
         addSubview(topBarView)
         addSubview(roomView)
-        roomView.addSubview(screenShareOverlay)
-        
+        addSubview(bottomBarView)
+    }
+    
+    private func setupWebinarViews() {
+        addSubview(topBarView)
+        addSubview(roomView)
         addSubview(barrageStreamView)
         addSubview(barrageInputView)
         addSubview(bottomBarView)
     }
     
     public func setupConstraints() {
+        roomType == .standard ? setupStandardConstraints() : setupWebinarConstraints()
+    }
+    
+    private func setupStandardConstraints() {
         topBarView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
@@ -139,26 +146,7 @@ public class RoomMainView: UIView, BaseView {
         roomView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(topBarView.snp.bottom)
-            make.bottom.equalTo(bottomBarView.snp.top).offset(-10)
-        }
-        
-        screenShareOverlay.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        
-        barrageStreamView.snp.makeConstraints { make in
-            make.height.equalTo(206)
-            make.left.equalToSuperview().offset(RoomSpacing.standard)
-            make.right.equalToSuperview().offset(-45)
-            make.bottom.equalTo(barrageInputView.snp.top).offset(-RoomSpacing.standard)
-        }
-        
-        barrageInputView.snp.makeConstraints { make in
-
-            make.left.equalToSuperview().offset(RoomSpacing.standard)
-            make.height.equalTo(40)
-            make.width.equalTo(130)
-            make.bottom.equalTo(bottomBarView.snp.top).offset(-20)
+            make.bottom.equalTo(bottomBarView.snp.top)
         }
         
         bottomBarView.snp.makeConstraints { make in
@@ -168,25 +156,56 @@ public class RoomMainView: UIView, BaseView {
         }
     }
     
+    private func setupWebinarConstraints() {
+        topBarView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide.snp.top)
+            make.left.right.equalToSuperview()
+            make.height.equalTo(53)
+        }
+        
+        roomView.snp.makeConstraints { make in
+            make.left.right.equalToSuperview()
+            make.top.equalTo(topBarView.snp.bottom).offset(30)
+            make.height.equalTo(roomView.snp.width).multipliedBy(9.0 / 16.0)
+        }
+        
+        barrageStreamView.snp.makeConstraints { make in
+            make.top.equalTo(roomView.snp.bottom).offset(RoomSpacing.large)
+            make.left.equalToSuperview().offset(RoomSpacing.standard)
+            make.right.equalToSuperview().offset(-RoomSpacing.standard)
+            make.bottom.equalTo(barrageInputView.snp.top).offset(-RoomSpacing.large)
+        }
+        
+        barrageInputView.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(RoomSpacing.standard)
+            make.height.equalTo(40)
+            make.width.equalTo(240)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+        
+        bottomBarView.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-RoomSpacing.standard)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            make.height.equalTo(40)
+        }
+    }
+    
     public func setupStyles() {
         backgroundColor = RoomColors.inRoomBackground
-        if roomType == .standard {
-            barrageStreamView.isHidden = true
-            barrageInputView.isHidden = true
-        }
     }
     
     public func setupBindings() {
         listView.delegate = self
         topBarView.delegate = self
         bottomBarView.delegate = self
-        screenShareOverlay.delegate = self
+        
         roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom))
             .receive(on: RunLoop.main)
             .sink { [weak self] roomInfo in
                 guard let self = self else { return }
-                if let roomInfo = roomInfo {
-                    barrageStreamView.setOwnerId(roomInfo.roomOwner.userID)
+                currentRoom = roomInfo
+                if let currentRoom = roomInfo {
+                    barrageStreamView.setOwnerId(currentRoom.roomOwner.userID)
                 }
             }
             .store(in: &cancellableSet)
@@ -196,8 +215,6 @@ public class RoomMainView: UIView, BaseView {
             .sink { [weak self] participant in
                 guard let self = self else { return }
                 localParticipant = participant
-                let screenShareStatus = participant?.screenShareStatus ?? .off
-                screenShareOverlay.isHidden = screenShareStatus == .off
             }
             .store(in: &cancellableSet)
         
@@ -263,7 +280,6 @@ extension RoomMainView {
             guard let self = self else { return }
             switch result {
             case .success():
-                handleConnectConfig()
                 handleDidEnterRoom()
             case .failure(let err):
                 showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
@@ -277,9 +293,6 @@ extension RoomMainView {
             guard let self = self else { return }
             switch result {
             case .success():
-                if roomType == .standard {
-                    handleConnectConfig()
-                }
                 handleDidEnterRoom()
             case .failure(let err):
                 showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
@@ -289,22 +302,19 @@ extension RoomMainView {
     }
     
     private func handleDidEnterRoom() {
-        deviceOperator.setAudioRoute(route: config.autoEnableSpeaker ? .speakerphone : .earpiece)
+        if roomType == .standard {
+            if config.autoEnableCamera {
+                openLocalCamera()
+            }
+            
+            if config.autoEnableMicrophone {
+                unmuteMicrophone()
+            }
+        }
+        
+        setAudioRoute(route: config.autoEnableSpeaker ? .speakerphone : .earpiece)
         participantStore.getParticipantList(cursor: "", completion: nil)
-        
-        if roomType == .webinar {
-            participantStore.getAudienceList(cursor: "", completion: nil)
-        }
-    }
-    
-    private func handleConnectConfig() {
-        if config.autoEnableCamera {
-            openLocalCamera()
-        }
-        
-        if config.autoEnableMicrophone {
-            unmuteMicrophone()
-        }
+        participantStore.getAudienceList(cursor: "", completion: nil)
     }
     
     private func endRoom() {
@@ -334,32 +344,61 @@ extension RoomMainView {
 
 extension RoomMainView {
     private func openLocalCamera() {
-        Task { @MainActor in
-            do {
-                try await deviceOperator.openLocalCamera()
-            } catch let error as ErrorInfo {
-                if error.code == RoomError.openCameraNeedPermissionFromAdmin.rawValue {
-                    showAtomicToast(text: InternalError(code: error.code, message: error.message).localizedMessage, style: .warning)
+        deviceStore.openLocalCamera(isFront: deviceStore.state.value.isFrontCamera) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(): break
+            case .failure(let err):
+                if err.code == RoomError.openCameraNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
                 } else {
-                    showAtomicToast(text: InternalError(code: error.code, message: error.message).localizedMessage, style: .error)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
         }
     }
     
+    private func closeLocalCamera() {
+        deviceStore.closeLocalCamera()
+    }
+
+    private func muteMicrophone() {
+        participantStore.muteMicrophone()
+    }
+    
     private func unmuteMicrophone() {
-        Task { @MainActor in
-            do {
-                try await deviceOperator.openLocalMicrophone()
-                try await deviceOperator.unmuteMicrophone(participantStore: participantStore)
-            } catch let error as ErrorInfo {
-                if error.code == RoomError.openMicrophoneNeedPermissionFromAdmin.rawValue {
-                    showAtomicToast(text: InternalError(code: error.code, message: error.message).localizedMessage, style: .warning)
+        deviceStore.openLocalMicrophone { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success():
+                unmuteMicrophoneInner()
+            case .failure(let err):
+                if err.code == RoomError.openMicrophoneNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
                 } else {
-                    showAtomicToast(text: InternalError(code: error.code, message: error.message).localizedMessage, style: .error)
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
                 }
             }
         }
+    }
+    
+    private func unmuteMicrophoneInner() {
+        participantStore.unmuteMicrophone { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(): break
+            case .failure(let err):
+                if err.code == RoomError.openMicrophoneNeedPermissionFromAdmin.rawValue {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .warning)
+                } else {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
+            }
+        }
+    }
+    
+    private func setAudioRoute(route: AudioRoute) {
+        deviceStore.setAudioRoute(route)
     }
     
     private func kickOutRoom(userID: String, name: String) {
@@ -382,32 +421,6 @@ extension RoomMainView {
                                      cancelButton: cancelButtonConfig,
                                      confirmButton: confirmButtonConfig)
         AtomicAlertView(config: config).show()
-    }
-    
-    private func setAdmin(userID: String, userName: String, completion: @escaping () -> Void) {
-        participantStore.setAdmin(userID: userID) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                showAtomicToast(text: String.setAsAdminSuccess.localizedReplace(userName), style: .success)
-            case .failure(let err):
-                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
-            }
-            completion()
-        }
-    }
-    
-    private func revokeAdmin(userID: String, userName: String, completion: @escaping () -> Void) {
-        participantStore.revokeAdmin(userID: userID) { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                showAtomicToast(text: String.revokeAdminSuccess.localizedReplace(userName), style: .success)
-            case .failure(let err):
-                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
-            }
-            completion()
-        }
     }
 }
 
@@ -550,8 +563,8 @@ extension RoomMainView {
     
     private func handleOnParticipantDemotedToAudience(userInfo: RoomUser) {
         if userInfo.userID == LoginStore.shared.state.value.loginUserInfo?.userID {
-            deviceOperator.closeLocalMicrophone()
-            deviceOperator.closeLocalCamera()
+            deviceStore.closeLocalMicrophone()
+            deviceStore.closeLocalCamera()
         }
     }
     
@@ -571,13 +584,12 @@ extension RoomMainView {
     private func handleOnParticipantDeviceClosed(deviceType: DeviceType) {
         switch deviceType {
         case .camera:
-            deviceOperator.closeLocalCamera()
+            closeLocalCamera()
             showAtomicToast(text: .cameraClosedByHost, style: .warning)
         case .microphone:
-            deviceOperator.muteMicrophone(participantStore: participantStore)
+            muteMicrophone()
             showAtomicToast(text: .mutedByHost, style: .warning)
-        case .screenShare:
-            showAtomicToast(text: .screenShareClosedByHost, style: .warning)
+        default: break
         }
     }
     
@@ -609,12 +621,13 @@ extension RoomMainView: RoomTopBarViewDelegate {
         let actionSheet = RoomActionSheet(message: .endRoomConfirm,
                                           actions: [
                                             RoomActionSheet.Action(title: .leaveRoom,
+                                                                   style: .default,
                                                                    handler: { [weak self] action in
                                                                        guard let self = self else { return }
                                                                        leaveRoom()
                                                                    }),
                                             RoomActionSheet.Action(title: .endRoom,
-                                                                   titleColor: RoomColors.destructiveActionButtonTitleColor,
+                                                                   style: .destructive,
                                                                    handler: { [weak self] action in
                                                                        guard let self = self else { return }
                                                                        endRoom()
@@ -627,6 +640,7 @@ extension RoomMainView: RoomTopBarViewDelegate {
         let actionSheet = RoomActionSheet(message: .leaveRoomConfirm,
                                           actions: [
                                             RoomActionSheet.Action(title: .leaveRoom,
+                                                                   style: .default,
                                                                    handler: { [weak self] action in
                                                                        guard let self = self else { return }
                                                                        leaveRoom()
@@ -641,8 +655,15 @@ extension RoomMainView: RoomBottomBarViewDelegate {
         listView.show(in: self, animated: true)
     }
     
-    public func onHandsUpManagerButtonTapped() {
-        handsUpView.show(in: self, animated: true)
+    public func onMicrophoneButtonTapped() {
+        guard let localParticipant = localParticipant else { return }
+        localParticipant.microphoneStatus == .on ? muteMicrophone() : unmuteMicrophone()
+         
+    }
+    
+    public func onCameraButtonTapped() {
+        guard let localParticipant = localParticipant else { return }
+        localParticipant.cameraStatus == .on ? closeLocalCamera() : openLocalCamera()
     }
 }
 
@@ -734,12 +755,26 @@ extension RoomMainView: ParticipantManagerViewDelegate {
     
     public func handleSetAsAdmin(view: ParticipantManagerView, participant: RoomParticipant) {
         if participant.role == .generalUser {
-            setAdmin(userID: participant.userID, userName: participant.name) {
-                view.dismiss()
+            participantStore.setAdmin(userID: participant.userID) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    showAtomicToast(text: String.setAsAdminSuccess.localizedReplace(participant.name), style: .success)
+                case .failure(let err):
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
+                view.dismiss(animated: true)
             }
         } else if participant.role == .admin {
-            revokeAdmin(userID: participant.userID, userName: participant.name) {
-                view.dismiss()
+            participantStore.revokeAdmin(userID: participant.userID) { [weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success:
+                    showAtomicToast(text: String.revokeAdminSuccess.localizedReplace(participant.name), style: .success)
+                case .failure(let err):
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                }
+                view.dismiss(animated: true)
             }
         }
     }
@@ -768,37 +803,8 @@ extension RoomMainView: ParticipantManagerViewDelegate {
 }
 
 extension RoomMainView: AudienceManagerViewDelegate {
-    public func handleSetAsAdmin(view: AudienceManagerView, audience: RoomUser, isAdmin: Bool) {
-        if isAdmin {
-            revokeAdmin(userID: audience.userID, userName: audience.name) {
-                view.dismiss()
-            }
-        } else {
-            setAdmin(userID: audience.userID, userName: audience.name) {
-                view.dismiss()
-            }
-        }
-    }
-    
     public func handleKickOut(view: AudienceManagerView, audience: RoomUser) {
         kickOutRoom(userID: audience.userID, name: audience.name)
-    }
-}
-
-extension RoomMainView: RoomScreenShareOverlayViewDelegate {
-    public func onStopScreenShareButtonTapped() {
-        let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
-            view.dismiss()
-        }
-        
-        let stopButtonConfig = AlertButtonConfig(text: .stop, type: .blue, isBold: false) { [weak self] view in
-            guard let self = self else { return }
-            deviceOperator.stopScreenShare()
-            view.dismiss()
-        }
-        
-        let config = AlertViewConfig(content: .stopScreenShare, iconUrl: nil, cancelButton: cancelButtonConfig, confirmButton: stopButtonConfig)
-        AtomicAlertView(config: config).show()
     }
 }
 
@@ -812,6 +818,7 @@ fileprivate extension String {
     static let becameAdmin = "roomkit_toast_you_are_admin".localized
     static let adminRevoked = "roomkit_toast_you_are_no_longer_admin".localized
     static let becameHost = "roomkit_toast_you_are_owner".localized
+    static let administrator = "roomkit_role_admin".localized
     
     // Device invitations
     static let inviteTurnOnCamera = "roomkit_msg_invite_start_video"
@@ -869,8 +876,7 @@ fileprivate extension String {
     static let switchToParticipant = "roomkit_switch_to_participant"
     static let switchToParticipantBySelf = "roomkit_switch_to_participant_byself".localized
     
-    // Screen Share
-    static let stopScreenShare = "roomkit_stop_screen_share".localized
-    static let stop = "roomkit_btn_stop".localized
-    static let screenShareClosedByHost = "roomkit_toast_screen_share_closed_by_host".localized
+    // Transfer audience
+    static let switchToAudience = "roomkit_switch_to_audience"
+    static let switchToAudienceBySelf = "roomkit_switch_to_audience_byself".localized
 }

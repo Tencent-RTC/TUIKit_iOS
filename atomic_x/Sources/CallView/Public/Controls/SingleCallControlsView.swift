@@ -27,6 +27,9 @@ class SingleCallControlsView: UIView {
         GCDTimer.cancel(timerName: timer) {}
     }
     
+    // MARK: Internal
+    var enableVirtualBackground: Bool = true
+    
     // MARK: Private
     private var cancellables = Set<AnyCancellable>()
     private let deviceStore = DeviceStore.shared
@@ -79,7 +82,7 @@ class SingleCallControlsView: UIView {
 
         if !isCalleeWaiting && !isCallerWaiting {
             switchCameraBtn.isHidden = !isOn
-            virtualBackgroundButton.isHidden = !isOn
+            virtualBackgroundButton.isHidden = !isOn || !enableVirtualBackground
         }
     }
     
@@ -166,7 +169,7 @@ extension SingleCallControlsView {
                 muteMicBtn.isHidden = false
                 closeCameraBtn.isHidden = false
                 switchCameraBtn.isHidden = false
-                virtualBackgroundButton.isHidden = false
+                virtualBackgroundButton.isHidden = !enableVirtualBackground
                 updateSwitchCameraButton(isSmallIcon: true)
                 updateVirtualBackgroundButton(isOpened: isBlurBackgroundEnabled, isSmallIcon: true)
 
@@ -181,7 +184,7 @@ extension SingleCallControlsView {
                 hangupBtn.updateTitle(title: CallKitLocalization.localized("cancel"))
                 
                 switchCameraBtn.isHidden = false
-                virtualBackgroundButton.isHidden = false
+                virtualBackgroundButton.isHidden = !enableVirtualBackground
                 closeCameraBtn.isHidden = false
                 updateSwitchCameraButton(isSmallIcon: false)
                 updateVirtualBackgroundButton(isOpened: isBlurBackgroundEnabled, isSmallIcon: false)

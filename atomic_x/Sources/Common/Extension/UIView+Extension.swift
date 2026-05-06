@@ -46,7 +46,7 @@ extension UIView {
         static var gradientLayerKey = "gradientLayerKey"
     }
 
-    var gradientLayer: CAGradientLayer? {
+    public var gradientLayer: CAGradientLayer? {
         get {
             return objc_getAssociatedObject(self, &AssociatedKeys.gradientLayerKey) as? CAGradientLayer
         }
@@ -55,7 +55,7 @@ extension UIView {
         }
     }
 
-    func removeGradientLayer() {
+    public func removeGradientLayer() {
         guard let glayer = gradientLayer else {
             return
         }

@@ -15,6 +15,7 @@ class LiveListViewCell: UICollectionViewCell {
     
     private lazy var imageBgView: UIImageView = {
         let view = UIImageView(frame: .zero)
+        view.contentMode = .scaleAspectFill
         return view
     }()
     
@@ -89,6 +90,7 @@ class LiveListViewCell: UICollectionViewCell {
         coreView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)
         coreView.startPreviewLiveStream(roomId: roomId, isMuteAudio: isMuteAudio) { [weak self] _ in
             guard let self = self else { return }
             self.coreView?.playingLiveID = roomId
@@ -120,6 +122,7 @@ class LiveListViewCell: UICollectionViewCell {
             return
         }
         LiveKitLog.info("\(#file)", "\(#line)", "unmutePreviewVideoStream roomId:\(roomId)")
+        KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)
         coreView?.startPreviewLiveStream(roomId: roomId, isMuteAudio: isMute) { [weak self] _ in
             guard let self = self else { return }
             coreView?.isMuteAudio = isMute

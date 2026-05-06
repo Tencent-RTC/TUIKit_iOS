@@ -42,6 +42,8 @@ extension NSObject {
     }
     
     @objc func initSdkSuccess(_ notification: Notification) {
-        TUICallKit.createInstance()
+        DispatchQueue.main.async {
+            TUICallKit.createInstance()
+        }
     }
 }

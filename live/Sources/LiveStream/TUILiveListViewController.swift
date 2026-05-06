@@ -177,18 +177,18 @@ class LivePresentationController: UIPresentationController {
     }
 }
 
-class LivePresentAnimation: NSObject, UIViewControllerAnimatedTransitioning {
-    var originFrame: CGRect
+public class LivePresentAnimation: NSObject, UIViewControllerAnimatedTransitioning {
+    public var originFrame: CGRect
 
-    init(originFrame: CGRect) {
+    public  init(originFrame: CGRect) {
         self.originFrame = originFrame
     }
 
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
+    public  func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return 0.5
     }
 
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+    public func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         guard let toVC = transitionContext.viewController(forKey: .to) else { return }
         let containerView = transitionContext.containerView
 
@@ -208,18 +208,18 @@ class LivePresentAnimation: NSObject, UIViewControllerAnimatedTransitioning {
     }
 }
 
-class LiveTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
-    var originFrame: CGRect
+public class LiveTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
+    public var originFrame: CGRect
 
-    init(originFrame: CGRect) {
+    public init(originFrame: CGRect) {
         self.originFrame = originFrame
     }
 
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return LivePresentAnimation(originFrame: originFrame)
     }
     
-    func presentationController(forPresented presented: UIViewController,
+    public func presentationController(forPresented presented: UIViewController,
                                 presenting: UIViewController?,
                                 source: UIViewController) -> UIPresentationController? {
         return LivePresentationController(presentedViewController: presented, presenting: presenting)

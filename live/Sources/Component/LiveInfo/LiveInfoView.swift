@@ -53,10 +53,6 @@ public class LiveInfoView: UIView {
         return button
     }()
     
-    public func initialize(liveInfo: AtomicXCore.LiveInfo) {
-        service.initLiveInfo(liveInfo: liveInfo)
-    }
-    
     public init(enableFollow: Bool = true, frame: CGRect = .zero) {
         self.enableFollow = enableFollow
         super.init(frame: frame)
@@ -67,12 +63,20 @@ public class LiveInfoView: UIView {
     }
     
     private var isViewReady = false
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = bounds.height * 0.5
+    }
+    
     public override func didMoveToWindow() {
         super.didMoveToWindow()
         guard !isViewReady else { return }
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        backgroundColor = UIColor.g1.withAlphaComponent(0.4)
+        clipsToBounds = true
         isViewReady = true
     }
 
@@ -87,23 +91,25 @@ public class LiveInfoView: UIView {
     private func activateConstraints() {
         avatarView.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(4.scale375())
-            make.centerY.equalToSuperview()
+            make.top.bottom.equalToSuperview().inset(4.scale375())
         }
 
         roomOwnerNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
-            if state.selfUserId != state.ownerId {
-                make.trailing.equalTo(followButton.snp.leading).offset(-8.scale375())
-            } else {
-                make.trailing.equalToSuperview().inset(8.scale375())
-            }
+            make.width.lessThanOrEqualTo(100.scale375())
             make.centerY.equalToSuperview()
-            make.height.equalToSuperview()
         }
         if !isOwner && enableFollow {
+            followButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+            roomOwnerNameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
             followButton.snp.makeConstraints { make in
+                make.leading.equalTo(roomOwnerNameLabel.snp.trailing).offset(8.scale375())
                 make.trailing.equalToSuperview().inset(8.scale375())
                 make.centerY.equalToSuperview()
+            }
+        } else {
+            roomOwnerNameLabel.snp.makeConstraints { make in
+                make.trailing.equalToSuperview().inset(8.scale375())
             }
         }
     }
@@ -112,8 +118,25 @@ public class LiveInfoView: UIView {
         followButton.setClickAction { [weak self] _ in
             self?.followButtonClick()
         }
-        
+        subscribeLiveListState()
         subscribeRoomInfoState()
+    }
+
+    private func subscribeLiveListState() {
+        LiveListStore.shared.state.subscribe(
+            StatePublisherSelector(keyPath: \LiveListState.currentLive)
+        )
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
+                guard let self = self, !currentLive.isEmpty else { return }
+                service.initLiveInfo(liveInfo: currentLive)
+            }
+            .store(in: &cancellableSet)
+    }
+    
+    func initialize(liveInfo: AtomicXCore.LiveInfo) {
+        service.initLiveInfo(liveInfo: liveInfo)
     }
     
     public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -193,29 +216,33 @@ public class LiveInfoView: UIView {
         }
         if visible {
             addSubview(followButton)
-            followButton.snp.remakeConstraints { make in
-                make.trailing.equalToSuperview().inset(8.scale375())
-                make.centerY.equalToSuperview()
-            }
             roomOwnerNameLabel.snp.remakeConstraints { make in
                 make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
-                make.trailing.equalTo(followButton.snp.leading).offset(-8.scale375())
+                make.width.lessThanOrEqualTo(100.scale375())
                 make.centerY.equalToSuperview()
-                make.height.equalToSuperview()
+            }
+            followButton.snp.remakeConstraints { make in
+                make.leading.equalTo(roomOwnerNameLabel.snp.trailing).offset(8.scale375())
+                make.trailing.equalToSuperview().inset(8.scale375())
+                make.centerY.equalToSuperview()
             }
         } else {
             followButton.safeRemoveFromSuperview()
             roomOwnerNameLabel.snp.remakeConstraints { make in
                 make.leading.equalTo(avatarView.snp.trailing).offset(8.scale375())
+                make.width.lessThanOrEqualTo(100.scale375())
                 make.trailing.equalToSuperview().inset(8.scale375())
                 make.centerY.equalToSuperview()
-                make.height.equalToSuperview()
             }
         }
     }
 }
 
 extension LiveInfoView {
+    func showInfoPanel() {
+        containerTapAction()
+    }
+
     @objc func containerTapAction() {
         if !WindowUtils.isPortrait { return }
         if let vc = WindowUtils.getCurrentWindowViewController() {

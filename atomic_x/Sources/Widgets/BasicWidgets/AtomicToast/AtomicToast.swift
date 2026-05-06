@@ -114,7 +114,7 @@ class AtomicToast: UIView {
     
     private lazy var textLabel: UILabel = {
         let label = UILabel()
-        label.numberOfLines = 0
+        label.numberOfLines = 3
         label.lineBreakMode = .byTruncatingTail
         label.text = text
         label.isUserInteractionEnabled = false

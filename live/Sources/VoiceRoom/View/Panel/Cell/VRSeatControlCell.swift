@@ -293,7 +293,7 @@ class VRInviteTakeSeatCell: VRSeatControlCell {
     func updateUser(user: LiveUserInfo) {
         self.user = user
         avatarView.setContent(.url(user.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
-        userNameLabel.text = user.userName
+        userNameLabel.text = user.userName.isEmpty ? user.userID : user.userName
     }
     
     func updateButtonView(isSelected: Bool) {

@@ -292,7 +292,7 @@ enum SelectionMode: CaseIterable {
         case .pk:
             return [.verticalGridDynamic]
         case .seat:
-            return LiveTemplateMode.allCases
+            return LiveTemplateMode.allCases.filter { $0 != .horizontalDynamic }
         }
     }
     func toString() -> String {

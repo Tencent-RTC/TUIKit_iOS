@@ -43,7 +43,8 @@ class VRUserManagerPanel: RTCBaseView {
         let label = UILabel(frame: .zero)
         label.textColor = .grayColor
         label.font = .customFont(ofSize: 16, weight: .medium)
-        label.adjustsFontSizeToFitWidth = true
+        label.numberOfLines = 1
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
     
@@ -140,18 +141,24 @@ class VRUserManagerPanel: RTCBaseView {
         userNameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.top.equalToSuperview()
-            make.width.lessThanOrEqualTo(150.scale375())
+            make.trailing.lessThanOrEqualToSuperview()
         }
         
         userIdLabel.snp.makeConstraints { make in
             make.leading.bottom.equalToSuperview()
-            make.width.lessThanOrEqualTo(150.scale375())
+            make.trailing.lessThanOrEqualToSuperview()
         }
         
         followButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-24.scale375())
             make.centerY.equalTo(userContentView.snp.centerY)
             make.size.equalTo(CGSizeMake(70.scale375(), 32.scale375Height()))
+        }
+
+        userContentView.snp.remakeConstraints { make in
+            make.leading.equalTo(avatarView.snp.trailing).offset(12.scale375())
+            make.top.bottom.equalTo(avatarView)
+            make.trailing.lessThanOrEqualTo(followButton.snp.leading).offset(-12.scale375())
         }
         
         if isOwner {

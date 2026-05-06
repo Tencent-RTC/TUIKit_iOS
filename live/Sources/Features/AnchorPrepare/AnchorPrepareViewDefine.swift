@@ -13,12 +13,14 @@ public class PrepareState {
     @Published public var privacyMode: LiveStreamPrivacyStatus
     @Published public var templateMode: LiveTemplateMode
     @Published public var pkTemplateMode: LiveTemplateMode
-    init(roomName: String, coverUrl: String, privacyMode: LiveStreamPrivacyStatus, templateMode: LiveTemplateMode, pkTemplateMode: LiveTemplateMode) {
+    @Published public var videoStreamSource: VideoStreamSource
+    init(roomName: String, coverUrl: String, privacyMode: LiveStreamPrivacyStatus, templateMode: LiveTemplateMode, pkTemplateMode: LiveTemplateMode, videoStreamSource: VideoStreamSource = .camera) {
         self.roomName = roomName
         self.coverUrl = coverUrl
         self.privacyMode = privacyMode
         self.templateMode = templateMode
         self.pkTemplateMode = pkTemplateMode
+        self.videoStreamSource = videoStreamSource
     }
 }
 
@@ -36,6 +38,8 @@ public protocol AnchorPrepareViewDelegate: AnyObject {
 extension LiveTemplateMode {
     func toSeatLayoutTemplate() -> SeatLayoutTemplate {
         switch self {
+        case .horizontalDynamic:
+            return .videoLandscape4Seats
         case .verticalGridDynamic:
             return .videoDynamicGrid9Seats
         case .verticalFloatDynamic:

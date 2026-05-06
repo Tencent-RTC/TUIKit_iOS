@@ -1,0 +1,87 @@
+//
+//  AudienceEmptySeatView.swift
+//  TUILiveKit
+//
+//  Created by gg on 2025/7/22.
+//
+
+import SnapKit
+import AtomicXCore
+import Combine
+
+class AudienceEmptySeatView: UIView {
+    
+    private let manager: AudienceStore
+    private let routerManager: AudienceRouterManager
+    private let creator: AudienceRootMenuDataCreator
+    private let seatInfo: SeatInfo
+    private weak var coreView: LiveCoreView?
+    private var cancellableSet = Set<AnyCancellable>()
+    private let linkMicTypePanel: LinkMicTypePanel
+
+    init(seatInfo: SeatInfo,
+         manager: AudienceStore,
+         routerManager: AudienceRouterManager,
+         coreView: LiveCoreView,
+         menuCreator: AudienceRootMenuDataCreator) {
+        self.seatInfo = seatInfo
+        self.manager = manager
+        self.routerManager = routerManager
+        self.coreView = coreView
+        self.creator = menuCreator
+        let data = menuCreator.generateLinkTypeMenuData(seatIndex: seatInfo.index)
+        self.linkMicTypePanel = LinkMicTypePanel(data: data, routerManager: routerManager, manager: manager, seatIndex: seatInfo.index)
+        super.init(frame: .zero)
+        
+        backgroundColor = .bgOperateColor
+        layer.borderWidth = 0.5
+        layer.borderColor = UIColor.black.withAlphaComponent(0.25).cgColor
+        
+        let imageView = UIImageView(image: internalImage("add"))
+        addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.bottom.equalTo(snp.centerY).offset(-2)
+            make.centerX.equalToSuperview()
+            make.size.equalTo(CGSize(width: 24, height: 24))
+        }
+        
+        let titleLabel = UILabel(frame: .zero)
+        titleLabel.font = .customFont(ofSize: 12, weight: .regular)
+        titleLabel.textColor = .white.withAlphaComponent(0.9)
+        titleLabel.text = .emptySeatText
+        titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 0
+        addSubview(titleLabel)
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(snp.centerY).offset(2)
+            make.leading.trailing.equalToSuperview()
+        }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(onTap))
+        addGestureRecognizer(tap)
+        
+        FloatWindow.shared.subscribeShowingState()
+            .receive(on: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] isShow in
+                guard let self = self else { return }
+                isHidden = isShow
+            }
+            .store(in: &cancellableSet)
+    }
+    
+    @objc private func onTap(_ tap: UITapGestureRecognizer) {
+        if manager.coGuestState.connected.isOnSeat() || manager.audienceState.isApplying {
+            return
+        }
+        routerManager.present(view: linkMicTypePanel)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+fileprivate extension String {
+    static let emptySeatText: String = internalLocalized("common_apply_connection")
+}

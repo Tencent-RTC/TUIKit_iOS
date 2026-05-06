@@ -43,7 +43,7 @@ public class SeatGridView: UIView {
 
     public init() {
         super.init(frame: .zero)
-        DataReporter.reportEventData(event: .panelShowSeatGridView)
+        KeyMetrics.reportEventData(event: .panelShowSeatGridView)
     }
     
     public required init?(coder: NSCoder) {
@@ -51,7 +51,7 @@ public class SeatGridView: UIView {
     }
     
     deinit {
-        DataReporter.reportEventData(event: .panelHideSeatGridView)
+        KeyMetrics.reportEventData(event: .panelHideSeatGridView)
         debugPrint("deinit:\(self)")
     }
     
@@ -102,12 +102,12 @@ extension SeatGridView {
     }
     
     public func setLayoutMode(layoutMode: SGLayoutMode, layoutConfig: SGSeatViewLayoutConfig? = nil) {
-        DataReporter.reportEventData(event: .methodCallSeatGridViewSetLayoutMode)
+        KeyMetrics.reportEventData(event: .methodCallSeatGridViewSetLayoutMode)
         viewManager.setLayoutMode(layoutMode: layoutMode, layoutConfig: layoutConfig)
     }
     
     public func setSeatViewDelegate(_ delegate: SGSeatViewDelegate) {
-        DataReporter.reportEventData(event: .methodCallSeatGridViewSetSeatViewDelegate)
+        KeyMetrics.reportEventData(event: .methodCallSeatGridViewSetSeatViewDelegate)
         self.delegate = delegate
     }
     
@@ -387,6 +387,17 @@ private extension SeatGridView {
             }
             .store(in: &cancellableSet)
 
+        liveListStore.state.subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+            .map { $0.liveOwner.userID }
+            .removeDuplicates()
+            .filter { !$0.isEmpty }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] ownerId in
+                guard let self = self else { return }
+                self.updateSeatViewsOwnerId(ownerId)
+            }
+            .store(in: &cancellableSet)
+
         coHostStore.state
             .subscribe(StatePublisherSelector(keyPath: \CoHostState.connected))
             .removeDuplicates()
@@ -407,6 +418,15 @@ private extension SeatGridView {
         let layout = SeatGridViewLayout(rowSpacing: layoutConfig.rowSpacing, rowConfigs: layoutConfig.rowConfigs)
         seatContainerView.collectionViewLayout.invalidateLayout()
         seatContainerView.setCollectionViewLayout(layout, animated: true)
+    }
+
+    private func updateSeatViewsOwnerId(_ ownerId: String) {
+        for cell in seatContainerView.visibleCells {
+            guard let containerCell = cell as? SGSeatContainerCell else { continue }
+            if let seatView = containerCell.contentContainerView.subviews.first as? SGSeatView {
+                seatView.updateOwnerId(ownerId)
+            }
+        }
     }
     
     private func isAutoOnSeat() -> Bool {

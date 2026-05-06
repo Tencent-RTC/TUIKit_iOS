@@ -13,30 +13,15 @@ import Combine
 
 public class RoomCreateView: UIView, BaseView {
     
-    // MARK: - Constants
-    private enum Layout {
-        static let horizontalPadding: CGFloat = 12
-        static let cardInnerPadding: CGFloat = 16
-        static let rowHeight: CGFloat = 56
-        static let cardCornerRadius: CGFloat = 12
-        static let buttonHeight: CGFloat = 52
-        static let buttonHorizontalInset: CGFloat = 88
-        static let navBarHeight: CGFloat = 60
-        static let backButtonSize: CGFloat = 16
-        static let navBarTopInset: CGFloat = 22
-        static let topSpacingAfterNav: CGFloat = 42
-        static let buttonTopSpacing: CGFloat = 48
-    }
-    
     // MARK: - Properties
     public weak var routerContext: RouterContext?
     private var cancellableSet = Set<AnyCancellable>()
     private var connectConfig: ConnectConfig = ConnectConfig()
-    private var selectedRoomType: RoomType = .standard
     
     // MARK: - UI Components
     private lazy var backButtonContainerView: UIView = {
         let view = UIView()
+        view.backgroundColor = .clear
         view.isUserInteractionEnabled = true
         return view
     }()
@@ -49,51 +34,97 @@ public class RoomCreateView: UIView, BaseView {
     }()
     
     private lazy var titleLabel: UILabel = {
-        makeLabel(.createRoom, color: RoomColors.g2, weight: .medium)
-    }()
-    
-    private lazy var roomTypeCardStackView: UIStackView = {
-        makeCardStackView()
-    }()
-    
-    private lazy var roomTypeLabel: UILabel = {
-        makeLabel(.roomType)
-    }()
-    
-    private lazy var selectRoomTypeLabel: UILabel = {
-        let label = makeLabel(selectedRoomType == .webinar ? .webinarRoom : .meetingRoom, color: RoomColors.g2)
-        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        let label = UILabel()
+        label.text = .createRoom
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .medium)
+        label.textColor = RoomColors.g2
         return label
     }()
     
-    private lazy var downArrowImageView: UIImageView = {
-        let imageView = UIImageView(image: ResourceLoader.loadImage("room_chevron_down_arrow"))
-        imageView.setContentHuggingPriority(.required, for: .horizontal)
-        imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
-        return imageView
+    private lazy var roomTypeCardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
+        return view
+    }()
+    
+    private lazy var formCardView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 12
+        view.clipsToBounds = true
+        return view
     }()
     
     private lazy var yourNameLabel: UILabel = {
-        makeLabel(.yourName)
-    }()
-    
-    private lazy var nameLabel: UILabel = {
-        let label = makeLabel("", color: RoomColors.g2)
+        let label = UILabel()
+        label.text = .yourName
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
+        label.textColor = RoomColors.g3
         return label
     }()
     
-    private lazy var formCardStackView: UIStackView = {
-        makeCardStackView()
+    private lazy var nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
+        label.textColor = RoomColors.g2
+        return label
     }()
     
-    private lazy var microphoneSwitch = makeSwitch()
-    private lazy var speakerSwitch = makeSwitch()
-    private lazy var cameraSwitch = makeSwitch()
+    private lazy var microphoneLabel: UILabel = {
+        let label = UILabel()
+        label.text = .enableAudio
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
+        label.textColor = RoomColors.g3
+        return label
+    }()
     
-    private lazy var roomTypeRow: UIStackView = {
-        let row = makeFormRow(roomTypeLabel, selectRoomTypeLabel, downArrowImageView)
-        row.isUserInteractionEnabled = true
-        return row
+    private lazy var microphoneSwitch: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = RoomColors.b1
+        return toggle
+    }()
+    
+    private lazy var speakerLabel: UILabel = {
+        let label = UILabel()
+        label.text = .enableSpeaker
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
+        label.textColor = RoomColors.g3
+        return label
+    }()
+    
+    private lazy var speakerSwitch: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = RoomColors.b1
+        return toggle
+    }()
+    
+    private lazy var cameraLabel: UILabel = {
+        let label = UILabel()
+        label.text = .enableVideo
+        label.font = RoomFonts.pingFangSCFont(size: 16, weight: .regular)
+        label.textColor = RoomColors.g3
+        return label
+    }()
+    
+    private lazy var cameraSwitch: UISwitch = {
+        let toggle = UISwitch()
+        toggle.onTintColor = RoomColors.b1
+        toggle.layer.cornerRadius = toggle.frame.height / 2
+        return toggle
+    }()
+    
+    private lazy var dividerLine2: UIView = {
+        let view = UIView()
+        view.backgroundColor = RoomColors.g8
+        return view
+    }()
+    
+    private lazy var dividerLine3: UIView = {
+        let view = UIView()
+        view.backgroundColor = RoomColors.g8
+        return view
     }()
     
     private lazy var createRoomButton: UIButton = {
@@ -125,57 +156,129 @@ public class RoomCreateView: UIView, BaseView {
     // MARK: - BaseView Implementation
     
     public func setupViews() {
+        // Add subviews
         addSubview(backButtonContainerView)
         backButtonContainerView.addSubview(backButton)
         backButtonContainerView.addSubview(titleLabel)
         
-        addSubview(roomTypeCardStackView)
-        roomTypeCardStackView.addArrangedSubviews(
-            roomTypeRow,
-            makeDivider(),
-            makeFormRow(yourNameLabel, nameLabel)
-        )
+        addSubview(roomTypeCardView)
+        addSubview(formCardView)
         
-        addSubview(formCardStackView)
-        formCardStackView.addArrangedSubviews(
-            makeSwitchRow(.enableAudio, microphoneSwitch),
-            makeDivider(),
-            makeSwitchRow(.enableSpeaker, speakerSwitch),
-            makeDivider(),
-            makeSwitchRow(.enableVideo, cameraSwitch)
-        )
+        // Room type card content
+        roomTypeCardView.addSubview(yourNameLabel)
+        roomTypeCardView.addSubview(nameLabel)
+        
+        // Form card content
+        formCardView.addSubview(microphoneLabel)
+        formCardView.addSubview(microphoneSwitch)
+        formCardView.addSubview(dividerLine2)
+        formCardView.addSubview(speakerLabel)
+        formCardView.addSubview(speakerSwitch)
+        formCardView.addSubview(dividerLine3)
+        formCardView.addSubview(cameraLabel)
+        formCardView.addSubview(cameraSwitch)
         
         addSubview(createRoomButton)
     }
     
     public func setupConstraints() {
+        // Back button container - expand click area
         backButtonContainerView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalTo(safeAreaLayoutGuide.snp.top)
             make.right.equalTo(titleLabel.snp.right).offset(20)
-            make.height.equalTo(Layout.navBarHeight)
+            make.height.equalTo(60)
         }
+        
         backButton.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(Layout.horizontalPadding)
-            make.top.equalToSuperview().offset(Layout.navBarTopInset)
-            make.size.equalTo(Layout.backButtonSize)
+            make.left.equalToSuperview().offset(12)
+            make.top.equalToSuperview().offset(22)
+            make.width.height.equalTo(16)
         }
+        
         titleLabel.snp.makeConstraints { make in
-            make.left.equalTo(backButton.snp.right).offset(Layout.horizontalPadding)
+            make.left.equalTo(backButton.snp.right).offset(12)
             make.centerY.equalTo(backButton)
         }
-        roomTypeCardStackView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview().inset(Layout.horizontalPadding)
-            make.top.equalTo(titleLabel.snp.bottom).offset(Layout.topSpacingAfterNav)
+        
+        roomTypeCardView.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(12)
+            make.right.equalToSuperview().offset(-12)
+            make.top.equalTo(titleLabel.snp.bottom).offset(42)
+            make.height.equalTo(54)
         }
-        formCardStackView.snp.makeConstraints { make in
-            make.left.right.equalToSuperview().inset(Layout.horizontalPadding)
-            make.top.equalTo(roomTypeCardStackView.snp.bottom).offset(RoomSpacing.standard)
+        
+        yourNameLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
+            make.height.equalTo(20)
+            make.width.equalTo(90)
         }
+        
+        nameLabel.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-16)
+            make.left.equalTo(yourNameLabel.snp.right).offset(20)
+            make.centerY.equalTo(yourNameLabel)
+            make.height.equalTo(20)
+        }
+        
+        formCardView.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(12)
+            make.right.equalToSuperview().offset(-12)
+            make.top.equalTo(roomTypeCardView.snp.bottom).offset(RoomSpacing.standard)
+            make.height.equalTo(166)
+        }
+        
+        microphoneLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.top.equalToSuperview().offset(18)
+            make.height.equalTo(20)
+        }
+        
+        microphoneSwitch.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-16)
+            make.centerY.equalTo(microphoneLabel)
+        }
+        
+        dividerLine2.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.right.equalToSuperview().offset(-16)
+            make.top.equalTo(microphoneLabel.snp.bottom).offset(18)
+            make.height.equalTo(1)
+        }
+        
+        speakerLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.top.equalTo(dividerLine2.snp.bottom).offset(18)
+        }
+        
+        speakerSwitch.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-16)
+            make.centerY.equalTo(speakerLabel)
+        }
+        
+        dividerLine3.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.right.equalToSuperview().offset(-16)
+            make.top.equalTo(speakerLabel.snp.bottom).offset(18)
+            make.height.equalTo(1)
+        }
+        
+        cameraLabel.snp.makeConstraints { make in
+            make.left.equalToSuperview().offset(16)
+            make.top.equalTo(dividerLine3.snp.bottom).offset(18)
+        }
+        
+        cameraSwitch.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-16)
+            make.centerY.equalTo(cameraLabel)
+        }
+        
         createRoomButton.snp.makeConstraints { make in
-            make.top.equalTo(formCardStackView.snp.bottom).offset(Layout.buttonTopSpacing)
-            make.height.equalTo(Layout.buttonHeight)
-            make.leading.trailing.equalToSuperview().inset(Layout.buttonHorizontalInset)
+            make.centerX.equalToSuperview()
+            make.top.equalTo(formCardView.snp.bottom).offset(48)
+            make.height.equalTo(52)
+            make.leading.trailing.equalToSuperview().inset(88)
         }
     }
     
@@ -187,12 +290,9 @@ public class RoomCreateView: UIView, BaseView {
     }
     
     public func setupBindings() {
-        backButtonContainerView.addGestureRecognizer(
-            UITapGestureRecognizer(target: self, action: #selector(handleBackButtonTapped))
-        )
-        roomTypeRow.addGestureRecognizer(
-            UITapGestureRecognizer(target: self, action: #selector(handleRoomTypeTapped))
-        )
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleBackButtonTapped))
+        backButtonContainerView.addGestureRecognizer(tapGesture)
+        
         createRoomButton.addTarget(self, action: #selector(handleCreateRoomButtonTapped), for: .touchUpInside)
         microphoneSwitch.addTarget(self, action: #selector(handleMicrophoneSwitchChanged(sender:)), for: .valueChanged)
         speakerSwitch.addTarget(self, action: #selector(handleSpeakerSwitchChanged(sender:)), for: .valueChanged)
@@ -212,98 +312,13 @@ public class RoomCreateView: UIView, BaseView {
     }
 }
 
-// MARK: - Factory Helpers
-extension RoomCreateView {
-    
-    private func makeLabel(_ text: String, color: UIColor = RoomColors.g3, weight: UIFont.Weight = .regular) -> UILabel {
-        let label = UILabel()
-        label.text = text
-        label.font = RoomFonts.pingFangSCFont(size: 16, weight: weight)
-        label.textColor = color
-        return label
-    }
-    
-    private func makeSwitch() -> UISwitch {
-        let toggle = UISwitch()
-        toggle.onTintColor = RoomColors.b1
-        return toggle
-    }
-    
-    private func makeCardStackView() -> UIStackView {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 0
-        sv.backgroundColor = .white
-        sv.layer.cornerRadius = Layout.cardCornerRadius
-        sv.clipsToBounds = true
-        sv.layoutMargins = UIEdgeInsets(top: 0, left: Layout.cardInnerPadding, bottom: 0, right: Layout.cardInnerPadding)
-        sv.isLayoutMarginsRelativeArrangement = true
-        return sv
-    }
-    
-    /// Form row: [title] — [content] — [optional accessory], height = rowHeight
-    private func makeFormRow(_ title: UIView, _ content: UIView, _ accessory: UIView? = nil) -> UIStackView {
-        title.setContentHuggingPriority(.required, for: .horizontal)
-        title.setContentCompressionResistancePriority(.required, for: .horizontal)
-        let row = UIStackView(arrangedSubviews: [title, content] + (accessory.map { [$0] } ?? []))
-        row.axis = .horizontal
-        row.alignment = .center
-        row.spacing = 20
-        row.snp.makeConstraints { $0.height.equalTo(Layout.rowHeight) }
-        return row
-    }
-    
-    /// Switch row: [label — spacer — switch]
-    private func makeSwitchRow(_ title: String, _ switchView: UISwitch) -> UIStackView {
-        let row = UIStackView(arrangedSubviews: [makeLabel(title), switchView])
-        row.axis = .horizontal
-        row.alignment = .center
-        row.snp.makeConstraints { $0.height.equalTo(Layout.rowHeight) }
-        return row
-    }
-    
-    /// 1px divider
-    private func makeDivider() -> UIView {
-        let line = UIView()
-        line.backgroundColor = RoomColors.g8
-        line.snp.makeConstraints { $0.height.equalTo(1) }
-        return line
-    }
-}
-
 // MARK: - Actions
 extension RoomCreateView {
     
     @objc private func handleBackButtonTapped() {
         routerContext?.pop(animated: true)
     }
-    
-    @objc private func handleRoomTypeTapped() {
-        // TODO:
-        var appearance = RoomActionSheet.Appearance()
-        appearance.backgroundColor = .white
-        appearance.separatorColor = RoomColors.g8
-        let actionSheet = RoomActionSheet(actions: [
-                                            RoomActionSheet.Action(title: .meetingRoom,
-                                                                   titleColor: .black,
-                                                                   titleFont: RoomFonts.pingFangSCFont(size: 18, weight: .regular),
-                                                                   handler: { [weak self] action in
-                                                                       guard let self = self else { return }
-                                                                       selectedRoomType = .standard
-                                                                       selectRoomTypeLabel.text = .meetingRoom
-                                                                   }),
-                                            RoomActionSheet.Action(title: .webinarRoom,
-                                                                   titleColor: .black,
-                                                                   titleFont: RoomFonts.pingFangSCFont(size: 18, weight: .regular),
-                                                                   handler: { [weak self] action in
-                                                                       guard let self = self else { return }
-                                                                       selectedRoomType = .webinar
-                                                                       selectRoomTypeLabel.text = .webinarRoom
-                                                                   }),
-                                         ], appearance: appearance)
-        actionSheet.show(in: self, animated: true)
-    }
-    
+   
     @objc private func handleMicrophoneSwitchChanged(sender: UISwitch) {
         connectConfig.autoEnableMicrophone = sender.isOn
     }
@@ -318,7 +333,7 @@ extension RoomCreateView {
     
     @objc private func handleCreateRoomButtonTapped() {
         guard let name = nameLabel.text else { return }
-        let roomID = generateRoomId(numberOfDigits: 6)
+        let roomID = getRandomRoomId(numberOfDigits: 6)
         var options = CreateRoomOptions()
         options.roomName = .roomName.localizedReplace(name)
         let mainViewController = RoomMainViewController(roomID: roomID,
@@ -327,26 +342,13 @@ extension RoomCreateView {
         routerContext?.push(mainViewController, animated: true)
     }
     
-    private func generateRoomId(numberOfDigits: Int) -> String {
+    private func getRandomRoomId(numberOfDigits: Int) -> String {
         var numberOfDigit = numberOfDigits > 0 ? numberOfDigits : 1
         numberOfDigit = numberOfDigit < 10 ? numberOfDigit : 9
         let minNumber = Int(truncating: NSDecimalNumber(decimal: pow(10, numberOfDigit - 1)))
         let maxNumber = Int(truncating: NSDecimalNumber(decimal: pow(10, numberOfDigit))) - 1
         let randomNumber = arc4random_uniform(UInt32(maxNumber - minNumber)) + UInt32(minNumber)
-        
-        switch selectedRoomType {
-        case .standard:
-            return String(randomNumber)
-        case .webinar:
-            return "webinar_" + String(randomNumber)
-        }
-    }
-}
-
-// MARK: - UIStackView Convenience
-private extension UIStackView {
-    func addArrangedSubviews(_ views: UIView...) {
-        views.forEach { addArrangedSubview($0) }
+        return String(randomNumber)
     }
 }
 
@@ -357,7 +359,4 @@ fileprivate extension String {
     static let enableSpeaker = "roomkit_enable_speaker".localized
     static let enableVideo = "roomkit_enable_video".localized
     static let roomName = "roomkit_user_room"
-    static let webinarRoom = "roomkit_room_type_webinar".localized
-    static let meetingRoom = "roomkit_room_type_meeting".localized
-    static let roomType = "roomkit_room_type".localized
 }

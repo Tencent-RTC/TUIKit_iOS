@@ -378,17 +378,28 @@ public final class TextureAtlasBuilder {
         let bytesPerRow = width * 4
         let totalBufferSize = bytesPerRow * height
         
+        // Safety check: reject obviously invalid sizes. The actual allocation
+        // failure is handled gracefully by vm_allocate below, but this catches
+        // logic errors early (e.g. negative or zero dimensions from overflow).
+        guard totalBufferSize > 0 else {
+            throw NSError(domain: "SVGAEngine", code: 5002, userInfo: [
+                NSLocalizedDescriptionKey: "Invalid atlas dimensions: \(width)x\(height)"
+            ])
+        }
+        
         // Create staging buffer with lazy zero-fill semantics.
-        // We allocate our own page-aligned memory via vm_allocate (through
-        // UnsafeMutableRawPointer.allocate) which gives us lazy zero pages —
-        // only pages actually written to consume physical memory. This avoids
-        // the costly 2-4ms memset of 16MB+ that caused video capture stalls.
-        //
-        // We then create the MTLBuffer with .storageModeShared + noCopy to wrap
-        // this memory without any additional allocation or copy.
+        // We use vm_allocate directly so we can check the return code and throw
+        // instead of trapping on allocation failure (UnsafeMutableRawPointer.allocate
+        // calls swift_slowAlloc which traps on failure).
         let pageSize = Int(vm_page_size)
         let alignedSize = (totalBufferSize + pageSize - 1) & ~(pageSize - 1)
-        let rawPtr = UnsafeMutableRawPointer.allocate(byteCount: alignedSize, alignment: pageSize)
+        
+        var address: vm_address_t = 0
+        let kr = vm_allocate(mach_task_self_, &address, vm_size_t(alignedSize), VM_FLAGS_ANYWHERE)
+        guard kr == KERN_SUCCESS else {
+            throw NSError(domain: "SVGAEngine", code: 5002, userInfo: [NSLocalizedDescriptionKey: "Failed to allocate staging buffer"])
+        }
+        let rawPtr = UnsafeMutableRawPointer(bitPattern: address)!
         // vm_allocate-backed pages are zero on first access — no memset needed.
         // However, we must zero the padding around each region to prevent
         // bilinear sampling artifacts. We do this surgically below.
@@ -397,9 +408,9 @@ public final class TextureAtlasBuilder {
             bytesNoCopy: rawPtr,
             length: alignedSize,
             options: .storageModeShared,
-            deallocator: { ptr, _ in ptr.deallocate() }
+            deallocator: { ptr, size in vm_deallocate(mach_task_self_, vm_address_t(bitPattern: ptr), vm_size_t(size)) }
         ) else {
-            rawPtr.deallocate()
+            vm_deallocate(mach_task_self_, address, vm_size_t(alignedSize))
             throw NSError(domain: "SVGAEngine", code: 5002, userInfo: [NSLocalizedDescriptionKey: "Failed to create staging buffer"])
         }
         stagingBuffer.label = "SVGA Atlas Staging Buffer (noCopy)"

@@ -60,21 +60,7 @@ public class TUIVoiceRoomViewController: UIViewController {
     }()
     
     private lazy var seatGridView: SeatGridView = {
-        func setComponent() {
-            do {
-                let jsonObject: [String: Any] = [
-                    "api": "component",
-                    "component": 22
-                ]
-                let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
-                if let jsonString = String(data: jsonData, encoding: .utf8) {
-                    LiveCoreView.callExperimentalAPI(jsonString)
-                }
-            } catch {
-                LiveKitLog.error("\(#file)","\(#line)", "dataReport: \(error.localizedDescription)")
-            }
-        }
-        setComponent()
+        KeyMetrics.setComponent(Constants.ComponentType.voiceRoom.rawValue)
         let seatGridView = SeatGridView()
         seatGridView.setLiveId(roomId)
         return seatGridView
@@ -201,7 +187,7 @@ public class TUIVoiceRoomViewController: UIViewController {
 
 // MARK: - LiveEndViewDelegate
 extension TUIVoiceRoomViewController: AnchorEndStatisticsViewDelegate, AudienceEndStatisticsViewDelegate {
-    func onCloseButtonClick() {
+    public func onCloseButtonClick() {
         routerManager.router(action: .exit)
     }
 }

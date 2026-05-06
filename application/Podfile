@@ -8,7 +8,6 @@ target 'App-UIKit' do
   # Pods for UIKitApp-UIKit
   pod 'SnapKit'
   pod 'SensorsAnalyticsSDK'
-  pod 'RTCCommon'
   
   pod 'TUICallKit_Swift', :path=>'../call/TUICallKit_Swift.podspec'
   pod 'TUIRoomKit', :path=>'../room/TUIRoomKit.podspec'

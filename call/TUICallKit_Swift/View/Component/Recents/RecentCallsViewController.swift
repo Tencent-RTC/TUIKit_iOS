@@ -134,6 +134,16 @@ import AtomicXCore
         NotificationCenter.default.publisher(for: UIWindow.didBecomeKeyNotification)
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
+                guard CallStore.shared.state.value.selfInfo.status == .none else { return }
+                self?.viewModel.queryRecentCalls()
+            }
+            .store(in: &cancellables)
+        
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector(keyPath: \CallState.selfInfo.status))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] status in
+                guard status == .none else { return }
                 self?.viewModel.queryRecentCalls()
             }
             .store(in: &cancellables)

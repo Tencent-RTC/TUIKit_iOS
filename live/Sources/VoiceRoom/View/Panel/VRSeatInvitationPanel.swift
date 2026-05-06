@@ -27,6 +27,13 @@ class VRSeatInvitationPanel: RTCBaseView {
         return label
     }()
     
+    private lazy var backButton: UIButton = {
+        let view = UIButton(type: .system)
+        view.setBackgroundImage(internalImage("live_back_icon", rtlFlipped: true), for: .normal)
+        view.addTarget(self, action: #selector(backButtonClick), for: .touchUpInside)
+        return view
+    }()
+    
     private let subTitleLabel: AtomicLabel = {
         let label = AtomicLabel(.onlineAudienceText) { theme in
             LabelAppearance(textColor: theme.color.textColorPrimary,
@@ -36,11 +43,10 @@ class VRSeatInvitationPanel: RTCBaseView {
     }()
     
     private let tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .grouped)
+        let tableView = UITableView(frame: .zero, style: .plain)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
         tableView.register(VRInviteTakeSeatCell.self, forCellReuseIdentifier: VRInviteTakeSeatCell.identifier)
-        tableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
         return tableView
     }()
     
@@ -56,21 +62,29 @@ class VRSeatInvitationPanel: RTCBaseView {
     }
     
     override func constructViewHierarchy() {
+        addSubview(backButton)
         addSubview(titleLabel)
         addSubview(subTitleLabel)
         addSubview(tableView)
     }
     
     override func activateConstraints() {
+        backButton.snp.makeConstraints { make in
+            make.leading.equalToSuperview().inset(20)
+            make.top.equalToSuperview().inset(20)
+            make.height.equalTo(24.scale375())
+            make.width.equalTo(24.scale375())
+        }
+        
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(20.scale375Height())
+            make.centerY.equalTo(backButton.snp.centerY)
         }
         
         subTitleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(24.scale375())
             make.height.equalTo(30.scale375Height())
-            make.top.equalTo(titleLabel.snp.bottom)
+            make.top.equalTo(titleLabel.snp.bottom).offset(20.scale375Height())
             make.width.equalToSuperview()
         }
         
@@ -88,6 +102,10 @@ class VRSeatInvitationPanel: RTCBaseView {
         subscribeHostEventListener()
         subscribeUserListState()
         subscribeToastState()
+    }
+    
+    @objc private func backButtonClick(_ sender: UIButton) {
+        routerManager.router(action: .dismiss())
     }
 }
 

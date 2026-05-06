@@ -97,9 +97,9 @@ extension TCEffectAnimationView: AnimationView {
 
 extension TCEffectAnimationView {
     private func reportGiftData() {
-        let key = DataReporter.componentType == .liveRoom ? Constants.DataReport.kDataReportLiveGiftEffectPlayCount :
+        let key = KeyMetrics.componentType == .liveRoom ? Constants.DataReport.kDataReportLiveGiftEffectPlayCount :
         Constants.DataReport.kDataReportLiveGiftEffectPlayCount
-        DataReporter.reportEventData(eventKey: key)
+        KeyMetrics.reportEventData(eventKey: key)
     }
 }
 

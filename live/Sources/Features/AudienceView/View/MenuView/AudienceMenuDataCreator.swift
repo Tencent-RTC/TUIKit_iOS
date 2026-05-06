@@ -1,0 +1,261 @@
+//
+//  AudienceMenuDataCreator.swift
+//  TUILiveKit
+//
+//  Created by aby on 2024/5/31.
+//
+
+import AtomicX
+import AtomicXCore
+import Combine
+import Foundation
+import TUICore
+
+class AudienceRootMenuDataCreator {
+    private let manager: AudienceStore
+    private let routerManager: AudienceRouterManager
+    private var cancellableSet: Set<AnyCancellable> = []
+    private var lastApplyHashValue: Int?
+    private lazy var linkMicTypePanel: LinkMicTypePanel = {
+        let panel = LinkMicTypePanel(
+            data: generateLinkTypeMenuData(),
+            routerManager: routerManager,
+            manager: manager,
+            seatIndex: -1
+        )
+        return panel
+    }()
+
+    init(manager: AudienceStore, routerManager: AudienceRouterManager) {
+        self.manager = manager
+        self.routerManager = routerManager
+    }
+    
+    func generateLinkTypeMenuData(seatIndex: Int = -1) -> [LinkMicTypeCellData] {
+        var data = [LinkMicTypeCellData]()
+        
+        data.append(LinkMicTypeCellData(image: internalImage("live_link_video"), text: .videoLinkRequestText, action: { [weak self] in
+            guard let self = self else { return }
+            applyForSeat(seatIndex: seatIndex, openCamera: true)
+            routerManager.router(action: .dismiss())
+        }))
+        
+        data.append(LinkMicTypeCellData(image: internalImage("live_link_audio"), text: .audioLinkRequestText, action: { [weak self] in
+            guard let self = self else { return }
+            applyForSeat(seatIndex: seatIndex, openCamera: false)
+            routerManager.router(action: .dismiss())
+        }))
+        return data
+    }
+    
+    func generateAudioOnlyLinkTypeMenuData(seatIndex: Int = -1) -> [LinkMicTypeCellData] {
+        var data = [LinkMicTypeCellData]()
+        
+        data.append(LinkMicTypeCellData(image: internalImage("live_link_audio"), text: .audioLinkRequestText, action: { [weak self] in
+            guard let self = self else { return }
+            applyForSeat(seatIndex: seatIndex, openCamera: false)
+            routerManager.router(action: .dismiss())
+        }))
+        return data
+    }
+    
+    func applyForSeat(seatIndex: Int, openCamera: Bool) {
+        let timeOutValue: TimeInterval = 60
+        manager.willApplying()
+        manager.coGuestStore.applyForSeat(seatIndex: seatIndex, timeout: timeOutValue, extraInfo: nil) { [weak self] result in
+            guard let self = self else { return }
+            manager.stopApplying()
+            switch result {
+            case .failure(let err):
+                let error = InternalError(code: err.code, message: err.message)
+                manager.toastSubject.send((error.localizedMessage, .error))
+            default: break
+            }
+        }
+        
+        clearLastApplyHashValue()
+        
+        let cancelable = manager.coGuestStore.guestEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onGuestApplicationResponded(isAccept: let isAccept, hostUser: _):
+                    manager.stopApplying()
+                    guard isAccept else { break }
+                    if openCamera {
+                        manager.deviceStore.openLocalCamera(isFront: manager.deviceState.isFrontCamera, completion: nil)
+                    }
+                    manager.deviceStore.openLocalMicrophone(completion: nil)
+                    clearLastApplyHashValue()
+                case .onGuestApplicationNoResponse(reason: _):
+                    manager.stopApplying()
+                    clearLastApplyHashValue()
+                default: break
+                }
+            }
+        cancelable.store(in: &cancellableSet)
+        lastApplyHashValue = cancelable.hashValue
+    }
+    
+    private func clearLastApplyHashValue() {
+        guard let hashValue = lastApplyHashValue else { return }
+        for item in cancellableSet.filter({ $0.hashValue == hashValue }) {
+            item.cancel()
+            cancellableSet.remove(item)
+        }
+        lastApplyHashValue = nil
+    }
+    
+    deinit {
+        print("deinit \(type(of: self))")
+    }
+}
+
+extension AudienceRootMenuDataCreator {
+    func generateMenuData(items: [AudienceBottomItem]) -> [AudienceButtonMenuInfo] {
+        var result: [AudienceButtonMenuInfo] = []
+        for item in items {
+            switch item {
+            case .gift:
+                var gift = AudienceButtonMenuInfo(normalIcon: "live_gift_icon")
+                gift.tapAction = { [weak self] _ in
+                    guard let self = self else { return }
+                    let giftPanel = GiftListView(roomId: manager.liveID)
+                    routerManager.present(view: giftPanel)
+                }
+                result.append(gift)
+            case .coGuest:
+                var linkMic = AudienceButtonMenuInfo(normalIcon: "live_link_icon", selectIcon: "live_linking_icon")
+                linkMic.tapAction = { [weak self] _ in
+                    guard let self = self else { return }
+                    if !manager.coHostState.connected.isEmpty {
+                        return
+                    }
+                    let isApplying = manager.coHostState.connected.isEmpty && manager.audienceState.isApplying
+                    if isApplying {
+                        let cancelRequestItem = AlertButtonConfig(text: .cancelLinkMicRequestText, type: .red) { [weak self] _ in
+                            guard let self = self else { return }
+                            routerManager.router(action: .dismiss())
+                            manager.stopApplying()
+                            manager.coGuestStore.cancelApplication { [weak self] result in
+                                guard let self = self else { return }
+                                switch result {
+                                case .failure(let err):
+                                    let error = InternalError(code: err.code, message: err.message)
+                                    manager.toastSubject.send((error.localizedMessage, .error))
+                                default: break
+                                }
+                            }
+                        }
+
+                        let cancelItem = AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                            guard let self = self else { return }
+                            self.routerManager.dismiss()
+                        }
+
+                        let alertConfig = AlertViewConfig(items: [cancelRequestItem, cancelItem])
+                        let alertView = AtomicAlertView(config: alertConfig)
+                        let routeItem = RouteItem(view: alertView, config: .bottomDefault())
+                        routerManager.router(action: .present(routeItem))
+                    } else {
+                        if manager.coGuestState.connected.isOnSeat() {
+                            confirmToTerminateCoGuest()
+                        } else {
+                            let isScreenShareLive = manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats
+                                && manager.liveListState.currentLive.keepOwnerOnSeat
+                            if isScreenShareLive {
+                                let data = generateAudioOnlyLinkTypeMenuData(seatIndex: -1)
+                                let panel = LinkMicTypePanel(data: data, routerManager: routerManager, manager: manager, seatIndex: -1)
+                                routerManager.present(view: panel)
+                            } else {
+                                routerManager.present(view: linkMicTypePanel)
+                            }
+                        }
+                    }
+                }
+                linkMic.bindStateClosure = { [weak self] button, cancellableSet in
+                    guard let self = self else { return }
+                    manager.subscribeState(StatePublisherSelector(keyPath: \CoGuestState.connected))
+                        .removeDuplicates()
+                        .combineLatest(manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates(),
+                                       manager.subscribeState(StatePublisherSelector(keyPath: \AudienceState.isApplying)).removeDuplicates())
+                        .receive(on: RunLoop.main)
+                        .sink { [weak self] connected, users, isApplying in
+                            guard let self = self else { return }
+                            onCoGuestStatusChanged(button: button, enable: users.isEmpty, isOnSeat: connected.isOnSeat(), isApplying: isApplying)
+                        }
+                        .store(in: &cancellableSet)
+                }
+                result.append(linkMic)
+            case .more:
+                var settingItem = AudienceButtonMenuInfo(normalIcon: "live_more_btn_icon")
+                settingItem.tapAction = { [weak self] _ in
+                    guard let self = self else { return }
+                    let panel = AudienceSettingPanel(manager: manager, routerManager: routerManager)
+                    routerManager.present(view: panel)
+                }
+                result.append(settingItem)
+            case .like, .custom:
+                break
+            }
+        }
+        return result
+    }
+    
+    private func onCoGuestStatusChanged(button: UIButton, enable: Bool, isOnSeat: Bool, isApplying: Bool) {
+        let imageName: String
+        let isSelected: Bool
+        if enable {
+            isSelected = isApplying
+            imageName = isOnSeat ? "live_linked_icon" : "live_link_icon"
+        } else {
+            isSelected = false
+            imageName = "live_link_disable_icon"
+        }
+        button.isSelected = isSelected
+        button.setImage(internalImage(imageName), for: .normal)
+    }
+    
+    private func confirmToTerminateCoGuest() {
+        let alertConfig = AlertViewConfig(
+            items: [
+                AlertButtonConfig(text: .confirmTerminateCoGuestText, type: .red) { [weak self] _ in
+                    guard let self = self else { return }
+                    manager.coGuestStore.disConnect { [weak self] result in
+                        guard let self = self else { return }
+                        switch result {
+                        case .success(()):
+                            manager.deviceStore.closeLocalCamera()
+                            manager.deviceStore.closeLocalMicrophone()
+                        default: break
+                        }
+                    }
+                    routerManager.router(action: .dismiss())
+                },
+                AlertButtonConfig(text: .cancelText, type: .grey) { [weak self] _ in
+                    guard let self = self else { return }
+                    routerManager.router(action: .dismiss())
+                }
+            ]
+        )
+        let alertView = AtomicAlertView(config: alertConfig)
+        let routeItem = RouteItem(view: alertView, config: .bottomDefault())
+        routerManager.router(action: .present(routeItem))
+    }
+}
+
+private extension String {
+    static let videoLinkRequestText = internalLocalized("common_text_link_mic_video")
+    static var audioLinkRequestText = internalLocalized("common_text_link_mic_audio")
+    static let waitToLinkText = internalLocalized("common_toast_apply_link_mic")
+    static let beautyText = internalLocalized("common_video_settings_item_beauty")
+    static let audioEffectsText = internalLocalized("common_audio_effect")
+    static let flipText = internalLocalized("common_video_settings_item_flip")
+    static let mirrorText = internalLocalized("common_video_settings_item_mirror")
+    
+    static let cancelLinkMicRequestText = internalLocalized("common_text_cancel_link_mic_apply")
+    static let confirmTerminateCoGuestText = internalLocalized("common_text_close_link_mic")
+    static let coGuestText = internalLocalized("common_link_guest")
+    static let cancelText = internalLocalized("common_cancel")
+}

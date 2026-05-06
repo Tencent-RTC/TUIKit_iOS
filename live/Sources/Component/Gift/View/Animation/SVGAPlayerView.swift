@@ -1469,10 +1469,10 @@ public final class SVGAPlayerView: UIView, AnimationView {
     // MARK: - Data Report
     
     private func reportGiftData() {
-        let key = DataReporter.componentType == .liveRoom
+        let key = KeyMetrics.componentType == .liveRoom
             ? Constants.DataReport.kDataReportLiveGiftSVGAPlayCount
             : Constants.DataReport.kDataReportVoiceGiftSVGAPlayCount
-        DataReporter.reportEventData(eventKey: key)
+        KeyMetrics.reportEventData(eventKey: key)
     }
     
     // MARK: - Public API

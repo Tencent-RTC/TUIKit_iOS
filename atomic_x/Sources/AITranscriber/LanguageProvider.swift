@@ -18,6 +18,8 @@ enum LanguageProvider {
             return CallKitBundle.localizedString(forKey: "ai_source_lang_zh")
         case .english:
             return CallKitBundle.localizedString(forKey: "ai_source_lang_en")
+        default:
+            return CallKitBundle.localizedString(forKey: "ai_source_lang_zh_en")
         }
     }
     

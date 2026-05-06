@@ -9,9 +9,9 @@ import TUICore
 import UIKit
 import AtomicX
 
-class AnchorEndStatisticsView: UIView {
+public class AnchorEndStatisticsView: UIView {
     private var isViewReady: Bool = false
-    override func didMoveToWindow() {
+    public override func didMoveToWindow() {
         super.didMoveToWindow()
         guard !isViewReady else { return }
         constructViewHierarchy()
@@ -19,10 +19,10 @@ class AnchorEndStatisticsView: UIView {
         isViewReady = true
     }
     
-    weak var delegate: AnchorEndStatisticsViewDelegate?
+    public weak var delegate: AnchorEndStatisticsViewDelegate?
 
     let endViewInfo: AnchorEndStatisticsViewInfo
-    init(endViewInfo: AnchorEndStatisticsViewInfo) {
+    public init(endViewInfo: AnchorEndStatisticsViewInfo) {
         self.endViewInfo = endViewInfo
         super.init(frame: .zero)
     }
@@ -43,6 +43,36 @@ class AnchorEndStatisticsView: UIView {
         label.textColor = .flowKitWhite
         label.text = .titleText
         return label
+    }()
+    
+    private lazy var dismissByServiceTitleView: UIView = {
+        let container = UIView()
+        
+        let imageView = UIImageView()
+        imageView.image = internalImage("live_dismiss_byservice")
+        imageView.contentMode = .scaleAspectFit
+        container.addSubview(imageView)
+        
+        let label = UILabel()
+        label.textAlignment = .natural
+        label.font = .customFont(ofSize: 20)
+        label.textColor = .flowKitWhite
+        label.text = .dismissByServiceText
+        container.addSubview(label)
+        
+        imageView.snp.makeConstraints { make in
+            make.leading.equalToSuperview()
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(20.scale375())
+        }
+        
+        label.snp.makeConstraints { make in
+            make.leading.equalTo(imageView.snp.trailing).offset(8.scale375())
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview()
+        }
+        
+        return container
     }()
 
     private lazy var closeButton: UIButton = {
@@ -100,7 +130,7 @@ class AnchorEndStatisticsView: UIView {
         case 1: // viewCountCell
             return (topTitle: "\(max(endViewInfo.viewCount - 1, 0))", bottomTitle: .audienceCountText)
         case 2: // messageCountCell
-            return (topTitle: "\(max(endViewInfo.messageCount - 1, 0))", bottomTitle: .messageCountText)
+            return (topTitle: "\(max(endViewInfo.messageCount, 0))", bottomTitle: .messageCountText)
         case 3: // giftIncomeCell
             return (topTitle: "\(endViewInfo.giftTotalCoins)", bottomTitle: .giftIncomeText)
         case 4: // giftSenderCountCell
@@ -119,11 +149,16 @@ extension AnchorEndStatisticsView {
     
     private func constructViewHierarchy() {
         backgroundColor = .g2
-        addSubview(titleLabel)
         addSubview(closeButton)
         addSubview(contentBgView)
         contentBgView.addSubview(contentDescLabel)
         contentBgView.addSubview(collectionView)
+        
+        if endViewInfo.liveEndedReason == .endedByServer {
+            addSubview(dismissByServiceTitleView)
+        } else {
+            addSubview(titleLabel)
+        }
     }
 
     private func activateConstraints() {
@@ -134,17 +169,32 @@ extension AnchorEndStatisticsView {
             make.width.height.equalTo(30.scale375())
         }
         
-        titleLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(120.scale375Height())
-            make.width.equalToSuperview()
-            make.height.equalTo(30.scale375Height())
-        }
-        
-        contentBgView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16.scale375())
-            make.height.equalTo(160.scale375Height())
-            make.top.equalTo(titleLabel.snp.bottom).offset(50.scale375Height())
+        if endViewInfo.liveEndedReason == .endedByServer {
+            dismissByServiceTitleView.snp.makeConstraints { make in
+                make.leading.equalToSuperview().inset(16.scale375())
+                make.top.equalToSuperview().offset(120.scale375Height())
+                make.height.equalTo(30.scale375Height())
+                make.trailing.lessThanOrEqualToSuperview().inset(16.scale375())
+            }
+            
+            contentBgView.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview().inset(16.scale375())
+                make.height.equalTo(160.scale375Height())
+                make.top.equalTo(dismissByServiceTitleView.snp.bottom).offset(50.scale375Height())
+            }
+        } else {
+            titleLabel.snp.makeConstraints { make in
+                make.centerX.equalToSuperview()
+                make.top.equalToSuperview().offset(120.scale375Height())
+                make.width.equalToSuperview()
+                make.height.equalTo(30.scale375Height())
+            }
+            
+            contentBgView.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview().inset(16.scale375())
+                make.height.equalTo(160.scale375Height())
+                make.top.equalTo(titleLabel.snp.bottom).offset(50.scale375Height())
+            }
         }
         
         contentDescLabel.snp.makeConstraints { make in
@@ -183,10 +233,10 @@ extension AnchorEndStatisticsView {
 }
 
 extension AnchorEndStatisticsView: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 6
     }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
         cell.contentView.subviews.forEach { $0.safeRemoveFromSuperview() }
         cell.backgroundColor = .clear
@@ -201,7 +251,7 @@ extension AnchorEndStatisticsView: UICollectionViewDataSource, UICollectionViewD
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.width / 3, height: 70.scale375Height())
     }
 }
@@ -245,5 +295,9 @@ private extension String {
     
     static var likeCountText: String {
         internalLocalized("common_common_like_count")
+    }
+    
+    static var dismissByServiceText: String {
+        internalLocalized("common_end_live_by_server")
     }
 }

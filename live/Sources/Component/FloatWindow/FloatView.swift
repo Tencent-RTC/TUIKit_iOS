@@ -33,12 +33,14 @@ class FloatView: UIView {
     private var margin : CGFloat = 10
     
     init(contentView: UIView) {
-        let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
-        let floatViewWidth: CGFloat = screenWidth * 0.293333
-        let floatViewHeight: CGFloat = screenHeight * 0.23152
-        let initialX = screenWidth - floatViewWidth - margin
-        let initialY = screenHeight * 0.1
+        let portraitWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        let portraitHeight = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        let contentSize = contentView.bounds.size
+        let isLandscapeContent = contentSize.width > 0 && contentSize.height > 0 && contentSize.width > contentSize.height
+        let floatViewWidth: CGFloat = isLandscapeContent ? portraitWidth * 0.536 : portraitWidth * 0.293333
+        let floatViewHeight: CGFloat = portraitHeight * 0.23152
+        let initialX = portraitWidth - floatViewWidth - margin
+        let initialY = portraitHeight * 0.1
         self.contentView = contentView
         super.init(frame: CGRect(x: initialX, y: initialY, width: floatViewWidth, height: floatViewHeight))
         setViewStyle()
@@ -79,9 +81,10 @@ class FloatView: UIView {
             make.height.equalTo(snp.width).multipliedBy(size.height / size.width)
         }
         
+        let portraitWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
         let windowW = frame.width
         let windowH = windowW * (size.height / size.width)
-        let windowX = UIScreen.main.bounds.width - windowW - margin
+        let windowX = portraitWidth - windowW - margin
         let windowY = frame.origin.y
         frame = CGRect(x: windowX, y: windowY, width: windowW, height: windowH)
         
@@ -121,8 +124,8 @@ class FloatView: UIView {
     }
     
     func snapToEdge() {
-        let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
+        let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+        let screenHeight = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
         let floatWindowWidth = frame.width
         let floatWindowHeight = frame.height
         

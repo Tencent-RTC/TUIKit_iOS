@@ -20,8 +20,8 @@ public protocol FloatWindowProvider: AnyObject {
     func relayoutCoreView()
 }
 
-class FloatWindow: NSObject {
-    static let shared = FloatWindow()
+public class FloatWindow: NSObject {
+    public static let shared = FloatWindow()
     private override init() {
         super.init()
         NotificationCenter.default.addObserver(self,selector: #selector(handleLogoutNotification),
@@ -45,12 +45,10 @@ class FloatWindow: NSObject {
 }
 
 // MARK: -------------- API --------------
-extension FloatWindow {
+public extension FloatWindow {
     @discardableResult
     func showFloatWindow(controller: UIViewController, provider: FloatWindowProvider) -> Bool {
         guard !isShow else { return false }
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow }) else { return false }
         
         self.controller = controller
         self.provider = provider
@@ -65,20 +63,25 @@ extension FloatWindow {
         
         coreView.safeRemoveFromSuperview()
         
-        let floatView = FloatView(contentView: coreView)
-        floatView.layoutSubviews()
-        floatView.delegate = self
-        window.addSubview(floatView)
-        self.floatView = floatView
-        
         isShow = true
-        
         LiveKitLog.info("\(#file)", "\(#line)", "FloatWindow show")
         TUIRoomEngine.sharedInstance().addObserver(self)
         
-        floatView.isUserInteractionEnabled = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak floatView] in
-            floatView?.isUserInteractionEnabled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            guard let self = self, self.isShow else { return }
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let window = windowScene.windows.first(where: { $0.isKeyWindow }) else { return }
+            
+            let floatView = FloatView(contentView: coreView)
+            floatView.layoutSubviews()
+            floatView.delegate = self
+            window.addSubview(floatView)
+            self.floatView = floatView
+            
+            floatView.isUserInteractionEnabled = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak floatView] in
+                floatView?.isUserInteractionEnabled = true
+            }
         }
         
         return true
@@ -88,9 +91,10 @@ extension FloatWindow {
     func resumeLive(atViewController: UIViewController) -> Bool {
         guard isShow, let controller = controller, let dataSource = provider else { return false }
         LiveKitLog.info("\(#file)", "\(#line)", "FloatWindow resume")
-        dataSource.relayoutCoreView()
         controller.modalPresentationStyle = .fullScreen
-        WindowUtils.getCurrentWindow()?.rootViewController?.present(controller, animated: true)
+        WindowUtils.getCurrentWindow()?.rootViewController?.present(controller, animated: true) {
+            dataSource.relayoutCoreView()
+        }
         dismiss()
         return true
     }
@@ -163,15 +167,20 @@ extension FloatWindow: FloatViewDelegate {
 
 // MARK: - Observer
 extension FloatWindow: TUIRoomObserver {
-    func onRoomDismissed(roomId: String, reason: TUIRoomDismissedReason) {
+    public func onRoomDismissed(roomId: String, reason: TUIRoomDismissedReason) {
+        WindowUtils.getCurrentWindow()?.rootViewController?.view.showAtomicToast(text: .liveHasStopText, style: .info)
         releaseFloatWindow()
     }
     
-    func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
+    public func onKickedOutOfRoom(roomId: String, reason: TUIKickedOutOfRoomReason, message: String) {
         releaseFloatWindow()
     }
     
-    func onKickedOffLine(message: String) {
+    public func onKickedOffLine(message: String) {
         releaseFloatWindow()
     }
+}
+
+fileprivate extension String {
+    static let liveHasStopText = internalLocalized("common_live_has_stop")
 }

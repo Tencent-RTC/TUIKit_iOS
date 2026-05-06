@@ -47,7 +47,7 @@ public class BarrageStreamView: UIView {
         self.liveID = liveID
         super.init(frame: .zero)
         initEmotions()
-        
+        subscribeLiveListState()
         BarrageManager.shared.toastSubject
             .receive(on: RunLoop.main)
             .sink { [weak self] msg,style in
@@ -90,11 +90,6 @@ public class BarrageStreamView: UIView {
         setNeedsReloadData()
     }
     
-    public func getBarrageCount() -> Int {
-        // TODO: chengyu summaryData明确后删除
-        return dataSource.count
-    }
-    
     public override func layoutSubviews() {
         super.layoutSubviews()
         updateContentInset()
@@ -110,7 +105,6 @@ public class BarrageStreamView: UIView {
     
     private func bindInteraction() {
         setupBarrageListener()
-        setupAudienceEvent()
     }
     
     private func resetStateListener() {
@@ -126,6 +120,19 @@ public class BarrageStreamView: UIView {
             .store(in: &cancellableSet)
         
         bindInteraction()
+    }
+    
+    private func subscribeLiveListState() {
+        LiveListStore.shared.state.subscribe(
+            StatePublisherSelector(keyPath: \LiveListState.currentLive)
+        )
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentLive in
+                guard let self = self, !currentLive.isEmpty else { return }
+                setOwnerId(currentLive.liveOwner.userID)
+            }
+            .store(in: &cancellableSet)
     }
 }
 
@@ -178,10 +185,6 @@ extension BarrageStreamView {
     var barrageStore: BarrageStore {
         return BarrageStore.create(liveID: liveID)
     }
-    
-    var liveAudienceStore: LiveAudienceStore {
-        return LiveAudienceStore.create(liveID: liveID)
-    }
 }
 
 // MARK: - Private functions
@@ -193,25 +196,6 @@ extension BarrageStreamView {
                 guard let self = self else { return }
                 guard !messageList.isEmpty else { return }
                 reloadBarrages(messageList)
-            }
-            .store(in: &cancellableSet)
-    }
-    
-    private func setupAudienceEvent() {
-        liveAudienceStore.liveAudienceEventPublisher
-            .receive(on: RunLoop.main)
-            .sink { [weak self] event in
-                guard let self = self else { return }
-                switch event {
-                case .onAudienceJoined(audience: let audience):
-                    var barrage = Barrage()
-                    barrage.liveID = liveID
-                    barrage.sender = audience
-                    barrage.textContent = " \(String.comingText)"
-                    barrage.timestampInSecond = Date().timeIntervalSince1970
-                    barrageStore.appendLocalTip(message: barrage)
-                default: break
-                }
             }
             .store(in: &cancellableSet)
     }
@@ -267,8 +251,4 @@ extension BarrageStreamView {
     private func initEmotions() {
         EmotionHelper.shared.useDefaultEmotions()
     }
-}
-
-private extension String {
-    static let comingText: String = internalLocalized("common_entered_room")
 }

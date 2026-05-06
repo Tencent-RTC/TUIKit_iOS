@@ -69,6 +69,7 @@ public class LikeButton: UIButton {
             case .success():
                 pendingCount = 0
             case .failure(let error):
+                guard error.code != LiveError.freqLimit.rawValue else { return }
                 let err = InternalError(code: error.code, message: error.message)
                 GiftManager.shared.toastSubject.send((err.localizedMessage,.error))
             }

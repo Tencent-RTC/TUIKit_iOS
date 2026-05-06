@@ -25,6 +25,7 @@
 "TUICallKit.Recents.noCall" = "لا توجد مكالمات";
 "TUICallKit.Recents.noMissedCall" = "لا توجد مكالمات فائتة";
 "TUICallKit.ErrorInvalidUserId" = "المستخدم غير موجود. يرجى التحقق مما إذا كان المستخدم مسجلاً أو إذا تم إدخال أحرف غير صالحة";
+"TUICallKit.ErrorGroupHasActiveCall" = "هذه المجموعة لديها بالفعل مكالمة نشطة";
 
 "TUICallKit.switchCamera" = "يُحوّل";
 "TUICallKit.blurBackground" = "الخلفية الغائمة";

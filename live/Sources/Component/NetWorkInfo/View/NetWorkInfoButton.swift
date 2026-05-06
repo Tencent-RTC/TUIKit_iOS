@@ -82,7 +82,7 @@ class NetworkInfoButton: UIView {
             make.leading.equalTo(wifiImageView.snp.trailing).offset(4.scale375())
             make.centerY.equalToSuperview()
             make.height.equalTo(16.scale375())
-            make.trailing.equalToSuperview().inset(2.scale375())
+            make.trailing.equalToSuperview().offset(-4.scale375())
         }
     }
 

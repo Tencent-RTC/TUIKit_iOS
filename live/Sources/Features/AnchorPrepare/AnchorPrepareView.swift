@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Kingfisher
 import TUICore
 import AtomicXCore
 import AtomicX
@@ -14,15 +15,7 @@ public class AnchorPrepareView: UIView {
     public weak var delegate: AnchorPrepareViewDelegate?
     
     private let coreView: LiveCoreView = {
-        let jsonObject: [String: Any] = [
-            "api": "component",
-            "component": 21
-        ]
-        if let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: []),
-           let jsonString = String(data: jsonData, encoding: .utf8)
-        {
-            LiveCoreView.callExperimentalAPI(jsonString)
-        }
+        KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)
         return LiveCoreView(viewType: .pushView)
     }()
     
@@ -49,9 +42,92 @@ public class AnchorPrepareView: UIView {
         return view
     }()
     
-    private lazy var state = PrepareState(roomName: getDefaultRoomName(), coverUrl: Constants.URL.defaultCover, privacyMode: .public, templateMode: .verticalGridDynamic, pkTemplateMode: .verticalGridDynamic)
+    private lazy var state: PrepareState = {
+        let coverUrl = LSSystemImageFactory.getImageAssets().randomElement()?.imageUrl?.absoluteString ?? Constants.URL.defaultCover
+        return PrepareState(roomName: getDefaultRoomName(),
+                            coverUrl: coverUrl,
+                            privacyMode: .public,
+                            templateMode: .verticalGridDynamic,
+                            pkTemplateMode: .verticalGridDynamic,
+                            videoStreamSource: .camera)
+    }()
     
     private lazy var editView = LSLiveInfoEditView(state: &state)
+    
+    // MARK: - Tab Switch (Video Live / Game Live)
+    
+    private lazy var videoStreamSourceTab: UIView = {
+        let container = UIView()
+        container.addSubview(videoLiveTabButton)
+        container.addSubview(gameLiveTabButton)
+        container.addSubview(tabIndicator)
+        
+        videoLiveTabButton.snp.makeConstraints { make in
+            make.leading.top.bottom.equalToSuperview()
+        }
+        gameLiveTabButton.snp.makeConstraints { make in
+            make.leading.equalTo(videoLiveTabButton.snp.trailing).offset(32.scale375())
+            make.top.bottom.trailing.equalToSuperview()
+        }
+        tabIndicator.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.centerX.equalTo(videoLiveTabButton)
+            make.width.equalTo(24.scale375())
+            make.height.equalTo(2)
+        }
+        return container
+    }()
+    
+    private lazy var videoLiveTabButton: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.setTitle(.videoLiveText, for: .normal)
+        btn.setTitleColor(.white, for: .selected)
+        btn.setTitleColor(UIColor.white.withAlphaComponent(0.6), for: .normal)
+        btn.titleLabel?.font = .customFont(ofSize: 16, weight: .bold)
+        btn.isSelected = true
+        btn.addTarget(self, action: #selector(videoLiveTabTapped), for: .touchUpInside)
+        return btn
+    }()
+    
+    private lazy var gameLiveTabButton: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.setTitle(.gameLiveText, for: .normal)
+        btn.setTitleColor(.white, for: .selected)
+        btn.setTitleColor(UIColor.white.withAlphaComponent(0.6), for: .normal)
+        btn.titleLabel?.font = .customFont(ofSize: 16, weight: .regular)
+        btn.isSelected = false
+        btn.addTarget(self, action: #selector(gameLiveTabTapped), for: .touchUpInside)
+        return btn
+    }()
+    
+    private lazy var tabIndicator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 1
+        return view
+    }()
+    
+    private lazy var gameLivePlaceholderView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        
+        let backgroundImageView = UIImageView()
+        backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.clipsToBounds = true
+        backgroundImageView.kf.setImage(with: URL(string: Constants.URL.defaultBackground))
+        view.addSubview(backgroundImageView)
+        backgroundImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        return view
+    }()
+    
+    private var isGameLiveMode: Bool = false {
+        didSet {
+            updateUIForStreamSource()
+        }
+    }
     
     private lazy var defaultPanelModelItems: [PrepareFeatureItem] = {
         var designConfig = PrepareFeatureItemDesignConfig()
@@ -339,9 +415,11 @@ extension AnchorPrepareView {
 extension AnchorPrepareView {
     func constructViewHierarchy() {
         addSubview(coreView)
+        addSubview(gameLivePlaceholderView)
         addSubview(topGradientView)
         addSubview(bottomGradientView)
         addSubview(backButton)
+        addSubview(videoStreamSourceTab)
         addSubview(editView)
         addSubview(featureClickPanel)
         addSubview(startButton)
@@ -367,6 +445,10 @@ extension AnchorPrepareView {
             make.bottom.equalToSuperview().inset(96.scale375Height())
         })
         
+        gameLivePlaceholderView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         topGradientView.snp.remakeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalToSuperview()
@@ -390,6 +472,16 @@ extension AnchorPrepareView {
             } else {
                 make.top.equalToSuperview().offset(16)
             }
+        }
+        
+        videoStreamSourceTab.snp.remakeConstraints { make in
+            make.centerX.equalToSuperview()
+            if self.isPortrait {
+                make.top.equalToSuperview().offset(64.scale375Height())
+            } else {
+                make.top.equalToSuperview().offset(16)
+            }
+            make.height.equalTo(30.scale375())
         }
         
         editView.snp.remakeConstraints { make in
@@ -470,6 +562,50 @@ extension AnchorPrepareView {
         delegate?.onClickStartButton(state: state)
     }
     
+    @objc private func videoLiveTabTapped() {
+        guard isGameLiveMode else { return }
+        isGameLiveMode = false
+    }
+    
+    @objc private func gameLiveTabTapped() {
+        guard !isGameLiveMode else { return }
+        isGameLiveMode = true
+    }
+    
+    private func updateUIForStreamSource() {
+        videoLiveTabButton.isSelected = !isGameLiveMode
+        gameLiveTabButton.isSelected = isGameLiveMode
+        videoLiveTabButton.titleLabel?.font = .customFont(ofSize: 16, weight: isGameLiveMode ? .regular : .bold)
+        gameLiveTabButton.titleLabel?.font = .customFont(ofSize: 16, weight: isGameLiveMode ? .bold : .regular)
+        
+        UIView.animate(withDuration: 0.25) { [weak self] in
+            guard let self = self else { return }
+            self.tabIndicator.snp.remakeConstraints { make in
+                make.bottom.equalToSuperview()
+                make.centerX.equalTo(self.isGameLiveMode ? self.gameLiveTabButton : self.videoLiveTabButton)
+                make.width.equalTo(24.scale375())
+                make.height.equalTo(2)
+            }
+            self.videoStreamSourceTab.layoutIfNeeded()
+        }
+        
+        if isGameLiveMode {
+            state.videoStreamSource = .screenShare
+            state.templateMode = .horizontalDynamic
+            coreView.isHidden = true
+            gameLivePlaceholderView.isHidden = false
+            featureClickPanel.isHidden = true
+            DeviceStore.shared.closeLocalCamera()
+        } else {
+            state.videoStreamSource = .camera
+            state.templateMode = .verticalGridDynamic
+            coreView.isHidden = false
+            gameLivePlaceholderView.isHidden = true
+            featureClickPanel.isHidden = false
+            DeviceStore.shared.openLocalCamera(isFront: true, completion: nil)
+        }
+    }
+    
     @objc func keyboardWillShow(notification: Notification) {
         guard let userInfo = notification.userInfo else {
             return
@@ -537,7 +673,7 @@ extension AnchorPrepareView {
         self.popupViewController = popover
         
         let isEffectBeauty = (TUICore.getService(TUICore_TEBeautyService) != nil)
-        DataReporter.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
+        KeyMetrics.reportEventData(eventKey: isEffectBeauty ? Constants.DataReport.kDataReportPanelShowLiveRoomBeautyEffect :
                                         Constants.DataReport.kDataReportPanelShowLiveRoomBeauty)
     }
     
@@ -665,4 +801,6 @@ private extension String {
     static let layoutText: String = internalLocalized("common_template_layout")
     static let videoSettingsText: String = internalLocalized("common_video_settings")
     static let template601ExceptionText: String = internalLocalized("common_template_601_ui_exception_toast")
+    static let videoLiveText: String = internalLocalized("common_preview_video_live")
+    static let gameLiveText: String = internalLocalized("common_game_live")
 }

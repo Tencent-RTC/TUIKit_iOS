@@ -12,7 +12,7 @@ import Foundation
 import RTCRoomEngine
 
 public class TUIGiftData {
-    public var giftCount: UInt8
+    public var giftCount: UInt
     public let giftInfo: Gift
     public let sender: LiveUserInfo
 
@@ -24,7 +24,7 @@ public class TUIGiftData {
         return "\(sender.userID)_\(giftInfo.giftID)"
     }
     
-    public init(_ giftCount: UInt8, giftInfo: Gift, sender: LiveUserInfo) {
+    public init(_ giftCount: UInt, giftInfo: Gift, sender: LiveUserInfo) {
         self.giftCount = giftCount
         self.giftInfo = giftInfo
         self.sender = sender

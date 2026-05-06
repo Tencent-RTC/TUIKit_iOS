@@ -12,9 +12,12 @@ import AtomicXCore
 
 public class GiftBarrageCell: UIView {
     
+    private static let barrageContentMaxWidth: CGFloat = 240.scale375Width()
+    private static let giftIconSize: CGFloat = 14
+    
     private lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor("0F1014").withAlphaComponent(0.4)
+        view.backgroundColor = .black.withAlphaComponent(0.25)
         view.layer.cornerRadius = 13
         view.layer.masksToBounds = true
         return view
@@ -22,28 +25,19 @@ public class GiftBarrageCell: UIView {
     
     private let barrageLabel: UILabel = {
         let label = UILabel()
-        label.bounds.size.height = 20.scale375Height()
+        label.numberOfLines = 0
+        label.lineBreakMode = .byCharWrapping
         return label
     }()
     
-    private let giftImageView: UIImageView = {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFit
-        return view
-    }()
-    
-    private let countLabel: UILabel = {
-        let label = UILabel()
-        label.bounds.size.height = 20.scale375Height()
-        return label
-    }()
-    
-    private let cellHeight: CGFloat = 26
+    private let barrage: Barrage
     
     public init(barrage: Barrage) {
+        self.barrage = barrage
         super.init(frame: .zero)
         backgroundColor = .clear
-        updateViewContent(barrage: barrage)
+        barrageLabel.attributedText = getBarrageAttributedText(barrage: barrage, giftImage: nil)
+        loadGiftIconIfNeeded()
     }
     
     required init?(coder: NSCoder) {
@@ -59,52 +53,85 @@ public class GiftBarrageCell: UIView {
         isViewReady = true
     }
     
-    private func updateViewContent(barrage: Barrage) {
-        let barrageAttributedText = getBarrageAttributedText(barrage: barrage)
-        barrageLabel.attributedText = barrageAttributedText
-        
-        if let extensionInfo = barrage.extensionInfo,
-           let giftIconUrlString = extensionInfo["gift_icon_url"],
-           let giftIconUrl = URL(string: giftIconUrlString) {
-                giftImageView.kf.setImage(with: giftIconUrl)
+    private func loadGiftIconIfNeeded() {
+        guard let extensionInfo = barrage.extensionInfo,
+              let giftIconUrlString = extensionInfo["gift_icon_url"],
+              let giftIconUrl = URL(string: giftIconUrlString) else {
+            return
+        }
+        KingfisherManager.shared.retrieveImage(with: giftIconUrl) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let value):
+                self.barrageLabel.attributedText = self.getBarrageAttributedText(barrage: self.barrage, giftImage: value.image)
+            case .failure:
+                break
             }
-        
-        let countAttributedText = getCountAttributedText(barrage: barrage)
-        countLabel.attributedText = countAttributedText
+        }
     }
     
-    private func getBarrageAttributedText(barrage: Barrage) -> NSMutableAttributedString {
+    private func getBarrageAttributedText(barrage: Barrage, giftImage: UIImage?) -> NSMutableAttributedString {
+        let font = UIFont.customFont(ofSize: 12, weight: .semibold)
+        let userNameColor = UIColor("80BEF6")
+        let result = NSMutableAttributedString()
+        
         let userName = barrage.sender.userName ?? ""
-        let userNameAttributes: [NSAttributedString.Key: Any] =
-            [.foregroundColor: UIColor.lightBlueColor, .font: UIFont.customFont(ofSize: 12, weight: .semibold)]
-        let mutableAttributedString = NSMutableAttributedString(string: userName, attributes: userNameAttributes)
+        let userNameAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: userNameColor,
+            .font: font
+        ]
+        result.append(NSAttributedString(string: userName, attributes: userNameAttributes))
         
-        let sendAttributedText = NSAttributedString(string: " " + .sendText + " ", attributes: [.foregroundColor: UIColor.white])
-        mutableAttributedString.append(sendAttributedText)
+        let sendAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: font
+        ]
+        result.append(NSAttributedString(string: " " + .sendText + " ", attributes: sendAttributes))
         
-        let colors: [UIColor] = [.red, .blue, .yellow]
         guard let extensionInfo = barrage.extensionInfo,
               let giftName = extensionInfo["gift_name"],
               let receiver = extensionInfo["gift_receiver_username"] else {
-            return NSMutableAttributedString()
+            return result
         }
         
-        let receiverAttributedText = NSAttributedString(string: receiver, attributes: [.foregroundColor: UIColor.lightBlueColor])
-        mutableAttributedString.append(receiverAttributedText)
+        let receiverAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: userNameColor,
+            .font: font
+        ]
+        result.append(NSAttributedString(string: receiver, attributes: receiverAttributes))
         
+        let colors: [UIColor] = [.red, .blue, .yellow]
         let random = Int(arc4random_uniform(UInt32(colors.count)))
-        let giftNameAttributedString = NSAttributedString(string: " " + giftName, attributes: [.foregroundColor: colors[random]])
-        mutableAttributedString.append(giftNameAttributedString)
-
-        mutableAttributedString.addAttribute(.font,
-                                             value: UIFont.customFont(ofSize: 12, weight: .semibold),
-                                             range: NSRange(location: 0, length: mutableAttributedString.length))
-        return mutableAttributedString
-    }
-    
-    private func getCountAttributedText(barrage: Barrage ) -> NSAttributedString {
+        let giftNameAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: colors[random],
+            .font: font
+        ]
+        result.append(NSAttributedString(string: " " + giftName, attributes: giftNameAttributes))
+        
+        if let giftImage = giftImage {
+            let attachment = NSTextAttachment()
+            attachment.image = giftImage
+            let iconSize = Self.giftIconSize
+            let yOffset = (font.capHeight - iconSize) / 2
+            attachment.bounds = CGRect(x: 0, y: yOffset, width: iconSize, height: iconSize)
+            result.append(NSAttributedString(string: " "))
+            result.append(NSAttributedString(attachment: attachment))
+        }
+        
         let giftCount = barrage.extensionInfo?["gift_count"] ?? "0"
-        return NSAttributedString(string: " x\(giftCount)", attributes: [.foregroundColor: UIColor.white])
+        let countAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.white,
+            .font: font
+        ]
+        result.append(NSAttributedString(string: " x\(giftCount)", attributes: countAttributes))
+        
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineBreakMode = .byCharWrapping
+        result.addAttribute(.paragraphStyle,
+                            value: paragraphStyle,
+                            range: NSRange(location: 0, length: result.length))
+        
+        return result
     }
 }
 
@@ -114,29 +141,18 @@ extension GiftBarrageCell {
     private func constructViewHierarchy() {
         addSubview(containerView)
         containerView.addSubview(barrageLabel)
-        containerView.addSubview(giftImageView)
-        containerView.addSubview(countLabel)
     }
     
     private func activateConstraints() {
         containerView.snp.makeConstraints { make in
             make.top.leading.bottom.equalToSuperview()
             make.trailing.lessThanOrEqualToSuperview()
-            make.height.equalTo(cellHeight)
+            make.width.lessThanOrEqualTo(Self.barrageContentMaxWidth)
         }
         barrageLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(5)
-            make.centerY.equalToSuperview()
-        }
-        giftImageView.snp.makeConstraints { make in
-            make.leading.equalTo(barrageLabel.snp.trailing).offset(8)
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(12)
-        }
-        countLabel.snp.makeConstraints { make in
-            make.leading.equalTo(giftImageView.snp.trailing)
-            make.centerY.equalToSuperview()
-            make.trailing.equalToSuperview().offset(-8)
+            make.leading.equalToSuperview().offset(8)
+            make.trailing.equalToSuperview().inset(8)
+            make.top.bottom.equalToSuperview().inset(5)
         }
     }
 }

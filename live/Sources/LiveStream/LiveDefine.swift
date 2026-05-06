@@ -21,7 +21,13 @@ public enum LiveStreamPrivacyStatus: NSInteger, CaseIterable {
     }
 }
 
+public enum VideoStreamSource: NSInteger {
+    case camera = 0
+    case screenShare = 1
+}
+
 public enum LiveTemplateMode: NSInteger, CaseIterable {
+    case horizontalDynamic = 200
     case verticalGridDynamic = 600
     case verticalFloatDynamic = 601
     case verticalGridStatic = 800
@@ -29,6 +35,8 @@ public enum LiveTemplateMode: NSInteger, CaseIterable {
     
     func toString() -> String {
         switch self {
+        case .horizontalDynamic:
+            return internalLocalized("common_game_live")
         case .verticalGridDynamic:
             return internalLocalized("common_template_dynamic_grid")
         case .verticalFloatDynamic:
@@ -42,6 +50,8 @@ public enum LiveTemplateMode: NSInteger, CaseIterable {
     
     func toImageName() -> String {
         switch self {
+        case .horizontalDynamic:
+            return "dynamicGridLayout"
         case .verticalGridDynamic:
             return "dynamicGridLayout"
         case .verticalFloatDynamic:

@@ -165,7 +165,8 @@ class IncomingBannerViewController: UIViewController {
     private func updateUserInfoUI() {
         let remoteUsers = CallStore.shared.state.value.allParticipants
             .filter { $0.id != CallStore.shared.state.value.selfInfo.id }
-        if let firstRemoteUser = remoteUsers.first {
+        let inviterId = CallStore.shared.state.value.activeCall.inviterId
+        if let firstRemoteUser = remoteUsers.first(where: { $0.id == inviterId }) ?? remoteUsers.first {
             userHeadImageView.sd_setImage(
                 with: URL(string: firstRemoteUser.avatarURL),
                 placeholderImage: CallKitBundle.getBundleImage(name: "default_user_icon")
@@ -180,7 +181,8 @@ class IncomingBannerViewController: UIViewController {
     private func subscribeParticipantInfo() {
         CallStore.shared.state
             .subscribe(StatePublisherSelector { state in
-                state.allParticipants.first(where: { $0.id != state.selfInfo.id })
+                state.allParticipants.first(where: { $0.id == state.activeCall.inviterId })
+                    ?? state.allParticipants.first(where: { $0.id != state.selfInfo.id })
             })
             .receive(on: RunLoop.main)
             .sink { [weak self] participant in

@@ -14,6 +14,7 @@ import SDWebImage
 
 public enum Feature: String {
     case aiTranscriber = "aiTranscriber"
+    case virtualBackground = "virtualBackground"
 }
 
 public class CallView: UIView {
@@ -33,8 +34,13 @@ public class CallView: UIView {
     }
     
     public func disableFeatures(_ features: [Feature]?) {
-        if let features = features, features.contains(.aiTranscriber) {
+        guard let features = features else { return }
+        if features.contains(.aiTranscriber) {
             callTranscriberView.isEnabled = false
+        }
+        if features.contains(.virtualBackground) {
+            singleCallControlsView.enableVirtualBackground = false
+            multiCallControlsView.enableVirtualBackground = false
         }
     }
     
@@ -103,8 +109,15 @@ extension CallView {
             make.edges.equalToSuperview()
         }
         
-        callCoreView.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
+        if isGroupCall {
+            callCoreView.snp.remakeConstraints { make in
+                make.top.equalToSuperview().offset(CallConstants.statusBar_Height + 40.scale375Height())
+                make.leading.trailing.bottom.equalToSuperview()
+            }
+        } else {
+            callCoreView.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
+            }
         }
         
         waitingParticipantsView.snp.remakeConstraints { make in
@@ -312,15 +325,6 @@ extension CallView {
         return fullPath
     }
     
-    private func handleDeviceEvent(_ event: DeviceEvent) {
-        if event == .onSmartCellularSwitchRecommended {
-            let recommendationView = SmartCellularSwitchRecommendationView()
-            recommendationView.onEnableSmartCellular = { DeviceStore.shared.enableSmartCellularSwitchMode(enable: true) }
-            recommendationView.show()
-            return
-        }
-    }
-    
     private func handleNetworkTypeChanged(_ newType: NetworkType) {
         var toastString = ""
         switch newType {
@@ -374,14 +378,6 @@ extension CallView {
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.handleOrientationChange()
-            }
-            .store(in: &cancellables)
-        
-        DeviceStore.shared.deviceEventPublisher
-            .receive(on: RunLoop.main)
-            .sink { [weak self] event in
-                guard let self = self else { return }
-                self.handleDeviceEvent(event)
             }
             .store(in: &cancellables)
         
