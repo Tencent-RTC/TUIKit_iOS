@@ -1,0 +1,92 @@
+/*
+  MainLocalized.strings
+  main
+
+  简体中文本地化
+  从 iOS/App/RT-Cube/Main/resource/localized/zh-Hans.lproj/MainLocalized.strings 迁移
+*/
+"App.PortalViewController.sharelog" = "分享上传日志";
+"App.PortalViewController.share" = "分享";
+"App.PortalViewController.cancel" = "取消";
+"AppCommon.TCUtil.sendhttprequest" = "sendHttpRequest failed，参数转成json格式失败";
+"AppCommon.TCUtil.parametererror" = "参数错误";
+"AppCommon.TCUtil.serverrequesterror" = "服务请求失败";
+
+"Demo.TRTC.Portal.Mine.personalcenter" = "个人中心";
+"Demo.TRTC.Portal.Mine.about" = "关于";
+
+"Demo.TRTC.Portal.App.title" = "腾讯云音视频";
+"Demo.TRTC.Portal.confirm" = "确认";
+"Demo.TRTC.Portal.enterusername" = "请输入用户昵称";
+"Demo.TRTC.Portal.privacy" = "隐私保护指引";
+"Demo.TRTC.Portal.disclaimer" = "免责声明";
+"Demo.TRTC.Portal.sdkversion" = "SDK 版本";
+"Demo.TRTC.Portal.appversion" = "商店版本";
+"Demo.TRTC.Portal.limit20count" = "仅限中文、字母、数字和下划线，2-20个字";
+"Demo.TRTC.Portal.changenickname" = "修改用户昵称";
+"Demo.TRTC.Portal.disclaimerdesc" = "腾讯云音视频 TRTC（\"本产品\"）是由腾讯云提供的一款测试产品，腾讯云享有本产品的著作权和所有权。本产品仅用于功能体验，不得用于任何商业用途。\n为配合相关部门监管要求，本产品音视频互动全程均有录音录像存档，严禁在使用中有任何色情、辱骂、暴恐、涉政等违规内容的传播。";
+"Demo.TRTC.Home.appusetoshowfunc" = "本APP用于展示腾讯视频云终端产品的各类功能";
+
+"Demo.TRTC.Portal.Main.call" = "通话";
+"Demo.TRTC.Portal.Main.callContent" = "响铃通知·通话悬浮窗·通话卡顿优化";
+"Demo.TRTC.Portal.Main.tuiRoom" = "会议";
+"Demo.TRTC.Portal.Main.tuiRoomContent" = "快速会议·邀请入会·会中管控·共享屏幕";
+"Demo.TRTC.Portal.Main.live" = "直播";
+"Demo.TRTC.Portal.Main.liveContent" = "开播预览·智能美颜·连麦PK";
+"Demo.TRTC.Portal.Main.uichat" = "聊天";
+"Demo.TRTC.Portal.Main.uichatContent" = "群组聊天·好友通讯录·语音消息·资料多端同步";
+"Demo.TRTC.Portal.Main.beautyEffects" = "美颜特效";
+"Demo.TRTC.Portal.Main.beautyEffectsContent" = "美颜·美妆·滤镜·贴纸";
+"Demo.TRTC.Portal.Main.video" = "视频播放";
+"Demo.TRTC.Portal.Main.videoContent" = "自适应拉流·视频切换·倍速播放";
+"Demo.TRTC.Portal.Main.shortVideo" = "短视频制作";
+"Demo.TRTC.Portal.Main.shortVideoContent" = "图片视频编辑·多屏合拍·图片转场";
+"Demo.TRTC.Portal.Main.VoiceRoom" = "语聊房";
+"Demo.TRTC.Portal.Main.VoiceRoomContent" = "高音质·大房间·平滑上下麦";
+"Demo.TRTC.Portal.Main.ktv" = "在线K歌";
+"Demo.TRTC.Portal.Main.ktvContent" = "曲库点唱·实时合唱·互动抢唱·实时评分";
+"Demo.TRTC.Portal.Main.AI" = "AI 对话";
+"Demo.TRTC.Portal.Main.AiDesc" = "实时语音对话·AI 降噪·智能打断";
+"Demo.TRTC.Portal.Main.HotComponent" = "热门";
+"Demo.TRTC.Portal.Main.Interpretation" = "AI 同声传译";
+"Demo.TRTC.Portal.Main.InterpretationDesc" = "超低延迟·精准翻译·多语言覆盖";
+"Demo.TRTC.Portal.Main.IndustryScenarioPractice" = "行业应用场景";
+"Demo.TRTC.Portal.Main.Exploremore" = "探索更多";
+"Demo.TRTC.Portal.Main.UICompnent" = "UI组件";
+"Demo.TRTC.Portal.Main.trial" = "* UI组件指该产品提供含UI快速集成方案，30分钟上线同款能力";
+"Demo.TRTC.Portal.Main.Report" = "仅用于业务功能体验，请勿轻信汇款、中奖等涉及钱款的信息，谨防上当受骗，立即举报";
+"Demo.TRTC.Portal.Main.MoudleBannedMessage" = "您的账户存在风险，已被限制使用";
+"Demo.TRTC.Portal.Main.FaceAuthFailedMessage" = "核验失败，请重试";
+"Demo.TRTC.Portal.Main.safetyReminderTitle" = "安全提示";
+"Demo.TRTC.Portal.Main.safetyReminderFirstPara" = "腾讯云音视频 App 为您提供腾讯云音视频及通信云服务的演示与体验。请注意：";
+"Demo.TRTC.Portal.Main.safetyReminderEndPara" = "感谢您的理解与支持，祝您使用愉快！";
+"Demo.TRTC.Portal.Main.safetyReminderMidPara" = "1. 本App用途仅适用于演示和体验，请勿用于日常沟通或商业交易。\n2. 请勿向陌生人透露您的个人信息、账号密码等敏感信息，以保护您的隐私安全。\n3. 请务必警惕汇款、中奖等涉及钱款的信息，避免上当受骗。\n4. 如遇到可疑情况，请及时向我们反馈，我们将尽快为您核实处理。";
+"Demo.TRTC.Portal.Main.safetyReminderConfirm" = "我知道了";
+
+"Demo.TRTC.Language.switchLanguage" = "切换语言";
+
+"Demo.TRTC.LiveRoom.videoLive" = "在线直播";
+"Demo.TRTC.LiveRoom.createroom" = "开直播";
+
+"Demo.TRTC.VoiceRoom.voicechatroom" = "语聊房";
+"Demo.TRTC.VoiceRoom.createroom" = "创建房间";
+
+"Demo.TRTC.Home.prompt" = "提示";
+"Demo.TRTC.Home.newversionpublic" = "有新版本发布啦~";
+"Demo.TRTC.Home.updatenow" = "现在更新";
+"Demo.TRTC.Home.later" = "稍后再说";
+
+// 海外版首页
+"Demo.TRTC.Portal.Main.Products" = "产品";
+"Demo.TRTC.Portal.Main.DiscoveryLab" = "发现实验室";
+"Demo.TRTC.Portal.Main.UIkit" = "UIKit";
+"Demo.TRTC.Portal.Main.BeautyAR" = "美颜特效";
+"Demo.TRTC.Portal.Main.BeautyARDesc" = "美颜·美妆·滤镜·贴纸";
+"Demo.TRTC.Portal.Main.ScenarioExperience" = "场景体验";
+"Demo.TRTC.Portal.Main.ScenarioExperienceDesc" = "抓娃娃机·1v1社交·在线教育·金融服务";
+"Demo.TRTC.Portal.Home.videoCallDesc" = "响铃通知·通话悬浮窗·通话卡顿优化";
+"Demo.TRTC.Portal.Home.tuiRoomDesc" = "快速会议·会中管控·共享屏幕";
+"Demo.TRTC.Portal.Main.call.tuiRoom" = "会议";
+"Demo.TRTC.Portal.Main.contactUsxxx" = "以下产品尚在探索中，如有需要请xxx";
+"Demo.TRTC.Portal.Main.contactUs" = "联系我们 >";
+"Demo.TRTC.Portal.Main.LoginFailed" = "连接失败，请检查网络连接后重新启动应用。";

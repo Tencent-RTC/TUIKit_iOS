@@ -1,0 +1,122 @@
+/*
+  PrivacyLocalized.strings
+  privacy
+
+  Privacy module — English localization
+*/
+
+// MARK: - Login page (existing)
+"Demo.TRTC.Portal.privateandagreement" = "I have read and agree to the xxxyyy and zzz";
+"Demo.TRTC.Portal.agreeprivatefirst" = "You must agree to the Privacy Policy and Terms of Use first.";
+"Demo.TRTC.Portal.<privacysummary>" = "《Privacy Policy Summary》";
+"Demo.TRTC.Portal.<private>" = "《Privacy Policy》";
+"Demo.TRTC.Portal.<agreement>" = "《Terms of Use》";
+"Demo.TRTC.Portal.privacysummary" = "Privacy Policy Summary";
+"Demo.TRTC.Portal.private" = "Privacy Policy";
+"Demo.TRTC.Portal.agreement" = "Terms of Use";
+"Demo.TRTC.Portal.readAndAgreeConditions" = "Acceptance of Terms and Conditions";
+"Demo.TRTC.Portal.agreeAndContinue" = "Agree & Continue";
+"Demo.TRTC.Portal.privatealertdescription" = "Welcome to TRTC. The Privacy Policy and Terms of Use agreements detail how we collect, use, and store your information, as well as the rights your are entitled to and how to exercise them. By tapping the button below, you agree to the content of the agreements.";
+"Demo.TRTC.Portal.privacy" = "Privacy";
+
+// MARK: - Privacy Center
+"Privacy.Center.title" = "Privacy";
+"Privacy.Center.personalAuth" = "My Information & Authorizations";
+"Privacy.Center.dataCollection" = "Personal Information";
+"Privacy.Center.dataCollectionList" = "Personal Information Collected";
+"Privacy.Center.thirdShare" = "Information Shared with Third Parties";
+"Privacy.Center.privacySummary" = "Privacy Policy Summary";
+"Privacy.Center.privacyAgreement" = "Privacy Policy";
+"Privacy.Center.termsOfService" = "Terms of Service";
+"Privacy.Center.userAgreement" = "Terms of Use";
+
+// MARK: - Personal Auth
+"Privacy.PersonalAuth.systemAuth" = "System Permissions";
+"Privacy.PersonalAuth.info" = "My Information";
+
+// MARK: - System Auth
+"Privacy.SystemAuth.camera" = "Camera";
+"Privacy.SystemAuth.microphone" = "Microphone";
+"Privacy.SystemAuth.photos" = "Photos";
+"Privacy.SystemAuth.apns" = "Notification";
+"Privacy.SystemAuth.beauty" = "Beauty";
+"Privacy.SystemAuth.allow" = "Allow";
+"Privacy.SystemAuth.deny" = "Deny";
+"Privacy.SystemAuth.unauthorized" = "Unauthorized";
+"Privacy.SystemAuth.goToSettings" = "Go to System Settings";
+
+// MARK: - Auth Detail
+"Privacy.AuthDetail.manage" = "Manage %@ access";
+"Privacy.AuthDetail.beautyDesc" = "When you use the tencent effect beautification function, we will perform real-time intelligent recognition of the facial pixel information captured by your camera or pictures you selected from media store. During this process, we will collect your facial pixel information in real-time to provide you with better beautification effects. We will not store or associate your facial pixel information in any form. This information is sensitive personal information, so please provide it with caution. If you do not authorize it, you will not be able to use this function. After authorization, you can disable this function in privacy settings at any time.";
+
+// MARK: - Personal Info
+"Privacy.SystemAuth.avatar" = "Profile Photo";
+"Privacy.SystemAuth.name" = "Name";
+"Privacy.SystemAuth.id" = "ID";
+"Privacy.SystemAuth.phone" = "Phone";
+"Privacy.SystemAuth.email" = "Email";
+
+// MARK: - Data Collection
+"Privacy.DataCollection.desc" = "You can check %@'s collection of your personal information.";
+"Privacy.DataCollection.none" = "None";
+
+// MARK: - Copy
+"Privacy.MyInfo.copySuccess" = "Copied";
+
+// MARK: - Anti-fraud Tips
+"Privacy.Antifraud.scamTips" = "Please be vigilant against various types of scams, such as impersonating public security, procuratorial, and judicial authorities, campus loans, and customer service.";
+"Privacy.Antifraud.warmPromptTitle" = "Note";
+"Privacy.Antifraud.warmPromptMessage" = "In order to comply with the regulatory requirements of relevant departments, pornography, abuse, violence, terrorism, politics and other illegal content are strictly prohibited.\nThis product is only for functional experience, please do not use it for commercial use. A single use of no more than 10 minutes.";
+"Privacy.Antifraud.confirm" = "OK";
+
+// MARK: - Screen Share Anti-fraud
+"Privacy.ScreenShare.antifraudTitle" = "Safety reminder";
+"Privacy.ScreenShare.antifraudMessage" = "When sharing your screen, private information such as SMS verification codes and passwords may be leaked, causing property damage. Please be wary of various scams.";
+"Privacy.ScreenShare.continue" = "Continue to share";
+"Privacy.ScreenShare.cancel" = "Cancel";
+
+// MARK: - Live 10-minute Reminder
+"Privacy.Live.alertContent" = "For functional experience only, not for commercial use. Each session lasts no more than 10 minutes. Please exit and re-enter to continue the experience.";
+"Privacy.Live.remainingTips" = "Experience duration remaining 1 min";
+"Privacy.Live.roomEndTips" = "Experience duration exhausted, room automatically ends.";
+"Privacy.Live.timeOutAlert" = "The room has been automatically dismissed.";
+
+// MARK: - Room High-Risk IP Alert
+"Privacy.RoomRiskIP.message" = "Users from high-risk IP regions are present. Exercise caution to avoid scams. If you encounter suspicious situations, please preserve evidence immediately and report to the police.";
+
+// MARK: - Real Name Authentication
+"Privacy.RealAuth.title" = "Real-name Authentication";
+"Privacy.RealAuth.tip" = "When you use the 'Interactive Live Streaming' feature and start a live stream, Tencent Cloud Audio and Video needs to collect your real-name identity information (including your name and ID card number), which will be used solely for real-name authentication. The above information is considered sensitive personal information. If you do not provide your real-name identity information, we will not be able to provide live streaming services to you. For more details, please refer to the privacy policy below regarding how Tencent Cloud Audio and Video processes related personal information.";
+"Privacy.RealAuth.faceTokenTip" = "Your account has been restricted due to security risks. Tencent Cloud RTC requires collection of your real-name verification information—including name, ID number, and facial images—solely for identity authentication purposes. Service will be unavailable if you decline to provide this information. For details, refer to Tencent Cloud RTC's Privacy Policy.";
+"Privacy.RealAuth.enterName" = "Please enter your real name";
+"Privacy.RealAuth.enterIDCard" = "Please enter your ID card number";
+"Privacy.RealAuth.authenticate" = "Authenticate";
+"Privacy.RealAuth.agree" = "Agree";
+"Privacy.RealAuth.disagree" = "Disagree";
+"Privacy.RealAuth.privacyToast" = "Please read and agree to the Privacy Policy and User Agreement first.";
+"Privacy.RealAuth.emptyMessage" = "Name or ID card number is empty";
+"Privacy.RealAuth.cancelledToast" = "Real-name verification cancelled";
+"Privacy.RealAuth.faceAuthFailed" = "Verification failed. Please try again.";
+"Privacy.RealAuth.privacyAgreement" = "I have read and agree to the <Privacy Policy Summary>, <Privacy Policy> and <Terms of Use>";
+"Privacy.RealAuth.<privacySummary>" = "<Privacy Policy Summary>";
+"Privacy.RealAuth.<private>" = "<Privacy Policy>";
+"Privacy.RealAuth.<agreement>" = "<Terms of Use>";
+"Privacy.RealAuth.privatePage" = "Privacy Policy";
+"Privacy.RealAuth.agreementPage" = "Terms of Use";
+"Privacy.RealAuth.privacySummaryPage" = "Privacy Policy Summary";
+
+// MARK: - Report
+"Privacy.Report.title" = "Report";
+"Privacy.Report.submit" = "Submit";
+"Privacy.Report.submitSuccess" = "Submitted successfully";
+"Privacy.Report.type.title" = "Report Type";
+"Privacy.Report.type.politics" = "Sensitive";
+"Privacy.Report.type.porn" = "Pornography";
+"Privacy.Report.type.personalAttacks" = "Abuse";
+"Privacy.Report.type.violence" = "Bloody";
+"Privacy.Report.type.ad" = "Advertise";
+"Privacy.Report.type.scam" = "Scam";
+"Privacy.Report.type.illegal" = "Illegal";
+"Privacy.Report.type.other" = "Other";
+"Privacy.Report.description" = "Report Description";
+"Privacy.Report.description.placeholder" = "Please describe your report";

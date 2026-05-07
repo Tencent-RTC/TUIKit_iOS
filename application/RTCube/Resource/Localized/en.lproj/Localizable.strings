@@ -1,0 +1,10 @@
+/*
+  Localizable.strings
+  RTCube
+
+  Migrated from iOS/Basic/Business/BusinessService/Source/Common/Resource/Localized/en.lproj/BussnessCommonLocalized.strings
+*/
+
+"LogUpload.ShareLog" = "Share and Upload Logs";
+"LogUpload.Share" = "share";
+"LogUpload.Cancel" = "cancel";

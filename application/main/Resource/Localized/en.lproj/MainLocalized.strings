@@ -1,0 +1,93 @@
+/*
+  MainLocalized.strings
+  main
+
+  English localization for Main module
+  Migrated from iOS/App/RT-Cube/Main/resource/localized/en.lproj/MainLocalized.strings
+*/
+"App.PortalViewController.sharelog" = "Share and Upload Logs";
+"App.PortalViewController.share" = "share";
+"App.PortalViewController.cancel" = "cancel";
+
+"AppCommon.TCUtil.sendhttprequest" = "Unable to convert parameter value to JSON string due to sendHttpRequest failure";
+"AppCommon.TCUtil.parametererror" = "Parameter error";
+"AppCommon.TCUtil.serverrequesterror" = "Server request error";
+
+"Demo.TRTC.Portal.Mine.personalcenter" = "Personal Center";
+"Demo.TRTC.Portal.Mine.about" = "About";
+
+"Demo.TRTC.Portal.App.title" = "Tencent Cloud Media Services";
+"Demo.TRTC.Portal.confirm" = "Done";
+"Demo.TRTC.Portal.enterusername" = "Please enter a nickname";
+"Demo.TRTC.Portal.privacy" = "Privacy";
+"Demo.TRTC.Portal.disclaimer" = "Disclaimer";
+"Demo.TRTC.Portal.sdkversion" = "SDK Version";
+"Demo.TRTC.Portal.appversion" = "Application Version";
+"Demo.TRTC.Portal.limit20count" = "Chinese characters, letters, numbers and underscores, 2 - 20 words";
+"Demo.TRTC.Portal.changenickname" = "Change Your Nickname";
+"Demo.TRTC.Portal.disclaimerdesc" = "TRTC (this app) is a tryout app, whose copyright is owned by Tencent Cloud. This app is for tryout only and must not be used commercially.\nIn accordance with relevant regulations, this app forbids pornographic, abusive, terrorism, and politically sensitive content. All audio/video interactions are recorded and archived.";
+"Demo.TRTC.Home.appusetoshowfunc" = "This app demonstrates the features of Tencent Video Cloud terminal products.";
+
+"Demo.TRTC.Portal.Main.call" = "Call";
+"Demo.TRTC.Portal.Main.callContent" = "Ringtone/Floating window/Less stutter";
+"Demo.TRTC.Portal.Main.tuiRoom" = "Conference";
+"Demo.TRTC.Portal.Main.tuiRoomContent" = "Quick meeting/Invite/Manage participants/Share screen";
+"Demo.TRTC.Portal.Main.live" = "Live";
+"Demo.TRTC.Portal.Main.liveContent" = "Live preview/Beauty filters/Multi-host";
+"Demo.TRTC.Portal.Main.uichat" = "Chat";
+"Demo.TRTC.Portal.Main.uichatContent" = "Group chat/Contacts/Audio chat/Data sync";
+"Demo.TRTC.Portal.Main.beautyEffects" = "Beauty AR";
+"Demo.TRTC.Portal.Main.beautyEffectsContent" = "Beautify/Makeup/Filters/Stickers";
+"Demo.TRTC.Portal.Main.video" = "Video Play";
+"Demo.TRTC.Portal.Main.videoContent" = "Adaptive bitrate/Change video quality & speed";
+"Demo.TRTC.Portal.Main.shortVideo" = "UGSV";
+"Demo.TRTC.Portal.Main.shortVideoContent" = "Photo & video editor/Split screen/Transition effects";
+"Demo.TRTC.Portal.Main.VoiceRoom" = "Voice Room";
+"Demo.TRTC.Portal.Main.VoiceRoomContent" = "High audio quality/Large room/Smooth mic on/off";
+"Demo.TRTC.Portal.Main.ktv" = "Karaoke";
+"Demo.TRTC.Portal.Main.ktvContent" = "Music library/Duet/Real-time scoring";
+"Demo.TRTC.Portal.Main.AI" = "Conversational AI";
+"Demo.TRTC.Portal.Main.AiDesc" = "Realtime Call · AI Noise Suppression · Smart Interruption";
+"Demo.TRTC.Portal.Main.HotComponent" = "Hot";
+"Demo.TRTC.Portal.Main.Interpretation" = "AI Translation";
+"Demo.TRTC.Portal.Main.InterpretationDesc" = "Simultaneous interpretation · Multi-languages";
+"Demo.TRTC.Portal.Main.IndustryScenarioPractice" = "Industry Scenario Practice";
+"Demo.TRTC.Portal.Main.Exploremore" = "Explore more";
+"Demo.TRTC.Portal.Main.UICompnent" = "UIKit";
+"Demo.TRTC.Portal.Main.trial" = "*The \"UI\" label indicates that the component comes with a ready-to-use UI kit.";
+"Demo.TRTC.Portal.Main.Report" = "Attention: This is a DEMO APP. Do not trust anyone asking you to transfer money. Report scam";
+"Demo.TRTC.Portal.Main.MoudleBannedMessage" = "Your account is at risk and has been restricted.";
+"Demo.TRTC.Portal.Main.FaceAuthFailedMessage" = "Verification failed. Please try again.";
+"Demo.TRTC.Portal.Main.safetyReminderTitle" = "Safety Reminder";
+"Demo.TRTC.Portal.Main.safetyReminderFirstPara" = "Tencent Cloud Media Services App provides you with the demonstration and experience of Tencent Cloud Audio and Video and Communication Cloud Services. Please note:";
+"Demo.TRTC.Portal.Main.safetyReminderEndPara" = "Thank you for your understanding and support, wish you a pleasant use!";
+"Demo.TRTC.Portal.Main.safetyReminderMidPara" = "1. This App is for demonstration and experience purposes only, and should not be used for daily communication or business transactions.\n2. Please do not disclose your personal information, account password, or other sensitive information to strangers to protect your privacy and security.\n3. Be vigilant about remittance, winning a prize, and other money-related information to avoid being deceived.\n4. If you encounter any suspicious situations, please report to us promptly, and we will verify and handle it as soon as possible.";
+"Demo.TRTC.Portal.Main.safetyReminderConfirm" = "GOT IT";
+
+"Demo.TRTC.Language.switchLanguage" = "Switch Language";
+
+"Demo.TRTC.LiveRoom.videoLive" = "Video Live";
+"Demo.TRTC.LiveRoom.createroom" = "Go Live";
+
+"Demo.TRTC.VoiceRoom.voicechatroom" = "Voice Room";
+"Demo.TRTC.VoiceRoom.createroom" = "Create Room";
+
+"Demo.TRTC.Home.prompt" = "Notice";
+"Demo.TRTC.Home.newversionpublic" = "A new version is available!";
+"Demo.TRTC.Home.updatenow" = "Update Now";
+"Demo.TRTC.Home.later" = "Later";
+
+// Overseas homepage
+"Demo.TRTC.Portal.Main.Products" = "Products";
+"Demo.TRTC.Portal.Main.DiscoveryLab" = "Discovery Lab";
+"Demo.TRTC.Portal.Main.UIkit" = "UIKit";
+"Demo.TRTC.Portal.Main.BeautyAR" = "Beauty AR";
+"Demo.TRTC.Portal.Main.BeautyARDesc" = "Beauty Enhancement · Makeup · Filter · Sticker";
+"Demo.TRTC.Portal.Main.ScenarioExperience" = "Scenario Experience";
+"Demo.TRTC.Portal.Main.ScenarioExperienceDesc" = "Claw Machine · 1v1 Social · Online Education · Financial Service";
+"Demo.TRTC.Portal.Home.videoCallDesc" = "Call Notification · Floating Window · Stutter Optimization";
+"Demo.TRTC.Portal.Home.tuiRoomDesc" = "Fast Meeting · In-meeting Control · Screen Sharing";
+"Demo.TRTC.Portal.Main.call.tuiRoom" = "Conference";
+"Demo.TRTC.Portal.Main.contactUsxxx" = "Products below are under exploration. If you have needs, please xxx";
+"Demo.TRTC.Portal.Main.contactUs" = "contact us >";
+"Demo.TRTC.Portal.Main.LoginFailed" = "Connection failed. Please check your internet connection and restart the app again.";

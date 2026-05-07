@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>privacySummaryURL</key>
+	<string>https://privacy.qq.com/document/preview/55d060f5059945dcb49ac844edc93889</string>
+	<key>privacyURL</key>
+	<string>https://privacy.qq.com/document/preview/5f422b2fed97475dbfbb9a38aaf00fd9</string>
+	<key>userProtocolURL</key>
+	<string>https://rule.tencent.com/rule/preview/2b809db2-e870-4f20-8443-d319fdfb6a12</string>
+	<key>dataCollectionURL</key>
+	<string>https://privacy.qq.com/document/preview/d1b6939dc49d4e83b084dbdfe1f2cdda</string>
+	<key>thirdShareURL</key>
+	<string>https://privacy.qq.com/document/preview/10d30e3998d440629a8cdf5d95efae39</string>
+	<key>version</key>
+	<string>0</string>
+	<key>dataCollection</key>
+	<array>
+		<dict>
+			<key>type</key>
+			<string>avatar</string>
+			<key>desc</key>
+			<string>用于完成注册及使用腾讯云音视频功能</string>
+			<key>desc_en</key>
+			<string>For registration and using Tencent Cloud Media Services features</string>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>name</string>
+			<key>desc</key>
+			<string>用于完成注册及使用腾讯云音视频功能</string>
+			<key>desc_en</key>
+			<string>For registration and using Tencent Cloud Media Services features</string>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>phone</string>
+			<key>desc</key>
+			<string>用于完成注册、登陆</string>
+			<key>desc_en</key>
+			<string>For registration and login</string>
+		</dict>
+		<dict>
+			<key>type</key>
+			<string>email</string>
+			<key>desc</key>
+			<string>用于完成注册、登陆</string>
+			<key>desc_en</key>
+			<string>For registration and login</string>
+		</dict>
+	</array>
+	<key>thirdShare</key>
+	<array>
+		<dict>
+			<key>name</key>
+			<string>腾讯Bugly</string>
+			<key>company</key>
+			<string>深圳市腾讯计算机系统有限公司</string>
+			<key>info</key>
+			<string>APP崩溃堆栈信息、系统名称、系统版本以及使用的软件版本信息</string>
+			<key>purpose</key>
+			<string>提供App稳定性监控和崩溃问题追踪</string>
+			<key>method</key>
+			<string>嵌入SDK，相关事件发生时由SDK主动收集传输用户信息</string>
+			<key>scene</key>
+			<string>APP崩溃、卡顿</string>
+			<key>privacy</key>
+			<string>https://privacy.qq.com/document/preview/fc748b3d96224fdb825ea79e132c1a56</string>
+		</dict>
+	</array>
+	<key>personalAuth</key>
+	<dict>
+		<key>info</key>
+		<array>
+			<string>avatar</string>
+			<string>name</string>
+			<string>id</string>
+			<string>phone</string>
+			<string>email</string>
+		</array>
+		<key>auth</key>
+		<array>
+			<string>camera</string>
+			<string>microphone</string>
+			<string>apns</string>
+			<string>beauty</string>
+			<string>photos</string>
+		</array>
+	</dict>
+</dict>
+</plist>

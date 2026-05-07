@@ -1,0 +1,128 @@
+/* 
+  CallingLocalized.strings
+  main
+
+  通话模块英文本地化
+*/
+
+"Demo.TRTC.calling.yourID" = "Your ID:";
+"Demo.TRTC.calling.searchID" = "Online user ID";
+"Demo.TRTC.calling.yourphonenumber" = "Your mobile number ";
+"Demo.TRTC.calling.searchphonenumber" = "Mobile number";
+"Demo.TRTC.calling.searching" = "Search";
+"Demo.TRTC.calling.searchandcall" = "Search for a registered user\n to start a call";
+"Demo.TRTC.calling.callingbegan" = "Joined call";
+"Demo.TRTC.calling.callingcancel" = "Call cancelled";
+"Demo.TRTC.calling.callingtimeout" = "Call timed out";
+"Demo.TRTC.calling.callingrefuse" = "declined the call";
+"Demo.TRTC.calling.callingleave" = "left the call";
+"Demo.TRTC.calling.callingnoresponse" = "didn't answer";
+"Demo.TRTC.calling.callingbusy" = "is busy";
+"Demo.TRTC.calling.searchingfailed" = "Search failed";
+"Demo.TRTC.calling.cantinviteself" = "You cannot invite yourself.";
+"Demo.TRTC.Streaming.call" = "Call";
+"Demo.TRTC.calling.add" = "Add";
+"Demo.TRTC.calling.delete" = "Delete";
+"Demo.TRTC.calling.addedUser" = "User Added";
+"Demo.TRTC.calling.done" = "Done";
+"Demo.TRTC.calling.tips" = "No users added, please search to add users";
+"Demo.TRTC.calling.numExceed" = "Failed, the users exceeded the limit";
+
+"Demo.TRTC.Calling.othernetworkpoor" = "The other party's network connection is poor";
+"Demo.TRTC.Calling.yournetworkpoor" = "Your network connection is poor";
+
+"Demo.TRTC.Calling.robotCalling" = "Call with robot";
+"Demo.TRTC.Calling.robotInitCalling" = "Call bot";
+"Demo.TRTC.Calling.robotHostCalling" = "Call me";
+"Demo.TRTC.calling.WakupRobot" = "Activating the robot...";
+"Demo.TRTC.Calling.robotCallingContent" = "Try with just one user ID";
+"Demo.TRTC.Calling.humanCalling" = "Call another user";
+"Demo.TRTC.Calling.humanCallingContent" = "Try with another online user ID";
+"Demo.TRTC.calling.cancel" = "Cancel";
+"Demo.TRTC.calling.RobotStressString" = "one user ID";
+"Demo.TRTC.calling.callTwoHumanStress" = "another online user ID";
+"Demo.TRTC.calling.detailGuide" = "How to call another user";
+"Demo.TRTC.calling.detailGuidText" = "Your friend clicks 'Call another user' and find the user ID.";
+"Demo.TRTC.calling.detailGuidCopyURL" = "Copy";
+"Demo.TRTC.calling.detailGuidCopyURLContext" = "Send the link below to your friend\nhttps://rtcube.cloud.tencent.com/com";
+"Demo.TRTC.calling.detailGuidCopySelectFriend" = "Your friend clicks 'Call another user' and find the user ID.";
+"Demo.TRTC.calling.detailGuidCopyCallFriend" = "You enter your friend's user ID, click to search and call.";
+"Demo.TRTC.calling.detailGuidAppStore" = "Your friend downloads Tencent Cloud Media Services.";
+"Demo.TRTC.calling.detailGuidAppReg" = "Your friend opens the app, logs in, and selects 'Call'.";
+"Demo.TRTC.calling.detailTRTCGuidAppReg" = "Your friend opens the app and selects 'Call'.";
+"Demo.TRTC.calling.detailGuidWebMainPage" = "Your friend opens the link on their computer, logs in, and selects 'Call'.";
+"Demo.TRTC.calling.detailGuidWebFriendCard" = "Your friend finds their user ID on the right and sends it to you.";
+"Demo.TRTC.calling.detailGuideH5" = "H5";
+"Demo.TRTC.calling.detailGuideApp" = "APP";
+"Demo.TRTC.calling.detailGuidePC" = "PC";
+"Demo.TRTC.calling.detailGuideReminerText" = "Single-player multi-terminal experience requires an operational computer by your side.";
+"Demo.TRTC.calling.detailGuideSteps" = "Directions";
+"Demo.TRTC.calling.callingBotIsBusy" = "Line busy. Please retry later.";
+"Demo.TRTC.calling.callingHistory" = "Call history";
+"Demo.TRTC.calling.callingSelectTitle" = "Choose call mode";
+"Demo.TRTC.calling.call" = "Call";
+"Demo.TRTC.calling.guideCopySucess" = "Copied successfully";
+"Demo.TRTC.calling.contactCopy" = "copy";
+"Demo.TRTC.calling.IDCopyFailed" = "invalid id";
+"Demo.TRTC.calling.detailGuidRTCAppStore" = "Your friend downloads Tencent RTC.";
+"Demo.TRTC.calling.detailGuidSelf" = "me";
+"Demo.TRTC.calling.detailGuidfriend" = "friend";
+"Demo.TRTC.calling.guideTitle" = "Call Guide";
+"Demo.TRTC.calling.unexpectedErr" = "Unexpected error";
+"Demo.TRTC.Portal.Main.LoginFailed" = "login failed";
+"Demo.TRTC.Portal.Main.call" = "Call";
+
+/* ── CallSettings / CallViewController / JoinGroupCallViewController（RTCubeLab 专用） ── */
+"Demo.TRTC.calling.settings.groupId" = "Group ID";
+"Demo.TRTC.calling.settings.inputGroupId" = "Enter Group ID";
+"Demo.TRTC.calling.settings.userId" = "User ID";
+"Demo.TRTC.calling.settings.inputUserIds" = "Enter User IDs (comma separated)";
+"Demo.TRTC.calling.settings.mediaType" = "Media Type";
+"Demo.TRTC.calling.settings.videoCall" = "Video Call";
+"Demo.TRTC.calling.settings.audioCall" = "Audio Call";
+"Demo.TRTC.calling.settings.callSettings" = "Call Settings";
+"Demo.TRTC.calling.settings.optionalParameters" = "Optional Parameters";
+"Demo.TRTC.calling.settings.joinGroupCall" = "Join Group Call";
+"Demo.TRTC.calling.settings.appCall" = "Call";
+"Demo.TRTC.calling.settings.call" = "Call";
+"Demo.TRTC.calling.settings.basicSetting" = "Basic Settings";
+"Demo.TRTC.calling.settings.ringSetting" = "Ring Setting";
+"Demo.TRTC.calling.settings.notSet" = "Not Set";
+"Demo.TRTC.calling.settings.muteMode" = "Mute Mode";
+"Demo.TRTC.calling.settings.enableFloating" = "Enable Floating Window";
+"Demo.TRTC.calling.settings.enableVirtualBackground" = "Enable Virtual Background";
+"Demo.TRTC.calling.settings.enableIncomingBanner" = "Enable Incoming Banner";
+"Demo.TRTC.calling.settings.enableAITranscriber" = "Enable AI Transcriber";
+"Demo.TRTC.calling.settings.callParamsSetting" = "Call Params Setting";
+"Demo.TRTC.calling.settings.timeout" = "Timeout";
+"Demo.TRTC.calling.settings.expendedInfo" = "Extended Info";
+"Demo.TRTC.calling.settings.offlinePushInfo" = "Offline Push Info";
+"Demo.TRTC.calling.settings.goToSettings" = "Go to Settings";
+"Demo.TRTC.calling.settings.videoSetting" = "Video Setting";
+"Demo.TRTC.calling.settings.resolution" = "Resolution";
+"Demo.TRTC.calling.settings.resolutionMode" = "Resolution Mode";
+"Demo.TRTC.calling.settings.horizontal" = "Horizontal";
+"Demo.TRTC.calling.settings.vertical" = "Vertical";
+"Demo.TRTC.calling.settings.fillMode" = "Fill Mode";
+"Demo.TRTC.calling.settings.fit" = "Fit";
+"Demo.TRTC.calling.settings.fill" = "Fill";
+"Demo.TRTC.calling.settings.rotation" = "Rotation";
+"Demo.TRTC.calling.settings.beautyLevel" = "Beauty Level";
+"Demo.TRTC.calling.settings.otherSetting" = "Other Setting";
+"Demo.TRTC.calling.settings.screenVertical" = "Vertical";
+"Demo.TRTC.calling.settings.screenHorizontal" = "Horizontal";
+"Demo.TRTC.calling.settings.screenAuto" = "Auto";
+"Demo.TRTC.calling.settings.settings" = "Settings";
+"Demo.TRTC.calling.settings.yes" = "OK";
+"Demo.TRTC.calling.settings.setRingTip" = "Enter the ring file path";
+"Demo.TRTC.calling.settings.setExtendTip" = "Enter extended info (JSON format)";
+"Demo.TRTC.calling.settings.setOffLineInfoTip" = "Enter offline push info (JSON format)";
+"Demo.TRTC.calling.settings.setRing" = "Set Ring";
+"Demo.TRTC.calling.settings.setExtend" = "Set Extended Info";
+"Demo.TRTC.calling.settings.setOffLineInfo" = "Set Offline Push Info";
+"Demo.TRTC.calling.settings.inputCallId" = "Enter CallID: ";
+"Demo.TRTC.calling.settings.pleaseInputCallId" = "Please enter CallID";
+"Demo.TRTC.calling.settings.roomIdInt" = "Room ID (Int)";
+"Demo.TRTC.calling.settings.roomIdString" = "Room ID (String)";
+"Demo.TRTC.calling.settings.inputRoomId" = "Enter Room ID";
+
