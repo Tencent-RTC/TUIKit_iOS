@@ -1,13 +1,13 @@
 //
 //  GenerateTestUserSig.swift
-//  TUILiveKitApp
+//  RTCube
 //
 //  Created by abyyxwang on 2021/5/7.
 //  Copyright © 2021 Tencent. All rights reserved.
 //
 
-import Foundation
 import CommonCrypto
+import Foundation
 import zlib
 
 /**
@@ -37,23 +37,28 @@ let EXPIRETIME: Int = 604_800
  */
 let SECRETKEY = ""
 
-let BEAUTY_LICENSE_KEY = ""
+let APP_STORE_ID = ""
 
-let BEAUTY_LICENSE_URL = ""
+let IOAAPPKEY = ""
+let IOAAPPID = ""
 
-let PLAYER_LICENSE_KEY = ""
+let PUSH_BUSINESS_ID: Int32 = 0
 
-let PLAYER_LICENSE_URL = ""
+let SERVERLESSURL = ""
+let TEST_SERVERLESSURL = ""
+
+let APAAS_APP_ID = ""
+let DEBUG_SDKAPPID: Int = SDKAPPID
+let DEBUG_SECRETKEY = SECRETKEY
 
 class GenerateTestUserSig {
-    
-    class func genTestUserSig(identifier: String) -> String {
+    class func genTestUserSig(identifier: String, sdkAppId: Int, secretKey: String) -> String {
         let current = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970
-        let TLSTime: CLong = CLong(floor(current))
+        let TLSTime = CLong(floor(current))
         var obj: [String: Any] = [
             "TLS.ver": "2.0",
             "TLS.identifier": identifier,
-            "TLS.sdkappid": SDKAPPID,
+            "TLS.sdkappid": sdkAppId,
             "TLS.expire": EXPIRETIME,
             "TLS.time": TLSTime,
         ]
@@ -64,28 +69,28 @@ class GenerateTestUserSig {
             "TLS.expire",
         ]
         var stringToSign = ""
-        keyOrder.forEach { (key) in
+        for key in keyOrder {
             if let value = obj[key] {
                 stringToSign += "\(key):\(value)\n"
             }
         }
         print("string to sign: \(stringToSign)")
-        let sig = hmac(stringToSign)
+        let sig = hmac(stringToSign, secretKey: secretKey)
         obj["TLS.sig"] = sig
         print("sig: \(String(describing: sig))")
         guard let jsonData = try? JSONSerialization.data(withJSONObject: obj, options: .sortedKeys) else { return "" }
-        
-        let bytes = jsonData.withUnsafeBytes { (result) -> UnsafePointer<Bytef> in
-            if let baseAddress = result.bindMemory(to: Bytef.self).baseAddress{
+
+        let bytes = jsonData.withUnsafeBytes { result -> UnsafePointer<Bytef> in
+            if let baseAddress = result.bindMemory(to: Bytef.self).baseAddress {
                 return baseAddress
-            }else{
+            } else {
                 return UnsafePointer<Bytef>("")
             }
         }
-        let srcLen: uLongf = uLongf(jsonData.count)
+        let srcLen = uLongf(jsonData.count)
         let upperBound: uLong = compressBound(srcLen)
-        let capacity: Int = Int(upperBound)
-        let dest: UnsafeMutablePointer<Bytef> = UnsafeMutablePointer<Bytef>.allocate(capacity: capacity)
+        let capacity = Int(upperBound)
+        let dest = UnsafeMutablePointer<Bytef>.allocate(capacity: capacity)
         var destLen = upperBound
         let ret = compress2(dest, &destLen, bytes, srcLen, Z_BEST_SPEED)
         if ret != Z_OK {
@@ -94,30 +99,30 @@ class GenerateTestUserSig {
             return ""
         }
         let count = Int(destLen)
-        let result = self.base64URL(data: Data(bytesNoCopy: dest, count: count, deallocator: .free))
+        let result = base64URL(data: Data(bytesNoCopy: dest, count: count, deallocator: .free))
         return result
     }
-    
-    class func hmac(_ plainText: String) -> String? {
-        let cKey = SECRETKEY.cString(using: .ascii)
+
+    class func hmac(_ plainText: String, secretKey: String) -> String? {
+        let cKey = secretKey.cString(using: .ascii)
         let cData = plainText.cString(using: .ascii)
-        
-        let cKeyLen = SECRETKEY.lengthOfBytes(using: .ascii)
+
+        let cKeyLen = secretKey.lengthOfBytes(using: .ascii)
         let cDataLen = plainText.lengthOfBytes(using: .ascii)
-        
+
         var cHMAC = [CUnsignedChar](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-        cHMAC.withUnsafeMutableBufferPointer { (bufferPointer) in
+        cHMAC.withUnsafeMutableBufferPointer { bufferPointer in
             CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA256), cKey, cKeyLen, cData, cDataLen, bufferPointer.baseAddress)
         }
-       
+
         let data = Data(cHMAC)
         return data.base64EncodedString(options: [])
     }
-    
+
     class func base64URL(data: Data) -> String {
         let result = data.base64EncodedString()
         var final = ""
-        result.forEach { (char) in
+        for char in result {
             switch char {
             case "+":
                 final += "*"

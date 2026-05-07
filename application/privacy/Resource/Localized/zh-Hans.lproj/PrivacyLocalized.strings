@@ -1,0 +1,122 @@
+/*
+  PrivacyLocalized.strings
+  privacy
+
+  隐私模块 — 中文本地化
+*/
+
+// MARK: - 登录页面已有
+"Demo.TRTC.Portal.privateandagreement" = "我已阅读并同意xxxyyy和zzz";
+"Demo.TRTC.Portal.agreeprivatefirst" = "请先同意隐私条款条款和用户协议。";
+"Demo.TRTC.Portal.<privacysummary>" = "《隐私政策摘要》";
+"Demo.TRTC.Portal.<private>" = "《隐私保护指引》";
+"Demo.TRTC.Portal.<agreement>" = "《用户协议》";
+"Demo.TRTC.Portal.privacysummary" = "隐私政策摘要";
+"Demo.TRTC.Portal.private" = "隐私保护指引";
+"Demo.TRTC.Portal.agreement" = "用户协议";
+"Demo.TRTC.Portal.readAndAgreeConditions" = "请阅读并同意以下条款";
+"Demo.TRTC.Portal.agreeAndContinue" = "同意并继续";
+"Demo.TRTC.Portal.privatealertdescription" = "欢迎您使用腾讯云音视频（TRTC），我们将通过xxx和yyy帮助您了解我们收集、使用、存储个人信息的情况，此外您还可以了解到您所享有的相关权利和实现途径，如您同意请点击下方按钮开始接受我们的服务；";
+"Demo.TRTC.Portal.privacy" = "隐私";
+
+// MARK: - 隐私管理中心
+"Privacy.Center.title" = "隐私";
+"Privacy.Center.personalAuth" = "个人信息与权限";
+"Privacy.Center.dataCollection" = "个人信息查看";
+"Privacy.Center.dataCollectionList" = "个人信息收集清单";
+"Privacy.Center.thirdShare" = "第三方信息共享清单";
+"Privacy.Center.privacySummary" = "隐私政策摘要";
+"Privacy.Center.privacyAgreement" = "隐私保护指引";
+"Privacy.Center.termsOfService" = "服务条款";
+"Privacy.Center.userAgreement" = "用户协议";
+
+// MARK: - 个人信息与权限
+"Privacy.PersonalAuth.systemAuth" = "系统权限";
+"Privacy.PersonalAuth.info" = "个人信息";
+
+// MARK: - 系统权限
+"Privacy.SystemAuth.camera" = "相机";
+"Privacy.SystemAuth.microphone" = "麦克风";
+"Privacy.SystemAuth.photos" = "相册";
+"Privacy.SystemAuth.apns" = "通知";
+"Privacy.SystemAuth.beauty" = "美颜";
+"Privacy.SystemAuth.allow" = "允许";
+"Privacy.SystemAuth.deny" = "拒绝";
+"Privacy.SystemAuth.unauthorized" = "未授权";
+"Privacy.SystemAuth.goToSettings" = "前往系统设置";
+
+// MARK: - 权限详情
+"Privacy.AuthDetail.manage" = "管理%@权限";
+"Privacy.AuthDetail.beautyDesc" = "在您使用特效美颜相关功能时，我们会对您实时拍摄或主动上传的面部像素信息进行实时智能识别，这个过程中会实时收集您的面部像素信息，以为您提供更好的美化效果，我们不会以任何形式存储或关联您的面部像素信息。该信息为敏感个人信息,请谨慎提供。如您不授权，将无法使用此功能;您也可以随时在隐私中禁用此功能。";
+
+// MARK: - 个人信息
+"Privacy.SystemAuth.avatar" = "头像";
+"Privacy.SystemAuth.name" = "昵称";
+"Privacy.SystemAuth.id" = "ID";
+"Privacy.SystemAuth.phone" = "手机号";
+"Privacy.SystemAuth.email" = "邮箱";
+
+// MARK: - 个人信息收集
+"Privacy.DataCollection.desc" = "你可以查阅%@对你的个人信息的收集情况。";
+"Privacy.DataCollection.none" = "未设置";
+
+// MARK: - 复制
+"Privacy.MyInfo.copySuccess" = "复制成功";
+
+// MARK: - 反诈提示
+"Privacy.Antifraud.scamTips" = "请警惕冒充公检法、校园贷款和客服等各类诈骗，避免泄漏个人信息。";
+"Privacy.Antifraud.warmPromptTitle" = "温馨提示";
+"Privacy.Antifraud.warmPromptMessage" = "为配合相关部门监管要求，严禁色情、辱骂、暴恐、涉政等违规内容。\n本产品仅用于功能体验，请勿商用。单次使用时长不超过10分钟。";
+"Privacy.Antifraud.confirm" = "确认";
+
+// MARK: - 屏幕共享反诈提醒
+"Privacy.ScreenShare.antifraudTitle" = "安全提醒";
+"Privacy.ScreenShare.antifraudMessage" = "共享屏幕时可能会泄露短信验证码、密码等隐私信息，造成财产损失，请警惕各种诈骗行为。";
+"Privacy.ScreenShare.continue" = "继续共享";
+"Privacy.ScreenShare.cancel" = "取消";
+
+// MARK: - 开播10分钟提示
+"Privacy.Live.alertContent" = "仅供功能体验，不用于商业用途。每次不超过10分钟。请退出并重新进入以继续体验。";
+"Privacy.Live.remainingTips" = "体验时长剩余一分钟";
+"Privacy.Live.roomEndTips" = "体验时间耗尽，房间自动结束。";
+"Privacy.Live.timeOutAlert" = "已自动解散房间";
+
+// MARK: - 房间内高风险 IP 提示
+"Privacy.RoomRiskIP.message" = "房间内有来自高危IP地区用户，谨防被骗。如不慎被骗或遇到可疑情形，请注意保存证据，立即拨打110报警。";
+
+// MARK: - 实名认证
+"Privacy.RealAuth.title" = "实名认证";
+"Privacy.RealAuth.tip" = "在您使用“互动直播”功能并开通直播时，腾讯云音视频需要收集您的实名身份信息（包括姓名、身份证号），仅用于实名认证。上述信息为敏感个人信息，如您不提供实名身份信息，则我们将无法为您提供直播服务。具体可以参考下方腾讯云音视频处理相关个人信息的隐私政策。";
+"Privacy.RealAuth.faceTokenTip" = "您的账户存在风险，已被限制使用。腾讯云音视频需要收集您的实名身份信息(包括姓名、身份证号及人脸图像​)，仅用于实名认证。如您不提供实名身份信息，则我们将无法为您提供服务。具体可以参考下方腾讯云音视频处理相关个人信息的隐私政策。";
+"Privacy.RealAuth.enterName" = "请输入您的真实姓名";
+"Privacy.RealAuth.enterIDCard" = "请输入您的身份证号";
+"Privacy.RealAuth.authenticate" = "认证";
+"Privacy.RealAuth.agree" = "同意";
+"Privacy.RealAuth.disagree" = "不同意";
+"Privacy.RealAuth.privacyToast" = "请先阅读并同意隐私条款和用户协议。";
+"Privacy.RealAuth.emptyMessage" = "姓名或身份证号为空";
+"Privacy.RealAuth.cancelledToast" = "实名认证取消";
+"Privacy.RealAuth.faceAuthFailed" = "核验失败，请重试";
+"Privacy.RealAuth.privacyAgreement" = "我已阅读并同意《隐私政策摘要》、《隐私保护指引》和《用户协议》";
+"Privacy.RealAuth.<privacySummary>" = "《隐私政策摘要》";
+"Privacy.RealAuth.<private>" = "《隐私保护指引》";
+"Privacy.RealAuth.<agreement>" = "《用户协议》";
+"Privacy.RealAuth.privatePage" = "隐私保护指引";
+"Privacy.RealAuth.agreementPage" = "用户协议";
+"Privacy.RealAuth.privacySummaryPage" = "隐私政策摘要";
+
+// MARK: - 举报
+"Privacy.Report.title" = "举报";
+"Privacy.Report.submit" = "提交";
+"Privacy.Report.submitSuccess" = "提交成功";
+"Privacy.Report.type.title" = "举报类型";
+"Privacy.Report.type.politics" = "政治敏感";
+"Privacy.Report.type.porn" = "低俗色情";
+"Privacy.Report.type.personalAttacks" = "攻击辱骂";
+"Privacy.Report.type.violence" = "血腥暴力";
+"Privacy.Report.type.ad" = "不良广告";
+"Privacy.Report.type.scam" = "涉嫌诈骗";
+"Privacy.Report.type.illegal" = "违法信息";
+"Privacy.Report.type.other" = "其他违规";
+"Privacy.Report.description" = "情况描述";
+"Privacy.Report.description.placeholder" = "请描述您的举报内容";

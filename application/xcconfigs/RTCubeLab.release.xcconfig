@@ -1,0 +1,5 @@
+// RTCubeLab (开发与测试) - Release
+// 此文件通过构建脚本的 #include 注入到 Pod 的 xcconfig 中，使 Pod 继承主工程的编译条件
+
+OTHER_SWIFT_FLAGS = $(inherited) -D RTCUBE_LOCAL_BUILD -D RTCUBE_LAB -D DEV_MODE
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) RTCUBE_LOCAL_BUILD=1 RTCUBE_LAB=1 DEV_MODE=1

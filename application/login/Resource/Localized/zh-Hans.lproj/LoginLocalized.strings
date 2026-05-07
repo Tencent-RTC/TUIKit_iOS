@@ -1,0 +1,174 @@
+/* 
+  LoginNetworkLocalized.strings
+  TXLiteAVDemo
+
+  Created by adams on 2021/3/22.
+  Copyright © 2021 Tencent. All rights reserved.
+*/
+
+"Demo.TRTC.Login.registsuccess" = "注册成功";
+"LoginNetwork.AppUtils.warmprompt" = "温馨提示";
+"LoginNetwork.AppUtils.determine" = "确定";
+"Demo.TRTC.LiveRoom.prompt" = "提示";
+"Demo.TRTC.Home.newversionpublic" = "有新版本发布啦~";
+"Demo.TRTC.Home.devopsupdate" = "检测到当前iOS新版本:%@, 请升级后使用。";
+"Demo.TRTC.Home.updatenow" = "现在更新";
+"Demo.TRTC.Home.later" = "稍后再说";
+"LoginNetwork.ProfileManager.sendfailed" = "发送失败，请稍后重试";
+"LoginNetwork.ProfileManager.iotfailed" = "此手机号为物联网卡手机号，请输入其他手机号码登录";
+"Demo.TRTC.Login.done" = "确认";
+"Demo.TRTC.Login.setavatar" = "设置头像";
+"LoginNetwork.ProfileManager.sendfailed" = "发送失败，请稍后重试";
+"V2.Live.LoginMock.sendtheverificatcode" = "请发送验证码";
+"LoginNetwork.ProfileManager.loginfailed" = "登录失败，请稍后重试";
+"LoginNetwork.ProfileManager.queryfailed" = "查询失败，请稍候重试";
+"LoginNetwork.ProfileManager.registerfailed" = "注册失败，请稍后重试";
+"Demo.TRTC.Login.welcome" = "欢迎使用腾讯云音视频";
+"V2.Live.LinkMicNew.enterphonenumber" = "请输入手机号";
+"V2.Live.LinkMicNew.enteremail" = "请输入邮箱";
+"V2.Live.LinkMicNew.entercorrectemail" = "请填写正确的邮箱地址";
+"V2.Live.LinkMicNew.enterverificationcode" = "请输入验证码";
+"V2.Live.LinkMicNew.getverificationcode" = "获取验证码";
+"V2.Live.LoginMock.login" = "登录/注册";
+"Demo.TRTC.Login.regist" = "注册";
+"Demo.TRTC.Login.enterusername" = "请输入用户昵称";
+"Demo.TRTC.Login.limit20count" = "仅限中文、字母、数字和下划线，2-20个字";
+"V2.Live.LinkMicNew.verificationcodesent" = "验证码已发送";
+"V2.Live.LinkMicNew.loginsuccess" = "登录成功";
+"V2.Live.LinkMicNew.termsandconditions" = "用户协议";
+"V2.Live.LinkMicNew.agree" = "同意";
+"V2.Live.LinkMicNew.disagree" = "不同意";
+"Demo.TRTC.Login.enterUserName" = "请输入用户名";
+"Demo.TRTC.Home.phoneoremailIsEmpty" = "电话号码或邮箱是空的";
+"Demo.TRTC.Home.userIDIsEmpty" = "UserId是空的";
+
+"Demo.TRTC.Portal.privateandagreement" = "我已阅读并同意xxxyyy和zzz";
+"Demo.TRTC.Portal.agreeprivatefirst" = "请先同意隐私条款条款和用户协议。";
+"Demo.TRTC.Portal.<privacysummary>" = "《隐私政策摘要》";
+"Demo.TRTC.Portal.<private>" = "《隐私保护指引》";
+"Demo.TRTC.Portal.<agreement>" = "《用户协议》";
+"Demo.TRTC.Portal.privacysummary" = "隐私政策摘要";
+"Demo.TRTC.Portal.private" = "隐私保护指引";
+"Demo.TRTC.Portal.agreement" = "用户协议";
+"Demo.TRTC.Portal.readAndAgreeConditions" = "请阅读并同意以下条款";
+"Demo.TRTC.Portal.agreeAndContinue" = "同意并继续";
+"Demo.TRTC.LoginMock.adduserinformationforfirstlogin" = "首次登录请补充用户信息";
+"Demo.TRTC.Login.modifyLaterInSettings" = "可在设置中修改";
+"Demo.TRTC.Portal.privatealertdescription" = "欢迎您使用腾讯云音视频（TRTC），我们将通过xxx和yyy帮助您了解我们收集、使用、存储个人信息的情况，此外您还可以了解到您所享有的相关权利和实现途径，如您同意请点击下方按钮开始接受我们的服务；";
+"Demo.TRTC.Home.useroverduemessage" = "登录状态失效，请重新登录";
+"Demo.TRTC.http.syserror"= "系统错误";
+
+"Demo.TRTC.LoginMock.username" = "用户名";
+"Demo.TRTC.LoginMock.fillinusernickname" = "请填写用户昵称";
+"Demo.TRTC.LoginMock.nickname.Martijn" = "路飞";
+"Demo.TRTC.LoginMock.nickname.irfan" = "山治";
+"Demo.TRTC.LoginMock.nickname.Rosanna" = "娜美";
+"Demo.TRTC.LoginMock.nickname.Franklyn" = "乌索普";
+"Demo.TRTC.LoginMock.nickname.Maren" = "香克斯";
+"Demo.TRTC.LoginMock.nickname.bartel" = "弗兰奇";
+"Demo.TRTC.LoginMock.nickname.Marianita" = "罗宾";
+"Demo.TRTC.LoginMock.nickname.Anneke" = "钢铁侠";
+"Demo.TRTC.LoginMock.nickname.elmira" = "蜘蛛侠";
+"Demo.TRTC.LoginMock.nickname.ivet" = "乔巴";
+"Demo.TRTC.LoginMock.nickname.clinton" = "鸣人";
+"Demo.TRTC.LoginMock.nickname.virelai" = "黑胡子";
+"Demo.TRTC.LoginMock.nickname.Ace" = "艾斯";
+"Demo.TRTC.Login.phonetext" = "切换手机号登录＞";
+"Demo.TRTC.Login.emailtext" = "切换邮箱登录＞";
+"Demo.TRTC.Login.ioatext" = "iOA 登录";
+"Demo.TRTC.Login.ioaLoading" = "iOA 登录中，请稍等...";
+"Demo.TRTC.Login.loading" = "登录中，请稍等...";
+
+"Demo.TRTC.login_custom_name_1" = "天津饭";
+"Demo.TRTC.login_custom_name_2" = "饺子";
+"Demo.TRTC.login_custom_name_3" = "龟仙人";
+"Demo.TRTC.login_custom_name_4" = "琪琪";
+"Demo.TRTC.login_custom_name_5" = "孙悟空";
+"Demo.TRTC.login_custom_name_6" = "孙悟饭";
+"Demo.TRTC.login_custom_name_7" = "孙悟天";
+"Demo.TRTC.login_custom_name_8" = "贝吉塔";
+"Demo.TRTC.login_custom_name_9" = "小林";
+"Demo.TRTC.login_custom_name_10" = "鸣人";
+"Demo.TRTC.login_custom_name_11" = "佐助";
+"Demo.TRTC.login_custom_name_12" = "卡卡西";
+"Demo.TRTC.login_custom_name_13" = "小樱";
+"Demo.TRTC.login_custom_name_14" = "自来也";
+"Demo.TRTC.login_custom_name_15" = "我爱罗";
+"Demo.TRTC.login_custom_name_16" = "迈特凯";
+"Demo.TRTC.login_custom_name_17" = "韩梅梅";
+"Demo.TRTC.login_custom_name_18" = "李雷雷";
+"Demo.TRTC.login_custom_name_19" = "樱木花道";
+"Demo.TRTC.login_custom_name_20" = "流川枫";
+"Demo.TRTC.login_custom_name_21" = "宫城良田";
+"Demo.TRTC.login_custom_name_22" = "三井寿";
+"Demo.TRTC.login_custom_name_23" = "赤木晴子";
+"Demo.TRTC.login_custom_name_24" = "冰河";
+"Demo.TRTC.login_custom_name_25" = "星矢";
+"Demo.TRTC.login_custom_name_26" = "紫龙";
+"Demo.TRTC.login_custom_name_27" = "瞬";
+"Demo.TRTC.login_custom_name_28" = "纱织";
+"Demo.TRTC.login_custom_name_29" = "撒加";
+"Demo.TRTC.login_custom_name_30" = "艾奥利亚";
+"Demo.TRTC.login_custom_name_31" = "沙加";
+"Demo.TRTC.login_custom_name_32" = "童虎";
+"Demo.TRTC.login_custom_name_33" = "米罗";
+
+"Demo.TRTC.DevMenu.selectLoginMethod" = "选择登录方式";
+"Demo.TRTC.DevMenu.phoneLogin" = "手机号登录";
+"Demo.TRTC.DevMenu.phoneLoginDesc" = "手机号 + 验证码，页面内可切换至 iOA";
+"Demo.TRTC.DevMenu.emailLogin" = "邮箱登录";
+"Demo.TRTC.DevMenu.emailLoginDesc" = "邮箱 + 验证码，适用于海外版";
+"Demo.TRTC.DevMenu.ioaLogin" = "iOA 企业登录";
+"Demo.TRTC.DevMenu.ioaLoginDesc" = "通过 iOA SDK 票据登录";
+"Demo.TRTC.DevMenu.inviteCodeLogin" = "邀请码登录";
+"Demo.TRTC.DevMenu.inviteCodeLoginDesc" = "通过邀请码直接登录";
+"Demo.TRTC.DevMenu.debugLogin" = "Debug 登录";
+"Demo.TRTC.DevMenu.debugLoginDesc" = "直接输入 userId 登录（跳过验证码）";
+"Demo.TRTC.DevMenu.envProduction" = "正式环境";
+"Demo.TRTC.DevMenu.envTest" = "测试环境";
+"Demo.TRTC.DevMenu.autoLogin" = "自动登录";
+
+"Demo.TRTC.Login.userCancelled" = "用户取消登录";
+"Demo.TRTC.Login.tokenExpired" = "Token 已过期";
+
+"Demo.TRTC.Language.switchLanguage" = "切换语言";
+
+"Demo.TRTC.Main.welcomeRTCube" = "欢迎使用 RTCube";
+"Demo.TRTC.Main.logout" = "登出";
+
+"Demo.TRTC.Portal.Main.InviteCodeBeUsed" = "邀请码已被使用";
+"Demo.TRTC.Portal.Main.InviteCodeInvalid" = "邀请码无效";
+"Demo.TRTC.Portal.Main.UserInviteCodeExpire" = "邀请码已过期";
+"Demo.TRTC.Portal.Main.EmailIncorrect" = "邮件发送失败";
+"Demo.TRTC.Portal.Main.EmailTooManyCodeRequest" = "请求次数过多，请检查邮箱中已发送的邀请码。";
+"Demo.TRTC.Portal.Main.AgreeBeforeUse" = "请先同意服务条款后使用";
+
+"Demo.TRTC.Email.welcomeTitle" = "欢迎使用 RTC";
+"Demo.TRTC.Email.subtitle" = "输入您的邮箱以获取邀请码。";
+"Demo.TRTC.Email.emailPlaceholder" = "邮箱地址";
+"Demo.TRTC.Email.continueButton" = "继续";
+"Demo.TRTC.Email.requesting" = "请求中...";
+"Demo.TRTC.Email.enterEmailError" = "请输入您的邮箱地址";
+"Demo.TRTC.Email.validEmailError" = "请输入有效的邮箱地址";
+"Demo.TRTC.Email.bottomTextPrefix" = "已有邀请码？";
+"Demo.TRTC.Email.enterCodeLink" = "输入邀请码";
+
+"Demo.TRTC.InviteCode.checkYourEmail" = "检查您的邮箱";
+"Demo.TRTC.InviteCode.enterInvitationCode" = "输入邀请码";
+"Demo.TRTC.InviteCode.enterCodeSentToEmail" = "请输入我们发送到您邮箱 %@ 的邀请码";
+"Demo.TRTC.InviteCode.enterCodeToGetStarted" = "如果您已有邀请码，请在此输入以开始使用";
+"Demo.TRTC.InviteCode.getStarted" = "开始使用";
+"Demo.TRTC.InviteCode.validating" = "验证中...";
+"Demo.TRTC.InviteCode.enterCompleteCode" = "请输入完整的6位邀请码";
+"Demo.TRTC.InviteCode.codeIncorrect" = "邀请码不正确";
+"Demo.TRTC.InviteCode.resendClickable" = "没有收到邀请码？请检查垃圾邮件文件夹。\n重新发送邀请码。";
+"Demo.TRTC.InviteCode.clickToResend" = "重新发送邀请码。";
+"Demo.TRTC.InviteCode.resendCountdown" = "没有收到邀请码？请检查垃圾邮件文件夹。\n%d秒后重新发送";
+"Demo.TRTC.InviteCode.resendAfter" = "%d秒后重新发送";
+"Demo.TRTC.InviteCode.resendingCode" = "正在重新发送邀请码...";
+"Demo.TRTC.InviteCode.agreeToTermsPrefix" = "我同意 TRTC 的";
+"Demo.TRTC.InviteCode.termsOfService" = "服务条款";
+"Demo.TRTC.InviteCode.agreeToTermsMiddle" = "和";
+"Demo.TRTC.InviteCode.privacyPolicy" = "隐私政策";
+"Demo.TRTC.InviteCode.agreeToTermsSuffix" = " ";
+"Demo.TRTC.InviteCode.marketingInfo" = "我希望收到 TRTC 的营销信息";

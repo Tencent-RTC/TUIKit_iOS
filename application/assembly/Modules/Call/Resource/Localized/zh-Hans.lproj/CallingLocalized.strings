@@ -1,0 +1,127 @@
+/* 
+  CallingLocalized.strings
+  TRTCScene
+
+  Created by adams on 2021/5/20.
+  Copyright © 2022 Tencent. All rights reserved.
+*/
+
+"Demo.TRTC.calling.yourID" = "您的ID：";
+"Demo.TRTC.calling.searchID" = "输入已注册并在线的用户ID进行通话";
+"Demo.TRTC.calling.yourphonenumber" = "您的手机号 ";
+"Demo.TRTC.calling.searchphonenumber" = "搜索手机号";
+"Demo.TRTC.calling.searching" = "搜索";
+"Demo.TRTC.calling.searchandcall" = "搜索添加已注册用户\n以发起通话";
+"Demo.TRTC.calling.call" = "通话";
+"Demo.TRTC.calling.callingbegan" = "进入通话";
+"Demo.TRTC.calling.callingcancel" = "通话取消";
+"Demo.TRTC.calling.callingtimeout" = "通话超时";
+"Demo.TRTC.calling.callingrefuse" = "拒绝了通话";
+"Demo.TRTC.calling.callingleave" = "离开了通话";
+"Demo.TRTC.calling.callingnoresponse" = "未响应";
+"Demo.TRTC.calling.callingbusy" = "忙线";
+"Demo.TRTC.calling.searchingfailed" = "查询失败";
+"Demo.TRTC.calling.cantinviteself" = "不能邀请自己";
+"Demo.TRTC.calling.add" = "添加";
+"Demo.TRTC.calling.delete" = "删除";
+"Demo.TRTC.calling.addedUser" = "已添加成员";
+"Demo.TRTC.calling.done" = "完成";
+"Demo.TRTC.calling.tips" = "未添加成员，请搜索添加成员";
+"Demo.TRTC.Streaming.call" = "呼叫";
+"Demo.TRTC.calling.numExceed" = "添加失败,人数超出限制";
+
+"Demo.TRTC.Calling.othernetworkpoor" = "对方网络不佳";
+"Demo.TRTC.Calling.yournetworkpoor" = "己方网络不佳";
+"Demo.TRTC.Calling.robotCalling" = "与机器人通话";
+"Demo.TRTC.Calling.robotInitCalling" = "模拟主叫";
+"Demo.TRTC.Calling.robotHostCalling" = "模拟被叫";
+"Demo.TRTC.calling.WakupRobot" = "正在激活机器人，请稍候...";
+"Demo.TRTC.Calling.robotCallingContent" = "单人单机即可体验";
+"Demo.TRTC.Calling.humanCalling" = "与其他用户通话";
+"Demo.TRTC.Calling.humanCallingContent" = "与另一个在线用户同步体验";
+"Demo.TRTC.calling.cancel" = "取消";
+"Demo.TRTC.calling.RobotStressString" = "单人单机";
+"Demo.TRTC.calling.callTwoHumanStress" = "另一个在线用户";
+"Demo.TRTC.calling.detailGuide" = "呼叫其他用户详细指引";
+"Demo.TRTC.calling.detailGuidText" = "好友用手机浏览器打开地址，点击“通话”模块（需先完成注册登录）";
+"Demo.TRTC.calling.detailGuidCopyURL" = "复制链接";
+"Demo.TRTC.calling.detailGuidSelf" = "自己";
+"Demo.TRTC.calling.detailGuidfriend" = "朋友";
+"Demo.TRTC.calling.detailGuidCopyURLContext" = "点击按钮复制以下地址，发送给好友
+https://rtcube.cloud.tencent.com/com";
+"Demo.TRTC.calling.detailGuidCopySelectFriend" = "好友选择“呼叫其他用户”，在搜索栏下方找到自己的用户ID";
+"Demo.TRTC.calling.detailGuidCopyCallFriend" = "你输入好友的用户ID，点击呼叫";
+"Demo.TRTC.calling.detailGuidAppStore" = "您的好友下载“腾讯云音视频”APP";
+"Demo.TRTC.calling.detailGuidAppReg" = "好友打开APP注册登录后，点击“通话”模块";
+"Demo.TRTC.calling.detailGuidWebMainPage" = "好友用电脑打开腾讯云音视频Demo体验馆，点击“通话”模块（需先完成注册登录）";
+"Demo.TRTC.calling.detailGuidWebFriendCard" = "好友在卡片右边找到自己的用户ID";
+"Demo.TRTC.calling.detailGuideH5" = "H5";
+"Demo.TRTC.calling.detailGuideApp" = "APP";
+"Demo.TRTC.calling.detailGuidePC" = "电脑";
+"Demo.TRTC.calling.detailGuideReminerText" = "体验呼叫其他用户，需要2个注册并在线的腾讯云音视频用户ID。";
+"Demo.TRTC.calling.detailGuideSteps" = "详细步骤";
+"Demo.TRTC.calling.callingBotIsBusy" = "机器人占线，请稍后再试";
+"Demo.TRTC.calling.callingHistory" = "查看我的通话记录";
+"Demo.TRTC.calling.callingSelectTitle" = "请选择通话方式";
+"Demo.TRTC.calling.guideCopySucess" = "已复制到剪切板";
+"Demo.TRTC.calling.contactCopy" = "复制";
+"Demo.TRTC.calling.IDCopyFailed" = "无效id";
+"Demo.TRTC.calling.guideTitle" = "互动通话体验指引";
+"Demo.TRTC.calling.unexpectedErr" = "非预期错误";
+"Demo.TRTC.Portal.Main.LoginFailed" = "登录失败";
+"Demo.TRTC.Portal.Main.call" = "通话";
+
+/* ── CallSettings / CallViewController / JoinGroupCallViewController（RTCubeLab 专用） ── */
+"Demo.TRTC.calling.settings.groupId" = "Group ID";
+"Demo.TRTC.calling.settings.inputGroupId" = "请输入 Group ID";
+"Demo.TRTC.calling.settings.userId" = "User ID";
+"Demo.TRTC.calling.settings.inputUserIds" = "请输入用户ID（多个用逗号分隔）";
+"Demo.TRTC.calling.settings.mediaType" = "媒体类型";
+"Demo.TRTC.calling.settings.videoCall" = "视频通话";
+"Demo.TRTC.calling.settings.audioCall" = "语音通话";
+"Demo.TRTC.calling.settings.callSettings" = "通话设置";
+"Demo.TRTC.calling.settings.optionalParameters" = "可选参数";
+"Demo.TRTC.calling.settings.joinGroupCall" = "加入群组通话";
+"Demo.TRTC.calling.settings.appCall" = "拨打";
+"Demo.TRTC.calling.settings.call" = "呼叫";
+"Demo.TRTC.calling.settings.basicSetting" = "基础设置";
+"Demo.TRTC.calling.settings.ringSetting" = "铃声设置";
+"Demo.TRTC.calling.settings.notSet" = "未设置";
+"Demo.TRTC.calling.settings.muteMode" = "静音模式";
+"Demo.TRTC.calling.settings.enableFloating" = "开启悬浮窗";
+"Demo.TRTC.calling.settings.enableVirtualBackground" = "开启虚拟背景";
+"Demo.TRTC.calling.settings.enableIncomingBanner" = "开启来电横幅";
+"Demo.TRTC.calling.settings.enableAITranscriber" = "开启AI转写";
+"Demo.TRTC.calling.settings.callParamsSetting" = "通话参数设置";
+"Demo.TRTC.calling.settings.timeout" = "超时时间";
+"Demo.TRTC.calling.settings.expendedInfo" = "扩展信息";
+"Demo.TRTC.calling.settings.offlinePushInfo" = "离线推送信息";
+"Demo.TRTC.calling.settings.goToSettings" = "前往设置";
+"Demo.TRTC.calling.settings.videoSetting" = "视频设置";
+"Demo.TRTC.calling.settings.resolution" = "分辨率";
+"Demo.TRTC.calling.settings.resolutionMode" = "分辨率模式";
+"Demo.TRTC.calling.settings.horizontal" = "横屏";
+"Demo.TRTC.calling.settings.vertical" = "竖屏";
+"Demo.TRTC.calling.settings.fillMode" = "填充模式";
+"Demo.TRTC.calling.settings.fit" = "适应";
+"Demo.TRTC.calling.settings.fill" = "填充";
+"Demo.TRTC.calling.settings.rotation" = "旋转";
+"Demo.TRTC.calling.settings.beautyLevel" = "美颜等级";
+"Demo.TRTC.calling.settings.otherSetting" = "其他设置";
+"Demo.TRTC.calling.settings.screenVertical" = "竖屏";
+"Demo.TRTC.calling.settings.screenHorizontal" = "横屏";
+"Demo.TRTC.calling.settings.screenAuto" = "自动";
+"Demo.TRTC.calling.settings.settings" = "设置";
+"Demo.TRTC.calling.settings.yes" = "确定";
+"Demo.TRTC.calling.settings.setRingTip" = "请输入铃声文件路径";
+"Demo.TRTC.calling.settings.setExtendTip" = "请输入扩展信息（JSON格式）";
+"Demo.TRTC.calling.settings.setOffLineInfoTip" = "请输入离线推送信息（JSON格式）";
+"Demo.TRTC.calling.settings.setRing" = "设置铃声";
+"Demo.TRTC.calling.settings.setExtend" = "设置扩展信息";
+"Demo.TRTC.calling.settings.setOffLineInfo" = "设置离线推送信息";
+"Demo.TRTC.calling.settings.inputCallId" = "输入 CallID: ";
+"Demo.TRTC.calling.settings.pleaseInputCallId" = "请输入 CallID";
+"Demo.TRTC.calling.settings.roomIdInt" = "Room ID (整数)";
+"Demo.TRTC.calling.settings.roomIdString" = "Room ID (字符串)";
+"Demo.TRTC.calling.settings.inputRoomId" = "请输入 Room ID";
+

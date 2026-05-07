@@ -1,0 +1,39 @@
+/* 
+  GuideLocalized.strings
+  main
+*/
+"Demo.TRTC.Guide.RoomSingleUser" = "Experience by yourself";
+"Demo.TRTC.Guide.RoomMultiUsers" = "Experience with others";
+"Demo.TRTC.Guide.call" = "Call";
+"Demo.TRTC.Guide.room" = "Conference";
+"Demo.TRTC.Guide.roomCopyLink" = "Click the button to copy the link and send to your computer.
+https://trtc.io/demo";
+"Demo.TRTC.Guide.createRoom" = "Create a new room and get the room ID.";
+"Demo.TRTC.Guide.joinRoom" = "Click 'Join Room' in the browser and inut the room ID to join.";
+"Demo.TRTC.Guide.AppJoinRoom" = "Create a new room and give your friend the room ID.";
+"Demo.TRTC.Guide.roomManage" = "Experience the features of different platforms and roles, such as 'transfer to the host', 'set as administrator'.";
+"Demo.TRTC.Guide.AppcreateRoom" = "Create a new room and give your friend the room ID.";
+"Demo.TRTC.Guide.AppRoomDesc" = "Experience different role and features with your friend.";
+"Demo.TRTC.Guide.othersUseWeb" = "Your friend uses browser";
+"Demo.TRTC.Guide.othersUseApp" = "Your friend uses TencentRTC App";
+"Demo.TRTC.Guide.AppDL" = "Your friend downloads Tencent RTC app.";
+"Demo.TRTC.Guide.calling.detailGuide" = "How to call another user";
+"Demo.TRTC.calling.detailGuidText" = "Your friend clicks 'Call another user' and find the user ID.";
+"Demo.TRTC.calling.detailGuidCopyURL" = "Copy";
+"Demo.TRTC.calling.detailGuidCopyURLContext" = "Send the link below to your friend
+https://rtcube.cloud.tencent.com/com";
+"Demo.TRTC.calling.detailGuidCopySelectFriend" = "Your friend clicks 'Call another user' and find the user ID.";
+"Demo.TRTC.calling.detailGuidCopyCallFriend" = "You enter your friend's user ID, click to search and call.";
+"Demo.TRTC.calling.detailGuidAppStore" = "Your friend downloads Tencent Cloud Media Services.";
+"Demo.TRTC.calling.detailGuidAppReg" = "Your friend opens the app, logs in, and selects 'Call'.";
+"Demo.TRTC.calling.detailTRTCGuidAppReg" = "Your friend opens the app and selects 'Call'.";
+"Demo.TRTC.calling.detailGuidWebMainPage" = "Your friend opens the link on their computer, logs in, and selects 'Call'.";
+"Demo.TRTC.calling.detailGuidWebFriendCard" = "Your friend finds their user ID on the right and sends it to you.";
+"Demo.TRTC.calling.detailGuideH5" = "H5";
+"Demo.TRTC.calling.detailGuideApp" = "APP";
+"Demo.TRTC.calling.detailGuidePC" = "PC";
+"Demo.TRTC.calling.detailGuideReminerText" = "Single-player multi-terminal experience requires an operational computer by your side.";
+"Demo.TRTC.calling.detailGuideSteps" = "Steps";
+"Demo.TRTC.calling.guideCopySucess" = "Copied successfully";
+"Demo.TRTC.calling.detailMultiGuideReminerText" = "Inviting others to join requires two Tencent RTC user IDs.";
+"Demo.TRTC.Guide.cancel" = "cancel";

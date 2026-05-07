@@ -1,0 +1,171 @@
+/*
+  LoginNetworkLocalized.strings
+  TXLiteAVDemo
+
+  Created by adams on 2021/3/22.
+  Copyright © 2021 Tencent. All rights reserved.
+*/
+
+"Demo.TRTC.Login.registsuccess" = "Registration successful";
+"LoginNetwork.AppUtils.warmprompt" = "Note";
+"LoginNetwork.AppUtils.determine" = "OK";
+"Demo.TRTC.LiveRoom.prompt" = "Information";
+"Demo.TRTC.Home.newversionpublic" = "A new version is available";
+"Demo.TRTC.Home.devopsupdate" = "The current iOS new version is detected: %@, please use after upgrading.";
+"Demo.TRTC.Home.updatenow" = "Update Now";
+"Demo.TRTC.Home.later" = "Later";
+"LoginNetwork.ProfileManager.sendfailed" = "Send failed. Please try again later.";
+"Demo.TRTC.Login.done" = "Done";
+"Demo.TRTC.Login.setavatar" = "Change Profile Picture";
+"V2.Live.LoginMock.sendtheverificatcode" = "Please send the verification code";
+"LoginNetwork.ProfileManager.loginfailed" = "Login failed. Please try again later.";
+"LoginNetwork.ProfileManager.queryfailed" = "Query failed. Please try again later.";
+"LoginNetwork.ProfileManager.registerfailed" = "Registration failed. Please try again later";
+"LoginNetwork.ProfileManager.iotfailed" = "This phone number is an ICCID number. Please enter another phone number to log in.";
+"Demo.TRTC.Login.welcome" = "Welcome to Tencent Cloud TRTC";
+"V2.Live.LinkMicNew.enterphonenumber" = "Enter a mobile number";
+"V2.Live.LinkMicNew.enteremail" = "Enter a email address";
+"V2.Live.LinkMicNew.entercorrectemail" = "Enter a valid email address";
+"V2.Live.LinkMicNew.enterverificationcode" = "Enter a verification code";
+"V2.Live.LinkMicNew.getverificationcode" = "Get";
+"V2.Live.LoginMock.login" = "Log In/Sign Up";
+"Demo.TRTC.Login.regist" = "Register";
+"Demo.TRTC.Login.enterusername" = "Please enter a nickname";
+"Demo.TRTC.Login.limit20count" = "Chinese characters, letters, numbers and underscores, 2 - 20 words";
+"V2.Live.LinkMicNew.verificationcodesent" = "Sent";
+"V2.Live.LinkMicNew.loginsuccess" = "Logged in";
+"V2.Live.LinkMicNew.termsandconditions" = "Terms and Conditions";
+"V2.Live.LinkMicNew.agree" = "Agree";
+"V2.Live.LinkMicNew.disagree" = "Disagree";
+"Demo.TRTC.Portal.privateandagreement" = "I have read and agree to the xxxyyy and zzz";
+"Demo.TRTC.Portal.agreeprivatefirst" = "You must agree to the Privacy Policy and Terms of Use first.";
+"Demo.TRTC.Portal.<privacysummary>" = "《Privacy Policy Summary》";
+"Demo.TRTC.Portal.<private>" = "《Privacy Policy》";
+"Demo.TRTC.Portal.<agreement>" = "《Terms of Use》";
+"Demo.TRTC.Portal.privacysummary" = "Privacy Policy Summary";
+"Demo.TRTC.Portal.private" = "Privacy Policy";
+"Demo.TRTC.Portal.agreement" = "Terms of Use";
+"Demo.TRTC.Portal.readAndAgreeConditions" = "Acceptance of Terms and Conditions";
+"Demo.TRTC.Portal.agreeAndContinue" = "Agree & Continue";
+"Demo.TRTC.LoginMock.adduserinformationforfirstlogin" = "This is your first login. Please complete your profile.";
+"Demo.TRTC.Login.modifyLaterInSettings" = "You can modify it later in settings";
+"Demo.TRTC.Portal.privatealertdescription" = "Welcome to TRTC. The Privacy Policy and Terms of Use agreements detail how we collect, use, and store your information, as well as the rights your are entitled to and how to exercise them. By tapping the button below, you agree to the content of the agreements.";
+"Demo.TRTC.Login.enterUserName" = "Please enter username";
+"Demo.TRTC.Home.phoneoremailIsEmpty" = "phone or email is empty";
+"Demo.TRTC.Home.userIDIsEmpty" = "userid is empty";
+"Demo.TRTC.Home.useroverduemessage" = "Login expired, please login again";
+
+"Demo.TRTC.LoginMock.username" = "User Name";
+"Demo.TRTC.LoginMock.fillinusernickname" = "Please fill in user nickname";
+"Demo.TRTC.LoginMock.nickname.Martijn" = "Martijn";
+"Demo.TRTC.LoginMock.nickname.irfan" = "irfan";
+"Demo.TRTC.LoginMock.nickname.Rosanna" = "Rosanna";
+"Demo.TRTC.LoginMock.nickname.Franklyn" = "Franklyn";
+"Demo.TRTC.LoginMock.nickname.Maren" = "Maren";
+"Demo.TRTC.LoginMock.nickname.bartel" = "bartel";
+"Demo.TRTC.LoginMock.nickname.Marianita" = "Marianita";
+"Demo.TRTC.LoginMock.nickname.Anneke" = "Anneke";
+"Demo.TRTC.LoginMock.nickname.elmira" = "elmira";
+"Demo.TRTC.LoginMock.nickname.ivet" = "ivet";
+"Demo.TRTC.LoginMock.nickname.clinton" = "clinton";
+"Demo.TRTC.LoginMock.nickname.virelai" = "virelai";
+"Demo.TRTC.LoginMock.nickname.Ace" = "Martijn";
+"Demo.TRTC.Login.phonetext" = "Log In with Mobile Number";
+"Demo.TRTC.Login.emailtext" = "Log In with Email";
+"Demo.TRTC.Login.ioatext" = "Signing in with iOA";
+"Demo.TRTC.Login.ioaLoading" = "Signing in with iOA...";
+"Demo.TRTC.Login.loading" = "Signing in，Please Waiting...";
+
+"Demo.TRTC.login_custom_name_1" = "Alice";
+"Demo.TRTC.login_custom_name_2" = "Amy";
+"Demo.TRTC.login_custom_name_3" = "Anne";
+"Demo.TRTC.login_custom_name_4" = "Jane";
+"Demo.TRTC.login_custom_name_5" = "May";
+"Demo.TRTC.login_custom_name_6" = "Linda";
+"Demo.TRTC.login_custom_name_7" = "Emma";
+"Demo.TRTC.login_custom_name_8" = "Judy";
+"Demo.TRTC.login_custom_name_9" = "Mary";
+"Demo.TRTC.login_custom_name_10" = "Susan";
+"Demo.TRTC.login_custom_name_11" = "Monica";
+"Demo.TRTC.login_custom_name_12" = "Sally";
+"Demo.TRTC.login_custom_name_13" = "Lisa";
+"Demo.TRTC.login_custom_name_14" = "Barry";
+"Demo.TRTC.login_custom_name_15" = "Clark";
+"Demo.TRTC.login_custom_name_16" = "Henry";
+"Demo.TRTC.login_custom_name_17" = "Peter";
+"Demo.TRTC.login_custom_name_18" = "John";
+"Demo.TRTC.login_custom_name_19" = "Andrew";
+"Demo.TRTC.login_custom_name_20" = "Charles";
+"Demo.TRTC.login_custom_name_21" = "Carl";
+"Demo.TRTC.login_custom_name_22" = "Mark";
+"Demo.TRTC.login_custom_name_23" = "James";
+"Demo.TRTC.login_custom_name_24" = "Eddie";
+"Demo.TRTC.login_custom_name_25" = "Bill";
+"Demo.TRTC.login_custom_name_26" = "Ben";
+"Demo.TRTC.login_custom_name_27" = "Bob";
+"Demo.TRTC.login_custom_name_28" = "Cody";
+"Demo.TRTC.login_custom_name_29" = "Denny";
+"Demo.TRTC.login_custom_name_30" = "Darwin";
+"Demo.TRTC.login_custom_name_31" = "Derek";
+"Demo.TRTC.login_custom_name_32" = "Dylan";
+"Demo.TRTC.login_custom_name_33" = "Edison";
+
+"Demo.TRTC.DevMenu.selectLoginMethod" = "Select Login Method";
+"Demo.TRTC.DevMenu.phoneLogin" = "Phone Login";
+"Demo.TRTC.DevMenu.phoneLoginDesc" = "Phone + Verification Code, switchable to iOA";
+"Demo.TRTC.DevMenu.emailLogin" = "Email Login";
+"Demo.TRTC.DevMenu.emailLoginDesc" = "Email + Verification Code, for overseas version";
+"Demo.TRTC.DevMenu.ioaLogin" = "iOA Enterprise Login";
+"Demo.TRTC.DevMenu.ioaLoginDesc" = "Login via iOA SDK ticket";
+"Demo.TRTC.DevMenu.inviteCodeLogin" = "Invite Code Login";
+"Demo.TRTC.DevMenu.inviteCodeLoginDesc" = "Login directly with invite code";
+"Demo.TRTC.DevMenu.debugLogin" = "Debug Login";
+"Demo.TRTC.DevMenu.debugLoginDesc" = "Enter userId directly (skip verification)";
+"Demo.TRTC.DevMenu.envProduction" = "Production";
+"Demo.TRTC.DevMenu.envTest" = "Test";
+"Demo.TRTC.DevMenu.autoLogin" = "Auto Login";
+
+"Demo.TRTC.Login.userCancelled" = "User cancelled login";
+"Demo.TRTC.Login.tokenExpired" = "Token has expired";
+
+"Demo.TRTC.Language.switchLanguage" = "Switch Language";
+
+"Demo.TRTC.Main.welcomeRTCube" = "Welcome to RTCube";
+"Demo.TRTC.Main.logout" = "Log Out";
+
+"Demo.TRTC.Portal.Main.InviteCodeBeUsed" = "User invite code be used";
+"Demo.TRTC.Portal.Main.InviteCodeInvalid" = "Invitation Code Invalid";
+"Demo.TRTC.Portal.Main.UserInviteCodeExpire" = "Invitation code has expired";
+"Demo.TRTC.Portal.Main.EmailIncorrect" = "Email sent failed";
+"Demo.TRTC.Portal.Main.EmailTooManyCodeRequest" = "Too many code-requests, please check your email for the sent codes.";
+"Demo.TRTC.Portal.Main.AgreeBeforeUse" = "Agree to the terms before use.";
+
+"Demo.TRTC.Email.welcomeTitle" = "Welcome to RTC";
+"Demo.TRTC.Email.subtitle" = "Enter your email to get an invitation code.";
+"Demo.TRTC.Email.emailPlaceholder" = "Email address";
+"Demo.TRTC.Email.continueButton" = "Continue";
+"Demo.TRTC.Email.requesting" = "Requesting...";
+"Demo.TRTC.Email.enterEmailError" = "Please enter your email address";
+"Demo.TRTC.Email.validEmailError" = "Please enter a valid email address";
+"Demo.TRTC.Email.bottomTextPrefix" = "Already have an invitation code? ";
+"Demo.TRTC.Email.enterCodeLink" = "Enter code";
+
+"Demo.TRTC.InviteCode.checkYourEmail" = "Check Your Email";
+"Demo.TRTC.InviteCode.enterInvitationCode" = "Enter Invitation Code";
+"Demo.TRTC.InviteCode.enterCodeSentToEmail" = "Please enter the invitation code we have sent to your email %@";
+"Demo.TRTC.InviteCode.enterCodeToGetStarted" = "If you already have an invitation code, please enter here to get started";
+"Demo.TRTC.InviteCode.getStarted" = "Get Started";
+"Demo.TRTC.InviteCode.validating" = "Validating...";
+"Demo.TRTC.InviteCode.enterCompleteCode" = "Please enter the complete 6-digit invitation code";
+"Demo.TRTC.InviteCode.codeIncorrect" = "The invitation code is incorrect";
+"Demo.TRTC.InviteCode.resendClickable" = "Didn't receive the code? Check your spam folder. \nResend code.";
+"Demo.TRTC.InviteCode.clickToResend" = "Resend code.";
+"Demo.TRTC.InviteCode.resendCountdown" = "Didn't receive the code? Check your spam folder. \nResend code in %ds";
+"Demo.TRTC.InviteCode.resendAfter" = "Resend code in %ds";
+"Demo.TRTC.InviteCode.resendingCode" = "Resending invitation code...";
+"Demo.TRTC.InviteCode.agreeToTermsPrefix" = "I agree to TRTC's ";
+"Demo.TRTC.InviteCode.termsOfService" = "Terms of Service";
+"Demo.TRTC.InviteCode.agreeToTermsMiddle" = " and ";
+"Demo.TRTC.InviteCode.privacyPolicy" = "Privacy Policy";
+"Demo.TRTC.InviteCode.agreeToTermsSuffix" = " ";
+"Demo.TRTC.InviteCode.marketingInfo" = "I'd like to receive marketing information from TRTC";
