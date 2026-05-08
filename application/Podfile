@@ -24,6 +24,11 @@ def shared_pods
 
   pod 'MJRefresh', '3.7.5'
 
+  pod 'AtomicX', :path => '../atomic_x/AtomicX.podspec'
+  pod 'TUICallKit_Swift/Professional', :path => '../call/'
+  pod 'TUILiveKit', :path => '../live/TUILiveKit.podspec'
+  pod 'TUIRoomKit', :path => '../room/TUIRoomKit.podspec'
+
 end
 
 target 'RTCubeLab' do

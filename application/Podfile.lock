@@ -1,55 +1,33 @@
 PODS:
-  - AFNetworking (4.0.1):
-    - AFNetworking/NSURLSession (= 4.0.1)
-    - AFNetworking/Reachability (= 4.0.1)
-    - AFNetworking/Security (= 4.0.1)
-    - AFNetworking/Serialization (= 4.0.1)
-    - AFNetworking/UIKit (= 4.0.1)
-  - AFNetworking/NSURLSession (4.0.1):
-    - AFNetworking/Reachability
-    - AFNetworking/Security
-    - AFNetworking/Serialization
-  - AFNetworking/Reachability (4.0.1)
-  - AFNetworking/Security (4.0.1)
-  - AFNetworking/Serialization (4.0.1)
-  - AFNetworking/UIKit (4.0.1):
-    - AFNetworking/NSURLSession
-  - AIConversationKit (1.0.0):
-    - AIConversationKit/Professional (= 1.0.0)
-    - Kingfisher
-    - Masonry
-    - RTCCommon
-    - SDWebImage
-    - SnapKit
-    - TUICore
-  - AIConversationKit/Professional (1.0.0):
-    - Kingfisher
-    - Masonry
-    - RTCCommon
-    - SDWebImage
-    - SnapKit
-    - TUICore
-    - TXLiteAVSDK_Professional
   - Alamofire (5.0.0)
-  - AppAssembly/Full (1.0.0):
-    - AIConversationKit
+  - AppAssembly (1.0.0):
     - Alamofire
+    - AppAssembly/OpenSource (= 1.0.0)
     - AtomicX
     - AtomicXCore
     - JXPagingView/Paging (= 2.1.2)
     - JXSegmentedView (= 1.3.0)
-    - Login/Full
     - RTCCommon
     - SnapKit
-    - TencentEffect
-    - TIMAppKit
     - Toast-Swift
     - TUICallKit_Swift
     - TUICore
     - TUILiveKit
     - TUIRoomKit
-    - VodPlay
-    - XiaoShiPinApp
+  - AppAssembly/OpenSource (1.0.0):
+    - Alamofire
+    - AtomicX
+    - AtomicXCore
+    - JXPagingView/Paging (= 2.1.2)
+    - JXSegmentedView (= 1.3.0)
+    - Login/OpenSource
+    - RTCCommon
+    - SnapKit
+    - Toast-Swift
+    - TUICallKit_Swift
+    - TUICore
+    - TUILiveKit
+    - TUIRoomKit
   - AtomicX (1.0.0):
     - AtomicXCore
     - Kingfisher
@@ -58,111 +36,37 @@ PODS:
     - TUICore
     - TXIMSDK_Plus_iOS_XCFramework (>= 8.8.7357)
     - TXLiteAVSDK_Professional
-  - AtomicXCore (3.0.5):
-    - RTCRoomEngine/Professional
-    - TXLiteAVSDK_Professional (>= 13.1.20454)
-  - BeautySettingKit (0.1.0):
-    - ZipArchive
-  - Bugly (2.7.49.1)
-  - CloudHuiYanSDK_FW (1.0.0):
-    - CloudHuiYanSDK_FW/Framework (= 1.0.0)
-    - CloudHuiYanSDK_FW/Resources (= 1.0.0)
-  - CloudHuiYanSDK_FW/Framework (1.0.0)
-  - CloudHuiYanSDK_FW/Resources (1.0.0)
-  - ITLogin (1.0.0)
+  - AtomicXCore (4.1.0):
+    - RTCRoomEngine/Professional (>= 4.1.0)
+    - TXLiteAVSDK_Professional (>= 13.0.20278)
   - JXPagingView/Paging (2.1.2)
   - JXSegmentedView (1.3.0)
   - Kingfisher (6.3.1)
-  - LiteAVPrivacy (1.0.0):
-    - Masonry
-    - RTCRoomEngine/Professional
-    - SDWebImage
-    - TUICore
-    - TXIMSDK_Plus_iOS_XCFramework
-    - TXLiteAVSDK_Professional
-  - Login/Full (1.0.0):
+  - Login (1.0.0):
     - Alamofire
     - AtomicX
-    - ITLogin
+    - Kingfisher
+    - Login/OpenSource (= 1.0.0)
+    - SnapKit
+    - Toast-Swift
+    - TUICore
+  - Login/OpenSource (1.0.0):
+    - Alamofire
+    - AtomicX
     - Kingfisher
     - SnapKit
     - Toast-Swift
     - TUICore
-  - Masonry (1.1.0)
-  - MBProgressHUD (1.2.0)
   - MJRefresh (3.7.5)
   - Protobuf (3.22.5)
-  - QCloudCore/WithoutMTA (6.5.3)
-  - QCloudCOSXML/Slim (6.5.3):
-    - QCloudCore/WithoutMTA (= 6.5.3)
-  - QCloudQuic (6.3.9):
-    - QCloudQuic/Default (= 6.3.9)
-  - QCloudQuic/Default (6.3.9)
-  - ReactiveObjC (3.1.1)
   - RTCCommon (1.3.6)
-  - RTCExperienceRoom (1.0.1):
-    - RTCCommon
-    - SnapKit
-    - TXLiteAVSDK_Professional
-  - RTCRoomEngine/Professional (3.4.0):
-    - TXIMSDK_Plus_iOS_XCFramework
-    - TXLiteAVSDK_Professional (>= 11.7.15304)
+  - RTCRoomEngine/Professional (4.1.0):
+    - TXIMSDK_Plus_iOS_XCFramework (>= 8.4.6676)
+    - TXLiteAVSDK_Professional (>= 12.8.0.19666)
   - SDWebImage (5.21.7):
     - SDWebImage/Core (= 5.21.7)
   - SDWebImage/Core (5.21.7)
-  - SensorsAnalyticsSDK (5.0.9):
-    - SensorsAnalyticsSDK/Core (= 5.0.9)
-  - SensorsAnalyticsSDK/Core (5.0.9)
   - SnapKit (5.0.1)
-  - SSZipArchive (2.4.3)
-  - SuperPlayer/Professional (3.7.8):
-    - Masonry
-    - SDWebImage
-    - TUICore
-    - TXLiteAVSDK_Professional
-  - TCEffectPlayer (3.2.249):
-    - TCMediaX
-  - TCEffectPlayerKit/Beauty (3.0.0):
-    - TCEffectPlayer
-    - TCMediaX
-    - TUICore
-  - TCMediaX (3.0.246)
-  - TEBeautyKit (4.2.0.21):
-    - Masonry
-    - SSZipArchive
-    - TEBeautyKit/S1-07 (= 4.2.0.21)
-  - TEBeautyKit/S1-07 (4.2.0.21):
-    - Masonry
-    - SSZipArchive
-    - TencentEffect_S1-07
-  - TEBeautyKitWrapper (1.0.0):
-    - SnapKit
-    - TEBeautyKit
-    - TUICore
-  - TencentEffect (0.1.0):
-    - AFNetworking
-    - LiteAVPrivacy
-    - Masonry
-    - SDWebImage
-    - SSZipArchive
-    - TEBeautyKit
-    - TUICore
-    - YYModel
-  - TencentEffect_S1-07 (4.2.0.21):
-    - TencentEffect_S1-07/Default (= 4.2.0.21)
-  - TencentEffect_S1-07/Default (4.2.0.21)
-  - TIMAppKit (1.0.0):
-    - ReactiveObjC
-    - TIMCommon
-    - TUIChat
-    - TUIContact
-    - TUIConversation
-    - TUICore
-  - TIMCommon (1.0.0):
-    - Masonry
-    - ReactiveObjC
-    - SDWebImage
-    - TUICore
   - Toast-Swift (5.1.1)
   - TUICallKit_Swift (1.0.0):
     - AtomicX
@@ -175,25 +79,12 @@ PODS:
     - RTCRoomEngine/Professional
     - TUICore
     - TXLiteAVSDK_Professional
-  - TUIChat (1.0.0):
-    - ReactiveObjC
+  - TUICore (8.9.7511):
     - SDWebImage
-    - TIMCommon
-    - TUICore
-  - TUIContact (1.0.0):
-    - ReactiveObjC
-    - TIMCommon
-    - TUICore
-  - TUIConversation (1.0.0):
-    - ReactiveObjC
-    - TIMCommon
-    - TUICore
-  - TUICore (1.0.0):
+    - TUICore/ImSDK_Plus (= 8.9.7511)
+  - TUICore/Base (8.9.7511):
     - SDWebImage
-    - TUICore/ImSDK_Plus (= 1.0.0)
-  - TUICore/Base (1.0.0):
-    - SDWebImage
-  - TUICore/ImSDK_Plus (1.0.0):
+  - TUICore/ImSDK_Plus (8.9.7511):
     - SDWebImage
     - TUICore/Base
     - TXIMSDK_Plus_iOS_XCFramework
@@ -216,276 +107,88 @@ PODS:
     - SnapKit
     - TUICore
     - TXIMSDK_Plus_iOS_XCFramework (>= 8.7.7021)
-  - TUIPlayerCore/Professional (2.1.3):
-    - TXLiteAVSDK_Professional (>= 11.4.0)
-  - TUIPlayerShortVideo/Professional (2.1.3):
-    - Masonry
-    - SDWebImage
-    - TUIPlayerCore/Professional
   - TUIRoomKit (4.0.0):
     - AtomicX
     - AtomicXCore
     - Kingfisher
     - SnapKit
-    - TXLiteAVSDK_Professional
-  - TXIMSDK_Plus_iOS_XCFramework (8.9.7537)
+  - TXIMSDK_Plus_iOS_XCFramework (8.9.7540)
   - TXLiteAVSDK_Professional (13.2.20652):
     - TXLiteAVSDK_Professional/Professional (= 13.2.20652)
   - TXLiteAVSDK_Professional/Professional (13.2.20652)
   - TXLiteAVSDK_Professional/ReplayKitExt (13.2.20652)
-  - UGCKit (0.1.0):
-    - BeautySettingKit
-    - TUICore
-    - UGCKit/Professional (= 0.1.0)
-    - xmagickit
-  - UGCKit/Professional (0.1.0):
-    - BeautySettingKit
-    - TUICore
-    - xmagickit
-  - VideoAdvanceExtension (1.0.0):
-    - TUICore
-    - VideoAdvanceExtension/Professional (= 1.0.0)
-  - VideoAdvanceExtension/Professional (1.0.0):
-    - RTCRoomEngine/Professional
-    - TUICore
-  - VodPlay (3.1.1):
-    - AFNetworking
-    - Masonry
-    - MBProgressHUD (= 1.2.0)
-    - MJRefresh (= 3.7.5)
-    - SDWebImage
-    - SuperPlayer/Professional
-    - TUICore
-    - TUIPlayerCore/Professional
-    - TUIPlayerShortVideo/Professional
-  - XiaoShiPinApp (3.1.1):
-    - AFNetworking
-    - BeautySettingKit
-    - Masonry
-    - MBProgressHUD (= 1.2.0)
-    - MJRefresh (= 3.7.5)
-    - QCloudCOSXML/Slim
-    - QCloudQuic
-    - SDWebImage
-    - TUICore
-    - UGCKit
-    - xmagickit
-  - xmagickit (0.1.0):
-    - Masonry
-    - SDWebImage
-    - SSZipArchive
-    - TEBeautyKit
-    - TUICore
-  - YYModel (1.0.4)
-  - ZipArchive (1.4.0)
 
 DEPENDENCIES:
-  - AIConversationKit/Professional (from `../../../iOS/Module/AIConversation/AIConversationKit/AIConversationKit.podspec`)
   - Alamofire (= 5.0.0)
-  - AppAssembly/Full (from `assembly/AppAssembly.podspec`)
-  - AtomicX (from `../../../client_uikit/atomic-x/ios/atomic_x/AtomicX.podspec`)
-  - AtomicXCore (from `../../../../tuikit_engine/atomicx/swift/AtomicXCore/AtomicXCore.podspec`)
-  - BeautySettingKit (from `../../../iOS/Module/Effect/BeautySettingKit/BeautySettingKit.podspec`)
-  - Bugly (from `../sdk/Bugly/Bugly.podspec`)
-  - CloudHuiYanSDK_FW (from `../sdk/CloudHuiYanSDK_FW/CloudHuiYanSDK_FW.podspec`)
-  - ITLogin (from `../sdk/ITLogin/ITLogin.podspec`)
-  - JXPagingView/Paging (= 2.1.2)
-  - JXSegmentedView (= 1.3.0)
+  - AppAssembly (from `assembly/AppAssembly.podspec`)
+  - AtomicX (from `../atomic_x/AtomicX.podspec`)
   - Kingfisher (= 6.3.1)
-  - LiteAVPrivacy (from `../../../iOS/Basic/Business/Privacy/`)
-  - Login/Full (from `login/Login.podspec`)
+  - Login (from `login/Login.podspec`)
   - MJRefresh (= 3.7.5)
-  - RTCExperienceRoom (from `../../../iOS/Module/RTCExperienceRoom/RTCExperienceRoom/RTCExperienceRoom.podspec`)
-  - RTCRoomEngine/Professional (from `../../../../tuikit_engine/RTCRoomEngine.podspec`)
-  - SensorsAnalyticsSDK
   - SnapKit (= 5.0.1)
-  - SuperPlayer/Professional (from `../../../iOS/Module/Player/SuperPlayerKit/SuperPlayer.podspec`)
-  - TCEffectPlayer (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.2/249/TCEffectPlayer.podspec`)
-  - TCEffectPlayerKit/Beauty (from `../../../client_uikit/atomic-x/ios/atomic_x/Sources/TCEffectPlayerKit/TCEffectPlayerKit.podspec`)
-  - TCMediaX (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.0.246/TCMediaX.podspec`)
-  - TEBeautyKit/S1-07 (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/TencentEffect/iOS/TEBeautyKit/latest/TEBeautyKit.podspec`)
-  - TEBeautyKitWrapper (from `../../../client_uikit/atomic-x/ios/TEBeautyKit`)
-  - TencentEffect (from `../../../iOS/Module/Effect/TencentEffect/TencentEffect.podspec`)
-  - TIMAppKit (from `../../../tui-components/iOS/TIMAppKit/`)
-  - TIMCommon (from `../../../tui-components/iOS/TIMCommon/`)
   - Toast-Swift
-  - TUICallKit_Swift/Professional (from `../../../client_uikit/atomic-x/ios/call/`)
-  - TUIChat (from `../../../tui-components/iOS/TUIChat/`)
-  - TUIContact (from `../../../tui-components/iOS/TUIContact/`)
-  - TUIConversation (from `../../../tui-components/iOS/TUIConversation/`)
-  - TUICore (from `../../../tui-components/iOS/TUICore/`)
-  - TUILiveKit (from `../../../client_uikit/atomic-x/ios/live/TUILiveKit.podspec`)
-  - TUIPlayerCore/Professional (from `../../../iOS/Module/Player/TUIShortVideoView/TUIPlayerCoreSDK/TUIPlayerCore.podspec`)
-  - TUIPlayerShortVideo/Professional (from `../../../iOS/Module/Player/TUIShortVideoView/TUIPlayerShortVideoSDK/TUIPlayerShortVideo.podspec`)
-  - TUIRoomKit (from `../../../client_uikit/atomic-x/ios/room/TUIRoomKit.podspec`)
+  - TUICallKit_Swift/Professional (from `../call/`)
+  - TUICore
+  - TUILiveKit (from `../live/TUILiveKit.podspec`)
+  - TUIRoomKit (from `../room/TUIRoomKit.podspec`)
   - TXLiteAVSDK_Professional (= 13.2.20652)
   - TXLiteAVSDK_Professional/ReplayKitExt (= 13.2.20652)
-  - UGCKit/Professional (from `../../../iOS/Module/UGSV/UGCKit/UGCKit.podspec`)
-  - VideoAdvanceExtension (from `../../../client_uikit/atomic-x/ios/atomic_x/Sources/VideoAdvanceExtension/VideoAdvanceExtension.podspec`)
-  - VodPlay (from `../../../iOS/Module/Player/VodPlay/VodPlay.podspec`)
-  - XiaoShiPinApp (from `../../../iOS/Module/UGSV/XiaoShiPinApp/XiaoShiPinApp.podspec`)
-  - xmagickit (from `../../../iOS/Module/Effect/xmagickit/xmagickit.podspec`)
 
 SPEC REPOS:
   trunk:
-    - AFNetworking
     - Alamofire
+    - AtomicXCore
     - JXPagingView
     - JXSegmentedView
     - Kingfisher
-    - Masonry
-    - MBProgressHUD
     - MJRefresh
     - Protobuf
-    - QCloudCore
-    - QCloudCOSXML
-    - QCloudQuic
-    - ReactiveObjC
     - RTCCommon
+    - RTCRoomEngine
     - SDWebImage
-    - SensorsAnalyticsSDK
     - SnapKit
-    - SSZipArchive
-    - TencentEffect_S1-07
     - Toast-Swift
+    - TUICore
     - TXIMSDK_Plus_iOS_XCFramework
     - TXLiteAVSDK_Professional
-    - YYModel
-    - ZipArchive
 
 EXTERNAL SOURCES:
-  AIConversationKit:
-    :path: "../../../iOS/Module/AIConversation/AIConversationKit/AIConversationKit.podspec"
   AppAssembly:
     :path: assembly/AppAssembly.podspec
   AtomicX:
-    :path: "../../../client_uikit/atomic-x/ios/atomic_x/AtomicX.podspec"
-  AtomicXCore:
-    :path: "../../../../tuikit_engine/atomicx/swift/AtomicXCore/AtomicXCore.podspec"
-  BeautySettingKit:
-    :path: "../../../iOS/Module/Effect/BeautySettingKit/BeautySettingKit.podspec"
-  Bugly:
-    :path: "../sdk/Bugly/Bugly.podspec"
-  CloudHuiYanSDK_FW:
-    :path: "../sdk/CloudHuiYanSDK_FW/CloudHuiYanSDK_FW.podspec"
-  ITLogin:
-    :path: "../sdk/ITLogin/ITLogin.podspec"
-  LiteAVPrivacy:
-    :path: "../../../iOS/Basic/Business/Privacy/"
+    :path: "../atomic_x/AtomicX.podspec"
   Login:
     :path: login/Login.podspec
-  RTCExperienceRoom:
-    :path: "../../../iOS/Module/RTCExperienceRoom/RTCExperienceRoom/RTCExperienceRoom.podspec"
-  RTCRoomEngine:
-    :path: "../../../../tuikit_engine/RTCRoomEngine.podspec"
-  SuperPlayer:
-    :path: "../../../iOS/Module/Player/SuperPlayerKit/SuperPlayer.podspec"
-  TCEffectPlayer:
-    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.2/249/TCEffectPlayer.podspec
-  TCEffectPlayerKit:
-    :path: "../../../client_uikit/atomic-x/ios/atomic_x/Sources/TCEffectPlayerKit/TCEffectPlayerKit.podspec"
-  TCMediaX:
-    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.0.246/TCMediaX.podspec
-  TEBeautyKit:
-    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/TencentEffect/iOS/TEBeautyKit/latest/TEBeautyKit.podspec
-  TEBeautyKitWrapper:
-    :path: "../../../client_uikit/atomic-x/ios/TEBeautyKit"
-  TencentEffect:
-    :path: "../../../iOS/Module/Effect/TencentEffect/TencentEffect.podspec"
-  TIMAppKit:
-    :path: "../../../tui-components/iOS/TIMAppKit/"
-  TIMCommon:
-    :path: "../../../tui-components/iOS/TIMCommon/"
   TUICallKit_Swift:
-    :path: "../../../client_uikit/atomic-x/ios/call/"
-  TUIChat:
-    :path: "../../../tui-components/iOS/TUIChat/"
-  TUIContact:
-    :path: "../../../tui-components/iOS/TUIContact/"
-  TUIConversation:
-    :path: "../../../tui-components/iOS/TUIConversation/"
-  TUICore:
-    :path: "../../../tui-components/iOS/TUICore/"
+    :path: "../call/"
   TUILiveKit:
-    :path: "../../../client_uikit/atomic-x/ios/live/TUILiveKit.podspec"
-  TUIPlayerCore:
-    :path: "../../../iOS/Module/Player/TUIShortVideoView/TUIPlayerCoreSDK/TUIPlayerCore.podspec"
-  TUIPlayerShortVideo:
-    :path: "../../../iOS/Module/Player/TUIShortVideoView/TUIPlayerShortVideoSDK/TUIPlayerShortVideo.podspec"
+    :path: "../live/TUILiveKit.podspec"
   TUIRoomKit:
-    :path: "../../../client_uikit/atomic-x/ios/room/TUIRoomKit.podspec"
-  UGCKit:
-    :path: "../../../iOS/Module/UGSV/UGCKit/UGCKit.podspec"
-  VideoAdvanceExtension:
-    :path: "../../../client_uikit/atomic-x/ios/atomic_x/Sources/VideoAdvanceExtension/VideoAdvanceExtension.podspec"
-  VodPlay:
-    :path: "../../../iOS/Module/Player/VodPlay/VodPlay.podspec"
-  XiaoShiPinApp:
-    :path: "../../../iOS/Module/UGSV/XiaoShiPinApp/XiaoShiPinApp.podspec"
-  xmagickit:
-    :path: "../../../iOS/Module/Effect/xmagickit/xmagickit.podspec"
+    :path: "../room/TUIRoomKit.podspec"
 
 SPEC CHECKSUMS:
-  AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  AIConversationKit: 93eda5ecb947e24dc52586c850e5bfc25f8b19ba
   Alamofire: 58ff2bfb8daaacaa233d5c36e37b10a5248f59b1
-  AppAssembly: 9b6ce726e913ab55c77392cda3c15f4b79daea0a
-  AtomicX: 20c47ae62de97979f8cf83b1b3b791f7cc42b7f6
-  AtomicXCore: 0ec38d6915cc05a6622277fb5ab904add168df5a
-  BeautySettingKit: c32527c5f4f9816315c024d30b13da4349f873e9
-  Bugly: 12ccee18548153acc01d43c0d1b803b40f48332d
-  CloudHuiYanSDK_FW: 85bcf6d12d89df82c72cd0ce4a44e1b91a5fba50
-  ITLogin: b4f8d0f79ea6b72ca0aef5e2a620fcbb59ee3cbb
+  AppAssembly: 492f21e6d8ee628ebedc156c271b1d3f1ad6f594
+  AtomicX: 185778c1821a6176606325210fa1a2407efbcd9b
+  AtomicXCore: f0b24c161b0edd15c914490f6113c20c6cd4453e
   JXPagingView: 90924b364a2ff7e94db534fad1fa50925ff69ee4
   JXSegmentedView: fec0d335355b6e019c494fe2e030bde8a36d2df6
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
-  LiteAVPrivacy: c65753ed01ffe94c776dcc5dcd5a20ec3cf06cea
-  Login: dc1c9ae7ce95bc17d375099be7faa09ee23a583a
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
-  MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
+  Login: d3e2c60bf183c07e382787f9ea2757e6f980346b
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
   Protobuf: bcec8c9430002f8d11c8a08f964b3ebcdd060536
-  QCloudCore: 463b8c0c99fdc48a1c9cc637ee5466a1e5cf0c6e
-  QCloudCOSXML: b092a768b1f290235ca99205123d12e5e8f389b4
-  QCloudQuic: 81e2c29fa8122c1d5e8323a90349683e52c8e101
-  ReactiveObjC: 011caa393aa0383245f2dcf9bf02e86b80b36040
   RTCCommon: 728b0a48a0f41ebcfc4c5989883abee7f737d54a
-  RTCExperienceRoom: 78c96e1523d0681b783eff42c5637cabef70dfd6
-  RTCRoomEngine: d8827cf8c8b92689a42e0e938b43624cedac39aa
+  RTCRoomEngine: a2ee69a0cb1636c41554d42f762c413a78f23b87
   SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
-  SensorsAnalyticsSDK: 1d507720d598ca47636bd478c2009b3cb6b6857e
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
-  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  SuperPlayer: 89f9627e490a82f72c38cf87da2ae0ee7b71ae4b
-  TCEffectPlayer: 7419722350d67795a8d9be1d6e066121a6335ecd
-  TCEffectPlayerKit: c15bdc734b2379bce6a6d021f725e3aaed6e2486
-  TCMediaX: 50c1d93086c1b0975c78414c91ec021d89b62d28
-  TEBeautyKit: 579f67bc5b5e58c02fcc8849610b3ca87796078f
-  TEBeautyKitWrapper: 0bc18b9c5fe977263a23cb8162f6376064936e21
-  TencentEffect: e85b81d489cfd778e62794da40ba0e229aba1f7a
-  TencentEffect_S1-07: ba6f3e4e25ff20f9b27a8535c67aa8e668079e31
-  TIMAppKit: b728dfd15697bf06e2acffaf4a2fe60f391362e1
-  TIMCommon: d20a09979bb1e4fe312b6e8e1b72a954179172ac
   Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
   TUICallKit_Swift: 21f1c9c61001aa2584c7b7440868ea1c20bdcbd7
-  TUIChat: 78caca39a558383d1f20db352b950357f5aaac36
-  TUIContact: 59d8395d9fcc07a38fea5c84a21f05faccfe5f98
-  TUIConversation: 3640d9d67973e7701992d9616306c31b58c6942c
-  TUICore: 160f1aba276b6be341b664bc806d8309cad72075
+  TUICore: 7360e867205b38f72974e42d094fbb06ea68fe1e
   TUILiveKit: 7fdf53c7e05a1179f9225c29efde40e361819ead
-  TUIPlayerCore: 7d9e733df414e1d3f3dbd8b982bdb7aefbc6e479
-  TUIPlayerShortVideo: d060add4637ff0ea462d87b1d36819a1a3ed5aaf
-  TUIRoomKit: 6182dd1074aff300f095b0bd163fe583d4bd1e54
-  TXIMSDK_Plus_iOS_XCFramework: 3e5178c57fe2475fa68cf891982b38af68f071d5
+  TUIRoomKit: 4c58eab1fab7cbb774a9362e8e6706aa49dc22fa
+  TXIMSDK_Plus_iOS_XCFramework: 0dc0d5df48de5693b74d0fc42e267ed4e5c3a247
   TXLiteAVSDK_Professional: e792e6084a208ecef6196c5f28237ad8078b4d7c
-  UGCKit: 2766bf3b2be2d8ce735160d9631f8b9cbc90ad7c
-  VideoAdvanceExtension: 11a73dede15c278edce309f79b600be07cbc4e65
-  VodPlay: 86cbe5e0350de5c01e46b4c3f427203f1fd20f7e
-  XiaoShiPinApp: aed3275d6b972fa8bc52b7b3d877c47443ab5bc5
-  xmagickit: 5d04087fbdcb141a47821e13493e64b60dd64be5
-  YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
-  ZipArchive: e25a4373192673e3229ac8d6e9f64a3e5713c966
 
-PODFILE CHECKSUM: 908ac8aea873fcbc8096840dc540008d84f35646
+PODFILE CHECKSUM: 4342b3f2713d58c0268e1a97ff28d20cc72e8985
 
 COCOAPODS: 1.16.2
