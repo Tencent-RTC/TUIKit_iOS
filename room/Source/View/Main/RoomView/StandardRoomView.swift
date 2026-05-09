@@ -65,12 +65,14 @@ class StandardRoomView: UIView, BaseView {
     private lazy var previousPageButton: UIButton = {
         let button = UIButton()
         button.setImage(ResourceLoader.loadImage("room_previous_page_icon"), for: .normal)
+        button.isHidden = true
         return button
     }()
     
     private lazy var nextPageButton: UIButton = {
         let button = UIButton()
         button.setImage(ResourceLoader.loadImage("room_next_page_icon"), for: .normal)
+        button.isHidden = true
         return button
     }()
     

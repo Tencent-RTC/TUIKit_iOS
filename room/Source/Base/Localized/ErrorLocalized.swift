@@ -209,6 +209,7 @@ public enum RoomError: Int, Error {
     case userAlreadyOnSeat = 100210
     case seatNotSupportLinkMic = 100211
     case emptySeatList = 100251
+    case speaker_seat_occupied = 100253
     case metadataKeyExceedsLimit = 100500
     case metadataValueSizeExceedsByteLimit = 100501
     case metadataTotalValueSizeExceedsByteLimit = 100502
@@ -390,6 +391,8 @@ extension RoomError: LocalizedError {
             return "roomkit_err_100211_seat_not_supported".localized
         case .emptySeatList:    // 100251
             return "roomkit_err_100251_seat_list_is_empty".localized
+        case .speaker_seat_occupied: //100253
+            return "roomkit_err_100253_speaker_seat_occupied".localized
         case .metadataKeyExceedsLimit:  // 100500
             return "roomkit_err_100500_room_metadata_key_limit".localized
         case .metadataValueSizeExceedsByteLimit:  // 100501

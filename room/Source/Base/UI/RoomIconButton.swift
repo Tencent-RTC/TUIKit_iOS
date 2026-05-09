@@ -43,8 +43,26 @@ public class RoomIconButton: UIControl {
     private var iconSpacing: CGFloat = 8
     
     private var iconSize: CGSize = .zero
+    
+    /// Badge red dot size (default: 8x8)
+    private var badgeDotSize: CGFloat = 8
+    
+    /// Badge offset from top-right corner
+    private var badgeOffset: CGPoint = CGPoint(x: 2, y: -2)
 
     // MARK: - UI Components
+    
+    private lazy var badgeView: UILabel = {
+        let label = UILabel()
+        label.backgroundColor = RoomColors.endTitleColor
+        label.textColor = .white
+        label.font = RoomFonts.pingFangSCFont(size: 10, weight: .medium)
+        label.textAlignment = .center
+        label.clipsToBounds = true
+        label.isHidden = true
+        label.isUserInteractionEnabled = false
+        return label
+    }()
     
     private lazy var iconImageView: UIImageView = {
         let imageView = UIImageView()
@@ -89,6 +107,7 @@ public class RoomIconButton: UIControl {
     
     private func setupUI() {
         addSubview(containerStackView)
+        addSubview(badgeView)
         
         containerStackView.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -97,6 +116,8 @@ public class RoomIconButton: UIControl {
             make.top.greaterThanOrEqualToSuperview()
             make.bottom.lessThanOrEqualToSuperview()
         }
+        
+        updateBadgeConstraints()
         
         // Set content compression resistance priority
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -156,7 +177,78 @@ public class RoomIconButton: UIControl {
         containerStackView.alignment = alignment
     }
     
+    // MARK: - Badge Methods
+    
+    /// Show or hide the badge red dot
+    /// - Parameter isHidden: Whether to hide the badge
+    public func setBadgeHidden(_ isHidden: Bool) {
+        badgeView.isHidden = isHidden
+    }
+    
+    /// Set badge count. Shows red dot when count > 0, hides when count == 0.
+    /// - When count > 0 and <= 99: displays the number
+    /// - When count > 99: displays "99+"
+    /// - When count == 0: hides the badge
+    /// - Parameter count: Badge count
+    public func setBadgeCount(_ count: Int) {
+        if count <= 0 {
+            badgeView.isHidden = true
+            badgeView.text = nil
+            updateBadgeConstraints()
+            return
+        }
+        
+        badgeView.isHidden = false
+        if count > 99 {
+            badgeView.text = "99+"
+        } else {
+            badgeView.text = "\(count)"
+        }
+        updateBadgeConstraints()
+    }
+    
+    /// Show badge as a simple red dot without number
+    public func showBadgeDot() {
+        badgeView.isHidden = false
+        badgeView.text = nil
+        updateBadgeConstraints()
+    }
+    
+    /// Set badge dot size (for dot mode without number)
+    /// - Parameter size: Dot diameter
+    public func setBadgeDotSize(_ size: CGFloat) {
+        badgeDotSize = size
+        updateBadgeConstraints()
+    }
+    
+    /// Set badge offset from the top-right corner of containerStackView
+    /// - Parameter offset: Offset point (positive x moves right, positive y moves down)
+    public func setBadgeOffset(_ offset: CGPoint) {
+        badgeOffset = offset
+        updateBadgeConstraints()
+    }
+    
     // MARK: - Private Methods
+    
+    private func updateBadgeConstraints() {
+        badgeView.snp.remakeConstraints { make in
+            if let text = badgeView.text, !text.isEmpty {
+                // Number mode: auto-size with minimum width
+                let textSize = badgeView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 16))
+                let badgeHeight: CGFloat = 16
+                let badgeWidth = max(badgeHeight, textSize.width + 8)
+                make.height.equalTo(badgeHeight)
+                make.width.equalTo(badgeWidth)
+                badgeView.layer.cornerRadius = badgeHeight / 2
+            } else {
+                // Dot mode: simple circle
+                make.width.height.equalTo(badgeDotSize)
+                badgeView.layer.cornerRadius = badgeDotSize / 2
+            }
+            make.right.equalTo(containerStackView.snp.right).offset(badgeOffset.x)
+            make.top.equalTo(containerStackView.snp.top).offset(badgeOffset.y)
+        }
+    }
     
     private func updateLayout() {
         // Remove all arranged subviews

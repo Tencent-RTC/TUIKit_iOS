@@ -15,6 +15,7 @@ import AtomicX
 
 public protocol AudienceManagerViewDelegate: AnyObject {
     func handleKickOut(view: AudienceManagerView, audience: RoomUser)
+    func handleSetAsAdmin(view: AudienceManagerView, audience: RoomUser, isAdmin: Bool)
 }
 
 // MARK: - AudienceManagerView
@@ -37,6 +38,8 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - Properties
     private var audience: RoomUser
+    private var markIsAdmin: Bool?
+    private var adminList: [RoomUser] = []
     private let roomID: String
     private var actionItems: [ActionItem] = []
     private var cancellableSet = Set<AnyCancellable>()
@@ -165,6 +168,19 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
                 }
             }
             .store(in: &cancellableSet)
+        participantStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.adminList))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] adminList in
+                guard let self = self else { return }
+                self.adminList = adminList
+                let isAdmin = isAdmin(user: audience)
+                if markIsAdmin == nil || markIsAdmin != isAdmin {
+                    setupActionItems()
+                    markIsAdmin = isAdmin
+                }
+            }
+            .store(in: &cancellableSet)
     }
     
     private func setupActionItems() {
@@ -174,7 +190,8 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
     }
     
     private func setupRemoteActionItems() {
-        if participantStore.state.value.localParticipant?.role == .admin {
+        let role = participantStore.state.value.localParticipant?.role
+        if role == .admin {
             actionItems.append(contentsOf: [
                 ActionItem(
                     icon: ResourceLoader.loadImage("room_members"),
@@ -191,7 +208,39 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
                         handleKickOut()
                     }
             ])
+        } else if role == .owner {
+            actionItems.append(contentsOf: [
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_members"),
+                    title: .setParticipant,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        setParticipant()
+                    },
+                ActionItem(
+                    icon: isAdmin(user: audience) ? ResourceLoader.loadImage("room_undo_administrator") :
+                        ResourceLoader.loadImage("room_set_admin"),
+                    title: isAdmin(user: audience) ?
+                        .undoAdministrator :
+                        .setAsAdministrator,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        handleSetAsAdmin()
+                    },
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_kickout"),
+                    title: .remove,
+                    textColor: RoomColors.endTitleColor) { [weak self] in
+                        guard let self = self else { return }
+                        handleKickOut()
+                    }
+            ])
         }
+    }
+    
+    private func isAdmin(user: RoomUser) -> Bool {
+        let result = adminList.filter { $0.userID == user.userID }
+        return !result.isEmpty
     }
 }
 
@@ -215,6 +264,10 @@ extension AudienceManagerView {
     
     private func handleKickOut() {
         delegate?.handleKickOut(view: self, audience: audience)
+    }
+    
+    private func handleSetAsAdmin() {
+        delegate?.handleSetAsAdmin(view: self, audience: audience, isAdmin: isAdmin(user: audience))
     }
 }
 
@@ -252,5 +305,7 @@ extension AudienceManagerView: UITableViewDelegate {
 fileprivate extension String {
     static let setParticipant = "roomkit_set_participant".localized
     static let remove = "roomkit_remove_member".localized
+    static let undoAdministrator = "roomkit_revoke_admin".localized
+    static let setAsAdministrator = "roomkit_set_admin".localized
 }
 

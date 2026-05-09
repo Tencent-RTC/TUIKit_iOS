@@ -279,7 +279,8 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
     }
     
     private func setupWebinarRemoteActionItems() {
-        if participantStore.state.value.localParticipant?.role == .admin {
+        let role = participantStore.state.value.localParticipant?.role
+        if role == .admin {
             actionItems.append(contentsOf: [
                 ActionItem(
                     icon: ResourceLoader.loadImage("room_members"),
@@ -306,6 +307,54 @@ public class ParticipantManagerView: UIView, BasePanel, PanelHeightProvider {
                         handleKickOut()
                     }
             ])
+        } else if role == .owner {
+            actionItems.append(contentsOf: [
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_members"),
+                    title: .setAudience,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        setAudience()
+                    },
+                ActionItem(
+                    icon: participant.microphoneStatus == .off ?   ResourceLoader.loadImage("room_mic_off_red") :
+                        ResourceLoader.loadImage("room_mic_on_big"),
+                    title: participant.microphoneStatus == .off ?
+                        .askToUnmute :
+                        .mute,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        handleAudioDevice(disable: participant.microphoneStatus == .on)
+                    },
+                ActionItem(
+                    icon: participant.role == .admin ? ResourceLoader.loadImage("room_undo_administrator") :
+                        ResourceLoader.loadImage("room_set_admin"),
+                    title: participant.role == .admin ?
+                        .undoAdministrator :
+                        .setAsAdministrator,
+                    textColor: RoomColors.g7) { [weak self] in
+                        guard let self = self else { return }
+                        handleSetAsAdmin()
+                    },
+                ActionItem(
+                    icon: ResourceLoader.loadImage("room_kickout"),
+                    title: .remove,
+                    textColor: RoomColors.endTitleColor) { [weak self] in
+                        guard let self = self else { return }
+                        handleKickOut()
+                    }
+            ])
+        }
+        
+        if participant.cameraStatus == .on {
+            actionItems.insert(
+                ActionItem(
+                icon: ResourceLoader.loadImage("camera_open"),
+                title: .stopVideo,
+                textColor: RoomColors.g7) { [weak self] in
+                    guard let self = self else { return }
+                    handleVideoDevice(disable: participant.cameraStatus == .on)
+                }, at: 2)
         }
     }
 }
