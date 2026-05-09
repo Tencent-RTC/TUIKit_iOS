@@ -71,5 +71,28 @@ public class RoomView: UIView, BaseView {
         backgroundColor = .clear
     }
     
-    public func setupBindings() {}
+    public func setupBindings() {
+        if roomType == .webinar {
+            webinarRoomView.delegate = self
+        }
+    }
+}
+
+extension RoomView: WebinarRoomViewDelegate {
+    func onRoomViewLayoutChanged(isLandscape: Bool, canvas: WebinarCanvas) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if isLandscape {
+                webinarRoomView.snp.remakeConstraints { make in
+                    make.top.equalToSuperview().offset(30)
+                    make.left.right.equalToSuperview()
+                    make.height.equalTo(self.snp.width).multipliedBy(CGFloat(canvas.h) / CGFloat(canvas.w))
+                }
+            } else {
+                webinarRoomView.snp.remakeConstraints { make in
+                    make.edges.equalToSuperview()
+                }
+            }
+        }
+    }
 }

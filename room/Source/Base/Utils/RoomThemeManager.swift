@@ -24,17 +24,11 @@ import UIKit
 /// // 3. 使用渐变
 /// view.applyGradient(colors: RoomGradients.blueGradient())
 ///
-/// // 4. 使用预定义字体
-/// label.font = RoomFonts.title1
-///
-/// // 5. 使用间距和圆角
+/// // 4. 使用间距和圆角
 /// stackView.spacing = RoomSpacing.standard
 /// view.layer.cornerRadius = RoomCornerRadius.medium
 ///
-/// // 6. 应用卡片样式
-/// cardView.applyCardStyle()
-///
-/// // 7. 监听主题变化
+/// // 5. 监听主题变化
 /// RoomThemeManager.shared.addObserver(self)
 /// ```
 public class RoomThemeManager {
@@ -178,6 +172,12 @@ public struct RoomColors {
         darkHex: "#4F586B"
     )
     
+    /// G5 - 主题灰色
+    public static let g5 = RoomThemeManager.dynamicColor(
+        lightHex: "#99A2B2",
+        darkHex: "#99A2B2"
+    )
+    
     /// G6 - 占位符文本色 (通常配合 0.5 透明度使用)
     public static let g6 = RoomThemeManager.dynamicColor(
         lightHex: "#B2BBD1",
@@ -265,7 +265,38 @@ public struct RoomColors {
         darkHex: "#181A1E"
     )
     
+    public static let aiRecordBorderColor = RoomThemeManager.dynamicColor(
+        lightHex: "#4E5461",
+        darkHex: "#4E5461"
+    )
+    
+    // MARK: - Functional Colors (功能色)
+    
+    /// Secondary label color (次要标签色)
+    public static let secondaryLabel = RoomThemeManager.dynamicColor(
+        lightHex: "#8F8F94",
+        darkHex: "#8F8F94"
+    )
+    
+    /// Separator color (分割线颜色)
+    public static let separator = RoomThemeManager.dynamicColor(
+        lightHex: "#EBEBEE",
+        darkHex: "#EBEBEE"
+    )
+    
+    /// Selected blue / tint color (选中蓝色)
+    public static let tintBlue = RoomThemeManager.dynamicColor(
+        lightHex: "#007AFF",
+        darkHex: "#007AFF"
+    )
+    
     // MARK: - Background Colors (背景色)
+    
+    /// Settings page background color (设置页面背景色)
+    public static let settingBackground = RoomThemeManager.dynamicColor(
+        lightHex: "#F5F5FA",
+        darkHex: "#F5F5FA"
+    )
     
     /// 主题背景色
     public static let themeBackground = RoomThemeManager.dynamicColor(
@@ -283,6 +314,12 @@ public struct RoomColors {
     public static let inRoomBackground = RoomThemeManager.dynamicColor(
         lightHex: "#0F1014",
         darkHex: "#0F1014"
+    )
+    
+    /// 停止屏幕分享按钮背景色
+    public static let stopScreenShareBackground = RoomThemeManager.dynamicColor(
+        lightHex: "#CC3D47",
+        darkHex: "#CC3D47"
     )
     
 }

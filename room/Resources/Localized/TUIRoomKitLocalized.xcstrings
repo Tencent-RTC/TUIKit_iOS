@@ -610,6 +610,35 @@
         }
       }
     },
+    "roomkit_user_webinar_room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx's webinar room"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx的研讨会房间"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxのセミナールーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة ندوة xxx"
+          }
+        }
+      }
+    },
     "roomkit_screen_share": {
       "extractionState": "manual",
       "localizations": {
@@ -1341,25 +1370,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All videos disabled"
+            "value": "Participants\\' video off. Camera access disabled."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已开启全体禁画"
+            "value": "已关闭所有成员视频，摄像头已禁用"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "全員ビデオ禁止を有効にしました"
+            "value": "全員のビデオをオフにしました。カメラへのアクセスが無効になりました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم تعطيل جميع الفيديو"
+            "value": "تم إيقاف فيديو المشاركين. تم تعطيل الوصول إلى الكاميرا."
           }
         }
       }
@@ -1370,25 +1399,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All videos enabled"
+            "value": "Participants can now start video."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已解除全体禁画"
+            "value": "已允许成员开启视频"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "全員ビデオ禁止を解除しました"
+            "value": "参加者はビデオを開始できるようになりました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم تفعيل جميع الفيديو"
+            "value": "يمكن للمشاركين الآن بدء الفيديو."
           }
         }
       }
@@ -1399,25 +1428,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All audios disabled"
+            "value": "Participants muted. Mic access disabled."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已开启全体静音"
+            "value": "已静音所有成员，麦克风已禁用"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "全員ミュートを有効にしました"
+            "value": "参加者をミュートしました。マイクへのアクセスが無効になりました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم كتم جميع الأصوات"
+            "value": "تم كتم صوت المشاركين. تم تعطيل الوصول إلى الميكروفون."
           }
         }
       }
@@ -1428,25 +1457,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All audios enabled"
+            "value": "Participants can now unmute themselves."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已解除全体静音"
+            "value": "已允许成员开启麦克风"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "全員ミュートを解除しました"
+            "value": "参加者は自分でミュートを解除できるようになりました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم تفعيل جميع الأصوات"
+            "value": "يمكن للمشاركين الآن إلغاء كتم الصوت بأنفسهم."
           }
         }
       }
@@ -2211,25 +2240,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Do you want to move xxx out of the room?"
+            "value": "Do you want to remove xxx from the room?"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "是否将xxx移除房间？"
+            "value": "是否将xxx移出房间？"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "xxxをルームから削除しますか？"
+            "value": "xxxをルームから退出させますか？"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "هل تريد إزالة xxx من الغرفة؟"
+            "value": "هل تريد إخراج xxx من الغرفة؟"
           }
         }
       }
@@ -2298,25 +2327,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You were removed by the host."
+            "value": "You were removed from the room by the host."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "你已经被主持人移除"
+            "value": "您已被主持人移出房间"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ホストによって削除されました。"
+            "value": "ホストによってルームから退出させられました。"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تمت إزالتك بواسطة المضيف."
+            "value": "تم إخراجك من الغرفة بواسطة المضيف."
           }
         }
       }
@@ -2559,25 +2588,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You were closed camera by the host."
+            "value": "Your camera has been disabled by xxx"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您已被关闭摄像头"
+            "value": "xxx已关闭您的摄像头"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ホストによってカメラがオフにされました。"
+            "value": "xxxによってカメラが無効化されました"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم إيقاف الكاميرا بواسطة المضيف."
+            "value": "xxx قام بتعطيل الكاميرا الخاصة بك"
           }
         }
       }
@@ -2588,25 +2617,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You were muted by the host."
+            "value": "Your microphone has been disabled by xxx"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您已被静音"
+            "value": "xxx已关闭您的麦克风"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ホストによってミュートされました。"
+            "value": "xxxによってマイクが無効化されました"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تم كتم صوتك بواسطة المضيف."
+            "value": "xxx قام بتعطيل الميكروفون الخاص بك"
           }
         }
       }
@@ -2646,25 +2675,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "All on mute audio unable to turn on microphone"
+            "value": "Muted by host. Unmute disabled."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "全员静音中，无法开启麦克风"
+            "value": "全员静音中，无法解除静音"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "全員ミュート中のため、マイクをオンにできません"
+            "value": "全員ミュート中のため、ミュート解除できません"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "الجميع في وضع كتم الصوت، لا يمكن تشغيل الميكروفون"
+            "value": "جميع المشاركين في وضع كتم الصوت ولا يمكن إلغاء الكتم"
           }
         }
       }
@@ -2984,6 +3013,2152 @@
           "stringUnit": {
             "state": "translated",
             "value": "تعيين كمشاهد"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_open_subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn On AI Subtitles"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启 AI 实时字幕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルタイム字幕をオン"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشغيل الترجمة الفورية بالذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_open_minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View AI Meeting Minutes"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看 AI 实时会议记录"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルタイム議事録を表示"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عرض محضر الاجتماع بالذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_close_subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn Off AI Subtitles"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭 AI 实时字幕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルタイム字幕をオフ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف الترجمة الفورية بالذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_close_minutes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn Off AI Meeting Minutes"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭 AI 实时会议记录"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルタイム議事録をオフ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف محضر الاجتماع بالذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_ai_minutes_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Meeting Minutes"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 实时会议记录"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルタイム会議文字起こし"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسخ الاجتماعات في الوقت الفعلي باستخدام الذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_enable_first": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enable AI transcription first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先开启AI字幕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まずAI字幕を有効にしてください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى تمكين النسخ بالذكاء الاصطناعي أولاً."
+          }
+        }
+      }
+    },
+    "roomkit_transfer_host_with_asr_warning": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After transferring room ownership, you will become a general member. Real-time Subtitles and AI Meeting Minutes will stop and must be re-enabled by the new host."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "转交房主后，您将成为普通成员。实时字幕 / AI 会议纪要将停止，需由新房主重新开启"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ルームオーナーを譲渡すると一般メンバーになります。リアルタイム字幕 / AI 議事録は停止し、新しいオーナーが再度有効にする必要があります。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد نقل ملكية الغرفة، ستصبح عضواً عادياً. سيتم إيقاف الترجمة الفورية / محضر الاجتماع بالذكاء الاصطناعي ويجب على المالك الجديد إعادة تفعيلها."
+          }
+        }
+      }
+    },
+    "roomkit_transcription_ai_tools": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Tools"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 工具"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIツール"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أدوات الذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording..."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录中..."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "記録中..."
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ التسجيل..."
+          }
+        }
+      }
+    },
+    "roomkit_transcription_ai_subtitle_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Real-time Subtitles"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 实时字幕"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIリアルTIME字幕"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الترجمة الفارية بالذكاء الاصتناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_ai_subtitle_settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Subtitle Settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI 字幕设置"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI字幕設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الترجمة الفارية بالذكاء الاصتناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_recognition_and_translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recognition and Translation Settings"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "识别与翻译设置"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "識別与翻譯設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات الترجمة الفارية بالذكاء الاصتناعي"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_identify_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identify language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "识别语言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "識別語言"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغة التي يتم استخدامها في الترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_owner_only_modify_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only allow owner to modify identify language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅允许房主修改识别语言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅房主可以修改識別語言"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغة التي يتم استخدامها في الترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_owner_changed_source_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owner changed subtitle identify language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房主已修改字幕识别语言类型"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房主已更改字幕识别语言类型"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغة التي يتم استخدامها في الترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_translate_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Translate language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻译语言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻譯語言"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغة التي يتم استخدامها في الترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_bilingual_subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Bilingual Subtitles"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "字幕显示双语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "字幕に二言語を表示"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عرض الترجمة ثنائية اللغة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_select_recognition_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please Select Recognition Language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择识别语言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "認識言語を選択してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى اختيار لغة التعرف"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_auto_detect_chinese_english": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-detect (Chinese/English)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动识别 (中英)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自動認識（中国語/英語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التعرف التلقائي (صينية/إنجليزية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_chinese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Chinese"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说中文"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中国語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالصينية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_english": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking English"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说英语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "英語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالإنجليزية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_cantonese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Cantonese"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说粤语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "広東語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالكانتونية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_vietnamese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Vietnamese"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说越南语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ベトナム語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالفيتنامية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_japanese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Japanese"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说日语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث باليابانية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_korean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Korean"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说韩语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "韓国語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالكورية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_indonesian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Indonesian"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说印尼语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "インドネシア語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالإندونيسية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_thai": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Thai"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说泰语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "タイ語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالتايلاندية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_portuguese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Portuguese"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说葡萄牙语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ポルトガル語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالبرتغالية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_turkish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Turkish"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说土耳其语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トルコ語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالتركية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_arabic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Arabic"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说阿拉伯语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アラビア語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالعربية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_spanish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Spanish"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说西班牙语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スペイン語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالإسبانية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_hindi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Hindi"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说印地语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ヒンディー語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالهندية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_french": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking French"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说法语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フランス語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالفرنسية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_malay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Malay"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说马来语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マレー語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالملايو"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_filipino": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Filipino"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说菲律宾语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フィリピン語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالفلبينية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_german": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking German"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说德语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ドイツ語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالألمانية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_italian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Italian"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说意大利语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "イタリア語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالإيطالية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_speaking_russian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaking Russian"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "说俄语"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ロシア語を話す"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتحدث بالروسية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_select_translation_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please Select Translation Language"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择翻译语言"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻訳言語を選択してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى اختيار لغة الترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_no_translation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Translation"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不翻译"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻訳なし"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدون ترجمة"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_chinese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文(Chinese)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文(简体中文)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文（中国語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文 (صينية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_english": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English(English)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English(英语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English（英語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English (إنجليزية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_vietnamese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt(Vietnamese)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt(越南语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt（ベトナム語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng Việt (فيتنامية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_japanese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語(Japanese)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語(日语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日本語 (يابانية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_korean": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어(Korean)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어(韩语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어（韓国語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어 (كورية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_indonesian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Indonesia(Indonesian)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Indonesia(印尼语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Indonesia（インドネシア語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Indonesia (إندونيسية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_thai": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษาไทย(Thai)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษาไทย(泰语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษาไทย（タイ語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ภาษาไทย (تايلاندية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_portuguese": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português(Portuguese)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português(葡萄牙语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português（ポルトガル語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Português (برتغالية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_arabic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العربية(Arabic)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العربية(阿拉伯语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العربية（アラビア語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "العربية"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_spanish": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español(Spanish)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español(西班牙语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español（スペイン語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español (إسبانية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_french": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français(French)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français(法语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français（フランス語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français (فرنسية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_malay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Melayu(Malay)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Melayu(马来语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Melayu（マレー語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahasa Melayu (ملايو)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_german": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch(German)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch(德语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch（ドイツ語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch (ألمانية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_italian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italiano(Italian)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italiano(意大利语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italiano（イタリア語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italiano (إيطالية)"
+          }
+        }
+      }
+    },
+    "roomkit_transcription_language_russian": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский(Russian)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский(俄语)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский（ロシア語）"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Русский (روسية)"
+          }
+        }
+      }
+    },
+    "roomkit_screen_sharing_tip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing in progress"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您正在屏幕分享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面を共有しています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشاركة الشاشة جارية"
+          }
+        }
+      }
+    },
+    "roomkit_room_type_meeting": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting room"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议房间"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会議ルーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة اجتماع"
+          }
+        }
+      }
+    },
+    "roomkit_room_type_webinar": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webinar room"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "研讨会房间"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ウェビナールーム"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غرفة ندوة"
+          }
+        }
+      }
+    },
+    "roomkit_start_screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen share"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕分享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشاركة الشاشة"
+          }
+        }
+      }
+    },
+    "roomkit_stop_screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop sharing"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止分享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有を停止"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف المشاركة"
+          }
+        }
+      }
+    },
+    "roomkit_btn_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إيقاف"
+          }
+        }
+      }
+    },
+    "roomkit_video_share_occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The speaker seat is already occupied. Unable to enable the camera."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主讲嘉宾席位已被占用，无法开启摄像头。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインスピーカー席は既に占有されています。カメラを有効にできません。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقعد المتحدث الرئيسي مشغول بالفعل. لا يمكن تشغيل الكاميرا."
+          }
+        }
+      }
+    },
+    "roomkit_screen_share_occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The speaker seat is already occupied. Unable to start screen sharing."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主讲嘉宾席位已被占用，无法开启屏幕分享。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインスピーカー席は既に占有されています。画面共有を開始できません。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقعد المتحدث الرئيسي مشغول بالفعل. لا يمكن بدء مشاركة الشاشة."
+          }
+        }
+      }
+    },
+    "roomkit_camera_blocked_by_screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently screen sharing. Unable to turn on video. Please stop screen sharing first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前正在屏幕分享中，无法打开视频，请先关闭屏幕分享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在画面共有中のため、ビデオをオンにできません。先に画面共有を停止してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشاركة الشاشة جارية حالياً. لا يمكن تشغيل الفيديو. يرجى إيقاف مشاركة الشاشة أولاً"
+          }
+        }
+      }
+    },
+    "roomkit_screen_share_blocked_by_camera": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently streaming video. Unable to start screen sharing. Please turn off video first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前正在视频推流，无法开启屏幕分享，请先关闭视频"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在ビデオ配信中のため、画面共有を開始できません。先にビデオをオフにしてください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البث المباشر للفيديو جارٍ حالياً. لا يمكن بدء مشاركة الشاشة. يرجى إيقاف الفيديو أولاً"
+          }
+        }
+      }
+    },
+    "roomkit_screen_share_start_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Someone is currently presenting. Starting screen sharing will interrupt their presentation. Continue?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前有人正在主讲，开始屏幕分享后将中断其主讲，是否继续？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在誰かがプレゼンテーションを行っています。画面共有を開始するとプレゼンテーションが中断されます。続行しますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شخص ما يقدم حاليًا. ستؤدي مشاركة الشاشة إلى مقاطعة عرضه التقديمي. هل تريد المتابعة؟"
+          }
+        }
+      }
+    },
+    "roomkit_video_start_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Someone is currently presenting. Turning on your video will interrupt their presentation. Continue?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前有人正在主讲，打开视频后将中断其主讲，是否继续？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在誰かがプレゼンテーションを行っています。ビデオをオンにするとプレゼンテーションが中断されます。続行しますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شخص ما يقدم حاليًا. سيؤدي تشغيل الفيديو الخاص بك إلى مقاطعة عرضه التقديمي. هل تريد المتابعة؟"
+          }
+        }
+      }
+    },
+    "roomkit_toast_screen_share_closed_by_host": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your screen sharing has been stopped by xxx"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx已停止您的屏幕共享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxによって画面共有が停止されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx قام بإيقاف مشاركة الشاشة الخاصة بك"
+          }
+        }
+      }
+    },
+    "roomkit_screen_sharing_status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕分享中"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有中"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مشاركة الشاشة"
+          }
+        }
+      }
+    },
+    "roomkit_hands_up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raise hand"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "举手"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "挙手"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رفع اليد"
+          }
+        }
+      }
+    },
+    "roomkit_hands_down": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lower hand"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手放下"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手を下ろす"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خفض اليد"
+          }
+        }
+      }
+    },
+    "roomkit_hands_up_list": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raised hands list"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "举手列表"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "挙手リスト"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة الأيدي المرفوعة"
+          }
+        }
+      }
+    },
+    "roomkit_hands_up_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No raised hands"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无举手请求"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "挙手リクエストはありません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا توجد أيدي مرفوعة"
+          }
+        }
+      }
+    },
+    "roomkit_toast_raise_hand_rejected": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your raise hand request was rejected"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的举手请求已被拒绝"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "挙手リクエストが拒否されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم رفض طلب رفع يدك"
           }
         }
       }
@@ -5275,6 +7450,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "قائمة المقاعد فارغة"
+          }
+        }
+      }
+    },
+    "roomkit_err_100253_speaker_seat_occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The speaker seat is already occupied. Unable to enable the device"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主讲嘉宾席位已被占用，无法开启设备"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインスピーカー席は既に占有されています。デバイスを有効にできません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقعد المتحدث الرئيسي مشغول بالفعل. لا يمكن تشغيل الجهاز"
           }
         }
       }

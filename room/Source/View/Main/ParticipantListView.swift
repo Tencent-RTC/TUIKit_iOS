@@ -185,6 +185,7 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             containerView.addSubview(scrollContainerView)
             scrollContainerView.addSubview(participantTableView)
             scrollContainerView.addSubview(audienceTableView)
+            containerView.addSubview(muteAllAudioButton)
         }
     }
     
@@ -239,7 +240,7 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             scrollContainerView.snp.makeConstraints { make in
                 make.top.equalTo(topSegmentView.snp.bottom).offset(RoomSpacing.medium)
                 make.left.right.equalToSuperview()
-                make.bottom.equalToSuperview()
+                make.bottom.equalTo(muteAllAudioButton.snp.top).offset(-5)
             }
             
             participantTableView.snp.makeConstraints { make in
@@ -255,6 +256,13 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
                 make.width.equalTo(scrollContainerView.snp.width)
                 make.height.equalTo(scrollContainerView.snp.height)
                 make.right.equalToSuperview()
+            }
+            
+            muteAllAudioButton.snp.makeConstraints { make in
+                make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+                make.left.equalToSuperview().offset(RoomSpacing.medium)
+                make.right.equalToSuperview().offset(-RoomSpacing.medium)
+                make.height.equalTo(40)
             }
         }
     }
@@ -350,6 +358,26 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
             .sink { [weak self] audienceList, adminList in
                 guard let self = self else { return }
                 updateAudienceList(audienceList: audienceList, adminList: adminList)
+            }
+            .store(in: &cancellableSet)
+        
+        participantStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.localParticipant))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] participant in
+                guard let self = self else { return }
+                muteAllAudioButton.isHidden = !(participant?.role == .admin || participant?.role == .owner)
+            }
+            .store(in: &cancellableSet)
+        
+        roomStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.currentRoom))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] currentRoom in
+                guard let self = self else { return }
+                if let currentRoom = currentRoom {
+                    muteAllAudioButton.isSelected = currentRoom.isAllMicrophoneDisabled
+                }
             }
             .store(in: &cancellableSet)
     }
