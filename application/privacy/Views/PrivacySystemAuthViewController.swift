@@ -79,7 +79,7 @@ final class PrivacySystemAuthViewController: UITableViewController {
     // MARK: - Navigation
     
     private func configureNavigation() {
-        title = PrivacyLocalize("Privacy.PersonalAuth.systemAuth")
+        title = PrivacyLocalize("privacy_system_auth")
         navigationController?.navigationBar.titleTextAttributes = [
             .font: ThemeStore.shared.typographyTokens.Medium18,
             .foregroundColor: UIColor.black
@@ -105,7 +105,7 @@ final class PrivacySystemAuthViewController: UITableViewController {
         
         let settingBtn = UIButton(type: .system)
         settingBtn.frame = CGRect(x: screenWidth / 2 - 100, y: 0, width: 200, height: 40)
-        settingBtn.setTitle(PrivacyLocalize("Privacy.SystemAuth.goToSettings"), for: .normal)
+        settingBtn.setTitle(PrivacyLocalize("privacy_system_setting"), for: .normal)
         settingBtn.addTarget(self, action: #selector(openSystemSettings), for: .touchUpInside)
         footerView.addSubview(settingBtn)
         
@@ -137,11 +137,11 @@ final class PrivacySystemAuthViewController: UITableViewController {
             guard let self = self else { return }
             switch settings.authorizationStatus {
             case .authorized:
-                self.notificationStatusText = PrivacyLocalize("Privacy.SystemAuth.allow")
+                self.notificationStatusText = PrivacyLocalize("privacy_allow")
             case .denied:
-                self.notificationStatusText = PrivacyLocalize("Privacy.SystemAuth.deny")
+                self.notificationStatusText = PrivacyLocalize("privacy_deny")
             default:
-                self.notificationStatusText = PrivacyLocalize("Privacy.SystemAuth.unauthorized")
+                self.notificationStatusText = PrivacyLocalize("privacy_unauthorized")
             }
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -156,45 +156,45 @@ final class PrivacySystemAuthViewController: UITableViewController {
         case .camera:
             let status = AVCaptureDevice.authorizationStatus(for: .video)
             switch status {
-            case .authorized: return PrivacyLocalize("Privacy.SystemAuth.allow")
-            case .notDetermined: return PrivacyLocalize("Privacy.SystemAuth.unauthorized")
-            default: return PrivacyLocalize("Privacy.SystemAuth.deny")
+            case .authorized: return PrivacyLocalize("privacy_allow")
+            case .notDetermined: return PrivacyLocalize("privacy_unauthorized")
+            default: return PrivacyLocalize("privacy_deny")
             }
             
         case .microphone:
             let status = AVCaptureDevice.authorizationStatus(for: .audio)
             switch status {
-            case .authorized: return PrivacyLocalize("Privacy.SystemAuth.allow")
-            case .notDetermined: return PrivacyLocalize("Privacy.SystemAuth.unauthorized")
-            default: return PrivacyLocalize("Privacy.SystemAuth.deny")
+            case .authorized: return PrivacyLocalize("privacy_allow")
+            case .notDetermined: return PrivacyLocalize("privacy_unauthorized")
+            default: return PrivacyLocalize("privacy_deny")
             }
             
         case .photos:
             let status = PHPhotoLibrary.authorizationStatus()
             switch status {
-            case .authorized: return PrivacyLocalize("Privacy.SystemAuth.allow")
-            case .notDetermined: return PrivacyLocalize("Privacy.SystemAuth.unauthorized")
-            default: return PrivacyLocalize("Privacy.SystemAuth.deny")
+            case .authorized: return PrivacyLocalize("privacy_allow")
+            case .notDetermined: return PrivacyLocalize("privacy_unauthorized")
+            default: return PrivacyLocalize("privacy_deny")
             }
             
         case .apns:
             return notificationStatusText.isEmpty
-                ? PrivacyLocalize("Privacy.SystemAuth.unauthorized")
+                ? PrivacyLocalize("privacy_unauthorized")
                 : notificationStatusText
             
         case .beauty:
             let rawValue = UserDefaults.standard.integer(forKey: kBeautyAuthStatusKey)
             let status = BeautyAuthStatus(rawValue: rawValue) ?? .notDetermined
             switch status {
-            case .allow: return PrivacyLocalize("Privacy.SystemAuth.allow")
-            case .notDetermined: return PrivacyLocalize("Privacy.SystemAuth.unauthorized")
-            case .deny: return PrivacyLocalize("Privacy.SystemAuth.deny")
+            case .allow: return PrivacyLocalize("privacy_allow")
+            case .notDetermined: return PrivacyLocalize("privacy_unauthorized")
+            case .deny: return PrivacyLocalize("privacy_deny")
             }
         }
     }
     
     private func localizedTitle(for key: String) -> String {
-        return PrivacyLocalize("Privacy.SystemAuth.\(key)")
+        return PrivacyLocalize("privacy_\(key)")
     }
     
     // MARK: - UITableViewDataSource

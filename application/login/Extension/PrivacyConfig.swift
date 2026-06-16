@@ -28,3 +28,11 @@ let WEBURL_PrivacySummary: String = {
 let WEBURL_Privacy: String = {
     return (Privacy_Info["privacyURL"] as? String) ?? ""
 }()
+
+let WEBURL_DataCollection: String = {
+    return (Privacy_Info["dataCollectionURL"] as? String) ?? ""
+}()
+
+let WEBURL_ThirdShare: String = {
+    return (Privacy_Info["thirdShareURL"] as? String) ?? ""
+}()

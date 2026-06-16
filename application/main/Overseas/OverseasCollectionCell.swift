@@ -65,7 +65,7 @@ class OverseasCollectionCell: UICollectionViewCell {
 
     private let hotLabel: UILabel = {
         let label = UILabel()
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.HotComponent")
+        label.text = MainLocalize("main_hot_component")
         label.textColor = .white
         label.textAlignment = .center
         label.isHidden = true
@@ -195,7 +195,7 @@ class OverseasCollectionCell: UICollectionViewCell {
         let showUIKit = config.cardStyle == .uiComponent
         uiComIconView.isHidden = !showUIKit
         if showUIKit {
-            uiComLabel.text = MainLocalize("Demo.TRTC.Portal.Main.UIkit")
+            uiComLabel.text = MainLocalize("main_overseas_tag_kit")
         }
 
         hotLabel.isHidden = !config.isHot

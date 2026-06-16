@@ -16,8 +16,8 @@ class ContactUsTipsView: UIView {
     private let reportLabel: UILabel = {
         let label = UILabel()
 
-        let replace = MainLocalize("Demo.TRTC.Portal.Main.contactUs")
-        let descStr = MainLocalize("Demo.TRTC.Portal.Main.contactUsxxx", replace)
+        let replace = MainLocalize("main_overseas_contact_us")
+        let descStr = MainLocalize("main_overseas_discovery_tips")
 
         let font = ThemeStore.shared.typographyTokens.Regular10
         let contactRange = (descStr as NSString).range(of: replace)

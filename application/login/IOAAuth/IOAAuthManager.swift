@@ -12,9 +12,11 @@ public final class IOAAuthManager: NSObject {
     private override init() { super.init() }
     
     weak var activeNavigator: LoginNavigator?
-    
+
+    weak var activeIOAViewController: IOAAuthViewController?
+
     private var isIOAInitialized = false
-    
+
     func setupIOA(appKey: String, appId: String) {
         guard !isIOAInitialized else { return }
         isIOAInitialized = true
@@ -24,6 +26,11 @@ public final class IOAAuthManager: NSObject {
         ITLogin.sharedInstance().delegate = self
         
         AppLifecycleRegistry.shared.register(self)
+    }
+
+    func logoutIOA() {
+        guard isIOAInitialized else { return }
+        ITLogin.sharedInstance().logout()
     }
 }
 
@@ -47,25 +54,29 @@ extension IOAAuthManager: ITLoginDelegate {
         let ticket = ITLogin.sharedInstance().getInfo().credentialkey
         performIOALogin(ticket: ticket)
     }
-    
+
     public func didValidateLoginFailWithError(_ error: ITLoginError!) {}
-    
+
     public func didValidateLoginFail(withError error: ITLoginError!) {}
-    
+
     public func didTokenLoginSuccess() {
         let ticket = ITLogin.sharedInstance().getInfo().credentialkey
         performIOALogin(ticket: ticket)
     }
-    
+
     public func didTokenLoginFailWithError(_ error: ITLoginError!) {}
-    
+
     public func didTokenLoginFail(withError error: ITLoginError!) {}
-    
+
     public func didFinishLogout() {}
-    
+
     // MARK: - Helper
-    
+
     private func performIOALogin(ticket: String) {
-        activeNavigator?.handleIOATicket(ticket)
+        if let vc = activeIOAViewController {
+            vc.handleTicket(ticket)
+        } else {
+            activeNavigator?.handleIOATicket(ticket)
+        }
     }
 }

@@ -23,7 +23,7 @@ public enum LoginError: Error {
     public var message: String {
         switch self {
         case .cancelled:
-            return LoginLocalize("Demo.TRTC.Login.userCancelled")
+            return LoginLocalize("login_user_cancelled")
         case .networkError(let message):
             return message
         case .verifyCodeFailed(let message):
@@ -31,7 +31,7 @@ public enum LoginError: Error {
         case .loginFailed(_, let message):
             return message
         case .tokenExpired:
-            return LoginLocalize("Demo.TRTC.Login.tokenExpired")
+            return LoginLocalize("login_token_expired")
         case .ioaAuthFailed(let message):
             return message
         case .unknown(let message):

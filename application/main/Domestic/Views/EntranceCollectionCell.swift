@@ -56,7 +56,7 @@ class EntranceCollectionCell: UICollectionViewCell {
 
     private let hotLabel: UILabel = {
         let label = UILabel()
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.HotComponent")
+        label.text = MainLocalize("main_hot_component")
         label.textColor = .white
         label.textAlignment = .center
         label.isHidden = true
@@ -186,7 +186,8 @@ class EntranceCollectionCell: UICollectionViewCell {
         descLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(convertPixel(w: 14))
             make.right.equalToSuperview().offset(convertPixel(w: -14))
-            make.top.equalTo(iconImageView.snp.bottom).offset(convertPixel(h: 6)).priority(.high)
+            make.top.greaterThanOrEqualTo(iconImageView.snp.bottom).offset(convertPixel(h: 6))
+            make.top.greaterThanOrEqualTo(titleLabel.snp.bottom).offset(convertPixel(h: 6))
             make.bottom.lessThanOrEqualToSuperview().offset(convertPixel(h: -8))
         }
 
@@ -195,6 +196,7 @@ class EntranceCollectionCell: UICollectionViewCell {
             make.centerY.equalTo(titleLabel)
             make.height.equalTo(18)
             make.width.equalTo(32)
+            make.right.lessThanOrEqualToSuperview().offset(-16)
         }
 
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -256,7 +258,8 @@ class EntranceCollectionCell: UICollectionViewCell {
         descLabel.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(convertPixel(w: 14))
             make.right.equalToSuperview().offset(convertPixel(w: -14))
-            make.top.equalTo(iconImageView.snp.bottom).offset(convertPixel(h: 6)).priority(.high)
+            make.top.greaterThanOrEqualTo(iconImageView.snp.bottom).offset(convertPixel(h: 6))
+            make.top.greaterThanOrEqualTo(titleLabel.snp.bottom).offset(convertPixel(h: 6))
             make.bottom.lessThanOrEqualToSuperview().offset(convertPixel(h: -8))
         }
 
@@ -268,7 +271,7 @@ class EntranceCollectionCell: UICollectionViewCell {
         let config = module.config
         if !config.gradientColors.isEmpty {
             gradientColors = config.gradientColors
-            uiComLabel.text = MainLocalize("Demo.TRTC.Portal.Main.UICompnent")
+            uiComLabel.text = MainLocalize("main_ui_component")
             containerView.gradientLayer?.colors = config.gradientColors
             containerView.gradient(colors: gradientColors, bounds: containerView.bounds, isVertical: true)
         }
@@ -302,7 +305,8 @@ class EntranceCollectionCell: UICollectionViewCell {
         descLabel.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(convertPixel(w: 14))
             make.right.equalToSuperview().offset(convertPixel(w: -14))
-            make.top.equalTo(iconImageView.snp.bottom).offset(convertPixel(h: 6)).priority(.high)
+            make.top.greaterThanOrEqualTo(iconImageView.snp.bottom).offset(convertPixel(h: 6))
+            make.top.greaterThanOrEqualTo(titleLabel.snp.bottom).offset(convertPixel(h: 6))
             make.bottom.lessThanOrEqualToSuperview().offset(convertPixel(h: -8))
         }
 
@@ -367,5 +371,84 @@ class EntranceCollectionCell: UICollectionViewCell {
             return false
         }
         return !language.contains("zh")
+    }
+
+    // MARK: - Static Height Calculation
+
+    static func calculateHeight(for module: ResolvedModule, cellWidth: CGFloat) -> CGFloat {
+        let config = module.config
+
+        if config.cardStyle == .banner {
+            return 58
+        }
+
+        let isEnglish: Bool = {
+            guard let language = TUIGlobalization.getPreferredLanguage() else { return false }
+            return !language.contains("zh")
+        }()
+        let engOffset: CGFloat = isEnglish ? 2 : 0
+
+        // Container inset: 4pt on each side (top + bottom)
+        let containerVerticalInset: CGFloat = convertPixel(h: 4) * 2
+        let containerWidth = cellWidth - convertPixel(h: 4) * 2
+
+        // Top padding (icon top margin from container)
+        let topPadding: CGFloat = 16
+        // Icon height
+        let iconHeight: CGFloat = 24
+
+        // Calculate available title width
+        let titleLeftOffset: CGFloat = 16 + 24 + convertPixel(w: 6) // iconLeft + iconWidth + gap
+        var titleRightOffset: CGFloat = 0
+        if config.cardStyle == .uiComponent {
+            // UIKit badge approximate width (~40pt) + gap
+            if !(ScreenWidth <= 375.0 && isEnglish) {
+                titleRightOffset = 40 + convertPixel(w: 6)
+            }
+        } else if config.isHot {
+            // Hot badge width(32) + gap
+            titleRightOffset = 32 + convertPixel(w: 6 - engOffset)
+        }
+        let titleWidth = max(containerWidth - titleLeftOffset - titleRightOffset, 0)
+
+        // Calculate title height
+        let titleFontSize = convertPixel(w: 17.0 - engOffset)
+        let titleFont = UIFont(name: "PingFangSC-Medium", size: titleFontSize)
+            ?? UIFont.systemFont(ofSize: titleFontSize, weight: .medium)
+        let titleHeight = Self.textHeight(config.title, font: titleFont, width: titleWidth, maxLines: 2)
+
+        // Header area height: max of icon and title
+        let headerHeight = max(iconHeight, titleHeight)
+
+        // Spacing between header and description
+        let spacing = convertPixel(h: 6)
+
+        // Calculate description height
+        let descHorizontalInset = convertPixel(w: 14) * 2
+        let descWidth = max(containerWidth - descHorizontalInset, 0)
+        let descFontSize = convertPixel(w: 12)
+        let descFont = UIFont(name: "PingFangSC-Regular", size: descFontSize)
+            ?? UIFont.systemFont(ofSize: descFontSize)
+        let descHeight = Self.textHeight(config.description, font: descFont, width: descWidth, maxLines: 3)
+
+        // Bottom padding
+        let bottomPadding = convertPixel(h: 8)
+
+        let totalHeight = containerVerticalInset + topPadding + headerHeight + spacing + descHeight + bottomPadding
+
+        // Minimum height matches Android's 106dp
+        return max(ceil(totalHeight), 106)
+    }
+
+    private static func textHeight(_ text: String, font: UIFont, width: CGFloat, maxLines: Int) -> CGFloat {
+        guard !text.isEmpty, width > 0 else { return 0 }
+        let maxHeight = font.lineHeight * CGFloat(maxLines)
+        let boundingRect = (text as NSString).boundingRect(
+            with: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return min(ceil(boundingRect.height), maxHeight)
     }
 }

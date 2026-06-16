@@ -26,7 +26,7 @@ class LanguageSelectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
-        title = MainLocalize("Demo.TRTC.Language.switchLanguage")
+        title = MainLocalize("main_switch_language")
         configData()
         setupNavigationBar()
         view.addSubview(tableView)

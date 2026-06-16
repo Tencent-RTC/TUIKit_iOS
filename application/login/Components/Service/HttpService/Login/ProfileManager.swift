@@ -42,7 +42,7 @@ public class ProfileManager: NSObject {
             UserDefaults.standard.set(cacheData, forKey: PER_USER_MODEL_KEY)
             success()
         } catch {
-            print("Save Failed")
+            LoginLogger.Login.warn("ProfileManager.login encode failed")
             failed?("usermodel save failed")
         }
     }
@@ -72,33 +72,64 @@ public class ProfileManager: NSObject {
 
     public func IMLogin(sdkAppId: Int, userSig: String, success: @escaping () -> Void, failed: @escaping (_ error: String) -> Void) {
         guard let userID = curUserModel?.userId else {
+            LoginLogger.Login.warn("ProfileManager.IMLogin curUserModel.userId is nil")
             failed("userID wrong")
             return
         }
         let user = String(userID)
+        LoginLogger.Login.info("ProfileManager.IMLogin sdkAppId=\(sdkAppId) userID=\(user)")
 
-        TUILogin.login(Int32(sdkAppId), userID: user, userSig: userSig) {
-            debugPrint("login success")
-            V2TIMManager.sharedInstance()?.getUsersInfo([userID], succ: { [weak self] (infos) in
-                guard let self = self else { return }
-                if let info = infos?.first {
-                    self.curUserModel?.avatar = info.faceURL ?? ""
-                    self.curUserModel?.name = info.nickName ?? ""
-                    self.curUserModel?.userId = info.userID ?? ""
-                    localizeUserModel()
-                    success()
-                    UserOverdueLogicManager.sharedManager().userOverdueState = .alreadyLogged
-                } else {
-                    failed("")
-                }
-            }, fail: { (code, err) in
-                failed(err ?? "")
-                debugPrint("get user info failed, code:\(code), error: \(err ?? "nil")")
-            })
+        TUILogin.login(Int32(sdkAppId), userID: user, userSig: userSig) { [weak self] in
+            self?.fetchSelfInfoGated(userID: user, success: success, failed: failed)
         } fail: { (code, errorDes) in
+            LoginLogger.Login.warn("ProfileManager.IMLogin TUILogin.login FAILED code=\(code) err=\(errorDes ?? "nil")")
             failed(errorDes ?? "")
-            debugPrint("login failed, code:\(code), error: \(errorDes ?? "nil")")
         }
+    }
+
+    private func fetchSelfInfoGated(userID: String,
+                                    success: @escaping () -> Void,
+                                    failed: @escaping (_ error: String) -> Void) {
+        fetchSelfInfo(userID: userID, success: success, failedRaw: { [weak self] code, err in
+            guard let self = self else { return }
+            let status = V2TIMManager.sharedInstance()?.getLoginStatus()
+            if status == .STATUS_LOGINED {
+                LoginLogger.Login.warn("ProfileManager.fetchSelfInfo failed after settled, code=\(code) err=\(err ?? "nil")")
+                failed(err ?? "")
+                return
+            }
+
+            LoginLogger.Login.info("ProfileManager.fetchSelfInfo first attempt failed code=\(code) status=\(String(describing: status)), waiting IMConnectGate")
+            IMConnectGate.shared.waitOnce(timeout: 1.0) { [weak self] in
+                LoginLogger.Login.info("ProfileManager.fetchSelfInfo gate fired, retrying")
+                self?.fetchSelfInfo(userID: userID, success: success, failedRaw: { code2, err2 in
+                    LoginLogger.Login.warn("ProfileManager.fetchSelfInfo retry failed code=\(code2) err=\(err2 ?? "nil")")
+                    failed(err2 ?? "")
+                })
+            }
+        })
+    }
+
+    private func fetchSelfInfo(userID: String,
+                               success: @escaping () -> Void,
+                               failedRaw: @escaping (_ code: Int32, _ err: String?) -> Void) {
+        V2TIMManager.sharedInstance()?.getUsersInfo([userID], succ: { [weak self] (infos) in
+            guard let self = self else { return }
+            if let info = infos?.first {
+                self.curUserModel?.avatar = info.faceURL ?? ""
+                self.curUserModel?.name = info.nickName ?? ""
+                self.curUserModel?.userId = info.userID ?? ""
+                self.localizeUserModel()
+                UserOverdueLogicManager.sharedManager().userOverdueState = .alreadyLogged
+                LoginLogger.Login.info("ProfileManager.IMLogin SUCCESS userID=\(info.userID ?? "nil") name='\(info.nickName ?? "")'")
+                success()
+            } else {
+                LoginLogger.Login.warn("ProfileManager.fetchSelfInfo getUsersInfo SUCC but empty infos")
+                failedRaw(0, "empty infos")
+            }
+        }, fail: { (code, err) in
+            failedRaw(code, err)
+        })
     }
 
     public func curUserID() -> String? {

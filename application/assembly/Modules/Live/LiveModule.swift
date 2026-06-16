@@ -28,7 +28,7 @@ final class LiveModule: ModuleProvider {
         self.environment = environment
     }
 
-    static var standard: LiveModule {
+    static func standard(target: AppTarget) -> LiveModule {
         class EnvironmentBox {
             weak var module: LiveModule?
         }
@@ -36,17 +36,23 @@ final class LiveModule: ModuleProvider {
 
         let config = ModuleConfig(
             identifier: "live",
-            title: AssemblyLocalize("Demo.TRTC.Portal.Main.live"),
-            description: AssemblyLocalize("Demo.TRTC.Portal.Main.liveContent"),
+            title: LiveLocalize("assembly_live_card_title"),
+            description: LiveLocalize("assembly_live_card_description"),
             iconName: "main_entrance_tuilivekit",
             iconImage: AppAssemblyBundle.image(named: "main_entrance_tuilivekit"),
             cardStyle: .uiComponent,
             gradientColors: stubUIComponentGradient,
             targetProvider: {
                 box.module?.initLicenseIfNeeded()
-                return LiveListViewController()
+                switch target {
+                case .overseas:
+                    return LiveEntranceViewController()
+                case .domestic, .lab:
+                    return LiveListViewController()
+                }
             },
-            analyticsEvent: "live_streaming"
+            analyticsEvent: "live_streaming",
+            keyMetricsEvent: Constants.DataReport.kDataReportDemoClickLive
         )
         let module = LiveModule(config: config)
         box.module = module
@@ -65,7 +71,7 @@ extension LiveModule {
         callTEBeautyKitSetLicense(with: environment)
 
         #if canImport(TCMediaX)
-        if let url = environment?.beautyLicenseURL, let key = environment?.beautyLicenseKey,
+        if let url = environment?.playerLicenseURL, let key = environment?.playerLicenseKey,
            !url.isEmpty, !key.isEmpty {
             TCMediaXBase.getInstance().setLicenceURL(url, key: key)
         }
@@ -73,8 +79,8 @@ extension LiveModule {
     }
 
     private static func callTEBeautyKitSetLicense(with environment: ModuleEnvironment?) {
-        guard let env = environment, !env.beautyLicenseURL.isEmpty, !env.beautyLicenseKey.isEmpty else {
-            debugPrint(" beautyLicense 未配置，跳过美颜 License 设置")
+        guard let env = environment, !env.effectLicenseURL.isEmpty, !env.effectLicenseKey.isEmpty else {
+            debugPrint(" effectLicense 未配置，跳过美颜 License 设置")
             return
         }
 
@@ -95,8 +101,8 @@ extension LiveModule {
                 let function = unsafeBitCast(implementation, to: SetLicenseFunction.self)
                 function(
                     teBeautyKitClass, setLicenseSelector,
-                    env.beautyLicenseURL as NSString,
-                    env.beautyLicenseKey as NSString
+                    env.effectLicenseURL as NSString,
+                    env.effectLicenseKey as NSString
                 ) { code, message in
                     debugPrint("TEBeautyKit license set with code: \(code), message: \(message ?? "nil")")
                     callTEUIConfigSetPanelLevel()

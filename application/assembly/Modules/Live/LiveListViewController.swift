@@ -33,7 +33,7 @@ final class LiveListViewController: UIViewController {
     private lazy var createRoomBtn = AtomicButton(variant: .filled,
                                                   colorType: .primary,
                                                   size: .large,
-                                                  content: .iconLeading(text: AssemblyLocalize("Demo.TRTC.LiveRoom.createroom"),
+                                                  content: .iconLeading(text: LiveLocalize("assembly_live_list_create_room"),
                                                                         icon: AppAssemblyBundle.image(named: "livekit_ic_add")))
 
     // MARK: - Lifecycle
@@ -45,6 +45,7 @@ final class LiveListViewController: UIViewController {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        AppAssembly.shared.analyticEventHandler?(.liveEvent(name: .liveShowLiveList))
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -93,7 +94,7 @@ extension LiveListViewController {
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
-        let titleLabel = AssemblyLocalize("Demo.TRTC.LiveRoom.videoLive")
+        let titleLabel = LiveLocalize("assembly_live_list_title")
         let titleView = AtomicLabel(titleLabel) { theme in
             LabelAppearance(textColor: theme.tokens.color.textColorPrimary,
                             backgroundColor: theme.tokens.color.clearColor,
@@ -190,6 +191,8 @@ extension LiveListViewController {
         liveListView.setColumnStyle(style: newStyle)
         sender.isSelected = currentStyle == .singleColumn
         createRoomBtn.isHidden = currentStyle == .singleColumn
+        let styleName = currentStyle == .doubleColumn ? "double_column" : "single_column"
+        AppAssembly.shared.analyticEventHandler?(.liveEvent(name: .liveToggleColumn, params: ["column_style": styleName]))
     }
 
     @objc private func debugModeChanged() {
@@ -307,5 +310,5 @@ extension LiveListViewController: OnItemClickDelegate {
 // MARK: - Localized Strings
 
 private extension String {
-    static let pushingToReturnText = AssemblyLocalize("Demo.TRTC.LiveRoom.exitFloatWindowTip")
+    static let pushingToReturnText = LiveLocalize("assembly_live_list_exit_float_window_tip")
 }

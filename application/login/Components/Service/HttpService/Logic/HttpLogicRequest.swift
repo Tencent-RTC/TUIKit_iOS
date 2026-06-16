@@ -52,7 +52,7 @@ public class IMLogicRequest {
                                    success: ((_ data: BSUserModel?) -> Void)?,
                                    failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
         guard let userModel = currentUserModel else {
-            failed?(-1, LoginLocalize("LoginNetwork.ProfileManager.loginfailed"))
+            failed?(-1, LoginLocalize("login_error_login_failed"))
             return
         }
         userModel.apaasAppId = apaasAppId
@@ -70,7 +70,7 @@ public class IMLogicRequest {
                     success?(userModel)
                     UserOverdueLogicManager.sharedManager().userOverdueState = .alreadyLogged
                 } else {
-                    failed?(-1, LoginLocalize("LoginNetwork.ProfileManager.loginfailed"))
+                    failed?(-1, LoginLocalize("login_error_login_failed"))
                 }
             }, fail: { code, errorDes in
                 failed?(code, errorDes)

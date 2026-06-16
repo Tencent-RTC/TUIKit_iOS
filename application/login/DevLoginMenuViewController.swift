@@ -3,9 +3,10 @@
 //  login
 //
 
-import SnapKit
-import UIKit
 import AtomicX
+import SnapKit
+import Toast_Swift
+import UIKit
 
 private struct LoginMenuItem {
     let title: String
@@ -20,8 +21,8 @@ public enum ServerEnvironment: Int {
     
     var title: String {
         switch self {
-        case .production: return LoginLocalize("Demo.TRTC.DevMenu.envProduction")
-        case .test: return LoginLocalize("Demo.TRTC.DevMenu.envTest")
+        case .production: return LoginLocalize("login_menu_env_production")
+        case .test: return LoginLocalize("login_menu_env_test")
         }
     }
 }
@@ -31,43 +32,43 @@ final class DevLoginMenuViewController: UIViewController {
     
     var onEnvironmentChanged: ((ServerEnvironment) -> Void)?
     
-    private(set) var currentEnvironment: ServerEnvironment = .production
+    private(set) var currentEnvironment: ServerEnvironment = LoginEntry.shared.currentEnvironment
     
     // MARK: - Data
     
     private let menuItems: [LoginMenuItem] = {
         var items: [LoginMenuItem] = [
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.phoneLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.phoneLoginDesc"),
+                title: LoginLocalize("login_menu_phone"),
+                subtitle: LoginLocalize("login_menu_phone_desc"),
                 icon: "phone.fill",
                 mode: .phoneVerify
             ),
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.emailLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.emailLoginDesc"),
+                title: LoginLocalize("login_menu_email"),
+                subtitle: LoginLocalize("login_menu_email_desc"),
                 icon: "envelope.fill",
                 mode: .emailVerify
             ),
         ]
         #if LOGIN_FULL
         items.append(LoginMenuItem(
-            title: LoginLocalize("Demo.TRTC.DevMenu.ioaLogin"),
-            subtitle: LoginLocalize("Demo.TRTC.DevMenu.ioaLoginDesc"),
+            title: LoginLocalize("login_menu_ioa"),
+            subtitle: LoginLocalize("login_menu_ioa_desc"),
             icon: "building.2.fill",
             mode: .ioaAuth
         ))
         #endif
         items.append(contentsOf: [
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.inviteCodeLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.inviteCodeLoginDesc"),
+                title: LoginLocalize("login_menu_invite"),
+                subtitle: LoginLocalize("login_menu_invite_desc"),
                 icon: "ticket.fill",
                 mode: .inviteCode
             ),
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.debugLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.debugLoginDesc"),
+                title: LoginLocalize("login_menu_debug"),
+                subtitle: LoginLocalize("login_menu_debug_desc"),
                 icon: "wrench.and.screwdriver.fill",
                 mode: .debugAuth
             ),
@@ -147,6 +148,7 @@ final class DevLoginMenuViewController: UIViewController {
         activateConstraints()
         applyEnvToggleStyle(animated: false)
         applyAutoLoginToggleStyle(animated: false)
+        setupHiddenEntry()
     }
     
     // MARK: - Setup
@@ -161,10 +163,20 @@ final class DevLoginMenuViewController: UIViewController {
             make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(200 + statusBarHeight())
         }
-        
+
         tableView.snp.makeConstraints { make in
             make.top.equalTo(headerView.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+
+    // MARK: - Hidden Config Entry
+
+    private func setupHiddenEntry() {
+        headerView.onHiddenEntryTriggered = { [weak self] in
+            guard let self = self else { return }
+            let configVC = HiddenConfigViewController()
+            navigationController?.pushViewController(configVC, animated: true)
         }
     }
     
@@ -199,7 +211,7 @@ final class DevLoginMenuViewController: UIViewController {
             ? .active(hex: "006EFF")
             : .inactive
         autoLoginToggleButton.applyCapsuleStyle(
-            title: LoginLocalize("Demo.TRTC.DevMenu.autoLogin"),
+            title: LoginLocalize("login_menu_auto_login"),
             style: style,
             dotView: autoLoginDotView,
             animated: animated
@@ -208,6 +220,12 @@ final class DevLoginMenuViewController: UIViewController {
     
     @objc private func envToggleTapped() {
         let newEnv: ServerEnvironment = (currentEnvironment == .production) ? .test : .production
+
+        if newEnv == .production && LoginEntry.shared.hasAppliedTestEnvironment {
+            view.makeToast(LoginLocalize("login_menu_env_changed_restart"))
+            return
+        }
+
         currentEnvironment = newEnv
         applyEnvToggleStyle(animated: true)
         onEnvironmentChanged?(newEnv)
@@ -249,7 +267,7 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
         header.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         
         let titleLabel = UILabel()
-        titleLabel.text = LoginLocalize("Demo.TRTC.DevMenu.selectLoginMethod")
+        titleLabel.text = LoginLocalize("login_dev_select_mode")
         titleLabel.font = ThemeStore.shared.typographyTokens.Medium18
         titleLabel.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         
@@ -298,7 +316,7 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
         return 64
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) -> Void {        tableView.deselectRow(at: indexPath, animated: true)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { tableView.deselectRow(at: indexPath, animated: true)
         let item = menuItems[indexPath.row]
         onSelectMode?(item.mode)
     }
@@ -406,6 +424,7 @@ private final class LoginMenuCell: UITableViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

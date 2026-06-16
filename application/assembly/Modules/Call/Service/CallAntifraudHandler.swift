@@ -17,11 +17,12 @@ final class CallAntifraudHandler {
     private init() {}
 
     func register() {
-        CallStore.shared.state.subscribe(StatePublisherSelector(keyPath: \CallState.selfInfo))
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector<CallState, CallParticipantStatus>(keyPath: \.selfInfo.status))
             .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { selfInfo in
-                if selfInfo.status == .accept {
+            .sink { status in
+                if status == .accept {
                     guard Bundle.main.bundleIdentifier != "com.tencent.rtc.app" else { return }
                     if let user = LoginManager.shared.getCurrentUser(), user.isMoa() { return }
 

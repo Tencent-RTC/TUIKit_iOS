@@ -54,7 +54,7 @@ public class TRTCCallingContactView: UIView {
         let searchBar = UISearchBar()
         searchBar.searchBarStyle = .minimal
         searchBar.backgroundImage = UIImage()
-        searchBar.placeholder = CallingLocalize("Demo.TRTC.calling.searchID")
+        searchBar.placeholder = CallingLocalize("assembly_call_input_registered_user")
         searchBar.barTintColor = UIColor.clear
         searchBar.backgroundColor = UIColor.clear
         searchBar.returnKeyType = .search
@@ -71,7 +71,7 @@ public class TRTCCallingContactView: UIView {
 
     lazy var searchBtn: UIButton = {
         let done = UIButton(type: .custom)
-        done.setTitle(CallingLocalize("Demo.TRTC.calling.searching"), for: .normal)
+        done.setTitle(CallingLocalize("assembly_call_btn_search"), for: .normal)
         done.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         done.titleLabel?.font = ThemeStore.shared.typographyTokens.Bold14
         done.clipsToBounds = true
@@ -89,8 +89,8 @@ public class TRTCCallingContactView: UIView {
 
     let userInfoLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        let copyStr = CallingLocalize("Demo.TRTC.calling.contactCopy")
-        let str = CallingLocalize("Demo.TRTC.calling.yourID") + " "
+        let copyStr = CallingLocalize("assembly_call_btn_copy")
+        let str = CallingLocalize("assembly_call_your_id") + " "
             + (LoginManager.shared.getCurrentUser()?.userId ?? "") + "  "
             + copyStr
         let font = ThemeStore.shared.typographyTokens.Regular12
@@ -128,7 +128,7 @@ public class TRTCCallingContactView: UIView {
 
     lazy var noMembersTip: UILabel = {
         let label = UILabel()
-        label.text = CallingLocalize("Demo.TRTC.calling.searchandcall")
+        label.text = CallingLocalize("assembly_call_search_and_call")
         label.numberOfLines = 2
         label.textAlignment = NSTextAlignment.center
         label.textColor = ThemeStore.shared.colorTokens.textColorDisable
@@ -319,7 +319,7 @@ extension TRTCCallingContactView: UITextFieldDelegate, UISearchBarDelegate {
                 self.callingGuideView.isHidden = false
                 self.makeToast(err)
                 if UserOverdueLogicManager.sharedManager().userOverdueState == .notLogin {
-                    self.makeToast(CallingLocalize("Demo.TRTC.Portal.Main.LoginFailed"))
+                    self.makeToast(CallingLocalize("assembly_call_login_failed"))
                 }
             })
 #else
@@ -346,7 +346,7 @@ extension TRTCCallingContactView: UITextFieldDelegate, UISearchBarDelegate {
                     self.callingGuideView.isHidden = false
                     self.makeToast(errorMessage)
                     if UserOverdueLogicManager.sharedManager().userOverdueState == .notLogin {
-                        self.makeToast(CallingLocalize("Demo.TRTC.Portal.Main.LoginFailed"))
+                        self.makeToast(CallingLocalize("assembly_call_login_failed"))
                     }
                 }
             })
@@ -372,7 +372,7 @@ extension TRTCCallingContactView: UITableViewDelegate, UITableViewDataSource {
                 cell.config(model: userModel, type: btnType, selected: false) { [weak self] in
                     guard let self = self else { return }
                     if userModel.userId == V2TIMManager.sharedInstance()?.getLoginUser() {
-                        self.makeToast(CallingLocalize("Demo.TRTC.calling.cantinviteself"))
+                        self.makeToast(CallingLocalize("assembly_call_cannot_invite_self"))
                         return
                     }
                     if let finish = self.selectedFinished {
@@ -417,9 +417,9 @@ extension TRTCCallingContactView {
     @objc private func copyUserIDClicked() {
         if let stringToCopy = LoginManager.shared.getCurrentUser()?.userId {
             UIPasteboard.general.string = stringToCopy
-            self.makeToast(CallingLocalize("Demo.TRTC.calling.guideCopySucess"))
+            self.makeToast(CallingLocalize("assembly_call_copied_to_clipboard"))
         } else {
-            self.makeToast(CallingLocalize("Demo.TRTC.calling.IDCopyFailed"))
+            self.makeToast(CallingLocalize("assembly_call_user_not_exist"))
         }
     }
 }

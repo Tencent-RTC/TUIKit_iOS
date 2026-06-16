@@ -81,8 +81,14 @@ class EntranceViewController: UIViewController {
         super.viewDidLoad()
 
         let appEnvironment = ModuleEnvironment(
-            beautyLicenseURL: "https://license.example.com/live",
-            beautyLicenseKey: "YOUR_SECRET_KEY_123",
+            liveLicenseURL: LIVE_LICENSE_URL,
+            liveLicenseKey: LIVE_LICENSE_KEY,
+            effectLicenseURL: TENCENT_EFFECT_LICENSE_URL,
+            effectLicenseKey: TENCENT_EFFECT_LICENSE_KEY,
+            playerLicenseURL: PLAYER_LICENSE_URL,
+            playerLicenseKey: PLAYER_LICENSE_KEY,
+            copyrightedMusicLicenseKey: COPYRIGHTED_MUSIC_LICENSE_KEY,
+            copyrightedMusicLicenseUrl: COPYRIGHTED_MUSIC_LICENSE_URL,
             getCurrentUserModel: {
                 LoginEntry.shared.userModel
             },
@@ -93,11 +99,21 @@ class EntranceViewController: UIViewController {
 
         #if !RTCUBE_LAB
         AppAssembly.shared.privacyActionHandler = { action in
+            if LoginManager.shared.getCurrentUser()?.isMoa() == true {
+                switch action {
+                case .checkRealNameAuth(_, _, let completion):
+                    completion(true, "success")
+                case .showFaceIdTokenVerify(_, _, let completion):
+                    completion(true, "")
+                default:
+                    break
+                }
+                return
+            }
+
             switch action {
             case .showAntifraudReminder:
                 AntifraudAlertManager.showAntifraudReminder()
-            case .showScreenShareAntifraud(let completion):
-                AntifraudAlertManager.showScreenShareAntifraudReminder(completion: completion)
             case .checkRealNameAuth(let userId, let token, let completion):
                 AntifraudAlertManager.checkRealNameAuth(userId: userId, token: token, completion: completion)
             case .showFaceIdTokenVerify(let userId, let token, let completion):
@@ -110,6 +126,18 @@ class EntranceViewController: UIViewController {
                 RoomRiskIPPresenter.showHighRiskIPAlert()
             case .showLiveTimeOutAlert(let onDismiss):
                 TimeLimitPresenter.showLiveTimeOutAlert(onDismiss: onDismiss)
+            }
+        }
+        AppAssembly.shared.analyticEventHandler = { action in
+            switch action {
+            case .liveEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "live", event: name, params: params)
+            case .voiceRoomEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "voice_room", event: name, params: params)
+            case .aiConversationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "conversation_ai", event: name, params: params)
+            case .interpretationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "simultaneous_interpretation", event: name, params: params)
             }
         }
         #else
@@ -137,7 +165,14 @@ class EntranceViewController: UIViewController {
 
         bindStoreState()
 
+        #if !RTCUBE_OVERSEAS && !RTCUBE_LAB && !OPEN_SOURCE
         ModulePermissionService.shared.loadUserBlackList()
+        #endif
+
+        #if !DEBUG
+        initAnalytics()
+        ModuleAnalytics.start()
+        #endif
 
         #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         HuiYanSDKKit.sharedInstance().initSDK(with: self)
@@ -245,7 +280,7 @@ class EntranceViewController: UIViewController {
 
     private func showBannedToast() {
         guard !ModulePermissionService.shared.isNeedFaceAuth else { return }
-        view.makeToast(MainLocalize("Demo.TRTC.Portal.Main.MoudleBannedMessage"))
+        view.makeToast(MainLocalize("main_module_banned_message"))
     }
 
     // MARK: - Risk Check Entry Point
@@ -313,7 +348,7 @@ class EntranceViewController: UIViewController {
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.view.makeToast(
-                        MainLocalize("Demo.TRTC.Portal.Main.FaceAuthFailedMessage"),
+                        MainLocalize("main_face_auth_failed_message"),
                         position: .bottom
                     )
                 }
@@ -370,7 +405,7 @@ extension EntranceViewController: UICollectionViewDataSource {
                 for: indexPath
             ) as! EntranceFooterView
 
-            footerView.footerLabel.text = MainLocalize("Demo.TRTC.Portal.Main.trial")
+            footerView.footerLabel.text = MainLocalize("main_trial_hint")
             return footerView
         }
         return UICollectionReusableView()
@@ -404,6 +439,13 @@ extension EntranceViewController: UICollectionViewDelegate {
             trackSensorData(module.config.analyticsEvent)
         }
 
+        if module.config.identifier == "scenes_application" {
+            if let url = URL(string: "https://trtc.io/exhibition/details?lang=zh&from=app") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            return
+        }
+
         if let targetVC = module.config.targetProvider() {
             if targetVC.modalPresentationStyle == .fullScreen {
                 present(targetVC, animated: true)
@@ -427,16 +469,52 @@ extension EntranceViewController: UICollectionViewDelegateFlowLayout {
         }
 
         let module = visibleModules[indexPath.item]
-        return module.config.cardStyle == .banner
-            ? CGSize(width: ScreenWidth - 24, height: 58)
-            : CGSize(width: ScreenWidth / 2 - 13, height: 106)
+
+        if module.config.cardStyle == .banner {
+            return CGSize(width: ScreenWidth - 24, height: 58)
+        }
+
+        let cellWidth = ScreenWidth / 2 - 13
+
+        let rowHeight = calculateRowHeight(for: indexPath.item, visibleModules: visibleModules, cellWidth: cellWidth)
+
+        return CGSize(width: cellWidth, height: rowHeight)
+    }
+
+    private func calculateRowHeight(for itemIndex: Int,
+                                    visibleModules: [ResolvedModule],
+                                    cellWidth: CGFloat) -> CGFloat
+    {
+        var nonBannerIndices: [Int] = []
+        for (i, m) in visibleModules.enumerated() {
+            if m.config.cardStyle != .banner {
+                nonBannerIndices.append(i)
+            }
+        }
+
+        guard let positionInNonBanner = nonBannerIndices.firstIndex(of: itemIndex) else {
+            return 106
+        }
+
+        let rowStartPosition = (positionInNonBanner / 2) * 2
+
+        var maxHeight: CGFloat = 106
+        for offset in 0..<2 {
+            let pos = rowStartPosition + offset
+            guard pos < nonBannerIndices.count else { break }
+            let idx = nonBannerIndices[pos]
+            let h = EntranceCollectionCell.calculateHeight(for: visibleModules[idx], cellWidth: cellWidth)
+            maxHeight = max(maxHeight, h)
+        }
+
+        return maxHeight
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> CGSize
     {
-        let text = MainLocalize("Demo.TRTC.Portal.Main.trial")
+        let text = MainLocalize("main_trial_hint")
         let font = ThemeStore.shared.typographyTokens.Regular12
         let attributes: [NSAttributedString.Key: Any] = [.font: font]
         let attributedString = NSAttributedString(string: text, attributes: attributes)
@@ -502,10 +580,28 @@ extension EntranceViewController: MainNavigationViewDelegate {
 // MARK: - Analytics
 
 extension EntranceViewController {
+    private func initAnalytics() {
+        let userId = LoginEntry.shared.userModel?.userId ?? ""
+        let sdkAppId = LoginEntry.shared.config.sdkAppId
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        let loginMode = LoginEntry.shared.loggedInMode?.rawValue ?? LoginMode.debugAuth.rawValue
+        #if RTCUBE_OVERSEAS
+        let appTarget = "overseas"
+        #else
+        let appTarget = "domestic"
+        #endif
+        AppAnalytics.initialize(sdkAppId: sdkAppId, userId: userId, appTarget: appTarget, appVersion: appVersion, loginMode: "\(loginMode)")
+    }
+
     private func trackSensorData(_ event: String) {
         let loginType = resolveLoginType()
+        #if RTCUBE_OVERSEAS
+        let eventName = AnalyticName.tencentRTCMainClick
+        #else
+        let eventName = AnalyticName.rtcubeMainClick
+        #endif
         AppAnalytics.trackMainClick(
-            eventName: "rtcube_main_click_event",
+            eventName: eventName,
             mainEvent: event,
             loginType: loginType
         )

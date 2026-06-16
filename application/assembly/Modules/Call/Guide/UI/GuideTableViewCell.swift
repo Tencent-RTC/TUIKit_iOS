@@ -64,7 +64,7 @@ class GuideTableViewCell: UITableViewCell {
 
     let copyButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle(GuideLocalize("Demo.TRTC.calling.detailGuidCopyURL"), for: .normal)
+        button.setTitle(GuideLocalize("assembly_call_guide_copy_url"), for: .normal)
         button.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium14
         return button

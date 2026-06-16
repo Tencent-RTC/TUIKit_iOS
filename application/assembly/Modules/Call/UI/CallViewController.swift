@@ -33,7 +33,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.black
-        label.text = CallingLocalize("Demo.TRTC.calling.settings.groupId")
+        label.text = CallingLocalize("assembly_call_settings_group_id")
         return label
     }()
     private let groupIdTextField: UITextField = {
@@ -41,7 +41,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         textField.backgroundColor = UIColor.clear
         textField.font = ThemeStore.shared.typographyTokens.Regular16
         textField.textColor = ThemeStore.shared.colorTokens.textColorPrimary
-        textField.attributedPlaceholder = NSAttributedString(string: CallingLocalize("Demo.TRTC.calling.settings.inputGroupId"))
+        textField.attributedPlaceholder = NSAttributedString(string: CallingLocalize("assembly_call_settings_input_group_id"))
         textField.textAlignment = .right
         textField.keyboardType = .asciiCapable
         return textField
@@ -55,7 +55,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.black
-        label.text = CallingLocalize("Demo.TRTC.calling.settings.userId")
+        label.text = CallingLocalize("assembly_call_settings_user_id")
         return label
     }()
     private let calledUserIdTextField: UITextField = {
@@ -63,7 +63,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         textField.backgroundColor = UIColor.clear
         textField.font = ThemeStore.shared.typographyTokens.Regular16
         textField.textColor = ThemeStore.shared.colorTokens.textColorPrimary
-        textField.attributedPlaceholder = NSAttributedString(string: CallingLocalize("Demo.TRTC.calling.settings.inputUserIds"))
+        textField.attributedPlaceholder = NSAttributedString(string: CallingLocalize("assembly_call_settings_input_user_ids"))
         textField.textAlignment = .right
         textField.keyboardType = .asciiCapable
         return textField
@@ -85,18 +85,18 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.black
-        label.text = CallingLocalize("Demo.TRTC.calling.settings.mediaType")
+        label.text = CallingLocalize("assembly_call_settings_media_type")
         return label
     }()
     private let videoButton: RadioButton = {
         let button = RadioButton(frame: CGRect.zero)
-        button.titleText = CallingLocalize("Demo.TRTC.calling.settings.videoCall")
+        button.titleText = CallingLocalize("assembly_call_settings_video_call")
         button.titleSize = 16
         return button
     }()
     private let voiceButton: RadioButton = {
         let button = RadioButton(frame: CGRect.zero)
-        button.titleText = CallingLocalize("Demo.TRTC.calling.settings.audioCall")
+        button.titleText = CallingLocalize("assembly_call_settings_audio_call")
         button.isSelected = true
         button.titleSize = 16
         return button
@@ -109,7 +109,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.blue
-        label.text = "\(CallingLocalize("Demo.TRTC.calling.settings.callSettings"))  >"
+        label.text = "\(CallingLocalize("assembly_call_settings_title"))  >"
         label.isUserInteractionEnabled = true
         return label
     }()
@@ -118,7 +118,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.blue
-        label.text = "\(CallingLocalize("Demo.TRTC.calling.settings.optionalParameters"))  >"
+        label.text = "\(CallingLocalize("assembly_call_settings_optional_parameters"))  >"
         label.isUserInteractionEnabled = true
         return label
     }()
@@ -127,14 +127,14 @@ class CallViewController: UIViewController, UITextFieldDelegate {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.blue
-        label.text = CallingLocalize("Demo.TRTC.calling.settings.joinGroupCall")
+        label.text = CallingLocalize("assembly_call_settings_join_group_call")
         label.isUserInteractionEnabled = true
         return label
     }()
     private let callButton: UIButton = {
         let btn = UIButton(type: .system)
         btn.setTitleColor(.white, for: .normal)
-        btn.setTitle(CallingLocalize("Demo.TRTC.calling.settings.appCall"), for: .normal)
+        btn.setTitle(CallingLocalize("assembly_call_btn_app_call"), for: .normal)
         btn.adjustsImageWhenHighlighted = false
         btn.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium20
@@ -155,7 +155,7 @@ class CallViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = CallingLocalize("Demo.TRTC.Portal.Main.call")
+        title = CallingLocalize("assembly_call_card_title")
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         setupNavigationBar()
         constructViewHierarchy()
@@ -311,10 +311,10 @@ class CallViewController: UIViewController, UITextFieldDelegate {
     @objc private func callSettingsLabelClick() {
         if groupIdContentView.isHidden {
             groupIdContentView.isHidden = false
-            optionalParamLabel.text = "\(CallingLocalize("Demo.TRTC.calling.settings.optionalParameters"))  v"
+            optionalParamLabel.text = "\(CallingLocalize("assembly_call_settings_optional_parameters"))  v"
         } else {
             groupIdContentView.isHidden = true
-            optionalParamLabel.text = "\(CallingLocalize("Demo.TRTC.calling.settings.optionalParameters"))  >"
+            optionalParamLabel.text = "\(CallingLocalize("assembly_call_settings_optional_parameters"))  >"
         }
     }
 
@@ -354,14 +354,14 @@ class CallViewController: UIViewController, UITextFieldDelegate {
     
     @objc private func settingButtonClick() {
         let settingVC = SettingsViewController()
-        settingVC.title = CallingLocalize("Demo.TRTC.calling.settings.callSettings")
+        settingVC.title = CallingLocalize("assembly_call_settings_title")
         settingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(settingVC, animated: true)
     }
     
     @objc private func joinInGroupClick() {
         let joinInGroupVC = JoinGroupCallViewController()
-        joinInGroupVC.title = CallingLocalize("Demo.TRTC.calling.settings.joinGroupCall")
+        joinInGroupVC.title = CallingLocalize("assembly_call_settings_join_group_call")
         joinInGroupVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(joinInGroupVC, animated: true)
     }

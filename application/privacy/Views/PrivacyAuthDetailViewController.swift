@@ -98,12 +98,12 @@ final class PrivacyAuthDetailViewController: UITableViewController {
     // MARK: - Localized Helpers
     
     private var localizedTitle: String {
-        return PrivacyLocalize("Privacy.SystemAuth.\(authType.rawValue)")
+        return PrivacyLocalize("privacy_\(authType.rawValue)")
     }
     
     private var localizedDescription: String {
         if authType == .beauty {
-            return PrivacyLocalize("Privacy.AuthDetail.beautyDesc")
+            return PrivacyLocalize("privacy_beauty_face_request")
         }
         let keyMap: [PrivacyAuthType: String] = [
             .camera: "NSCameraUsageDescription",
@@ -141,8 +141,8 @@ final class PrivacyAuthDetailViewController: UITableViewController {
         cell.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         cell.textLabel?.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         cell.textLabel?.font = ThemeStore.shared.typographyTokens.Regular16
-        let format = PrivacyLocalize("Privacy.AuthDetail.manage")
-        cell.textLabel?.text = String(format: format, localizedTitle)
+        cell.textLabel?.text = PrivacyLocalize("privacy_manage")
+            .replacingOccurrences(of: "xxx", with: localizedTitle)
         return cell
     }
     
@@ -154,8 +154,8 @@ final class PrivacyAuthDetailViewController: UITableViewController {
         cell.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         cell.textLabel?.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         cell.textLabel?.font = ThemeStore.shared.typographyTokens.Regular16
-        let format = PrivacyLocalize("Privacy.AuthDetail.manage")
-        cell.textLabel?.text = String(format: format, localizedTitle)
+        cell.textLabel?.text = PrivacyLocalize("privacy_manage")
+            .replacingOccurrences(of: "xxx", with: localizedTitle)
         
         cell.accessoryView = nil
         

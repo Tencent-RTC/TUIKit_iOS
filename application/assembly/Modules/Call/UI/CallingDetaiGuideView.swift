@@ -27,7 +27,7 @@ class CallingDetaiGuideView: UIView {
 
     private let guideButtonTitleLable: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = CallingLocalize("Demo.TRTC.calling.detailGuide")
+        label.text = CallingLocalize("assembly_call_call_other_users_guide")
         label.font = ThemeStore.shared.typographyTokens.Medium14
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5

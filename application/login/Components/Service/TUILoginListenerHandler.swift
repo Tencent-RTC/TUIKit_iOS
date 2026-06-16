@@ -31,15 +31,20 @@ extension TUILoginListenerHandler: TUILoginListener {
 
     func onConnectSuccess() {}
 
-    func onConnectFailed(_ code: Int32, err: String!) {}
+    func onConnectFailed(_ code: Int32, err: String!) {
+        LoginLogger.Login.warn("TUILoginListener.onConnectFailed code=\(code) err=\(err ?? "nil")")
+    }
 
     func onKickedOffline() {
+        LoginLogger.Login.warn("TUILoginListener.onKickedOffline")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue
         }
     }
 
     func onUserSigExpired() {
+        LoginLogger.Login.warn("TUILoginListener.onUserSigExpired")
+        LoginEntry.shared.onTokenExpired?()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue
         }

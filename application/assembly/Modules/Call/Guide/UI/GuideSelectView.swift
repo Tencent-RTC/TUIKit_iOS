@@ -66,9 +66,9 @@ class GuideSelectView: UIView {
 
     private lazy var selectData: [[String: Any]] = {
         return [
-            ["desc": GuideLocalize("Demo.TRTC.Guide.othersUseWeb"),
+            ["desc": GuideLocalize("assembly_call_guide_others_use_web"),
              "type": GuideSelectedType.web],
-            ["desc": GuideLocalize("Demo.TRTC.Guide.othersUseApp"),
+            ["desc": GuideLocalize("assembly_call_guide_others_use_app"),
              "type": GuideSelectedType.app],
         ]
     }()

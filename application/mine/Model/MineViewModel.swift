@@ -29,23 +29,23 @@ class MineViewModel: NSObject {
         tableTypeSource.forEach { type in
             switch type {
             case .privacy:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.privacy"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_privacy"),
                                                    image: UIImage(named: "main_mine_privacy"), type: type)
                 res.append(model)
             case .disclaimer:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.disclaimer"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_statement"),
                                                    image: UIImage(named: "main_mine_disclaimer"), type: type)
                 if !isRTCApp {
                     res.append(model)
                 }
             case .icp:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.Mine.ICPNumber"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_icp_number"),
                                                    image: UIImage(named: "main_mine_icp"), type: type)
                 if !isRTCApp {
                     res.append(model)
                 }
             case .about:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.Mine.about"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_about"),
                                                    image: UIImage(named: "main_mine_about"), type: type)
                 res.append(model)
             }

@@ -28,7 +28,7 @@ public class LoginNetworkManager: NSObject {
                           "apaasAppId": apaasAppId]
             NetworkManager.request(baseUrl: baseUrl, params: params, success: success, failed: failed)
         } else {
-            failed?(-1, LoginLocalize("Demo.TRTC.Home.phoneoremailIsEmpty"))
+            failed?(-1, LoginLocalize("login_home_phone_or_email_empty"))
         }
     }
 
@@ -39,7 +39,7 @@ public class LoginNetworkManager: NSObject {
             let params = ["userId": userID]
             NetworkManager.request(baseUrl: baseUrl, params: params, success: success, failed: failed)
         } else {
-            failed?(-1, LoginLocalize("Demo.TRTC.Home.userIDIsEmpty"))
+            failed?(-1, LoginLocalize("login_home_user_id_empty"))
         }
     }
 
@@ -54,7 +54,7 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
@@ -73,7 +73,7 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
@@ -93,7 +93,7 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
@@ -112,7 +112,7 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
@@ -126,6 +126,9 @@ public class LoginNetworkManager: NSObject {
                       "token": token,
                       "apaasAppId": apaasAppId]
         NetworkManager.request(baseUrl: baseUrl, params: params, success: { model in
+            if let sdkAppId = model.sdkAppId {
+                HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
+            }
             IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
         }, failed: failed)
     }

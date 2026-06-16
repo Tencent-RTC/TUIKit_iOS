@@ -17,7 +17,12 @@ class InviteCodeStore: LoginSubStore {
     var resultPublisher: AnyPublisher<Result<LoginResult, LoginError>, Never> {
         resultSubject.eraseToAnyPublisher()
     }
-    
+
+    // MARK: - Toast Event
+
+    private let toastSubject = PassthroughSubject<String, Never>()
+    var toastPublisher: AnyPublisher<String, Never> { toastSubject.eraseToAnyPublisher() }
+
     // MARK: - Dependencies
     
     private let networkService = LoginNetworkService()
@@ -84,16 +89,16 @@ class InviteCodeStore: LoginSubStore {
     
     func resendInvitationCode() {
         guard state.isResendEnabled, let email = state.emailAddress else { return }
-        state.toastMessage = String.InvitationCode.resendingCode
+        toastSubject.send(String.InvitationCode.resendingCode)
         clearErrorState()
         sendInvitationCode(email: email) { [weak self] in
             self?.startCountdown()
         } failed: { [weak self] code, _ in
             guard let self = self else { return }
             if code == 230 {
-                self.state.toastMessage = LoginLocalize("Demo.TRTC.Portal.Main.EmailTooManyCodeRequest")
+                self.toastSubject.send(LoginLocalize("login_email_too_many_requests"))
             } else {
-                self.state.toastMessage = LoginLocalize("Demo.TRTC.Portal.Main.EmailIncorrect")
+                self.toastSubject.send(LoginLocalize("login_email_send_failed"))
             }
         }
     }
@@ -102,7 +107,7 @@ class InviteCodeStore: LoginSubStore {
         let code = state.inviteCode
         
         guard code.count == 6 else {
-            state.toastMessage = String.InvitationCode.enterCompleteCode
+            toastSubject.send(String.InvitationCode.enterCompleteCode)
             return
         }
         
@@ -153,19 +158,21 @@ class InviteCodeStore: LoginSubStore {
                 self.resultSubject.send(.success(loginResult))
             case .failure(let error):
                 self.handleValidationFailure()
+                let message: String
                 if case .loginFailed(let errorCode, _) = error {
                     if errorCode == kAppLoginServiceUserInviteCodeBeUsed {
-                        self.state.toastMessage = LoginLocalize("Demo.TRTC.Portal.Main.InviteCodeBeUsed")
+                        message = LoginLocalize("login_invite_code_used")
                     } else if errorCode == kAppLoginServiceUserInviteIncorrect {
-                        self.state.toastMessage = LoginLocalize("Demo.TRTC.Portal.Main.InviteCodeInvalid")
+                        message = LoginLocalize("login_invite_code_invalid")
                     } else if errorCode == kAppLoginServiceUserInviteCodeExpire {
-                        self.state.toastMessage = LoginLocalize("Demo.TRTC.Portal.Main.UserInviteCodeExpire")
+                        message = LoginLocalize("login_invite_code_expired")
                     } else {
-                        self.state.toastMessage = error.message
+                        message = error.message
                     }
                 } else {
-                    self.state.toastMessage = error.message
+                    message = error.message
                 }
+                self.toastSubject.send(message)
             }
         }
     }
@@ -214,7 +221,6 @@ public struct InviteCodeState {
     public var showAgreeCheckBubble: Bool = false
     public var remainingSeconds: Int = 0
     public var isResendEnabled: Bool = false
-    public var toastMessage: String = ""
 }
 
 // MARK: - String Constants
@@ -223,53 +229,53 @@ extension String {
     enum InvitationCode {
         // MARK: - Titles
 
-        static var checkYourEmail: String { LoginLocalize("Demo.TRTC.InviteCode.checkYourEmail") }
-        static var enterInvitationCode: String { LoginLocalize("Demo.TRTC.InviteCode.enterInvitationCode") }
+        static var checkYourEmail: String { LoginLocalize("login_email_invite_code_title") }
+        static var enterInvitationCode: String { LoginLocalize("login_invite_title") }
         
         // MARK: - Descriptions
 
         static func enterCodeSentToEmail(_ email: String) -> String {
-            return String(format: LoginLocalize("Demo.TRTC.InviteCode.enterCodeSentToEmail"), email)
+            return LoginLocalizeReplace("login_email_invite_code_subtitle", email)
         }
 
-        static var enterCodeToGetStarted: String { LoginLocalize("Demo.TRTC.InviteCode.enterCodeToGetStarted") }
+        static var enterCodeToGetStarted: String { LoginLocalize("login_invite_subtitle") }
         
         // MARK: - Button Texts
 
-        static var getStarted: String { LoginLocalize("Demo.TRTC.InviteCode.getStarted") }
-        static var validating: String { LoginLocalize("Demo.TRTC.InviteCode.validating") }
+        static var getStarted: String { LoginLocalize("login_email_invite_code_get_started") }
+        static var validating: String { LoginLocalize("login_email_invite_code_verifying") }
         
         // MARK: - Error Messages
 
-        static var enterCompleteCode: String { LoginLocalize("Demo.TRTC.InviteCode.enterCompleteCode") }
-        static var codeIncorrect: String { LoginLocalize("Demo.TRTC.InviteCode.codeIncorrect") }
+        static var enterCompleteCode: String { LoginLocalize("login_invite_enter_complete") }
+        static var codeIncorrect: String { LoginLocalize("login_email_invite_code_error") }
         
         // MARK: - Resend Messages
 
-        static var resendClickable: String { LoginLocalize("Demo.TRTC.InviteCode.resendClickable") }
-        static var clickToResend: String { LoginLocalize("Demo.TRTC.InviteCode.clickToResend") }
+        static var resendClickable: String { LoginLocalize("login_email_invite_code_resend_clickable") }
+        static var clickToResend: String { LoginLocalize("login_email_invite_code_resend") }
         static func resendCountdown(_ seconds: Int) -> String {
-            return String(format: LoginLocalize("Demo.TRTC.InviteCode.resendCountdown"), seconds)
+            return LoginLocalizeReplace("login_email_invite_code_resend_countdown", "\(seconds)")
         }
 
         static func resendAfter(_ seconds: Int) -> String {
-            return String(format: LoginLocalize("Demo.TRTC.InviteCode.resendAfter"), seconds)
+            return LoginLocalizeReplace("login_email_invite_code_resend_hint", "\(seconds)")
         }
 
-        static var resendingCode: String { LoginLocalize("Demo.TRTC.InviteCode.resendingCode") }
+        static var resendingCode: String { LoginLocalize("login_email_invite_code_resending") }
         
         // MARK: - Agreement Texts
 
         static var agreeToTermsText: String {
-            return LoginLocalize("Demo.TRTC.InviteCode.agreeToTermsPrefix")
-                + termsOfService
-                + LoginLocalize("Demo.TRTC.InviteCode.agreeToTermsMiddle")
-                + privacyPolicy
-                + LoginLocalize("Demo.TRTC.InviteCode.agreeToTermsSuffix")
+            return LoginLocalizeReplace(
+                "login_invite_terms_agreement",
+                termsOfService,
+                privacyPolicy
+            )
         }
 
-        static var termsOfService: String { LoginLocalize("Demo.TRTC.InviteCode.termsOfService") }
-        static var privacyPolicy: String { LoginLocalize("Demo.TRTC.InviteCode.privacyPolicy") }
-        static var marketingInfo: String { LoginLocalize("Demo.TRTC.InviteCode.marketingInfo") }
+        static var termsOfService: String { LoginLocalize("login_terms_of_service") }
+        static var privacyPolicy: String { LoginLocalize("login_terms_privacy_policy") }
+        static var marketingInfo: String { LoginLocalize("login_email_invite_code_marketing") }
     }
 }

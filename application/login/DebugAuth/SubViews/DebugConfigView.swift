@@ -8,11 +8,20 @@ import TUICore
 import AtomicX
 
 class DebugConfigView: UIView {
-    
+
     var onLoginButtonTapped: (() -> Void)?
     var onUserNameChanged: ((String) -> Void)?
-    
+
     weak var currentTextField: UITextField?
+
+    var isUserIdEditable: Bool = true {
+        didSet {
+            accountTextField.isUserInteractionEnabled = isUserIdEditable
+            accountTextField.textColor = isUserIdEditable
+                ? ThemeStore.shared.colorTokens.textColorPrimary
+                : ThemeStore.shared.colorTokens.textColorDisable
+        }
+    }
     
     // MARK: - SubViews
     
@@ -34,7 +43,7 @@ class DebugConfigView: UIView {
     }()
     
     lazy var accountTextField: UITextField = {
-        let textField = createTextField(LoginLocalize("Demo.TRTC.Login.enterUserName"))
+        let textField = createTextField(LoginLocalize("login_profile_nickname_hint"))
         textField.keyboardType = .default
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor
@@ -45,7 +54,7 @@ class DebugConfigView: UIView {
     lazy var loginButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitleColor(ThemeStore.shared.colorTokens.textColorButton, for: .normal)
-        button.setTitle(LoginLocalize("V2.Live.LoginMock.login"), for: .normal)
+        button.setTitle(LoginLocalize("login_btn_login"), for: .normal)
         button.adjustsImageWhenHighlighted = false
         button.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium18

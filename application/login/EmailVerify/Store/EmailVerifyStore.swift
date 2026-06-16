@@ -18,6 +18,11 @@ public class EmailVerifyStore: LoginSubStore {
     var resultPublisher: AnyPublisher<Result<LoginResult, LoginError>, Never> {
         resultSubject.eraseToAnyPublisher()
     }
+
+    // MARK: - Toast Event
+
+    private let toastSubject = PassthroughSubject<String, Never>()
+    var toastPublisher: AnyPublisher<String, Never> { toastSubject.eraseToAnyPublisher() }
     
     // MARK: - Dependencies
     
@@ -50,12 +55,12 @@ public class EmailVerifyStore: LoginSubStore {
         let email = state.email.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !email.isEmpty else {
-            state.toastMessage = String.EmailLogin.enterEmailError
+            toastSubject.send(String.EmailLogin.enterEmailError)
             return
         }
-        
+
         guard isValidEmail(email) else {
-            state.toastMessage = String.EmailLogin.validEmailError
+            toastSubject.send(String.EmailLogin.validEmailError)
             return
         }
         

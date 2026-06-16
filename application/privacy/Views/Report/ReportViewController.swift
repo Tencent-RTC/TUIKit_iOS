@@ -17,21 +17,21 @@ enum ReportType: String {
     var title: String {
         switch self {
         case .politics:
-            return PrivacyLocalize("Privacy.Report.type.politics")
+            return PrivacyLocalize("privacy_report_type_politics")
         case .porn:
-            return PrivacyLocalize("Privacy.Report.type.porn")
+            return PrivacyLocalize("privacy_report_type_porn")
         case .attacks:
-            return PrivacyLocalize("Privacy.Report.type.personalAttacks")
+            return PrivacyLocalize("privacy_report_type_personal_attacks")
         case .violence:
-            return PrivacyLocalize("Privacy.Report.type.violence")
+            return PrivacyLocalize("privacy_report_type_violence")
         case .ad:
-            return PrivacyLocalize("Privacy.Report.type.ad")
+            return PrivacyLocalize("privacy_report_type_ad")
         case .scam:
-            return PrivacyLocalize("Privacy.Report.type.scam")
+            return PrivacyLocalize("privacy_report_type_scam")
         case .illegal:
-            return PrivacyLocalize("Privacy.Report.type.illegal")
+            return PrivacyLocalize("privacy_report_type_illegal")
         case .other:
-            return PrivacyLocalize("Privacy.Report.type.other")
+            return PrivacyLocalize("privacy_report_type_other")
         default:
             return rawValue
         }
@@ -95,7 +95,7 @@ class ReportViewController: UIViewController {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = PrivacyLocalize("Privacy.Report.title")
+        label.text = PrivacyLocalize("privacy_report_title")
         label.font = UIFont.systemFont(ofSize: 24, weight: .medium)
         label.textColor = .black
         return label
@@ -103,7 +103,7 @@ class ReportViewController: UIViewController {
 
     private lazy var submitBtn: UIButton = {
         let btn = UIButton(frame: .zero)
-        btn.setTitle(PrivacyLocalize("Privacy.Report.submit"), for: .normal)
+        btn.setTitle(PrivacyLocalize("privacy_report_submit"), for: .normal)
         btn.setTitleColor(UIColor(hex: "006EFF"), for: .normal)
         btn.setTitleColor(UIColor(hex: "AACFFF"), for: .disabled)
         btn.titleLabel?.font = UIFont.systemFont(ofSize: 16)
@@ -231,7 +231,7 @@ extension ReportViewController {
         ) { [weak self] in
             guard let self else { return }
             self.loadingIndicator.stopAnimating()
-            self.showToast(PrivacyLocalize("Privacy.Report.submitSuccess")) { [weak self] in
+            self.showToast(PrivacyLocalize("privacy_report_submit_success")) { [weak self] in
                 guard let self else { return }
                 self.tapDismiss()
             }

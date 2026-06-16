@@ -40,10 +40,18 @@ class NetworkManager {
 
     static func request(_ convertible: URLConvertible, method: HTTPMethod = .get, parameters:
         Parameters? = nil, encoding: ParameterEncoding, completionHandler: HttpCompletionCallBack? = nil) {
-        AF.request(convertible, method: method, parameters: addBaseParametersData(parameters), encoding: encoding)
+        let urlString = (try? convertible.asURL().absoluteString) ?? "<invalid-url>"
+        let mergedParams = addBaseParametersData(parameters)
+        let tokenInParams = (mergedParams?["token"] as? String) ?? ""
+        let userIdInParams = (mergedParams?["userId"] as? String) ?? ""
+        LoginLogger.Login.info(
+            "NetworkManager.request -> url=\(urlString) method=\(method.rawValue) tokenEmpty=\(tokenInParams.isEmpty) userIdEmpty=\(userIdInParams.isEmpty)"
+        )
+
+        AF.request(convertible, method: method, parameters: mergedParams, encoding: encoding)
             .nmResponseJSON { data in
                 var result: HttpJsonModel = HttpJsonModel()
-                result.errorMessage = LoginLocalize("Demo.TRTC.http.syserror")
+                result.errorMessage = Self.resolveDefaultErrorMessage(from: data)
                 if let respData = data.data, respData.count > 0 {
                     let value = try? JSONSerialization.jsonObject(with: respData, options: .mutableLeaves)
                     #if DEBUG
@@ -56,8 +64,40 @@ class NetworkManager {
                         }
                     }
                 }
+                if result.errorCode != 0 {
+                    LoginLogger.Login.warn(
+                        "NetworkManager.response url=\(urlString) errorCode=\(result.errorCode) errorMessage=\(result.errorMessage)"
+                    )
+                }
                 completionHandler?(result)
             }
+    }
+
+    private static func resolveDefaultErrorMessage(from response: AFDataResponse<Any>) -> String {
+        guard let afError = response.error else {
+            return LoginLocalize("login_home_sys_error")
+        }
+
+        if let urlError = afError.underlyingError as? URLError {
+            switch urlError.code {
+            case .timedOut:
+                return LoginLocalize("login_error_network_timeout")
+            case .notConnectedToInternet,
+                 .networkConnectionLost,
+                 .cannotFindHost,
+                 .cannotConnectToHost,
+                 .dnsLookupFailed:
+                return LoginLocalize("login_error_network")
+            default:
+                return LoginLocalize("login_error_network")
+            }
+        }
+
+        if case .sessionTaskFailed = afError {
+            return LoginLocalize("login_error_network")
+        }
+
+        return LoginLocalize("login_home_sys_error")
     }
 
     private static func addBaseParametersData(_ parameters: Parameters? = nil) -> Parameters? {

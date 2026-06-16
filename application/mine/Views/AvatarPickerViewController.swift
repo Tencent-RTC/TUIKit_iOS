@@ -81,7 +81,7 @@ final class AvatarPickerViewController: UIViewController {
             variant: .text,
             colorType: .primary,
             size: .xsmall,
-            content: .textOnly(text: MineLocalize("Demo.TRTC.Portal.Mine.profileOK"))
+            content: .textOnly(text: MineLocalize("mine_profile_btn_confirm"))
         )
         button.setClickAction { [weak self] _ in
             self?.onConfirmTapped()
@@ -106,7 +106,7 @@ final class AvatarPickerViewController: UIViewController {
     // MARK: - Setup
 
     private func setupUI() {
-        title = MineLocalize("Demo.TRTC.Portal.Mine.profilePhoto")
+        title = MineLocalize("mine_profile_avatar")
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: confirmButton)
 

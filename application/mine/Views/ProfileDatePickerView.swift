@@ -61,7 +61,7 @@ class ProfileDatePickerView: UIView {
     
     lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .custom)
-        cancelButton.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.cancel"), for: .normal)
+        cancelButton.setTitle(MineLocalize("mine_common_btn_cancel"), for: .normal)
         cancelButton.setTitleColor(ThemeStore.shared.colorTokens.textColorPrimary, for: .normal)
         cancelButton.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
         cancelButton.addTarget(self, action: #selector(onViewHide), for: .touchUpInside)
@@ -70,7 +70,7 @@ class ProfileDatePickerView: UIView {
     
     lazy var okButton: UIButton = {
         let okButton = UIButton(type: .custom)
-        okButton.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.determine"), for: .normal)
+        okButton.setTitle(MineLocalize("mine_common_btn_determine"), for: .normal)
         okButton.setTitleColor(ThemeStore.shared.colorTokens.textColorPrimary, for: .normal)
         okButton.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
         okButton.addTarget(self, action: #selector(onConfirmClicked), for: .touchUpInside)

@@ -52,8 +52,8 @@ class GuideHomeViewController: UIViewController {
 
     private lazy var dataSource: JXSegmentedDotDataSource = {
         let source = JXSegmentedDotDataSource()
-        source.titles = [GuideLocalize("Demo.TRTC.Guide.RoomSingleUser"),
-                         GuideLocalize("Demo.TRTC.Guide.RoomMultiUsers")]
+        source.titles = [GuideLocalize("assembly_call_guide_room_single"),
+                         GuideLocalize("assembly_call_guide_room_multi")]
         source.dotStates = [false, false]
         source.titleNormalColor = UIColor(red: 98, green: 110, blue: 132, alpha: 0.6)
         source.titleSelectedColor = UIColor(red: 0, green: 108, blue: 255)

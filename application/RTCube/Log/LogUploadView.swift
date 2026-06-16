@@ -47,20 +47,20 @@ class LogUploadView: UIView {
     private let shareButton: UIButton = {
         let button = UIButton(type: .system)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-        button.setTitle(NSLocalizedString("LogUpload.Share", comment: "分享"), for: .normal)
+        button.setTitle(NSLocalizedString("root_logupload_btn_share", comment: "分享"), for: .normal)
         return button
     }()
 
     private let shareLogTitle: UILabel = {
         let label = UILabel()
-        label.text = NSLocalizedString("LogUpload.ShareLog", comment: "分享日志")
+        label.text = NSLocalizedString("root_logupload_share_log", comment: "分享上传日志")
         label.font = .systemFont(ofSize: 14, weight: .medium)
         return label
     }()
 
     private let cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle(NSLocalizedString("LogUpload.Cancel", comment: "取消"), for: .normal)
+        button.setTitle(NSLocalizedString("root_logupload_btn_cancel", comment: "取消"), for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         return button
     }()

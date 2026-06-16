@@ -47,7 +47,7 @@ class PhoneVerifyView: UIView {
     lazy var loginButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
-        button.setTitle(LoginLocalize("V2.Live.LoginMock.login"), for: .normal)
+        button.setTitle(LoginLocalize("login_btn_login"), for: .normal)
         button.adjustsImageWhenHighlighted = false
         button.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium18
@@ -79,7 +79,7 @@ class PhoneVerifyView: UIView {
     
     lazy var dividerLabel: UILabel = {
         let label = UILabel()
-        label.text = LoginLocalize("Demo.TRTC.Login.ioatext")
+        label.text = LoginLocalize("login_home_ioa_text")
         label.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textAlignment = .center
@@ -240,6 +240,12 @@ class PhoneVerifyView: UIView {
         #if LOGIN_FULL
         ioaLoginButton.addTarget(self, action: #selector(ioaLoginButtonClick), for: .touchUpInside)
         #endif
+
+        headerView.onHiddenEntryTriggered = { [weak self] in
+            guard let self = self else { return }
+            let configVC = HiddenConfigViewController()
+            navigationController?.pushViewController(configVC, animated: true)
+        }
         
         phoneInputView.onTextChanged = { [weak self] text in
             guard let self = self else { return }
@@ -256,15 +262,13 @@ class PhoneVerifyView: UIView {
         privacyAgreementView.hostViewController = navigationController
         
         // Subscribe to state changes
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message)
             }
             .store(in: &cancellables)
-        
+
         store.$state
             .map(\.isLoading)
             .removeDuplicates()

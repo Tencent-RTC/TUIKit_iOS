@@ -5,6 +5,7 @@
 
 import Combine
 import TUICallKit_Swift
+import TUILiveKit
 import UIKit
 
 // MARK: - CallModule
@@ -23,8 +24,8 @@ final class CallModule: ModuleProvider {
     static func standard(target: AppTarget) -> CallModule {
         let config = ModuleConfig(
             identifier: "call",
-            title: AssemblyLocalize("Demo.TRTC.Portal.Main.call"),
-            description: AssemblyLocalize("Demo.TRTC.Portal.Main.callContent"),
+            title: CallingLocalize("assembly_call_card_title"),
+            description: CallingLocalize("assembly_call_card_description"),
             iconName: "main_entrance_tuicallkit",
             iconImage: AppAssemblyBundle.image(named: "main_entrance_tuicallkit"),
             cardStyle: .uiComponent,
@@ -37,7 +38,8 @@ final class CallModule: ModuleProvider {
                     return CallingEntranceMenuViewController()
                 }
             },
-            analyticsEvent: "video_call"
+            analyticsEvent: "video_call",
+            keyMetricsEvent: Constants.DataReport.kDataReportDemoClickCall
         )
         return CallModule(config: config)
     }

@@ -118,7 +118,7 @@ class AvatarListAlertView: AlertContentView {
     
     lazy var confirmBtn: UIButton = {
         let btn = UIButton(type: .system)
-        btn.setTitle(LoginLocalize("Demo.TRTC.Login.done"), for: .normal)
+        btn.setTitle(LoginLocalize("login_profile_avatar_dialog_confirm"), for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium16
         btn.isEnabled = false
         return btn
@@ -142,7 +142,7 @@ class AvatarListAlertView: AlertContentView {
     override init(frame: CGRect = .zero, viewModel: AvatarViewModel) {
         super.init(frame: frame, viewModel: viewModel)
         titleLabel.font = ThemeStore.shared.typographyTokens.Medium20
-        titleLabel.text = LoginLocalize("Demo.TRTC.Login.setavatar")
+        titleLabel.text = LoginLocalize("login_profile_avatar_dialog_title")
     }
     
     required init?(coder: NSCoder) {

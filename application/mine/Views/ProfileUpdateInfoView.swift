@@ -53,7 +53,7 @@ class ProfileUpdateInfoView: UIView {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = MineLocalize("Demo.TRTC.Portal.Mine.profileName")
+        label.text = MineLocalize("mine_profile_nickname")
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
@@ -93,7 +93,7 @@ class ProfileUpdateInfoView: UIView {
     lazy var tipsLabel: UILabel = {
         let label = UILabel()
         label.font = ThemeStore.shared.typographyTokens.Regular12
-        label.text = MineLocalize("Demo.TRTC.Portal.Mine.profileEditAliasDesc")
+        label.text = MineLocalize("mine_profile_input_rule")
         label.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         return label
     }()
@@ -104,7 +104,7 @@ class ProfileUpdateInfoView: UIView {
         button.layer.shadowColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor
         button.layer.cornerRadius = ThemeStore.shared.borderRadius.radius8
         button.layer.masksToBounds = true
-        button.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.profileOK"), for: .normal)
+        button.setTitle(MineLocalize("mine_profile_btn_confirm"), for: .normal)
         return button
     }()
     
@@ -121,7 +121,7 @@ class ProfileUpdateInfoView: UIView {
     
     private let randomButton: CustomRefreshButton = {
         let button = CustomRefreshButton(type: .system)
-        button.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.profileRandom"), for: .normal)
+        button.setTitle(MineLocalize("mine_profile_random"), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular14
         button.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         button.setImage(UIImage(named: "mine_profile_refresh"), for: .normal)
@@ -281,7 +281,18 @@ extension ProfileUpdateInfoView {
 extension ProfileUpdateInfoView {
     func getRandomName() -> String {
         let randomNumber = Int.random(in: 1...33)
-        return BundleLoader.moduleLocalized(key: "Demo.TRTC.login_custom_name_\(randomNumber)", in: Bundle.main, tableName: "LoginLocalized")
+        let key = "login_profile_custom_name_\(randomNumber)"
+        return BundleLoader.moduleLocalized(key: key, in: loginResourcesBundle, tableName: "LoginLocalized")
+    }
+
+    private var loginResourcesBundle: Bundle {
+        for framework in Bundle.allFrameworks {
+            if let url = framework.url(forResource: "LoginResources", withExtension: "bundle"),
+               let bundle = Bundle(url: url) {
+                return bundle
+            }
+        }
+        return .main
     }
 }
 

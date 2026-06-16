@@ -32,7 +32,7 @@ class PhoneInputView: UIView {
     }()
     
     lazy var textField: LoginTextField = {
-        let tf = LoginTextField(placeholder: LoginLocalize("V2.Live.LinkMicNew.enterphonenumber"))
+        let tf = LoginTextField(placeholder: LoginLocalize("login_phone_hint"))
         tf.keyboardType = .phonePad
         tf.layer.borderWidth = 1.0
         tf.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor

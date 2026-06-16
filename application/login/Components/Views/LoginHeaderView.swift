@@ -3,19 +3,22 @@
 //  login
 //
 
-import UIKit
 import TUICore
+import UIKit
 
 class LoginHeaderView: UIView {
-    
+    var onHiddenEntryTriggered: (() -> Void)?
+
     lazy var bgView: UIImageView = {
         let imageView = UIImageView(image: UIImage.loginImage(named: "login_bg"))
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
-    
+
     lazy var logoView: UIImageView = {
         let imageView = UIImageView(image: UIImage.loginImage(named: getMainLogoStr()))
         imageView.contentMode = .scaleAspectFit
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -23,6 +26,7 @@ class LoginHeaderView: UIView {
         super.init(frame: frame)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -56,7 +60,14 @@ class LoginHeaderView: UIView {
     }
     
     func bindInteraction() {
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hiddenEntryTapped))
+        tapGesture.numberOfTapsRequired = 5
+        tapGesture.numberOfTouchesRequired = 1
+        logoView.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func hiddenEntryTapped() {
+        onHiddenEntryTriggered?()
     }
     
     func refreshLogo() {

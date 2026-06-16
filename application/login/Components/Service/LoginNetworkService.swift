@@ -32,7 +32,7 @@ public final class LoginNetworkService {
                 success(sessionId)
             } else {
                 if code == kAppLoginServiceIOTDenyCode {
-                    failed(.verifyCodeFailed(message: LoginLocalize("LoginNetwork.ProfileManager.iotfailed")))
+                    failed(.verifyCodeFailed(message: LoginLocalize("login_error_iot_phone")))
                 } else {
                     failed(.verifyCodeFailed(message: errorMessage))
                 }
@@ -141,6 +141,7 @@ public final class LoginNetworkService {
             } else {
                 UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue
                 LoginNetworkManager.processLoginFailCode(code: Int32(resultCode))
+                LoginEntry.shared.onTokenExpired?()
                 completion(.failure(.tokenExpired))
             }
         }

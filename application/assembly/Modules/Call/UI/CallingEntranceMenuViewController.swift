@@ -45,7 +45,7 @@ public class CallingEntranceMenuViewController: UIViewController {
 
     private let selectLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = CallingLocalize("Demo.TRTC.calling.callingSelectTitle")
+        label.text = CallingLocalize("assembly_call_select_call_method")
         label.font = ThemeStore.shared.typographyTokens.Medium12
         label.textColor = ThemeStore.shared.colorTokens.textColorSecondary
         return label
@@ -60,7 +60,7 @@ public class CallingEntranceMenuViewController: UIViewController {
     private let historybuttonLabel: UILabel = {
         let label = UILabel(frame: .zero)
         let text = NSMutableAttributedString(string:
-            CallingLocalize("Demo.TRTC.calling.callingHistory"))
+            CallingLocalize("assembly_call_view_history"))
         if let image = AppAssemblyBundle.image(named: "calling_call_pushArrow") {
             let imageAttachment = NSTextAttachment()
             imageAttachment.image = image
@@ -83,21 +83,21 @@ public class CallingEntranceMenuViewController: UIViewController {
 
     func configData() {
         CallingMenuItems = [
-            CallingMenuModel(title: CallingLocalize("Demo.TRTC.Calling.robotCalling"),
-                             content: CallingLocalize("Demo.TRTC.Calling.robotCallingContent"),
+            CallingMenuModel(title: CallingLocalize("assembly_call_call_with_robot"),
+                             content: CallingLocalize("assembly_call_call_with_robot_desc"),
                              imageName: "calling_unfold_arrow",
                              stressContent: [
-                                 CallingLocalize("Demo.TRTC.calling.RobotStressString"),
+                                 CallingLocalize("assembly_call_call_with_robot_highlight"),
                              ],
                              selectHandle: { [weak self] in
                                  guard let self = self else { return }
                                  self.updateBotCells()
                              }),
-            CallingMenuModel(title: CallingLocalize("Demo.TRTC.Calling.humanCalling"),
-                             content: CallingLocalize("Demo.TRTC.Calling.humanCallingContent"),
+            CallingMenuModel(title: CallingLocalize("assembly_call_call_other_users"),
+                             content: CallingLocalize("assembly_call_call_other_users_desc"),
                              imageName: "calling_call_pushArrow",
                              stressContent: [
-                                 CallingLocalize("Demo.TRTC.calling.callTwoHumanStress"),
+                                 CallingLocalize("assembly_call_call_other_users_highlight"),
                              ],
                              selectHandle: { [weak self] in
                                  guard let self = self else { return }
@@ -116,7 +116,7 @@ public class CallingEntranceMenuViewController: UIViewController {
         item.tintColor = UIColor.black
         navigationItem.leftBarButtonItem = item
         
-        title = CallingLocalize("Demo.TRTC.Portal.Main.call")
+        title = CallingLocalize("assembly_call_card_title")
 
         configData()
         constructViewHierarchy()
@@ -280,11 +280,11 @@ extension CallingEntranceMenuViewController {
                                   hasTopBorder: false,
                                   hasBotBorder: false,
                                   botCallType: .hostCall),
-            ]
+            ].filter { $0.callType != .initCall }
         } else {
             CallingRobotItems.removeAll()
             if UserOverdueLogicManager.sharedManager().userOverdueState == .notLogin {
-                self.view.makeToast(CallingLocalize("Demo.TRTC.Portal.Main.LoginFailed"))
+                self.view.makeToast(CallingLocalize("assembly_call_login_failed"))
             }
         }
         tableView.reloadData()
@@ -295,7 +295,7 @@ extension CallingEntranceMenuViewController {
     func gotoHesitationVC(botAvatarImage: UIImage, callType: CallBotType) {
         let hesVC = CallingBotHesitationViewController(callType: callType)
         hesVC.configRobotAvatar(avatarImage: botAvatarImage)
-        hesVC.title = CallingLocalize("Demo.TRTC.calling.call")
+        hesVC.title = CallingLocalize("assembly_call_btn_start_call")
         hesVC.requestBotHandler = { [weak self] callID in
             let language = TUIGlobalization.getPreferredLanguage() ?? ""
             if language.contains("zh") {
@@ -323,7 +323,7 @@ extension CallingEntranceMenuViewController {
         }
         hesVC.callBotIsBusyHandle = { [weak self] in
             guard let self = self else { return }
-            self.view.makeToast(CallingLocalize("Demo.TRTC.calling.callingBotIsBusy"))
+            self.view.makeToast(CallingLocalize("assembly_call_bot_busy"))
         }
         hesVC.callBotFailedHandle = { [weak self] message in
             guard let self = self else { return }
@@ -339,7 +339,7 @@ extension CallingEntranceMenuViewController {
     func gotoCallingContactVC() {
         let videoCallVC = TRTCCallingContactViewController()
         videoCallVC.callType = .video
-        videoCallVC.title = CallingLocalize("Demo.TRTC.calling.call")
+        videoCallVC.title = CallingLocalize("assembly_call_btn_start_call")
         navigationController?.pushViewController(videoCallVC, animated: true)
     }
 

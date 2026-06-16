@@ -26,7 +26,7 @@ final class VoiceRoomViewController: UIViewController {
     private lazy var createButton = AtomicButton(variant: .filled,
                                                  colorType: .primary,
                                                  size: .large,
-                                                 content: .iconLeading(text: AssemblyLocalize("Demo.TRTC.LiveRoom.createroom"),
+                                                 content: .iconLeading(text: VoiceRoomLocalize("assembly_voiceroom_list_go_live"),
                                                                        icon: AppAssemblyBundle.image(named: "livekit_ic_add")))
 
     // MARK: - Lifecycle
@@ -39,6 +39,7 @@ final class VoiceRoomViewController: UIViewController {
         activateConstraints()
         bindInteraction()
         view.backgroundColor = .white
+        AppAssembly.shared.analyticEventHandler?(.voiceRoomEvent(name: .voiceRoomShowLiveList))
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -64,7 +65,7 @@ extension VoiceRoomViewController {
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
 
-        let titleLabel = AssemblyLocalize("Demo.TRTC.VoiceRoom.voicechatroom")
+        let titleLabel = VoiceRoomLocalize("assembly_voiceroom_card_title")
         let titleView = AtomicLabel(titleLabel) { theme in
             LabelAppearance(textColor: theme.tokens.color.textColorAntiPrimary,
                             backgroundColor: theme.tokens.color.clearColor,

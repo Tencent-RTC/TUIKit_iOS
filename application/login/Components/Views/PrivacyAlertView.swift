@@ -25,7 +25,7 @@ class PrivacyAlertView: UIView {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Medium18
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
-        label.text = LoginLocalize("Demo.TRTC.Login.welcome")
+        label.text = LoginLocalize("login_home_welcome")
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5
@@ -37,11 +37,11 @@ class PrivacyAlertView: UIView {
         textView.backgroundColor = .clear
         textView.delegate = self
         
-        let totalStr = LoginLocalize("Demo.TRTC.Portal.privatealertdescription",
-                                     LoginLocalize("Demo.TRTC.Portal.<private>"),
-                                     LoginLocalize("Demo.TRTC.Portal.<agreement>"))
-        let privaStr = LoginLocalize("Demo.TRTC.Portal.<private>")
-        let protoStr = LoginLocalize("Demo.TRTC.Portal.<agreement>")
+        let totalStr = LoginLocalizeReplace("login_privacy_alert_description",
+                                     LoginLocalize("login_privacy_protection_guide"),
+                                     LoginLocalize("login_privacy_user_agreement"))
+        let privaStr = LoginLocalize("login_privacy_protection_guide")
+        let protoStr = LoginLocalize("login_privacy_user_agreement")
         
         guard let privaR = totalStr.range(of: privaStr), let protoR = totalStr.range(of: protoStr) else {
             return textView
@@ -72,14 +72,14 @@ class PrivacyAlertView: UIView {
     }()
     lazy var confirmBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle(LoginLocalize("V2.Live.LinkMicNew.agree"), for: .normal)
+        btn.setTitle(LoginLocalize("login_common_agree"), for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = .blue
         return btn
     }()
     lazy var cancelBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle(LoginLocalize("V2.Live.LinkMicNew.disagree"), for: .normal)
+        btn.setTitle(LoginLocalize("login_common_disagree"), for: .normal)
         btn.setTitleColor(.black, for: .normal)
         btn.backgroundColor = .clear
         return btn

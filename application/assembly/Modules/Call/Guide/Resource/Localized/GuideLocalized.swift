@@ -6,7 +6,7 @@
 import Foundation
 import AtomicX
 
-private let guideLocalizedTableName = "GuideLocalized"
+private let guideLocalizedTableName = "CallingLocalized"
 
 func GuideLocalize(_ key: String, _ args: CVarArg...) -> String {
     return BundleLoader.moduleLocalized(
