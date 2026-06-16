@@ -2,9 +2,15 @@
 //  PrivacyAgreementView.swift
 //  login
 //
+//  隐私协议勾选组件（从旧版 TRTCLoginRootView 提取）
+//  勾选框 AgreementButton 点击热区扩展 16px 必须保留
+//  LoginAgreementTextView 禁止成为第一响应者的行为必须保留
+//
 
 import UIKit
 import AtomicX
+
+// MARK: - AgreementButton（点击热区扩展 16px）
 
 class AgreementButton: UIButton {
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
@@ -21,6 +27,8 @@ class AgreementButton: UIButton {
         }
     }
 }
+
+// MARK: - LoginAgreementTextView（禁止成为第一响应者）
 
 class LoginAgreementTextView: UITextView {
     override var canBecomeFirstResponder: Bool {
@@ -56,14 +64,14 @@ class PrivacyAgreementView: UIView {
         textView.textContainer.lineFragmentPadding = 0
         textView.dataDetectorTypes = .link
         textView.textAlignment = .left
-        let totalStr = LoginLocalize("Demo.TRTC.Portal.privateandagreement",
-                                     LoginLocalize("Demo.TRTC.Portal.<privacysummary>"),
-                                     LoginLocalize("Demo.TRTC.Portal.<private>"),
-                                     LoginLocalize("Demo.TRTC.Portal.<agreement>"))
+        let totalStr = LoginLocalizeReplace("login_privacy_read_agreement",
+                                     LoginLocalize("login_privacy_summary_link"),
+                                     LoginLocalize("login_privacy_protection_guide"),
+                                     LoginLocalize("login_privacy_user_agreement"))
         
-        let privaSummaryStr = LoginLocalize("Demo.TRTC.Portal.<privacysummary>")
-        let privaStr = LoginLocalize("Demo.TRTC.Portal.<private>")
-        let protoStr = LoginLocalize("Demo.TRTC.Portal.<agreement>")
+        let privaSummaryStr = LoginLocalize("login_privacy_summary_link")
+        let privaStr = LoginLocalize("login_privacy_protection_guide")
+        let protoStr = LoginLocalize("login_privacy_user_agreement")
         
         guard let privaR = totalStr.range(of: privaStr),
               let protoR = totalStr.range(of: protoStr),
@@ -142,6 +150,7 @@ class PrivacyAgreementView: UIView {
         agreementButton.isSelected = !agreementButton.isSelected
     }
     
+    /// 设置勾选状态
     func setAgreed(_ agreed: Bool) {
         agreementButton.isSelected = agreed
     }

@@ -199,7 +199,7 @@ class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UI
         
         let currentParticipantCount = CallStore.shared.state.value.allParticipants.count
         if userIds.count + currentParticipantCount >=  MAX_USER {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit") ?? "")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit"))
             return
         }
         

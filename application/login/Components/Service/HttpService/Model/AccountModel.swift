@@ -2,6 +2,11 @@
 //  AccountModel.swift
 //  login
 //
+//  从 BusinessService 复制的用户数据模型
+//  注意：此处的 UserModel 是 BusinessService 的完整版 class，
+//  与 login/Components/Model/UserModel.swift 中的 struct UserModel 不同。
+//  在 login 模块内使用时，通过 BSUserModel typealias 区分。
+//
 
 import UIKit
 
@@ -19,6 +24,8 @@ public class LoginModel: NSObject, Codable {
     var data: BSUserModel? = nil
 }
 
+/// BusinessService 原始 UserModel（class 版本）
+/// 使用 BSUserModel 别名以避免与 login 模块自有的 UserModel (struct) 冲突
 @objcMembers
 public class BSUserModel: NSObject, Codable {
     public var token: String

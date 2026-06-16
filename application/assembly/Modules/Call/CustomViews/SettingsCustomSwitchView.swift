@@ -2,6 +2,8 @@
 //  SettingsCustomSwitchView.swift
 //  AppAssembly
 //
+//  通话模块 - 自定义开关视图
+//
 
 import UIKit
 import AtomicX

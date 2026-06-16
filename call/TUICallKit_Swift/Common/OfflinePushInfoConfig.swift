@@ -14,7 +14,7 @@ public class OfflinePushInfoConfig: NSObject {
     public static func createOfflinePushInfo() -> TUIOfflinePushInfo {
         let pushInfo: TUIOfflinePushInfo = TUIOfflinePushInfo()
         pushInfo.title = ""
-        pushInfo.desc = TUICallKitLocalize(key: "TUICallKit.have.new.invitation") ?? ""
+        pushInfo.desc = TUICallKitLocalize(key: "TUICallKit.have.new.invitation")
         // iOS push type: if you want user VoIP, please modify type to TUICallIOSOfflinePushTypeVoIP
         pushInfo.iOSPushType = .apns
         pushInfo.ignoreIOSBadge = false

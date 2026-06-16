@@ -54,9 +54,30 @@ class DoubleColumnWidgetView: RTCBaseView {
         return label
     }()
     
+    private lazy var gradientMaskView: UIView = {
+        let view = UIView(frame: .zero)
+        view.isUserInteractionEnabled = false
+        return view
+    }()
+    
+    private lazy var bottomGradientLayer: CAGradientLayer = {
+        let layer = CAGradientLayer()
+        layer.colors = [UIColor.black.withAlphaComponent(0).cgColor,
+                        UIColor.black.withAlphaComponent(0).cgColor,
+                        UIColor.black.withAlphaComponent(0.05).cgColor,
+                        UIColor.black.withAlphaComponent(0.2).cgColor,
+                        UIColor.black.withAlphaComponent(0.4).cgColor]
+        layer.locations = [0, 0.3, 0.5, 0.75, 1]
+        layer.startPoint = CGPoint(x: 0.5, y: 0)
+        layer.endPoint = CGPoint(x: 0.5, y: 1)
+        return layer
+    }()
+    
     override func constructViewHierarchy() {
         addSubview(watchingIcon)
         addSubview(watchingLabel)
+        addSubview(gradientMaskView)
+        gradientMaskView.layer.addSublayer(bottomGradientLayer)
         addSubview(roomNameLabel)
         addSubview(ownerAvatarView)
         addSubview(roomOwnerNameLabel)
@@ -93,10 +114,20 @@ class DoubleColumnWidgetView: RTCBaseView {
             make.height.equalTo(20.scale375Height())
             make.trailing.lessThanOrEqualToSuperview().inset(8.scale375())
         }
+        
+        gradientMaskView.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalToSuperview().multipliedBy(0.5)
+        }
     }
     
     override func setupViewStyle() {
         updateView(liveInfo: liveInfo)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        bottomGradientLayer.frame = gradientMaskView.bounds
     }
     
     func updateView(liveInfo: LiveInfo) {

@@ -2,6 +2,8 @@
 //  InvitationBubbleView.swift
 //  login
 //
+//  气泡提示视图（从旧版 TRTCInvitationCodeViewController 迁移）
+//
 
 import UIKit
 import AtomicX

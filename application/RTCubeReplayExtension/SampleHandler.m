@@ -136,11 +136,8 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
 - (void)handleReplayKit2PushStopNotification:(NSNotification *)noti {
   [self sendLocalNotificationToHostAppWithTitle:
             replayKitLocalize(
-                @"ReplayKitUpload.SampleHandler.tencentcloudpushstream")
-                                            msg:replayKitLocalize(
-                                                    @"ReplayKitUpload."
-                                                    @"SampleHandler."
-                                                    @"pushstreamstop")
+                @"replay_extension_push_stream_title")
+                                            msg:@""
                                        userInfo:nil];
 }
 
@@ -181,10 +178,8 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
   [self
       sendLocalNotificationToHostAppWithTitle:
           replayKitLocalize(
-              @"ReplayKitUpload.SampleHandler.tencentcloudpushstream")
-                                          msg:replayKitLocalize(
-                                                  @"ReplayKitUpload."
-                                                  @"SampleHandler.replaystart")
+              @"replay_extension_push_stream_title")
+                                          msg:@""
                                      userInfo:@{
                                        kReplayKit2UploadingKey :
                                            kReplayKit2Uploading
@@ -201,10 +196,8 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
 
   [self sendLocalNotificationToHostAppWithTitle:
             replayKitLocalize(
-                @"ReplayKitUpload.SampleHandler.tencentcloudpushstream")
-                                            msg:replayKitLocalize(
-                                                    @"ReplayKitUpload."
-                                                    @"SampleHandler.replaystop")
+                @"replay_extension_push_stream_title")
+                                            msg:@""
                                        userInfo:nil];
 }
 
@@ -214,11 +207,8 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
 
   [self sendLocalNotificationToHostAppWithTitle:
             replayKitLocalize(
-                @"ReplayKitUpload.SampleHandler.tencentcloudpushstream")
-                                            msg:replayKitLocalize(
-                                                    @"ReplayKitUpload."
-                                                    @"SampleHandler."
-                                                    @"replayrestored")
+                @"replay_extension_push_stream_title")
+                                            msg:@""
                                        userInfo:nil];
 }
 
@@ -228,10 +218,8 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
   [self
       sendLocalNotificationToHostAppWithTitle:
           replayKitLocalize(
-              @"ReplayKitUpload.SampleHandler.tencentcloudpushstream")
-                                          msg:replayKitLocalize(
-                                                  @"ReplayKitUpload."
-                                                  @"SampleHandler.replayend")
+              @"replay_extension_push_stream_title")
+                                          msg:@""
                                      userInfo:@{
                                        kReplayKit2UploadingKey : kReplayKit2Stop
                                      }];
@@ -256,14 +244,14 @@ static void onDarwinReplayKit2ResolutionChange(CFNotificationCenterRef center,
   NSString *tip = @"";
   switch (reason) {
   case TXReplayKitExtReasonRequestedByMain:
-    tip = replayKitLocalize(@"ReplayKitUpload.SampleHandler.screenshareend");
+    tip = replayKitLocalize(@"replay_extension_screen_share_ended");
     break;
   case TXReplayKitExtReasonDisconnected:
     tip = replayKitLocalize(
-        @"ReplayKitUpload.SampleHandler.applicationtodisconnect");
+        @"replay_extension_app_disconnected");
     break;
   case TXReplayKitExtReasonVersionMismatch:
-    tip = replayKitLocalize(@"ReplayKitUpload.SampleHandler.integrationerror");
+    tip = replayKitLocalize(@"replay_extension_integration_error");
     break;
   }
 

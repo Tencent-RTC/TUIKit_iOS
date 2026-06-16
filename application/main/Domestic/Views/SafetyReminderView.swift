@@ -2,6 +2,9 @@
 //  SafetyReminderView.swift
 //  main
 //
+//  安全提醒弹窗 — 从 v1 SafetyReminderView 迁移。
+//  样式：全屏半透明遮罩 + 居中圆角卡片 + 富文本内容（首末段加粗）+ 倒计时禁用按钮。
+//
 
 import UIKit
 import SnapKit
@@ -15,13 +18,13 @@ class SafetyReminderView: UIView {
         let view = UIView()
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         view.layer.masksToBounds = true
-        view.layer.cornerRadius = 15
+        view.layer.cornerRadius = 15 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         return view
     }()
 
     private let safeTitle: UILabel = {
         let label = UILabel()
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderTitle")
+        label.text = MainLocalize("main_safety_reminder_title")
         label.font = ThemeStore.shared.typographyTokens.Medium18
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
@@ -37,9 +40,9 @@ class SafetyReminderView: UIView {
         let label = UILabel()
         label.numberOfLines = 0
 
-        let firstPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderFirstPara") + "\n"
-        let midPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderMidPara") + "\n"
-        let endPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderEndPara") + "\n"
+        let firstPara = MainLocalize("main_safety_reminder_first_para") + "\n"
+        let midPara = MainLocalize("main_safety_reminder_mid_para") + "\n"
+        let endPara = MainLocalize("main_safety_reminder_end_para") + "\n"
         let reminderText = firstPara + midPara + endPara
 
         let paragraphStyle = NSMutableParagraphStyle()
@@ -55,9 +58,11 @@ class SafetyReminderView: UIView {
         ]
         let attributedStr = NSMutableAttributedString(string: reminderText, attributes: regularAttr)
 
+        // 首段加粗
         let firstRange = NSRange(location: 0, length: firstPara.count)
         attributedStr.addAttribute(.font, value: semiboldFont, range: firstRange)
 
+        // 末段加粗
         let endRange = NSRange(location: firstPara.count + midPara.count, length: endPara.count)
         attributedStr.addAttribute(.font, value: semiboldFont, range: endRange)
 
@@ -69,7 +74,7 @@ class SafetyReminderView: UIView {
         let view = UIView()
         view.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDisabled
         view.layer.masksToBounds = true
-        view.layer.cornerRadius = 18
+        view.layer.cornerRadius = 18 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         return view
     }()
 
@@ -90,7 +95,7 @@ class SafetyReminderView: UIView {
 
     var confirmTimeCount: Int = 0 {
         didSet {
-            buttonTitleLabel.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm") + "(\(confirmTimeCount))"
+            buttonTitleLabel.text = MainLocalize("main_safety_reminder_confirm") + "(\(confirmTimeCount))"
         }
     }
 
@@ -171,13 +176,13 @@ class SafetyReminderView: UIView {
             if timeCount == 0 {
                 timer.invalidate()
                 self?.confirmButton.isEnabled = true
-                self?.buttonTitleLabel.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm")
+                self?.buttonTitleLabel.text = MainLocalize("main_safety_reminder_confirm")
                 self?.buttonTitleLabel.textColor = ThemeStore.shared.colorTokens.textColorButton
                 self?.confirmButtonView.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
             } else {
                 timeCount -= 1
                 self?.buttonTitleLabel.text =
-                    MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm") + "(\(timeCount))"
+                    MainLocalize("main_safety_reminder_confirm") + "(\(timeCount))"
             }
         }
     }

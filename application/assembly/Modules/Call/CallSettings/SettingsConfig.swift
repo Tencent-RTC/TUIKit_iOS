@@ -2,6 +2,8 @@
 //  SettingsConfig.swift
 //  AppAssembly
 //
+//  通话模块 - 设置配置（仅 RTCubeLab 使用）
+//
 
 import Foundation
 import TUICore

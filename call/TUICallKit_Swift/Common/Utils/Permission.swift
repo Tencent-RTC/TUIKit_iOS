@@ -75,17 +75,17 @@ class Permission: NSObject {
         
         switch deniedType {
         case .audio:
-            title = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Title") ?? ""
-            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Tips") ?? ""
+            title = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Title")
+            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Tips")
             message = String(format: messageTemplate, appName)
-            laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Later") ?? ""
-            openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Enable") ?? ""
+            laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Later")
+            openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetMicrophonePermission.Enable")
         case .video:
-            title = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Title") ?? ""
-            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Tips") ?? ""
+            title = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Title")
+            let messageTemplate = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Tips")
             message = String(format: messageTemplate, appName)
-            laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Later") ?? ""
-            openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Enable") ?? ""
+            laterMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Later")
+            openSettingMessage = TUICallKitLocalize(key: "TUICallKit.FailedToGetCameraPermission.Enable")
         }
         
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert )

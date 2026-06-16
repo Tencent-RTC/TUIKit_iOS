@@ -75,13 +75,13 @@ public class AITranscriberRepository {
     
     @Published public private(set) var selectedSourceLanguage: SourceLanguage = .chineseEnglish
     @Published public private(set) var selectedTranslationLanguage: TranslationLanguage? = .english
-    @Published public private(set) var isTranscriptionStart: Bool = false
     @Published public var isBilingualEnabled: Bool = true
     
     // MARK: - Properties
     
     private let transcriberStore: AITranscriberStore
     private let roomID: String
+    private(set) var isTranscriptionStart: Bool = false
     private(set) var currentConfig: TranscriberConfig?
     private var cancellables = Set<AnyCancellable>()
     
@@ -89,7 +89,7 @@ public class AITranscriberRepository {
     
     public init(roomID: String) {
         self.roomID = roomID
-        transcriberStore = AITranscriberStore.shared
+        transcriberStore = AITranscriberStore.create(roomID: roomID)
         subscribeToTranscriberState()
     }
     

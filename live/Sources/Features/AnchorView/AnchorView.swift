@@ -448,6 +448,8 @@ extension AnchorView {
                         }
                     case .onKickedOutOfLive(let liveID, _, _):
                         if liveID == store.liveID {
+                            let host = WindowUtils.getCurrentWindow() ?? self
+                            host.showAtomicToast(text: .kickedOutText, style: .info, duration: .long)
                             onLiveEnded(liveEndedReason: .endedByHost)
                         }
                 }
@@ -519,7 +521,7 @@ extension AnchorView {
                         routerManager.dismiss(dismissType: .alert, completion: nil)
                     }
                     let alertConfig = AlertViewConfig(title: String.localizedReplace(.connectionInviteText,
-                                                                                     replace: "\(applicantUser.userName)"),
+                                                                                     replace: "\(applicantUser.displayName)"),
                                                       iconUrl: applicantUser.avatarURL,
                                                       cancelButton: cancelButton,
                                                       confirmButton: confirmButton)
@@ -660,26 +662,6 @@ extension AnchorView {
                 needPresentAlertConfig = nil
             }
             .store(in: &cancellableSet)
-        
-        store.kickedOutSubject
-            .receive(on: RunLoop.main)
-            .sink { [weak self] isDismissed in
-                guard let self = self else { return }
-                overlayView.isUserInteractionEnabled = false
-                coreView.isUserInteractionEnabled = false
-                routerManager.router(action: .dismiss())
-                if isDismissed {
-                    showAtomicToast(text: .roomDismissText, style: .warning)
-                } else {
-                    showAtomicToast(text: .kickedOutText, style: .warning)
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                    guard let self = self else { return }
-                    overlayView.isUserInteractionEnabled = true
-                    coreView.isUserInteractionEnabled = true
-                    routerManager.router(action: .exit)
-                }
-            }.store(in: &cancellableSet)
     }
 }
 
@@ -712,7 +694,7 @@ extension AnchorView {
             routerManager.dismiss(dismissType: .alert, completion: nil)
         }
         
-        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.userName),
+        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.displayName),
                                           iconUrl: inviter.avatarURL,
                                           cancelButton: cancelButton,
                                           confirmButton: confirmButton)

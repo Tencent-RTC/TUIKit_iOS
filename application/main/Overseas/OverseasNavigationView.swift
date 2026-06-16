@@ -2,6 +2,15 @@
 //  OverseasNavigationView.swift
 //  main
 //
+//  海外版顶部导航栏（白色背景 + 英文 Logo + 头像按钮）
+//
+//  从 Tencent-RTC/Main/ui/MainNavigationView.swift 迁移至 v2 架构。
+//  变更说明：
+//    - 移除 `import BusinessService`、`import AtomicXCore` 依赖
+//    - 头像更新改为接收外部传入的 URL 字符串（与国内版 MainNavigationView 保持一致）
+//    - 白色背景，仅英文 Logo（固定 main_english_logo, 166x32）
+//    - 复用现有 MainNavigationViewDelegate 协议
+//
 
 import UIKit
 import Kingfisher
@@ -82,6 +91,9 @@ class OverseasNavigationView: UIView {
 
     // MARK: - Public
 
+    /// 更新用户头像
+    ///
+    /// - Parameter urlString: 头像 URL 字符串，传 nil 则使用默认头像
     func updateAvatarImage(urlString: String?) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
             self.mineCenterBtn.setBackgroundImage(UIImage(named: "default_avatar"), for: .normal)

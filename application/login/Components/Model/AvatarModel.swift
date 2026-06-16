@@ -2,6 +2,8 @@
 //  AvatarModel.swift
 //  login
 //
+//  头像数据模型（从旧版 TRTCAlertViewModel.swift 迁移，24个 CDN URL 保持不变）
+//
 
 import Foundation
 

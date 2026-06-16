@@ -2,6 +2,12 @@
 //  ContactUsButtonView.swift
 //  main
 //
+//  "联系我们"浮窗按钮 — 从旧版 iOS/Basic/Business/BusinessService/Source/AppScene/ContactUS 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon` 依赖
+//    - 图片使用 MainAssets 中的 main_entrance_contact
+//
 
 import UIKit
 import SnapKit

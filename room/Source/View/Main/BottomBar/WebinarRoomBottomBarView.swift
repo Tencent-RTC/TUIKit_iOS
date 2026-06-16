@@ -160,39 +160,33 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
         }
         .store(in: &cancellableSet)
         
-        Publishers.CombineLatest3(
+        Publishers.CombineLatest(
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantList))
                 .map { list in list.contains { $0.userID == localUserID } }
                 .removeDuplicates(),
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
                 .map { $0?.cameraStatus }
-                .removeDuplicates(),
-            participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
-                .map { $0?.role }
                 .removeDuplicates()
         )
         .receive(on: RunLoop.main)
-        .sink { [weak self] isLocalInList, camStatus, role in
+        .sink { [weak self] isLocalInList, camStatus in
             guard let self = self else { return }
-            updateCameraStatus(isLocalInParticipantList: isLocalInList, cameraStatus: camStatus, role: role)
+            updateCameraStatus(isLocalInParticipantList: isLocalInList, cameraStatus: camStatus)
         }
         .store(in: &cancellableSet)
         
-        Publishers.CombineLatest3(
+        Publishers.CombineLatest(
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantList))
                 .map { list in list.contains { $0.userID == localUserID } }
                 .removeDuplicates(),
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
                 .map { $0?.screenShareStatus ?? .off }
-                .removeDuplicates(),
-            participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
-                .map { $0?.role }
                 .removeDuplicates()
         )
         .receive(on: RunLoop.main)
-        .sink { [weak self] isLocalInList, screenStatus, role in
+        .sink { [weak self] isLocalInList, screenStatus in
             guard let self = self else { return }
-            updateScreenShareStatus(isLocalInParticipantList: isLocalInList, screenStatus: screenStatus, role: role)
+            updateScreenShareStatus(isLocalInParticipantList: isLocalInList, screenStatus: screenStatus)
         }
         .store(in: &cancellableSet)
         
@@ -230,7 +224,7 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     }
     
     private func updateParticipantCount(count: Int) {
-        RoomKitLog.info("updateParticipantCount count:$count")
+        RoomKitLog.info("updateParticipantCount count:\(count)")
         membersButton.setTitle(.members.localizedReplace("\(count)"))
     }
     
@@ -316,11 +310,10 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     private func updateCameraStatus(
         isLocalInParticipantList: Bool,
-        cameraStatus: DeviceStatus?,
-        role: ParticipantRole?) {
-            RoomKitLog.info("updateCameraStatus isLocalInParticipantList:\(isLocalInParticipantList) cameraStatus:\(cameraStatus) role:\(role)")
+        cameraStatus: DeviceStatus?) {
+            RoomKitLog.info("updateCameraStatus isLocalInParticipantList:\(isLocalInParticipantList) cameraStatus:\(cameraStatus)")
             
-            if !isLocalInParticipantList || role != .owner {
+            if !isLocalInParticipantList {
                 cameraButton.isHidden = true
                 updateStackViewSpacing()
                 return
@@ -340,10 +333,9 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     private func updateScreenShareStatus(
         isLocalInParticipantList: Bool,
-        screenStatus: DeviceStatus,
-        role: ParticipantRole?) {
-            RoomKitLog.info("updateScreenShareStatus isLocalInParticipantList:\(isLocalInParticipantList) screenStatus:\(screenStatus) role:\(role)")
-            if !isLocalInParticipantList || role != .owner {
+        screenStatus: DeviceStatus) {
+            RoomKitLog.info("updateScreenShareStatus isLocalInParticipantList:\(isLocalInParticipantList) screenStatus:\(screenStatus)")
+            if !isLocalInParticipantList {
                 screenShareButton.isHidden = true
                 updateStackViewSpacing()
                 return
@@ -353,10 +345,8 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
             switch screenStatus {
             case .on:
                 screenShareButton.setIcon(ResourceLoader.loadImage("room_stop_screen_share"))
-                screenShareButton.setTitle(.stopScreenShare)
             case .off:
                 screenShareButton.setIcon(ResourceLoader.loadImage("room_start_screen_share"))
-                screenShareButton.setTitle(.startScreenShare)
             }
             updateStackViewSpacing()
         }
@@ -455,7 +445,10 @@ extension WebinarRoomBottomBarView {
         
         if participantStore.state.value.participantListWithVideo.allSatisfy({ $0.userID == loginUserID }) {
             RoomKitLog.info("screenShareButtonTapped: no other sharing, start screen share directly")
-            deviceOperator.launchScreenShareBroadcast()
+            requestScreenShareTip { [weak self] in
+                guard let self = self else { return }
+                deviceOperator.launchScreenShareBroadcast()
+            }
             return
         }
         
@@ -467,7 +460,62 @@ extension WebinarRoomBottomBarView {
         
         showStartVideoConfirmAlert(title: .startScreenShare, message: .startScreenShareMessage) { [weak self] in
             guard let self = self else { return }
-            deviceOperator.launchScreenShareBroadcast()
+            requestScreenShareTip { [weak self] in
+                guard let self = self else { return }
+                deviceOperator.launchScreenShareBroadcast()
+            }
+        }
+    }
+    
+    private func requestScreenShareTip(onApproved: @escaping () -> Void) {
+        let bannedFeatureIds = UserDefaults.standard.stringArray(forKey: "rtcube_module_permission.bannedFeatureIds") ?? []
+        if bannedFeatureIds.contains("screen_share") {
+            RoomKitLog.info("requestScreenShareTip: screen share is banned by backend")
+            showScreenShareForbiddenAlertView()
+            return
+        }
+        showScreenShareTipAlertView(onApproved: onApproved)
+    }
+    
+    private func showScreenShareForbiddenAlertView() {
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
+            view.dismiss()
+        }
+        
+        let contactButtonConfig = AlertButtonConfig(text: .contactUs, type: .blue, isBold: false) { [weak self] view in
+            guard let self = self else { return }
+            self.openContactURL()
+            view.dismiss()
+        }
+        
+        let config = AlertViewConfig(title: .tips,
+                                     content: .unableToSharedScreen,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: contactButtonConfig)
+        AtomicAlertView(config: config).show()
+    }
+    
+    private func showScreenShareTipAlertView(onApproved: @escaping () -> Void) {
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
+            view.dismiss()
+        }
+        
+        let continueButtonConfig = AlertButtonConfig(text: .privacyScreenShareTipContinue, type: .blue, isBold: false) { view in
+            onApproved()
+            view.dismiss()
+        }
+        
+        let config = AlertViewConfig(title: .privacyScreenShareTipTitle,
+                                     content: .privacyScreenShareTipContent,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: continueButtonConfig)
+        AtomicAlertView(config: config).show()
+    }
+    
+    private func openContactURL() {
+        guard let url = URL(string: "https://im.cloud.tencent.com/s/cWSPGIIM62CC/cFUPGIIM62CF") else { return }
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
     
@@ -541,13 +589,16 @@ extension WebinarRoomBottomBarView {
             view.dismiss()
         }
         
-        let stopButtonConfig = AlertButtonConfig(text: .stop, type: .blue, isBold: false) { [weak self] view in
+        let stopButtonConfig = AlertButtonConfig(text: .ok, type: .blue, isBold: false) { [weak self] view in
             guard let self = self else { return }
             deviceOperator.stopScreenShare()
             view.dismiss()
         }
         
-        let config = AlertViewConfig(content: .stopScreenShare, iconUrl: nil, cancelButton: cancelButtonConfig, confirmButton: stopButtonConfig)
+        let config = AlertViewConfig(title: .stopScreenShare,
+                                     content: .stopScreenShareConfirm,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: stopButtonConfig)
         AtomicAlertView(config: config).show()
     }
     
@@ -577,6 +628,7 @@ fileprivate extension String {
     static let startScreenShare = "roomkit_start_screen_share".localized
     static let startScreenShareMessage = "roomkit_screen_share_start_message".localized
     static let stopScreenShare = "roomkit_stop_screen_share".localized
+    static let stopScreenShareConfirm = "roomkit_stop_screen_share_confirm".localized
     static let handsUp = "roomkit_hands_up".localized
     static let handsDown = "roomkit_hands_down".localized
     static let handsUpList = "roomkit_hands_up_list".localized
@@ -586,4 +638,10 @@ fileprivate extension String {
     static let screenShareOccupied = "roomkit_screen_share_occupied".localized
     static let cameraBlockedByScreenShare = "roomkit_camera_blocked_by_screen_share".localized
     static let cannotUnmute = "roomkit_tip_all_muted_cannot_unmute".localized
+    static let tips = "roomkit_tips".localized
+    static let unableToSharedScreen = "roomkit_unable_to_shared_screen".localized
+    static let contactUs = "roomkit_contact_us".localized
+    static let privacyScreenShareTipTitle = "roomkit_privacy_screen_share_tip_title".localized
+    static let privacyScreenShareTipContent = "roomkit_privacy_screen_share_tip_content".localized
+    static let privacyScreenShareTipContinue = "roomkit_privacy_screen_share_tip_continue".localized
 }

@@ -46,7 +46,7 @@ class AnchorUserInfoPanelView: RTCBaseView {
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 16)
-        label.text = user.userName
+        label.text = user.displayName
         label.textColor = .g7
         label.textAlignment = .center
         return label

@@ -17,7 +17,11 @@ class AnchorUserManagePanelView: RTCBaseView {
     private let userManagePanelType: AnchorUserManagePanelType
     private let user: LiveUserInfo
     @Published private var isFollow: Bool = false
-    private var isMessageDisabled = false
+    private var isMessageDisabled: Bool {
+        let userID = user.userID
+        return store.audienceStore.state.value.messageBannedUserList
+            .contains(where: { $0.userID == userID })
+    }
     
     private var isSelf: Bool {
         user.userID == store.selfUserID
@@ -199,10 +203,8 @@ class AnchorUserManagePanelView: RTCBaseView {
         store.audienceStore.state.subscribe(StatePublisherSelector(keyPath: \LiveAudienceState.messageBannedUserList))
             .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { [weak self] userList in
+            .sink { [weak self] _ in
                 guard let self = self else { return }
-                let userID = user.userID
-                isMessageDisabled = userList.contains(where: { $0.userID == userID })
                 updateFeatureItems()
             }
             .store(in: &cancellableSet)
@@ -439,12 +441,11 @@ extension AnchorUserManagePanelView {
     }
     
     private func disableChatClick(_ sender: AnchorFeatureItemButton) {
-        store.audienceStore.disableSendMessage(userID: user.userID, isDisable: !isMessageDisabled) { [weak self, weak sender] result in
+        store.audienceStore.disableSendMessage(userID: user.userID, isDisable: !isMessageDisabled) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(()):
-                isMessageDisabled = !isMessageDisabled
-                sender?.isSelected = isMessageDisabled
+                break
             case .failure(let err):
                 let error = InternalError(code: err.code, message: err.message)
                     store.toastSubject.send((error.localizedMessage, .error))

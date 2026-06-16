@@ -2,6 +2,12 @@
 //  ReportNetworkService.swift
 //  privacy
 //
+//  Report 模块独立的网络请求服务
+//  参考 v2 中 InterpretationRequestManager 的实现模式：
+//    - LoginEntry.shared.config.httpBaseUrl 获取 baseUrl
+//    - LoginManager.shared.getCurrentUser() 获取鉴权信息
+//    - Alamofire 发起 POST 请求
+//
 
 import Foundation
 import Alamofire
@@ -11,8 +17,17 @@ private var reportBaseUrl: String {
     return LoginEntry.shared.config.httpBaseUrl + "base/v1/reports/report_room"
 }
 
+/// Report 模块独立的网络请求服务
 enum ReportNetworkService {
 
+    /// 举报房间
+    /// - Parameters:
+    ///   - targetRoomId: 房间 ID
+    ///   - ownerId: 房主 userId
+    ///   - reason: 举报原因
+    ///   - description: 详情描述
+    ///   - success: 成功回调（主线程）
+    ///   - failed: 失败回调（主线程），参数为 (errorCode, errorMessage)
     static func reportRoom(targetRoomId: String,
                            ownerId: String,
                            reason: String,
@@ -27,6 +42,7 @@ enum ReportNetworkService {
             "description": description,
         ]
 
+        // 附加鉴权参数（与 v2 其他模块一致）
         if let userId = LoginManager.shared.getCurrentUser()?.userId {
             params["userId"] = userId
         }

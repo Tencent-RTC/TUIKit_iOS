@@ -140,7 +140,10 @@ extension LinkMicTypePanel {
 
 extension LinkMicTypePanel {
     @objc func videoSettingImageViewAction() {
-        routerManager.present(view: videoLinkSettingPanel)
+        routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
+            guard let self = self else { return }
+            routerManager.present(view: videoLinkSettingPanel)
+        }))
     }
 }
 

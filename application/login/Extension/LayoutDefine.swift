@@ -2,6 +2,8 @@
 //  LayoutDefine.swift
 //  login
 //
+//  布局常量与工具函数，替代 RTCCommon 中的 ScreenWidth/Height、convertPixel、statusBarHeight 等
+//
 
 import UIKit
 

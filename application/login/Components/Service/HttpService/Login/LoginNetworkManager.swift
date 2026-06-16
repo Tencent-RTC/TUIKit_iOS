@@ -2,12 +2,15 @@
 //  LoginNetworkManager.swift
 //  login
 //
+//  从 BusinessService 复制，仅保留登录模块需要的网络请求方法
+//
 
 import UIKit
 import TUICore
 
 public class LoginNetworkManager: NSObject {
 
+    /// 验证码登录（发送验证码）
     static func getSms(appId: String,
                        ticket: String, phone: String = "", email: String = "",
                        randstr: String = "", success: ((_ data: HttpJsonModel) -> Void)? = nil,
@@ -28,7 +31,7 @@ public class LoginNetworkManager: NSObject {
                           "apaasAppId": apaasAppId]
             NetworkManager.request(baseUrl: baseUrl, params: params, success: success, failed: failed)
         } else {
-            failed?(-1, LoginLocalize("Demo.TRTC.Home.phoneoremailIsEmpty"))
+            failed?(-1, LoginLocalize("login_home_phone_or_email_empty"))
         }
     }
 
@@ -39,10 +42,11 @@ public class LoginNetworkManager: NSObject {
             let params = ["userId": userID]
             NetworkManager.request(baseUrl: baseUrl, params: params, success: success, failed: failed)
         } else {
-            failed?(-1, LoginLocalize("Demo.TRTC.Home.userIDIsEmpty"))
+            failed?(-1, LoginLocalize("login_home_user_id_empty"))
         }
     }
 
+    /// 无验证登录
     public static func noneAuthLogin(withInvitationCode invitationCode: String?,
                                      success: ((_ data: BSUserModel?) -> Void)? = nil,
                                      failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)? = nil) {
@@ -54,11 +58,12 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
 
+    /// 手机验证码登录
     static func login(phone: String, sessionId: String,
                       code: String,
                       success: ((_ data: BSUserModel?) -> Void)?,
@@ -73,11 +78,12 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
 
+    /// 邮箱验证码登录
     static func login(email: String,
                       sessionId: String,
                       code: String,
@@ -93,11 +99,12 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
 
+    /// MOA 票据登录
     public static func loginByMOA(ticket: String,
                                   success: ((_ data: BSUserModel?) -> Void)?,
                                   failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
@@ -112,11 +119,12 @@ public class LoginNetworkManager: NSObject {
                 HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
                 IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
             } else {
-                failed?(-1, LoginLocalize("Demo.TRTC.http.syserror"))
+                failed?(-1, LoginLocalize("login_home_sys_error"))
             }
         }, failed: failed)
     }
 
+    /// Token 登录
     static func loginByToken(userId: String,
                              token: String,
                              success: ((_ data: BSUserModel?) -> Void)?,
@@ -126,22 +134,28 @@ public class LoginNetworkManager: NSObject {
                       "token": token,
                       "apaasAppId": apaasAppId]
         NetworkManager.request(baseUrl: baseUrl, params: params, success: { model in
+            if let sdkAppId = model.sdkAppId {
+                HttpLogicRequest.updateSdkAppId(sdkAppId: sdkAppId)
+            }
             IMLogicRequest.imUserLogin(currentUserModel: model.currentUserModel, success: success, failed: failed)
         }, failed: failed)
     }
 
+    /// 全局调度（获取 captcha appid）
     static func getImageCaptcha(success: ((_ data: HttpJsonModel) -> Void)?,
                                 failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
         let baseUrl = appLoginBaseUrl + "gslb"
         NetworkManager.request(baseUrl: baseUrl, params: nil, success: success, failed: failed)
     }
 
+    /// 心跳保活
     static func keepAlive(success: ((_ data: HttpJsonModel) -> Void)?,
                           failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
         let baseUrl = appLoginBaseUrl + "auth_users/user_keepalive"
         NetworkManager.request(baseUrl: baseUrl, params: [:], success: success, failed: failed)
     }
 
+    /// 注销登录
     static func logout(userId: String, token: String,
                        success: ((_ data: BSUserModel?) -> Void)?,
                        failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
@@ -152,6 +166,7 @@ public class LoginNetworkManager: NSObject {
         }, failed: failed)
     }
 
+    /// 注销账户（删除用户）
     static func deleteUser(userId: String, token: String,
                            success: ((_ data: BSUserModel?) -> Void)?,
                            failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
@@ -162,6 +177,7 @@ public class LoginNetworkManager: NSObject {
         }, failed: failed)
     }
 
+    /// 修改用户信息
     static func updateUser(currentUserModel: BSUserModel,
                            name: String, success: ((_ data: BSUserModel?) -> Void)?,
                            failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)?) {
@@ -176,6 +192,7 @@ public class LoginNetworkManager: NSObject {
         }, failed: failed)
     }
 
+    /// 获取用户信息
     public static func userQueryUserId(param: [AnyHashable : Any]?,
                                        resultCallback: @escaping TUICallServiceResultCallback) -> Bool {
         let searchUserId = param?["searchUserId"]
@@ -202,6 +219,7 @@ public class LoginNetworkManager: NSObject {
                                failed: failed)
     }
 
+    /// 申请邀请码
     static func requestInvitationCode(_ email: String?,
                                       success: ((_ data: HttpJsonModel) -> Void)? = nil,
                                       failed: ((_ errorCode: Int32, _ errorMessage: String?) -> Void)? = nil) {
@@ -212,6 +230,7 @@ public class LoginNetworkManager: NSObject {
         NetworkManager.request(baseUrl: requeURL, params: params, success: success, failed: failed)
     }
 
+    /// 营销邮件订阅
     static func requestEdmSendEmail(_ email: String,
                                     _ marketingStatus: Bool,
                                     success: ((_ data: HttpJsonModel) -> Void)? = nil,
@@ -225,6 +244,7 @@ public class LoginNetworkManager: NSObject {
         NetworkManager.request(baseUrl: requestURL, params: params, success: success, failed: failed)
     }
 
+    /// 心跳保活 (TUICore 适配)
     static func keepUserLoginAlive(param: [AnyHashable: Any]?,
                                    resultCallback: @escaping TUICallServiceResultCallback) -> Bool {
         LoginNetworkManager.keepAlive { data in
@@ -239,6 +259,7 @@ public class LoginNetworkManager: NSObject {
         return true
     }
 
+    /// 处理登录失败码
     static func processLoginFailCode(code: Int32) {
         if (code == 203) || (code == 204) {
             UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue

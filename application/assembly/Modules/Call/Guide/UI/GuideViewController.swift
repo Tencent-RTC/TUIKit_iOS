@@ -2,6 +2,7 @@
 //  GuideViewController.swift
 //  main
 //
+//  Guide 模块 - 引导步骤页面（加载 JSON 数据展示步骤列表）
 
 import UIKit
 import AtomicX
@@ -32,7 +33,7 @@ class GuideViewController: UIViewController {
 
     private let stepsLable: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = GuideLocalize("Demo.TRTC.calling.detailGuideSteps")
+        label.text = GuideLocalize("assembly_call_guide_steps")
         label.font = ThemeStore.shared.typographyTokens.Medium16
         return label
     }()
@@ -198,9 +199,9 @@ extension GuideViewController {
 
     func configReminder() {
         if pageType == .SinglePlayer {
-            reminderLable.text = GuideLocalize("Demo.TRTC.calling.detailGuideReminerText")
+            reminderLable.text = GuideLocalize("assembly_call_guide_reminder_single")
         } else {
-            reminderLable.text = GuideLocalize("Demo.TRTC.calling.detailMultiGuideReminerText")
+            reminderLable.text = GuideLocalize("assembly_call_guide_reminder_multi")
         }
     }
 }
@@ -290,7 +291,7 @@ extension GuideViewController {
             stringToCopy = copyUrlEn
         }
         UIPasteboard.general.string = stringToCopy
-        view.makeToast(GuideLocalize("Demo.TRTC.calling.guideCopySucess"))
+        view.makeToast(GuideLocalize("assembly_call_guide_copy_success"))
     }
 
     @objc func showSelectTableView() {

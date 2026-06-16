@@ -2,10 +2,15 @@
 //  AvatarListAlertView.swift
 //  login
 //
+//  头像选择弹窗（从旧版 TRTCAlerts.swift 迁移，CollectionView 4列布局不变）
+//  底部弹出，CollectionView 4列，圆形头像 + 蓝色选中边框
+//
 
 import UIKit
 import AtomicX
 import Kingfisher
+
+// MARK: - AlertContentView 基类
 
 class AlertContentView: UIView {
     lazy var bgView: UIView = {
@@ -118,7 +123,7 @@ class AvatarListAlertView: AlertContentView {
     
     lazy var confirmBtn: UIButton = {
         let btn = UIButton(type: .system)
-        btn.setTitle(LoginLocalize("Demo.TRTC.Login.done"), for: .normal)
+        btn.setTitle(LoginLocalize("login_profile_avatar_dialog_confirm"), for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium16
         btn.isEnabled = false
         return btn
@@ -142,7 +147,7 @@ class AvatarListAlertView: AlertContentView {
     override init(frame: CGRect = .zero, viewModel: AvatarViewModel) {
         super.init(frame: frame, viewModel: viewModel)
         titleLabel.font = ThemeStore.shared.typographyTokens.Medium20
-        titleLabel.text = LoginLocalize("Demo.TRTC.Login.setavatar")
+        titleLabel.text = LoginLocalize("login_profile_avatar_dialog_title")
     }
     
     required init?(coder: NSCoder) {

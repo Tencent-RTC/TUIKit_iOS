@@ -8,6 +8,7 @@
 import AtomicXCore
 import Combine
 import Login
+import TUILiveKit
 
 class AtomicXCoreLogin {
     private var cancellable: AnyCancellable?
@@ -26,8 +27,13 @@ class AtomicXCoreLogin {
                 if let userModel = userModel {
                     LoginStore.shared.login(sdkAppID: Int32(LoginEntry.shared.config.sdkAppId),
                                             userID: userModel.userId,
-                                            userSig: userModel.userSig,
-                                            completion: nil)
+                                            userSig: userModel.userSig) { result in
+                        switch result {
+                        case .success:
+                            KeyMetrics.reportAtomicMetrics(platform: Constants.DataReport.kDataReportDemoLoginSuccess)
+                        default: break
+                        }
+                    }
                 } else {
                     LoginStore.shared.logout(completion: nil)
                 }

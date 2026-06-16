@@ -420,18 +420,8 @@ extension interactionInvitePanel {
 }
 
     private func handleConnectionError(_ error: ErrorInfo) {
-        switch error.code {
-            case TUIConnectionCode.roomNotExist.rawValue,
-                TUIConnectionCode.connecting.rawValue,
-                TUIConnectionCode.connectingOtherRoom.rawValue,
-                TUIConnectionCode.full.rawValue,
-                TUIConnectionCode.retry.rawValue:
-                let error = InternalError(error: TUIConnectionCode(rawValue: error.code) ?? .unknown, message: error.message)
-                toastService.showToast(error.localizedMessage, toastStyle: .error)
-            default:
-                let error = InternalError(code: error.code, message: error.message)
-                toastService.showToast(error.localizedMessage, toastStyle: .error)
-        }
+        let error = InternalError(errorInfo: error)
+        toastService.showToast(error.localizedMessage, toastStyle: .error)
     }
 }
 
@@ -574,5 +564,3 @@ fileprivate extension String {
     static let requestTimeoutText = internalLocalized("common_connect_invitation_timeout")
     static let cannotConnectionWithBackSeatsOccupiedText = internalLocalized("common_back_seats_occupied")
 }
-
-

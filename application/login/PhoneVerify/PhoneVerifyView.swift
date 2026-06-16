@@ -2,6 +2,10 @@
 //  PhoneVerifyView.swift
 //  login
 //
+//  手机号登录入口视图
+//  从旧版 TRTCPhoneLoginView + TRTCLoginRootView 基类布局组合而成
+//  所有 SnapKit 约束值与旧版完全一致
+//
 
 import UIKit
 import AtomicX
@@ -47,13 +51,13 @@ class PhoneVerifyView: UIView {
     lazy var loginButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitleColor(.white, for: .normal)
-        button.setTitle(LoginLocalize("V2.Live.LoginMock.login"), for: .normal)
+        button.setTitle(LoginLocalize("login_btn_login"), for: .normal)
         button.adjustsImageWhenHighlighted = false
         button.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium18
         button.layer.shadowColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor
         button.layer.shadowOffset = CGSize(width: 0, height: 6)
-        button.layer.shadowRadius = 16
+        button.layer.shadowRadius = 16 // NOTE: 不在 AtomicX Shadows 体系中，保留原值
         button.layer.shadowOpacity = 0.4
         button.layer.masksToBounds = true
         button.isEnabled = false
@@ -79,7 +83,7 @@ class PhoneVerifyView: UIView {
     
     lazy var dividerLabel: UILabel = {
         let label = UILabel()
-        label.text = LoginLocalize("Demo.TRTC.Login.ioatext")
+        label.text = LoginLocalize("login_home_ioa_text")
         label.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textAlignment = .center
@@ -240,6 +244,12 @@ class PhoneVerifyView: UIView {
         #if LOGIN_FULL
         ioaLoginButton.addTarget(self, action: #selector(ioaLoginButtonClick), for: .touchUpInside)
         #endif
+
+        headerView.onHiddenEntryTriggered = { [weak self] in
+            guard let self = self else { return }
+            let configVC = HiddenConfigViewController()
+            navigationController?.pushViewController(configVC, animated: true)
+        }
         
         phoneInputView.onTextChanged = { [weak self] text in
             guard let self = self else { return }
@@ -256,15 +266,13 @@ class PhoneVerifyView: UIView {
         privacyAgreementView.hostViewController = navigationController
         
         // Subscribe to state changes
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message)
             }
             .store(in: &cancellables)
-        
+
         store.$state
             .map(\.isLoading)
             .removeDuplicates()
@@ -299,11 +307,12 @@ class PhoneVerifyView: UIView {
             }
             .store(in: &cancellables)
         
+        // Store 状态重置时（登出），同步清空输入框并恢复按钮状态
         store.$state
             .map(\.phoneNumber)
             .removeDuplicates()
             .filter { $0.isEmpty }
-            .dropFirst()
+            .dropFirst() // 跳过初始空值
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }

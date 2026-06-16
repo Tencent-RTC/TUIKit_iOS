@@ -2,6 +2,8 @@
 //  TRTCGroupCallingContactViewController.swift
 //  main
 //
+//  通话模块 - 群组通话 VC（已添加用户列表 + 搜索添加，最多 8 人）
+//
 
 import UIKit
 import Foundation
@@ -27,7 +29,7 @@ public class TRTCGroupCallingContactViewController: UIViewController {
 
     let addedTableTitle: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = CallingLocalize("Demo.TRTC.calling.addedUser")
+        label.text = CallingLocalize("assembly_call_added_user")
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = UIColor.black
         label.textAlignment = .left
@@ -46,7 +48,7 @@ public class TRTCGroupCallingContactViewController: UIViewController {
 
     lazy var noMembersTip: UILabel = {
         let label = UILabel()
-        label.text = CallingLocalize("Demo.TRTC.calling.tips")
+        label.text = CallingLocalize("assembly_call_no_users_added")
         label.numberOfLines = 2
         label.textAlignment = NSTextAlignment.center
         label.textColor = ThemeStore.shared.colorTokens.textColorDisable
@@ -72,7 +74,7 @@ public class TRTCGroupCallingContactViewController: UIViewController {
         navigationItem.leftBarButtonItem = item
 
         let callBtn = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 30))
-        callBtn.setTitle(CallingLocalize("Demo.TRTC.calling.done"), for: .normal)
+        callBtn.setTitle(CallingLocalize("assembly_call_btn_done"), for: .normal)
         callBtn.setTitleColor(UIColor.black, for: .normal)
         callBtn.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
         callBtn.addTarget(self, action: #selector(showCallVC), for: .touchUpInside)
@@ -90,7 +92,7 @@ public class TRTCGroupCallingContactViewController: UIViewController {
         var userIds: [String] = []
         for item in addedUserModel { userIds.append(item.userId) }
         guard userIds.count > 0 else {
-            self.view.makeToast(CallingLocalize("Demo.TRTC.calling.tips"))
+            self.view.makeToast(CallingLocalize("assembly_call_no_users_added"))
             return
         }
         TUICallKit.createInstance().calls(userIdList: userIds, mediaType: callType, params: nil, completion: nil)
@@ -174,7 +176,7 @@ extension TRTCGroupCallingContactViewController {
     func adduser(users: [UserModel]) {
         guard users.count > 0 else { return }
         guard addedUserModel.count < 8 else {
-            self.view.makeToast(CallingLocalize("Demo.TRTC.calling.numExceed"))
+            self.view.makeToast(CallingLocalize("assembly_call_users_exceeded"))
             return
         }
         var addedFlag = false

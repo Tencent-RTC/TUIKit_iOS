@@ -268,6 +268,15 @@ public class AITranscriptionSettingView: UIView {
         return tv
     }()
     
+    private let loadView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray.withAlphaComponent(0.5)
+        view.isHidden = true
+        return view
+    }()
+    
+    private let loadingIndicatorView = UIActivityIndicatorView(style: .large)
+    
     private var isOwner: Bool = false
     
     // MARK: - Initialization
@@ -293,6 +302,8 @@ public class AITranscriptionSettingView: UIView {
         backButtonContainerView.addSubview(titleLabel)
         addSubview(sectionTitleLabel)
         addSubview(tableView)
+        addSubview(loadView)
+        loadView.addSubview(loadingIndicatorView)
     }
     
     private func setupConstraints() {
@@ -325,6 +336,14 @@ public class AITranscriptionSettingView: UIView {
             make.leading.equalToSuperview().offset(12)
             make.trailing.equalToSuperview().offset(-12)
             make.height.equalTo(52 * 3)
+        }
+        
+        loadView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        loadingIndicatorView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     
@@ -446,8 +465,14 @@ public class AITranscriptionSettingView: UIView {
         
         let picker = AITranscriptionPickerView(title: .selectSourceLanguage, items: items) { [weak self] index, _ in
             guard let self = self, let repo = self.repository else { return }
+            showLoading()
             let selectedLanguage = repo.sourceLanguageList[index]
-            repo.updateTranscription(sourceLanguage: selectedLanguage)
+            repo.updateTranscription(sourceLanguage: selectedLanguage) { _ in
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    hiddenLoading()
+                }
+            }
         }
         picker.show(in: parent, animated: true)
     }
@@ -465,8 +490,14 @@ public class AITranscriptionSettingView: UIView {
         
         let picker = AITranscriptionPickerView(title: .selectTranslationLanguage, items: items) { [weak self] index, _ in
             guard let self = self, let repo = self.repository else { return }
+            showLoading()
             let selectedLanguage = repo.translationLanguageList[index]
-            repo.updateTranscription(translationLanguage: selectedLanguage)
+            repo.updateTranscription(translationLanguage: selectedLanguage) { _ in
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    hiddenLoading()
+                }
+            }
         }
         picker.show(in: parent, animated: true)
     }
@@ -481,6 +512,16 @@ public class AITranscriptionSettingView: UIView {
         guard index < rows.count else { return }
         rows[index].isOn = isOn
         tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+    }
+    
+    private func showLoading() {
+        loadView.isHidden = false
+        loadingIndicatorView.startAnimating()
+    }
+    
+    private func hiddenLoading() {
+        loadingIndicatorView.stopAnimating()
+        loadView.isHidden = true
     }
     
     // MARK: - Actions

@@ -2,6 +2,16 @@
 //  OverseasMainViewController.swift
 //  main
 //
+//  海外版首页内容页（双 Tab）— 从 Tencent-RTC/MainViewController.swift 迁移
+//
+//  变更说明：
+//    - 数据源从硬编码 MainMenuItemModel 数组改为 EntranceStore + ResolvedModule
+//    - 模块按 identifier 分组：discoveryIdentifiers 归入 Discovery Lab，其余归入 Products
+//    - 移除 `import RTCCommon`、`import BusinessService` 等直接依赖
+//    - 跳转逻辑统一使用 config.targetProvider()，不再硬编码各模块跳转
+//    - 埋点事件名使用 "tencent_rtc_main_click_event"
+//    - 其他 UI 布局完全保持旧版不变
+//
 
 import UIKit
 import Combine
@@ -20,17 +30,20 @@ class OverseasMainViewController: UIViewController {
     private let store = EntranceStore()
     private var cancellables = Set<AnyCancellable>()
 
+    /// Discovery Lab Tab 中展示的模块 identifier
     private let discoveryIdentifiers: Set<String> = ["player", "ugsv"]
 
+    /// Products Tab 的模块列表
     private var productsModules: [ResolvedModule] = []
+    /// Discovery Lab Tab 的模块列表
     private var discoveryModules: [ResolvedModule] = []
 
     // MARK: - UI Elements
 
     private let topSegmentedView: UISegmentedControl = {
         let segmentedView = UISegmentedControl(items: [
-            MainLocalize("Demo.TRTC.Portal.Main.Products"),
-            MainLocalize("Demo.TRTC.Portal.Main.DiscoveryLab"),
+            MainLocalize("main_overseas_tab_products"),
+            MainLocalize("main_overseas_tab_discovery"),
         ])
         segmentedView.selectedSegmentIndex = 0
         segmentedView.setTitleTextAttributes([
@@ -110,8 +123,14 @@ class OverseasMainViewController: UIViewController {
         super.viewDidLoad()
 
         let appEnvironment = ModuleEnvironment(
-            beautyLicenseURL: "https://license.example.com/live",
-            beautyLicenseKey: "YOUR_SECRET_KEY_123",
+            liveLicenseURL: LIVE_LICENSE_URL,
+            liveLicenseKey: LIVE_LICENSE_KEY,
+            effectLicenseURL: TENCENT_EFFECT_LICENSE_URL,
+            effectLicenseKey: TENCENT_EFFECT_LICENSE_KEY,
+            playerLicenseURL: PLAYER_LICENSE_URL,
+            playerLicenseKey: PLAYER_LICENSE_KEY,
+            copyrightedMusicLicenseKey: COPYRIGHTED_MUSIC_LICENSE_KEY,
+            copyrightedMusicLicenseUrl: COPYRIGHTED_MUSIC_LICENSE_URL,
             getCurrentUserModel: {
                 return LoginEntry.shared.userModel
             },
@@ -120,17 +139,31 @@ class OverseasMainViewController: UIViewController {
             }
         )
 
+        // ① 从 AppAssembly 获取所有场景模块并注册到首页
+        // 海外版禁用实名认证（与旧版 Tencent-RTC/AppDelegate.configApp() 行为一致）
         PrivacyEntry.enableIdCardVerification = false
 
         #if !OPEN_SOURCE
+        // 注入隐私模块统一动作回调（UI 由 privacy 模块提供）
         AppAssembly.shared.privacyActionHandler = { action in
+            // MOA/IOA 内部账号统一跳过所有隐私/风控动作，对需要结果回调的动作直接放行
+            if LoginManager.shared.getCurrentUser()?.isMoa() == true {
+                switch action {
+                case .checkRealNameAuth(_, _, let completion):
+                    completion(true, "success")
+                case .showFaceIdTokenVerify(_, _, let completion):
+                    completion(true, "")
+                default:
+                    break
+                }
+                return
+            }
+
             switch action {
             case .showHighRiskIPAlert:
                 RoomRiskIPPresenter.showHighRiskIPAlert()
             case .showAntifraudReminder:
                 AntifraudAlertManager.showAntifraudReminder()
-            case .showScreenShareAntifraud(let completion):
-                AntifraudAlertManager.showScreenShareAntifraudReminder(completion: completion)
             case .checkRealNameAuth(let userId, let token, let completion):
                 AntifraudAlertManager.checkRealNameAuth(userId: userId, token: token, completion: completion)
             case .showFaceIdTokenVerify(let userId, let token, let completion):
@@ -141,6 +174,18 @@ class OverseasMainViewController: UIViewController {
                 TimeLimitPresenter.showRemainingOneMinToast()
             case .showLiveTimeOutAlert(let onDismiss):
                 TimeLimitPresenter.showLiveTimeOutAlert(onDismiss: onDismiss)
+            }
+        }
+        AppAssembly.shared.analyticEventHandler = { action in
+            switch action {
+            case .liveEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "live", event: name, params: params)
+            case .voiceRoomEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "voice_room", event: name, params: params)
+            case .aiConversationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "conversation_ai", event: name, params: params)
+            case .interpretationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "simultaneous_interpretation", event: name, params: params)
             }
         }
         #endif
@@ -157,16 +202,26 @@ class OverseasMainViewController: UIViewController {
             registry.register(provider)
         }
 
+        // ② 注册需要 App 生命周期回调的 handler
         AppAssembly.shared.registerLifecycleHandlers()
 
+        // ③ 构建 UI
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
 
+        // ④ 加载模块数据
         store.loadModules()
         splitModules()
 
+        // ⑤ 订阅 Store 状态变化，驱动 UI 刷新
         bindStoreState()
+
+        // ⑤.5 启动模块级埋点观察器 + 初始化埋点公共属性
+        #if !DEBUG
+        initAnalytics()
+        ModuleAnalytics.start()
+        #endif
 
         setupToast()
     }
@@ -184,6 +239,7 @@ class OverseasMainViewController: UIViewController {
 
     // MARK: - Module Split
 
+    /// 将全部模块按 identifier 分为 Products / Discovery 两组
     private func splitModules() {
         let allModules = store.state.modules.filter { $0.isVisible }
         productsModules = allModules.filter { !discoveryIdentifiers.contains($0.config.identifier) }
@@ -206,8 +262,10 @@ class OverseasMainViewController: UIViewController {
 
     // MARK: - Public
 
+    /// 更新未读消息红点
     func updateUnreadCount(_ totalUnreadCount: UInt64) {
         guard !productsModules.isEmpty else { return }
+        // 未读数更新到第一个模块（Call 模块）
         let identifier = productsModules[0].config.identifier
         store.updateBadgeCount(for: identifier, count: totalUnreadCount)
         splitModules()
@@ -334,10 +392,24 @@ extension OverseasMainViewController: UICollectionViewDelegate {
             module = discoveryModules[indexPath.item]
         }
 
+        // 埋点
         if !module.config.analyticsEvent.isEmpty {
             trackSensorData(module.config.analyticsEvent)
         }
 
+        // 场景体验入口拦截：海外版 push MiniProgramViewController
+        // 仅 TencentRTC（RTCUBE_OVERSEAS）target 真实编译进 MiniProgramViewController；
+        // RTCube / RTCubeLab 虽然也编译此文件，但 Banner 卡片仅在海外配置中存在，
+        // 加宏守卫主要解决符号查找问题
+        if module.config.identifier == "scenes_application" {
+            #if RTCUBE_OVERSEAS
+            let miniVC = MiniProgramViewController()
+            navigationController?.pushViewController(miniVC, animated: true)
+            #endif
+            return
+        }
+
+        // 创建并跳转目标 VC
         if let targetVC = module.config.targetProvider() {
             if targetVC.modalPresentationStyle == .fullScreen {
                 present(targetVC, animated: true)
@@ -404,12 +476,15 @@ extension OverseasMainViewController: UICollectionViewDataSource {
 extension OverseasMainViewController {
 
     @objc private func goScenarioExperience() {
-        if let scenesModule = store.state.modules.first(where: { $0.config.identifier == "scenesApplication" }) {
-            if let targetVC = scenesModule.config.targetProvider() {
-                targetVC.title = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperience")
-                navigationController?.pushViewController(targetVC, animated: true)
-            }
-        }
+        // 场景体验跳转 — 海外版直接 push MiniProgramViewController
+        // （与 collectionView didSelectItemAt 中 scenes_application 拦截分支一致）
+        // MiniProgramViewController 仅 TencentRTC（RTCUBE_OVERSEAS）target 编译，
+        // 加宏守卫保证 RTCube / RTCubeLab 编译时能找到符号
+        #if RTCUBE_OVERSEAS
+        let miniVC = MiniProgramViewController()
+        miniVC.title = MainLocalize("main_overseas_scenario_experience")
+        navigationController?.pushViewController(miniVC, animated: true)
+        #endif
     }
 }
 
@@ -417,10 +492,19 @@ extension OverseasMainViewController {
 
 extension OverseasMainViewController {
 
+    private func initAnalytics() {
+        let userId = LoginEntry.shared.userModel?.userId ?? ""
+        let sdkAppId = LoginEntry.shared.config.sdkAppId
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        let loginMode = LoginEntry.shared.loggedInMode?.rawValue ?? LoginMode.debugAuth.rawValue
+        let appTarget = "overseas"
+        AppAnalytics.initialize(sdkAppId: sdkAppId, userId: userId, appTarget: appTarget, appVersion: appVersion, loginMode: "\(loginMode)")
+    }
+
     private func trackSensorData(_ event: String) {
         let loginType = resolveLoginType()
         AppAnalytics.trackMainClick(
-            eventName: "tencent_rtc_main_click_event",
+            eventName: .tencentRTCMainClick,
             mainEvent: event,
             loginType: loginType
         )

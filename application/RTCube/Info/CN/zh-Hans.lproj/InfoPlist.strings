@@ -1,0 +1,14 @@
+/* 
+  InfoPlist.strings
+  RTCube (CN)
+
+  本地化覆盖 Info.plist 中的字段，iOS 取值优先级：本地化 .strings > Info.plist。
+  与旧 iOS/App/RT-Cube 工程保持 1:1 一致。
+*/
+
+"CFBundleDisplayName" = "腾讯云音视频";
+"NSCameraUsageDescription" = "音视频通话需要使用您的相机权限";
+"NSMicrophoneUsageDescription" = "音视频通话需要使用您的麦克风权限";
+"NSPhotoLibraryUsageDescription" = "需要您的相册权限来使用照片或视频";
+"NSPhotoLibraryAddUsageDescription" = "需要您的相册权限来保存照片或视频";
+"UILaunchStoryboardName" = "LaunchScreen";

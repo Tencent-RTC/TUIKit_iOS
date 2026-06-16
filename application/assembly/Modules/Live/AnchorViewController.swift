@@ -25,7 +25,9 @@ class AnchorViewController: UIViewController {
 
     private let anchorView: AnchorView
 
+    /// 9分钟定时器（开播后第9分钟提示剩余1分钟）
     private var remainingTimer: Timer?
+    /// 10分钟定时器（开播后第10分钟自动解散房间）
     private var timeOutTimer: Timer?
 
     init(liveInfo: LiveInfo, coreView: LiveCoreView? = nil, behavior: RoomBehavior = .createRoom) {
@@ -96,6 +98,7 @@ class AnchorViewController: UIViewController {
         remainingTimer = nil
         timeOutTimer?.invalidate()
         timeOutTimer = nil
+        // 房间结束时重置高风险 IP 弹窗标记，确保下次进入新房间可再次弹窗
         RoomRiskIPObserver.shared.resetForNewRoom()
         AudioEffectStore.shared.reset()
         DeviceStore.shared.reset()
@@ -144,7 +147,11 @@ class AnchorViewController: UIViewController {
         return .portrait
     }
 
+    // MARK: - 体验时长定时器
+
+    /// 开播后启动9分钟定时器，到期后通过 privacyActionHandler 弹出"剩余1分钟"Toast
     private static let kNineMinuteDuration: TimeInterval = 9 * 60
+    /// 开播后启动10分钟定时器，到期后自动解散房间并弹出超时提示
     private static let kTenMinuteDuration: TimeInterval = 10 * 60
 
     private func startRemainingTimer() {
@@ -182,9 +189,13 @@ extension AnchorViewController: AnchorViewDelegate {
     }
     
     func onStartLiving() {
+        // IOA 登录用户跳过 10 分钟提示
         guard LoginManager.shared.currentUser?.isMoa() != true else { return }
+        // 弹出10分钟体验时长提示弹窗
         AppAssembly.shared.privacyActionHandler?(.showLiveTimeLimitAlert)
+        // 启动9分钟定时器，到期后弹出"剩余1分钟"Toast
         startRemainingTimer()
+        // 启动10分钟定时器，到期后自动解散房间并弹出超时提示
         startTimeOutTimer()
     }
     

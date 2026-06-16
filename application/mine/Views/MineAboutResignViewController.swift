@@ -2,6 +2,14 @@
 //  MineAboutResignViewController.swift
 //  mine
 //
+//  账号注销页面 — 从旧版 iOS/App/RT-Cube/Mine/ui/MineAboutResignViewController.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon / BusinessService / AtomicXCore / ITLogin / TUICore`
+//    - 注销账户通过 LoginEntry.shared.logoff() 统一处理
+//    - 获取 userId 通过 LoginEntry.shared.userModel 而非 LoginManager
+//    - 使用 assembly/Extension 中的工具函数
+//
 
 import UIKit
 import AtomicX
@@ -23,7 +31,7 @@ class MineAboutResignViewController: UIViewController {
         label.numberOfLines = 0
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5
-        label.text = MineLocalize("Demo.TRTC.Portal.resigntips")
+        label.text = MineLocalize("mine_logoff_hint")
         return label
     }()
     
@@ -39,7 +47,7 @@ class MineAboutResignViewController: UIViewController {
     
     lazy var confirmBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle(MineLocalize("Demo.TRTC.Portal.confirmresign"), for: .normal)
+        btn.setTitle(MineLocalize("mine_logoff_btn_text"), for: .normal)
         btn.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
         btn.addTarget(self, action: #selector(resignBtnClick), for: .touchUpInside)
         return btn
@@ -58,7 +66,7 @@ class MineAboutResignViewController: UIViewController {
         
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         
-        self.title = MineLocalize("Demo.TRTC.Portal.resignaccount")
+        self.title = MineLocalize("mine_logoff_title")
         navigationController?.navigationBar.titleTextAttributes = [
             NSAttributedString.Key.foregroundColor: UIColor.black,
             NSAttributedString.Key.font: ThemeStore.shared.typographyTokens.Bold18
@@ -104,10 +112,8 @@ class MineAboutResignViewController: UIViewController {
             make.height.equalTo(56)
         }
         
-        numberLabel.text = MineLocalize(
-            "Demo.TRTC.Portal.currentaccount",
-            LoginEntry.shared.userModel?.userId ?? ""
-        )
+        numberLabel.text = MineLocalize("mine_logoff_cur_account")
+            .replacingOccurrences(of: "xxx", with: LoginEntry.shared.userModel?.userId ?? "")
         
         view.addSubview(loading)
         loading.snp.makeConstraints { make in
@@ -118,16 +124,16 @@ class MineAboutResignViewController: UIViewController {
     
     @objc func resignBtnClick() {
         let alert = UIAlertController(
-            title: MineLocalize("Demo.TRTC.Portal.alerttoresign"),
+            title: MineLocalize("mine_logoff_confirm"),
             message: "",
             preferredStyle: .alert
         )
         let cancel = UIAlertAction(
-            title: MineLocalize("App.PortalViewController.cancel"),
+            title: MineLocalize("mine_common_btn_cancel"),
             style: .cancel, handler: nil
         )
         let confirm = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.confirmresign"),
+            title: MineLocalize("mine_logoff_btn_text"),
             style: .default
         ) { [weak self] _ in
             self?.resignPhoneNumber()
@@ -146,8 +152,9 @@ class MineAboutResignViewController: UIViewController {
             case .success:
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                    let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
-                    window.makeToast(MineLocalize("Demo.TRTC.Portal.resignsuccess"))
+                    window.makeToast(MineLocalize("mine_logoff_ok"))
                 }
+                // 注销成功后通知外部跳转登录页
                 if let mineVC = self.navigationController?.viewControllers.first(where: { $0 is MineViewController }) as? MineViewController {
                     mineVC.onLogout?()
                 }

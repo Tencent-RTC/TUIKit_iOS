@@ -2,6 +2,8 @@
 //  FullScreenLoadingView.swift
 //  login
 //
+//  全屏 loading 遮罩（从旧版 FullScreenLoadingView.swift 迁移，UI 完全保持不变）
+//
 
 import UIKit
 import SnapKit
@@ -45,7 +47,7 @@ public class FullScreenLoadingView: UIView {
         label.textColor = .white
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textAlignment = .left
-        label.text = LoginLocalize("Demo.TRTC.Login.loading")
+        label.text = LoginLocalize("login_home_loading")
         return label
     }()
 
@@ -115,7 +117,7 @@ public class FullScreenLoadingView: UIView {
     }
 
     private func setMessage(_ message: String?) {
-        loadingLabel.text = message ?? LoginLocalize("Demo.TRTC.Login.ioaLoading")
+        loadingLabel.text = message ?? LoginLocalize("login_ioa_loading")
     }
 
     // MARK: - Public Methods

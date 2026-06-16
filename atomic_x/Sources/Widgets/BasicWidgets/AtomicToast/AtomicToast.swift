@@ -132,20 +132,10 @@ class AtomicToast: UIView {
         return imageView
     }()
     
-    private lazy var containerStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.distribution = .fill
-        stackView.spacing = size.elementSpacing
-        stackView.isUserInteractionEnabled = false
-        
-        if let iconImageView = iconImageView {
-            stackView.addArrangedSubview(iconImageView)
-        }
-        stackView.addArrangedSubview(textLabel)
-        
-        return stackView
+    private lazy var contentContainerView: UIView = {
+        let view = UIView()
+        view.isUserInteractionEnabled = false
+        return view
     }()
     
     private var cancellables = Set<AnyCancellable>()
@@ -240,7 +230,11 @@ class AtomicToast: UIView {
         }
 
         containerView.addSubview(self)
-        addSubview(containerStackView)
+        addSubview(contentContainerView)
+        if let iconImageView = iconImageView {
+            contentContainerView.addSubview(iconImageView)
+        }
+        contentContainerView.addSubview(textLabel)
         setupConstraints(position: position)
     }
     
@@ -274,7 +268,7 @@ class AtomicToast: UIView {
             applyPositionConstraint(make, for: position)
         }
         
-        containerStackView.snp.makeConstraints { make in
+        contentContainerView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(UIEdgeInsets(
                 top: size.elementSpacing,
                 left: size.insetHorizontalPadding,
@@ -283,8 +277,26 @@ class AtomicToast: UIView {
             ))
         }
         
-        iconImageView?.snp.makeConstraints { make in
-            make.width.height.equalTo(size.iconSize)
+        let maxTextWidth = size.maxWidth - size.insetHorizontalPadding * 2
+        
+        if let iconImageView = iconImageView {
+            iconImageView.snp.makeConstraints { make in
+                make.leading.equalToSuperview()
+                make.centerY.equalToSuperview()
+                make.width.height.equalTo(size.iconSize)
+            }
+            
+            textLabel.snp.makeConstraints { make in
+                make.leading.equalTo(iconImageView.snp.trailing).offset(size.elementSpacing)
+                make.trailing.lessThanOrEqualToSuperview()
+                make.top.bottom.equalToSuperview()
+                make.width.lessThanOrEqualTo(maxTextWidth - size.iconSize - size.elementSpacing)
+            }
+        } else {
+            textLabel.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+                make.width.lessThanOrEqualTo(maxTextWidth)
+            }
         }
     }
     

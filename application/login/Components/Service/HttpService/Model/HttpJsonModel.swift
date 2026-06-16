@@ -2,10 +2,14 @@
 //  HttpJsonModel.swift
 //  login
 //
+//  从 BusinessService 复制，仅保留登录模块需要的部分
+//  （去除了 Karaoke、Room、ShowLive 等不相关的解析逻辑）
+//
 
 import Foundation
 import TUICore
 
+/// HTTP 响应拦截模型
 public class HttpJsonModel: NSObject {
     public var errorCode: Int32 = -1
     public var errorMessage: String = ""
@@ -30,26 +34,33 @@ public class HttpJsonModel: NSObject {
         return info
     }
 
+    // MARK: - 懒加载业务解析
+
+    /// 全局调度 — captcha web appid
     public lazy var captchaWebAppid: NSInteger? = {
         guard let result = data as? [String: Any] else { return nil }
         return result["captcha_web_appid"] as? NSInteger
     }()
 
+    /// 获取验证码 sessionId
     public lazy var sessionID: String? = {
         guard let result = data as? [String: Any] else { return nil }
         return result["sessionId"] as? String
     }()
 
+    /// 获取登录返回的 sdkAppId
     public lazy var sdkAppId: Int32? = {
         guard let result = data as? [String: Any] else { return nil }
         return result["sdkAppId"] as? Int32
     }()
 
+    /// 获取 UserModel
     public lazy var currentUserModel: BSUserModel? = {
         guard let result = data as? [String: Any] else { return nil }
         return getUserModel(result)
     }()
 
+    /// 获取用户列表
     public lazy var users: [BSUserModel] = {
         var usersResult: [BSUserModel] = []
         guard let result = data as? [[String: Any]] else { return usersResult }
@@ -61,6 +72,7 @@ public class HttpJsonModel: NSObject {
         return usersResult
     }()
 
+    /// 获取搜索用户
     public lazy var searchUserModel: BSUserModel? = {
         guard let result = data as? [String: Any] else { return nil }
         return getSearchUserModel(result)

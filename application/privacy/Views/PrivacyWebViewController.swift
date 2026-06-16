@@ -2,6 +2,9 @@
 //  PrivacyWebViewController.swift
 //  privacy
 //
+//  通用 WebView 页面 — 展示隐私/用户协议网页
+//  从 Login 模块的 WebViewController 迁移
+//
 
 import UIKit
 import AtomicX

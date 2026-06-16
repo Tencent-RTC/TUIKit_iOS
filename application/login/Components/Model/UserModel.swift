@@ -2,9 +2,12 @@
 //  UserModel.swift
 //  login
 //
+//  用户数据模型（对外可见）
+//
 
 import Foundation
 
+/// 用户数据模型
 public struct UserModel {
     public var userId: String
     public var token: String

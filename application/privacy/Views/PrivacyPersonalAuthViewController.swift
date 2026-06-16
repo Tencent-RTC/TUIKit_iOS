@@ -2,6 +2,9 @@
 //  PrivacyPersonalAuthViewController.swift
 //  privacy
 //
+//  个人信息与权限 — 枢纽页面（系统权限 / 个人信息）
+//  对标 v1 LiteAVPrivacyPersonalViewController
+//
 
 import UIKit
 import AtomicX
@@ -10,6 +13,7 @@ final class PrivacyPersonalAuthViewController: UITableViewController {
     
     private let config: PrivacyConfig
     
+    /// 数据源: [(title, subData)]
     private var dataSource: [(title: String, data: [String])] = []
     
     // MARK: - Init
@@ -29,12 +33,12 @@ final class PrivacyPersonalAuthViewController: UITableViewController {
     private func buildDataSource() {
         let authList = config.authList
         if !authList.isEmpty {
-            let title = PrivacyLocalize("Privacy.PersonalAuth.systemAuth")
+            let title = PrivacyLocalize("privacy_system_auth")
             dataSource.append((title, authList))
         }
         let infoList = config.infoList
         if !infoList.isEmpty {
-            let title = PrivacyLocalize("Privacy.PersonalAuth.info")
+            let title = PrivacyLocalize("privacy_personal_info")
             dataSource.append((title, infoList))
         }
     }
@@ -52,7 +56,7 @@ final class PrivacyPersonalAuthViewController: UITableViewController {
     // MARK: - Navigation
     
     private func configureNavigation() {
-        title = PrivacyLocalize("Privacy.Center.personalAuth")
+        title = PrivacyLocalize("privacy_personal_auth")
         navigationController?.navigationBar.titleTextAttributes = [
             .font: ThemeStore.shared.typographyTokens.Medium18,
             .foregroundColor: UIColor.black
@@ -98,8 +102,8 @@ final class PrivacyPersonalAuthViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = dataSource[indexPath.row]
-        let systemAuthTitle = PrivacyLocalize("Privacy.PersonalAuth.systemAuth")
-        let infoTitle = PrivacyLocalize("Privacy.PersonalAuth.info")
+        let systemAuthTitle = PrivacyLocalize("privacy_system_auth")
+        let infoTitle = PrivacyLocalize("privacy_personal_info")
         
         if item.title == systemAuthTitle {
             let vc = PrivacySystemAuthViewController(config: config)

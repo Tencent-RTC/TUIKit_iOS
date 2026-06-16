@@ -2,6 +2,9 @@
 //  PrivacyAuthDetailViewController.swift
 //  privacy
 //
+//  单个权限详情页面 — 展示权限描述 + 管理入口（美颜用开关）
+//  对标 v1 LiteAVPrivacyAuthDetailViewController
+//
 
 import UIKit
 import AtomicX
@@ -98,19 +101,21 @@ final class PrivacyAuthDetailViewController: UITableViewController {
     // MARK: - Localized Helpers
     
     private var localizedTitle: String {
-        return PrivacyLocalize("Privacy.SystemAuth.\(authType.rawValue)")
+        return PrivacyLocalize("privacy_\(authType.rawValue)")
     }
     
     private var localizedDescription: String {
         if authType == .beauty {
-            return PrivacyLocalize("Privacy.AuthDetail.beautyDesc")
+            return PrivacyLocalize("privacy_beauty_face_request")
         }
+        // 从 Info.plist 读取权限使用说明
         let keyMap: [PrivacyAuthType: String] = [
             .camera: "NSCameraUsageDescription",
             .microphone: "NSMicrophoneUsageDescription",
             .photos: "NSPhotoLibraryUsageDescription",
         ]
         guard let plistKey = keyMap[authType] else { return "" }
+        // 优先读取本地化 InfoPlist.strings
         let desc = Bundle.main.localizedString(forKey: plistKey, value: "", table: "InfoPlist")
         if !desc.isEmpty && desc != plistKey {
             return desc
@@ -141,8 +146,10 @@ final class PrivacyAuthDetailViewController: UITableViewController {
         cell.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         cell.textLabel?.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         cell.textLabel?.font = ThemeStore.shared.typographyTokens.Regular16
-        let format = PrivacyLocalize("Privacy.AuthDetail.manage")
-        cell.textLabel?.text = String(format: format, localizedTitle)
+        // 注：xcstrings 中 privacy_manage 三语事实使用命名占位符 `xxx`，必须用
+        // replacingOccurrences 注入，不能用 String(format:)（后者无法替换 `xxx`）
+        cell.textLabel?.text = PrivacyLocalize("privacy_manage")
+            .replacingOccurrences(of: "xxx", with: localizedTitle)
         return cell
     }
     
@@ -154,9 +161,10 @@ final class PrivacyAuthDetailViewController: UITableViewController {
         cell.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
         cell.textLabel?.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         cell.textLabel?.font = ThemeStore.shared.typographyTokens.Regular16
-        let format = PrivacyLocalize("Privacy.AuthDetail.manage")
-        cell.textLabel?.text = String(format: format, localizedTitle)
+        cell.textLabel?.text = PrivacyLocalize("privacy_manage")
+            .replacingOccurrences(of: "xxx", with: localizedTitle)
         
+        // 移除旧开关（复用时）
         cell.accessoryView = nil
         
         let authSwitch = UISwitch()

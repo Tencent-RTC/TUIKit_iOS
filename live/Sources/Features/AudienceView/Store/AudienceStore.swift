@@ -62,7 +62,6 @@ class AudienceStore {
         let audienceBattleObservableState = ObservableState(initialState: AudienceBattleState())
 
         let toastSubject = PassthroughSubject<(String, ToastStyle), Never>()
-        let kickedOutSubject = PassthroughSubject<Void, Never>()
         let floatWindowSubject = PassthroughSubject<Void, Never>()
         let exitLiveRequestSubject = PassthroughSubject<Void, Never>()
 
@@ -129,10 +128,6 @@ class AudienceStore {
 extension AudienceStore {
     var toastSubject: PassthroughSubject<(String, ToastStyle), Never> {
         context.toastSubject
-    }
-
-    var kickedOutSubject: PassthroughSubject<Void, Never> {
-        context.kickedOutSubject
     }
 
     var floatWindowSubject: PassthroughSubject<Void, Never> {

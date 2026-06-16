@@ -2,6 +2,12 @@
 //  MineAboutViewController.swift
 //  mine
 //
+//  关于页面 — 从旧版 iOS/App/RT-Cube/Mine/ui/MineAboutViewController.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon`
+//    - `ApplicationUtils.appVersionWithBuild` 替换为内联获取方式
+//
 
 import UIKit
 import AtomicX
@@ -14,7 +20,7 @@ class MineAboutViewController: UIViewController {
         
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         
-        self.title = MineLocalize("Demo.TRTC.Portal.Mine.about")
+        self.title = MineLocalize("mine_about_title")
         navigationController?.navigationBar.titleTextAttributes = [
             NSAttributedString.Key.foregroundColor: UIColor.black,
             NSAttributedString.Key.font: ThemeStore.shared.typographyTokens.Bold18
@@ -58,14 +64,14 @@ class MineAboutViewController: UIViewController {
     lazy var dataSource: [MineAboutModel] = {
         var res: [MineAboutModel] = []
         let sdkVersion = TRTCCloud.getSDKVersion()
-        let sdk = MineAboutModel(title: MineLocalize("Demo.TRTC.Portal.sdkversion"), value: sdkVersion)
+        let sdk = MineAboutModel(title: MineLocalize("mine_about_sdk_version"), value: sdkVersion)
         res.append(sdk)
         
         let version = Self.appVersionWithBuild
-        let storeVersion = MineAboutModel(title: MineLocalize("Demo.TRTC.Portal.appversion"), value: version)
+        let storeVersion = MineAboutModel(title: MineLocalize("mine_about_app_version"), value: version)
         res.append(storeVersion)
         
-        let resign = MineAboutModel(title: MineLocalize("Demo.TRTC.Portal.resignaccount"), type: .resign)
+        let resign = MineAboutModel(title: MineLocalize("mine_logoff_title"), type: .resign)
         res.append(resign)
         
         return res

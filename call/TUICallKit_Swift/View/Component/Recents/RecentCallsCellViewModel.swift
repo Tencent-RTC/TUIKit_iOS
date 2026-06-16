@@ -120,11 +120,11 @@ class RecentCallsCellViewModel: ObservableObject {
     private func configResult(_ callResultType: CallDirection) {
         switch callResultType {
         case .missed:
-            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.missed") ?? "Missed"
+            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.missed")
         case .incoming:
-            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.incoming") ?? "Incoming"
+            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.incoming")
         case .outgoing:
-            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.outgoing") ?? "Outgoing"
+            resultLabelStr = TUICallKitLocalize(key: "TUICallKit.Recents.outgoing")
         case .unknown:
             break
         }

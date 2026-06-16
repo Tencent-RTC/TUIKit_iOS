@@ -2,6 +2,8 @@
 //  CallingDetaiGuideView.swift
 //  main
 //
+//  通话模块 - 引导图视图（图片 + "呼叫其他用户详细指引"链接）
+//
 
 import UIKit
 import AtomicX
@@ -27,7 +29,7 @@ class CallingDetaiGuideView: UIView {
 
     private let guideButtonTitleLable: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = CallingLocalize("Demo.TRTC.calling.detailGuide")
+        label.text = CallingLocalize("assembly_call_call_other_users_guide")
         label.font = ThemeStore.shared.typographyTokens.Medium14
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.5

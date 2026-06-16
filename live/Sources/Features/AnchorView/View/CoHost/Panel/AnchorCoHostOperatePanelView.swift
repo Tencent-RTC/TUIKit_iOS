@@ -62,7 +62,7 @@ class AnchorCoHostOperatePanelView: RTCBaseView {
 
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
-        label.text = user.userName.isEmpty ? user.userID : user.userName
+        label.text = user.displayName
         label.font = .customFont(ofSize: 16)
         label.textColor = .g7
         return label

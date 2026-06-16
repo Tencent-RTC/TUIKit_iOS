@@ -73,7 +73,7 @@ class TUICallKitImpl: TUICallKit {
         }
         
         if userIdList.count == 1 && userIdList.first == LoginStore.shared.state.value.loginUserInfo?.userID {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.calNotCallYourself") ?? "")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.calNotCallYourself"))
             completion?(.failure(ErrorInfo(code: Int(ERROR_INIT_FAIL), message: "call failed, not to call self")))
             return
         }
@@ -86,13 +86,13 @@ class TUICallKitImpl: TUICallKit {
         }
         
         if userIdList.count >= MAX_USER {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit") ?? "")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.User.Exceed.Limit"))
             completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "groupCall failed, currently supports call with up to 9 people")))
             return
         }
         
         if CallStore.shared.state.value.selfInfo.status != .none {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls") ?? "")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls"))
             completion?(.failure(ErrorInfo(code: Int(ERROR_REQUEST_REFUSED), message: "calls failed: Status: Waiting/Accept. Do not call repeatedly.")))
             return
         }
@@ -118,7 +118,7 @@ class TUICallKitImpl: TUICallKit {
     override func join(callId: String, completion: CompletionClosure?) {
         let selfStatus = CallStore.shared.state.value.selfInfo.status
         if selfStatus != .none {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls") ?? "")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.youHaveMissedCalls"))
             completion?(.failure(ErrorInfo(code: Int(ERROR_REQUEST_REFUSED), message: "join failed: Status: Waiting/Accept. Do not call repeatedly.")))
             return
         }
@@ -342,6 +342,7 @@ extension TUICallKitImpl {
     }
     
     @objc func setupCallEngine() {
+        LoginStore.shared.login(sdkAppID: TUILogin.getSdkAppID(), userID: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "", completion: nil)
         TUICallEngine.createInstance().`init`(TUILogin.getSdkAppID(), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "") { [weak self] in
             guard let self = self else { return }
         } fail: { code, message in
@@ -350,7 +351,6 @@ extension TUICallKitImpl {
     }
     
     @objc func loginSuccess() {
-        LoginStore.shared.login(sdkAppID: TUILogin.getSdkAppID(), userID: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "", completion: nil)
         setFramework()
         setExcludeFromHistoryMessage()
     }
@@ -467,6 +467,17 @@ extension TUICallKitImpl {
                 self.handleCallEvent(event)
             }
             .store(in: &cancellables)
+        CallStore.shared.state.subscribe(StatePublisherSelector<CallState, String>(keyPath: \.activeCall.callId))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] callId in
+                guard let self = self else { return }
+                if !callId.isEmpty {
+                    if isCaller() && globalState.enableAITranscriber {
+                        startRealtimeTranscriber(callID: callId)
+                    }
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func handleCallEvent(_ event: CallEvent) {
@@ -477,9 +488,6 @@ extension TUICallKitImpl {
                 hasSetDefaultDeviceState = true
             }
             showCallKitViewController(isCaller: true)
-            if isCaller() && globalState.enableAITranscriber {
-                startRealtimeTranscriber()
-            }
         case let .onCallReceived(callId, _, _):
             KeyMetrics.countUV(eventId: .received, callId: callId)
             showCallKitViewController(isCaller: false)
@@ -519,7 +527,7 @@ extension TUICallKitImpl {
             messageKey = nil
         }
         guard let messageKey = messageKey else { return }
-        let message = TUICallKitLocalize(key: messageKey) ?? ""
+        let message = TUICallKitLocalize(key: messageKey)
         if message.isEmpty { return }
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: EVENT_SHOW_TOAST), object: message)
     }
@@ -546,7 +554,7 @@ extension TUICallKitImpl {
     }
     
     private func convertCallKitError(code: Int32, message: String?) -> String {
-        var errorMessage: String? = message
+        var errorMessage: String = message ?? ""
         if code == ERROR_PACKAGE_NOT_PURCHASED {
             errorMessage = TUICallKitLocalize(key: "TUICallKit.purchased")
         } else if code == ERROR_PACKAGE_NOT_SUPPORTED {
@@ -576,7 +584,7 @@ extension TUICallKitImpl {
         } else if code == ERR_SVR_GROUP_HAS_ACTIVE_CALL {
             errorMessage = TUICallKitLocalize(key: "TUICallKit.ErrorGroupHasActiveCall")
         }
-        return errorMessage ?? ""
+        return errorMessage
     }
     
     private func getToastEventId(for code: Int32) -> Int? {
@@ -630,9 +638,8 @@ extension TUICallKitImpl {
         return state.selfInfo.id == state.activeCall.inviterId
     }
     
-    private func startRealtimeTranscriber() {
-        let config = TranscriberSettings.config
-        AITranscriberStore.shared.startRealtimeTranscriber(config: config, completion: nil)
+    private func startRealtimeTranscriber(callID: String) {
+        AITranscriberStore.create(roomID: callID).startRealtimeTranscriber(config: TranscriberSettings.config, completion: nil)
         closeVAD()
     }
         

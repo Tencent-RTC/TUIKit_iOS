@@ -2,23 +2,37 @@
 //  CaptchaService.swift
 //  login
 //
+//  人机验证服务（手机/邮箱共用）
+//
+//  旧版来源：
+//    - TRTCLoginViewController 中的 WKWebView + JS Bridge 人机验证
 //    - CaptchaManager (BusinessService)
+//
+//  封装内容：
+//    - VerifyPicture.html 加载
+//    - checkCaptchaStatus 网络可达检测
+//    - verifySuccess/Error/Cancel JS 回调处理
+//    - 绕过票据生成逻辑（容灾）
+//    - getGlobalData 获取 captchaWebAppid（步骤 3.3）
 //
 
 import TUICore
 import UIKit
 import WebKit
 
+/// 人机验证内部错误
 private enum CaptchaError: Error {
     case message(String)
 }
 
+/// 人机验证结果
 public struct CaptchaResult {
     public let appId: String
     public let ticket: String
     public let randstr: String
 }
 
+/// 弱引用包装器，打破 WKUserContentController → CaptchaService 的循环引用
 private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
     weak var delegate: WKScriptMessageHandler?
     
@@ -35,6 +49,11 @@ private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
     }
 }
 
+/// 人机验证服务
+///
+/// 使用流程：
+///   1. `captchaService.verify { result in ... }` 一步完成
+///   2. 内部自动获取 captchaWebAppid → 加载 WebView → 等待 JS 回调 → 返回 CaptchaResult
 public final class CaptchaService: NSObject {
     // MARK: - Constants
     
@@ -48,9 +67,11 @@ public final class CaptchaService: NSObject {
     private var verifyFailedBlock: ((_ message: String) -> Void)?
     private var verifyCancelBlock: (() -> Void)?
     
+    /// 使用 Optional 存储 webView，避免 lazy var 在 deinit 中被意外触发初始化导致 crash
     private var _webView: WKWebView?
     
     deinit {
+        // 仅在 webView 已经创建过的情况下才清理 ScriptMessageHandler
         guard let webView = _webView else { return }
         let controller = webView.configuration.userContentController
         controller.removeScriptMessageHandler(forName: "verifySuccess")
@@ -58,6 +79,7 @@ public final class CaptchaService: NSObject {
         controller.removeScriptMessageHandler(forName: "verifyCancel")
     }
     
+    /// 按需创建 webView（首次调用时初始化，后续复用）
     private var webView: WKWebView {
         if let existing = _webView {
             return existing
@@ -90,6 +112,18 @@ public final class CaptchaService: NSObject {
     
     // MARK: - Public API
     
+    /// 执行人机验证（一步完成）
+    ///
+    /// 内部流程：
+    ///   1. 调用 gslb 接口获取 captchaWebAppid
+    ///   2. 检查 TCaptcha.js 可达性
+    ///   3. 可达 → 加载 VerifyPicture.html → 弹出验证码
+    ///   4. 不可达 → 生成容灾票据
+    ///
+    /// - Parameters:
+    ///   - success: 验证成功回调，返回 `CaptchaResult`
+    ///   - failed: 验证失败回调
+    ///   - cancelled: 用户取消回调
     public func verify(
         success: @escaping (CaptchaResult) -> Void,
         failed: @escaping (String) -> Void,
@@ -120,13 +154,15 @@ public final class CaptchaService: NSObject {
         }
     }
     
+    // MARK: - 步骤 3.3 — 获取 captchaWebAppid（gslb 接口）
+    
     private func fetchCaptchaAppId(completion: @escaping (Result<NSInteger, CaptchaError>) -> Void) {
         LoginManager.shared.getGlobalData(param: [:]) { code, errorMessage, result in
             if code == kAppLoginServiceSuccessCode {
                 guard let model = result["jsonModel"] as? HttpJsonModel,
                       let captchaWebAppid = model.captchaWebAppid
                 else {
-                    completion(.failure(.message(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))))
+                    completion(.failure(.message(LoginLocalize("login_error_send_failed"))))
                     return
                 }
                 completion(.success(captchaWebAppid))
@@ -135,6 +171,8 @@ public final class CaptchaService: NSObject {
             }
         }
     }
+    
+    // MARK: - 人机验证 WebView 展示
     
     private func showVerifyWebView(
         success: @escaping (_ ticket: String, _ randstr: String) -> Void,
@@ -146,6 +184,7 @@ public final class CaptchaService: NSObject {
             if isAccessible {
                 self.loadVerifyWebView(success: success, failed: failed, cancelled: cancelled)
             } else {
+                // 容灾：TCaptcha.js 不可达，生成降级票据
                 let ticket = "\(CaptchaService.networkDisabledTicket)\(self.captchaWebAppid)_\(Int(Date().timeIntervalSince1970))"
                 let randomStr = UUID().uuidString.lowercased().prefix(11)
                 success(ticket, "@\(randomStr)")
@@ -159,7 +198,7 @@ public final class CaptchaService: NSObject {
         cancelled: (() -> Void)? = nil
     ) {
         guard let parentView = findPresentingView() else {
-            failed(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))
+            failed(LoginLocalize("login_error_send_failed"))
             return
         }
         
@@ -169,7 +208,7 @@ public final class CaptchaService: NSObject {
         }
         
         guard let path = Bundle.loginResources.path(forResource: "VerifyPicture", ofType: "html") else {
-            failed(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))
+            failed(LoginLocalize("login_error_send_failed"))
             return
         }
         
@@ -193,6 +232,8 @@ public final class CaptchaService: NSObject {
         webView.configuration.preferences.javaScriptEnabled = true
         webView.load(req)
     }
+    
+    // MARK: - 网络可达检测（3秒超时）
     
     private func checkCaptchaStatus(completion: @escaping (Bool) -> Void) {
         guard let captchaUrl = URL(string: CaptchaService.tCaptchaURL) else {

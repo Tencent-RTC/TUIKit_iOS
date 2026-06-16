@@ -26,6 +26,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'Kingfisher'
   spec.dependency 'AtomicX'
   spec.dependency 'AtomicXCore'
+  spec.dependency 'TXLiteAVSDK_Professional'
   spec.source_files = 'Source/**/*.{swift,h,m}'
   spec.resource_bundles = {
     'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings']

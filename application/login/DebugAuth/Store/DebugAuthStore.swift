@@ -2,6 +2,13 @@
 //  DebugAuthStore.swift
 //  login
 //
+//  Debug 登录 Store（业务逻辑）
+//
+//  旧版来源：
+//    - TRTCDebugLoginViewController — 登录逻辑
+//    - TRTCDebugRegisterViewController — 注册逻辑（视图已统一为 RegisterView）
+//    - ProfileManager — Debug 版网络请求
+//
 
 import Foundation
 import Combine
@@ -19,7 +26,12 @@ class DebugAuthStore: LoginSubStore {
     var resultPublisher: AnyPublisher<Result<LoginResult, LoginError>, Never> {
         resultSubject.eraseToAnyPublisher()
     }
-    
+
+    // MARK: - Toast Event
+
+    private let toastSubject = PassthroughSubject<String, Never>()
+    var toastPublisher: AnyPublisher<String, Never> { toastSubject.eraseToAnyPublisher() }
+
     // MARK: - Callbacks
     
     var onNeedsRegister: (() -> Void)?
@@ -30,9 +42,13 @@ class DebugAuthStore: LoginSubStore {
     
     init() {
         logoutCancellable = subscribeLogout()
+        // 从缓存恢复用户名
         if let userModel = ProfileManager.shared.getCurrentUser() {
             UserOverdueLogicManager.sharedManager().userOverdueState = .alreadyLogged
             state.userName = userModel.userId
+            LoginLogger.Login.info("DebugAuthStore.init restored cachedUser userId=\(userModel.userId)")
+        } else {
+            LoginLogger.Login.info("DebugAuthStore.init no cached user")
         }
     }
     
@@ -44,29 +60,37 @@ class DebugAuthStore: LoginSubStore {
     
     // MARK: - Public Methods
     
+    /// 更新用户名
     func updateUserName(_ name: String) {
         state.userName = name
     }
     
+    /// 登录（4秒防重复）
     func login() {
         let phone = state.userName
-        guard !phone.isEmpty else { return }
-        
+        guard !phone.isEmpty else {
+            LoginLogger.Login.warn("DebugAuthStore.login userName empty, skipped")
+            return
+        }
+
         state.isLoginEnabled = false
         state.isLoading = true
-        
+
+        // 4秒后恢复按钮
         DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { [weak self] in
             self?.state.isLoginEnabled = true
         }
-        
+
         let config = LoginEntry.shared.config
         guard let generator = LoginEntry.shared.userSigGenerator else {
+            LoginLogger.Login.warn("DebugAuthStore.login userSigGenerator is nil, skipped")
             state.isLoading = false
             state.isLoginEnabled = true
             return
         }
         let userSig = generator(phone, config.sdkAppId, config.secretKey)
-        
+        LoginLogger.Login.info("DebugAuthStore.login phone=\(phone) sdkAppId=\(config.sdkAppId)")
+
         ProfileManager.shared.login(phone: phone,
                                     name: "",
                                     token: userSig) { [weak self] in
@@ -75,7 +99,26 @@ class DebugAuthStore: LoginSubStore {
             self.loginIM()
         }
     }
+
+    func loginWithCredentials(_ credentials: HiddenConfigCredentials) {
+        state.userName = credentials.userId
+        state.isLoginEnabled = false
+        state.isLoading = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { [weak self] in
+            self?.state.isLoginEnabled = true
+        }
+
+        ProfileManager.shared.login(phone: credentials.userId,
+                                    name: "",
+                                    token: credentials.userSig) { [weak self] in
+            guard let self = self else { return }
+            self.state.isLoading = false
+            self.loginIM()
+        }
+    }
     
+    /// 注册（设置昵称）
     func register(nickName: String) {
         state.isLoading = true
         
@@ -90,10 +133,11 @@ class DebugAuthStore: LoginSubStore {
         } failed: { [weak self] err in
             guard let self = self else { return }
             self.state.isLoading = false
-            self.state.toastMessage = err
+            self.toastSubject.send(err)
         }
     }
     
+    /// 更新头像
     func updateAvatar(_ url: String) {
         ProfileManager.shared.curUserModel?.avatar = url
         state.avatarURL = url
@@ -102,44 +146,56 @@ class DebugAuthStore: LoginSubStore {
     // MARK: - Private
     
     private func loginIM() {
-        guard let userID = ProfileManager.shared.curUserID() else { return }
+        guard let userID = ProfileManager.shared.curUserID() else {
+            LoginLogger.Login.warn("DebugAuthStore.loginIM curUserID is nil, skipped")
+            return
+        }
         let userSig = ProfileManager.shared.curUserSig()
-        
+
         if TUILogin.getUserID() != userID {
+            // TUILogin 持有的用户与本次不同，清空昵称强制走"需要注册/同步"路径
             ProfileManager.shared.curUserModel?.name = ""
         }
-        
-        ProfileManager.shared.IMLogin(sdkAppId: LoginEntry.shared.config.sdkAppId, userSig: userSig) { [weak self] in
+
+        let sdkAppIdForLogin = LoginEntry.shared.config.sdkAppId
+        LoginLogger.Login.info("DebugAuthStore.loginIM begin userID=\(userID) sdkAppId=\(sdkAppIdForLogin)")
+        ProfileManager.shared.IMLogin(sdkAppId: sdkAppIdForLogin, userSig: userSig) { [weak self] in
             guard let self = self else { return }
             self.loginSuccess()
         } failed: { [weak self] error in
             guard let self = self else { return }
-            self.state.toastMessage = LoginLocalize("LoginNetwork.ProfileManager.loginfailed")
+            // 注意：此分支不通过 resultPublisher 抛错；LoginEntry 自动登录订阅者将静默。
+            // 转而写 .loggedAndOverdue 触发"登录状态失效"弹窗 → 用户点确认后走 logout 流程。
+            LoginLogger.Login.warn("DebugAuthStore.loginIM IMLogin FAILED error=\(error), set userOverdueState=.loggedAndOverdue")
+            self.toastSubject.send(LoginLocalize("login_error_login_failed"))
             UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue
         }
     }
-    
+
     private func loginSuccess() {
         if ProfileManager.shared.curUserModel?.name.count == 0 {
+            // 需要注册
             let avatarURL = ProfileManager.shared.curUserModel?.avatar ?? ""
             let defaultAvatar = "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png"
-            
+
             if avatarURL.isEmpty {
                 ProfileManager.shared.curUserModel?.avatar = defaultAvatar
             }
-            
+
             state.needsRegister = true
             state.avatarURL = ProfileManager.shared.curUserModel?.avatar ?? defaultAvatar
+            LoginLogger.Login.info("DebugAuthStore.loginSuccess name empty -> needsRegister=true onNeedsRegister=\(onNeedsRegister != nil ? "set" : "nil")")
             onNeedsRegister?()
         } else {
-            state.toastMessage = LoginLocalize("V2.Live.LinkMicNew.loginsuccess")
+            LoginLogger.Login.info("DebugAuthStore.loginSuccess emit result")
+            toastSubject.send(LoginLocalize("login_status_success"))
             buildAndEmitResult()
         }
     }
     
     private func registerSuccess() {
         state.isLoading = false
-        state.toastMessage = LoginLocalize("Demo.TRTC.Login.registsuccess")
+        toastSubject.send(LoginLocalize("login_profile_toast_register_success"))
         ProfileManager.shared.localizeUserModel()
         ProfileManager.shared.synchronizUserInfo()
         buildAndEmitResult()

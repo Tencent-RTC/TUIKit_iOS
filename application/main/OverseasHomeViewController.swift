@@ -2,6 +2,16 @@
 //  OverseasHomeViewController.swift
 //  main
 //
+//  海外版首页容器控制器 — 从 Tencent-RTC/HomeViewController.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon`、`import BusinessService` 依赖
+//    - 头像更新改为通过 LoginManager 获取 URL，与 v2 架构一致
+//    - 导航栏使用独立的 OverseasNavigationView（白色背景、英文 Logo）
+//    - 嵌入 OverseasMainViewController 作为内容页
+//    - 监听 IM 未读消息并传递给内容页更新红点
+//    - 管理联系我们入口的显示/隐藏
+//
 
 import UIKit
 import AtomicX
@@ -40,8 +50,10 @@ class OverseasHomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        // 注册"联系我们"TUICore 服务（需在 viewWillAppear 调用 callService 之前完成）
         ContactUsService.registerService()
 
+        // 嵌入内容子控制器
         addChild(mainViewController)
         view.addSubview(mainViewController.view)
         mainViewController.didMove(toParent: self)
@@ -54,6 +66,7 @@ class OverseasHomeViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
 
+        // 显示联系我们入口
         let result = TUICore.callService(TUICore_ContactUsService,
                                          method: TUICore_ContactService_ShowContactEntrance,
                                          param: [:])
@@ -66,6 +79,7 @@ class OverseasHomeViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
+        // 隐藏联系我们入口
         let result = TUICore.callService(TUICore_ContactUsService,
                                          method: TUICore_ContactService_HideContactEntrance,
                                          param: [:])
@@ -74,6 +88,7 @@ class OverseasHomeViewController: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        // 渐变背景 F7F9FC → F0F2F5
         let gradientLayer = view.gradient(colors: [
             UIColor(red: 247 / 255.0, green: 249 / 255.0, blue: 252 / 255.0, alpha: 1),
             UIColor(red: 240 / 255.0, green: 242 / 255.0, blue: 245 / 255.0, alpha: 1),

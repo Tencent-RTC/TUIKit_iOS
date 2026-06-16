@@ -2,6 +2,8 @@
 //  SettingDetailViewController.swift
 //  AppAssembly
 //
+//  通话模块 - 设置详情页（仅 RTCubeLab 使用）
+//
 
 import Foundation
 import UIKit
@@ -52,7 +54,7 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
 
     private let confirmButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle(CallingLocalize("Demo.TRTC.calling.settings.yes"), for: .normal)
+        button.setTitle(CallingLocalize("assembly_call_btn_confirm"), for: .normal)
         button.tintColor = .black
         return button
     }()
@@ -96,11 +98,11 @@ class SettingDetailViewController: UIViewController, UITextViewDelegate {
     private func setTextView() {
         switch detail {
         case .ringInfo:
-            textView.text = CallingLocalize("Demo.TRTC.calling.settings.setRingTip")
+            textView.text = CallingLocalize("assembly_call_settings_set_ring_tip")
         case .entendInfo:
-            textView.text = CallingLocalize("Demo.TRTC.calling.settings.setExtendTip")
+            textView.text = CallingLocalize("assembly_call_settings_set_extend_tip")
         case .offlinePushInfo:
-            textView.text = CallingLocalize("Demo.TRTC.calling.settings.setOffLineInfoTip")
+            textView.text = CallingLocalize("assembly_call_settings_set_offline_info_tip")
         }
     }
     

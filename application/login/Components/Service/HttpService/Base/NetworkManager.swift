@@ -2,6 +2,8 @@
 //  NetworkManager.swift
 //  login
 //
+//  从 BusinessService 复制的基础网络请求封装
+//
 
 import Alamofire
 import Foundation
@@ -17,6 +19,7 @@ var apaasAppId: String {
 class NetworkManager {
     typealias HttpCompletionCallBack = (_ model: HttpJsonModel) -> Void
 
+    /// 发起网络请求
     static func request(baseUrl: URLConvertible,
                         params: Parameters? = nil,
                         success: ((_ data: HttpJsonModel) -> Void)?,
@@ -40,10 +43,21 @@ class NetworkManager {
 
     static func request(_ convertible: URLConvertible, method: HTTPMethod = .get, parameters:
         Parameters? = nil, encoding: ParameterEncoding, completionHandler: HttpCompletionCallBack? = nil) {
-        AF.request(convertible, method: method, parameters: addBaseParametersData(parameters), encoding: encoding)
+        // 请求出口日志：所有走 NetworkManager 的 HTTP 都会被记录到 clog，便于排查
+        // "Debug 登录路径理论上不发 HTTP，但 toast 里出现了 (204) token required"这类问题。
+        // 关键字段：URL、tokenEmpty、userIdEmpty——可定位到任何不该走 HTTP 的路径。
+        let urlString = (try? convertible.asURL().absoluteString) ?? "<invalid-url>"
+        let mergedParams = addBaseParametersData(parameters)
+        let tokenInParams = (mergedParams?["token"] as? String) ?? ""
+        let userIdInParams = (mergedParams?["userId"] as? String) ?? ""
+        LoginLogger.Login.info(
+            "NetworkManager.request -> url=\(urlString) method=\(method.rawValue) tokenEmpty=\(tokenInParams.isEmpty) userIdEmpty=\(userIdInParams.isEmpty)"
+        )
+
+        AF.request(convertible, method: method, parameters: mergedParams, encoding: encoding)
             .nmResponseJSON { data in
                 var result: HttpJsonModel = HttpJsonModel()
-                result.errorMessage = LoginLocalize("Demo.TRTC.http.syserror")
+                result.errorMessage = Self.resolveDefaultErrorMessage(from: data)
                 if let respData = data.data, respData.count > 0 {
                     let value = try? JSONSerialization.jsonObject(with: respData, options: .mutableLeaves)
                     #if DEBUG
@@ -56,8 +70,44 @@ class NetworkManager {
                         }
                     }
                 }
+                // 响应日志：errorCode != 0 时打印完整 url + code + message
+                if result.errorCode != 0 {
+                    LoginLogger.Login.warn(
+                        "NetworkManager.response url=\(urlString) errorCode=\(result.errorCode) errorMessage=\(result.errorMessage)"
+                    )
+                }
                 completionHandler?(result)
             }
+    }
+
+    /// 根据 Alamofire 响应判断网络层错误，返回用户友好的默认错误消息
+    private static func resolveDefaultErrorMessage(from response: AFDataResponse<Any>) -> String {
+        guard let afError = response.error else {
+            return LoginLocalize("login_home_sys_error")
+        }
+
+        // 判断是否为网络连接类错误（断网、DNS 解析失败、连接被拒等）
+        if let urlError = afError.underlyingError as? URLError {
+            switch urlError.code {
+            case .timedOut:
+                return LoginLocalize("login_error_network_timeout")
+            case .notConnectedToInternet,
+                 .networkConnectionLost,
+                 .cannotFindHost,
+                 .cannotConnectToHost,
+                 .dnsLookupFailed:
+                return LoginLocalize("login_error_network")
+            default:
+                return LoginLocalize("login_error_network")
+            }
+        }
+
+        // 其他 AFError（如 SSL、编码等），统一按网络错误处理
+        if case .sessionTaskFailed = afError {
+            return LoginLocalize("login_error_network")
+        }
+
+        return LoginLocalize("login_home_sys_error")
     }
 
     private static func addBaseParametersData(_ parameters: Parameters? = nil) -> Parameters? {
@@ -86,6 +136,7 @@ class NetworkManager {
     }
 }
 
+// 为了调试方便，拦截打印了 url 和请求参数
 extension DataRequest {
     @discardableResult
     public func nmResponseJSON(completionHandler: @escaping (AFDataResponse<Any>) -> Void) -> Self {

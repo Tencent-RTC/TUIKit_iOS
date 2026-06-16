@@ -2,6 +2,8 @@
 //  CallingBotHesitationViewController.swift
 //  main
 //
+//  通话模块 - Bot 等待页（激活机器人 → 请求接口 → 发起通话或显示忙线）
+//
 
 import UIKit
 import AtomicX
@@ -44,7 +46,7 @@ class CallingBotHesitationViewController: UIViewController {
 
     private let tipsLable: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = CallingLocalize("Demo.TRTC.calling.WakupRobot")
+        label.text = CallingLocalize("assembly_call_activating_robot")
         label.textColor = ThemeStore.shared.colorTokens.textColorSecondary
         label.font = ThemeStore.shared.typographyTokens.Medium12
         return label
@@ -57,7 +59,7 @@ class CallingBotHesitationViewController: UIViewController {
         button.layer.cornerRadius = ThemeStore.shared.borderRadius.radius16
         button.layer.masksToBounds = true
         button.setTitleColor(ThemeStore.shared.colorTokens.textColorError, for: .normal)
-        button.setTitle(CallingLocalize("Demo.TRTC.calling.cancel"), for: .normal)
+        button.setTitle(CallingLocalize("assembly_call_btn_cancel"), for: .normal)
         return button
     }()
 
@@ -164,7 +166,7 @@ extension CallingBotHesitationViewController {
                 }
             } else {
                 printClog("[AppCall][initCallBot] requestSuccessButResultErr:\(String(describing: requestModel?.errorCode))")
-                self.view.makeToast(CallingLocalize("Demo.TRTC.calling.unexpectedErr"))
+                self.view.makeToast(CallingLocalize("assembly_call_unexpected_error"))
             }
             self.navigationController?.popViewController(animated: true)
         } failed: { [weak self] message in
@@ -202,6 +204,7 @@ extension CallingBotHesitationViewController {
 
 extension CallingBotHesitationViewController {
     private func printClog(_ log: String) {
+        // TODO: gg 这里是否需要打到日志文件中？
 //        TRTCCloud.sharedInstance().apiLog(log)
         debugPrint(log)
     }
