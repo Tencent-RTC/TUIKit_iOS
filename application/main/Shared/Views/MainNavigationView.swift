@@ -46,6 +46,15 @@ class MainNavigationView: UIView {
         return button
     }()
 
+    private lazy var sdkAppIdTipLabel: UILabel = {
+        let label = UILabel()
+        label.font = ThemeStore.shared.typographyTokens.Regular12
+        label.textColor = ThemeStore.shared.colorTokens.textColorTertiary
+        label.textAlignment = .center
+        label.isHidden = true
+        return label
+    }()
+
     // MARK: - Lifecycle
 
     private var isViewReady = false
@@ -65,6 +74,7 @@ class MainNavigationView: UIView {
 
     private func constructViewHierarchy() {
         addSubview(iconView)
+        addSubview(sdkAppIdTipLabel)
         addSubview(mineCenterBtn)
     }
 
@@ -73,6 +83,12 @@ class MainNavigationView: UIView {
             make.left.centerY.equalToSuperview()
             make.width.equalTo(142)
             make.height.equalTo(32)
+        }
+
+        sdkAppIdTipLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.left.equalTo(iconView.snp.right).offset(8)
+            make.right.lessThanOrEqualTo(mineCenterBtn.snp.left).offset(-8)
         }
 
         mineCenterBtn.snp.makeConstraints { make in
@@ -98,6 +114,7 @@ class MainNavigationView: UIView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] userModel in
                 self?.updateAvatarImage(urlString: userModel?.avatar)
+                self?.updateSdkAppIdTip()
             }
             .store(in: &cancellables)
     }
@@ -114,6 +131,15 @@ class MainNavigationView: UIView {
             for: .normal,
             placeholder: UIImage(named: "default_avatar")
         )
+    }
+
+    private func updateSdkAppIdTip() {
+        if let credentials = LoginEntry.shared.hiddenCredentials {
+            sdkAppIdTipLabel.text = "SDKAppID: \(credentials.sdkAppId)"
+            sdkAppIdTipLabel.isHidden = false
+        } else {
+            sdkAppIdTipLabel.isHidden = true
+        }
     }
 
     // MARK: - Actions

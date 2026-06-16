@@ -1,6 +1,6 @@
 //
 //  ScenesApplicationModule.swift
-//  main
+//  AppAssembly
 //
 
 import UIKit
@@ -14,24 +14,17 @@ final class ScenesApplicationModule: ModuleProvider {
         self.config = config
     }
 
-    // MARK: - Constants
-
-    private static let exhibitionURL = "https://trtc.io/exhibition/details?lang=zh&from=app"
+    static let moduleIdentifier = "scenes_application"
 
     static var standard: ScenesApplicationModule {
         let config = ModuleConfig(
-            identifier: "scenes_application",
-            title: AssemblyLocalize("Demo.TRTC.Portal.Main.IndustryScenarioPractice"),
-            description: AssemblyLocalize("Demo.TRTC.Portal.Main.Exploremore"),
+            identifier: moduleIdentifier,
+            title: AssemblyLocalize("assembly_scenes_application_card_title"),
+            description: AssemblyLocalize("assembly_scenes_application_card_description"),
             iconName: "",
             cardStyle: .banner,
             gradientColors: stubUIComponentGradient,
-            targetProvider: {
-                if let url = URL(string: ScenesApplicationModule.exhibitionURL) {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
-                return nil
-            },
+            targetProvider: { nil },
             analyticsEvent: ""
         )
         return ScenesApplicationModule(config: config)

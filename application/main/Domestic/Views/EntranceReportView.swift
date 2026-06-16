@@ -26,7 +26,7 @@ class EntranceReportView: UIView {
             height: arrowImage.size.height
         )
 
-        let mutableAttrStr = NSMutableAttributedString(string: MainLocalize("Demo.TRTC.Portal.Main.Report"))
+        let mutableAttrStr = NSMutableAttributedString(string: MainLocalize("main_report_hint"))
         let arrowImageAttr = NSAttributedString(attachment: attachment)
         mutableAttrStr.append(arrowImageAttr)
 

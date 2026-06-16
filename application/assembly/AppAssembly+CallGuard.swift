@@ -17,7 +17,7 @@ extension AppAssembly {
 
     func showCannotStartRoomToast() {
         guard let window = Self.keyWindow else { return }
-        window.makeToast(AssemblyLocalize("Demo.TRTC.Common.cannotStartRoomDuringCall"))
+        window.makeToast(AssemblyLocalize("assembly_common_cannot_start_room_during_call"))
     }
 
     private static var keyWindow: UIWindow? {

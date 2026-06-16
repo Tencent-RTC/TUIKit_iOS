@@ -9,17 +9,34 @@ import Combine
 import Toast_Swift
 
 class DebugAuthView: UIView {
-    
+
     // MARK: - Dependencies
-    
+
     let store: DebugAuthStore
     private var cancellables = Set<AnyCancellable>()
-    
+
+    var isUserIdEditable: Bool = true {
+        didSet {
+            debugConfigView.isUserIdEditable = isUserIdEditable
+            backButton.isHidden = isUserIdEditable
+        }
+    }
+
+    var onBack: (() -> Void)?
+
     // MARK: - SubViews
-    
+
     lazy var debugConfigView: DebugConfigView = {
         let view = DebugConfigView()
         return view
+    }()
+
+    private lazy var backButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+        button.tintColor = UIColor("676A70")
+        button.isHidden = true
+        return button
     }()
     
     // MARK: - Init
@@ -49,17 +66,26 @@ class DebugAuthView: UIView {
     
     func constructViewHierarchy() {
         addSubview(debugConfigView)
+        addSubview(backButton)
     }
-    
+
     func activateConstraints() {
         debugConfigView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        backButton.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).offset(9)
+            make.leading.equalToSuperview().offset(24)
+            make.width.equalTo(16)
+            make.height.equalTo(28)
         }
     }
     
     func bindInteraction() {
         debugConfigView.accountTextField.text = store.state.userName
-        
+
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
         debugConfigView.onLoginButtonTapped = { [weak self] in
             guard let self = self else { return }
             self.store.updateUserName(self.debugConfigView.accountTextField.text ?? "")
@@ -70,15 +96,13 @@ class DebugAuthView: UIView {
             self?.store.updateUserName(name)
         }
         
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message)
             }
             .store(in: &cancellables)
-        
+
         store.$state
             .map(\.isLoginEnabled)
             .removeDuplicates()
@@ -102,5 +126,11 @@ class DebugAuthView: UIView {
             .store(in: &cancellables)
     }
     
+    // MARK: - Actions
+
+    @objc private func backButtonTapped() {
+        onBack?()
+    }
+
     func setupViewStyle() {}
 }

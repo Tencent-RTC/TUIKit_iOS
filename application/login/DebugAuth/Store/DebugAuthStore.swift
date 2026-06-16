@@ -19,7 +19,12 @@ class DebugAuthStore: LoginSubStore {
     var resultPublisher: AnyPublisher<Result<LoginResult, LoginError>, Never> {
         resultSubject.eraseToAnyPublisher()
     }
-    
+
+    // MARK: - Toast Event
+
+    private let toastSubject = PassthroughSubject<String, Never>()
+    var toastPublisher: AnyPublisher<String, Never> { toastSubject.eraseToAnyPublisher() }
+
     // MARK: - Callbacks
     
     var onNeedsRegister: (() -> Void)?
@@ -33,6 +38,9 @@ class DebugAuthStore: LoginSubStore {
         if let userModel = ProfileManager.shared.getCurrentUser() {
             UserOverdueLogicManager.sharedManager().userOverdueState = .alreadyLogged
             state.userName = userModel.userId
+            LoginLogger.Login.info("DebugAuthStore.init restored cachedUser userId=\(userModel.userId)")
+        } else {
+            LoginLogger.Login.info("DebugAuthStore.init no cached user")
         }
     }
     
@@ -50,26 +58,49 @@ class DebugAuthStore: LoginSubStore {
     
     func login() {
         let phone = state.userName
-        guard !phone.isEmpty else { return }
-        
+        guard !phone.isEmpty else {
+            LoginLogger.Login.warn("DebugAuthStore.login userName empty, skipped")
+            return
+        }
+
         state.isLoginEnabled = false
         state.isLoading = true
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { [weak self] in
             self?.state.isLoginEnabled = true
         }
-        
+
         let config = LoginEntry.shared.config
         guard let generator = LoginEntry.shared.userSigGenerator else {
+            LoginLogger.Login.warn("DebugAuthStore.login userSigGenerator is nil, skipped")
             state.isLoading = false
             state.isLoginEnabled = true
             return
         }
         let userSig = generator(phone, config.sdkAppId, config.secretKey)
-        
+        LoginLogger.Login.info("DebugAuthStore.login phone=\(phone) sdkAppId=\(config.sdkAppId)")
+
         ProfileManager.shared.login(phone: phone,
                                     name: "",
                                     token: userSig) { [weak self] in
+            guard let self = self else { return }
+            self.state.isLoading = false
+            self.loginIM()
+        }
+    }
+
+    func loginWithCredentials(_ credentials: HiddenConfigCredentials) {
+        state.userName = credentials.userId
+        state.isLoginEnabled = false
+        state.isLoading = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { [weak self] in
+            self?.state.isLoginEnabled = true
+        }
+
+        ProfileManager.shared.login(phone: credentials.userId,
+                                    name: "",
+                                    token: credentials.userSig) { [weak self] in
             guard let self = self else { return }
             self.state.isLoading = false
             self.loginIM()
@@ -90,7 +121,7 @@ class DebugAuthStore: LoginSubStore {
         } failed: { [weak self] err in
             guard let self = self else { return }
             self.state.isLoading = false
-            self.state.toastMessage = err
+            self.toastSubject.send(err)
         }
     }
     
@@ -102,44 +133,52 @@ class DebugAuthStore: LoginSubStore {
     // MARK: - Private
     
     private func loginIM() {
-        guard let userID = ProfileManager.shared.curUserID() else { return }
+        guard let userID = ProfileManager.shared.curUserID() else {
+            LoginLogger.Login.warn("DebugAuthStore.loginIM curUserID is nil, skipped")
+            return
+        }
         let userSig = ProfileManager.shared.curUserSig()
-        
+
         if TUILogin.getUserID() != userID {
             ProfileManager.shared.curUserModel?.name = ""
         }
-        
-        ProfileManager.shared.IMLogin(sdkAppId: LoginEntry.shared.config.sdkAppId, userSig: userSig) { [weak self] in
+
+        let sdkAppIdForLogin = LoginEntry.shared.config.sdkAppId
+        LoginLogger.Login.info("DebugAuthStore.loginIM begin userID=\(userID) sdkAppId=\(sdkAppIdForLogin)")
+        ProfileManager.shared.IMLogin(sdkAppId: sdkAppIdForLogin, userSig: userSig) { [weak self] in
             guard let self = self else { return }
             self.loginSuccess()
         } failed: { [weak self] error in
             guard let self = self else { return }
-            self.state.toastMessage = LoginLocalize("LoginNetwork.ProfileManager.loginfailed")
+            LoginLogger.Login.warn("DebugAuthStore.loginIM IMLogin FAILED error=\(error), set userOverdueState=.loggedAndOverdue")
+            self.toastSubject.send(LoginLocalize("login_error_login_failed"))
             UserOverdueLogicManager.sharedManager().userOverdueState = .loggedAndOverdue
         }
     }
-    
+
     private func loginSuccess() {
         if ProfileManager.shared.curUserModel?.name.count == 0 {
             let avatarURL = ProfileManager.shared.curUserModel?.avatar ?? ""
             let defaultAvatar = "https://liteav.sdk.qcloud.com/app/res/picture/voiceroom/avatar/user_avatar1.png"
-            
+
             if avatarURL.isEmpty {
                 ProfileManager.shared.curUserModel?.avatar = defaultAvatar
             }
-            
+
             state.needsRegister = true
             state.avatarURL = ProfileManager.shared.curUserModel?.avatar ?? defaultAvatar
+            LoginLogger.Login.info("DebugAuthStore.loginSuccess name empty -> needsRegister=true onNeedsRegister=\(onNeedsRegister != nil ? "set" : "nil")")
             onNeedsRegister?()
         } else {
-            state.toastMessage = LoginLocalize("V2.Live.LinkMicNew.loginsuccess")
+            LoginLogger.Login.info("DebugAuthStore.loginSuccess emit result")
+            toastSubject.send(LoginLocalize("login_status_success"))
             buildAndEmitResult()
         }
     }
     
     private func registerSuccess() {
         state.isLoading = false
-        state.toastMessage = LoginLocalize("Demo.TRTC.Login.registsuccess")
+        toastSubject.send(LoginLocalize("login_profile_toast_register_success"))
         ProfileManager.shared.localizeUserModel()
         ProfileManager.shared.synchronizUserInfo()
         buildAndEmitResult()

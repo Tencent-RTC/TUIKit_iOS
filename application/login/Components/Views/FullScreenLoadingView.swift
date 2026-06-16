@@ -45,7 +45,7 @@ public class FullScreenLoadingView: UIView {
         label.textColor = .white
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textAlignment = .left
-        label.text = LoginLocalize("Demo.TRTC.Login.loading")
+        label.text = LoginLocalize("login_home_loading")
         return label
     }()
 
@@ -115,7 +115,7 @@ public class FullScreenLoadingView: UIView {
     }
 
     private func setMessage(_ message: String?) {
-        loadingLabel.text = message ?? LoginLocalize("Demo.TRTC.Login.ioaLoading")
+        loadingLabel.text = message ?? LoginLocalize("login_ioa_loading")
     }
 
     // MARK: - Public Methods

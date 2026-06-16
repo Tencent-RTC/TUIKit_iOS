@@ -43,7 +43,7 @@ class MineRootView: UIView {
     lazy var titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Bold16
-        label.text = MineLocalize("Demo.TRTC.Portal.Mine.personalcenter")
+        label.text = MineLocalize("mine_info_title")
         label.textAlignment = .center
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
@@ -103,7 +103,7 @@ class MineRootView: UIView {
     private let rtcExperienceRoomBtn: RTCExperienceRoomButtonView = {
         let btn = RTCExperienceRoomButtonView()
         btn.configure(
-            with: MineLocalize("Demo.TRTC.Portal.Mine.quickOnlineDebug"),
+            with: MineLocalize("mine_info_fast_debug"),
             leftImageName: "main_mine_debug",
             rightImageName: "main_mine_detail"
         )
@@ -114,7 +114,7 @@ class MineRootView: UIView {
     
     private lazy var logoutBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.logout"), for: .normal)
+        btn.setTitle(MineLocalize("mine_info_logout"), for: .normal)
         btn.setTitleColor(ThemeStore.shared.colorTokens.textColorError, for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Bold16
         btn.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
@@ -366,11 +366,12 @@ extension MineRootView: UITableViewDelegate {
             
         case .disclaimer:
             let alert = UIAlertController(
-                title: MineLocalize("Demo.TRTC.Portal.disclaimerdesc"),
+                title: MineLocalize("mine_info_statement_detail")
+                    .replacingOccurrences(of: "xxx", with: MineLocalize("mine_info_app_name")),
                 message: "",
                 preferredStyle: .alert
             )
-            let action = UIAlertAction(title: MineLocalize("Demo.TRTC.Portal.confirm"), style: .default, handler: nil)
+            let action = UIAlertAction(title: MineLocalize("mine_common_btn_confirm"), style: .default, handler: nil)
             alert.addAction(action)
             delegate?.present(alert, animated: true, completion: nil)
             
@@ -431,7 +432,7 @@ class MineTableViewCell: UITableViewCell {
             titleLabel.text = model.title
             if model.type == .icp {
                 detailLabel.isHidden = false
-                detailLabel.text = MineLocalize("Demo.TRTC.Portal.Mine.ICPDetailNumber")
+                detailLabel.text = MineLocalize("mine_info_icp_value")
             }
         }
     }

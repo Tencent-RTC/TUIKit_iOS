@@ -31,7 +31,7 @@ class OverseasFooterView: UICollectionReusableView {
         label.textAlignment = .left
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperience")
+        label.text = MainLocalize("main_overseas_scenario_experience")
         return label
     }()
 
@@ -43,7 +43,7 @@ class OverseasFooterView: UICollectionReusableView {
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.8
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperienceDesc")
+        label.text = MainLocalize("main_overseas_scenario_experience_desc")
         return label
     }()
 

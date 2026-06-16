@@ -150,11 +150,11 @@ extension AppDelegate {
         V2TXLivePremier.setLicence(LIVE_LICENSE_URL, key: LIVE_LICENSE_KEY)
         TXLiveBase.setLicenceURL(LIVE_LICENSE_URL, key: LIVE_LICENSE_KEY)
         TXUGCBase.setLicenceURL(TENCENT_EFFECT_LICENSE_URL, key: TENCENT_EFFECT_LICENSE_KEY)
-//        TUIBeautyKit.initialize(licenseUrl: TENCENT_EFFECT_LICENSE_URL,
-//                                licenseKey: TENCENT_EFFECT_LICENSE_KEY,
-//                                beautyLevel: .S1_07)
+        TUIBeautyKit.initialize(licenseUrl: TENCENT_EFFECT_LICENSE_URL,
+                                licenseKey: TENCENT_EFFECT_LICENSE_KEY,
+                                beautyLevel: .S1_07)
         TCMediaXBase.getInstance().setDelegate(self)
-        TCMediaXBase.getInstance().setLicenceURL(TENCENT_EFFECT_LICENSE_URL, key: TENCENT_EFFECT_LICENSE_KEY)
+        TCMediaXBase.getInstance().setLicenceURL(PLAYER_LICENSE_URL, key: PLAYER_LICENSE_KEY)
         #endif
     }
 
@@ -282,7 +282,7 @@ extension AppDelegate {
 
 extension AppDelegate {
     func checkAppUpdateVersion() {
-        #if !DEBUG || !RTCUBE_LAB
+        #if !DEBUG && !RTCUBE_LAB
         checkStoreVersion(appID: APP_STORE_ID)
         #endif
     }
@@ -314,14 +314,14 @@ extension AppDelegate {
     }
 
     private func showUpdateAlert(appID: String) {
-        let title = MainLocalize("Demo.TRTC.Home.prompt")
-        let message = MainLocalize("Demo.TRTC.Home.newversionpublic")
+        let title = MainLocalize("main_home_prompt")
+        let message = MainLocalize("main_home_new_version_public")
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
 
-        let updateAction = UIAlertAction(title: MainLocalize("Demo.TRTC.Home.updatenow"), style: .default) { [weak self] _ in
+        let updateAction = UIAlertAction(title: MainLocalize("main_home_update_now"), style: .default) { [weak self] _ in
             self?.openAppStore(appID: appID)
         }
-        let laterAction = UIAlertAction(title: MainLocalize("Demo.TRTC.Home.later"), style: .cancel)
+        let laterAction = UIAlertAction(title: MainLocalize("main_home_later"), style: .cancel)
 
         alert.addAction(updateAction)
         alert.addAction(laterAction)

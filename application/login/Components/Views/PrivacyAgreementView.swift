@@ -56,14 +56,14 @@ class PrivacyAgreementView: UIView {
         textView.textContainer.lineFragmentPadding = 0
         textView.dataDetectorTypes = .link
         textView.textAlignment = .left
-        let totalStr = LoginLocalize("Demo.TRTC.Portal.privateandagreement",
-                                     LoginLocalize("Demo.TRTC.Portal.<privacysummary>"),
-                                     LoginLocalize("Demo.TRTC.Portal.<private>"),
-                                     LoginLocalize("Demo.TRTC.Portal.<agreement>"))
+        let totalStr = LoginLocalizeReplace("login_privacy_read_agreement",
+                                     LoginLocalize("login_privacy_summary_link"),
+                                     LoginLocalize("login_privacy_protection_guide"),
+                                     LoginLocalize("login_privacy_user_agreement"))
         
-        let privaSummaryStr = LoginLocalize("Demo.TRTC.Portal.<privacysummary>")
-        let privaStr = LoginLocalize("Demo.TRTC.Portal.<private>")
-        let protoStr = LoginLocalize("Demo.TRTC.Portal.<agreement>")
+        let privaSummaryStr = LoginLocalize("login_privacy_summary_link")
+        let privaStr = LoginLocalize("login_privacy_protection_guide")
+        let protoStr = LoginLocalize("login_privacy_user_agreement")
         
         guard let privaR = totalStr.range(of: privaStr),
               let protoR = totalStr.range(of: protoStr),

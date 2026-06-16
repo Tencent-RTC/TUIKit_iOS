@@ -1,0 +1,14 @@
+/* 
+  InfoPlist.strings
+  RTCube (CN)
+
+  本地化覆盖 Info.plist 中的字段，iOS 取值优先级：本地化 .strings > Info.plist。
+  与旧 iOS/App/RT-Cube 工程保持 1:1 一致。
+*/
+
+"CFBundleDisplayName" = "Tencent Cloud Media Services";
+"NSCameraUsageDescription" = "Audio and video calls require permission to access your camera.";
+"NSMicrophoneUsageDescription" = "Audio and video calls require permission to access your microphone.";
+"NSPhotoLibraryUsageDescription" = "You need access to your album to use the photos or videos in it.";
+"NSPhotoLibraryAddUsageDescription" = "You need access to your album to save photos or videos to it.";
+"UILaunchStoryboardName" = "LaunchScreen";

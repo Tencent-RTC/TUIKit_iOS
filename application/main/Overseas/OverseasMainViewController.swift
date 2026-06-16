@@ -29,8 +29,8 @@ class OverseasMainViewController: UIViewController {
 
     private let topSegmentedView: UISegmentedControl = {
         let segmentedView = UISegmentedControl(items: [
-            MainLocalize("Demo.TRTC.Portal.Main.Products"),
-            MainLocalize("Demo.TRTC.Portal.Main.DiscoveryLab"),
+            MainLocalize("main_overseas_tab_products"),
+            MainLocalize("main_overseas_tab_discovery"),
         ])
         segmentedView.selectedSegmentIndex = 0
         segmentedView.setTitleTextAttributes([
@@ -110,8 +110,14 @@ class OverseasMainViewController: UIViewController {
         super.viewDidLoad()
 
         let appEnvironment = ModuleEnvironment(
-            beautyLicenseURL: "https://license.example.com/live",
-            beautyLicenseKey: "YOUR_SECRET_KEY_123",
+            liveLicenseURL: LIVE_LICENSE_URL,
+            liveLicenseKey: LIVE_LICENSE_KEY,
+            effectLicenseURL: TENCENT_EFFECT_LICENSE_URL,
+            effectLicenseKey: TENCENT_EFFECT_LICENSE_KEY,
+            playerLicenseURL: PLAYER_LICENSE_URL,
+            playerLicenseKey: PLAYER_LICENSE_KEY,
+            copyrightedMusicLicenseKey: COPYRIGHTED_MUSIC_LICENSE_KEY,
+            copyrightedMusicLicenseUrl: COPYRIGHTED_MUSIC_LICENSE_URL,
             getCurrentUserModel: {
                 return LoginEntry.shared.userModel
             },
@@ -124,13 +130,23 @@ class OverseasMainViewController: UIViewController {
 
         #if !OPEN_SOURCE
         AppAssembly.shared.privacyActionHandler = { action in
+            if LoginManager.shared.getCurrentUser()?.isMoa() == true {
+                switch action {
+                case .checkRealNameAuth(_, _, let completion):
+                    completion(true, "success")
+                case .showFaceIdTokenVerify(_, _, let completion):
+                    completion(true, "")
+                default:
+                    break
+                }
+                return
+            }
+
             switch action {
             case .showHighRiskIPAlert:
                 RoomRiskIPPresenter.showHighRiskIPAlert()
             case .showAntifraudReminder:
                 AntifraudAlertManager.showAntifraudReminder()
-            case .showScreenShareAntifraud(let completion):
-                AntifraudAlertManager.showScreenShareAntifraudReminder(completion: completion)
             case .checkRealNameAuth(let userId, let token, let completion):
                 AntifraudAlertManager.checkRealNameAuth(userId: userId, token: token, completion: completion)
             case .showFaceIdTokenVerify(let userId, let token, let completion):
@@ -141,6 +157,18 @@ class OverseasMainViewController: UIViewController {
                 TimeLimitPresenter.showRemainingOneMinToast()
             case .showLiveTimeOutAlert(let onDismiss):
                 TimeLimitPresenter.showLiveTimeOutAlert(onDismiss: onDismiss)
+            }
+        }
+        AppAssembly.shared.analyticEventHandler = { action in
+            switch action {
+            case .liveEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "live", event: name, params: params)
+            case .voiceRoomEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "voice_room", event: name, params: params)
+            case .aiConversationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "conversation_ai", event: name, params: params)
+            case .interpretationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "simultaneous_interpretation", event: name, params: params)
             }
         }
         #endif
@@ -167,6 +195,11 @@ class OverseasMainViewController: UIViewController {
         splitModules()
 
         bindStoreState()
+
+        #if !DEBUG
+        initAnalytics()
+        ModuleAnalytics.start()
+        #endif
 
         setupToast()
     }
@@ -338,6 +371,14 @@ extension OverseasMainViewController: UICollectionViewDelegate {
             trackSensorData(module.config.analyticsEvent)
         }
 
+        if module.config.identifier == "scenes_application" {
+            #if RTCUBE_OVERSEAS
+            let miniVC = MiniProgramViewController()
+            navigationController?.pushViewController(miniVC, animated: true)
+            #endif
+            return
+        }
+
         if let targetVC = module.config.targetProvider() {
             if targetVC.modalPresentationStyle == .fullScreen {
                 present(targetVC, animated: true)
@@ -404,12 +445,11 @@ extension OverseasMainViewController: UICollectionViewDataSource {
 extension OverseasMainViewController {
 
     @objc private func goScenarioExperience() {
-        if let scenesModule = store.state.modules.first(where: { $0.config.identifier == "scenesApplication" }) {
-            if let targetVC = scenesModule.config.targetProvider() {
-                targetVC.title = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperience")
-                navigationController?.pushViewController(targetVC, animated: true)
-            }
-        }
+        #if RTCUBE_OVERSEAS
+        let miniVC = MiniProgramViewController()
+        miniVC.title = MainLocalize("main_overseas_scenario_experience")
+        navigationController?.pushViewController(miniVC, animated: true)
+        #endif
     }
 }
 
@@ -417,10 +457,19 @@ extension OverseasMainViewController {
 
 extension OverseasMainViewController {
 
+    private func initAnalytics() {
+        let userId = LoginEntry.shared.userModel?.userId ?? ""
+        let sdkAppId = LoginEntry.shared.config.sdkAppId
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        let loginMode = LoginEntry.shared.loggedInMode?.rawValue ?? LoginMode.debugAuth.rawValue
+        let appTarget = "overseas"
+        AppAnalytics.initialize(sdkAppId: sdkAppId, userId: userId, appTarget: appTarget, appVersion: appVersion, loginMode: "\(loginMode)")
+    }
+
     private func trackSensorData(_ event: String) {
         let loginType = resolveLoginType()
         AppAnalytics.trackMainClick(
-            eventName: "tencent_rtc_main_click_event",
+            eventName: .tencentRTCMainClick,
             mainEvent: event,
             loginType: loginType
         )

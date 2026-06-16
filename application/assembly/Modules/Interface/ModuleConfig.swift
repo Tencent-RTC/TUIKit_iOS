@@ -3,6 +3,7 @@
 //  AppAssembly
 //
 
+import TUILiveKit
 import UIKit
 
 public struct ModuleConfig {
@@ -26,6 +27,8 @@ public struct ModuleConfig {
 
     public let analyticsEvent: String
 
+    public let keyMetricsEvent: Int?
+
     public init(identifier: String,
                 title: String,
                 description: String,
@@ -35,7 +38,8 @@ public struct ModuleConfig {
                 gradientColors: [UIColor] = [],
                 isHot: Bool = false,
                 targetProvider: @escaping () -> UIViewController?,
-                analyticsEvent: String = "") {
+                analyticsEvent: String = "",
+                keyMetricsEvent: Int? = nil) {
         self.identifier = identifier
         self.title = title
         self.description = description
@@ -44,7 +48,16 @@ public struct ModuleConfig {
         self.cardStyle = cardStyle
         self.gradientColors = gradientColors
         self.isHot = isHot
-        self.targetProvider = targetProvider
         self.analyticsEvent = analyticsEvent
+        self.keyMetricsEvent = keyMetricsEvent
+
+        if let event = keyMetricsEvent {
+            self.targetProvider = {
+                KeyMetrics.reportAtomicMetrics(platform: event)
+                return targetProvider()
+            }
+        } else {
+            self.targetProvider = targetProvider
+        }
     }
 }

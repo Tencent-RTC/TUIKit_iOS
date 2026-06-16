@@ -21,7 +21,7 @@ class SafetyReminderView: UIView {
 
     private let safeTitle: UILabel = {
         let label = UILabel()
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderTitle")
+        label.text = MainLocalize("main_safety_reminder_title")
         label.font = ThemeStore.shared.typographyTokens.Medium18
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         return label
@@ -37,9 +37,9 @@ class SafetyReminderView: UIView {
         let label = UILabel()
         label.numberOfLines = 0
 
-        let firstPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderFirstPara") + "\n"
-        let midPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderMidPara") + "\n"
-        let endPara = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderEndPara") + "\n"
+        let firstPara = MainLocalize("main_safety_reminder_first_para") + "\n"
+        let midPara = MainLocalize("main_safety_reminder_mid_para") + "\n"
+        let endPara = MainLocalize("main_safety_reminder_end_para") + "\n"
         let reminderText = firstPara + midPara + endPara
 
         let paragraphStyle = NSMutableParagraphStyle()
@@ -90,7 +90,7 @@ class SafetyReminderView: UIView {
 
     var confirmTimeCount: Int = 0 {
         didSet {
-            buttonTitleLabel.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm") + "(\(confirmTimeCount))"
+            buttonTitleLabel.text = MainLocalize("main_safety_reminder_confirm") + "(\(confirmTimeCount))"
         }
     }
 
@@ -171,13 +171,13 @@ class SafetyReminderView: UIView {
             if timeCount == 0 {
                 timer.invalidate()
                 self?.confirmButton.isEnabled = true
-                self?.buttonTitleLabel.text = MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm")
+                self?.buttonTitleLabel.text = MainLocalize("main_safety_reminder_confirm")
                 self?.buttonTitleLabel.textColor = ThemeStore.shared.colorTokens.textColorButton
                 self?.confirmButtonView.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
             } else {
                 timeCount -= 1
                 self?.buttonTitleLabel.text =
-                    MainLocalize("Demo.TRTC.Portal.Main.safetyReminderConfirm") + "(\(timeCount))"
+                    MainLocalize("main_safety_reminder_confirm") + "(\(timeCount))"
             }
         }
     }

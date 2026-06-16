@@ -48,6 +48,14 @@ public final class PrivacyEntry {
         return (privacyInfo["privacyURL"] as? String) ?? ""
     }
 
+    public static var dataCollectionURL: String {
+        return (privacyInfo["dataCollectionURL"] as? String) ?? ""
+    }
+
+    public static var thirdShareURL: String {
+        return (privacyInfo["thirdShareURL"] as? String) ?? ""
+    }
+
     public static func makeWebViewController(url: URL, title: String) -> UIViewController {
         return PrivacyWebViewController(url: url, title: title)
     }
@@ -65,7 +73,9 @@ public final class PrivacyEntry {
         }
 
         vc.hidesBottomBarWhenPushed = true
-        if let navigationController = viewController?.navigationController {
+        if let navController = viewController as? UINavigationController {
+            navController.pushViewController(vc, animated: true)
+        } else if let navigationController = viewController?.navigationController {
             navigationController.pushViewController(vc, animated: true)
         } else {
             let nav = UINavigationController(rootViewController: vc)
@@ -77,11 +87,15 @@ public final class PrivacyEntry {
     private static func urlAndTitle(for type: PrivacyPageType) -> (String, String) {
         switch type {
         case .privacy, .privacyCenter:
-            return (privacyURL, PrivacyLocalize("Demo.TRTC.Portal.private"))
+            return (privacyURL, PrivacyLocalize("privacy_agreement"))
         case .privacySummary:
-            return (privacySummaryURL, PrivacyLocalize("Demo.TRTC.Portal.privacysummary"))
+            return (privacySummaryURL, PrivacyLocalize("privacy_policy_summary"))
         case .agreement:
-            return (agreementURL, PrivacyLocalize("Demo.TRTC.Portal.agreement"))
+            return (agreementURL, PrivacyLocalize("privacy_user_agreement"))
+        case .dataCollection:
+            return (dataCollectionURL, PrivacyLocalize("privacy_data_collection_list"))
+        case .thirdShare:
+            return (thirdShareURL, PrivacyLocalize("privacy_third_share"))
         }
     }
 }
@@ -90,5 +104,7 @@ public enum PrivacyPageType {
     case privacy
     case privacySummary
     case agreement
+    case dataCollection
+    case thirdShare
     case privacyCenter
 }

@@ -84,11 +84,11 @@ public class CallingSelectUserTableViewCell: UITableViewCell {
 
         switch type {
         case .call:
-            btnName = CallingLocalize("Demo.TRTC.Streaming.call")
+            btnName = CallingLocalize("assembly_call_btn_streaming_call")
         case .add:
-            btnName = CallingLocalize("Demo.TRTC.calling.add")
+            btnName = CallingLocalize("assembly_call_btn_add")
         case .delete:
-            btnName = CallingLocalize("Demo.TRTC.calling.delete")
+            btnName = CallingLocalize("assembly_call_btn_delete")
         }
         rightButton.setTitle(btnName, for: .normal)
     }

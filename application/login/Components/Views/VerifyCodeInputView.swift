@@ -11,7 +11,7 @@ class VerifyCodeInputView: UIView {
     var onTextChanged: ((String) -> Void)?
     
     lazy var textField: LoginTextField = {
-        let tf = LoginTextField(placeholder: LoginLocalize("V2.Live.LinkMicNew.enterverificationcode"))
+        let tf = LoginTextField(placeholder: LoginLocalize("login_verify_code_hint"))
         tf.keyboardType = .numberPad
         tf.layer.borderWidth = 1.0
         tf.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor

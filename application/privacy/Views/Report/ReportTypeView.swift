@@ -63,7 +63,7 @@ class ReportTypeView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
         let content = NSMutableAttributedString(
-            string: PrivacyLocalize("Privacy.Report.type.title") + "*",
+            string: PrivacyLocalize("privacy_report_type_title") + "*",
             attributes: [
                 .font: UIFont.systemFont(ofSize: 12),
                 .foregroundColor: UIColor(hex: "888888") ?? UIColor.lightText,

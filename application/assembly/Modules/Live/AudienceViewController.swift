@@ -186,5 +186,5 @@ extension Notification.Name {
 }
 
 private extension String {
-    static let liveHasStopText = AssemblyLocalize("Demo.TRTC.LiveRoom.liveHasStop")
+    static let liveHasStopText = LiveLocalize("assembly_live_list_has_stop")
 }

@@ -61,6 +61,22 @@ public final class AppLifecycleRegistry {
         return false
     }
     
+    @discardableResult
+    public func handleOpenURLContexts(_ contexts: Set<UIOpenURLContext>) -> Bool {
+        var consumedAny = false
+        for context in contexts {
+            let options: [UIApplication.OpenURLOptionsKey: Any] = [
+                .sourceApplication: context.options.sourceApplication as Any,
+                .annotation: context.options.annotation as Any,
+                .openInPlace: context.options.openInPlace,
+            ]
+            if handleOpenURL(context.url, options: options) {
+                consumedAny = true
+            }
+        }
+        return consumedAny
+    }
+    
     public func applicationDidFinishLaunching(_ application: UIApplication) {
         cleanUp()
         handlers.forEach { $0.value?.applicationDidFinishLaunching(application) }

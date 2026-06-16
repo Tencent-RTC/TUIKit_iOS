@@ -103,9 +103,9 @@ extension CallingRobotCell {
         topIntervalLineView.isHidden = !model.hasTopBorder
         self.callType = model.callType
         if model.callType == .initCall {
-            buttonTitleLabel.text = CallingLocalize("Demo.TRTC.Calling.robotInitCalling")
+            buttonTitleLabel.text = CallingLocalize("assembly_call_simulate_caller")
         } else {
-            buttonTitleLabel.text = CallingLocalize("Demo.TRTC.Calling.robotHostCalling")
+            buttonTitleLabel.text = CallingLocalize("assembly_call_simulate_called")
         }
     }
 }

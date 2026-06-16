@@ -49,7 +49,9 @@ class IOAService {
     }
     
     private func addBackButton(to ioaView: UIView) {
-        if ioaView.viewWithTag(IOAService.backButtonTag) != nil {
+        if let existingButton = ioaView.viewWithTag(IOAService.backButtonTag) as? UIButton {
+            existingButton.removeTarget(nil, action: nil, for: .touchUpInside)
+            existingButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
             return
         }
         

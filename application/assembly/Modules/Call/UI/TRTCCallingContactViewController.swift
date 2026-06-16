@@ -77,7 +77,7 @@ extension TRTCCallingContactViewController {
                                                                                                  withWebJsonName: "callingWithWebGuideData"),
                                                   copyUrl: url,
                                                   copyUrlEn: urlEn)
-            guideVC.title = CallingLocalize("Demo.TRTC.calling.guideTitle")
+            guideVC.title = CallingLocalize("assembly_call_guide_title")
             self.navigationController?.pushViewController(guideVC, animated: true)
         }
     }

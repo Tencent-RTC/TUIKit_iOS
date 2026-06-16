@@ -13,6 +13,16 @@ final class ModulePermissionService {
 
     private(set) var bannedModuleIds: Set<String> = []
 
+    private var bannedFeatureIds: Set<String> {
+        get {
+            let ids = UserDefaults.standard.stringArray(forKey: "rtcube_module_permission.bannedFeatureIds") ?? []
+            return Set(ids)
+        }
+        set {
+            UserDefaults.standard.set(Array(newValue), forKey: "rtcube_module_permission.bannedFeatureIds")
+        }
+    }
+
     private(set) var isHighRiskUser: Bool = false
 
     private(set) var isNeedFaceAuth: Bool = false

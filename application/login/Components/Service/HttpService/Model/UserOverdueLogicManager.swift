@@ -30,6 +30,13 @@ public class UserOverdueLogicManager: NSObject {
 
     public var userOverdueState: UserOverdueState {
         set {
+            let oldValue = _userOverdueState
+            if newValue == .loggedAndOverdue {
+                LoginLogger.Login.warn("UserOverdueState \(oldValue) -> .loggedAndOverdue, caller stack:")
+                Thread.callStackSymbols.prefix(12).enumerated().forEach { idx, frame in
+                    LoginLogger.Login.warn("  #\(idx) \(frame)")
+                }
+            }
             switch newValue {
             case .notLogin:
                 if _userOverdueState == .alreadyLogged {
@@ -52,7 +59,8 @@ public class UserOverdueViewModel: NSObject {
                                       change: [NSKeyValueChangeKey: Any]?,
                                       context: UnsafeMutableRawPointer?) {
         if keyPath == "_userOverdueState" {
-            if UserOverdueLogicManager.sharedManager().userOverdueState == .loggedAndOverdue {
+            let current = UserOverdueLogicManager.sharedManager().userOverdueState
+            if current == .loggedAndOverdue {
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
                     self.showOverdueAlertView()
                 }
@@ -64,12 +72,13 @@ public class UserOverdueViewModel: NSObject {
         if UserOverdueLogicManager.sharedManager().nowAlertController != nil {
             return
         }
+        LoginLogger.Login.warn("UserOverdueViewModel.showOverdueAlertView present")
         let alertController = UIAlertController(
-            title: LoginLocalize("Demo.TRTC.LiveRoom.prompt"),
-            message: LoginLocalize("Demo.TRTC.Home.useroverduemessage"),
+            title: LoginLocalize("login_common_prompt"),
+            message: LoginLocalize("login_home_user_overdue"),
             preferredStyle: .alert
         )
-        let sureAction = UIAlertAction(title: LoginLocalize("LoginNetwork.AppUtils.determine"), style: .default) { _ in
+        let sureAction = UIAlertAction(title: LoginLocalize("login_common_btn_ok"), style: .default) { _ in
             LoginEntry.shared.logout { _ in
                 LoginEntry.shared.onPassiveLogout?()
             }

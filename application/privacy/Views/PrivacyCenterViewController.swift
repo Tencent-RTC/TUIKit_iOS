@@ -52,67 +52,67 @@ final class PrivacyCenterViewController: UITableViewController {
     
     private func buildOverseasMenuItems() {
         if config.personalAuth != nil, !config.authList.isEmpty {
-            let title = PrivacyLocalize("Privacy.PersonalAuth.systemAuth")
+            let title = PrivacyLocalize("privacy_system_auth")
             menuItems.append((title, .systemPermissions))
         }
         
         if !config.dataCollectionList.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.dataCollection")
+            let title = PrivacyLocalize("privacy_data_collection")
             menuItems.append((title, .dataCollection))
         }
         
         // 3. Privacy Policy（URL）
         let privacyURL = config.privacyURL
         if !privacyURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.privacyAgreement")
+            let title = PrivacyLocalize("privacy_agreement")
             menuItems.append((title, .privacyAgreement(url: privacyURL)))
         }
     }
     
     private func buildDomesticMenuItems() {
         if config.personalAuth != nil {
-            let title = PrivacyLocalize("Privacy.Center.personalAuth")
+            let title = PrivacyLocalize("privacy_personal_auth")
             menuItems.append((title, .personalAuth))
         }
         
         if !config.dataCollectionList.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.dataCollection")
+            let title = PrivacyLocalize("privacy_data_collection")
             menuItems.append((title, .dataCollection))
         }
         
         let dataCollectionURL = config.dataCollectionURL
         if !dataCollectionURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.dataCollectionList")
+            let title = PrivacyLocalize("privacy_data_collection_list")
             menuItems.append((title, .dataCollectionList(url: dataCollectionURL)))
         }
         
         let thirdShareURL = config.thirdShareURL
         if !thirdShareURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.thirdShare")
+            let title = PrivacyLocalize("privacy_third_share")
             menuItems.append((title, .thirdShare(url: thirdShareURL)))
         }
         
         let privacySummaryURL = config.privacySummaryURL
         if !privacySummaryURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.privacySummary")
+            let title = PrivacyLocalize("privacy_policy_summary")
             menuItems.append((title, .privacySummary(url: privacySummaryURL)))
         }
         
         let privacyURL = config.privacyURL
         if !privacyURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.privacyAgreement")
+            let title = PrivacyLocalize("privacy_agreement")
             menuItems.append((title, .privacyAgreement(url: privacyURL)))
         }
         
         let serviceURL = config.serviceURL
         if !serviceURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.termsOfService")
+            let title = PrivacyLocalize("privacy_terms_of_service")
             menuItems.append((title, .termsOfService(url: serviceURL)))
         }
         
         let agreementURL = config.agreementURL
         if !agreementURL.isEmpty {
-            let title = PrivacyLocalize("Privacy.Center.userAgreement")
+            let title = PrivacyLocalize("privacy_user_agreement")
             menuItems.append((title, .userAgreement(url: agreementURL)))
         }
     }
@@ -137,7 +137,7 @@ final class PrivacyCenterViewController: UITableViewController {
     // MARK: - Navigation
     
     private func configureNavigation() {
-        title = PrivacyLocalize("Privacy.Center.title")
+        title = PrivacyLocalize("privacy_title")
         navigationController?.navigationBar.titleTextAttributes = [
             .font: ThemeStore.shared.typographyTokens.Medium18,
             .foregroundColor: UIColor.black

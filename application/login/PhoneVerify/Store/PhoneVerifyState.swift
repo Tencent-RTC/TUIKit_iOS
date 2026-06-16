@@ -12,7 +12,6 @@ public struct PhoneVerifyState {
     public var sessionId: String = ""
     public var isLoading: Bool = false
     public var countdownSeconds: Int = 0
-    public var toastMessage: String = ""
     public var fullScreenLoadingMessage: String = ""
     public var isFullScreenLoading: Bool = false
 }

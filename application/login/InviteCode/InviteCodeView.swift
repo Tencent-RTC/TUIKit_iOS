@@ -212,7 +212,7 @@ class InviteCodeView: UIView {
     
     private lazy var agreeCheckBubbleView: InvitationBubbleView = {
         let view = InvitationBubbleView()
-        view.label.text = LoginLocalize("Demo.TRTC.Portal.Main.AgreeBeforeUse")
+        view.label.text = LoginLocalize("login_email_invite_code_terms_tooltip")
         view.label.font = ThemeStore.shared.typographyTokens.Medium14
         view.label.adjustsFontSizeToFitWidth = true
         view.triangleWidth = 10
@@ -402,6 +402,7 @@ class InviteCodeView: UIView {
         let textField = CodeInputTextField()
         textField.borderStyle = .none
         textField.textAlignment = .center
+        textField.textColor = UIColor.black
         textField.font = ThemeStore.shared.typographyTokens.Regular20
         textField.inputView = alphanumericKeyboard
         textField.autocorrectionType = .no
@@ -428,15 +429,13 @@ class InviteCodeView: UIView {
     // MARK: - Store Binding
     
     private func bindStore() {
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message, position: .center)
             }
             .store(in: &cancellables)
-        
+
         store.$state
             .map(\.isValidating)
             .removeDuplicates()

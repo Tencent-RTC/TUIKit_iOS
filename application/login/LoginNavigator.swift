@@ -16,8 +16,10 @@ final class LoginNavigator: NSObject {
     private let completion: (Result<LoginResult, LoginError>) -> Void
     
     var onLoginModeChanged: ((LoginMode) -> Void)?
-    
+
     var onEnvironmentChanged: ((ServerEnvironment) -> Void)?
+
+    var onPrivacyAgreed: ((_ isAgree: Bool) -> Void)?
     
     private var cancellables = Set<AnyCancellable>()
     private var hasFinished = false
@@ -29,6 +31,7 @@ final class LoginNavigator: NSObject {
     }
     
     func buildViewController(mode: LoginMode) -> UIViewController {
+        LoginLogger.Login.info("LoginNavigator.buildViewController mode=\(mode)")
         currentMode = mode
         navigationController.setNavigationBarHidden(true, animated: false)
         navigationController.modalPresentationStyle = .fullScreen
@@ -52,7 +55,13 @@ final class LoginNavigator: NSObject {
         case .menu:
             pushDevLoginMenu(animated: false)
         }
-        
+
+        #if !RTCUBE_OVERSEAS && !RTCUBE_LAB && !OPEN_SOURCE
+        DispatchQueue.main.async { [weak self] in
+            self?.showPrivacyAlertIfNeeded()
+        }
+        #endif
+
         return navigationController
     }
     
@@ -95,25 +104,30 @@ final class LoginNavigator: NSObject {
 
     func pushIOAAuth(animated: Bool = true) {
         #if LOGIN_FULL
-        let store = IOAAuthStore()
-        store.onBack = { [weak self] in
-            self?.pop()
+        let resultBridge = PassthroughSubject<Result<LoginResult, LoginError>, Never>()
+        subscribeStoreResult(resultBridge.eraseToAnyPublisher())
+
+        let ioaVC = IOAAuthViewController { [weak self] result in
+            switch result {
+            case .success(let loginResult):
+                resultBridge.send(.success(loginResult))
+            case .failure:
+                break
+            case .cancelled:
+                if self?.navigationController.viewControllers.count ?? 0 <= 1 {
+                    self?.finish(result: .failure(.cancelled))
+                }
+            }
         }
-        subscribeStoreResult(store.resultPublisher)
-        
-        let vc = UIViewController()
-        let view = IOAAuthView(store: store)
-        vc.view = view
-        showViewController(vc, animated: animated)
+
+        IOAAuthManager.shared.activeIOAViewController = ioaVC
+        navigationController.present(ioaVC, animated: animated)
         #endif
     }
-    
+
     #if LOGIN_FULL
     func handleIOATicket(_ ticket: String) {
-        if let topView = navigationController.topViewController?.view as? IOAAuthView {
-            topView.store.loginWithTicket(ticket)
-            ITLogin.sharedInstance().dimissLoginView()
-        }
+        IOAAuthManager.shared.activeIOAViewController?.handleTicket(ticket)
     }
     #endif
     
@@ -138,6 +152,8 @@ final class LoginNavigator: NSObject {
         let menuVC = DevLoginMenuViewController()
         menuVC.onSelectMode = { [weak self] selectedMode in
             guard let self = self else { return }
+            LoginLogger.Login.info("LoginNavigator.devMenu.onSelectMode \(selectedMode) (currentMode \(self.currentMode) -> \(selectedMode))")
+            self.currentMode = selectedMode
             self.onLoginModeChanged?(selectedMode)
             switch selectedMode {
             case .phoneVerify:
@@ -161,24 +177,47 @@ final class LoginNavigator: NSObject {
     }
     
     private func pushDebugAuthDirect(animated: Bool = true) {
+        LoginLogger.Login.info("LoginNavigator.pushDebugAuthDirect")
         let store = LoginEntry.shared.debugAuthStore
         store.onNeedsRegister = { [weak self] in
             guard let self = self else { return }
             self.pushDebugRegister(store: store)
         }
         subscribeStoreResult(store.resultPublisher)
-        
+
         let vc = UIViewController()
         let view = DebugAuthView(store: store)
         vc.view = view
         showViewController(vc, animated: animated)
     }
+
+    func pushDebugAuthWithCredentials(_ credentials: HiddenConfigCredentials) {
+        let store = LoginEntry.shared.debugAuthStore
+        store.updateUserName(credentials.userId)
+        store.onNeedsRegister = { [weak self] in
+            guard let self = self else { return }
+            self.pushDebugRegister(store: store)
+        }
+        subscribeStoreResult(store.resultPublisher)
+
+        let vc = UIViewController()
+        let debugAuthView = DebugAuthView(store: store)
+        debugAuthView.isUserIdEditable = false
+        debugAuthView.onBack = { [weak self] in
+            self?.pop()
+        }
+        vc.view = debugAuthView
+        navigationController.pushViewController(vc, animated: true)
+
+        store.loginWithCredentials(credentials)
+    }
     
     // MARK: - DebugRegister
     
     private func pushDebugRegister(store: DebugAuthStore) {
+        LoginLogger.Login.info("LoginNavigator.pushDebugRegister")
         let vc = UIViewController()
-        vc.title = LoginLocalize("Demo.TRTC.Login.regist")
+        vc.title = LoginLocalize("login_profile_title")
         let registerView = RegisterView()
         registerView.setAvatarURL(store.state.avatarURL)
         
@@ -208,8 +247,9 @@ final class LoginNavigator: NSObject {
     }
     
     private func pushRegister(pendingResult: LoginResult) {
+        LoginLogger.Login.info("LoginNavigator.pushRegister mode=\(currentMode) userId=\(pendingResult.userModel.userId)")
         let vc = UIViewController()
-        vc.title = LoginLocalize("Demo.TRTC.Login.regist")
+        vc.title = LoginLocalize("login_profile_title")
         let registerView = RegisterView()
         
         registerView.onRegisterButtonTapped = { [weak self] nickName, avatarURL in
@@ -239,6 +279,7 @@ final class LoginNavigator: NSObject {
     }
     
     private func performRegister(nickName: String, avatarURL: String, pendingResult: LoginResult) {
+        LoginLogger.Login.info("LoginNavigator.performRegister begin mode=\(currentMode) nickName.len=\(nickName.count) avatarEmpty=\(avatarURL.isEmpty)")
         networkService.updateUserName(name: nickName) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -266,15 +307,17 @@ final class LoginNavigator: NSObject {
                     )
                 }
                 let updatedResult = LoginResult(userModel: latestUser, mode: currentMode)
-                
+
                 if let topView = self.navigationController.topViewController?.view {
-                    topView.makeToast(LoginLocalize("Demo.TRTC.Login.registsuccess"))
+                    topView.makeToast(LoginLocalize("login_profile_toast_register_success"))
                 }
+                LoginLogger.Login.info("LoginNavigator.performRegister SUCCESS userId=\(latestUser.userId) -> finish")
                 self.finish(result: .success(updatedResult))
             case .failure(let error):
                 if let topView = self.navigationController.topViewController?.view {
                     topView.makeToast(error.message)
                 }
+                LoginLogger.Login.warn("LoginNavigator.performRegister FAILED error=\(error.message), pop after 1s")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     self?.navigationController.popViewController(animated: true)
                 }
@@ -352,6 +395,8 @@ final class LoginNavigator: NSObject {
         let menuVC = DevLoginMenuViewController()
         menuVC.onSelectMode = { [weak self] selectedMode in
             guard let self = self else { return }
+            LoginLogger.Login.info("LoginNavigator.rebuildDebugMenu.onSelectMode \(selectedMode) (currentMode \(self.currentMode) -> \(selectedMode))")
+            self.currentMode = selectedMode
             self.onLoginModeChanged?(selectedMode)
             switch selectedMode {
             case .phoneVerify:
@@ -384,6 +429,25 @@ final class LoginNavigator: NSObject {
     func pop(animated: Bool = true) {
         navigationController.popViewController(animated: animated)
     }
+
+    private static let privacyAgreedKey = "com.rtcube.login.privacyAlertAgreed"
+
+    private func showPrivacyAlertIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: Self.privacyAgreedKey) else { return }
+        guard let topVC = navigationController.topViewController else { return }
+        let alertView = FirstLaunchPrivacyAlertView(superVC: navigationController)
+        alertView.didClickConfirmBtn = { [weak self] in
+            UserDefaults.standard.set(true, forKey: LoginNavigator.privacyAgreedKey)
+            self?.onPrivacyAgreed?(true)
+        }
+        alertView.didClickCancelBtn = { [weak self] in
+            self?.onPrivacyAgreed?(false)
+        }
+        topVC.view.addSubview(alertView)
+        alertView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
     
     private func subscribeStoreResult(_ publisher: AnyPublisher<Result<LoginResult, LoginError>, Never>) {
         publisher
@@ -393,8 +457,10 @@ final class LoginNavigator: NSObject {
                 guard let self = self else { return }
                 switch result {
                 case .success(let loginResult):
+                    LoginLogger.Login.info("LoginNavigator.subscribeStoreResult success userId=\(loginResult.userModel.userId) mode=\(currentMode)")
                     self.handleLoginSuccessWithRegistrationCheck(loginResult: loginResult)
-                case .failure:
+                case .failure(let error):
+                    LoginLogger.Login.warn("LoginNavigator.subscribeStoreResult failure error=\(error)")
                     self.finish(result: result)
                 }
             }
@@ -403,26 +469,39 @@ final class LoginNavigator: NSObject {
     
     private func handleLoginSuccessWithRegistrationCheck(loginResult: LoginResult) {
         if case .debugAuth = currentMode {
+            LoginLogger.Login.info("LoginNavigator.handleLoginSuccess debugAuth -> finish (skip register check)")
             finish(result: .success(loginResult))
             return
         }
-        
+
         if loginResult.userModel.avatar.isEmpty {
+            LoginLogger.Login.info("LoginNavigator.handleLoginSuccess avatar empty mode=\(currentMode) -> pushRegister")
             pushRegister(pendingResult: loginResult)
         } else {
+            LoginLogger.Login.info("LoginNavigator.handleLoginSuccess mode=\(currentMode) -> finish")
             finish(result: .success(loginResult))
         }
     }
     
     private func finish(result: Result<LoginResult, LoginError>) {
-        guard !hasFinished else { return }
+        guard !hasFinished else {
+            LoginLogger.Login.info("LoginNavigator.finish ignored (already finished)")
+            return
+        }
         hasFinished = true
+        switch result {
+        case .success(let loginResult):
+            LoginLogger.Login.info("LoginNavigator.finish SUCCESS userId=\(loginResult.userModel.userId) mode=\(loginResult.loginMode)")
+        case .failure(let error):
+            LoginLogger.Login.warn("LoginNavigator.finish FAILURE error=\(error)")
+        }
         completion(result)
     }
 }
 
 extension LoginNavigator: UIAdaptivePresentationControllerDelegate {
     func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        LoginLogger.Login.info("LoginNavigator.presentationControllerDidDismiss -> finish(.cancelled)")
         finish(result: .failure(.cancelled))
     }
 }

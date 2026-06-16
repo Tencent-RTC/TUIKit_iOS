@@ -126,7 +126,7 @@ public final class CaptchaService: NSObject {
                 guard let model = result["jsonModel"] as? HttpJsonModel,
                       let captchaWebAppid = model.captchaWebAppid
                 else {
-                    completion(.failure(.message(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))))
+                    completion(.failure(.message(LoginLocalize("login_error_send_failed"))))
                     return
                 }
                 completion(.success(captchaWebAppid))
@@ -159,7 +159,7 @@ public final class CaptchaService: NSObject {
         cancelled: (() -> Void)? = nil
     ) {
         guard let parentView = findPresentingView() else {
-            failed(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))
+            failed(LoginLocalize("login_error_send_failed"))
             return
         }
         
@@ -169,7 +169,7 @@ public final class CaptchaService: NSObject {
         }
         
         guard let path = Bundle.loginResources.path(forResource: "VerifyPicture", ofType: "html") else {
-            failed(LoginLocalize("LoginNetwork.ProfileManager.sendfailed"))
+            failed(LoginLocalize("login_error_send_failed"))
             return
         }
         

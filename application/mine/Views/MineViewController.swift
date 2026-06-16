@@ -82,16 +82,16 @@ extension MineViewController: MineRootViewDelegate {
     
     func logout() {
         let alertVC = UIAlertController(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.areYouSureLogOut"),
+            title: MineLocalize("mine_info_dialog_logout"),
             message: nil,
             preferredStyle: .alert
         )
         let cancelAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.cancel"),
+            title: MineLocalize("mine_common_btn_cancel"),
             style: .cancel, handler: nil
         )
         let sureAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.determine"),
+            title: MineLocalize("mine_common_btn_determine"),
             style: .default
         ) { [weak self] _ in
             self?.onLogout?()

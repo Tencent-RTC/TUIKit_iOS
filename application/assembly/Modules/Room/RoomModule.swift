@@ -3,6 +3,7 @@
 //  main
 //
 
+import TUILiveKit
 import TUIRoomKit
 import UIKit
 
@@ -19,8 +20,8 @@ final class RoomModule: ModuleProvider {
     static var standard: RoomModule {
         let config = ModuleConfig(
             identifier: "room",
-            title: AssemblyLocalize("Demo.TRTC.Portal.Main.tuiRoom"),
-            description: AssemblyLocalize("Demo.TRTC.Portal.Main.tuiRoomContent"),
+            title: RoomLocalize("assembly_room_card_title"),
+            description: RoomLocalize("assembly_room_card_description"),
             iconName: "main_entrance_tuiroom",
             iconImage: AppAssemblyBundle.image(named: "main_entrance_tuiroom"),
             cardStyle: .uiComponent,
@@ -32,7 +33,8 @@ final class RoomModule: ModuleProvider {
                 }
                 return RoomHomeViewController()
             },
-            analyticsEvent: "conference"
+            analyticsEvent: "conference",
+            keyMetricsEvent: Constants.DataReport.kDataReportDemoClickRoom
         )
         return RoomModule(config: config)
     }

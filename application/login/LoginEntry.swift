@@ -5,6 +5,7 @@
 
 import Combine
 import ImSDK_Plus
+import Toast_Swift
 import UIKit
 
 public enum LoginMode: Int {
@@ -35,24 +36,24 @@ public final class LoginEntry: NSObject {
     
     public var loggedInMode: LoginMode? {
         let value = UserDefaults.standard.integer(forKey: loggedInKey)
-        if let mode = LoginMode(rawValue: value) {
-            return mode
-        }
-        return nil
+        return LoginMode(rawValue: value)
     }
-    
+
     private func markLoggedIn(mode: LoginMode) {
         if isAutoLoginEnabled {
             UserDefaults.standard.set(mode.rawValue, forKey: loggedInKey)
+            LoginLogger.Login.info("markLoggedIn persisted mode=\(mode)")
         } else {
             UserDefaults.standard.removeObject(forKey: loggedInKey)
+            LoginLogger.Login.info("markLoggedIn auto-login OFF, cleared mode key")
         }
         userInfoManager.startListener()
     }
-    
+
     private func clearLoggedIn() {
         UserDefaults.standard.removeObject(forKey: loggedInKey)
         userInfoManager.stopListener()
+        LoginLogger.Login.info("clearLoggedIn done")
     }
     
     public private(set) var config: LoginConfig = .default
@@ -62,10 +63,14 @@ public final class LoginEntry: NSObject {
     public var userSigGenerator: ((_ identifier: String, _ sdkAppId: Int, _ secretKey: String) -> String)?
     
     public var privacyLinkHandler: ((_ linkType: String, _ viewController: UIViewController?) -> Void)?
+
+    public var onPrivacyAgreed: ((_ isAgree: Bool) -> Void)?
     
     public var onEnvironmentChanged: ((_ environment: ServerEnvironment) -> Void)?
     
     public var onPassiveLogout: (() -> Void)?
+
+    public var onTokenExpired: (() -> Void)?
     
     public private(set) var testBaseUrl: String?
     
@@ -79,8 +84,10 @@ public final class LoginEntry: NSObject {
     private var debugCancellable: AnyCancellable?
     
     private let userInfoManager = UserInfoManager()
-    
-    private var currentEnvironment: ServerEnvironment = .production
+
+    private(set) var currentEnvironment: ServerEnvironment = .production
+
+    private(set) var hasAppliedTestEnvironment: Bool = false
     
     public func initialize(
         baseUrl: String,
@@ -95,7 +102,9 @@ public final class LoginEntry: NSObject {
         ioaAppId: String? = nil
     ) {
         TUILoginListenerHandler.shared.register()
-        
+
+        IMConnectGate.shared.activate()
+
         self.testBaseUrl = testBaseUrl
 
         let newConfig = LoginConfig(
@@ -172,9 +181,14 @@ public final class LoginEntry: NSObject {
                 self?.markLoggedIn(mode: loginResult.loginMode)
             }
             self?.navigator = nil
+            #if LOGIN_FULL
+            IOAAuthManager.shared.activeIOAViewController = nil
+            #endif
             completion(result)
         }
-        currentEnvironment = .production
+        if !hasAppliedTestEnvironment {
+            currentEnvironment = .production
+        }
         let navigator = LoginNavigator(completion: wrappedCompletion)
         navigator.onLoginModeChanged = { [weak self] mode in
             self?.switchConfig(for: mode)
@@ -182,6 +196,7 @@ public final class LoginEntry: NSObject {
         navigator.onEnvironmentChanged = { [weak self] env in
             self?.currentEnvironment = env
         }
+        navigator.onPrivacyAgreed = onPrivacyAgreed
         self.navigator = navigator
         let viewController = navigator.buildViewController(mode: mode)
         
@@ -191,15 +206,18 @@ public final class LoginEntry: NSObject {
         
         let launchAction: () -> Void = { [weak self] in
             guard let self = self else { return }
+            LoginLogger.Login.info("launchAction begin requestedMode=\(mode) persistedMode=\(loggedInMode.map { String(describing: $0) } ?? "nil")")
             if let loggedInMode = loggedInMode {
-                switchConfig(for: loggedInMode)
+                switchConfig(for: loggedInMode, isAutoLogin: true)
                 switch loggedInMode {
                 case .phoneVerify, .emailVerify, .ioaAuth, .inviteCode:
                     performTokenAuth(originalMode: loggedInMode) { [weak self] result in
                         switch result {
                         case .success(let loginResult):
+                            LoginLogger.Login.info("launchAction token-auth SUCCESS")
                             wrappedCompletion(.success(loginResult))
                         case .failure(let error):
+                            LoginLogger.Login.warn("launchAction token-auth FAILED error=\(error), clearing cache")
                             self?.clearLoggedIn()
                             LoginManager.shared.removeLoginCache()
                             ProfileManager.shared.removeLoginCache()
@@ -212,8 +230,10 @@ public final class LoginEntry: NSObject {
                         .sink { [weak self] result in
                             switch result {
                             case .success(let loginResult):
+                                LoginLogger.Login.info("launchAction debug-auth SUCCESS")
                                 wrappedCompletion(.success(loginResult))
                             case .failure(let err):
+                                LoginLogger.Login.warn("launchAction debug-auth FAILED err=\(err), clearing cache")
                                 self?.clearLoggedIn()
                                 LoginManager.shared.removeLoginCache()
                                 ProfileManager.shared.removeLoginCache()
@@ -221,18 +241,20 @@ public final class LoginEntry: NSObject {
                             }
                             self?.debugCancellable = nil
                         }
-                default: break
+                default:
+                    LoginLogger.Login.warn("launchAction unsupported loggedInMode=\(loggedInMode), skip auto-login")
+                    break
                 }
             }
         }
-        
+
         if isInitialized {
             launchAction()
         } else {
-            debugPrint(" initialize not yet complete, launch will be deferred")
+            LoginLogger.Login.info("launch deferred (initialize not finished), queued in pendingLaunchActions")
             pendingLaunchActions.append(launchAction)
         }
-        
+
         return viewController
     }
     
@@ -273,16 +295,14 @@ public final class LoginEntry: NSObject {
         HttpLogicRequest.resetSdkAppIdCache()
     }
     
-    func switchConfig(for mode: LoginMode) {
-        defer {
-            V2TIMManager.sharedInstance().unInitSDK()
-            debugPrint("Environment: set env: \(currentEnvironment.title)")
-            onEnvironmentChanged?(currentEnvironment)
-        }
+    func switchConfig(for mode: LoginMode, isAutoLogin: Bool = false) {
         var targetConfig: LoginConfig
         switch mode {
         case .debugAuth:
-            guard let debugConfig = debugConfig else { return }
+            guard let debugConfig = debugConfig else {
+                LoginLogger.Login.warn("switchConfig debugConfig is nil for .debugAuth, EARLY RETURN")
+                return
+            }
             targetConfig = debugConfig
         default:
             targetConfig = primaryConfig
@@ -290,16 +310,45 @@ public final class LoginEntry: NSObject {
         if currentEnvironment == .test, let testUrl = testBaseUrl {
             targetConfig = targetConfig.withBaseUrl(testUrl)
         }
-        guard targetConfig != config else { return }
+        guard targetConfig != config else {
+            return  // no-op
+        }
         applyConfig(targetConfig)
+        if !isAutoLogin {
+            V2TIMManager.sharedInstance().unInitSDK()
+        }
+        LoginLogger.Login.info("switchConfig mode=\(mode) sdkAppId=\(targetConfig.sdkAppId) isAutoLogin=\(isAutoLogin) unInit=\(!isAutoLogin)")
+        fireEnvironmentChangedIfNeeded()
     }
     
+    ///
+    ///   - currentEnvironment == .production：
+    private func fireEnvironmentChangedIfNeeded() {
+        switch currentEnvironment {
+        case .production:
+            if hasAppliedTestEnvironment {
+                DispatchQueue.main.async {
+                    UIApplication.shared.windows
+                        .first(where: { $0.isKeyWindow })?
+                        .makeToast(LoginLocalize("login_menu_env_changed_restart"))
+                }
+            }
+            return
+        case .test:
+            hasAppliedTestEnvironment = true
+            onEnvironmentChanged?(currentEnvironment)
+        }
+    }
+
     private func performLogout(completion: @escaping () -> Void) {
         clearLoggedIn()
         userModel = nil
         LoginManager.shared.removeLoginCache()
         ProfileManager.shared.removeLoginCache()
         LoginSubStoreLogoutSignal.shared.subject.send()
+        #if LOGIN_FULL
+        IOAAuthManager.shared.logoutIOA()
+        #endif
         let networkService = LoginNetworkService()
         networkService.logout { _ in
             completion()
@@ -322,9 +371,55 @@ public final class LoginEntry: NSObject {
     private lazy var tokenStore = TokenAuthStore()
     
     private static let autoLoginKey = "com.rtcube.login.autoLoginEnabled"
-    
+
+    public var initialAutoLoginEnabled: Bool = false
+
     public var isAutoLoginEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: Self.autoLoginKey) }
+        get {
+            if UserDefaults.standard.object(forKey: Self.autoLoginKey) != nil {
+                return UserDefaults.standard.bool(forKey: Self.autoLoginKey)
+            }
+            return initialAutoLoginEnabled
+        }
         set { UserDefaults.standard.set(newValue, forKey: Self.autoLoginKey) }
+    }
+
+    public private(set) var hiddenCredentials: HiddenConfigCredentials?
+
+    func switchSDKAppID(credentials: HiddenConfigCredentials) {
+        hiddenCredentials = credentials
+
+        guard let sdkAppIdInt = Int(credentials.sdkAppId) else {
+            debugPrint("[HiddenConfig] switchSDKAppID failed: invalid sdkAppId '\(credentials.sdkAppId)'")
+            return
+        }
+
+        let newConfig = LoginConfig(
+            httpBaseUrl: config.httpBaseUrl,
+            isSetupService: false,
+            sdkAppId: sdkAppIdInt,
+            apaasAppId: config.apaasAppId,
+            secretKey: config.secretKey
+        )
+
+        applyConfig(newConfig)
+
+        V2TIMManager.sharedInstance().unInitSDK()
+        debugPrint("[HiddenConfig] switchSDKAppID: sdkAppId=\(credentials.sdkAppId), userId=\(credentials.userId)")
+        fireEnvironmentChangedIfNeeded()
+    }
+
+    func loginWithHiddenCredentials(_ credentials: HiddenConfigCredentials) {
+        navigator?.pushDebugAuthWithCredentials(credentials)
+    }
+
+    func resetSDKAppID() {
+        hiddenCredentials = nil
+
+        applyConfig(primaryConfig)
+
+        V2TIMManager.sharedInstance().unInitSDK()
+        debugPrint("[HiddenConfig] resetSDKAppID: restored to primaryConfig sdkAppId=\(primaryConfig.sdkAppId)")
+        fireEnvironmentChangedIfNeeded()
     }
 }
