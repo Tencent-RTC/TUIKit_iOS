@@ -2,11 +2,20 @@
 //  DevLoginMenuViewController.swift
 //  login
 //
+//  开发测试 Target（RTCubeLab）的登录入口页面
+//
+//  展示所有可用的登录方式列表，点击后跳转到对应的登录页面。
+//  用于开发和测试阶段快速切换不同登录流程。
+//
+//  UI 风格与手机号登录页保持一致：LoginHeaderView（背景图 + Logo）+ 白色内容区
+//
 
-import SnapKit
-import UIKit
 import AtomicX
+import SnapKit
+import Toast_Swift
+import UIKit
 
+/// 登录方式菜单项
 private struct LoginMenuItem {
     let title: String
     let subtitle: String
@@ -14,60 +23,74 @@ private struct LoginMenuItem {
     let mode: LoginMode
 }
 
+/// 服务器环境枚举
 public enum ServerEnvironment: Int {
     case production = 0
     case test = 1
     
     var title: String {
         switch self {
-        case .production: return LoginLocalize("Demo.TRTC.DevMenu.envProduction")
-        case .test: return LoginLocalize("Demo.TRTC.DevMenu.envTest")
+        case .production: return LoginLocalize("login_menu_env_production")
+        case .test: return LoginLocalize("login_menu_env_test")
         }
     }
 }
 
+/// 开发测试用登录方式选择页面
+///
+/// 列出所有可用的登录方式：
+///   - 手机号验证码登录
+///   - 邮箱验证码登录
+///   - iOA 企业登录
+///   - 邀请码登录
+///   - Debug（userId 直接登录）
+///
+/// 点击后通过回调通知 LoginNavigator 进行页面跳转。
 final class DevLoginMenuViewController: UIViewController {
+    /// 选中登录方式后的回调
     var onSelectMode: ((LoginMode) -> Void)?
     
+    /// 环境切换后的回调，外部实现具体逻辑
     var onEnvironmentChanged: ((ServerEnvironment) -> Void)?
     
-    private(set) var currentEnvironment: ServerEnvironment = .production
+    /// 当前选中的环境（从 LoginEntry 恢复，保证登出后重新进入时状态一致）
+    private(set) var currentEnvironment: ServerEnvironment = LoginEntry.shared.currentEnvironment
     
     // MARK: - Data
     
     private let menuItems: [LoginMenuItem] = {
         var items: [LoginMenuItem] = [
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.phoneLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.phoneLoginDesc"),
+                title: LoginLocalize("login_menu_phone"),
+                subtitle: LoginLocalize("login_menu_phone_desc"),
                 icon: "phone.fill",
                 mode: .phoneVerify
             ),
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.emailLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.emailLoginDesc"),
+                title: LoginLocalize("login_menu_email"),
+                subtitle: LoginLocalize("login_menu_email_desc"),
                 icon: "envelope.fill",
                 mode: .emailVerify
             ),
         ]
         #if LOGIN_FULL
         items.append(LoginMenuItem(
-            title: LoginLocalize("Demo.TRTC.DevMenu.ioaLogin"),
-            subtitle: LoginLocalize("Demo.TRTC.DevMenu.ioaLoginDesc"),
+            title: LoginLocalize("login_menu_ioa"),
+            subtitle: LoginLocalize("login_menu_ioa_desc"),
             icon: "building.2.fill",
             mode: .ioaAuth
         ))
         #endif
         items.append(contentsOf: [
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.inviteCodeLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.inviteCodeLoginDesc"),
+                title: LoginLocalize("login_menu_invite"),
+                subtitle: LoginLocalize("login_menu_invite_desc"),
                 icon: "ticket.fill",
                 mode: .inviteCode
             ),
             LoginMenuItem(
-                title: LoginLocalize("Demo.TRTC.DevMenu.debugLogin"),
-                subtitle: LoginLocalize("Demo.TRTC.DevMenu.debugLoginDesc"),
+                title: LoginLocalize("login_menu_debug"),
+                subtitle: LoginLocalize("login_menu_debug_desc"),
                 icon: "wrench.and.screwdriver.fill",
                 mode: .debugAuth
             ),
@@ -94,6 +117,8 @@ final class DevLoginMenuViewController: UIViewController {
         return tv
     }()
     
+    // MARK: - 顶部胶囊控件容器
+    
     private lazy var toggleContainer: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -101,6 +126,8 @@ final class DevLoginMenuViewController: UIViewController {
         stack.alignment = .center
         return stack
     }()
+    
+    // MARK: - 自动登录胶囊
     
     private lazy var autoLoginToggleButton: UIButton = {
         let button = UIButton(type: .system)
@@ -113,12 +140,15 @@ final class DevLoginMenuViewController: UIViewController {
         return button
     }()
     
+    /// 自动登录胶囊左侧的状态圆点
     private lazy var autoLoginDotView: UIView = {
         let dot = UIView()
         dot.layer.cornerRadius = ThemeStore.shared.borderRadius.radius4
         dot.isUserInteractionEnabled = false
         return dot
     }()
+    
+    // MARK: - 环境切换胶囊
     
     private lazy var envToggleButton: UIButton = {
         let button = UIButton(type: .system)
@@ -131,6 +161,7 @@ final class DevLoginMenuViewController: UIViewController {
         return button
     }()
     
+    /// 环境胶囊左侧的状态圆点
     private lazy var envDotView: UIView = {
         let dot = UIView()
         dot.layer.cornerRadius = ThemeStore.shared.borderRadius.radius4
@@ -147,6 +178,7 @@ final class DevLoginMenuViewController: UIViewController {
         activateConstraints()
         applyEnvToggleStyle(animated: false)
         applyAutoLoginToggleStyle(animated: false)
+        setupHiddenEntry()
     }
     
     // MARK: - Setup
@@ -161,10 +193,20 @@ final class DevLoginMenuViewController: UIViewController {
             make.top.leading.trailing.equalToSuperview()
             make.height.equalTo(200 + statusBarHeight())
         }
-        
+
         tableView.snp.makeConstraints { make in
             make.top.equalTo(headerView.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+
+    // MARK: - Hidden Config Entry
+
+    private func setupHiddenEntry() {
+        headerView.onHiddenEntryTriggered = { [weak self] in
+            guard let self = self else { return }
+            let configVC = HiddenConfigViewController()
+            navigationController?.pushViewController(configVC, animated: true)
         }
     }
     
@@ -189,6 +231,8 @@ final class DevLoginMenuViewController: UIViewController {
         return wrapper
     }
     
+    // MARK: - 自动登录切换
+    
     @objc private func autoLoginToggleTapped() {
         LoginEntry.shared.isAutoLoginEnabled.toggle()
         applyAutoLoginToggleStyle(animated: true)
@@ -199,15 +243,24 @@ final class DevLoginMenuViewController: UIViewController {
             ? .active(hex: "006EFF")
             : .inactive
         autoLoginToggleButton.applyCapsuleStyle(
-            title: LoginLocalize("Demo.TRTC.DevMenu.autoLogin"),
+            title: LoginLocalize("login_menu_auto_login"),
             style: style,
             dotView: autoLoginDotView,
             animated: animated
         )
     }
     
+    // MARK: - 环境切换
+    
     @objc private func envToggleTapped() {
         let newEnv: ServerEnvironment = (currentEnvironment == .production) ? .test : .production
+
+        // 已经实际切过测试环境后，不允许切回正式，提示用户重启
+        if newEnv == .production && LoginEntry.shared.hasAppliedTestEnvironment {
+            view.makeToast(LoginLocalize("login_menu_env_changed_restart"))
+            return
+        }
+
         currentEnvironment = newEnv
         applyEnvToggleStyle(animated: true)
         onEnvironmentChanged?(newEnv)
@@ -241,7 +294,7 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 76
+        return 76 // 64(cell 内容) + 12(间距)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -249,7 +302,7 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
         header.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         
         let titleLabel = UILabel()
-        titleLabel.text = LoginLocalize("Demo.TRTC.DevMenu.selectLoginMethod")
+        titleLabel.text = LoginLocalize("login_dev_select_mode")
         titleLabel.font = ThemeStore.shared.typographyTokens.Medium18
         titleLabel.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         
@@ -298,7 +351,7 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
         return 64
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) -> Void {        tableView.deselectRow(at: indexPath, animated: true)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { tableView.deselectRow(at: indexPath, animated: true)
         let item = menuItems[indexPath.row]
         onSelectMode?(item.mode)
     }
@@ -306,13 +359,14 @@ extension DevLoginMenuViewController: UITableViewDataSource, UITableViewDelegate
 
 // MARK: - LoginMenuCell
 
+/// 登录方式菜单 Cell
 private final class LoginMenuCell: UITableViewCell {
     static let reuseID = "LoginMenuCell"
     
     private let iconBgView: UIView = {
         let view = UIView()
         view.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.withAlphaComponent(0.1)
-        view.layer.cornerRadius = 18
+        view.layer.cornerRadius = 18 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         return view
     }()
     
@@ -348,6 +402,7 @@ private final class LoginMenuCell: UITableViewCell {
         return iv
     }()
     
+    /// cell 内部的圆角卡片容器
     private let cardView: UIView = {
         let view = UIView()
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
@@ -373,7 +428,7 @@ private final class LoginMenuCell: UITableViewCell {
             make.top.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
-            make.bottom.equalToSuperview().offset(-12)
+            make.bottom.equalToSuperview().offset(-12) // 12pt 间距
         }
         
         iconBgView.snp.makeConstraints { make in
@@ -406,6 +461,7 @@ private final class LoginMenuCell: UITableViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -430,8 +486,16 @@ private final class LoginMenuCell: UITableViewCell {
     }
 }
 
+// MARK: - 胶囊按钮样式
+
+/// 胶囊按钮的视觉样式
 private enum CapsuleStyle {
+    /// 激活态：主色调高亮
+    /// - Parameters:
+    ///   - hex: 主色 hex 值，用于圆点、背景色（10% 透明度）、边框色（30% 透明度）
+    ///   - textHex: 文字色 hex 值，默认与主色相同
     case active(hex: String, textHex: String? = nil)
+    /// 未激活态：灰色调
     case inactive
     
     var dotColor: UIColor {
@@ -466,6 +530,7 @@ private enum CapsuleStyle {
 }
 
 private extension UIButton {
+    /// 应用胶囊按钮样式
     func applyCapsuleStyle(title: String, style: CapsuleStyle, dotView: UIView, animated: Bool) {
         let applyBlock = {
             self.setTitle(title, for: .normal)

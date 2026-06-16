@@ -2,11 +2,21 @@
 //  OverseasFooterView.swift
 //  main
 //
+//  海外版场景体验 Footer — 从 Tencent-RTC/MainCollectionViewCell.swift 中 MainFooterView 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon` 依赖
+//    - 使用 v2 已有的 convertPixel / UIView+Extension gradient 等工具
+//    - UI 布局完全保持旧版不变
+//
 
 import UIKit
 import SnapKit
 import AtomicX
 
+/// 海外版 CollectionView Footer///
+/// 渐变蓝白背景，圆角 10，左侧图标 + 标题 + 描述 + 右侧箭头。
+/// 点击后跳转场景体验页面。
 class OverseasFooterView: UICollectionReusableView {
 
     // MARK: - UI Elements
@@ -31,7 +41,7 @@ class OverseasFooterView: UICollectionReusableView {
         label.textAlignment = .left
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperience")
+        label.text = MainLocalize("main_overseas_scenario_experience")
         return label
     }()
 
@@ -43,7 +53,7 @@ class OverseasFooterView: UICollectionReusableView {
         label.numberOfLines = 2
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.8
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.ScenarioExperienceDesc")
+        label.text = MainLocalize("main_overseas_scenario_experience_desc")
         return label
     }()
 

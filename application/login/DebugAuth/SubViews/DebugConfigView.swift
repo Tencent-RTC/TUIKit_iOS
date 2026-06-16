@@ -2,17 +2,29 @@
 //  DebugConfigView.swift
 //  login
 //
+//  Debug 登录 — 用户名输入 + 版本号显示
+//  从旧版 TRTCDebugLoginView 完整保留布局
+//
 
 import UIKit
 import TUICore
 import AtomicX
 
 class DebugConfigView: UIView {
-    
+
     var onLoginButtonTapped: (() -> Void)?
     var onUserNameChanged: ((String) -> Void)?
-    
+
     weak var currentTextField: UITextField?
+
+    var isUserIdEditable: Bool = true {
+        didSet {
+            accountTextField.isUserInteractionEnabled = isUserIdEditable
+            accountTextField.textColor = isUserIdEditable
+                ? ThemeStore.shared.colorTokens.textColorPrimary
+                : ThemeStore.shared.colorTokens.textColorDisable
+        }
+    }
     
     // MARK: - SubViews
     
@@ -34,7 +46,7 @@ class DebugConfigView: UIView {
     }()
     
     lazy var accountTextField: UITextField = {
-        let textField = createTextField(LoginLocalize("Demo.TRTC.Login.enterUserName"))
+        let textField = createTextField(LoginLocalize("login_profile_nickname_hint"))
         textField.keyboardType = .default
         textField.layer.borderWidth = 1.0
         textField.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor
@@ -45,13 +57,13 @@ class DebugConfigView: UIView {
     lazy var loginButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setTitleColor(ThemeStore.shared.colorTokens.textColorButton, for: .normal)
-        button.setTitle(LoginLocalize("V2.Live.LoginMock.login"), for: .normal)
+        button.setTitle(LoginLocalize("login_btn_login"), for: .normal)
         button.adjustsImageWhenHighlighted = false
         button.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium18
         button.layer.shadowColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor
         button.layer.shadowOffset = CGSize(width: 0, height: 6)
-        button.layer.shadowRadius = 16
+        button.layer.shadowRadius = 16 // NOTE: 不在 AtomicX Shadows 体系中，保留原值
         button.layer.shadowOpacity = 0.4
         button.layer.masksToBounds = true
         button.isEnabled = false

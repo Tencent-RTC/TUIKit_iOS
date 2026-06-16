@@ -2,6 +2,15 @@
 //  OverseasCollectionCell.swift
 //  main
 //
+//  海外版首页卡片 Cell — 从 Tencent-RTC/MainCollectionViewCell.swift 迁移
+//
+//  变更说明：
+//    - 数据源从 `MainMenuItemModel` 改为 `ResolvedModule`
+//    - 移除 `import RTCCommon` 依赖，使用 v2 已有的 convertPixel / UIColor(hex:) 等工具
+//    - 单列全宽布局（宽度 - 40，高度 74）
+//    - 白色容器，圆角 10
+//    - 支持 UIKit 蓝色标签、Hot 橙色标签、未读红点
+//
 
 import UIKit
 import SnapKit
@@ -65,7 +74,7 @@ class OverseasCollectionCell: UICollectionViewCell {
 
     private let hotLabel: UILabel = {
         let label = UILabel()
-        label.text = MainLocalize("Demo.TRTC.Portal.Main.HotComponent")
+        label.text = MainLocalize("main_hot_component")
         label.textColor = .white
         label.textAlignment = .center
         label.isHidden = true
@@ -184,22 +193,28 @@ class OverseasCollectionCell: UICollectionViewCell {
 
     // MARK: - Public Config
 
+    /// 使用 ResolvedModule 配置 Cell
     func config(_ module: ResolvedModule) {
         let config = module.config
 
+        // 图标
         setIconImage(name: config.iconName, preloaded: config.iconImage)
 
+        // 标题 & 描述
         titleLabel.text = config.title
         descLabel.text = config.description
 
+        // UIKit 标签（uiComponent 样式显示）
         let showUIKit = config.cardStyle == .uiComponent
         uiComIconView.isHidden = !showUIKit
         if showUIKit {
-            uiComLabel.text = MainLocalize("Demo.TRTC.Portal.Main.UIkit")
+            uiComLabel.text = MainLocalize("main_overseas_tag_kit")
         }
 
+        // Hot 标签
         hotLabel.isHidden = !config.isHot
 
+        // 未读红点
         unreadImageView.isHidden = module.badgeCount == 0
     }
 

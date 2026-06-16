@@ -34,7 +34,7 @@ Pod::Spec.new do |spec|
     ss.resource_bundles = {
       'LoginResources' => [
         'Resource/**/*.xcassets',
-        'Resource/**/*.strings',
+        'Resource/**/*.xcstrings',
         'Resource/**/*.html',
       ]
     }

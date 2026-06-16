@@ -51,6 +51,18 @@ let APAAS_APP_ID = ""
 let DEBUG_SDKAPPID: Int = SDKAPPID
 let DEBUG_SECRETKEY = SECRETKEY
 
+let LIVE_LICENSE_URL = ""
+let LIVE_LICENSE_KEY = ""
+
+let TENCENT_EFFECT_LICENSE_KEY = ""
+let TENCENT_EFFECT_LICENSE_URL = ""
+
+let PLAYER_LICENSE_KEY = TENCENT_EFFECT_LICENSE_KEY
+let PLAYER_LICENSE_URL = TENCENT_EFFECT_LICENSE_URL
+
+let COPYRIGHTED_MUSIC_LICENSE_KEY = ""
+let COPYRIGHTED_MUSIC_LICENSE_URL = ""
+
 class GenerateTestUserSig {
     class func genTestUserSig(identifier: String, sdkAppId: Int, secretKey: String) -> String {
         let current = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970

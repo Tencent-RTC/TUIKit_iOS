@@ -2,6 +2,8 @@
 //  CallingRecentCallsViewController.swift
 //  main
 //
+//  通话模块 - 通话记录页（嵌入 TUICallKit 的 RecentCallsVC）
+//
 
 import UIKit
 import AtomicX
@@ -13,7 +15,7 @@ class CallingRecentCallsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = CallingLocalize("Demo.TRTC.calling.call")
+        self.title = CallingLocalize("assembly_call_btn_start_call")
         let backBtn = UIButton(type: .custom)
         backBtn.setImage(AppAssemblyBundle.image(named: "calling_back"), for: .normal)
         backBtn.addTarget(self, action: #selector(backBtnClick), for: .touchUpInside)

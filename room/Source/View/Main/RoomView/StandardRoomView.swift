@@ -218,6 +218,7 @@ extension StandardRoomView: UICollectionViewDataSource {
                 guard let cell = cell else { return }
                 guard let self = self else { return }
                 cell.updateUI(with: participant)
+                cell.participantView.setFillMode(fillMode: .fit)
                 cell.participantView.updateParticipant(participant: participant)
                 cell.participantView.updateStreamType(streamType: .screen)
                 if isCellVisible(cell) {
@@ -255,6 +256,7 @@ extension StandardRoomView: UICollectionViewDataSource {
                 guard let cell = cell else { return }
                 guard let self = self else { return }
                 cell.updateUI(with: participant)
+                cell.participantView.setFillMode(fillMode: .fill)
                 cell.participantView.updateParticipant(participant: participant)
                 cell.participantView.updateStreamType(streamType: .camera)
                 if isCellVisible(cell) {

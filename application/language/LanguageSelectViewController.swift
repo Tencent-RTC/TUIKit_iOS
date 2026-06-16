@@ -2,12 +2,20 @@
 //  LanguageSelectViewController.swift
 //  language
 //
+//  语言选择页面（从 iOS/App/RT-Cube 移植，适配 v2 模块化架构）
+//
+//  核心逻辑：
+//    1. 展示支持的语言列表（简体中文 / English）
+//    2. 用户选择后通过 LanguageEntry 写入 app 语言偏好
+//    3. 通过 onLanguageChanged 回调通知外部刷新 UI
+//
 
 import UIKit
 import AtomicX
 
 class LanguageSelectViewController: UIViewController {
     
+    /// 语言切换完成回调，参数为选中的 languageID（如 "zh-Hans"、"en"）
     var onLanguageChanged: ((String) -> Void)?
     
     private var dataSource: [LanguageCellModel] = []
@@ -26,7 +34,7 @@ class LanguageSelectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
-        title = MainLocalize("Demo.TRTC.Language.switchLanguage")
+        title = MainLocalize("main_switch_language")
         configData()
         setupNavigationBar()
         view.addSubview(tableView)
@@ -110,13 +118,16 @@ extension LanguageSelectViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedModel = dataSource[indexPath.row]
         
+        // 更新选中状态
         for i in 0..<dataSource.count {
             dataSource[i].selected = (i == indexPath.row)
         }
         tableView.reloadData()
         
+        // 写入 app 语言偏好
         LanguageEntry.shared.currentLanguageID = selectedModel.languageID
         
+        // 通知外部
         onLanguageChanged?(selectedModel.languageID)
     }
 }
@@ -172,12 +183,14 @@ class LanguageSelectCell: UITableViewCell {
         checkmarkView.isHidden = !model.selected
     }
     
+    /// 使用代码绘制勾选图标（避免依赖外部图片资源）
     private func createCheckmarkImage() -> UIImage? {
         let size = CGSize(width: 20, height: 20)
         UIGraphicsBeginImageContextWithOptions(size, false, 0)
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
         
-        let checkColor = UIColor(red: 0.0, green: 0.48, blue: 1.0, alpha: 1.0)
+        // 绘制蓝色勾号
+        let checkColor = UIColor(red: 0.0, green: 0.48, blue: 1.0, alpha: 1.0) // 系统蓝色
         context.setStrokeColor(checkColor.cgColor)
         context.setLineWidth(2.5)
         context.setLineCap(.round)

@@ -2,6 +2,13 @@
 //  ProfileTableViewCell.swift
 //  mine
 //
+//  个人资料页通用 Cell — 从旧版 iOS/App/RT-Cube/Mine/ui/ProfileTableViewCell.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon / TUICore`
+//    - 布局使用 assembly/Extension/LayoutDefine.swift 中的 convertPixel
+//    - UIColor(hex:) 使用 assembly/Extension/UIColor+Extension.swift
+//
 
 import UIKit
 import AtomicX

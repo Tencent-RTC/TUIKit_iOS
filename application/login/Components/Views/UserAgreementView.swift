@@ -2,6 +2,8 @@
 //  UserAgreementView.swift
 //  login
 //
+//  用户协议页（从旧版 UserAgreementViewController.swift + UI 扩展 合并迁移）
+//
 
 import UIKit
 import WebKit
@@ -48,7 +50,7 @@ class UserAgreementViewController: UIViewController {
 // MARK: - UI Setup
 extension UserAgreementViewController {
     func setupUI() {
-        title = LoginLocalize("V2.Live.LinkMicNew.termsandconditions")
+        title = LoginLocalize("login_terms_and_conditions_link")
         view.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
         let htmlPath = Bundle.loginResources.path(forResource: "UserProtocol", ofType: "html")
         var htmlContent = ""
@@ -78,7 +80,7 @@ extension UserAgreementViewController {
         }
         
         let agreeBtn = UIButton()
-        agreeBtn.setTitle(LoginLocalize("V2.Live.LinkMicNew.agree"), for: .normal)
+        agreeBtn.setTitle(LoginLocalize("login_common_agree"), for: .normal)
         agreeBtn.setTitleColor(ThemeStore.shared.colorTokens.textColorLink, for: .normal)
         view.addSubview(agreeBtn)
         agreeBtn.snp.remakeConstraints { (make) in
@@ -90,7 +92,7 @@ extension UserAgreementViewController {
         agreeBtn.addTarget(self, action: #selector(agreeBtnTouchEvent(sender:)), for: .touchUpInside)
         
         let unAgreeBtn = UIButton()
-        unAgreeBtn.setTitle(LoginLocalize("V2.Live.LinkMicNew.disagree"), for: .normal)
+        unAgreeBtn.setTitle(LoginLocalize("login_common_disagree"), for: .normal)
         unAgreeBtn.setTitleColor(ThemeStore.shared.colorTokens.textColorLink, for: .normal)
         view.addSubview(unAgreeBtn)
         unAgreeBtn.snp.remakeConstraints { (make) in

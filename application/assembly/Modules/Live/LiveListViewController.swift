@@ -2,6 +2,7 @@
 //  LiveListViewController.swift
 //  main
 //
+//
 
 import AtomicX
 import AtomicXCore
@@ -33,7 +34,7 @@ final class LiveListViewController: UIViewController {
     private lazy var createRoomBtn = AtomicButton(variant: .filled,
                                                   colorType: .primary,
                                                   size: .large,
-                                                  content: .iconLeading(text: AssemblyLocalize("Demo.TRTC.LiveRoom.createroom"),
+                                                  content: .iconLeading(text: LiveLocalize("assembly_live_list_create_room"),
                                                                         icon: AppAssemblyBundle.image(named: "livekit_ic_add")))
 
     // MARK: - Lifecycle
@@ -45,6 +46,7 @@ final class LiveListViewController: UIViewController {
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
+        AppAssembly.shared.analyticEventHandler?(.liveEvent(name: .liveShowLiveList))
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -93,7 +95,7 @@ extension LiveListViewController {
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         navigationItem.standardAppearance = appearance
         navigationItem.scrollEdgeAppearance = appearance
-        let titleLabel = AssemblyLocalize("Demo.TRTC.LiveRoom.videoLive")
+        let titleLabel = LiveLocalize("assembly_live_list_title")
         let titleView = AtomicLabel(titleLabel) { theme in
             LabelAppearance(textColor: theme.tokens.color.textColorPrimary,
                             backgroundColor: theme.tokens.color.clearColor,
@@ -108,6 +110,7 @@ extension LiveListViewController {
         titleView.frame = CGRect(origin: .zero, size: CGSize(width: width, height: 44))
         navigationItem.titleView = titleView
 
+        // 隐藏调试区域（5 次点击触发 debug 模式）
         let debugView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         debugView.backgroundColor = .clear
         debugView.isUserInteractionEnabled = true
@@ -116,6 +119,7 @@ extension LiveListViewController {
         debugView.addGestureRecognizer(tap)
         let debugViewItem = UIBarButtonItem(customView: debugView)
 
+        // 切换列布局按钮
         let switchColumnBtn = UIButton(type: .custom)
         switchColumnBtn.setImage(AppAssemblyBundle.image(named: "live_single_column_icon"), for: .normal)
         switchColumnBtn.setImage(AppAssemblyBundle.image(named: "live_double_column_icon"), for: .selected)
@@ -125,6 +129,7 @@ extension LiveListViewController {
         switchItem.tintColor = .white
         navigationItem.rightBarButtonItems = [switchItem, debugViewItem]
 
+        // 返回按钮
         let backBtn = UIButton(type: .custom)
         backBtn.setImage(AppAssemblyBundle.image(named: "calling_back")?.withTintColor(.white, renderingMode: .alwaysOriginal),
                          for: .normal)
@@ -157,6 +162,7 @@ extension LiveListViewController {
 
 extension LiveListViewController {
     @objc private func createRoom() {
+        // 通话中禁止开播
         guard AppAssembly.shared.canStartNewRoom else {
             AppAssembly.shared.showCannotStartRoomToast()
             return
@@ -190,6 +196,8 @@ extension LiveListViewController {
         liveListView.setColumnStyle(style: newStyle)
         sender.isSelected = currentStyle == .singleColumn
         createRoomBtn.isHidden = currentStyle == .singleColumn
+        let styleName = currentStyle == .doubleColumn ? "double_column" : "single_column"
+        AppAssembly.shared.analyticEventHandler?(.liveEvent(name: .liveToggleColumn, params: ["column_style": styleName]))
     }
 
     @objc private func debugModeChanged() {
@@ -242,6 +250,7 @@ extension LiveListViewController {
 
 extension LiveListViewController: OnItemClickDelegate {
     func onItemClick(liveInfo: LiveInfo, frame: CGRect) {
+        // 悬浮窗逻辑处理
         if FloatWindow.shared.isShowingFloatWindow() {
             if FloatWindow.shared.getCurrentRoomId() == liveInfo.liveID {
                 FloatWindow.shared.resumeLive(atViewController: navigationController ?? self)
@@ -288,6 +297,7 @@ extension LiveListViewController: OnItemClickDelegate {
         }
     }
 
+    /// 监听进房成功后才淡出截图遮罩，避免直播画面未加载时闪黑屏
     private func bindSnapshotDismissal(transitionDelegate: LiveListTransitioningDelegate) {
         transitionCancellable = LiveListStore.shared.state
             .subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
@@ -307,5 +317,5 @@ extension LiveListViewController: OnItemClickDelegate {
 // MARK: - Localized Strings
 
 private extension String {
-    static let pushingToReturnText = AssemblyLocalize("Demo.TRTC.LiveRoom.exitFloatWindowTip")
+    static let pushingToReturnText = LiveLocalize("assembly_live_list_exit_float_window_tip")
 }

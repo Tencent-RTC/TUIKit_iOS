@@ -267,19 +267,7 @@ extension AnchorCoHostManagerPanel: UITableViewDataSource {
                         switch result {
                         case .failure(let err):
                             store.stopApplyingHost()
-                            switch err.code {
-                            case TUIConnectionCode.roomNotExist.rawValue,
-                                 TUIConnectionCode.connecting.rawValue,
-                                 TUIConnectionCode.connectingOtherRoom.rawValue,
-                                 TUIConnectionCode.full.rawValue,
-                                 TUIConnectionCode.retry.rawValue,
-                                 TUIConnectionCode.roomMismatch.rawValue:
-                                let error = InternalError(error: TUIConnectionCode(rawValue: err.code) ?? .unknown, message: err.message)
-                                store.onError(error)
-                            default:
-                                let error = InternalError(code: err.code, message: err.message)
-                                store.onError(error)
-                            }
+                            store.onError(InternalError(errorInfo: err))
                         default: break
                         }
                     }

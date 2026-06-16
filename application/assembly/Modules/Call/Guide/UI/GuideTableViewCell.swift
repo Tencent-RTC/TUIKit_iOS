@@ -2,6 +2,7 @@
 //  GuideTableViewCell.swift
 //  main
 //
+//  Guide 模块 - 步骤说明 Cell（头像 + 气泡文本 + 截图 + 可选复制按钮）
 
 import UIKit
 import AtomicX
@@ -64,7 +65,7 @@ class GuideTableViewCell: UITableViewCell {
 
     let copyButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setTitle(GuideLocalize("Demo.TRTC.calling.detailGuidCopyURL"), for: .normal)
+        button.setTitle(GuideLocalize("assembly_call_guide_copy_url"), for: .normal)
         button.setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium14
         return button
@@ -186,6 +187,7 @@ extension GuideTableViewCell {
 }
 
 extension GuideTableViewCell {
+    // MARK: 根据头像方向更新约束
     private func updateConstraintsToLeft() {
         avatarImageView.snp.remakeConstraints { make in
             make.top.equalTo(contextContainer)

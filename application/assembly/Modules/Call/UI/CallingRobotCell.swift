@@ -2,6 +2,8 @@
 //  CallingRobotCell.swift
 //  main
 //
+//  通话模块 - 机器人行 Cell（头像 + 名称 + "模拟主叫/被叫"按钮）
+//
 
 import UIKit
 import AtomicX
@@ -103,9 +105,9 @@ extension CallingRobotCell {
         topIntervalLineView.isHidden = !model.hasTopBorder
         self.callType = model.callType
         if model.callType == .initCall {
-            buttonTitleLabel.text = CallingLocalize("Demo.TRTC.Calling.robotInitCalling")
+            buttonTitleLabel.text = CallingLocalize("assembly_call_simulate_caller")
         } else {
-            buttonTitleLabel.text = CallingLocalize("Demo.TRTC.Calling.robotHostCalling")
+            buttonTitleLabel.text = CallingLocalize("assembly_call_simulate_called")
         }
     }
 }
@@ -118,6 +120,7 @@ extension CallingRobotCell {
         containerView.addSubview(dialButton)
         containerView.addSubview(topIntervalLineView)
         containerView.addSubview(botIntervalLineView)
+        // MARK: 按钮的样式在按钮的下面防止点击事件被拦截
         containerView.insertSubview(dialButtonContentView, belowSubview: dialButton)
         dialButtonContentView.addSubview(buttonIconImage)
         dialButtonContentView.addSubview(buttonTitleLabel)

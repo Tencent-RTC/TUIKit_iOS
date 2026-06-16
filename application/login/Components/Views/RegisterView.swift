@@ -2,6 +2,14 @@
 //  RegisterView.swift
 //  login
 //
+//  注册视图（新用户设置昵称+头像）
+//  从旧版 TRTCRegisterRootView 完整保留布局：
+//    - 圆形头像按钮(100x100) + 昵称输入框(最大20字符) + 注册按钮
+//    - 随机预填昵称（33个本地化预设）
+//    - 昵称正则校验：中英文/数字/下划线，2~20位
+//    - 键盘遮挡自动上移
+//  所有 SnapKit 约束值与旧版完全一致
+//
 
 import UIKit
 import Kingfisher
@@ -20,7 +28,7 @@ class RegisterView: UIView {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular20
         label.textColor = ThemeStore.shared.colorTokens.textColorPrimary
-        label.text = LoginLocalize("Demo.TRTC.Login.regist")
+        label.text = LoginLocalize("login_profile_title")
         return label
     }()
     
@@ -28,14 +36,14 @@ class RegisterView: UIView {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textColor = ThemeStore.shared.colorTokens.textColorTertiary
-        label.text = LoginLocalize("Demo.TRTC.LoginMock.adduserinformationforfirstlogin")
+        label.text = LoginLocalize("login_profile_first_login_hint")
         label.numberOfLines = 0
         return label
     }()
     
     lazy var headImageViewBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.layer.cornerRadius = 50
+        btn.layer.cornerRadius = 50 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         btn.clipsToBounds = true
         btn.adjustsImageWhenHighlighted = false
         return btn
@@ -47,7 +55,7 @@ class RegisterView: UIView {
         textField.font = ThemeStore.shared.typographyTokens.Regular16
         textField.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         textField.attributedPlaceholder = NSAttributedString(
-            string: LoginLocalize("Demo.TRTC.LoginMock.fillinusernickname"),
+            string: LoginLocalize("login_profile_fillin_nickname"),
             attributes: [
                 .font: ThemeStore.shared.typographyTokens.Regular16,
                 .foregroundColor: ThemeStore.shared.colorTokens.textColorDisable,
@@ -68,7 +76,7 @@ class RegisterView: UIView {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular16
         label.textColor = .darkGray
-        label.text = LoginLocalize("Demo.TRTC.Login.limit20count")
+        label.text = LoginLocalize("login_profile_nickname_limit")
         label.adjustsFontSizeToFitWidth = true
         return label
     }()
@@ -77,7 +85,7 @@ class RegisterView: UIView {
         let label = UILabel(frame: .zero)
         label.font = ThemeStore.shared.typographyTokens.Regular14
         label.textColor = ThemeStore.shared.colorTokens.textColorDisable
-        label.text = LoginLocalize("Demo.TRTC.Login.modifyLaterInSettings")
+        label.text = LoginLocalize("login_profile_modify_later_in_settings")
         label.textAlignment = .center
         return label
     }()
@@ -85,13 +93,13 @@ class RegisterView: UIView {
     lazy var registBtn: UIButton = {
         let btn = UIButton(type: .custom)
         btn.setTitleColor(ThemeStore.shared.colorTokens.textColorButton, for: .normal)
-        btn.setTitle(LoginLocalize("Demo.TRTC.Login.regist"), for: .normal)
+        btn.setTitle(LoginLocalize("login_profile_title"), for: .normal)
         btn.adjustsImageWhenHighlighted = false
         btn.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium18
         btn.layer.shadowColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
-        btn.layer.shadowRadius = 16
+        btn.layer.shadowRadius = 16 // NOTE: 不在 AtomicX Shadows 体系中，保留原值
         btn.layer.shadowOpacity = 0.4
         btn.layer.masksToBounds = true
         btn.isEnabled = false
@@ -113,7 +121,7 @@ class RegisterView: UIView {
         }
         var datas = [String]()
         for i in 1..<34 {
-            datas.append(LoginLocalize("Demo.TRTC.login_custom_name_\(i)"))
+            datas.append(LoginLocalize("login_profile_custom_name_\(i)"))
         }
         return datas
     }()

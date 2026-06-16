@@ -2,6 +2,13 @@
 //  ProfileDatePickerView.swift
 //  mine
 //
+//  日期选择器 — 从旧版 iOS/App/RT-Cube/Mine/ui/ProfileDatePickerView.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon`
+//    - UIView 扩展使用 assembly/Extension/UIView+Extension.swift
+//    - TUITheme 动态颜色保持（依赖 TUICore）
+//
 
 import UIKit
 import AtomicX
@@ -17,6 +24,9 @@ class ProfileDatePickerView: UIView {
         self.profile = profile
     }
     
+    /// 根据 ThemeStore 当前主题，返回 UIKit 覆盖用的 userInterfaceStyle。
+    /// - 作用：强制 UIDatePicker 等系统控件使用与主题一致的明暗，
+    ///   避免"深色主题下系统绘制文字为黑色"等错配问题。
     private var themedInterfaceStyle: UIUserInterfaceStyle {
         switch ThemeStore.shared.currentMode {
         case .dark: return .dark
@@ -61,7 +71,7 @@ class ProfileDatePickerView: UIView {
     
     lazy var cancelButton: UIButton = {
         let cancelButton = UIButton(type: .custom)
-        cancelButton.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.cancel"), for: .normal)
+        cancelButton.setTitle(MineLocalize("mine_common_btn_cancel"), for: .normal)
         cancelButton.setTitleColor(ThemeStore.shared.colorTokens.textColorPrimary, for: .normal)
         cancelButton.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
         cancelButton.addTarget(self, action: #selector(onViewHide), for: .touchUpInside)
@@ -70,7 +80,7 @@ class ProfileDatePickerView: UIView {
     
     lazy var okButton: UIButton = {
         let okButton = UIButton(type: .custom)
-        okButton.setTitle(MineLocalize("Demo.TRTC.Portal.Mine.determine"), for: .normal)
+        okButton.setTitle(MineLocalize("mine_common_btn_determine"), for: .normal)
         okButton.setTitleColor(ThemeStore.shared.colorTokens.textColorPrimary, for: .normal)
         okButton.titleLabel?.font = ThemeStore.shared.typographyTokens.Regular16
         okButton.addTarget(self, action: #selector(onConfirmClicked), for: .touchUpInside)

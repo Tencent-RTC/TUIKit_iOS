@@ -2,6 +2,9 @@
 //  PrivacyMyInfoViewController.swift
 //  privacy
 //
+//  个人信息页面 — 展示用户个人信息，支持复制
+//  对标 v1 LiteAVPrivacyMyInfoViewController
+//
 
 import UIKit
 import AtomicX
@@ -22,7 +25,7 @@ final class PrivacyMyInfoViewController: UITableViewController {
         label.backgroundColor = .black
         label.layer.cornerRadius = ThemeStore.shared.borderRadius.radius4
         label.layer.masksToBounds = true
-        label.text = PrivacyLocalize("Privacy.MyInfo.copySuccess")
+        label.text = PrivacyLocalize("privacy_tip_copy")
         label.textColor = .white
         label.textAlignment = .center
         label.font = ThemeStore.shared.typographyTokens.Regular14
@@ -63,7 +66,7 @@ final class PrivacyMyInfoViewController: UITableViewController {
     // MARK: - Navigation
     
     private func configureNavigation() {
-        title = PrivacyLocalize("Privacy.PersonalAuth.info")
+        title = PrivacyLocalize("privacy_personal_info")
         navigationController?.navigationBar.titleTextAttributes = [
             .font: ThemeStore.shared.typographyTokens.Medium18,
             .foregroundColor: UIColor.black
@@ -97,8 +100,8 @@ final class PrivacyMyInfoViewController: UITableViewController {
         }
         
         let key = infoItems[indexPath.row]
-        let title = PrivacyLocalize("Privacy.SystemAuth.\(key)")
-        let noneText = PrivacyLocalize("Privacy.DataCollection.none")
+        let title = PrivacyLocalize("privacy_\(key)")
+        let noneText = PrivacyLocalize("privacy_none")
         
         if key == "avatar" {
             cell.configure(title: title, value: nil, avatarURL: config.userAvatar)
@@ -185,7 +188,7 @@ private final class PrivacyMyInfoCell: UITableViewCell {
     let avatarImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
-        iv.layer.cornerRadius = 22
+        iv.layer.cornerRadius = 22 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         iv.clipsToBounds = true
         iv.isHidden = true
         return iv

@@ -4618,25 +4618,25 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Screen sharing in progress"
+            "value": "You are sharing your screen..."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "您正在屏幕分享"
+            "value": "您正在共享屏幕..."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "画面を共有しています"
+            "value": "画面を共有中です..."
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مشاركة الشاشة جارية"
+            "value": "أنت تشارك شاشتك..."
           }
         }
       }
@@ -4734,25 +4734,83 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stop sharing"
+            "value": "End sharing"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "停止分享"
+            "value": "结束共享"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有を停止"
+            "value": "共有を終了"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "إيقاف المشاركة"
+            "value": "إنهاء المشاركة"
+          }
+        }
+      }
+    },
+    "roomkit_stop_screen_share_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After ending sharing, others will no longer be able to view your screen. Are you sure you want to end sharing?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束共享后，其他人将无法继续观看你的屏幕内容，确定要结束共享吗？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有を終了すると、他のユーザーはあなたの画面を視聴できなくなります。共有を終了してもよろしいですか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد إنهاء المشاركة، لن يتمكن الآخرون من الاستمرار في مشاهدة شاشتك. هل أنت متأكد أنك تريد إنهاء المشاركة؟"
+          }
+        }
+      }
+    },
+    "roomkit_another_is_sharing_the_screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another user is sharing the screen."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他用户正在共享屏幕。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "他のユーザーが画面を共有しています。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستخدم آخر يشارك الشاشة."
           }
         }
       }
@@ -4927,6 +4985,93 @@
           "stringUnit": {
             "state": "translated",
             "value": "شخص ما يقدم حاليًا. ستؤدي مشاركة الشاشة إلى مقاطعة عرضه التقديمي. هل تريد المتابعة؟"
+          }
+        }
+      }
+    },
+    "roomkit_all_screen_share_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing disabled for participants."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已禁止成员屏幕共享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参加者の画面共有が無効になりました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تعطيل مشاركة الشاشة للمشاركين."
+          }
+        }
+      }
+    },
+    "roomkit_all_screen_share_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing enabled for participants."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许成员开启屏幕共享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参加者の画面共有が有効になりました。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم تفعيل مشاركة الشاشة للمشاركين."
+          }
+        }
+      }
+    },
+    "roomkit_not_allowed_to_screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currently only host/admins can share screen."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前仅主持人/管理员可以共享屏幕。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在はホスト/管理者のみ画面共有が可能です。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حالياً يمكن للمضيف/المسؤولين فقط مشاركة الشاشة."
           }
         }
       }
@@ -5159,6 +5304,93 @@
           "stringUnit": {
             "state": "translated",
             "value": "تم رفض طلب رفع يدك"
+          }
+        }
+      }
+    },
+    "roomkit_enter_room_password_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入会密码"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入室パスワード"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كلمة مرور الغرفة"
+          }
+        }
+      }
+    },
+    "roomkit_please_input_room_password": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please enter the room password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入入会密码"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "入室パスワードを入力してください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى إدخال كلمة مرور الغرفة"
+          }
+        }
+      }
+    },
+    "roomkit_password_error": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码错误"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスワードが間違っています"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كلمة المرور غير صحيحة"
           }
         }
       }
@@ -7711,6 +7943,180 @@
           "stringUnit": {
             "state": "translated",
             "value": "إرسال"
+          }
+        }
+      }
+    },
+    "roomkit_privacy_screen_share_tip_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Security reminder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全提醒"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "セキュリティリマインダー"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تذكير الأمان"
+          }
+        }
+      }
+    },
+    "roomkit_privacy_screen_share_tip_content": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing may leak private information such as SMS verification codes and passwords, causing property loss. Please be vigilant against various fraudulent activities."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享屏幕时可能会泄露短信验证码、密码等隐私信息，造成财产损失，请警惕各种诈骗行为。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面共有によりSMS認証コードやパスワードなどの個人情報が漏洩し、財産損失を引き起こす可能性があります。様々な詐欺行為にご注意ください。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قد تؤدي مشاركة الشاشة إلى تسريب معلومات خاصة مثل رموز التحقق عبر الرسائل القصيرة وكلمات المرور، مما يتسبب في خسائر مالية. يرجى توخي الحذر ضد الأنشطة الاحتيالية المختلفة."
+          }
+        }
+      }
+    },
+    "roomkit_privacy_screen_share_tip_continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue sharing"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续共享"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有を続行"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متابعة المشاركة"
+          }
+        }
+      }
+    },
+    "roomkit_unable_to_shared_screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please contact us to experience this feature"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如需体验该功能请联系我们"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この機能を使用するにはお問い合わせください"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يرجى الاتصال بنا لتجربة هذه الميزة"
+          }
+        }
+      }
+    },
+    "roomkit_tips": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Friendly reminder"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "温馨提示"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ご案内"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تذكير ودّي"
+          }
+        }
+      }
+    },
+    "roomkit_contact_us": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contact us"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "联系我们"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お問い合わせ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اتصل بنا"
           }
         }
       }

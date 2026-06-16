@@ -2,6 +2,8 @@
 //  CallingMenuHeaderView.swift
 //  main
 //
+//  通话模块 - 菜单 Section Header（标题 + 描述 + 高亮文字）
+//
 
 import UIKit
 import AtomicX

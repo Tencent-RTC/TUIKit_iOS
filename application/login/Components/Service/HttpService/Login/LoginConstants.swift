@@ -2,6 +2,8 @@
 //  LoginConstants.swift
 //  login
 //
+//  从 BusinessService/LoginService.swift 复制的登录相关常量
+//
 
 import Foundation
 

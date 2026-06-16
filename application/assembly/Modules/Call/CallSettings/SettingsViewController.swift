@@ -2,6 +2,8 @@
 //  SettingsViewController.swift
 //  AppAssembly
 //
+//  通话模块 - 设置页面（仅 RTCubeLab 使用）
+//
 
 import Foundation
 import TUICore
@@ -34,7 +36,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var basicSettingLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.basicSetting"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_basic"))
     }()
     
     private let ringContentView: UIView = {
@@ -43,11 +45,11 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var ringLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.ringSetting"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_ring_setting"))
     }()
     private lazy var ringInfoLabel: UILabel = {
         let place: String = SettingsConfig.share.ringUrl.isEmpty ?
-        CallingLocalize("Demo.TRTC.calling.settings.notSet") : SettingsConfig.share.ringUrl
+        CallingLocalize("assembly_call_settings_not_set") : SettingsConfig.share.ringUrl
         let view = createLabel(textSize: 16, text: place)
         view.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         view.textAlignment = .right
@@ -60,7 +62,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var muteSwitchView: UIView = {
-        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("Demo.TRTC.calling.settings.muteMode"),
+        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("assembly_call_settings_mute_mode"),
                                                         isOn: SettingsConfig.share.mute)
         customSwitchView.switchValueChanged = { isOn in
             self.muteSwitchClick(isOn)
@@ -68,7 +70,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return customSwitchView
     }()
     private lazy var floatingSwitchView: UIView = {
-        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("Demo.TRTC.calling.settings.enableFloating"),
+        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("assembly_call_settings_enable_floating"),
                                                         isOn: SettingsConfig.share.floatWindow)
         customSwitchView.switchValueChanged = { isOn in
             self.floatingSwitchClick(isOn)
@@ -77,7 +79,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     }()
 #if canImport(TUICallKit_Swift)
     private lazy var virtualBackgroundSwitchView: SettingsCustomSwitchView = {
-        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("Demo.TRTC.calling.settings.enableVirtualBackground"),
+        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("assembly_call_settings_enable_virtual_bg"),
                                                         isOn: SettingsConfig.share.enableVirtualBackground)
         customSwitchView.switchValueChanged = { isOn in
             self.virtualBackgroundSwitchClick(isOn)
@@ -85,7 +87,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return customSwitchView
     }()
     private lazy var incomingBannerSwitchView: SettingsCustomSwitchView = {
-        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("Demo.TRTC.calling.settings.enableIncomingBanner"),
+        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("assembly_call_settings_enable_incoming_banner"),
                                                         isOn: SettingsConfig.share.enableIncomingBanner)
         customSwitchView.switchValueChanged = { isOn in
             self.incomingBannerSwitchClick(isOn)
@@ -93,7 +95,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return customSwitchView
     }()
     private lazy var aiTranscriberSwitchView: SettingsCustomSwitchView = {
-        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("Demo.TRTC.calling.settings.enableAITranscriber"),
+        let customSwitchView = SettingsCustomSwitchView(title: CallingLocalize("assembly_call_settings_enable_ai_transcriber"),
                                                         isOn: SettingsConfig.share.enableAITranscriber)
         customSwitchView.switchValueChanged = { [weak self] isOn in
             self?.aiTranscriberSwitchClick(isOn)
@@ -107,7 +109,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var callSettingLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.callParamsSetting"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_call_params"))
     }()
     
     private let stringRoomIdContentView: UIView = {
@@ -144,7 +146,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var timeoutLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.timeout"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_timeout"))
     }()
     private lazy var timeoutTextField: UITextField = {
         let timeoutTextField = createTextField(text: "30")
@@ -158,10 +160,10 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var extendedInfoLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.expendedInfo"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_extended_info"))
     }()
     private lazy var extendedInfo: UILabel = {
-        let place = SettingsConfig.share.userData.isEmpty ? CallingLocalize("Demo.TRTC.calling.settings.notSet") : SettingsConfig.share.userData
+        let place = SettingsConfig.share.userData.isEmpty ? CallingLocalize("assembly_call_settings_not_set") : SettingsConfig.share.userData
         let view = createLabel(textSize: 16, text: place)
         view.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         view.textAlignment = .right
@@ -180,10 +182,10 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var offlinePushLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.offlinePushInfo"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_offline_push_info"))
     }()
     private lazy var offlinePushInfo: UILabel = {
-        let view = createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.goToSettings"))
+        let view = createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_go_to_settings"))
         view.textColor = ThemeStore.shared.colorTokens.textColorTertiary
         view.textAlignment = .right
         return view
@@ -201,7 +203,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var videoSettingLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.videoSetting"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_video_setting"))
     }()
     
     private let resolutionContentView: UIView = {
@@ -210,7 +212,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var resolutionLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.resolution"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_resolution"))
     }()
     private let resolutionData = ["640*360","960*540","1280*720","1920*1080"]
     private lazy var resolutionDropMenu: SwiftDropMenuListView = {
@@ -230,12 +232,12 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var resolutionModeLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.resolutionMode"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_resolution_mode"))
     }()
     private lazy var resolutionModeSegment: UISegmentedControl = {
         let index = SettingsConfig.share.resolutionMode == .landscape ? 0 : 1
-        return createSegment(item: [CallingLocalize("Demo.TRTC.calling.settings.horizontal"),
-                                    CallingLocalize("Demo.TRTC.calling.settings.vertical"),], select: index)
+        return createSegment(item: [CallingLocalize("assembly_call_settings_horizontal"),
+                                    CallingLocalize("assembly_call_settings_vertical"),], select: index)
     }()
     
     private let fillModeContentView: UIView = {
@@ -244,12 +246,12 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var fillModeLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.fillMode"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_fill_mode"))
     }()
     private lazy var fillModeSegment: UISegmentedControl = {
         let index = SettingsConfig.share.fillMode == .fit ? 0 : 1
-        return createSegment(item: [CallingLocalize("Demo.TRTC.calling.settings.fit"),
-                                    CallingLocalize("Demo.TRTC.calling.settings.fill"),], select: index)
+        return createSegment(item: [CallingLocalize("assembly_call_settings_fit"),
+                                    CallingLocalize("assembly_call_settings_fill"),], select: index)
     }()
     
     private let rotationContentView: UIView = {
@@ -258,7 +260,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var rotationLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.rotation"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_rotation"))
     }()
     private lazy var rotationSegment: UISegmentedControl = {
         return createSegment(item: ["0", "90", "180", "270"], select: convertRotationToIndex(rotation: SettingsConfig.share.rotation))
@@ -270,7 +272,7 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var beautyLevelLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.beautyLevel"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_beauty_level"))
     }()
     private lazy var beautyLevelTextField: UITextField = {
         let textField = createTextField(text: "\(SettingsConfig.share.beautyLevel)")
@@ -284,13 +286,13 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
         return view
     }()
     private lazy var screenModeLabel: UILabel = {
-        return createLabel(textSize: 16, text: CallingLocalize("Demo.TRTC.calling.settings.otherSetting"))
+        return createLabel(textSize: 16, text: CallingLocalize("assembly_call_settings_other_setting"))
     }()
     private lazy var screenModeSegment: UISegmentedControl = {
         let titles = [
-            CallingLocalize("Demo.TRTC.calling.settings.screenVertical"),
-            CallingLocalize("Demo.TRTC.calling.settings.screenHorizontal"),
-            CallingLocalize("Demo.TRTC.calling.settings.screenAuto")
+            CallingLocalize("assembly_call_settings_screen_vertical"),
+            CallingLocalize("assembly_call_settings_screen_horizontal"),
+            CallingLocalize("assembly_call_settings_screen_auto")
         ]
         return createSegment(item: titles, select: SettingsConfig.share.screenOrientation)
     }()
@@ -325,9 +327,9 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     
     private func updateView() {
         ringInfoLabel.text = SettingsConfig.share.ringUrl.isEmpty ?
-        CallingLocalize("Demo.TRTC.calling.settings.notSet") : SettingsConfig.share.ringUrl
+        CallingLocalize("assembly_call_settings_not_set") : SettingsConfig.share.ringUrl
         extendedInfo.text = SettingsConfig.share.userData.isEmpty ?
-        CallingLocalize("Demo.TRTC.calling.settings.notSet") : SettingsConfig.share.userData
+        CallingLocalize("assembly_call_settings_not_set") : SettingsConfig.share.userData
     }
     
     private func setupNavigationBar() {
@@ -712,21 +714,21 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     
     @objc private func ringAvBtnClick() {
         let offlinePushVC = SettingDetailViewController(type: .ringInfo)
-        offlinePushVC.title = CallingLocalize("Demo.TRTC.calling.settings.setRing")
+        offlinePushVC.title = CallingLocalize("assembly_call_settings_set_ring")
         offlinePushVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(offlinePushVC, animated: true)
     }
     
     @objc private func offlinePushClick() {
         let offlinePushVC = SettingDetailViewController(type: .offlinePushInfo)
-        offlinePushVC.title = CallingLocalize("Demo.TRTC.calling.settings.setOffLineInfo")
+        offlinePushVC.title = CallingLocalize("assembly_call_settings_set_offline_info")
         offlinePushVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(offlinePushVC, animated: true)
     }
     
     @objc private func extendClick() {
         let extendVC = SettingDetailViewController(type: .entendInfo)
-        extendVC.title = CallingLocalize("Demo.TRTC.calling.settings.setExtend")
+        extendVC.title = CallingLocalize("assembly_call_settings_set_extend")
         extendVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(extendVC, animated: true)
     }
@@ -853,13 +855,13 @@ extension SettingsViewController {
     func createSettingButton() -> UIButton {
         let btn = UIButton(type: .system)
         btn.setTitleColor(.white, for: .normal)
-        btn.setTitle(CallingLocalize("Demo.TRTC.calling.settings.settings"), for: .normal)
+        btn.setTitle(CallingLocalize("assembly_call_settings_general"), for: .normal)
         btn.adjustsImageWhenHighlighted = false
         btn.setBackgroundImage(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.trans2Image(), for: .normal)
         btn.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium16
         btn.layer.shadowColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault.cgColor
         btn.layer.shadowOffset = CGSize(width: 0, height: 6)
-        btn.layer.shadowRadius = 16
+        btn.layer.shadowRadius = 16 // NOTE: 不在 AtomicX Shadows 体系中，保留原值
         btn.layer.shadowOpacity = 0.4
         btn.layer.masksToBounds = true
         btn.layer.cornerRadius = 5

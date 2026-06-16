@@ -2,6 +2,14 @@
 //  MineViewController.swift
 //  mine
 //
+//  个人中心主控制器 — 从旧版 iOS/App/RT-Cube/Mine/ui/MineViewController.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import ImSDK_Plus / TUIContact / RTCCommon / BusinessService / ITLogin / AtomicXCore`
+//    - 退出登录改为通过 `onLogout` 回调通知外部，由外部调用 LoginEntry.shared.logout()
+//    - 语言切换改为使用 v2/ios/language/ 模块的 LanguageEntry
+//    - `LanguageSelectViewControllerDelegate` 替换为 onLanguageChanged 闭包回调
+//
 
 import UIKit
 import AtomicX
@@ -10,10 +18,13 @@ import Login
 
 class MineViewController: UIViewController {
     
+    /// 退出登录回调（由外部注入）
     var onLogout: (() -> Void)?
     
+    /// 语言切换回调（由外部注入）
     var onLanguageChanged: ((String) -> Void)?
     
+    /// 体验房点击回调（由外部注入）
     var onExperienceRoomClicked: (() -> Void)?
     
     var isNeedUpdateProfile = false
@@ -82,16 +93,16 @@ extension MineViewController: MineRootViewDelegate {
     
     func logout() {
         let alertVC = UIAlertController(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.areYouSureLogOut"),
+            title: MineLocalize("mine_info_dialog_logout"),
             message: nil,
             preferredStyle: .alert
         )
         let cancelAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.cancel"),
+            title: MineLocalize("mine_common_btn_cancel"),
             style: .cancel, handler: nil
         )
         let sureAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.determine"),
+            title: MineLocalize("mine_common_btn_determine"),
             style: .default
         ) { [weak self] _ in
             self?.onLogout?()

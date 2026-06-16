@@ -2,6 +2,8 @@
 //  Double+Extension.swift
 //  RTCube
 //
+//  Double 屏幕适配扩展
+//
 
 import UIKit
 

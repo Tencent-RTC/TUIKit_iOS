@@ -51,6 +51,8 @@ public class ErrorLocalized {
         public init(code: Int, message: String) {
             if let err = LiveError(rawValue: code) {
                 self.error = err
+            } else if let connectionCode = TUIConnectionCode(rawValue: code), connectionCode != .unknown {
+                self.error = connectionCode
             } else {
                 self.error = nil
                 self.code = code
@@ -61,6 +63,33 @@ public class ErrorLocalized {
         public init(errorInfo: ErrorInfo) {
             self.init(code: errorInfo.code, message: errorInfo.message)
         }
+        
+        public var shouldShowToast: Bool {
+            guard let error = error else { return true }
+            return !Self.isSilentError(error)
+        }
+        
+        private static func isSilentError(_ error: LocalizedError) -> Bool {
+            if let liveError = error as? LiveError {
+                switch liveError {
+                case .freqLimit, .ERR_SDK_COMM_API_CALL_FREQUENCY_LIMIT:
+                    return true
+                default:
+                    return false
+                }
+            }
+            return false
+        }
+
+    }
+}
+
+// MARK: - Toast convenience
+
+extension PassthroughSubject where Output == (String, ToastStyle), Failure == Never {
+    func sendError(_ error: InternalError) {
+        guard error.shouldShowToast else { return }
+        self.send((error.localizedMessage, .error))
     }
 }
 
@@ -97,6 +126,7 @@ public enum TIMError: Int, Error {
     case ERR_SDK_NET_WAIT_SEND_TIMEOUT_NO_NETWORK = 9523
     case ERR_SDK_NET_WAIT_ACK_TIMEOUT_NO_NETWORK = 9524
     case ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK = 9525
+    case ERR_SVR_COMM_SENSITIVE_TEXT = 80001
 }
 
 extension TIMError: LocalizedError {
@@ -129,6 +159,8 @@ extension TIMError: LocalizedError {
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK:
             return internalLocalized("live_barrage_error_network")
+        case .ERR_SVR_COMM_SENSITIVE_TEXT:
+            return internalLocalized("common_server_error_im_sensitive_words_ban")
         }
     }
 }
@@ -289,6 +321,7 @@ public enum LiveError: Int, Error {
     case ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK = 9525
     case ERR_SVR_GROUP_NOT_FOUND = 10010
     case ERR_INVALID_PARAMETERS = 6017
+    case ERR_SVR_COMM_SENSITIVE_TEXT = 80001
 
 }
 
@@ -510,6 +543,8 @@ extension LiveError: LocalizedError {
                 .ERR_SDK_NET_WAIT_ACK_TIMEOUT_NO_NETWORK,
                 .ERR_SDK_NET_SEND_REMAINING_TIMEOUT_NO_NETWORK:
             return internalLocalized("live_barrage_error_network")
+        case .ERR_SVR_COMM_SENSITIVE_TEXT:
+            return internalLocalized("common_server_error_im_sensitive_words_ban")
             
         @unknown default:
             return internalLocalized("common_client_error_failed") + ":\(self.rawValue)"

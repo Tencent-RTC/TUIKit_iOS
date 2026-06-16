@@ -2,6 +2,8 @@
 //  Int+Extension.swift
 //  RTCube
 //
+//  Int 屏幕适配扩展
+//
 
 import UIKit
 

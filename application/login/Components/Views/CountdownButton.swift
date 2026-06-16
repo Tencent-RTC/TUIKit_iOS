@@ -2,6 +2,9 @@
 //  CountdownButton.swift
 //  login
 //
+//  倒计时按钮（手机/邮箱登录共用，从旧版 TRTCLoginRootView 提取）
+//  60秒倒计时逻辑
+//
 
 import UIKit
 import AtomicX
@@ -21,8 +24,8 @@ class CountdownButton: UIButton {
     }
     
     private func setupStyle() {
-        setTitle(LoginLocalize("V2.Live.LinkMicNew.getverificationcode"), for: .normal)
-        setTitle(LoginLocalize("V2.Live.LinkMicNew.getverificationcode"), for: .disabled)
+        setTitle(LoginLocalize("login_get_verify_code"), for: .normal)
+        setTitle(LoginLocalize("login_get_verify_code"), for: .disabled)
         titleLabel?.font = ThemeStore.shared.typographyTokens.Medium16
         setTitleColor(ThemeStore.shared.colorTokens.buttonColorPrimaryDefault, for: .normal)
         setTitleColor(ThemeStore.shared.colorTokens.textColorDisable, for: .disabled)
@@ -76,8 +79,8 @@ class CountdownButton: UIButton {
     }
     
     private func resetTitle() {
-        setTitle(LoginLocalize("V2.Live.LinkMicNew.getverificationcode"), for: .normal)
-        setTitle(LoginLocalize("V2.Live.LinkMicNew.getverificationcode"), for: .disabled)
+        setTitle(LoginLocalize("login_get_verify_code"), for: .normal)
+        setTitle(LoginLocalize("login_get_verify_code"), for: .disabled)
         sizeToFit()
     }
     

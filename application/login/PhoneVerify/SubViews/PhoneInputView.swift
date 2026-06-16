@@ -2,6 +2,9 @@
 //  PhoneInputView.swift
 //  login
 //
+//  手机号输入组件（左侧手机图标 + 国家码 Label + 输入框）
+//  从旧版 TRTCPhoneLoginView 提取，保持所有约束一致
+//
 
 import UIKit
 import AtomicX
@@ -32,7 +35,7 @@ class PhoneInputView: UIView {
     }()
     
     lazy var textField: LoginTextField = {
-        let tf = LoginTextField(placeholder: LoginLocalize("V2.Live.LinkMicNew.enterphonenumber"))
+        let tf = LoginTextField(placeholder: LoginLocalize("login_phone_hint"))
         tf.keyboardType = .phonePad
         tf.layer.borderWidth = 1.0
         tf.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor

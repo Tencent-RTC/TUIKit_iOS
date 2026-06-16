@@ -32,7 +32,8 @@ Pod::Spec.new do |s|
   s.exclude_files = [
     'Sources/TCEffectPlayerKit/**/*.{swift,h,m}',
     'Sources/VideoAdvanceExtension/**/*.{swift,h,m}',
-    'Sources/TEBeautyKit/**/*.{swift,h,m}'
+    'Sources/TEBeautyKit/**/*.{swift,h,m}',
+    'Sources/AlbumPicker/**/*.{swift,h,m}'
   ]
   s.resource_bundles = {
     'AtomicXBundle' => ['Resources/**/*.{xcassets,json,png,xcstrings,vtt,mp3,json,flac,gif,pag}']

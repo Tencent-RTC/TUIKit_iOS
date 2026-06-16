@@ -2,6 +2,9 @@
 //  LogUploadManager.swift
 //  RTCube
 //
+//  从旧版 iOS/Basic/Business/BusinessService/Source/Common/Log/LogUploadManager.swift 迁移。
+//  移除了 RTCCommon 依赖，WindowUtils 替换为内联实现。
+//
 
 import UIKit
 
@@ -108,6 +111,8 @@ public class LogUploadManager: NSObject {
         }
         return files
     }
+
+    // MARK: - Window Utilities (替代 RTCCommon.WindowUtils)
 
     private static func getCurrentWindow() -> UIWindow? {
         if #available(iOS 13.0, *) {

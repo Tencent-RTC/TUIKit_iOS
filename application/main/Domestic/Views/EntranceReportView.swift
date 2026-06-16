@@ -2,13 +2,24 @@
 //  EntranceReportView.swift
 //  main
 //
+//  举报提示横条 — 从旧版 EntranceReportView.swift 迁移
+//
+//  变更说明：
+//    - 改为继承 UIView（旧版继承 UICollectionViewCell 但实际作为普通视图使用）
+//    - addTapGesture 扩展改为直接使用 UITapGestureRecognizer
+//    - 其他 UI 布局完全保持旧版不变
+//
 
 import UIKit
 import SnapKit
 import AtomicX
 
+/// 举报提示横条
+///
+/// 仅在中文环境 + 非 MOA 用户时显示，点击后跳转腾讯云举报平台。
 class EntranceReportView: UIView {
 
+    /// 点击举报的回调
     var reportHandler: (() -> Void)?
 
     // MARK: - UI Elements
@@ -17,8 +28,10 @@ class EntranceReportView: UIView {
         let label = UILabel()
         let font = ThemeStore.shared.typographyTokens.Regular12
 
+        // 将">"箭头添加到富文本中
         let arrowImage = UIImage(named: "main_entrance_report_arrow") ?? UIImage()
         let attachment = NSTextAttachment(image: arrowImage)
+        // ">"垂直居中
         attachment.bounds = CGRect(
             x: 0,
             y: round(font.capHeight - arrowImage.size.height) / 2.0,
@@ -26,7 +39,7 @@ class EntranceReportView: UIView {
             height: arrowImage.size.height
         )
 
-        let mutableAttrStr = NSMutableAttributedString(string: MainLocalize("Demo.TRTC.Portal.Main.Report"))
+        let mutableAttrStr = NSMutableAttributedString(string: MainLocalize("main_report_hint"))
         let arrowImageAttr = NSAttributedString(attachment: attachment)
         mutableAttrStr.append(arrowImageAttr)
 

@@ -43,10 +43,6 @@ class NetWorkInfoService {
         params.videoResolution = resolution
         trtcCloud.setVideoEncoderParam(params)
     }
-
-    func updateAudioQuality(quality: TUIAudioQuality) {
-        roomEngine.updateAudioQuality(quality)
-    }
 }
 
 extension NetWorkInfoService: NetWorkInfoServiceDelegate {

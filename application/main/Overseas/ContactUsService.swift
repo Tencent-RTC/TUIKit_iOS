@@ -2,6 +2,14 @@
 //  ContactUsService.swift
 //  main
 //
+//  "联系我们"TUICore 服务实现 — 从旧版 iOS/Basic/Business/BusinessService/Source/AppScene/ContactUS 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCCommon`、`import BusinessService` 依赖
+//    - gotoContactUS 简化为打开 trtc.io 联系页面（移除旧版重表单 + Captcha 依赖）
+//    - 浮窗按钮图片使用 MainAssets 中的 main_entrance_contact
+//    - WindowUtils 替换为内联实现
+//
 
 import UIKit
 import SafariServices
@@ -15,6 +23,7 @@ class ContactUsService: NSObject, TUIServiceProtocol {
     static let shared = ContactUsService()
     private override init() {}
 
+    /// 注册 TUICore 服务 — 供壳工程启动时调用
     static func registerService() {
         TUICore.registerService(TUICore_ContactUsService, object: ContactUsService.shared)
     }
@@ -70,6 +79,7 @@ class ContactUsService: NSObject, TUIServiceProtocol {
     // MARK: - Actions
 
     private func showContactEntrance() {
+        // 仅海外版（bundleID = com.tencent.rtc.app）显示浮窗
         let bundleID = Bundle.main.bundleIdentifier
         if bundleID == "com.tencent.rtc.app" {
             contactEntranceView.isHidden = false
@@ -81,6 +91,7 @@ class ContactUsService: NSObject, TUIServiceProtocol {
     }
 
     private func goToContactUs() {
+        // 隐藏浮窗
         if !contactEntranceView.isHidden {
             contactEntranceView.isHidden = true
         }
@@ -93,6 +104,7 @@ class ContactUsService: NSObject, TUIServiceProtocol {
         topVC.present(safariVC, animated: true, completion: nil)
     }
 
+    /// 获取当前最顶层的 ViewController，用于 present SFSafariViewController
     private static func topViewController() -> UIViewController? {
         guard let rootVC = getCurrentWindow()?.rootViewController else { return nil }
         return findTopViewController(from: rootVC)

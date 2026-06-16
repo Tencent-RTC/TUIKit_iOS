@@ -100,10 +100,6 @@ public class AudienceOverlayView: UIView {
             let isScreenShareLive = manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats
             && manager.liveListState.currentLive.keepOwnerOnSeat
             let panel = NetWorkInfoView(liveID: manager.liveID, manager: netWorkInfoManager, isAudience: !manager.coGuestState.connected.isOnSeat(), isScreenShareLive: isScreenShareLive)
-            panel.onRequestDismissNetworkPanel = { [weak self] completion in
-                guard let self = self else { return }
-                routerManager.dismiss(completion: completion)
-            }
             routerManager.present(view: panel)
         }
         return button
@@ -635,9 +631,26 @@ extension AudienceOverlayView: BarrageStreamViewDelegate {
 
     public func onBarrageClicked(user: LiveUserInfo) {
         if user.userID == manager.loginState.loginUserInfo?.userID { return }
-        let seatInfo = SeatInfo(userInfo: user)
-        let panel = AudienceUserManagePanelView(user: seatInfo, manager: manager, routerManager: routerManager, type: .userInfo)
-        routerManager.present(view: panel)
+        if selfIsAdmin() && !userIsOwnerOrAdmin(userID: user.userID) {
+            let panel = AdminManagerPanelView(user: user, manager: manager, routerManager: routerManager)
+            routerManager.present(view: panel)
+        } else {
+            let seatInfo = SeatInfo(userInfo: user)
+            let panel = AudienceUserInfoPanelView(user: seatInfo, manager: manager)
+            routerManager.present(view: panel, config: .bottomDefault())
+        }
+    }
+
+    private func selfIsAdmin() -> Bool {
+        guard let selfUserID = manager.loginState.loginUserInfo?.userID, !selfUserID.isEmpty else { return false }
+        let adminList = manager.liveAudienceStore.state.value.adminList
+        return adminList.contains(where: { $0.userID == selfUserID })
+    }
+
+    private func userIsOwnerOrAdmin(userID: String) -> Bool {
+        if userID == manager.liveListState.currentLive.liveOwner.userID { return true }
+        let adminList = manager.liveAudienceStore.state.value.adminList
+        return adminList.contains(where: { $0.userID == userID })
     }
 }
 
@@ -645,7 +658,7 @@ extension AudienceOverlayView: BarrageStreamViewDelegate {
 
 extension AudienceOverlayView: GiftPlayViewDelegate {
     public func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        var receiverUserName = manager.liveListState.currentLive.liveOwner.userName
+        var receiverUserName = manager.liveListState.currentLive.liveOwner.displayName
         if manager.liveListState.currentLive.liveOwner.userID == manager.loginState.loginUserInfo?.userID {
             receiverUserName = .meText
         }

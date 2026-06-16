@@ -99,7 +99,6 @@ class VRSeatInvitationPanel: RTCBaseView {
     override func bindInteraction() {
         tableView.delegate = self
         tableView.dataSource = self
-        subscribeHostEventListener()
         subscribeUserListState()
         subscribeToastState()
     }
@@ -141,27 +140,6 @@ extension VRSeatInvitationPanel {
             guard let self = self else { return }
             self.showAtomicToast(text: message, style: style)
         })
-    }
-    
-    private func subscribeHostEventListener() {
-        coGuestStore.hostEventPublisher
-            .receive(on: RunLoop.main)
-            .sink { [weak self] event in
-                guard let self = self else { return }
-                switch event {
-                case .onHostInvitationResponded(isAccept: let isAccept, guestUser: let guestUser):
-                    if !isAccept {
-                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: guestUser.userName.isEmpty ? guestUser.userID : guestUser.userName), toastStyle: .info)
-                    }
-                case .onHostInvitationNoResponse(guestUser: _, reason: let reason):
-                    if reason == .timeout {
-                        toastService.showToast(.requestTimeoutText, toastStyle: .info)
-                    }
-                default:
-                    break
-                }
-            }
-            .store(in: &cancellableSet)
     }
 }
 

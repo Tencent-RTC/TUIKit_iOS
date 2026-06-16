@@ -2,6 +2,9 @@
 //  LoginTextField.swift
 //  login
 //
+//  统一输入框样式（从旧版 TRTCLoginRootView.createTextField 提取）
+//  圆角、字号、placeholder 颜色保持一致
+//
 
 import UIKit
 import AtomicX

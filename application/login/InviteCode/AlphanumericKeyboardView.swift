@@ -2,6 +2,9 @@
 //  AlphanumericKeyboardView.swift
 //  login
 //
+//  仿系统键盘风格的自定义字母数字键盘
+//  用于邀请码输入，避免多 TextField 切换焦点时键盘面板重置
+//
 
 import UIKit
 import AtomicX
@@ -15,6 +18,7 @@ class AlphanumericKeyboardView: UIView {
     
     // MARK: - Constants
     
+    /// 键盘行定义：数字行 + 三行字母（与系统 QWERTY 布局一致）
     private let rows: [[String]] = [
         ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
         ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -22,6 +26,7 @@ class AlphanumericKeyboardView: UIView {
         ["Z", "X", "C", "V", "B", "N", "M"]
     ]
     
+    // 仿系统键盘配色
     private let keyboardBackgroundColor = ThemeStore.shared.colorTokens.bgColorDefault
     private let keyBackgroundColor = ThemeStore.shared.colorTokens.bgColorOperate
     private let keyTextColor = ThemeStore.shared.colorTokens.textColorPrimary
@@ -40,6 +45,7 @@ class AlphanumericKeyboardView: UIView {
     
     private var rowStackViews: [UIStackView] = []
     private var deleteButton: UIButton?
+    /// 记录上一次计算的高度，避免重复触发 invalidateIntrinsicContentSize
     private var lastCalculatedHeight: CGFloat = 0
     
     // MARK: - Init
@@ -57,11 +63,13 @@ class AlphanumericKeyboardView: UIView {
     
     // MARK: - Intrinsic Size
     
+    /// 键盘内容区域高度（不含 safe area）
     private var keysAreaHeight: CGFloat {
         return topInset + keyHeight * CGFloat(rows.count) + keySpacingV * CGFloat(rows.count - 1) + bottomInsetAboveKeys
     }
     
     override var intrinsicContentSize: CGSize {
+        // 加上底部安全区域高度，避免刘海屏 Home Indicator 遮挡按键
         let safeBottom = safeAreaInsets.bottom
         let totalHeight = keysAreaHeight + safeBottom
         return CGSize(width: UIView.noIntrinsicMetric, height: totalHeight)
@@ -69,6 +77,7 @@ class AlphanumericKeyboardView: UIView {
     
     override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
+        // safe area 变化时（如旋转屏幕）重新计算高度
         let newHeight = keysAreaHeight + safeAreaInsets.bottom
         if newHeight != lastCalculatedHeight {
             lastCalculatedHeight = newHeight
@@ -94,12 +103,14 @@ class AlphanumericKeyboardView: UIView {
         
         for (rowIndex, row) in rows.enumerated() {
             if rowIndex == rows.count - 1 {
+                // 最后一行（Z-M）需要特殊处理：左侧留空，右侧放删除键
                 let rowContainer = UIView()
                 rowContainer.translatesAutoresizingMaskIntoConstraints = false
                 containerStack.addArrangedSubview(rowContainer)
                 rowContainer.widthAnchor.constraint(equalTo: containerStack.widthAnchor).isActive = true
                 rowContainer.heightAnchor.constraint(equalToConstant: keyHeight).isActive = true
                 
+                // 字母键 StackView
                 let letterStack = UIStackView()
                 letterStack.axis = .horizontal
                 letterStack.spacing = keySpacingH
@@ -111,6 +122,7 @@ class AlphanumericKeyboardView: UIView {
                     letterStack.addArrangedSubview(button)
                 }
                 
+                // 删除键
                 let delButton = createDeleteButton()
                 rowContainer.addSubview(delButton)
                 self.deleteButton = delButton
@@ -118,6 +130,7 @@ class AlphanumericKeyboardView: UIView {
                 letterStack.translatesAutoresizingMaskIntoConstraints = false
                 delButton.translatesAutoresizingMaskIntoConstraints = false
                 
+                // 删除键宽度与系统键盘一致（约为普通键的 1.5 倍）
                 NSLayoutConstraint.activate([
                     delButton.trailingAnchor.constraint(equalTo: rowContainer.trailingAnchor),
                     delButton.topAnchor.constraint(equalTo: rowContainer.topAnchor),
@@ -129,6 +142,7 @@ class AlphanumericKeyboardView: UIView {
                     letterStack.bottomAnchor.constraint(equalTo: rowContainer.bottomAnchor),
                 ])
                 
+                // 字母键总宽度 = 7 个键 + 6 个间距，约占屏幕宽度的 70%
                 letterStack.widthAnchor.constraint(equalTo: rowContainer.widthAnchor, multiplier: 0.72).isActive = true
                 
             } else {
@@ -147,8 +161,10 @@ class AlphanumericKeyboardView: UIView {
                 rowStack.heightAnchor.constraint(equalToConstant: keyHeight).isActive = true
                 
                 if rowIndex == 0 || rowIndex == 1 {
+                    // 数字行和第一行字母（QWERTY）：占满宽度
                     rowStack.widthAnchor.constraint(equalTo: containerStack.widthAnchor).isActive = true
                 } else if rowIndex == 2 {
+                    // 第二行字母（ASDF）：两侧缩进，与系统键盘一致
                     rowStack.widthAnchor.constraint(equalTo: containerStack.widthAnchor, multiplier: 0.885).isActive = true
                 }
                 
@@ -210,6 +226,8 @@ class AlphanumericKeyboardView: UIView {
     @objc private func deleteTapped() {
         onDeleteTapped?()
     }
+    
+    // MARK: - Touch Feedback（仿系统键盘按下变暗效果）
     
     @objc private func keyTouchDown(_ sender: UIButton) {
         UIView.animate(withDuration: 0.05) {

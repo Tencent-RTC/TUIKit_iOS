@@ -2,6 +2,12 @@
 //  MineViewModel.swift
 //  mine
 //
+//  个人中心 ViewModel — 从旧版 iOS/App/RT-Cube/Mine/model/MineViewModel.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import BusinessService` 依赖
+//    - `isRTCApp` 通过 TUICore 判断逻辑保持不变
+//
 
 import Foundation
 import UIKit
@@ -29,23 +35,23 @@ class MineViewModel: NSObject {
         tableTypeSource.forEach { type in
             switch type {
             case .privacy:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.privacy"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_privacy"),
                                                    image: UIImage(named: "main_mine_privacy"), type: type)
                 res.append(model)
             case .disclaimer:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.disclaimer"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_statement"),
                                                    image: UIImage(named: "main_mine_disclaimer"), type: type)
                 if !isRTCApp {
                     res.append(model)
                 }
             case .icp:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.Mine.ICPNumber"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_icp_number"),
                                                    image: UIImage(named: "main_mine_icp"), type: type)
                 if !isRTCApp {
                     res.append(model)
                 }
             case .about:
-                let model = MineTableViewCellModel(title: MineLocalize("Demo.TRTC.Portal.Mine.about"),
+                let model = MineTableViewCellModel(title: MineLocalize("mine_info_about"),
                                                    image: UIImage(named: "main_mine_about"), type: type)
                 res.append(model)
             }

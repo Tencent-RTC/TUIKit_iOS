@@ -67,13 +67,6 @@ class NetWorkInfoItemCell: UITableViewCell {
         }
         return label
     }()
-
-    private let arrowIcon: UIImageView = {
-        let view = UIImageView()
-        view.image = internalImage("live_networkinfo_arrow", rtlFlipped: true)
-        view.tintColor = UIColor.white.withAlphaComponent(0.55)
-        return view
-    }()
     
     private lazy var slider: UISlider = {
         let slider = UISlider()
@@ -97,7 +90,6 @@ class NetWorkInfoItemCell: UITableViewCell {
     }()
 
     private var type: NetWorkInfoItemViewType?
-    var onRightComponentsTapped: (() -> Void)?
     var onSliderValueChanged: ((Float) -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -133,9 +125,6 @@ class NetWorkInfoItemCell: UITableViewCell {
     }
 
     private func  bindInteraction() {
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleRightComponentsTap))
-        tap.cancelsTouchesInView = false
-        rightComponentsView.addGestureRecognizer(tap)
         slider.addTarget(self, action: #selector(handleSliderValueChanged), for: .valueChanged)
     }
 
@@ -194,10 +183,6 @@ class NetWorkInfoItemCell: UITableViewCell {
         }
     }
 
-    @objc private func handleRightComponentsTap() {
-        onRightComponentsTapped?()
-    }
-    
     @objc private func handleSliderValueChanged() {
         onSliderValueChanged?(slider.value)
     }
@@ -210,7 +195,6 @@ class NetWorkInfoItemCell: UITableViewCell {
         
         if hasSlider {
             contentView.addSubview(slider)
-            rightComponentsView.addSubview(arrowIcon)
             contentView.addSubview(volumeLabel)
             
             volumeLabel.snp.makeConstraints { make in
@@ -225,13 +209,6 @@ class NetWorkInfoItemCell: UITableViewCell {
                 make.trailing.equalTo(volumeLabel.snp.leading).offset(-4.scale375())
                 make.centerY.equalTo(volumeLabel)
                 make.height.equalTo(20.scale375())
-            }
-            
-            arrowIcon.snp.makeConstraints { make in
-                make.leading.equalTo(rightLabel.snp.trailing)
-                make.centerY.equalToSuperview()
-                make.width.height.equalTo(16.scale375())
-                make.trailing.equalToSuperview()
             }
         }
     }
@@ -264,7 +241,7 @@ class NetWorkInfoItemCell: UITableViewCell {
                 iconView.tintColor = .greenColor
         }
 
-        rightComponentsView.isHidden = !showDetail
+        rightComponentsView.isHidden = !showDetail || type == .audio
         let shouldShowSlider = type == .audio && showDetail
         slider.isHidden = !shouldShowSlider
         volumeLabel.isHidden = !shouldShowSlider

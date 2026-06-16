@@ -53,7 +53,9 @@ class LiveListViewCell: UICollectionViewCell {
             return
         }
         stopPreload()
-        coreView?.safeRemoveFromSuperview()
+        if let coreView = coreView, coreView.superview === self {
+            coreView.safeRemoveFromSuperview()
+        }
         coreView = nil
     }
     
@@ -71,7 +73,7 @@ class LiveListViewCell: UICollectionViewCell {
     }
     
     func startPreload(roomId: String, isMuteAudio: Bool = true) {
-        if let playingLiveID = coreView?.playingLiveID, playingLiveID == roomId {
+        if let playingLiveID = coreView?.playingLiveID, playingLiveID == roomId, coreView?.superview == self {
             if let mute = coreView?.isMuteAudio, mute != isMuteAudio {
                 mutePreviewVideoStream(isMute: isMuteAudio)
             }
@@ -81,13 +83,13 @@ class LiveListViewCell: UICollectionViewCell {
             LiveKitLog.info("\(#file)", "\(#line)", "float window view is showing, startPreload ignore, roomId: \(roomId)")
             return
         }
-        if let coreView = coreView, !coreView.isEnteredRoom {
+        if let coreView = coreView, coreView.superview === self, !coreView.isEnteredRoom {
             coreView.stopAndRemoveFromSuperView()
         }
         let coreView = LiveCoreView.getCachedCoreView(liveID: roomId, type: .playView)
         self.coreView = coreView
         insertSubview(coreView, aboveSubview: blurView)
-        coreView.snp.makeConstraints { make in
+        coreView.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
         KeyMetrics.setComponent(Constants.ComponentType.liveRoom.rawValue)

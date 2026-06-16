@@ -2,6 +2,9 @@
 //  InviteCodeView.swift
 //  login
 //
+//  邀请码登录视图
+//  完全复刻 TRTCInvitationCodeViewController 的 UI 和交互
+//
 
 import UIKit
 import Combine
@@ -77,6 +80,7 @@ class InviteCodeView: UIView {
     private var cancellables = Set<AnyCancellable>()
     private var codeInputFields: [CodeInputTextField] = []
     
+    /// 自定义字母数字键盘（所有输入框共享同一实例，避免焦点切换时键盘面板重置）
     private lazy var alphanumericKeyboard: AlphanumericKeyboardView = {
         let keyboard = AlphanumericKeyboardView()
         keyboard.onKeyTapped = { [weak self] key in
@@ -212,7 +216,7 @@ class InviteCodeView: UIView {
     
     private lazy var agreeCheckBubbleView: InvitationBubbleView = {
         let view = InvitationBubbleView()
-        view.label.text = LoginLocalize("Demo.TRTC.Portal.Main.AgreeBeforeUse")
+        view.label.text = LoginLocalize("login_email_invite_code_terms_tooltip")
         view.label.font = ThemeStore.shared.typographyTokens.Medium14
         view.label.adjustsFontSizeToFitWidth = true
         view.triangleWidth = 10
@@ -252,10 +256,12 @@ class InviteCodeView: UIView {
         bindStore()
         updateGetStartedButtonState()
         
+        // 自动聚焦第一个输入框
         DispatchQueue.main.async {
             _ = self.codeInputFields.first?.becomeFirstResponder()
         }
         
+        // 如果有邮箱，自动发送邀请码并启动倒计时
         store.sendInvitationCodeIfNeeded()
         
         isViewReady = true
@@ -280,6 +286,7 @@ class InviteCodeView: UIView {
         
         addSubview(agreeCheckBubbleView)
         
+        // 设置初始文案
         titleLabel.text = store.state.titleText
         descriptionLabel.text = store.state.descriptionText
         marketingCheckbox.isHidden = !store.state.showMarketingCheckbox
@@ -402,6 +409,7 @@ class InviteCodeView: UIView {
         let textField = CodeInputTextField()
         textField.borderStyle = .none
         textField.textAlignment = .center
+        textField.textColor = UIColor.black
         textField.font = ThemeStore.shared.typographyTokens.Regular20
         textField.inputView = alphanumericKeyboard
         textField.autocorrectionType = .no
@@ -428,15 +436,13 @@ class InviteCodeView: UIView {
     // MARK: - Store Binding
     
     private func bindStore() {
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message, position: .center)
             }
             .store(in: &cancellables)
-        
+
         store.$state
             .map(\.isValidating)
             .removeDuplicates()
@@ -476,6 +482,7 @@ class InviteCodeView: UIView {
             }
             .store(in: &cancellables)
         
+        // Store 状态重置时（登出），同步清空输入框
         store.$state
             .map(\.inviteCode)
             .removeDuplicates()
@@ -574,21 +581,28 @@ class InviteCodeView: UIView {
     
     // MARK: - Custom Keyboard Input Handling
     
+    /// 处理自定义键盘的字符输入
     private func handleKeyboardInput(_ key: String) {
+        // 清除错误状态
         if store.state.isCodeInvalid {
             clearErrorState()
         }
         
+        // 找到当前焦点的输入框
         guard let currentField = codeInputFields.first(where: { $0.isFirstResponder }) else { return }
         
+        // 如果当前格已有内容，跳过
         if let text = currentField.text, !text.isEmpty { return }
         
+        // 填入大写字符
         currentField.text = key.uppercased()
         moveToNextField(from: currentField)
         updateGetStartedButtonState()
     }
     
+    /// 处理自定义键盘的删除操作
     private func handleKeyboardDelete() {
+        // 清除错误状态
         if store.state.isCodeInvalid {
             clearErrorState()
         }
@@ -596,10 +610,12 @@ class InviteCodeView: UIView {
         guard let currentField = codeInputFields.first(where: { $0.isFirstResponder }) else { return }
         
         if let text = currentField.text, !text.isEmpty {
+            // 当前格有内容，清除当前格
             currentField.text = ""
             updateFieldAppearance(at: currentField.tag)
             updateGetStartedButtonState()
         } else {
+            // 当前格为空，回退到上一格并清除
             let previousTag = currentField.tag - 1
             if previousTag >= 0 {
                 let previousField = codeInputFields[previousTag]

@@ -2,6 +2,8 @@
 //  ReportDescView.swift
 //  privacy
 //
+//  迁移自 v1 TRTCReportDescView，适配 v2 模块化架构
+//
 
 import Foundation
 import UIKit
@@ -12,7 +14,7 @@ class ReportDescView: UIView {
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel(frame: .zero)
-        label.text = PrivacyLocalize("Privacy.Report.description")
+        label.text = PrivacyLocalize("privacy_report_description")
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = UIColor(hex: "888888") ?? UIColor.lightText
         return label
@@ -24,7 +26,7 @@ class ReportDescView: UIView {
         view.font = UIFont.systemFont(ofSize: 12)
         view.layer.borderWidth = 1.0
         view.layer.borderColor = (UIColor(hex: "EEEEEE") ?? UIColor.lightText).cgColor
-        view.text = PrivacyLocalize("Privacy.Report.description.placeholder")
+        view.text = PrivacyLocalize("privacy_report_description_placeholder")
         return view
     }()
 
@@ -88,7 +90,7 @@ extension ReportDescView {
 
 extension ReportDescView: UITextViewDelegate {
     func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-        if textView.text == PrivacyLocalize("Privacy.Report.description.placeholder") {
+        if textView.text == PrivacyLocalize("privacy_report_description_placeholder") {
             textView.text = ""
             textView.textColor = .black
         }
@@ -97,7 +99,7 @@ extension ReportDescView: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text == "" {
-            textView.text = PrivacyLocalize("Privacy.Report.description.placeholder")
+            textView.text = PrivacyLocalize("privacy_report_description_placeholder")
             textView.textColor = UIColor(hex: "BBBBBB")
         }
     }

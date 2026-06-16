@@ -152,13 +152,6 @@ extension NetWorkInfoManager {
             state.showToast = false
         }
     }
-
-    func onAudioQualityChanged(_ quality: TUIAudioQuality) {
-        service.updateAudioQuality(quality: quality)
-        state.update { state in
-            state.audioQuality = quality
-        }
-    }
 }
 
 

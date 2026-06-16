@@ -2,6 +2,8 @@
 //  ProfileInfoModel.swift
 //  mine
 //
+//  个人资料数据模型 — 从旧版 iOS/App/RT-Cube/Mine/model/ProfileInfoModel.swift 迁移
+//
 
 import UIKit
 

@@ -2,6 +2,14 @@
 //  ProfileController.swift
 //  mine
 //
+//  个人资料编辑页 — 从旧版 iOS/App/RT-Cube/Mine/ui/ProfileController.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import TUIContact / TIMCommon / BusinessService / RTCCommon`
+//    - 布局工具函数使用 assembly/Extension/LayoutDefine.swift
+//    - UIColor(hex:) 使用 assembly/Extension/UIColor+Extension.swift
+//    - 其他逻辑保持不变
+//
 
 import UIKit
 import AtomicX
@@ -40,7 +48,7 @@ class ProfileController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = MineLocalize("Demo.TRTC.Portal.Mine.profileDetail")
+        title = MineLocalize("mine_profile_title")
         let backBtn = UIButton(type: .custom)
         backBtn.setImage(UIImage(named: "mine_back"), for: .normal)
         backBtn.addTarget(self, action: #selector(backBtnClick), for: .touchUpInside)
@@ -111,7 +119,7 @@ extension ProfileController {
         profileData = [
             [
                 ProfileInfoModel(
-                    title: MineLocalize("Demo.TRTC.Portal.Mine.profilePhoto"),
+                    title: MineLocalize("mine_profile_avatar"),
                     imageName: profile?.faceURL,
                     cellHeight: navigationFullHeight(),
                     selectHandler: { [weak self] in
@@ -121,7 +129,7 @@ extension ProfileController {
             ],
             [
                 ProfileInfoModel(
-                    title: MineLocalize("Demo.TRTC.Portal.Mine.profileName"),
+                    title: MineLocalize("mine_profile_nickname"),
                     detail: profile?.showName(),
                     cellHeight: 58.0,
                     selectHandler: { [weak self] in
@@ -129,7 +137,7 @@ extension ProfileController {
                     }
                 ),
                 ProfileInfoModel(
-                    title: MineLocalize("Demo.TRTC.Portal.Mine.profileAccount"),
+                    title: MineLocalize("mine_profile_account"),
                     detail: profile?.userID,
                     cellHeight: 58.0
                 ),
@@ -138,7 +146,7 @@ extension ProfileController {
         
         let rtcubeData = [
             ProfileInfoModel(
-                title: MineLocalize("Demo.TRTC.Portal.Mine.profileSignature"),
+                title: MineLocalize("mine_profile_signature"),
                 detail: profile?.selfSignature,
                 cellHeight: 58.0,
                 selectHandler: { [weak self] in
@@ -146,7 +154,7 @@ extension ProfileController {
                 }
             ),
             ProfileInfoModel(
-                title: MineLocalize("Demo.TRTC.Portal.Mine.profileGender"),
+                title: MineLocalize("mine_profile_gender"),
                 detail: profile?.showGender(),
                 cellHeight: 58.0,
                 selectHandler: { [weak self] in
@@ -154,7 +162,7 @@ extension ProfileController {
                 }
             ),
             ProfileInfoModel(
-                title: MineLocalize("Demo.TRTC.Portal.Mine.profileBirth"),
+                title: MineLocalize("mine_profile_birthday"),
                 detail: birthString(with: profile?.birthday),
                 cellHeight: 58.0,
                 selectHandler: { [weak self] in
@@ -203,10 +211,10 @@ extension ProfileController {
             V2TIMManager.sharedInstance().setSelfInfo(info: info) { [weak self] in
                 guard let self = self else { return }
                 self.profile?.nickName = newName
-                self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateSucc"))
+                self.view.makeToast(MineLocalize("mine_profile_update_succ"))
                 self.configData()
             } fail: { code, err in
-                self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateFailed"))
+                self.view.makeToast(MineLocalize("mine_profile_update_failed"))
                 AppLogger.App.warn("updateUserInfoWithUserModel:\(code)==\(String(describing: err))")
             }
         }
@@ -224,7 +232,7 @@ extension ProfileController {
                 self.profile?.faceURL = urlString
                 self.configData()
             } fail: { code, err in
-                self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateFailed"))
+                self.view.makeToast(MineLocalize("mine_profile_update_failed"))
                 AppLogger.App.warn("updateUserInfoWithUserModel:\(code)==\(String(describing: err))")
             }
         }
@@ -242,10 +250,10 @@ extension ProfileController {
             V2TIMManager.sharedInstance().setSelfInfo(info: info) { [weak self] in
                 guard let self = self else { return }
                 self.profile?.selfSignature = newSignature
-                self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateSucc"))
+                self.view.makeToast(MineLocalize("mine_profile_update_succ"))
                 self.configData()
             } fail: { code, err in
-                self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateFailed"))
+                self.view.makeToast(MineLocalize("mine_profile_update_failed"))
                 AppLogger.App.warn("updateUserInfoWithUserModel:\(code)==\(String(describing: err))")
             }
         }
@@ -253,24 +261,24 @@ extension ProfileController {
     
     @objc func didSelectChangeGender() {
         let alertController = UIAlertController(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.profileEditGender"),
+            title: MineLocalize("mine_profile_modify_gender"),
             message: nil,
             preferredStyle: .actionSheet
         )
         let selectMaleAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.profileMaleGender"),
+            title: MineLocalize("mine_profile_gender_male"),
             style: .default
         ) { [weak self] _ in
             self?.setProfile(withGender: .GENDER_MALE)
         }
         let selectFemaleAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.profileFemaleGender"),
+            title: MineLocalize("mine_profile_gender_female"),
             style: .default
         ) { [weak self] _ in
             self?.setProfile(withGender: .GENDER_FEMALE)
         }
         let cancelAction = UIAlertAction(
-            title: MineLocalize("Demo.TRTC.Portal.Mine.cancel"),
+            title: MineLocalize("mine_common_btn_cancel"),
             style: .cancel
         )
         alertController.addAction(selectMaleAction)
@@ -286,7 +294,7 @@ extension ProfileController {
             self.profile?.gender = info.gender
             self.configData()
         } fail: { code, message in
-            self.view.makeToast(MineLocalize("Demo.TRTC.Portal.Mine.profileUpdateFailed"))
+            self.view.makeToast(MineLocalize("mine_profile_update_failed"))
             AppLogger.App.warn("updateUserInfoWithUserModel:\(code)==\(String(describing: message))")
         }
     }
@@ -309,6 +317,7 @@ extension ProfileController {
         datePicker.hideClosure = {
             datePicker.removeFromSuperview()
         }
+        // 获取当前 window
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
             window.addSubview(datePicker)

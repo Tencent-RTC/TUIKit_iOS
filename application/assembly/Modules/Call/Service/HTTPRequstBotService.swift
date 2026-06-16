@@ -2,6 +2,8 @@
 //  HTTPRequstBotService.swift
 //  main
 //
+//  通话模块 - 机器人呼叫 HTTP 服务
+//
 
 import UIKit
 import Alamofire
@@ -99,6 +101,7 @@ class HTTPRequstBotService: NSObject {
 
 extension HTTPRequstBotService {
     static func printClog(_ log: String) {
+        // TODO: gg 这里是否需要打到日志文件中？
         debugPrint(log)
 //        TRTCCloud.sharedInstance().apiLog(log)
     }

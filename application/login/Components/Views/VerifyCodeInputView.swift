@@ -2,6 +2,9 @@
 //  VerifyCodeInputView.swift
 //  login
 //
+//  验证码输入框（手机/邮箱共用，从旧版 TRTCLoginRootView 提取）
+//  左侧安全图标 + 6位数字键盘 + 右侧获取验证码按钮
+//
 
 import UIKit
 import AtomicX
@@ -11,7 +14,7 @@ class VerifyCodeInputView: UIView {
     var onTextChanged: ((String) -> Void)?
     
     lazy var textField: LoginTextField = {
-        let tf = LoginTextField(placeholder: LoginLocalize("V2.Live.LinkMicNew.enterverificationcode"))
+        let tf = LoginTextField(placeholder: LoginLocalize("login_verify_code_hint"))
         tf.keyboardType = .numberPad
         tf.layer.borderWidth = 1.0
         tf.layer.borderColor = ThemeStore.shared.colorTokens.strokeColorPrimary.cgColor

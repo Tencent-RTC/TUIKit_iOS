@@ -2,6 +2,9 @@
 //  PrivacyDataCollectionViewController.swift
 //  privacy
 //
+//  个人信息查看 — 展示已收集的个人信息及用途
+//  对标 v1 LiteAVPrivacyDataCollectionViewController
+//
 
 import UIKit
 import AtomicX
@@ -25,7 +28,7 @@ final class PrivacyDataCollectionViewController: UITableViewController {
         let titleLabel = UILabel()
         titleLabel.font = ThemeStore.shared.typographyTokens.Bold20
         titleLabel.textColor = ThemeStore.shared.colorTokens.textColorPrimary
-        titleLabel.text = PrivacyLocalize("Privacy.Center.dataCollection")
+        titleLabel.text = PrivacyLocalize("privacy_data_collection")
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(titleLabel)
         
@@ -33,8 +36,10 @@ final class PrivacyDataCollectionViewController: UITableViewController {
         descLabel.font = ThemeStore.shared.typographyTokens.Regular14
         descLabel.textColor = ThemeStore.shared.colorTokens.textColorSecondary
         descLabel.numberOfLines = 0
-        let format = PrivacyLocalize("Privacy.DataCollection.desc")
-        descLabel.text = String(format: format, appName)
+        // 注：xcstrings 中 privacy_desc 三语事实使用命名占位符 `xxx`，必须用
+        // replacingOccurrences 注入，不能用 String(format:)
+        descLabel.text = PrivacyLocalize("privacy_desc")
+            .replacingOccurrences(of: "xxx", with: appName)
         descLabel.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(descLabel)
         
@@ -80,7 +85,7 @@ final class PrivacyDataCollectionViewController: UITableViewController {
     // MARK: - Navigation
     
     private func configureNavigation() {
-        title = PrivacyLocalize("Privacy.Center.dataCollection")
+        title = PrivacyLocalize("privacy_data_collection")
         navigationController?.navigationBar.titleTextAttributes = [
             .font: ThemeStore.shared.typographyTokens.Medium18,
             .foregroundColor: UIColor.black
@@ -134,8 +139,8 @@ final class PrivacyDataCollectionViewController: UITableViewController {
             desc = descEn
         }
         
-        let title = PrivacyLocalize("Privacy.SystemAuth.\(type)")
-        let noneText = PrivacyLocalize("Privacy.DataCollection.none")
+        let title = PrivacyLocalize("privacy_\(type)")
+        let noneText = PrivacyLocalize("privacy_none")
         
         if type == "avatar" {
             cell.configure(

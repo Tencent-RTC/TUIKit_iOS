@@ -218,6 +218,7 @@ class VoiceRoomRootView: RTCBaseView {
         subscribeUserState()
         subscribeCoHostState()
         subscribeBattleState()
+        subscribeGuestEvent()
         muteMicrophoneButton.addTarget(self, action: #selector(muteMicrophoneButtonClick(sender:)), for: .touchUpInside)
         setupliveEventListener()
         setupGuestEventListener()
@@ -456,7 +457,7 @@ extension VoiceRoomRootView {
             let info: [String: Any] = [
                 "roomId": liveID,
                 "avatarUrl": currentLiveOwner?.avatarURL ?? "",
-                "userName": currentLiveOwner?.userName ?? ""
+                "userName": currentLiveOwner?.displayName ?? ""
             ]
             delegate?.rootView(self, showEndView: info, isAnchor: false)
         }
@@ -667,7 +668,7 @@ extension VoiceRoomRootView {
                             }
                             self.routerManager.dismiss(dismissType: .alert)
                         }
-                        let alertConfig = AlertViewConfig(title: String.localizedReplace(titleText, replace: inviter.userName),
+                        let alertConfig = AlertViewConfig(title: String.localizedReplace(titleText, replace: inviter.displayName),
                                                           iconUrl: inviter.avatarURL,
                                                           cancelButton: cancelButton,
                                                           confirmButton: confirmButton,
@@ -677,7 +678,7 @@ extension VoiceRoomRootView {
                     }
                     routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
                     case .onCoHostRequestRejected(let invitee):
-                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: invitee.userName.isEmpty ? invitee.userID : invitee.userName), toastStyle: .info)
+                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: invitee.displayName), toastStyle: .info)
                     case .onCoHostRequestTimeout(let inviter,_):
                         if inviter.userID == TUIRoomEngine.getSelfInfo().userId {
                             toastService.showToast(.requestTimeoutText, toastStyle: .info)
@@ -685,7 +686,7 @@ extension VoiceRoomRootView {
                     case .onCoHostRequestCancelled(let inviter,let invitee):
                         if invitee?.userID == TUIRoomEngine.getSelfInfo().userId {
                             routerManager.dismiss(dismissType: .alert, completion: nil)
-                            let message = String.localizedReplace(.coHostcanceledText, replace: inviter.userName)
+                            let message = String.localizedReplace(.coHostcanceledText, replace: inviter.displayName)
                             toastService.showToast(message, toastStyle: .info)
                         }
                     case .onCoHostRequestAccepted(_):
@@ -778,7 +779,7 @@ extension VoiceRoomRootView {
                             }
                             self.routerManager.dismiss(dismissType: .alert)
                         }
-                        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.userName),
+                        let alertConfig = AlertViewConfig(title: .localizedReplace(.battleInvitationText, replace: inviter.displayName),
                                                           iconUrl: inviter.avatarURL,
                                                           cancelButton: cancelButton,
                                                           confirmButton: confirmButton,
@@ -789,7 +790,7 @@ extension VoiceRoomRootView {
                     routerManager.present(view: AtomicAlertView(config: alertConfig), config: .centerDefault())
                     case .onBattleRequestReject(battleID: _, let inviter, let invitee):
                         if inviter.userID == selfId {
-                            let message = String.localizedReplace(.battleInvitationRejectText, replace: invitee.userName)
+                            let message = String.localizedReplace(.battleInvitationRejectText, replace: invitee.displayName)
                             toastService.showToast(message, toastStyle: .info)
                         }
                     case .onBattleRequestTimeout(_, let inviter, _):
@@ -798,7 +799,7 @@ extension VoiceRoomRootView {
                         }
                     case .onBattleRequestCancelled(_, let inviter, let invitee):
                         if invitee.userID == selfId {
-                            toastService.showToast(.localizedReplace(.battleInviterCancelledText, replace: "\(inviter.userName)"), toastStyle: .info)
+                            toastService.showToast(.localizedReplace(.battleInviterCancelledText, replace: "\(inviter.displayName)"), toastStyle: .info)
                             routerManager.dismiss(dismissType: .alert, completion: nil)
                         }
                     case .onBattleStarted(_,let inviter,_):
@@ -809,6 +810,27 @@ extension VoiceRoomRootView {
                         break
                 }
             }.store(in: &cancellableSet)
+    }
+    
+    private func subscribeGuestEvent() {
+        coGuestStore.hostEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .onHostInvitationResponded(isAccept: let isAccept, guestUser: let guestUser):
+                    if !isAccept {
+                        toastService.showToast(String.localizedReplace(.requestRejectedText, replace: guestUser.userName.isEmpty ? guestUser.userID : guestUser.userName), toastStyle: .info)
+                    }
+                case .onHostInvitationNoResponse(guestUser: _, reason: let reason):
+                    if reason == .timeout {
+                        toastService.showToast(.requestTimeoutText, toastStyle: .info)
+                    }
+                default:
+                    break
+                }
+            }
+            .store(in: &cancellableSet)
     }
 }
 
@@ -1158,7 +1180,7 @@ extension VoiceRoomRootView {
                 }
             }
         }
-        let alertConfig = AlertViewConfig(title: String.localizedReplace(.inviteLinkText, replace: "\(liveOwner.userName)"),
+        let alertConfig = AlertViewConfig(title: String.localizedReplace(.inviteLinkText, replace: "\(liveOwner.displayName)"),
                                           iconUrl: liveOwner.avatarURL,
                                           cancelButton: cancelButton,
                                           confirmButton: confirmButton,
@@ -1363,13 +1385,10 @@ extension VoiceRoomRootView: BarrageStreamViewDelegate {
 
 extension VoiceRoomRootView: GiftPlayViewDelegate {
     func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        let receiver = TUIUserInfo()
         let liveOwner = liveListStore.state.value.currentLive.liveOwner
-        receiver.userId = liveOwner.userID
-        receiver.userName = liveOwner.userName
-        receiver.avatarUrl = liveOwner.avatarURL
-        if receiver.userId == selfInfo.userID {
-            receiver.userName = .meText
+        var receiverUseName = liveOwner.displayName
+        if liveOwner.userID == selfInfo.userID {
+            receiverUseName = .meText
         }
         
         var barrage = Barrage()
@@ -1380,7 +1399,7 @@ extension VoiceRoomRootView: GiftPlayViewDelegate {
             "gift_name": gift.name,
             "gift_count": "\(giftCount)",
             "gift_icon_url": gift.iconURL,
-            "gift_receiver_username": receiver.userName
+            "gift_receiver_username": receiverUseName
         ]
         barrageStore.appendLocalTip(message: barrage)
     }

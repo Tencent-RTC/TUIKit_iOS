@@ -2,6 +2,16 @@
 //  EntranceViewController.swift
 //  main
 //
+//  首页主控制器 — 唯一入口类
+//
+//  从旧版 EntranceViewController.swift (~750 行) 重构迁移。
+//  核心变化：
+//    - 模块列表由 configData() 硬编码 → AppAssembly.shared.allModuleProviders() 统一获取
+//    - 10 个 goto{Module}() 方法 → 统一 config.targetProvider()
+//    - 权限检查散落在各 goto → 集中在 ModulePermissionService
+//    - App 生命周期回调 → AppAssembly.shared.registerLifecycleHandlers() + AppLifecycleRegistry
+//    - UI 布局完全保持旧版不变
+//
 
 import AppAssembly
 import AtomicX
@@ -24,6 +34,9 @@ class EntranceViewController: UIViewController {
     private let store = EntranceStore()
     private var cancellables = Set<AnyCancellable>()
 
+    /// 标记当前登录会话是否已执行过高风险检查 & 安全提醒弹窗。
+    /// 每次退出登录（重新 present 登录页）时重置为 false，
+    /// 确保换账号后能再次触发检查。
     private var hasPerformedRiskCheck = false
 
     // MARK: - UI Elements
@@ -81,8 +94,14 @@ class EntranceViewController: UIViewController {
         super.viewDidLoad()
 
         let appEnvironment = ModuleEnvironment(
-            beautyLicenseURL: "https://license.example.com/live",
-            beautyLicenseKey: "YOUR_SECRET_KEY_123",
+            liveLicenseURL: LIVE_LICENSE_URL,
+            liveLicenseKey: LIVE_LICENSE_KEY,
+            effectLicenseURL: TENCENT_EFFECT_LICENSE_URL,
+            effectLicenseKey: TENCENT_EFFECT_LICENSE_KEY,
+            playerLicenseURL: PLAYER_LICENSE_URL,
+            playerLicenseKey: PLAYER_LICENSE_KEY,
+            copyrightedMusicLicenseKey: COPYRIGHTED_MUSIC_LICENSE_KEY,
+            copyrightedMusicLicenseUrl: COPYRIGHTED_MUSIC_LICENSE_URL,
             getCurrentUserModel: {
                 LoginEntry.shared.userModel
             },
@@ -91,13 +110,26 @@ class EntranceViewController: UIViewController {
             }
         )
 
+        // ① 注入 AppAssembly 回调
+        // RTCubeLab / 开源版不注册 handler（所有安全弹窗跳过，privacy 模块在开源工程中物理剔除）
         #if !RTCUBE_LAB
         AppAssembly.shared.privacyActionHandler = { action in
+            // MOA/IOA 内部账号统一跳过所有隐私/风控动作，对需要结果回调的动作直接放行
+            if LoginManager.shared.getCurrentUser()?.isMoa() == true {
+                switch action {
+                case .checkRealNameAuth(_, _, let completion):
+                    completion(true, "success")
+                case .showFaceIdTokenVerify(_, _, let completion):
+                    completion(true, "")
+                default:
+                    break
+                }
+                return
+            }
+
             switch action {
             case .showAntifraudReminder:
                 AntifraudAlertManager.showAntifraudReminder()
-            case .showScreenShareAntifraud(let completion):
-                AntifraudAlertManager.showScreenShareAntifraudReminder(completion: completion)
             case .checkRealNameAuth(let userId, let token, let completion):
                 AntifraudAlertManager.checkRealNameAuth(userId: userId, token: token, completion: completion)
             case .showFaceIdTokenVerify(let userId, let token, let completion):
@@ -112,7 +144,20 @@ class EntranceViewController: UIViewController {
                 TimeLimitPresenter.showLiveTimeOutAlert(onDismiss: onDismiss)
             }
         }
+        AppAssembly.shared.analyticEventHandler = { action in
+            switch action {
+            case .liveEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "live", event: name, params: params)
+            case .voiceRoomEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "voice_room", event: name, params: params)
+            case .aiConversationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "conversation_ai", event: name, params: params)
+            case .interpretationEvent(let name, let params):
+                AppAnalytics.trackModuleEvent(moduleId: "simultaneous_interpretation", event: name, params: params)
+            }
+        }
         #else
+        // RTCubeLab 模式下禁用实名认证（与旧版行为一致）
         PrivacyEntry.enableIdCardVerification = false
         #endif
 
@@ -129,20 +174,37 @@ class EntranceViewController: UIViewController {
             registry.register(provider)
         }
 
+        // ② 注册需要 App 生命周期回调的 handler
         AppAssembly.shared.registerLifecycleHandlers()
 
+        // ③ 构建 UI
         setupUI()
 
+        // ④ 加载模块数据
         store.loadModules()
 
+        // ⑤ 订阅 Store 状态变化，驱动 UI 刷新
         bindStoreState()
 
+        // ⑥ 加载权限数据（仅国内版需要拉取模块黑名单）
+        #if !RTCUBE_OVERSEAS && !RTCUBE_LAB && !OPEN_SOURCE
         ModulePermissionService.shared.loadUserBlackList()
+        #endif
 
+        // ⑥.5 启动模块级埋点观察器 + 初始化埋点公共属性
+        #if !DEBUG
+        initAnalytics()
+        ModuleAnalytics.start()
+        #endif
+
+        // ⑦ 初始化 HuiYanSDK（人脸核身）
         #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         HuiYanSDKKit.sharedInstance().initSDK(with: self)
         #endif
 
+        // ⑧ 高风险用户检查 & 安全提醒弹窗
+        //    时机延迟到 viewDidAppear，等登录页 dismiss 后首页真正可见时再触发，
+        //    避免在 viewDidLoad 时弹窗被登录页遮盖导致倒计时失效。
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -243,18 +305,29 @@ class EntranceViewController: UIViewController {
         ToastManager.shared.position = .bottom
     }
 
+    /// 显示被禁用的提示
     private func showBannedToast() {
         guard !ModulePermissionService.shared.isNeedFaceAuth else { return }
-        view.makeToast(MainLocalize("Demo.TRTC.Portal.Main.MoudleBannedMessage"))
+        view.makeToast(MainLocalize("main_module_banned_message"))
     }
 
     // MARK: - Risk Check Entry Point
 
+    /// 高风险用户检查 & 安全提醒弹窗的统一入口
+    ///
+    /// 触发条件：首页真正可见（`viewDidAppear`）+ 尚未执行过检查 + 登录页已不在前台。
+    /// 这样可以保证登录页 dismiss 后弹窗才出现，倒计时不会被遮盖失效。
+    ///
+    /// 与 v1 行为对齐：
+    /// - 每次登录会话（含换账号 / Token 过期重登）执行 **1 次** 自动检查
+    /// - 高风险用户点击模块时可 **无限次** 重新触发核身弹窗（由 didSelectItemAt 处理）
     private func performRiskCheckIfNeeded() {
+        // RTCubeLab 模式下跳过所有安全提示弹窗
         #if RTCUBE_LAB
         return
         #endif
 
+        // 登录页仍然 present 在上层 → 跳过，同时重置标记以便新账号登录后能再次触发
         if presentedViewController != nil {
             hasPerformedRiskCheck = false
             return
@@ -273,7 +346,13 @@ class EntranceViewController: UIViewController {
         #endif
     }
 
+    // MARK: - Face Auth (高风险用户人脸核身)
+
     #if !RTCUBE_OVERSEAS
+    /// 弹出实名认证弹窗，获取人脸核身 Token
+    ///
+    /// 通过 `privacyActionHandler` 调用 privacy 模块获取 faceIdToken，
+    /// 成功后启动 HuiYanSDK 人脸核身流程。
     private func showFaceAuthAlert(user: BSUserModel) {
         AppAssembly.shared.privacyActionHandler?(.showFaceIdTokenVerify(userId: user.userId, token: user.token, completion: { [weak self] isAuth, faceToken in
             guard let self = self else { return }
@@ -290,6 +369,14 @@ class EntranceViewController: UIViewController {
     #endif
 
     #if !RTCUBE_OVERSEAS
+    /// 启动 HuiYanSDK 人脸核身
+    ///
+    /// 对应旧版 `getFaceAuth(token:)`。
+    /// - 核身成功：解除模块禁用，展示安全提醒弹窗
+    /// - 核身失败：Toast 提示用户重试
+    ///
+    /// 开源版(OPEN_SOURCE)不链接 HuiYanPublicSDK，方法体空实现；
+    /// 保留方法签名以维持 showFaceAuthAlert 的调用链编译通过。
     private func getFaceAuth(token: String) {
         #if !OPEN_SOURCE
         let config = AuthConfig()
@@ -313,7 +400,7 @@ class EntranceViewController: UIViewController {
                 guard let self = self else { return }
                 DispatchQueue.main.async {
                     self.view.makeToast(
-                        MainLocalize("Demo.TRTC.Portal.Main.FaceAuthFailedMessage"),
+                        MainLocalize("main_face_auth_failed_message"),
                         position: .bottom
                     )
                 }
@@ -326,6 +413,13 @@ class EntranceViewController: UIViewController {
 
     // MARK: - Safety Reminder
 
+    /// 显示安全提醒弹窗（5 秒倒计时，倒计时结束后方可关闭）
+    ///
+    /// 对应旧版 `showReminderWarningView()` + `SafetyReminderView`，
+    /// 使用 v1 同款 SafetyReminderView 实现，保持样式完全一致：
+    /// - 全屏半透明遮罩 + 居中圆角卡片
+    /// - 富文本内容（首末段加粗）
+    /// - 倒计时期间按钮灰色禁用，结束后变蓝色可点击
     private func showSafetyReminderAlert() {
         safeReminderWarningView.resetTimer()
         view.addSubview(safeReminderWarningView)
@@ -370,7 +464,7 @@ extension EntranceViewController: UICollectionViewDataSource {
                 for: indexPath
             ) as! EntranceFooterView
 
-            footerView.footerLabel.text = MainLocalize("Demo.TRTC.Portal.Main.trial")
+            footerView.footerLabel.text = MainLocalize("main_trial_hint")
             return footerView
         }
         return UICollectionReusableView()
@@ -387,7 +481,9 @@ extension EntranceViewController: UICollectionViewDelegate {
         guard indexPath.row < visibleModules.count else { return }
         let module = visibleModules[indexPath.row]
 
+        // 权限检查
         guard ModulePermissionService.shared.isModuleEnabled(module) else {
+            // 需要人脸核身时，重新弹出核身弹窗（与旧版 isModelEnable 行为一致）
             #if !RTCUBE_OVERSEAS
             if ModulePermissionService.shared.isNeedFaceAuth,
                let user = LoginManager.shared.getCurrentUser()
@@ -400,10 +496,20 @@ extension EntranceViewController: UICollectionViewDelegate {
             return
         }
 
+        // 埋点
         if !module.config.analyticsEvent.isEmpty {
             trackSensorData(module.config.analyticsEvent)
         }
 
+        // 场景体验入口拦截：国内/Lab 打开外链，不创建 VC
+        if module.config.identifier == "scenes_application" {
+            if let url = URL(string: "https://trtc.io/exhibition/details?lang=zh&from=app") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+            return
+        }
+
+        // 创建并跳转目标 VC
         if let targetVC = module.config.targetProvider() {
             if targetVC.modalPresentationStyle == .fullScreen {
                 present(targetVC, animated: true)
@@ -427,16 +533,58 @@ extension EntranceViewController: UICollectionViewDelegateFlowLayout {
         }
 
         let module = visibleModules[indexPath.item]
-        return module.config.cardStyle == .banner
-            ? CGSize(width: ScreenWidth - 24, height: 58)
-            : CGSize(width: ScreenWidth / 2 - 13, height: 106)
+
+        // Banner 卡片占据整行
+        if module.config.cardStyle == .banner {
+            return CGSize(width: ScreenWidth - 24, height: 58)
+        }
+
+        let cellWidth = ScreenWidth / 2 - 13
+
+        // 计算当前 item 在非 banner 序列中的配对伙伴索引，使同一行两个卡片高度一致
+        let rowHeight = calculateRowHeight(for: indexPath.item, visibleModules: visibleModules, cellWidth: cellWidth)
+
+        return CGSize(width: cellWidth, height: rowHeight)
+    }
+
+    /// 计算指定 item 所在行的统一高度（取同行两个卡片中的最大值）
+    private func calculateRowHeight(for itemIndex: Int,
+                                    visibleModules: [ResolvedModule],
+                                    cellWidth: CGFloat) -> CGFloat
+    {
+        // 收集非 banner 的 item 索引，确定配对关系
+        var nonBannerIndices: [Int] = []
+        for (i, m) in visibleModules.enumerated() {
+            if m.config.cardStyle != .banner {
+                nonBannerIndices.append(i)
+            }
+        }
+
+        // 找到当前 item 在非 banner 列表中的位置
+        guard let positionInNonBanner = nonBannerIndices.firstIndex(of: itemIndex) else {
+            return 106
+        }
+
+        // 配对：0-1, 2-3, 4-5, ...
+        let rowStartPosition = (positionInNonBanner / 2) * 2
+
+        var maxHeight: CGFloat = 106
+        for offset in 0..<2 {
+            let pos = rowStartPosition + offset
+            guard pos < nonBannerIndices.count else { break }
+            let idx = nonBannerIndices[pos]
+            let h = EntranceCollectionCell.calculateHeight(for: visibleModules[idx], cellWidth: cellWidth)
+            maxHeight = max(maxHeight, h)
+        }
+
+        return maxHeight
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         referenceSizeForFooterInSection section: Int) -> CGSize
     {
-        let text = MainLocalize("Demo.TRTC.Portal.Main.trial")
+        let text = MainLocalize("main_trial_hint")
         let font = ThemeStore.shared.typographyTokens.Regular12
         let attributes: [NSAttributedString.Key: Any] = [.font: font]
         let attributedString = NSAttributedString(string: text, attributes: attributes)
@@ -469,6 +617,7 @@ extension EntranceViewController: MainNavigationViewDelegate {
             onLanguageChanged: { [weak self] languageID in
                 self?.hasPerformedRiskCheck = false
                 AppLogger.App.info(" language changed to: \(languageID)")
+                // 语言切换后重建首页
                 guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
                       let sceneDelegate = scene.delegate as? SceneDelegate else { return }
                 sceneDelegate.showLogin()
@@ -502,10 +651,28 @@ extension EntranceViewController: MainNavigationViewDelegate {
 // MARK: - Analytics
 
 extension EntranceViewController {
+    private func initAnalytics() {
+        let userId = LoginEntry.shared.userModel?.userId ?? ""
+        let sdkAppId = LoginEntry.shared.config.sdkAppId
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+        let loginMode = LoginEntry.shared.loggedInMode?.rawValue ?? LoginMode.debugAuth.rawValue
+        #if RTCUBE_OVERSEAS
+        let appTarget = "overseas"
+        #else
+        let appTarget = "domestic"
+        #endif
+        AppAnalytics.initialize(sdkAppId: sdkAppId, userId: userId, appTarget: appTarget, appVersion: appVersion, loginMode: "\(loginMode)")
+    }
+
     private func trackSensorData(_ event: String) {
         let loginType = resolveLoginType()
+        #if RTCUBE_OVERSEAS
+        let eventName = AnalyticName.tencentRTCMainClick
+        #else
+        let eventName = AnalyticName.rtcubeMainClick
+        #endif
         AppAnalytics.trackMainClick(
-            eventName: "rtcube_main_click_event",
+            eventName: eventName,
             mainEvent: event,
             loginType: loginType
         )

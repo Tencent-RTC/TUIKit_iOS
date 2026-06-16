@@ -2,6 +2,8 @@
 //  LoginManager.swift
 //  login
 //
+//  从 BusinessService 复制的登录管理器
+//
 
 import Alamofire
 import ImSDK_Plus
@@ -55,6 +57,7 @@ public class LoginManager: NSObject {
     }
 }
 
+// MARK: - 用户信息缓存
 extension LoginManager {
     public func removeLoginCache() {
         currentUser = nil
@@ -63,6 +66,7 @@ extension LoginManager {
     }
 }
 
+// MARK: - 封装 LoginNetworkManager 方法
 extension LoginManager {
 
     public func getSms(param: [AnyHashable: Any]?,
@@ -110,6 +114,8 @@ extension LoginManager {
         LoginNetworkManager.loginByToken(userId: userId, token: token,
                                          success: { [weak self] data in
             guard let self = self else { return }
+            // 用服务端返回的新数据更新 currentUser（与 loginByPhone/loginByEmail 对齐），
+            // 确保 name/avatar/token/userSig 等核心字段在 Token 登录后也同步更新。
             if let data = data {
                 currentUser = data
             }
@@ -135,6 +141,9 @@ extension LoginManager {
         LoginNetworkManager.login(phone: phone, sessionId: sessionId, code: code,
                                   success: { [weak self] data in
             guard let self = self else { return }
+            // 用服务端返回的新数据更新 currentUser，而非从 UserDefaults 读旧缓存。
+            // 修复：DebugAuth 登录后残留的旧 BSUserModel（含错误的 userSig）
+            // 会污染 getCurrentUser() 的内存缓存，导致后续手机号登录拿到错误的 userSig。
             if let data = data {
                 currentUser = data
             }
@@ -160,6 +169,7 @@ extension LoginManager {
         LoginNetworkManager.login(email: email, sessionId: sessionId, code: code,
                                   success: { [weak self] data in
             guard let self = self else { return }
+            // 同 loginByPhone 修复：用服务端返回的新数据更新 currentUser
             if let data = data {
                 currentUser = data
             }
@@ -224,6 +234,7 @@ extension LoginManager {
         })
     }
 
+    /// 注销账户（删除用户）
     public func logoff(param: [AnyHashable: Any]?,
                        resultCallback: @escaping TUICallServiceResultCallback) {
         let token = param?["token"] as! String

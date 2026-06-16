@@ -2,6 +2,7 @@
 //  GuideModel.swift
 //  main
 //
+//  Guide 模块 - 数据模型
 
 import UIKit
 

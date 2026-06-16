@@ -2,6 +2,8 @@
 //  CallingSelectUserTableViewCell.swift
 //  main
 //
+//  通话模块 - 搜索结果用户 Cell（头像 + 名称 + 呼叫/添加/删除按钮）
+//
 
 import UIKit
 import Login
@@ -32,7 +34,7 @@ public class CallingSelectUserTableViewCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.backgroundColor = UIColor("006EFF")
         button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 15
+        button.layer.cornerRadius = 15 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         return button
     }()
 
@@ -78,17 +80,17 @@ public class CallingSelectUserTableViewCell: UITableViewCell {
         }
 
         userImageView.layer.masksToBounds = true
-        userImageView.layer.cornerRadius = 25
+        userImageView.layer.cornerRadius = 25 // NOTE: 不在 BorderRadiusToken 体系中，保留原值
         nameLabel.text = model.name != "" ? model.name : model.userId
         buttonAction = action
 
         switch type {
         case .call:
-            btnName = CallingLocalize("Demo.TRTC.Streaming.call")
+            btnName = CallingLocalize("assembly_call_btn_streaming_call")
         case .add:
-            btnName = CallingLocalize("Demo.TRTC.calling.add")
+            btnName = CallingLocalize("assembly_call_btn_add")
         case .delete:
-            btnName = CallingLocalize("Demo.TRTC.calling.delete")
+            btnName = CallingLocalize("assembly_call_btn_delete")
         }
         rightButton.setTitle(btnName, for: .normal)
     }

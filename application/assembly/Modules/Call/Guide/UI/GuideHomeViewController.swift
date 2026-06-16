@@ -2,6 +2,10 @@
 //  GuideHomeViewController.swift
 //  main
 //
+//  Guide 模块 - 首页（分段切换 "单人多端" / "邀请他人"）
+//
+//  注意：此页面依赖 JXSegmentedView / JXPagingView Pod。
+//  如果 Podfile 中未添加，请先添加：
 //    pod 'JXSegmentedView'
 //    pod 'JXPagingView/Paging'
 
@@ -52,8 +56,8 @@ class GuideHomeViewController: UIViewController {
 
     private lazy var dataSource: JXSegmentedDotDataSource = {
         let source = JXSegmentedDotDataSource()
-        source.titles = [GuideLocalize("Demo.TRTC.Guide.RoomSingleUser"),
-                         GuideLocalize("Demo.TRTC.Guide.RoomMultiUsers")]
+        source.titles = [GuideLocalize("assembly_call_guide_room_single"),
+                         GuideLocalize("assembly_call_guide_room_multi")]
         source.dotStates = [false, false]
         source.titleNormalColor = UIColor(red: 98, green: 110, blue: 132, alpha: 0.6)
         source.titleSelectedColor = UIColor(red: 0, green: 108, blue: 255)

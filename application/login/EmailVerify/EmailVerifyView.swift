@@ -2,6 +2,9 @@
 //  EmailVerifyView.swift
 //  login
 //
+//  邮箱登录入口视图
+//  完全复刻 TRTCEmailLoginViewController 的 UI 和交互
+//
 
 import UIKit
 import AtomicX
@@ -31,6 +34,7 @@ class EmailVerifyView: UIView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage.loginImage(named: "rtc_logo")
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -105,6 +109,16 @@ class EmailVerifyView: UIView {
         return view
     }()
     
+    // MARK: - iOA Login Components
+    
+    private let ssoTextLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textAlignment = .left
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
     // MARK: - Init
     
     init(store: EmailVerifyStore) {
@@ -132,6 +146,9 @@ class EmailVerifyView: UIView {
         setupUI()
         setupConstraints()
         setupBottomText()
+        #if LOGIN_FULL
+        setupSSOText()
+        #endif
         setupActions()
         bindStore()
         fullScreenLoadingView.hide()
@@ -150,6 +167,11 @@ class EmailVerifyView: UIView {
         emailInputContainer.addSubview(inputBottomBorder)
         addSubview(continueButton)
         addSubview(bottomTextLabel)
+        
+        #if LOGIN_FULL
+        addSubview(ssoTextLabel)
+        #endif
+        
         addSubview(fullScreenLoadingView)
     }
     
@@ -201,6 +223,13 @@ class EmailVerifyView: UIView {
             make.leading.trailing.equalToSuperview().inset(24)
         }
         
+        #if LOGIN_FULL
+        ssoTextLabel.snp.makeConstraints { make in
+            make.top.equalTo(bottomTextLabel.snp.bottom).offset(4)
+            make.leading.trailing.equalToSuperview().inset(24)
+        }
+        #endif
+        
         fullScreenLoadingView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -233,24 +262,32 @@ class EmailVerifyView: UIView {
         continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         continueButton.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
         continueButton.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside, .touchCancel])
-        
+
+        #if LOGIN_FULL
+        let ssoTapGesture = UITapGestureRecognizer(target: self, action: #selector(ssoTextTapped(_:)))
+        ssoTextLabel.addGestureRecognizer(ssoTapGesture)
+        #endif
+
         emailTextField.delegate = self
         emailTextField.addTarget(self, action: #selector(emailTextChanged), for: .editingChanged)
-        
+
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         addGestureRecognizer(tapGesture)
+
+        let hiddenEntryGesture = UITapGestureRecognizer(target: self, action: #selector(hiddenEntryTapped))
+        hiddenEntryGesture.numberOfTapsRequired = 5
+        logoImageView.addGestureRecognizer(hiddenEntryGesture)
     }
     
     private func bindStore() {
-        store.$state
-            .map(\.toastMessage)
-            .removeDuplicates()
+        store.toastPublisher
+            .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                guard !message.isEmpty else { return }
                 self?.makeToast(message)
             }
             .store(in: &cancellables)
-        
+
+        // Store 状态重置时（登出），同步清空输入框并恢复按钮状态
         store.$state
             .map(\.email)
             .removeDuplicates()
@@ -315,12 +352,73 @@ class EmailVerifyView: UIView {
     @objc private func dismissKeyboard() {
         endEditing(true)
     }
+
+    @objc private func hiddenEntryTapped() {
+        showHiddenConfigPage()
+    }
+
+    #if LOGIN_FULL
+    @objc private func ssoTextTapped(_ gesture: UITapGestureRecognizer) {
+        let text = ssoTextLabel.text ?? ""
+        let ioaText = String.EmailLogin.ioaLoginLink
+        let ioaRange = (text as NSString).range(of: ioaText)
+        
+        if ioaRange.location != NSNotFound {
+            let tapLocation = gesture.location(in: ssoTextLabel)
+            let textContainer = NSTextContainer(size: ssoTextLabel.bounds.size)
+            let layoutManager = NSLayoutManager()
+            let textStorage = NSTextStorage(attributedString: ssoTextLabel.attributedText ?? NSAttributedString())
+            
+            layoutManager.addTextContainer(textContainer)
+            textStorage.addLayoutManager(layoutManager)
+            
+            textContainer.lineFragmentPadding = 0
+            textContainer.maximumNumberOfLines = ssoTextLabel.numberOfLines
+            textContainer.lineBreakMode = ssoTextLabel.lineBreakMode
+            
+            let characterIndex = layoutManager.characterIndex(for: tapLocation, in: textContainer, fractionOfDistanceBetweenInsertionPoints: nil)
+            
+            if NSLocationInRange(characterIndex, ioaRange) {
+                store.switchToIOA()
+            }
+        }
+    }
     
+    private func setupSSOText() {
+        let ioaText = String.EmailLogin.ioaLoginLink
+        let fullText = String.EmailLogin.ssoText(ioaText)
+        let attributedString = NSMutableAttributedString(string: fullText)
+        
+        let fullRange = NSRange(location: 0, length: fullText.count)
+        attributedString.addAttributes([
+            .font: ThemeStore.shared.typographyTokens.Regular12,
+            .foregroundColor: ThemeStore.shared.colorTokens.textColorSecondary,
+        ], range: fullRange)
+        
+        let ioaRange = (fullText as NSString).range(of: ioaText)
+        if ioaRange.location != NSNotFound {
+            attributedString.addAttributes([
+                .font: ThemeStore.shared.typographyTokens.Regular12,
+                .foregroundColor: ThemeStore.shared.colorTokens.buttonColorPrimaryDefault,
+            ], range: ioaRange)
+        }
+        
+        ssoTextLabel.attributedText = attributedString
+    }
+    #endif
+
     @objc private func emailTextChanged() {
         store.updateEmail(emailTextField.text ?? "")
         updateContinueButtonState()
     }
     
+    // MARK: - Hidden Config Entry
+
+    private func showHiddenConfigPage() {
+        let configVC = HiddenConfigViewController()
+        navigationController?.pushViewController(configVC, animated: true)
+    }
+
     // MARK: - Button State
     
     private func updateContinueButtonState() {
@@ -379,23 +477,28 @@ extension EmailVerifyView: UITextFieldDelegate {
 extension String {
     struct EmailLogin {
         // MARK: - Titles and Labels
-        static var welcomeTitle: String { LoginLocalize("Demo.TRTC.Email.welcomeTitle") }
-        static var subtitle: String { LoginLocalize("Demo.TRTC.Email.subtitle") }
-        
+        static var welcomeTitle: String { LoginLocalize("login_email_welcome_title") }
+        static var subtitle: String { LoginLocalize("login_email_welcome_subtitle") }
+
         // MARK: - Input Fields
-        static var emailPlaceholder: String { LoginLocalize("Demo.TRTC.Email.emailPlaceholder") }
-        
+        static var emailPlaceholder: String { LoginLocalize("login_email_welcome_hint") }
+
+        // MARK: - Validation Errors
+        static var enterEmailError: String { LoginLocalize("login_email_enter_error") }
+        static var validEmailError: String { LoginLocalize("login_email_valid_error") }
+
         // MARK: - Button Texts
-        static var continueButton: String { LoginLocalize("Demo.TRTC.Email.continueButton") }
-        static var requesting: String { LoginLocalize("Demo.TRTC.Email.requesting") }
-        
-        // MARK: - Error Messages
-        static var enterEmailError: String { LoginLocalize("Demo.TRTC.Email.enterEmailError") }
-        static var validEmailError: String { LoginLocalize("Demo.TRTC.Email.validEmailError") }
-        
+        static var continueButton: String { LoginLocalize("login_email_welcome_continue") }
+
         // MARK: - Bottom Text
-        static var bottomTextPrefix: String { LoginLocalize("Demo.TRTC.Email.bottomTextPrefix") }
-        static var enterCodeLink: String { LoginLocalize("Demo.TRTC.Email.enterCodeLink") }
+        static var bottomTextPrefix: String { LoginLocalize("login_email_welcome_has_invite_code") }
+        static var enterCodeLink: String { LoginLocalize("login_email_welcome_enter_code") }
         static var bottomText: String { bottomTextPrefix + enterCodeLink }
+        
+        // MARK: - SSO / iOA
+        static var ioaLoginLink: String { LoginLocalize("login_other_methods_divider") }
+        static func ssoText(_ ioaLink: String) -> String {
+            return LoginLocalizeReplace("login_email_welcome_sso_text", ioaLink)
+        }
     }
 }

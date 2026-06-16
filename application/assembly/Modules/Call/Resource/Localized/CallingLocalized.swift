@@ -2,6 +2,8 @@
 //  CallingLocalized.swift
 //  AppAssembly
 //
+//  通话模块 - 本地化辅助函数 — 底层统一使用 AtomicX BundleLoader.moduleLocalized
+//
 
 import Foundation
 import AtomicX

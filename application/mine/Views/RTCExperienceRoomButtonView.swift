@@ -2,6 +2,13 @@
 //  RTCExperienceRoomButtonView.swift
 //  mine
 //
+//  体验房入口按钮 — 从旧版 iOS/App/RT-Cube/Mine/ui/RTCExperienceRoomButtonView.swift 迁移
+//
+//  变更说明：
+//    - 移除 `import RTCExperienceRoom / TUICore`
+//    - 点击事件改为 `onClicked` 闭包回调，不再内部构造 ViewController
+//    - 由外部（MineViewController → MineEntry）注入具体跳转逻辑
+//
 
 import UIKit
 import AtomicX
@@ -9,6 +16,7 @@ import SnapKit
 
 class RTCExperienceRoomButtonView: UIButton {
     
+    /// 点击回调，由外部注入具体跳转逻辑
     var onClicked: (() -> Void)?
     
     private let leftImageView: UIImageView = {

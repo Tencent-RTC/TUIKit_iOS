@@ -49,7 +49,7 @@ Pod::Spec.new do |spec|
       *modules.map { |m| "Modules/#{m}/**/*.{swift,h,m}" },
     ]
     ss.resource_bundles = {
-      'AppAssemblyBundle' => modules.map { |m| "Modules/#{m}/**/*.{xcassets,strings,json}" },
+      'AppAssemblyBundle' => modules.map { |m| "Modules/#{m}/**/*.{xcassets,xcstrings,json}" },
     }
   end
 

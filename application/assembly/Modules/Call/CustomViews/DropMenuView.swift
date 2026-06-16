@@ -2,6 +2,8 @@
 //  DropMenuView.swift
 //  AppAssembly
 //
+//  通话模块 - 下拉菜单自定义视图
+//
 
 import UIKit
 import AtomicX
@@ -509,6 +511,7 @@ private class SwiftDropMenuDefaultCell: UICollectionViewCell {
                                                                       metrics: nil,
                                                                       views: ["titleLabel": self.titleLabel]))
         NSLayoutConstraint.activate(constraints)
+        
         
         self.contentView.layer.borderColor = UIColor(red: 221/255.0, green: 221/255.0, blue: 221/255.0, alpha: 1.0).cgColor
         self.contentView.backgroundColor = ThemeStore.shared.colorTokens.bgColorOperate

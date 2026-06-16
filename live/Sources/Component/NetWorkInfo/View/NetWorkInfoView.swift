@@ -26,13 +26,10 @@ enum NetWorkInfoItemViewType {
 
 class NetWorkInfoView: UIView {
     private var cancellableSet = Set<AnyCancellable>()
-    private weak var presentedPanelController: UIViewController?
     private let isAudience: Bool
     private let isScreenShareLive: Bool
     private weak var manager: NetWorkInfoManager?
-    private weak var popupViewController: UIViewController?
-    
-    var onRequestDismissNetworkPanel: ((@escaping () -> Void) -> Void)?
+
     private let titleLabel: AtomicLabel = {
         let label = AtomicLabel(.liveInfoTitle) { theme in
             LabelAppearance(textColor: theme.color.textColorPrimary,
@@ -296,12 +293,6 @@ class NetWorkInfoView: UIView {
             }
             .store(in: &cancellableSet)
         
-        manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.audioQuality))
-            .sink { [weak self] audioQuality in
-                self?.onAudioQualityChanged(audioQuality)
-            }
-            .store(in: &cancellableSet)
-        
         manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.videoState))
             .sink { [weak self] videoState in
                 self?.onVideoStateChanged(videoState)
@@ -317,14 +308,6 @@ class NetWorkInfoView: UIView {
         manager.subscribe(StatePublisherSelector(keyPath: \NetWorkInfoState.volume))
             .sink { [weak self] volume in
                 self?.onVolumeChanged(volume)
-            }
-            .store(in: &cancellableSet)
-        
-        manager.kickedOutSubject
-            .receive(on: RunLoop.main)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                self.dismissPanel()
             }
             .store(in: &cancellableSet)
     }
@@ -531,99 +514,6 @@ class NetWorkInfoView: UIView {
         }
     }
 
-    private func onAudioQualityChanged(_ audioQuality: TUIAudioQuality) {
-        DispatchQueue.main.async { [weak self] in
-            guard let index = self?.items.firstIndex(where: { $0 == .audio }),
-                  let cell = self?.tableView.cellForRow(at: IndexPath(row: index, section: 0)) as? NetWorkInfoItemCell else { return }
-            
-            let qualityText: String
-            switch audioQuality {
-                case .default:
-                    qualityText = .AudioQualityDefault
-                case .speech:
-                    qualityText = .AudioQualitySpeech
-                case .music:
-                    qualityText = .AudioQualityMusic
-                default:
-                    return
-            }
-            
-            cell.updateContent(rightText: qualityText)
-        }
-    }
-
-    private func handleRightComponentsTap(for type: NetWorkInfoItemViewType) {
-        if type == .audio {
-            showAudioSettingsMenu()
-        }
-    }
-    
-    
-    private func showAudioSettingsMenu() {
-        onRequestDismissNetworkPanel? { [weak self] in
-            guard let self = self else { return }
-            self.presentAudioQualityPanel()
-        }
-    }
-    
-    private func presentAudioQualityPanel() {
-        weak var popoverRef: UIViewController?
-        let manager = self.manager
-        
-        let dismissPopover = {
-            popoverRef?.dismiss(animated: false)
-            popoverRef = nil
-        }
-        
-        let items = [
-            AlertButtonConfig(text: .AudioQualityDefault, type: .primary) { _ in
-                manager?.onAudioQualityChanged(TUIAudioQuality.default)
-                dismissPopover()
-            },
-            AlertButtonConfig(text: .AudioQualityMusic, type: .primary) { _ in
-                manager?.onAudioQualityChanged(TUIAudioQuality.music)
-                dismissPopover()
-            },
-            AlertButtonConfig(text: .AudioQualitySpeech, type: .primary) { _ in
-                manager?.onAudioQualityChanged(TUIAudioQuality.speech)
-                dismissPopover()
-            },
-            AlertButtonConfig(text: .cancelText, type: .primary) { _ in
-                dismissPopover()
-            }
-        ]
-        
-        let alertConfig = AlertViewConfig(items: items)
-        let alertView = AtomicAlertView(config: alertConfig)
-        
-        let config = AtomicPopover.AtomicPopoverConfig(
-            position: .bottom,
-            height: .wrapContent,
-            animation: .slideFromBottom,
-            onBackdropTap: {
-                dismissPopover()
-            }
-        )
-        
-        let popover = AtomicPopover(contentView: alertView, configuration: config)
-        
-        if let vc = WindowUtils.getCurrentWindowViewController() {
-            popupViewController = vc
-            vc.present(popover, animated: false)
-            presentedPanelController = popover
-            popoverRef = popover
-        }
-    }
-
-    private func dismissPanel() {
-        if let presentedVC = presentedPanelController {
-            presentedVC.dismiss(animated: false)
-            presentedPanelController = nil
-        }
-    }
-
-
-
     private func onVolumeChanged(_ volume: Int) {
         DispatchQueue.main.async { [weak self] in
             if let index = self?.items.firstIndex(where: { $0 == .audio }),
@@ -652,10 +542,6 @@ extension NetWorkInfoView: UITableViewDataSource, UITableViewDelegate {
         let type = items[indexPath.row]
         let showDetail = (type == .video || type == .audio) && !isAudience
         cell.configure(with: type, showDetail: showDetail)
-        
-        cell.onRightComponentsTapped = { [weak self] in
-            self?.handleRightComponentsTap(for: type)
-        }
         
         if type == .audio {
             cell.onSliderValueChanged = { [weak self] value in
@@ -692,15 +578,10 @@ fileprivate extension String {
     static let fairText = internalLocalized("common_device_temp_fair")
     static let seriousText = internalLocalized("common_device_temp_serious")
 
-    static let AudioQualityDefault = internalLocalized("common_audio_mode_default")
-    static let AudioQualitySpeech = internalLocalized("common_audio_mode_speech")
-    static let AudioQualityMusic = internalLocalized("common_audio_mode_music")
-
     static let smoothStreaming = internalLocalized("common_video_stream_smooth")
     static let properVolume = internalLocalized("common_audio_tips_proper_volume")
     static let regularChecks = internalLocalized("common_audio_tips_regular_checks")
     static let avoidSwitching = internalLocalized("common_network_switch_tips")
     static let VideoException = internalLocalized("common_video_stream_freezing")
     static let VideoDisable = internalLocalized("common_video_capture_closed")
-    static let cancelText = internalLocalized("common_cancel")
 }

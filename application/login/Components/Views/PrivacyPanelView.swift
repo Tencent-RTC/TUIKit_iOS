@@ -2,6 +2,9 @@
 //  PrivacyPanelView.swift
 //  login
 //
+//  隐私协议底部面板（从旧版 TRTCPrivacyPanelView.swift 迁移，UI 完全保持不变）
+//  底部 206 高度，上方圆角，毛玻璃背景
+//
 
 import UIKit
 import AtomicX
@@ -43,7 +46,7 @@ class PrivacyPanelView: UIView {
         let label = UILabel()
         label.font = ThemeStore.shared.typographyTokens.Medium16
         label.textColor = ThemeStore.shared.colorTokens.textColorSecondary
-        label.text = LoginLocalize("Demo.TRTC.Portal.readAndAgreeConditions")
+        label.text = LoginLocalize("login_privacy_read_conditions")
         label.textAlignment = .center
         return label
     }()
@@ -58,9 +61,9 @@ class PrivacyPanelView: UIView {
         textView.dataDetectorTypes = .link
         textView.textAlignment = .center
         
-        let privaSummaryStr = LoginLocalize("Demo.TRTC.Portal.<privacysummary>")
-        let privaStr = LoginLocalize("Demo.TRTC.Portal.<private>")
-        let protoStr = LoginLocalize("Demo.TRTC.Portal.<agreement>")
+        let privaSummaryStr = LoginLocalize("login_privacy_summary_link")
+        let privaStr = LoginLocalize("login_privacy_protection_guide")
+        let protoStr = LoginLocalize("login_privacy_user_agreement")
         let totalStr = privaSummaryStr + privaStr + protoStr
         
         guard let privaR = totalStr.range(of: privaStr),
@@ -97,7 +100,7 @@ class PrivacyPanelView: UIView {
     private lazy var agreeButton: UIButton = {
         let button = UIButton()
         button.setTitleColor(.white, for: .normal)
-        button.setTitle(LoginLocalize("Demo.TRTC.Portal.agreeAndContinue"), for: .normal)
+        button.setTitle(LoginLocalize("login_privacy_agree_continue"), for: .normal)
         button.titleLabel?.font = ThemeStore.shared.typographyTokens.Medium16
         button.backgroundColor = ThemeStore.shared.colorTokens.buttonColorPrimaryDefault
         button.layer.cornerRadius = ThemeStore.shared.borderRadius.radius20
