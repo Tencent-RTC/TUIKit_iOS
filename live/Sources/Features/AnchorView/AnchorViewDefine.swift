@@ -49,7 +49,7 @@ public enum AnchorBottomItem: Hashable {
         case (.coHost, .coHost),
              (.battle, .battle),
              (.coGuest, .coGuest),
-            (.more, .more):
+             (.more, .more):
             return true
         case (.custom(let lView), .custom(let rView)):
             return lView === rView

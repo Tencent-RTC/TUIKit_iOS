@@ -56,7 +56,7 @@ public class KeyMetrics {
         }
     }
     
-    static func reportAtomicMetrics(platform: Int) {
+    public static func reportAtomicMetrics(platform: Int) {
         let param: [String: Any] = ["UIComponentType": platform]
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: param, options: [])

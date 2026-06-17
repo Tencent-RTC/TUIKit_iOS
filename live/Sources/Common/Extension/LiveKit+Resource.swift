@@ -32,10 +32,10 @@ public extension UIImage {
 }
 
 public extension String {
-    static func liveLocalized(_ key: String) -> String {
-        return BundleLoader.moduleLocalized(key: key, in: Bundle.liveBundle, tableName: "TUILiveKitLocalized")
+    var liveLocalized: String {
+        return BundleLoader.moduleLocalized(key: self, in: Bundle.liveBundle, tableName: "TUILiveKitLocalized")
     }
-
+    
     static func liveLocalizedReplace(_ key: String, replaces: CVarArg...) -> String {
         return BundleLoader.moduleLocalized(key: key, in: Bundle.liveBundle, tableName: "TUILiveKitLocalized", arguments: replaces)
     }

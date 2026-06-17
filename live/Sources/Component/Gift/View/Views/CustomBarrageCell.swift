@@ -75,7 +75,7 @@ public class GiftBarrageCell: UIView {
         let userNameColor = UIColor("80BEF6")
         let result = NSMutableAttributedString()
         
-        let userName = barrage.sender.userName ?? ""
+        let userName = barrage.sender.displayName
         let userNameAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: userNameColor,
             .font: font

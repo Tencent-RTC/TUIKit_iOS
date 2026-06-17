@@ -123,7 +123,7 @@ class RecentCallsViewModel: ObservableObject {
         if (callInfo.chatGroupId.isEmpty && userIds.count <= 1) {
             repeatSingleCall(callInfo, userIds)
         } else {
-            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.Recents.groupCallNotSupported") ?? "Group calls cannot be initiated from call history")
+            showErrorToast(message: TUICallKitLocalize(key: "TUICallKit.Recents.groupCallNotSupported"))
         }
     }
     

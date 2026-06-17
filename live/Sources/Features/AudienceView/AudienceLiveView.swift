@@ -200,6 +200,13 @@ public class AudienceLiveView: RTCBaseView {
     func onViewWillSlideIn() {
         LiveKitLog.info("\(#file)", "\(#line)", "onViewWillSlideIn roomId: \(roomId)")
         overlayView.isHidden = true
+        if coreView.superview !== self {
+            coreView.safeRemoveFromSuperview()
+            insertSubview(coreView, aboveSubview: coverBgView)
+            coreView.snp.remakeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+        }
         startPreview()
     }
     
@@ -252,6 +259,8 @@ public class AudienceLiveView: RTCBaseView {
                 currentLiveOwner = manager.liveListState.currentLive.liveOwner
                 showSeatListIfNeeded()
                 subscribeHostAbsentState()
+                refreshBottomItems()
+                overlayView.updateTopRightItems(topRightItems)
             }
         }
     }
@@ -340,6 +349,10 @@ public class AudienceLiveView: RTCBaseView {
     private func updateCoreViewLayout() {
         if coreView.superview == nil {
             insertSubview(coreView, aboveSubview: coverBgView)
+        } else if coreView.superview != self {
+            /// AudienceLiveView cell会提前加载多个房间，预览会将coreView摆到房间列表，此时需要将coreView拿回来
+            coreView.safeRemoveFromSuperview()
+            insertSubview(coreView, aboveSubview: coverBgView)
         }
         guard !manager.liveListState.currentLive.isEmpty,
               manager.liveListState.currentLive.seatTemplate == .videoLandscape4Seats,
@@ -424,7 +437,7 @@ extension AudienceLiveView {
         showHostAbsentWorkItem = nil
         
         hostAbsentCancellable = manager.subscribeState(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] seatList in
                 guard let self = self else { return }
                 let hasHost = !seatList.isEmpty && seatList.contains { !$0.userInfo.userID.isEmpty }
@@ -510,17 +523,17 @@ extension AudienceLiveView {
     }
     
     private func subscribeRoomState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive))
+        manager.subscribeState(StatePublisherSelector(keyPath: \LiveListState.currentLive.liveID))
             .removeDuplicates()
             .dropFirst()
             .receive(on: RunLoop.main)
-            .sink { [weak self] currentLive in
+            .sink { [weak self] liveID in
                 guard let self = self else { return }
-                if currentLive.isEmpty {
+                if liveID.isEmpty {
                     routeToAudienceView()
                     return
                 }
-                guard currentLive.liveID == manager.liveID else { return }
+                guard liveID == manager.liveID else { return }
                 updateCoreViewLayout()
                 updateLiveViewLayout()
                 updateBackground()
@@ -570,7 +583,7 @@ extension AudienceLiveView {
                     routeToAudienceView()
                     delegate?.onRoomDismissed(roomId: liveID,
                                               avatarUrl: currentLiveOwner?.avatarURL ?? "",
-                                              userName: currentLiveOwner?.userName ?? "")
+                                              userName: currentLiveOwner?.displayName ?? "")
                     
                 case .onKickedOutOfLive(liveID: let liveID, reason: _, message: _):
                     guard liveID == self.roomId else { return }

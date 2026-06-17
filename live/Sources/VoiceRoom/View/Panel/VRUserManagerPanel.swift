@@ -178,7 +178,7 @@ class VRUserManagerPanel: RTCBaseView {
     
     override func setupViewStyle() {
         avatarView.setContent(.url(seatInfo.avatarUrl ?? "", placeholder: UIImage.avatarPlaceholderImage))
-        userNameLabel.text = seatInfo.userName
+        userNameLabel.text = seatInfo.displayName
         userIdLabel.text = .userIDText.replacingOccurrences(of: "xxx", with: seatInfo.userId ?? "")
     }
     

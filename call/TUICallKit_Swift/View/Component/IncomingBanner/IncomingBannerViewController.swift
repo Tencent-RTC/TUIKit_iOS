@@ -16,7 +16,7 @@ class IncomingBannerViewController: UIViewController {
     private let userHeadImageView: UIImageView = {
         let userHeadImageView = UIImageView(frame: CGRect.zero)
         userHeadImageView.layer.masksToBounds = true
-        userHeadImageView.layer.cornerRadius = 7.0
+        userHeadImageView.layer.cornerRadius = 8.0
         userHeadImageView.contentMode = .scaleAspectFill
         userHeadImageView.image = CallKitBundle.getBundleImage(name: "default_user_icon")
         return userHeadImageView
@@ -63,7 +63,7 @@ class IncomingBannerViewController: UIViewController {
         
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super .init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        view.layer.cornerRadius = 10.0
+        view.layer.cornerRadius = 12.0
         view.backgroundColor = UIColor("22262E")
         let tap = UITapGestureRecognizer(target: self, action: #selector(showCallView(sender:)))
         view.addGestureRecognizer(tap)
@@ -204,14 +204,14 @@ class IncomingBannerViewController: UIViewController {
     // MARK: other private
     private func getCallStatusTipText() -> String {
         if !(CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1) {
-            return TUICallKitLocalize(key: "TUICallKit.Group.inviteToGroupCall") ?? ""
+            return TUICallKitLocalize(key: "TUICallKit.Group.inviteToGroupCall")
         }
         var tipLabelText = String()
         switch CallStore.shared.state.value.activeCall.mediaType {
         case .audio:
-            tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToAudioCall") ?? ""
+            tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToAudioCall")
         case .video:
-            tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToVideoCall") ?? ""
+            tipLabelText = TUICallKitLocalize(key: "TUICallKit.inviteToVideoCall")
         case nil:
             break
         }

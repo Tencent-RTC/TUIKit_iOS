@@ -24,7 +24,6 @@ public class TUILiveListViewController: UIViewController {
     private var currentStyle = LiveListViewStyle.doubleColumn
     
     private var cancellableSet = Set<AnyCancellable>()
-    private var transitionCancellable: AnyCancellable?
     private var popupViewController: UIViewController?
     
     public override func loadView() {
@@ -128,7 +127,7 @@ extension TUILiveListViewController: OnItemClickDelegate {
         case .voice:
             let vc = TUIVoiceRoomViewController(roomId: liveInfo.liveID, behavior: isOwner ? .autoCreate : .join)
             vc.modalPresentationStyle = .custom
-            let transitionDelegate = LiveListTransitioningDelegate(originFrame: frame)
+            let transitionDelegate = LiveTransitioningDelegate(originFrame: frame)
             vc.transitioningDelegate = transitionDelegate
             present(vc, animated: true)
         default:
@@ -136,38 +135,17 @@ extension TUILiveListViewController: OnItemClickDelegate {
             if isOwner {
                 let vc = TUILiveRoomAnchorViewController(liveInfo: liveInfo, behavior: .enterRoom)
                 vc.modalPresentationStyle = .custom
-                let transitionDelegate = LiveListTransitioningDelegate(originFrame: frame)
+                let transitionDelegate = LiveTransitioningDelegate(originFrame: frame)
                 vc.transitioningDelegate = transitionDelegate
                 present(vc, animated: true)
             } else {
-                let isSingleColumn: Bool = frame.size == UIScreen.main.bounds.size
-                let snapshotView = isSingleColumn ? view.snapshotView(afterScreenUpdates: true) : nil
                 let vc = TUILiveRoomAudienceViewController(roomId: liveInfo.liveID)
                 vc.modalPresentationStyle = .custom
-                let transitionDelegate = LiveListTransitioningDelegate(originFrame: frame, snapshotView: snapshotView)
+                let transitionDelegate = LiveTransitioningDelegate(originFrame: frame)
                 vc.transitioningDelegate = transitionDelegate
                 present(vc, animated: true)
-                if isSingleColumn {
-                    bindSnapshotDismissal(transitionDelegate: transitionDelegate)
-                }
             }
         }
-    }
-
-    /// 监听进房成功后才淡出截图遮罩，避免直播画面未加载时闪黑屏
-    private func bindSnapshotDismissal(transitionDelegate: LiveListTransitioningDelegate) {
-        transitionCancellable = LiveListStore.shared.state
-            .subscribe(StatePublisherSelector(keyPath: \LiveListState.currentLive))
-            .receive(on: RunLoop.main)
-            .removeDuplicates()
-            .dropFirst()
-            .sink { [weak self] currentLive in
-                guard let self else { return }
-                if !currentLive.isEmpty {
-                    transitionDelegate.dismissSnapshotOverlay()
-                    transitionCancellable = nil
-                }
-            }
     }
 }
 

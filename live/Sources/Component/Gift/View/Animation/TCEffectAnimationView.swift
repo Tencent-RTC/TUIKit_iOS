@@ -72,7 +72,6 @@ extension TCEffectAnimationView: AnimationView {
         finishClosure = onFinished
         reportGiftData()
         if !isMp4File(url: playUrl) {
-            showAtomicToast(text: .isNotMp4FileText, style: .error)
             onFinished(-1)
             return
         }
@@ -101,8 +100,4 @@ extension TCEffectAnimationView {
         Constants.DataReport.kDataReportLiveGiftEffectPlayCount
         KeyMetrics.reportEventData(eventKey: key)
     }
-}
-
-private extension String {
-    static let isNotMp4FileText = internalLocalized("live_gift_animation_is_not_mp4_file")
 }

@@ -215,7 +215,7 @@ extension BarrageStreamView {
             barrageTableView.reloadData()
             barrageTableView.layoutIfNeeded()
             updateContentInset()
-            if !isDraging {
+            if !isDraging && !dataSource.isEmpty{
                 let indexPath = IndexPath(row: max(dataSource.count - 1, 0), section: 0)
                 barrageTableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
             }

@@ -82,10 +82,6 @@ public class AnchorOverlayView: UIView {
             let isScreenShareLive = store.liveListState.currentLive.seatTemplate == .videoLandscape4Seats
                 && store.liveListState.currentLive.keepOwnerOnSeat
             let panel = NetWorkInfoView(liveID: store.liveID, manager: netWorkInfoManager, isAudience: !store.liveListState.currentLive.keepOwnerOnSeat, isScreenShareLive: isScreenShareLive)
-            panel.onRequestDismissNetworkPanel = { [weak self] completion in
-                guard let self = self else { return }
-                routerManager.dismiss(completion: completion)
-            }
             routerManager.present(view: panel, config: .bottomDefault())
         }
         return button
@@ -163,6 +159,20 @@ public class AnchorOverlayView: UIView {
             .store(in: &cancellableSet)
     }
     
+    private func handleCustomMessage(_ barrage: Barrage) {
+        let dataString = barrage.data
+        guard !dataString.isEmpty,
+              let jsonData = dataString.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let messageSource = json["messageSource"] as? String,
+              let messageType = json["messageType"] as? String,
+              messageSource == "live_background",
+              messageType == "violation_alert" else {
+            return
+        }
+        store.toastSubject.send((.violationAlertToastText, .warning))
+    }
+    
     private func shouldNotifyEnterRoom(userID: String) -> Bool {
         switch enterRoomNotifyStrategy {
         case .always:
@@ -194,6 +204,17 @@ public class AnchorOverlayView: UIView {
                     self.netWorkStatusToastView.isHidden = false
                 } else {
                     self.netWorkStatusToastView.isHidden = true
+                }
+            }
+            .store(in: &cancellableSet)
+        
+        store.barrageStore.CustomMessageEventPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                switch event {
+                case .customMessageReceived(barrage: let barrage):
+                    self.handleCustomMessage(barrage)
                 }
             }
             .store(in: &cancellableSet)
@@ -395,10 +416,7 @@ extension AnchorOverlayView: BarrageStreamViewDelegate {
 
 extension AnchorOverlayView: GiftPlayViewDelegate {
     public func giftPlayView(_ giftPlayView: GiftPlayView, onReceiveGift gift: Gift, giftCount: Int, sender: LiveUserInfo) {
-        var userName = store.liveListState.currentLive.liveOwner.userName
-        if store.liveListState.currentLive.liveOwner.userID == store.selfUserID {
-            userName = .meText
-        }
+        var userName: String = .meText
         var barrage = Barrage()
         barrage.textContent = "gift"
         barrage.sender = sender
@@ -484,4 +502,5 @@ final class AnchorNodeSlot {
 private extension String {
     static let meText = internalLocalized("common_gift_me")
     static let comingText = internalLocalized("common_entered_room")
+    static let violationAlertToastText = internalLocalized("common_violation_alert_toast")
 }

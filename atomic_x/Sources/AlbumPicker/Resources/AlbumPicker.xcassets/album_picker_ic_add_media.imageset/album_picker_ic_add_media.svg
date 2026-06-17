@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24">
+  <!-- Rounded rectangle border -->
+  <path d="M21,1H3C1.9,1 1,1.9 1,3v18c0,1.1 0.9,2 2,2h18c1.1,0 2,-0.9 2,-2V3C23,1.9 22.1,1 21,1zM21,21H3V3h18V21z" fill="#FFFFFF"/>
+  <!-- Mountain/landscape image -->
+  <path d="M5,19h14l-4.5,-6l-3.5,4l-2.5,-3L5,19z" fill="#FFFFFF"/>
+  <!-- Sparkle in top-right -->
+  <path d="M16,5l-0.8,1.7L13.5,7.5l1.7,0.8L16,10l0.8,-1.7L18.5,7.5l-1.7,-0.8z" fill="#FFFFFF"/>
+</svg>

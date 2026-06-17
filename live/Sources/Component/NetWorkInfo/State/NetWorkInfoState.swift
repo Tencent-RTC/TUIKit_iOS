@@ -17,7 +17,6 @@ struct NetWorkInfoState {
     var videoResolution: Int = 720
 
     var audioState: AudioState = .normal
-    var audioQuality: TUIAudioQuality = .default
     var volume: Int = 50
 
     var netWorkQuality: TUINetworkQuality = .excellent

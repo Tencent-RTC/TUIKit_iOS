@@ -207,7 +207,7 @@ class SGSeatView: UIView {
     private func update(seatInfo: TUISeatInfo) {
         if let userId = seatInfo.userId, !userId.isEmpty {
             mainAvatarView.setContent(.url(seatInfo.avatarUrl ?? "", placeholder: UIImage.avatarPlaceholderImage))
-            nameLabel.text = seatInfo.userName ?? ""
+            nameLabel.text = seatInfo.displayName
             toUserOnSeatStyle()
         } else {
             if seatInfo.isLocked {
