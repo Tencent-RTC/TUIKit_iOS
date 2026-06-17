@@ -20,6 +20,8 @@ class AnchorMenuDataCreator {
     
     private weak var presentedExitBattleAlertView: AtomicAlertView?
     
+    private lazy var bgmStore = BGMStore(liveID: store.liveID)
+    
     init(store: AnchorStore, routerManager: AnchorRouterManager) {
         self.store = store
         self.routerManager = routerManager
@@ -58,10 +60,10 @@ extension AnchorMenuDataCreator {
 
     private func createMenu(for item: AnchorBottomItem) -> AnchorButtonMenuInfo? {
         switch item {
-        case .coHost:   return createCoHostMenu()
-        case .battle:   return createBattleMenu()
-        case .coGuest:  return createCoGuestMenu()
-        case .more:     return createMoreMenu()
+        case .coHost:       return createCoHostMenu()
+        case .battle:       return createBattleMenu()
+        case .coGuest:      return createCoGuestMenu()
+        case .more:         return createMoreMenu()
         case .custom:
             return nil
         }
@@ -342,6 +344,17 @@ extension AnchorMenuDataCreator {
                                                      routerManager.present(view: audioPanel, config: .bottomDefault())
                                                  }))
                                              }))
+        model.items.append(AnchorFeatureItem(normalTitle: .musicText,
+                                             normalImage: internalImage("live_setting_music_icon")?.withTintColor(.textPrimaryColor),
+                                             designConfig: designConfig,
+                                             actionClosure: { [weak self] _ in
+                                                 guard let self = self else { return }
+                                                 routerManager.router(action: .dismiss(.panel, completion: { [weak self] in
+                                                     guard let self = self else { return }
+                                                     let bgmPanel = BGMPanelView(store: bgmStore)
+                                                     routerManager.present(view: bgmPanel, config: .bottomDefault())
+                                                 }))
+                                             }))
         if !isScreenShareLive {
             model.items.append(AnchorFeatureItem(normalTitle: .flipText,
                                                  normalImage: internalImage("live_video_setting_flip")?.withTintColor(.textPrimaryColor),
@@ -410,4 +423,5 @@ private extension String {
     static let coGuestText = internalLocalized("common_link_guest")
     static let MoreText = internalLocalized("common_more")
     static let switchToText = internalLocalized("mirror_type_change_to")
+    static let musicText = internalLocalized("common_music")
 }

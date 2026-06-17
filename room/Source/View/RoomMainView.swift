@@ -92,6 +92,21 @@ public class RoomMainView: UIView, BaseView {
         return listView
     }()
     
+    private lazy var passwordView: EnterRoomPasswordView = {
+        let passwordView = EnterRoomPasswordView { [weak self] in
+            guard let self = self else { return }
+            routerContext?.pop(animated: true)
+        } onJoin: { [weak self] password in
+            guard let self = self else { return }
+            guard let password = password, !password.isEmpty else {
+                showAtomicToast(text: .pleaseInputPassword, style: .error)
+                return
+            }
+            joinRoom(password: password)
+        }
+        return passwordView
+    }()
+    
     private var subtitleView: AISubtitleView?
     private lazy var handsUpView: HandsUpListView = {
         let view = HandsUpListView(roomID: roomID)
@@ -100,6 +115,7 @@ public class RoomMainView: UIView, BaseView {
     
     private var inviteCameraAlertView: AtomicAlertView?
     private var inviteMicrophoneAlertView: AtomicAlertView?
+    private var isFirstJoinRoom: Bool = false
     
     // MARK: - Initialization
     public init(roomID: String, behavior: RoomBehavior, config: ConnectConfig) {
@@ -190,8 +206,12 @@ public class RoomMainView: UIView, BaseView {
             .receive(on: RunLoop.main)
             .sink { [weak self] roomInfo in
                 guard let self = self else { return }
-                if let roomInfo = roomInfo {
+                if let roomInfo = roomInfo, !roomInfo.roomID.isEmpty {
                     barrageStreamView.setOwnerId(roomInfo.roomOwner.userID)
+                    if !isFirstJoinRoom {
+                        handleConnectConfig(roomInfo: roomInfo)
+                        isFirstJoinRoom = true
+                    }
                 }
             }
             .store(in: &cancellableSet)
@@ -262,16 +282,6 @@ public class RoomMainView: UIView, BaseView {
                 }
             }
             .store(in: &cancellableSet)
-        
-        repository.$isTranscriptionStart
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isTranscriptionStart in
-                guard let self = self else { return }
-                if !isTranscriptionStart && subtitleView != nil {
-                    hiddenAISubtitleView()
-                }
-            }
-            .store(in: &cancellableSet)
     }
 }
 
@@ -291,7 +301,6 @@ extension RoomMainView {
             guard let self = self else { return }
             switch result {
             case .success():
-                handleConnectConfig()
                 handleDidEnterRoom()
             case .failure(let err):
                 showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
@@ -300,18 +309,22 @@ extension RoomMainView {
         }
     }
     
-    private func joinRoom() {
-        roomStore.joinRoom(roomID: roomID, roomType: roomType, password: nil) { [weak self] result in
+    private func joinRoom(password: String? = "") {
+        roomStore.joinRoom(roomID: roomID, roomType: roomType, password: password) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success():
-                if roomType == .standard {
-                    handleConnectConfig()
-                }
+                dismissPasswordView()
                 handleDidEnterRoom()
             case .failure(let err):
-                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
-                routerContext?.pop(animated: true)
+                if err.code == RoomError.requiresPassword.rawValue {
+                    showPasswordView()
+                } else if err.code == RoomError.roomEntryPasswordError.rawValue {
+                    showAtomicToast(text: .passwordError, style: .error)
+                } else {
+                    showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+                    routerContext?.pop(animated: true)
+                }
             }
         }
     }
@@ -325,13 +338,31 @@ extension RoomMainView {
         }
     }
     
-    private func handleConnectConfig() {
-        if config.autoEnableCamera {
-            openLocalCamera()
+    private func handleConnectConfig(roomInfo: RoomInfo) {
+        if roomInfo.roomType == .standard {
+            if config.autoEnableCamera && !roomInfo.isAllCameraDisabled {
+                openLocalCamera()
+            }
+            
+            if config.autoEnableMicrophone && !roomInfo.isAllMicrophoneDisabled {
+                unmuteMicrophone()
+            }
         }
         
-        if config.autoEnableMicrophone {
-            unmuteMicrophone()
+        if roomInfo.roomType == .webinar {
+            switch behavior {
+            case .create(let options):
+                if config.autoEnableCamera {
+                    openLocalCamera()
+                }
+                
+                if config.autoEnableMicrophone {
+                    unmuteMicrophone()
+                }
+                break
+            case .join:
+                break
+            }
         }
     }
     
@@ -358,6 +389,15 @@ extension RoomMainView {
             }
             routerContext?.pop(animated: true)
         }
+    }
+    
+    private func showPasswordView() {
+        guard passwordView.superview == nil else { return }
+        passwordView.show(in: self)
+    }
+    
+    private func dismissPasswordView() {
+        passwordView.dismiss()
     }
 }
 
@@ -446,10 +486,20 @@ extension RoomMainView {
         let confirmButtonConfig = AlertButtonConfig(text: .ok, type: .blue) { [weak self] view in
             guard let self = self else { return }
             view.dismiss()
-            routerContext?.pop(animated: true)
+            popRoomViewController(animated: true)
         }
         let config = AlertViewConfig(title: .roomClosed, confirmButton: confirmButtonConfig)
         AtomicAlertView(config: config).show()
+    }
+    
+    private func popRoomViewController(animated: Bool) {
+        guard let roomVC = routerContext as? UIViewController,
+              let nav = roomVC.navigationController,
+              let index = nav.viewControllers.firstIndex(of: roomVC), index > 0 else {
+            routerContext?.pop(animated: animated)
+            return
+        }
+        nav.popToViewController(nav.viewControllers[index - 1], animated: animated)
     }
 }
 
@@ -470,9 +520,9 @@ extension RoomMainView {
     private func handleOnOwnerChanged(newUser: RoomUser, oldUser: RoomUser) {
         if newUser.userID == localParticipant?.userID {
             showAtomicToast(text: .becameHost, style: .info)
-            if subtitleView != nil {
-                hiddenAISubtitleView()
-            }
+        }
+        if subtitleView != nil {
+            hiddenAISubtitleView()
         }
     }
     
@@ -576,7 +626,8 @@ extension RoomMainView {
             disable ? showAtomicToast(text: .allVideosDisabled, style: .warning) : showAtomicToast(text: .allVideosEnabled, style: .info)
         case .microphone:
             disable ? showAtomicToast(text: .allAudiosDisabled, style: .warning) : showAtomicToast(text: .allAudiosEnabled, style: .info)
-        default:break
+        case .screenShare:
+            disable ? showAtomicToast(text: .allScreenShareDisabled, style: .warning) : showAtomicToast(text: .allScreenShareEnabled, style: .info)
         }
     }
     
@@ -623,7 +674,7 @@ extension RoomMainView {
         let confirmButtonConfig = AlertButtonConfig(text: .ok, type: .blue) { [weak self] view in
             guard let self = self else { return }
             view.dismiss()
-            routerContext?.pop(animated: true)
+            popRoomViewController(animated: true)
         }
         let config = AlertViewConfig(title: .removedByHost, confirmButton: confirmButtonConfig)
         AtomicAlertView(config: config).show()
@@ -650,6 +701,9 @@ extension RoomMainView: RoomTopBarViewDelegate {
                                                                    titleColor: RoomColors.defaultActionButtonTitleColor,
                                                                    handler: { [weak self] action in
                                                                        guard let self = self else { return }
+                                                                       if repository.isTranscriptionStart {
+                                                                           repository.stopTranscription(completion: nil)
+                                                                       }
                                                                        leaveRoom()
                                                                    }),
                                             RoomActionSheet.Action(title: .endRoom,
@@ -853,11 +907,11 @@ extension RoomMainView: ParticipantManagerViewDelegate {
     }
     
     public func handleTransferHost(view: ParticipantManagerView, participant: RoomParticipant) {
-        let cancelButtonConfig = AlertButtonConfig(text: .cancel) { view in
-            view.dismiss()
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel) { alertView in
+            alertView.dismiss()
         }
         
-        let confirmButtonConfig = AlertButtonConfig(text: .confirmTransfer, type: .blue) { [weak self] view in
+        let confirmButtonConfig = AlertButtonConfig(text: .confirmTransfer, type: .blue) { [weak self] alertView in
             guard let self = self else { return }
             if repository.isTranscriptionStart {
                 repository.stopTranscription { [weak self] result in
@@ -877,6 +931,7 @@ extension RoomMainView: ParticipantManagerViewDelegate {
             } else {
                 transferOwner(participant: participant)
             }
+            alertView.dismiss()
             view.dismiss()
         }
         let config = AlertViewConfig(title: String.transferHostTitle.localizedReplace(participant.name), content: repository.isTranscriptionStart ? .transferHostWithAsrMessage : .transferHostMessage, cancelButton: cancelButtonConfig, confirmButton: confirmButtonConfig)
@@ -922,13 +977,16 @@ extension RoomMainView: RoomScreenShareOverlayViewDelegate {
             view.dismiss()
         }
         
-        let stopButtonConfig = AlertButtonConfig(text: .stop, type: .blue, isBold: false) { [weak self] view in
+        let stopButtonConfig = AlertButtonConfig(text: .ok, type: .blue, isBold: false) { [weak self] view in
             guard let self = self else { return }
             deviceOperator.stopScreenShare()
             view.dismiss()
         }
         
-        let config = AlertViewConfig(content: .stopScreenShare, iconUrl: nil, cancelButton: cancelButtonConfig, confirmButton: stopButtonConfig)
+        let config = AlertViewConfig(title: .stopScreenShare,
+                                     content: .stopScreenShareConfirm,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: stopButtonConfig)
         AtomicAlertView(config: config).show()
     }
 }
@@ -1019,6 +1077,13 @@ fileprivate extension String {
 
     // Screen Share
     static let stopScreenShare = "roomkit_stop_screen_share".localized
+    static let stopScreenShareConfirm = "roomkit_stop_screen_share_confirm".localized
     static let stop = "roomkit_btn_stop".localized
     static let screenShareClosedByHost = "roomkit_toast_screen_share_closed_by_host"
+    static let allScreenShareDisabled = "roomkit_all_screen_share_disabled".localized
+    static let allScreenShareEnabled = "roomkit_all_screen_share_enabled".localized
+    
+    // Password
+    static let passwordError = "roomkit_password_error".localized
+    static let pleaseInputPassword = "roomkit_please_input_room_password".localized
 }

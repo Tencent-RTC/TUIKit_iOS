@@ -44,7 +44,7 @@ class AudienceUserInfoPanelView: RTCBaseView {
     private lazy var userNameLabel: UILabel = {
         let label = UILabel()
         label.font = .customFont(ofSize: 16)
-        label.text = user.userInfo.userName
+        label.text = user.userInfo.displayName
         label.textColor = .g7
         label.textAlignment = .center
         return label

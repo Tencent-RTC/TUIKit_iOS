@@ -397,7 +397,6 @@ public final class SVGAPlayerView: UIView, AnimationView {
         
         // Validate file
         guard isSVGAFile(url: playUrl) else {
-            showAtomicToast(text: .isNotSVGAFileText, style: .error)
             onFinished(-1)
             return
         }
@@ -1688,9 +1687,3 @@ extension SVGAPlayerView {
     }
 }
 #endif
-
-// MARK: - String Extension
-
-private extension String {
-    static let isNotSVGAFileText = internalLocalized("live_gift_animation_is_not_svga_file")
-}

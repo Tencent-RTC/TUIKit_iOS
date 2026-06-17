@@ -1,0 +1,117 @@
+//
+//  ScoreBoardView.swift
+//  Pods
+//
+//  Created by ssc on 2025/8/27.
+//
+import UIKit
+import AtomicX
+
+class ScoreBoardView: UIView {
+    private lazy var scoreLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "DIN-Bold", size: 40) ?? .boldSystemFont(ofSize: 40)
+        label.textAlignment = .center
+        label.textColor = ThemeStore.shared.colorTokens.textColorError
+        label.text = "75.1"
+        return label
+    }()
+
+    private lazy var unitLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "PingFangSC-Medium", size: 16) ?? .systemFont(ofSize: 16, weight: .medium)
+        label.textAlignment = .right
+        label.textColor = ThemeStore.shared.colorTokens.textColorError
+        label.text = .pointText
+        return label
+    }()
+
+    private lazy var avatarView: AtomicAvatar = {
+        let avatar = AtomicAvatar(
+            content: .icon(image: UIImage.atomicXBundleImage(named: "ktv_note") ?? UIImage()),
+            size: .xxs,
+            shape: .round
+        )
+        return avatar
+    }()
+
+    private lazy var nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "PingFangSC-Regular", size: 12)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
+        label.text = "1212"
+        return label
+    }()
+
+    private lazy var textLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont(name: "PingFangSC-Regular", size: 10)
+        label.textColor = ThemeStore.shared.colorTokens.textColorSecondary.withAlphaComponent(0.55)
+        label.text = .songingScoreText
+        return label
+    }()
+
+    private var isViewReady = false
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard !isViewReady else { return }
+        constructViewHierarchy()
+        activateConstraints()
+        bindInteraction()
+        isViewReady = true
+    }
+
+    private func constructViewHierarchy() {
+        addSubview(scoreLabel)
+        addSubview(unitLabel)
+        addSubview(avatarView)
+        addSubview(nameLabel)
+        addSubview(textLabel)
+    }
+
+    private func activateConstraints() {
+        scoreLabel.snp.makeConstraints{ make in
+            make.height.equalTo(43.scale375())
+            make.left.equalToSuperview()
+            make.top.equalToSuperview()
+        }
+
+        unitLabel.snp.makeConstraints{ make in
+            make.top.equalTo(scoreLabel.snp.top).offset(15.scale375())
+            make.left.equalTo(scoreLabel.snp.right).offset(4.scale375())
+            make.height.equalTo(22.scale375())
+            make.width.equalTo(16.scale375())
+        }
+
+        avatarView.snp.makeConstraints{ make in
+            make.top.equalTo(scoreLabel.snp.bottom).offset(10.scale375())
+            make.left.equalToSuperview()
+        }
+
+        nameLabel.snp.makeConstraints{ make in
+            make.top.equalTo(avatarView.snp.top)
+            make.left.equalTo(avatarView.snp.right).offset(5.scale375())
+        }
+
+        textLabel.snp.makeConstraints{ make in
+            make.left.equalTo(nameLabel.snp.right).offset(9.scale375())
+            make.top.equalTo(avatarView.snp.top).offset(-2.scale375())
+            make.height.equalTo(20.scale375())
+        }
+    }
+
+    private func bindInteraction() {
+
+    }
+
+    func showScoreBoard(imageURl: String, username: String, score: Int32) {
+        avatarView.setContent(.url(imageURl, placeholder: UIImage.avatarPlaceholderImage))
+        nameLabel.text = username
+        scoreLabel.text = String(format: "%.1f", Double(score))
+    }
+}
+
+fileprivate extension String {
+    static var songingScoreText: String = ("karaoke_singing_score").liveLocalized
+    static var pointText: String = ("karaoke_point").liveLocalized
+}

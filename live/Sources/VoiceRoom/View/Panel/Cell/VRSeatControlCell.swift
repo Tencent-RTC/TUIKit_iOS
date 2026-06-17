@@ -140,7 +140,7 @@ class VRTheSeatCell: VRSeatControlCell {
     func updateSeatInfo(seatInfo: SeatInfo) {
         self.seatInfo = seatInfo
         avatarView.setContent(.url(seatInfo.userInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
-        userNameLabel.text = seatInfo.userInfo.userName
+        userNameLabel.text = seatInfo.userInfo.displayName
         seatIndexLabel.text = "\(seatInfo.index + 1)"
     }
     
@@ -226,7 +226,7 @@ class VRApplyTakeSeatCell: VRSeatControlCell {
     func updateSeatApplication(seatApplication: LiveUserInfo) {
         self.seatApplication = seatApplication
         avatarView.setContent(.url(seatApplication.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
-        userNameLabel.text = seatApplication.userName
+        userNameLabel.text = seatApplication.displayName
     }
     
     private func approveButtonClick() {

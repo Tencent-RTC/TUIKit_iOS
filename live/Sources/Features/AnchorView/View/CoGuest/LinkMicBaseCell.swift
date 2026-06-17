@@ -18,7 +18,7 @@ class LinkMicBaseCell: UITableViewCell {
                 return
             }
             avatarView.setContent(.url(seatInfo.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
-            nameLabel.text = seatInfo.userName
+            nameLabel.text = seatInfo.displayName
         }
     }
     var seatApplication: LiveUserInfo? {
@@ -27,7 +27,7 @@ class LinkMicBaseCell: UITableViewCell {
                 return
             }
             avatarView.setContent(.url(seatApplication.avatarURL, placeholder: UIImage.avatarPlaceholderImage))
-            nameLabel.text = seatApplication.userName
+            nameLabel.text = seatApplication.displayName
         }
     }
     

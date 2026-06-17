@@ -35,7 +35,6 @@ class AnchorStore {
 
         let toastSubject = PassthroughSubject<(String, ToastStyle), Never>()
         let floatWindowSubject = PassthroughSubject<Void, Never>()
-        let kickedOutSubject = PassthroughSubject<Bool, Never>() // bool value for room is dismissed
         let endLiveRequestSubject = PassthroughSubject<Void, Never>() // user tapped close button, requesting to end live
 
         var coGuestStore: CoGuestStore {
@@ -166,10 +165,6 @@ extension AnchorStore {
 extension AnchorStore {
     var toastSubject: PassthroughSubject<(String, ToastStyle), Never> {
         context.toastSubject
-    }
-
-    var kickedOutSubject: PassthroughSubject<Bool, Never> {
-        context.kickedOutSubject
     }
 
     var floatWindowSubject: PassthroughSubject<Void, Never> {

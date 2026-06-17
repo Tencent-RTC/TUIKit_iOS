@@ -215,7 +215,7 @@ class JoinCallView: UIView, UICollectionViewDelegate, UICollectionViewDataSource
         self.participants = participants.filter { $0.id != TUILogin.getUserID() }
         
         titleLabel.isHidden = self.participants.isEmpty
-        titleLabel.text = String(format: TUICallKitLocalize(key: "TUICallKit.JoinGroupView.title") ?? "", self.participants.count)
+        titleLabel.text = String(format: TUICallKitLocalize(key: "TUICallKit.JoinGroupView.title"), self.participants.count)
         titleLabel.textAlignment = TUICoreDefineConvert.getIsRTL() ? .right : .left
         collectionView.reloadData()
     }

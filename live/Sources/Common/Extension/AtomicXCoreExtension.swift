@@ -117,6 +117,15 @@ extension SeatInfo {
     }
 }
 
+extension TUISeatInfo {
+    var displayName: String {
+        if let userName = userName, !userName.isEmpty {
+            return userName
+        }
+        return userId ?? ""
+    }
+}
+
 extension RegionInfo {
     init(seatFullInfo: TUISeatFullInfo) {
         self.init()
@@ -149,6 +158,10 @@ extension LiveUserInfo {
         userID = seatUserInfo.userID
         userName = seatUserInfo.userName
         avatarURL = seatUserInfo.avatarURL
+    }
+    
+    var displayName: String {
+        userName.isEmpty ? userID : userName
     }
 }
 
