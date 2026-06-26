@@ -93,7 +93,7 @@ extension AudioEffectView {
             make.trailing.equalToSuperview().inset(20)
             make.top.equalToSuperview().inset(20)
             make.height.equalTo(24.scale375())
-            make.width.equalTo(32.scale375())
+            make.width.greaterThanOrEqualTo(32.scale375())
         }
         titleLabel.snp.remakeConstraints { make in
             make.centerY.equalTo(doneButton)
