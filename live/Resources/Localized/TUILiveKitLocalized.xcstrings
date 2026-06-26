@@ -6517,7 +6517,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naughty child"
+            "value": "Kid"
           }
         },
         "zh-Hans": {
@@ -6587,7 +6587,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Loli"
+            "value": "Girl"
           }
         },
         "zh-Hans": {
@@ -6622,7 +6622,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Original"
+            "value": "Default"
           }
         },
         "zh-Hans": {
@@ -8092,7 +8092,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Metallic sound"
+            "value": "Metallic"
           }
         },
         "zh-Hans": {
@@ -8372,7 +8372,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "KTV"
+            "value": "Karaoke"
           }
         },
         "zh-Hans": {

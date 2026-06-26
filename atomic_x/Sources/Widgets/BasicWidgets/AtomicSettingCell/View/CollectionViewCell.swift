@@ -41,6 +41,11 @@ public class ButtonCollectionCell: UICollectionViewCell {
         view.textColor = ThemeStore.shared.colorTokens.textColorPrimary
         view.textAlignment = .center
         view.numberOfLines = 2
+        view.lineBreakMode = .byTruncatingTail
+        view.adjustsFontSizeToFitWidth = true
+        view.minimumScaleFactor = 0.8
+        view.allowsDefaultTighteningForTruncation = true
+        view.baselineAdjustment = .alignCenters
         self.contentView.addSubview(view)
         return view
     }()
@@ -74,9 +79,10 @@ public class ButtonCollectionCell: UICollectionViewCell {
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(containerView.snp.bottom).offset(6.0)
+            make.top.equalTo(containerView.snp.bottom).offset(2.0)
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
+            make.bottom.lessThanOrEqualToSuperview()
         }
     }
     
