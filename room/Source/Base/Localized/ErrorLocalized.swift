@@ -215,6 +215,7 @@ public enum RoomError: Int, Error {
     case metadataTotalValueSizeExceedsByteLimit = 100502
     case metadataNoValidKey = 100503
     case metadataKeySizeExceedsByteLimit = 100504
+    case recordingConfigNotEnabled = 101072
     
     
     // TIMError
@@ -403,6 +404,8 @@ extension RoomError: LocalizedError {
             return "roomkit_err_100503_room_metadata_no_valid_keys".localized
         case .metadataKeySizeExceedsByteLimit:  // 100504
             return "roomkit_err_100504_room_metadata_key_size_limit".localized
+        case .recordingConfigNotEnabled:  // 101072
+            return "roomkit_err_101072_recording_config_not_enabled".localized
             
             // TIMError
         case .ERR_SDK_COMM_TINYID_EMPTY:

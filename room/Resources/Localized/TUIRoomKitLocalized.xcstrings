@@ -5395,6 +5395,383 @@
         }
       }
     },
+    "roomkit_cloud_record_start_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start cloud recording?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是否开启云端录制？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラウド録画を開始しますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل تريد بدء التسجيل السحابي؟"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_start_tips": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once enabled, the room's audio/video and shared screen content will be recorded to the cloud, and all participants will be notified."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，将录制房间中的音视频画面、共享屏幕内容到云端，并告知所有参会成员"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有効にすると、ルーム内の音声・映像および共有画面の内容がクラウドに録画され、すべての参加者に通知されます。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد التفعيل، سيتم تسجيل الصوت والفيديو ومحتوى الشاشة المشتركة في الغرفة إلى السحابة، وسيتم إخطار جميع المشاركين."
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_stop_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop cloud recording?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束云端录制？"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラウド録画を終了しますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء التسجيل السحابي؟"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_stop_tips": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once stopped, audio/video and shared screen content will no longer be recorded. All participants will be notified."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束录制后，将停止录制房间中的音视频画面、共享屏幕内容到云端，并告知所有参会成员"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画を終了すると、ルーム内の音声・映像および共有画面の内容のクラウドへの録画が停止され、すべての参加者に通知されます。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بعد الإيقاف، لن يتم تسجيل الصوت والفيديو ومحتوى الشاشة المشتركة بعد الآن، وسيتم إخطار جميع المشاركين."
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop recording"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束录制"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画を終了"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إنهاء التسجيل"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_recording": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制中"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画中"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ التسجيل"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording ended"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制已结束"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラウド録画が終了しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتهى التسجيل السحابي"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_end_abnormal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording was interrupted unexpectedly"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制异常中断"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラウド録画が予期せず中断されました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم انقطاع التسجيل السحابي بشكل غير متوقع"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التسجيل"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_start_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Recording"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启录制"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画を開始"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدء التسجيل"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_started_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording in progress"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制中"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クラウド録画中"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ التسجيل السحابي"
+          }
+        }
+      }
+    },
+    "roomkit_cloud_record_started_tips": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx started cloud recording. Audio, video, and shared screen content in the room will be recorded. By staying in the room, you consent to being recorded."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxx开启了云端录制，房间中的音视频画面、共享屏幕内容将会被录制。如果留在房间中，表示您同意录制。"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "xxxがクラウド録画を開始しました。ルーム内の音声、映像、画面共有などの内容が録画されます。ルームに留まることで、録画に同意したものとみなされます。"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدأ xxx التسجيل السحابي. سيتم تسجيل الصوت والفيديو ومحتوى مشاركة الشاشة في الغرفة. بالبقاء في الغرفة، فإنك توافق على التسجيل."
+          }
+        }
+      }
+    },
+    "roomkit_i_know": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我知道了"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "了解しました"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حسنًا، فهمت"
+          }
+        }
+      }
+    },
     "roomkit_err_0_success": {
       "extractionState": "manual",
       "localizations": {
@@ -7856,6 +8233,35 @@
           "stringUnit": {
             "state": "translated",
             "value": "حجم المفتاح في البيانات الوصفية للغرفة يتجاوز الحد الأقصى للبايت"
+          }
+        }
+      }
+    },
+    "roomkit_err_101072_recording_config_not_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording configuration does not exist or is not enabled"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制配置不存在或未启用"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "録画設定が存在しないか、有効になっていません"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تكوين التسجيل غير موجود أو غير مفعل"
           }
         }
       }

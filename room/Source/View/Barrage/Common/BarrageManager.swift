@@ -19,6 +19,7 @@ class BarrageManager: NSObject {
     }
     
     private func subscribe() {
+        cancellableSet.removeAll()
         RoomStore.shared.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom))
             .removeDuplicates()
             .dropFirst()
