@@ -87,6 +87,12 @@ public class RoomMainView: UIView, BaseView {
         return overlayView
     }()
     
+    private lazy var recordingFloatingView: RoomRecordingFloatingView = {
+        let view = RoomRecordingFloatingView(roomID: roomID)
+        view.isHidden = true
+        return view
+    }()
+    
     private lazy var listView: ParticipantListView = {
         let listView = ParticipantListView(roomID: roomID, roomType: roomType)
         return listView
@@ -116,6 +122,7 @@ public class RoomMainView: UIView, BaseView {
     private var inviteCameraAlertView: AtomicAlertView?
     private var inviteMicrophoneAlertView: AtomicAlertView?
     private var isFirstJoinRoom: Bool = false
+    private var recordingNoticeAlertView: AtomicAlertView?
     
     // MARK: - Initialization
     public init(roomID: String, behavior: RoomBehavior, config: ConnectConfig) {
@@ -148,6 +155,7 @@ public class RoomMainView: UIView, BaseView {
         addSubview(barrageStreamView)
         addSubview(barrageInputView)
         addSubview(bottomBarView)
+        addSubview(recordingFloatingView)
     }
     
     public func setupConstraints() {
@@ -183,9 +191,15 @@ public class RoomMainView: UIView, BaseView {
         }
         
         bottomBarView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
+            make.leading.equalToSuperview().offset(12)
+            make.trailing.equalToSuperview().offset(-12)
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.height.equalTo(52)
+        }
+        
+        recordingFloatingView.snp.makeConstraints { make in
+            make.top.equalTo(topBarView.snp.bottom).offset(12)
+            make.leading.equalToSuperview().offset(16)
         }
     }
     
@@ -267,6 +281,10 @@ public class RoomMainView: UIView, BaseView {
                 switch event {
                 case .onRoomEnded(roomInfo: let roomInfo):
                     handleOnRoomEnd(roomInfo: roomInfo)
+                case .onRecordingStarted(_, let operatorUser):
+                    handleOnRecordingStarted(operatorUser: operatorUser)
+                case .onRecordingStopped(_, let operatorUser, let reason):
+                    handleOnRecordingStopped(operatorUser: operatorUser, reason: reason)
                 default: break
                 }
             }
@@ -282,6 +300,7 @@ public class RoomMainView: UIView, BaseView {
                 }
             }
             .store(in: &cancellableSet)
+        
     }
 }
 
@@ -490,6 +509,65 @@ extension RoomMainView {
         }
         let config = AlertViewConfig(title: .roomClosed, confirmButton: confirmButtonConfig)
         AtomicAlertView(config: config).show()
+    }
+    
+    private func handleOnRecordingStopped(operatorUser: RoomUser, reason: RecordingStopReason) {
+        dismissRecordingNoticeAlertView()
+        if reason == .recorderLeftRoom {
+            showAtomicToast(text: .recordEndAbnormal, style: .warning)
+            return
+        }
+        let localUserID = LoginStore.shared.state.value.loginUserInfo?.userID
+        if reason == .stoppedByUser && operatorUser.userID == localUserID {
+            return
+        }
+        showAtomicToast(text: .recordEnded, style: .info)
+    }
+    
+    private func handleOnRecordingStarted(operatorUser: RoomUser) {
+        if operatorUser.userID.isEmpty { return }
+        let localUserID = LoginStore.shared.state.value.loginUserInfo?.userID
+        if operatorUser.userID == localUserID { return }
+        showRecordingStartedDialog(operatorUser: operatorUser)
+    }
+    
+    private func showRecordingStartedDialog(operatorUser: RoomUser) {
+        dismissRecordingNoticeAlertView()
+        let content = String.recordStartedTips.localizedReplace(operatorUser.name)
+        let leaveButtonConfig = AlertButtonConfig(text: .leaveRoom, type: .grey, isBold: false) { [weak self] view in
+            guard let self = self else { return }
+            view.dismiss()
+            recordingNoticeAlertView = nil
+            handleLeaveRoomFromRecordingNotice()
+        }
+        let confirmButtonConfig = AlertButtonConfig(text: .iKnow, type: .blue) { [weak self] view in
+            view.dismiss()
+            self?.recordingNoticeAlertView = nil
+        }
+        let config = AlertViewConfig(title: .recordStartedTitle,
+                                     content: content,
+                                     cancelButton: leaveButtonConfig,
+                                     confirmButton: confirmButtonConfig)
+        let alertView = AtomicAlertView(config: config)
+        recordingNoticeAlertView = alertView
+        alertView.show()
+    }
+
+    private func dismissRecordingNoticeAlertView() {
+        recordingNoticeAlertView?.dismiss()
+        recordingNoticeAlertView = nil
+    }
+    
+    private func handleLeaveRoomFromRecordingNotice() {
+        roomStore.leaveRoom { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success: break
+            case .failure(let err):
+                showAtomicToast(text: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+            }
+            routerContext?.pop(animated: true)
+        }
     }
     
     private func popRoomViewController(animated: Bool) {
@@ -1086,4 +1164,11 @@ fileprivate extension String {
     // Password
     static let passwordError = "roomkit_password_error".localized
     static let pleaseInputPassword = "roomkit_please_input_room_password".localized
+    
+    // Recording
+    static let recordEnded = "roomkit_cloud_record_ended".localized
+    static let recordEndAbnormal = "roomkit_cloud_record_end_abnormal".localized
+    static let iKnow = "roomkit_i_know".localized
+    static let recordStartedTitle = "roomkit_cloud_record_started_title".localized
+    static let recordStartedTips = "roomkit_cloud_record_started_tips"
 }

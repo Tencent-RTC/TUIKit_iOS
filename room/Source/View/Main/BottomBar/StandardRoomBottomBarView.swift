@@ -31,6 +31,8 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private let deviceOperator: DeviceOperator = DeviceOperator()
     private var isAllCameraDisabled: Bool = false
     private var isAllMicrophoneDisabled: Bool = false
+    private var isRecording: Bool = false
+    private weak var recordingConfirmAlertView: AtomicAlertView?
     private let roomID: String
     private var cancellableSet = Set<AnyCancellable>()
     
@@ -38,9 +40,9 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private lazy var buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.distribution = .fill
+        stackView.distribution = .equalSpacing
         stackView.alignment = .center
-        stackView.spacing = 25
+        stackView.spacing = 0
         return stackView
     }()
     
@@ -64,8 +66,12 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         return makeIconButton(title: .aiTools, imageName: "room_ai_tools")
     }()
     
+    private lazy var recordingButton: RoomIconButton = {
+        return makeIconButton(title: .record, imageName: "room_recording")
+    }()
+    
     private lazy var buttons: [RoomIconButton] = {
-        [membersButton, microphoneButton, cameraButton, screenShareButton, aiToolsButton]
+        [membersButton, microphoneButton, cameraButton, screenShareButton, aiToolsButton, recordingButton]
     }()
     
     // MARK: - Initialization
@@ -111,6 +117,22 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
         screenShareButton.addTarget(self, action: #selector(screenShareButtonTapped), for: .touchUpInside)
         aiToolsButton.addTarget(self, action: #selector(aiToolsButtonTapped), for: .touchUpInside)
+        recordingButton.addTarget(self, action: #selector(recordingButtonTapped), for: .touchUpInside)
+        
+        participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
+            .map { $0?.role ?? .generalUser }
+            .removeDuplicates()
+            .combineLatest(
+                roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom))
+                    .map { $0?.recordingInfo.status ?? .none }
+                    .removeDuplicates()
+            )
+            .receive(on: RunLoop.main)
+            .sink { [weak self] role, status in
+                guard let self = self else { return }
+                updateRecordingStatus(role: role, status: status)
+            }
+            .store(in: &cancellableSet)
         
         participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .combineLatest(roomStore.state.subscribe(StatePublisherSelector(keyPath: \.currentRoom)))
@@ -206,6 +228,28 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         button.layer.cornerRadius = 8
         button.backgroundColor = RoomColors.g2
         return button
+    }
+    
+    private func updateRecordingStatus(role: ParticipantRole, status: RecordingStatus) {
+        let wasRecording = isRecording
+        isRecording = status == .recording
+        let canManage = role == .owner || role == .admin
+        recordingButton.isHidden = !canManage
+        if isRecording {
+            recordingButton.setIcon(ResourceLoader.loadImage("room_recording_on"))
+            recordingButton.setTitle(.recording)
+        } else {
+            recordingButton.setIcon(ResourceLoader.loadImage("room_recording"))
+            recordingButton.setTitle(.record)
+        }
+        if !canManage || wasRecording != isRecording {
+            dismissRecordingConfirmAlertView()
+        }
+    }
+
+    private func dismissRecordingConfirmAlertView() {
+        recordingConfirmAlertView?.dismiss()
+        recordingConfirmAlertView = nil
     }
     
     private func updateScreenShareStatus(screenStatus: DeviceStatus, userRole: ParticipantRole, isAllScreenShareDisabled: Bool) {
@@ -355,6 +399,70 @@ extension StandardRoomBottomBarView {
         delegate?.onAIToolsButtonTapped()
     }
     
+    @objc private func recordingButtonTapped() {
+        if isRecording {
+            showStopRecordingConfirm()
+        } else {
+            showStartRecordingConfirm()
+        }
+    }
+    
+    private func showStartRecordingConfirm() {
+        dismissRecordingConfirmAlertView()
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
+            view.dismiss()
+        }
+        let confirmButtonConfig = AlertButtonConfig(text: .recordStartConfirm, type: .blue, isBold: false) { [weak self] view in
+            guard let self = self else { return }
+            startRecording()
+            view.dismiss()
+        }
+        let config = AlertViewConfig(title: .recordStartTitle,
+                                     content: .recordStartTips,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: confirmButtonConfig)
+        let alert = AtomicAlertView(config: config)
+        recordingConfirmAlertView = alert
+        alert.show()
+    }
+    
+    private func showStopRecordingConfirm() {
+        dismissRecordingConfirmAlertView()
+        let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
+            view.dismiss()
+        }
+        let confirmButtonConfig = AlertButtonConfig(text: .recordStop, type: .red, isBold: false) { [weak self] view in
+            guard let self = self else { return }
+            stopRecording()
+            view.dismiss()
+        }
+        let config = AlertViewConfig(title: .recordStopTitle,
+                                     content: .recordStopTips,
+                                     cancelButton: cancelButtonConfig,
+                                     confirmButton: confirmButtonConfig)
+        let alert = AtomicAlertView(config: config)
+        recordingConfirmAlertView = alert
+        alert.show()
+    }
+    
+    private func startRecording() {
+        roomStore.startRecording { [weak self] result in
+            guard let self = self else { return }
+            if case .failure(let err) = result {
+                delegate?.onShowToast(message: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+            }
+        }
+    }
+    
+    private func stopRecording() {
+        roomStore.stopRecording { [weak self] result in
+            guard let self = self else { return }
+            if case .failure(let err) = result {
+                delegate?.onShowToast(message: InternalError(code: err.code, message: err.message).localizedMessage, style: .error)
+            }
+        }
+    }
+    
     private func showStopScreenShareAlert() {
         let cancelButtonConfig = AlertButtonConfig(text: .cancel, type: .grey, isBold: false) { view in
             view.dismiss()
@@ -397,4 +505,12 @@ fileprivate extension String {
     static let privacyScreenShareTipContent = "roomkit_privacy_screen_share_tip_content".localized
     static let privacyScreenShareTipContinue = "roomkit_privacy_screen_share_tip_continue".localized
     static let notAllowedToScreenShare = "roomkit_not_allowed_to_screen_share".localized
+    static let record = "roomkit_cloud_record".localized
+    static let recordStartConfirm = "roomkit_cloud_record_start_confirm".localized
+    static let recording = "roomkit_cloud_record_recording".localized
+    static let recordStop = "roomkit_cloud_record_stop".localized
+    static let recordStartTitle = "roomkit_cloud_record_start_title".localized
+    static let recordStartTips = "roomkit_cloud_record_start_tips".localized
+    static let recordStopTitle = "roomkit_cloud_record_stop_title".localized
+    static let recordStopTips = "roomkit_cloud_record_stop_tips".localized
 }

@@ -267,8 +267,8 @@ public class AIMinutesView: UIView {
         tableView.reloadData()
         
         if !segmentIds.isEmpty {
-            DispatchQueue.main.async {
-                self.scrollToBottom(animated: false)
+            DispatchQueue.main.async { [weak self] in
+                self?.scrollToBottom(animated: false)
             }
         }
     }

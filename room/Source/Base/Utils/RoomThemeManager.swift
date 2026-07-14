@@ -270,6 +270,18 @@ public struct RoomColors {
         darkHex: "#4E5461"
     )
     
+    /// Cloud recording floating bar / card background (#22262E @70%)
+    public static let recordingFloatingBg = RoomThemeManager.dynamicColor(
+        light: UIColor(hex: "#22262E", alpha: 0.7),
+        dark: UIColor(hex: "#22262E", alpha: 0.7)
+    )
+    
+    /// Cloud recording red dot color
+    public static let recordingDot = RoomThemeManager.dynamicColor(
+        lightHex: "#FF2E2E",
+        darkHex: "#FF2E2E"
+    )
+    
     // MARK: - Functional Colors (功能色)
     
     /// Secondary label color (次要标签色)
