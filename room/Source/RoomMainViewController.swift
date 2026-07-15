@@ -12,6 +12,18 @@ import SnapKit
 public class RoomMainViewController: UIViewController, RouterContext {
     // MARK: - Properties
     private let rootView: RoomMainView
+
+    /// When `true`, the controller only allows landscape orientations;
+    /// when `false` (default) only portrait is allowed.
+    public var isLandscapeMode: Bool = false {
+        didSet {
+            if #available(iOS 16.0, *) {
+                setNeedsUpdateOfSupportedInterfaceOrientations()
+            } else {
+                UIViewController.attemptRotationToDeviceOrientation()
+            }
+        }
+    }
     
     // MARK: - Lifecycle
     
@@ -41,18 +53,30 @@ public class RoomMainViewController: UIViewController, RouterContext {
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
+
+        // Reset to portrait when leaving the room
+        isLandscapeMode = false
+        if #available(iOS 16.0, *) {
+            setNeedsUpdateOfSupportedInterfaceOrientations()
+            if let windowScene = view.window?.windowScene {
+                let geometry = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .portrait)
+                windowScene.requestGeometryUpdate(geometry)
+            }
+        } else {
+            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+            UIViewController.attemptRotationToDeviceOrientation()
+        }
     }
     
     public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
+        return isLandscapeMode ? .landscape : .portrait
     }
-    
-    
+
     public override var shouldAutorotate: Bool {
         return false
     }
-    
+
     public override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return .portrait
+        return isLandscapeMode ? .landscapeRight : .portrait
     }
 }

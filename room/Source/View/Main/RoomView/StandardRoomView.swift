@@ -121,6 +121,10 @@ class StandardRoomView: UIView, BaseView {
         backgroundColor = .clear
     }
     
+    public func setScrollEnabled(_ enabled: Bool) {
+        collectionView.isScrollEnabled = enabled
+    }
+    
     public func setupBindings() {
         // MARK: - Real Data Binding
         roomParticipantStore.state
