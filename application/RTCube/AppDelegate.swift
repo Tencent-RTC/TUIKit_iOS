@@ -345,6 +345,22 @@ extension AppDelegate {
     }
 }
 
+// MARK: - Top View Controller Helper
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topMostViewController()
+        }
+        if let nav = self as? UINavigationController {
+            return nav.visibleViewController?.topMostViewController() ?? nav
+        }
+        if let tab = self as? UITabBarController {
+            return tab.selectedViewController?.topMostViewController() ?? tab
+        }
+        return self
+    }
+}
+
 #if !OPEN_SOURCE
 extension AppDelegate: TCMediaXBaseDelegate {
     func onLicenseCheckCallback(_ errcode: Int32, withParam param: [AnyHashable: Any]) {
