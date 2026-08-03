@@ -172,6 +172,12 @@ public struct RoomColors {
         darkHex: "#4F586B"
     )
     
+    /// 行右侧 value 文本色 (#2B2E38B2)
+    public static let valueText = RoomThemeManager.dynamicColor(
+        lightHex: "#2B2E38",
+        darkHex: "#2B2E38"
+    ).withAlphaComponent(178.0 / 255.0)
+    
     /// G5 - 主题灰色
     public static let g5 = RoomThemeManager.dynamicColor(
         lightHex: "#99A2B2",
