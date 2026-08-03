@@ -95,7 +95,10 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     public func setupConstraints() {
         buttonStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+            make.left.greaterThanOrEqualToSuperview()
+            make.right.lessThanOrEqualToSuperview()
         }
         
         buttons.forEach { button in
@@ -160,33 +163,39 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
         }
         .store(in: &cancellableSet)
         
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantList))
                 .map { list in list.contains { $0.userID == localUserID } }
                 .removeDuplicates(),
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
                 .map { $0?.cameraStatus }
+                .removeDuplicates(),
+            participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
+                .map { $0?.role }
                 .removeDuplicates()
         )
         .receive(on: RunLoop.main)
-        .sink { [weak self] isLocalInList, camStatus in
+        .sink { [weak self] isLocalInList, camStatus, role in
             guard let self = self else { return }
-            updateCameraStatus(isLocalInParticipantList: isLocalInList, cameraStatus: camStatus)
+            updateCameraStatus(isLocalInParticipantList: isLocalInList, cameraStatus: camStatus, role: role)
         }
         .store(in: &cancellableSet)
         
-        Publishers.CombineLatest(
+        Publishers.CombineLatest3(
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantList))
                 .map { list in list.contains { $0.userID == localUserID } }
                 .removeDuplicates(),
             participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
                 .map { $0?.screenShareStatus ?? .off }
+                .removeDuplicates(),
+            participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
+                .map { $0?.role }
                 .removeDuplicates()
         )
         .receive(on: RunLoop.main)
-        .sink { [weak self] isLocalInList, screenStatus in
+        .sink { [weak self] isLocalInList, screenStatus, role in
             guard let self = self else { return }
-            updateScreenShareStatus(isLocalInParticipantList: isLocalInList, screenStatus: screenStatus)
+            updateScreenShareStatus(isLocalInParticipantList: isLocalInList, screenStatus: screenStatus, role: role)
         }
         .store(in: &cancellableSet)
         
@@ -310,10 +319,11 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     private func updateCameraStatus(
         isLocalInParticipantList: Bool,
-        cameraStatus: DeviceStatus?) {
-            RoomKitLog.info("updateCameraStatus isLocalInParticipantList:\(isLocalInParticipantList) cameraStatus:\(cameraStatus)")
+        cameraStatus: DeviceStatus?,
+        role: ParticipantRole?) {
+            RoomKitLog.info("updateCameraStatus isLocalInParticipantList:\(isLocalInParticipantList) cameraStatus:\(cameraStatus) role:\(role)")
             
-            if !isLocalInParticipantList {
+            if !isLocalInParticipantList || role != .owner {
                 cameraButton.isHidden = true
                 updateStackViewSpacing()
                 return
@@ -333,9 +343,10 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     private func updateScreenShareStatus(
         isLocalInParticipantList: Bool,
-        screenStatus: DeviceStatus) {
-            RoomKitLog.info("updateScreenShareStatus isLocalInParticipantList:\(isLocalInParticipantList) screenStatus:\(screenStatus)")
-            if !isLocalInParticipantList {
+        screenStatus: DeviceStatus,
+        role: ParticipantRole?) {
+            RoomKitLog.info("updateScreenShareStatus isLocalInParticipantList:\(isLocalInParticipantList) screenStatus:\(screenStatus) role:\(role)")
+            if !isLocalInParticipantList || role != .owner {
                 screenShareButton.isHidden = true
                 updateStackViewSpacing()
                 return

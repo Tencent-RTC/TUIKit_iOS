@@ -50,6 +50,7 @@ public class RoomMainView: UIView, BaseView {
     private let behavior: RoomBehavior
     private let config: ConnectConfig
     private var roomType: RoomType = .standard
+    private let localUserID: String = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
     private var localParticipant: RoomParticipant?
     private let deviceOperator = DeviceOperator()
     private var currentScreenSharerID: String?
@@ -134,7 +135,6 @@ public class RoomMainView: UIView, BaseView {
     
     private var inviteCameraAlertView: AtomicAlertView?
     private var inviteMicrophoneAlertView: AtomicAlertView?
-    private var isFirstJoinRoom: Bool = false
     private var recordingNoticeAlertView: AtomicAlertView?
     
     // MARK: - Initialization
@@ -156,7 +156,7 @@ public class RoomMainView: UIView, BaseView {
     }
     
     private func getRoomType(_ roomID: String) -> RoomType {
-        return !roomID.hasPrefix("webinar_") ? .standard : .webinar 
+        return !roomID.hasPrefix("webinar_") ? .standard : .webinar
     }
     
     // MARK: - BaseView Implementation
@@ -242,10 +242,6 @@ public class RoomMainView: UIView, BaseView {
                 guard let self = self else { return }
                 if let roomInfo = roomInfo, !roomInfo.roomID.isEmpty {
                     barrageStreamView.setOwnerId(roomInfo.roomOwner.userID)
-                    if !isFirstJoinRoom {
-                        handleConnectConfig(roomInfo: roomInfo)
-                        isFirstJoinRoom = true
-                    }
                 }
             }
             .store(in: &cancellableSet)
@@ -477,40 +473,59 @@ extension RoomMainView {
     }
     
     private func handleDidEnterRoom() {
-        deviceOperator.setAudioRoute(route: config.autoEnableSpeaker ? .speakerphone : .earpiece)
-        participantStore.getParticipantList(cursor: "", completion: nil)
+        participantStore.getParticipantList(cursor: "") { [weak self] (result: Result<([RoomParticipant], String), ErrorInfo>) in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.handleConnectConfig()
+            case .failure(let err):
+                RoomKitLog.error("getParticipantList failed: code=\(err.code), message=\(err.message)")
+            }
+        }
         
         if roomType == .webinar {
             participantStore.getAudienceList(cursor: "", completion: nil)
         }
     }
     
-    private func handleConnectConfig(roomInfo: RoomInfo) {
+    private func handleConnectConfig() {
+        guard let roomInfo = roomStore.state.value.currentRoom else { return }
+        guard localUserID == roomInfo.roomOwner.userID ||
+                participantStore.state.value.participantList.contains(where: { $0.userID == localUserID }) else {
+            return
+        }
+
+        if config.autoEnableMicrophone && canOpenMicrophone(roomInfo: roomInfo) {
+            unmuteMicrophone()
+        }
+
+        if config.autoEnableCamera && canOpenCamera(roomInfo: roomInfo) {
+            openLocalCamera()
+        }
+
         if roomInfo.roomType == .standard {
-            if config.autoEnableCamera && !roomInfo.isAllCameraDisabled {
-                openLocalCamera()
-            }
-            
-            if config.autoEnableMicrophone && !roomInfo.isAllMicrophoneDisabled {
-                unmuteMicrophone()
-            }
+            deviceOperator.setAudioRoute(route: config.autoEnableSpeaker ? .speakerphone : .earpiece)
         }
-        
-        if roomInfo.roomType == .webinar {
-            switch behavior {
-            case .create(let options):
-                if config.autoEnableCamera {
-                    openLocalCamera()
-                }
-                
-                if config.autoEnableMicrophone {
-                    unmuteMicrophone()
-                }
-                break
-            case .join:
-                break
-            }
+    }
+
+    private func canOpenCamera(roomInfo: RoomInfo) -> Bool {
+        if localUserID == roomInfo.roomOwner.userID {
+            return true
         }
+        if roomInfo.roomType == .standard && participantStore.state.value.localParticipant?.role == .admin {
+            return true
+        }
+        return !roomInfo.isAllCameraDisabled
+    }
+
+    private func canOpenMicrophone(roomInfo: RoomInfo) -> Bool {
+        if localUserID == roomInfo.roomOwner.userID {
+            return true
+        }
+        if participantStore.state.value.localParticipant?.role == .admin {
+            return true
+        }
+        return !roomInfo.isAllMicrophoneDisabled
     }
     
     private func endRoom() {
