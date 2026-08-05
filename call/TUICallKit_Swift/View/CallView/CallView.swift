@@ -44,6 +44,15 @@ public class CallView: UIView {
             multiCallControlsView.enableVirtualBackground = false
         }
     }
+
+    func playEndHintTransition(text: String, onComplete: @escaping () -> Void) {
+        hintView.isHidden = false
+        hintView.playEndCallTransition(text: text, onComplete: onComplete)
+    }
+
+    func cancelEndHintTransition() {
+        hintView.cancelEndCallTransition()
+    }
     
     // MARK: - Private
     private let timerView = TimerView(frame: .zero)
@@ -168,7 +177,7 @@ extension CallView {
             hintView.snp.remakeConstraints { make in
                 make.centerX.equalToSuperview()
                 make.bottom.equalToSuperview().offset(-300.scale375Height() - 10.scale375Height())
-                make.height.equalTo(24.scale375Height())
+                make.height.equalTo(32.scale375Height())
             }
         } else {
             timerView.snp.remakeConstraints { make in
@@ -180,7 +189,7 @@ extension CallView {
             hintView.snp.remakeConstraints { make in
                 make.centerX.equalToSuperview()
                 make.bottom.equalToSuperview().offset(-150.scale375Height())
-                make.height.equalTo(24.scale375Height())
+                make.height.equalTo(32.scale375Height())
             }
         }
     }

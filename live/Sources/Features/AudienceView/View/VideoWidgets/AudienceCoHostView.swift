@@ -12,13 +12,15 @@ import AtomicXCore
 
 class AudienceCoHostView: UIView {
     private let manager: AudienceStore
+    private let routerManager: AudienceRouterManager?
     private var isViewReady: Bool = false
     private var seatInfo: SeatInfo
     private var cancellableSet = Set<AnyCancellable>()
     
-    init(seatInfo: SeatInfo, manager: AudienceStore) {
+    init(seatInfo: SeatInfo, manager: AudienceStore, routerManager: AudienceRouterManager? = nil) {
         self.seatInfo = seatInfo
         self.manager = manager
+        self.routerManager = routerManager
         super.init(frame: .zero)
     }
     
@@ -36,7 +38,8 @@ class AudienceCoHostView: UIView {
         activateConstraints()
         initViewState()
         subscribeState()
-        self.isUserInteractionEnabled = false
+        self.isUserInteractionEnabled = (routerManager != nil)
+        addTapGestureIfNeeded()
     }
     
     private lazy var userInfoView = AudienceUserStatusView(seatInfo: seatInfo, manager: manager)
@@ -55,31 +58,58 @@ class AudienceCoHostView: UIView {
     }
     
     private func initViewState() {
-        if manager.coHostState.connected.count > 1 || manager.coGuestState.connected.count > 1 {
-            userInfoView.isHidden = false
-        } else {
-            userInfoView.isHidden = true
+        updateUserInfoVisibility(coHostCount: manager.coHostState.connected.count)
+    }
+
+    private func updateUserInfoVisibility(coHostCount: Int) {
+        userInfoView.isHidden = !(coHostCount > 1)
+    }
+    
+    private func addTapGestureIfNeeded() {
+        guard routerManager != nil else { return }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        addGestureRecognizer(tap)
+    }
+    
+    @objc private func handleTap() {
+        
+        guard isViewReady, !isHidden, window != nil,
+              bounds.width > 0, bounds.height > 0 else {
+            return
         }
+        
+        guard let routerManager = routerManager else {
+            return
+        }
+
+        if seatInfo.userInfo.userID == manager.loginState.loginUserInfo?.userID {
+            return
+        }
+        let panel = CoHostAnchorInfoView(seatInfo: seatInfo, manager: manager, routerManager: routerManager)
+        routerManager.present(view: panel, config: .bottomDefault())
     }
 }
 
 extension AudienceCoHostView {
     func subscribeState() {
-        manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+        let coHostConnectedPublisher = manager.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
+
+        coHostConnectedPublisher
             .receive(on: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] connectedUsers in
                 guard let self = self else { return }
-                self.isHidden = connectedUsers.isEmpty
+                self.updateUserInfoVisibility(coHostCount: connectedUsers.count)
             }
             .store(in: &cancellableSet)
-        
-        FloatWindow.shared.subscribeShowingState()
+
+
+        Publishers.CombineLatest(coHostConnectedPublisher, FloatWindow.shared.subscribeShowingState())
             .receive(on: RunLoop.main)
-            .removeDuplicates()
-            .sink { [weak self] isShow in
+            .removeDuplicates { $0.0 == $1.0 && $0.1 == $1.1 }
+            .sink { [weak self] connectedUsers, isFloatShow in
                 guard let self = self else { return }
-                isHidden = isShow
+                self.isHidden = connectedUsers.isEmpty || isFloatShow
             }
             .store(in: &cancellableSet)
     }

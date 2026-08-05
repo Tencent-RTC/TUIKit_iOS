@@ -14,7 +14,6 @@ import TCMediaX
 import TEBeautyKitWrapper
 #endif
 import TUICore
-import TUIRoomKit
 import TXLiteAVSDK_Professional
 import UIKit
 import UserNotifications
@@ -88,10 +87,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask
     {
-        if let topVC = window?.rootViewController?.topMostViewController(),
-           let roomVC = topVC as? RoomMainViewController {
-            return roomVC.isLandscapeMode ? .landscape : .portrait
-        }
         return AppDelegate.allowedOrientations
     }
 
@@ -342,22 +337,6 @@ extension AppDelegate {
     private func openAppStore(appID: String) {
         guard let url = URL(string: "https://itunes.apple.com/us/app/id\(appID)?ls=1&mt=8") else { return }
         UIApplication.shared.open(url)
-    }
-}
-
-// MARK: - Top View Controller Helper
-extension UIViewController {
-    func topMostViewController() -> UIViewController {
-        if let presented = presentedViewController {
-            return presented.topMostViewController()
-        }
-        if let nav = self as? UINavigationController {
-            return nav.visibleViewController?.topMostViewController() ?? nav
-        }
-        if let tab = self as? UITabBarController {
-            return tab.selectedViewController?.topMostViewController() ?? tab
-        }
-        return self
     }
 }
 

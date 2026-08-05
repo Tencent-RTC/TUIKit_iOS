@@ -65,6 +65,11 @@ class SingleColumnWidgetView: RTCBaseView {
         label.textColor = .white
         label.font = .customFont(ofSize: 16)
         label.textAlignment = .center
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
+        label.lineBreakMode = .byTruncatingTail
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.isUserInteractionEnabled = false
         return label
     }()
@@ -109,7 +114,8 @@ class SingleColumnWidgetView: RTCBaseView {
         joinLiveButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.bottom.equalToSuperview().inset(234.scale375Height())
-            make.width.equalTo(200.scale375())
+            make.width.greaterThanOrEqualTo(200.scale375())
+            make.width.lessThanOrEqualToSuperview().inset(20.scale375())
             make.height.equalTo(40.scale375())
         }
         
@@ -118,7 +124,10 @@ class SingleColumnWidgetView: RTCBaseView {
         }
         
         joinLiveButtonStack.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerY.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.leading.greaterThanOrEqualToSuperview().offset(16.scale375())
+            make.trailing.lessThanOrEqualToSuperview().offset(-16.scale375())
         }
     }
     

@@ -27,6 +27,7 @@ protocol AudienceLiveViewDelegate: AnyObject {
     func disableScrolling()
     func enableScrolling()
     func scrollToNextPage()
+    func switchToRoom(liveID: String)
     func onRoomDismissed(roomId: String, avatarUrl: String, userName: String)
 }
 
@@ -266,11 +267,9 @@ public class AudienceLiveView: RTCBaseView {
     }
 
     private func setupVideoViewDelegate() {
-        if coreView.videoViewDelegate == nil {
-            let delegate = AudienceVideoDelegate(manager: manager, routerManager: routerManager, coreView: coreView)
-            defaultVideoViewDelegate = delegate
-            coreView.videoViewDelegate = delegate
-        }
+        let delegate = AudienceVideoDelegate(manager: manager, routerManager: routerManager, coreView: coreView)
+        defaultVideoViewDelegate = delegate
+        coreView.videoViewDelegate = delegate
     }
     
     public override func constructViewHierarchy() {
@@ -336,6 +335,10 @@ public class AudienceLiveView: RTCBaseView {
     
     func stopPreview() {
         coreView.stopPreviewLiveStream(roomId: roomId)
+        if coreView.videoViewDelegate === defaultVideoViewDelegate {
+            coreView.videoViewDelegate = nil
+        }
+        defaultVideoViewDelegate = nil
     }
     
     func relayoutCoreView() {
@@ -418,6 +421,7 @@ extension AudienceLiveView {
         subscribeScrollState()
         subscribeVideoStreamOrientation()
         subscribeExitLiveRequest()
+        subscribeSwitchRoomRequest()
     }
 
     private func subscribeExitLiveRequest() {
@@ -426,6 +430,16 @@ extension AudienceLiveView {
             .sink { [weak self] in
                 guard let self = self else { return }
                 leaveButtonClick()
+            }
+            .store(in: &cancellableSet)
+    }
+
+    private func subscribeSwitchRoomRequest() {
+        manager.switchRoomSubject
+            .receive(on: RunLoop.main)
+            .sink { [weak self] targetLiveID in
+                guard let self = self else { return }
+                delegate?.switchToRoom(liveID: targetLiveID)
             }
             .store(in: &cancellableSet)
     }

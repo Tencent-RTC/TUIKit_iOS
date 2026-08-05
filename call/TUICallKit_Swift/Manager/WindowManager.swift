@@ -75,10 +75,6 @@ class WindowManager: NSObject {
         UIDevice.current.setValue(orientationValue, forKey: "orientation")
         UIViewController.attemptRotationToDeviceOrientation()
 
-        if let mediaType = CallStore.shared.state.value.activeCall.mediaType {
-            _ = Permission.hasPermission(callMediaType: mediaType, completion: nil)
-        }
-        
         TUICallKitImpl.shared.viewState.router.value = .fullView
         window.frame = currentScreenFrame
         window.rootViewController = CallKitNavigationController(rootViewController: CallMainViewController())
@@ -90,16 +86,16 @@ class WindowManager: NSObject {
     // MARK: show Floating Window
     func showFloatingWindow() {
         TUICallKitImpl.shared.viewState.router.value = .floatView
-        let vc = FloatWindowViewController()
-        vc.tapGestureAction = { [weak self] gesture in
+        let floatWindowViewController = FloatWindowViewController()
+        floatWindowViewController.tapGestureAction = { [weak self] gesture in
             self?.tapGestureAction(tapGesture: gesture)
         }
-            
-        vc.panGestureAction = { [weak self] gesture in
+
+        floatWindowViewController.panGestureAction = { [weak self] gesture in
             self?.panGestureAction(panGesture: gesture)
         }
-            
-        window.rootViewController = vc
+
+        window.rootViewController = floatWindowViewController
         window.frame = getFloatWindowFrame()
         window.isHidden = false
         window.backgroundColor = UIColor.clear
@@ -123,6 +119,18 @@ class WindowManager: NSObject {
         window.rootViewController = nil
         window.isHidden = true
         cancellables.removeAll()
+    }
+
+    func currentCallMainViewController() -> CallMainViewController? {
+        guard let navigationController = window.rootViewController as? CallKitNavigationController else { return nil }
+        return navigationController.viewControllers.compactMap { $0 as? CallMainViewController }.first
+    }
+
+    func notifyRoomStateEnded() {
+        TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
+                            subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
+                            object: nil,
+                            param: nil)
     }
     
     func hideFloatingWindow() {

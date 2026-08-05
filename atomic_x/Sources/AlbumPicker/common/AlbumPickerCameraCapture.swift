@@ -120,13 +120,23 @@ private extension AlbumPickerCameraCapture {
             picker.dismiss(animated: true)
             return
         }
-        let localPath = AlbumPickerStore.saveImageToCache(image)
+        let localPath = AlbumPickerStore.saveImageToCache(normalizedImage(image))
         var mediaModel = AlbumMediaModel()
         mediaModel.id = UUID().uuidString
         mediaModel.type = .photo
         mediaModel.mediaPath = localPath
         picker.dismiss(animated: false) { [weak self] in
             self?.notifyCapture([mediaModel])
+        }
+    }
+
+    func normalizedImage(_ image: UIImage) -> UIImage {
+        guard image.imageOrientation != .up else { return image }
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = image.scale
+        let renderer = UIGraphicsImageRenderer(size: image.size, format: format)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: image.size))
         }
     }
 

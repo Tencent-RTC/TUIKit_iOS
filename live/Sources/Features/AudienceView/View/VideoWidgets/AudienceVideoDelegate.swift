@@ -45,7 +45,7 @@ class AudienceVideoDelegate: VideoViewDelegate {
         switch viewLayer {
         case .foreground:
             if !seatInfo.userInfo.userID.isEmpty {
-                return AudienceCoHostView(seatInfo: seatInfo, manager: manager)
+                return AudienceCoHostView(seatInfo: seatInfo, manager: manager, routerManager: routerManager)
             }
             return AudienceEmptySeatView(seatInfo: seatInfo, manager: manager, routerManager: routerManager, coreView: coreView, menuCreator: menuCreator)
         case .background:
@@ -57,7 +57,9 @@ class AudienceVideoDelegate: VideoViewDelegate {
     }
 
     func createBattleView(seatInfo: SeatInfo) -> UIView? {
-        return AudienceBattleMemberInfoView(manager: manager, userId: seatInfo.userInfo.userID)
+        let battleView = AudienceBattleMemberInfoView(manager: manager, userId: seatInfo.userInfo.userID)
+        battleView.isUserInteractionEnabled = false
+        return battleView
     }
 
     func createBattleContainerView() -> UIView? {

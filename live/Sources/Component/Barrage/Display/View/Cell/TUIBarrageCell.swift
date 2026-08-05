@@ -138,11 +138,26 @@ class BarrageDefaultCell: UIView {
     func getBarrageLabelAttributedText(barrage: Barrage) -> NSMutableAttributedString {
         let result = NSMutableAttributedString()
         let isRTL = isRTLLanguage()
+        let font = UIFont.customFont(ofSize: 12, weight: .semibold)
+
+        if ENABLE_LIVEKIT_BARRAGE_USER_LEVEL {
+            let userLevel = Int(barrage.sender.level)
+            if let level = BarrageLevel.from(level: userLevel) {
+                let levelText = "\(userLevel)"
+                let levelAttachment = NSTextAttachment()
+                levelAttachment.image = BarrageLevelTagRenderer.image(for: level, text: levelText)
+                let levelSize = BarrageLevelTagRenderer.size(forText: levelText)
+                let levelYOffset = (font.capHeight - levelSize.height) / 2
+                levelAttachment.bounds = CGRect(x: 0, y: levelYOffset,
+                                                width: levelSize.width, height: levelSize.height)
+                result.append(NSAttributedString(attachment: levelAttachment))
+                result.append(NSAttributedString(string: " "))
+            }
+        }
 
         if isOwner {
             let attachment = NSTextAttachment()
             attachment.image = anchorTagImage
-            let font = UIFont.customFont(ofSize: 12, weight: .semibold)
             let imageHeight: CGFloat = 14
             let imageWidth: CGFloat = 42
             let yOffset = (font.capHeight - imageHeight) / 2
@@ -155,7 +170,7 @@ class BarrageDefaultCell: UIView {
         let displayName = userName.isEmpty ? barrage.sender.userID : userName
         let userNameAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor("80BEF6"),
-            .font: UIFont.customFont(ofSize: 12, weight: .semibold)
+            .font: font
         ]
         result.append(NSAttributedString(string: FSI + displayName + PDI + "：", attributes: userNameAttributes))
 

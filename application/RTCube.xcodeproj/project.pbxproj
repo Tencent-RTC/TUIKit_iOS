@@ -17,7 +17,6 @@
 		48A8A75CBC5526E8F4AF15C9 /* 69babfea7b12a1a7d89502bc918f480b.mov in Resources */ = {isa = PBXBuildFile; fileRef = FE037D22B116E78C267CD926 /* 69babfea7b12a1a7d89502bc918f480b.mov */; };
 		4908A1B68B8E2DCA58614C51 /* PrivacyAuthDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB791ADDD68B6208D2AF0B1 /* PrivacyAuthDetailViewController.swift */; };
 		49F98C61FE3BBDC6C36FF195 /* AppAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4ADCA4B9FE7C9ADB83FD68 /* AppAnalytics.swift */; };
-		A0DE0A1A0F0E0AAA00BBCCDD /* ModuleAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DE0A1B0F0E0AAA00BBCCDD /* ModuleAnalytics.swift */; };
 		56052174246E6C515AC43FAB /* MainLocalized.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FB0E736CA96EC2173C773277 /* MainLocalized.xcstrings */; };
 		5B0070D3829C72416680CFBB /* LaunchAnimationPlaybackRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF4E3F31AB81DA4F9762EED4 /* LaunchAnimationPlaybackRecord.swift */; };
 		65D92A6204F727BA05E0A2BA /* PrivacyLocalized.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FFFF90A31E9AC45DE1657BBE /* PrivacyLocalized.xcstrings */; };
@@ -25,6 +24,7 @@
 		87173B0F3D1C1722FEC5150C /* PrivacyMyInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99E452DA3178F16A5759428 /* PrivacyMyInfoViewController.swift */; };
 		9525DC8561B1A0D254D5CAF7 /* ReportDescView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE0698911E0CA7C58CFAC01 /* ReportDescView.swift */; };
 		971D2F196DEE3C8BC470FC04 /* AvatarPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7536B416CDE69AACA73EA8 /* AvatarPickerViewController.swift */; };
+		A0DE0A1A0F0E0AAA00BBCCDD /* ModuleAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0DE0A1B0F0E0AAA00BBCCDD /* ModuleAnalytics.swift */; };
 		A1F73AD1D13E775750839498 /* PrivacyCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D466A5A284E7A9CB84410DF /* PrivacyCenterViewController.swift */; };
 		A33D9853F682E9C5A3086331 /* PrivacySystemAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42018FAA990A1E7E62C515DF /* PrivacySystemAuthViewController.swift */; };
 		A8D7E71A7C31001CEC737C58 /* PrivacyAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C84E95DCE99E2F890D9505DE /* PrivacyAssets.xcassets */; };
@@ -145,6 +145,7 @@
 		8EFDC389C49473CB3F9877C8 /* PrivacyDataCollectionViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrivacyDataCollectionViewController.swift; sourceTree = "<group>"; };
 		8FB791ADDD68B6208D2AF0B1 /* PrivacyAuthDetailViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrivacyAuthDetailViewController.swift; sourceTree = "<group>"; };
 		96AACFF69D15670D49ACBB0F /* ReportTypeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReportTypeView.swift; sourceTree = "<group>"; };
+		A0DE0A1B0F0E0AAA00BBCCDD /* ModuleAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ModuleAnalytics.swift; sourceTree = "<group>"; };
 		A2000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A2000002 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A2000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -221,7 +222,6 @@
 		C97618C3ACB8696944DEA829 /* MineLocalized.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json.xcstrings; path = MineLocalized.xcstrings; sourceTree = "<group>"; };
 		CCE0698911E0CA7C58CFAC01 /* ReportDescView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReportDescView.swift; sourceTree = "<group>"; };
 		CD4ADCA4B9FE7C9ADB83FD68 /* AppAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppAnalytics.swift; sourceTree = "<group>"; };
-		A0DE0A1B0F0E0AAA00BBCCDD /* ModuleAnalytics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ModuleAnalytics.swift; sourceTree = "<group>"; };
 		D144472BD0A98D274A0AE821 /* PrivacyWebViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PrivacyWebViewController.swift; sourceTree = "<group>"; };
 		D2000010 /* RTCubeLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RTCubeLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2POD001 /* Pods_RTCubeLab.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RTCubeLab.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -916,13 +916,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RTCubeLab/Pods-RTCubeLab-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RTCubeLab/Pods-RTCubeLab-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -937,13 +933,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RTCubeLab/Pods-RTCubeLab-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RTCubeLab/Pods-RTCubeLab-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

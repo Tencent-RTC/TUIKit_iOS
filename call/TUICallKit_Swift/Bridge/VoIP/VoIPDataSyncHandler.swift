@@ -44,10 +44,10 @@ class VoIPDataSyncHandler {
         } else if method == TUICore_TUICallingService_HangupMethod {
             if CallStore.shared.state.value.selfInfo.status == .accept {
                 Logger.info("VoIPDataSyncHandler - onCall - hangup")
-                CallStore.shared.hangup(completion: nil)
+                CallManager.shared.hangup(completion: nil)
             } else {
                 Logger.info("VoIPDataSyncHandler - onCall - reject")
-                CallStore.shared.reject(completion: nil)
+                CallManager.shared.reject(completion: nil)
             }
         } else if  method == TUICore_TUICallingService_AcceptMethod {
             Logger.info("VoIPDataSyncHandler - onCall - accept")

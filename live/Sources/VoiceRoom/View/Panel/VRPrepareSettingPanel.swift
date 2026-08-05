@@ -14,7 +14,7 @@ class VRPrepareSettingPanel: UIView {
     private let prepareStore: VoiceRoomPrepareStore
     private var cancellableSet = Set<AnyCancellable>()
     private lazy var menus: [SwitchItem] = {
-        var item = SwitchItem(title: .needRequestText, isOn: prepareStore.state.liveInfo.seatMode == .apply)
+        var item = SwitchItem(title: .needRequestText, isOn: prepareStore.roomParams.seatMode == .applyToTake)
         item.action = { [weak self] isNeedToApply in
             guard let self = self else { return }
             prepareStore.onChangedSeatMode(isNeedToApply ? .applyToTake : .freeToTake)

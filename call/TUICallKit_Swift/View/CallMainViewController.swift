@@ -18,6 +18,8 @@ private let TUICore_TEBeautyService = "TUICore_TEBeautyService"
 class CallMainViewController: UIViewController {
     private var cancellables = Set<AnyCancellable>()
     private weak var beautyPopover: UIViewController?
+    private var isShowingEndHint: Bool = false
+    private var endHintCoverView: UIView?
 
     private lazy var mainView: CallView = {
         let view = CallView(frame: .zero)
@@ -175,8 +177,45 @@ class CallMainViewController: UIViewController {
                 if status != .accept {
                     self.dismissBeautyPanel()
                 }
+
+                if self.isShowingEndHint && status != .none {
+                    self.resetEndHintForNewCall()
+                }
             }
             .store(in: &cancellables)
+    }
+
+    /// Cross-layer entry called by `TUICallKitImpl` on call end; keep non-private.
+    func showEndCallHint(text: String) {
+        isShowingEndHint = true
+
+        let cover = UIView()
+        cover.backgroundColor = .clear
+        cover.isUserInteractionEnabled = true
+        view.insertSubview(cover, aboveSubview: mainView)
+        cover.snp.makeConstraints { make in
+            make.edges.equalTo(mainView)
+        }
+        endHintCoverView = cover
+
+        mainView.playEndHintTransition(text: text) { [weak self] in
+            self?.finishEndCallHint()
+        }
+    }
+
+    private func finishEndCallHint() {
+        isShowingEndHint = false
+        endHintCoverView?.removeFromSuperview()
+        endHintCoverView = nil
+        WindowManager.shared.closeWindow()
+        WindowManager.shared.notifyRoomStateEnded()
+    }
+
+    private func resetEndHintForNewCall() {
+        isShowingEndHint = false
+        mainView.cancelEndHintTransition()
+        endHintCoverView?.removeFromSuperview()
+        endHintCoverView = nil
     }
 
     // MARK: - Beauty Panel

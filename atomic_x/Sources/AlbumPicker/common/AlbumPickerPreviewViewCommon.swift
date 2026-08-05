@@ -200,7 +200,12 @@ extension AlbumPickerPreviewViewCommon: AlbumPickerPreviewPagerViewDelegate {
             container.endEditing(true)
             return
         }
-        showBars()
+        let isVideo = store.state.currentPreviewMedia?.type == .video
+        if isVideo {
+            showBars()
+        } else {
+            toggleBars()
+        }
     }
 
     internal func previewPagerViewDidLongPress(_ pagerView: AlbumPickerPreviewPagerView) {

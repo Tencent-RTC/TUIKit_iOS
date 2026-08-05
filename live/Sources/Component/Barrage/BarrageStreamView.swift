@@ -26,6 +26,7 @@ public class BarrageStreamView: UIView {
     private var dataSource: [Barrage] = []
     private var reloadWorkItem: DispatchWorkItem?
     private var cancellableSet = Set<AnyCancellable>()
+    private var liveListStateCancellableSet = Set<AnyCancellable>()
     
     private var isDraging: Bool = false
 
@@ -58,6 +59,7 @@ public class BarrageStreamView: UIView {
     }
     
     public func setOwnerId(_ ownerId: String) {
+        guard self.ownerId != ownerId else { return }
         self.ownerId = ownerId
         dataSource.removeAll()
         barrageTableView.reloadData()
@@ -132,7 +134,7 @@ public class BarrageStreamView: UIView {
                 guard let self = self, !currentLive.isEmpty else { return }
                 setOwnerId(currentLive.liveOwner.userID)
             }
-            .store(in: &cancellableSet)
+            .store(in: &liveListStateCancellableSet)
     }
 }
 

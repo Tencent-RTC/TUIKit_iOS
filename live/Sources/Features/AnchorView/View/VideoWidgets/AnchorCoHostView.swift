@@ -73,10 +73,16 @@ class AnchorCoHostView: UIView {
     
     @objc private func handleTap() {
         let isSelf = store.selfUserID == seatInfo.userInfo.userID
-        guard !isSelf else { return }
-        let liveUserInfo = LiveUserInfo(seatUserInfo: seatInfo.userInfo)
-        let panel = AnchorCoHostOperatePanelView(user: liveUserInfo, store: store, routerManager: routerManager)
-        routerManager.present(view: panel, config: .bottomDefault())
+        let isSelfOwner = store.selfUserID == store.liveListState.currentLive.liveOwner.userID
+        if !isSelf {
+            let liveUserInfo = LiveUserInfo(seatUserInfo: seatInfo.userInfo)
+            let panel = AnchorCoHostOperatePanelView(user: liveUserInfo, store: store, routerManager: routerManager)
+            routerManager.present(view: panel, config: .bottomDefault())
+        } else if isSelfOwner {
+            let liveUserInfo = LiveUserInfo(seatUserInfo: seatInfo.userInfo)
+            let panel = AnchorUserManagePanelView(user: liveUserInfo, store: store, routerManager: routerManager, type: .mediaAndSeat)
+            routerManager.present(view: panel, config: .bottomDefault())
+        }
     }
 }
 

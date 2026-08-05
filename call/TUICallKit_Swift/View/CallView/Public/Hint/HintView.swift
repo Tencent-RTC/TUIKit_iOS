@@ -12,10 +12,17 @@ import RTCRoomEngine
 import SnapKit
 
 class HintView: UIView {
+    /// UX-specified: hold the end-call hint text on screen so users have time to read it.
+    private static let endHintHoldDuration: TimeInterval = 0.9
+    /// UX-specified: duration of the push transition between old and new hint text.
+    private static let endHintTransitionDuration: CFTimeInterval = 0.25
+    private static let endHintTransitionKey = "endHintTransition"
+
     // MARK: Init
     override init(frame: CGRect) {
         needShowAcceptHit = (CallStore.shared.state.value.selfInfo.status == .accept) ? false : true
         super.init(frame: frame)
+        clipsToBounds = true
         updateStatusText()
         updateHintView()
         subscribeCallListState()
@@ -26,16 +33,26 @@ class HintView: UIView {
     }
     
     // MARK: Private
+    private static let hintFontSize: CGFloat = 19.0
+
     private let callStatusLabel: UILabel = {
         let callStatusLabel = UILabel(frame: CGRect.zero)
         callStatusLabel.textColor = UIColor("FFFFFF")
-        callStatusLabel.font = UIFont.systemFont(ofSize: 15.0)
+        callStatusLabel.font = UIFont.systemFont(ofSize: HintView.hintFontSize)
         callStatusLabel.backgroundColor = UIColor.clear
         callStatusLabel.textAlignment = .center
         return callStatusLabel
     }()
     private var needShowAcceptHit: Bool
     private var cancellables = Set<AnyCancellable>()
+    private var holdWorkItem: DispatchWorkItem?
+
+    deinit {
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+        holdWorkItem?.cancel()
+        holdWorkItem = nil
+    }
     
     // MARK: UI Specification Processing
     private var isViewReady: Bool = false
@@ -69,15 +86,11 @@ extension HintView {
     }
 
     func updateHintView() {
-        if CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1 {
-            callStatusLabel.isHidden = false
-        } else if !(CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1) &&
-                    !(CallStore.shared.state.value.selfInfo.id == CallStore.shared.state.value.activeCall.inviterId) &&
-                    CallStore.shared.state.value.selfInfo.status == .waiting {
-            callStatusLabel.isHidden = false
-        } else {
-            callStatusLabel.isHidden = true
-        }
+        let state = CallStore.shared.state.value
+        let isOneToOne = state.activeCall.chatGroupId.isEmpty && state.activeCall.inviteeIds.count == 1
+        let isInvitee = state.selfInfo.id != state.activeCall.inviterId
+        let isWaiting = state.selfInfo.status == .waiting
+        callStatusLabel.isHidden = !(isOneToOne || (isInvitee && isWaiting))
     }
 
     func updateNetworkQualityText() {
@@ -104,7 +117,6 @@ extension HintView {
         switch CallStore.shared.state.value.selfInfo.status {
         case .waiting:
             self.callStatusLabel.text = self.getCurrentWaitingText()
-            break
         case .accept:
             if needShowAcceptHit {
                 self.callStatusLabel.text = CallKitLocalization.localized("accept")
@@ -116,9 +128,6 @@ extension HintView {
             } else {
                 self.callStatusLabel.text = ""
             }
-            break
-        case .none:
-            break
         default:
             break
         }
@@ -170,5 +179,39 @@ extension HintView {
                 self.updateNetworkQualityText()
             }
             .store(in: &cancellables)
+    }
+}
+
+// MARK: End Call Transition
+extension HintView {
+    func playEndCallTransition(text: String, holdDuration: TimeInterval = HintView.endHintHoldDuration, onComplete: @escaping () -> Void) {
+        if holdWorkItem != nil { return }
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+
+        let transition = CATransition()
+        transition.type = .push
+        transition.subtype = .fromBottom
+        transition.duration = HintView.endHintTransitionDuration
+        transition.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        callStatusLabel.layer.add(transition, forKey: HintView.endHintTransitionKey)
+        callStatusLabel.text = text
+        callStatusLabel.isHidden = false
+
+        let work = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.holdWorkItem = nil
+            onComplete()
+        }
+        holdWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + HintView.endHintTransitionDuration + holdDuration, execute: work)
+    }
+
+    func cancelEndCallTransition() {
+        holdWorkItem?.cancel()
+        holdWorkItem = nil
+        callStatusLabel.layer.removeAnimation(forKey: HintView.endHintTransitionKey)
+        callStatusLabel.text = ""
+        callStatusLabel.isHidden = false
     }
 }

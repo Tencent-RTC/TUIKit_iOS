@@ -138,7 +138,7 @@ class RecentCallsViewModel: ObservableObject {
             guard let userid = otherUserIds.first else { return }
             targetUserId = userid
         }
-        CallStore.shared.calls(participantIds: [targetUserId], mediaType: mediaType, params: nil, completion: nil)
+        CallManager.shared.calls(participantIds: [targetUserId], mediaType: mediaType, params: nil, completion: nil)
     }
     
     func deleteAllRecordCalls() {
