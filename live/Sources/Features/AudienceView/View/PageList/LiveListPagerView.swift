@@ -40,6 +40,8 @@ class LiveListPagerView: UIView {
     
     private var confirmedPage: Int = 0
     private var deletingIndexPaths: Set<IndexPath> = []
+    private var pendingSwitchIndexPath: IndexPath?
+    private weak var pendingSwitchOldView: UIView?
     
     init() {
         super.init(frame: .zero)
@@ -91,7 +93,9 @@ class LiveListPagerView: UIView {
     private func fetchLiveList() {
         dataSource?.fetchLiveList { [weak self] liveList in
             guard let self = self else { return }
-            self.liveList.append(contentsOf: liveList)
+            let existingIDs = Set(self.liveList.map { $0.liveID })
+            let newList = liveList.filter { !existingIDs.contains($0.liveID) }
+            self.liveList.append(contentsOf: newList)
             DispatchQueue.main.async { [weak self] in
                 self?.tableView.reloadData()
                 DispatchQueue.main.async { [weak self] in
@@ -154,6 +158,52 @@ class LiveListPagerView: UIView {
             tableView.scrollToRow(at: indexPath, at: .top, animated: true)
         }
     }
+
+    func switchToRoom(_ liveInfo: LiveInfo) {
+        guard pendingSwitchIndexPath == nil else { return }
+        var insertIndex = currentPage + 1
+        guard insertIndex <= liveList.count else { return }
+        guard currentPage >= liveList.count || liveList[currentPage].liveID != liveInfo.liveID else { return }
+
+        var deletePath: IndexPath?
+        if let existing = liveList.firstIndex(where: { $0.liveID == liveInfo.liveID }), existing != insertIndex {
+            deletePath = IndexPath(row: existing, section: 0)
+            liveList.remove(at: existing)
+            if existing < insertIndex {
+                insertIndex -= 1
+                currentPage -= 1
+            }
+        }
+
+        let needInsert = insertIndex >= liveList.count || liveList[insertIndex].liveID != liveInfo.liveID
+        if needInsert { liveList.insert(liveInfo, at: insertIndex) }
+
+        let targetPath = IndexPath(row: insertIndex, section: 0)
+
+        let oldView = tableView.cellForRow(at: IndexPath(row: currentPage, section: 0))?.contentView.subviews.first
+        if let oldView = oldView {
+            delegate?.onViewWillSlideOut(view: oldView)
+        }
+
+        pendingSwitchOldView = oldView
+        deletingIndexPaths.insert(IndexPath(row: currentPage, section: 0))
+        pendingSwitchIndexPath = targetPath
+        isUserInteractionEnabled = false
+
+        tableView.performBatchUpdates({
+            if let p = deletePath {
+                self.deletingIndexPaths.insert(p)
+                tableView.deleteRows(at: [p], with: .none)
+            }
+            if needInsert { tableView.insertRows(at: [targetPath], with: .none) }
+        }, completion: { [weak self] _ in
+            self?.tableView.scrollToRow(at: targetPath, at: .top, animated: true)
+        })
+    }
+
+    func liveInfo(for liveID: String) -> LiveInfo? {
+        return liveList.first(where: { $0.liveID == liveID })
+    }
     
     deinit {
         debugPrint("deinit:\(self)")
@@ -175,8 +225,14 @@ extension LiveListPagerView: UITableViewDelegate {
             isFetchingLiveList = true
             dataSource.fetchLiveList { [weak self] list in
                 guard let self = self else { return }
+                let existingIDs = Set(self.liveList.map { $0.liveID })
+                let newList = list.filter { !existingIDs.contains($0.liveID) }
+                guard !newList.isEmpty else {
+                    self.isFetchingLiveList = false
+                    return
+                }
                 let startIndex = self.liveList.count
-                self.liveList.append(contentsOf: list)
+                self.liveList.append(contentsOf: newList)
                 let endIndex = self.liveList.count
                 let indexPaths = (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
                 DispatchQueue.main.async {
@@ -264,6 +320,24 @@ extension LiveListPagerView: UIScrollViewDelegate {
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if let target = pendingSwitchIndexPath {
+            pendingSwitchIndexPath = nil
+            isUserInteractionEnabled = true
+
+            let oldView = tableView.cellForRow(at: IndexPath(row: currentPage, section: 0))?.contentView.subviews.first ?? pendingSwitchOldView
+            if let oldView = oldView {
+                delegate?.onViewDidSlideOut(view: oldView)
+            }
+            pendingSwitchOldView = nil
+            if let newView = tableView.cellForRow(at: target)?.contentView.subviews.first {
+                delegate?.onViewDidSlideIn(view: newView)
+            }
+
+            currentPage = target.row
+            confirmedPage = target.row
+            return
+        }
+
         let nextPage = currentPage + 1
         if nextPage < liveList.count {
             let oldIndexPath = IndexPath(row: currentPage, section: 0)

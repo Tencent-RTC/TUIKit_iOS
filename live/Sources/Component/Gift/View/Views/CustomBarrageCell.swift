@@ -74,7 +74,22 @@ public class GiftBarrageCell: UIView {
         let font = UIFont.customFont(ofSize: 12, weight: .semibold)
         let userNameColor = UIColor("80BEF6")
         let result = NSMutableAttributedString()
-        
+
+        if ENABLE_LIVEKIT_BARRAGE_USER_LEVEL {
+            let userLevel = Int(barrage.sender.level)
+            if let level = GiftBarrageLevel.from(level: userLevel) {
+                let levelText = "\(userLevel)"
+                let levelAttachment = NSTextAttachment()
+                levelAttachment.image = GiftBarrageLevelTagRenderer.image(for: level, text: levelText)
+                let levelSize = GiftBarrageLevelTagRenderer.size(forText: levelText)
+                let levelYOffset = (font.capHeight - levelSize.height) / 2
+                levelAttachment.bounds = CGRect(x: 0, y: levelYOffset,
+                                                width: levelSize.width, height: levelSize.height)
+                result.append(NSAttributedString(attachment: levelAttachment))
+                result.append(NSAttributedString(string: " "))
+            }
+        }
+
         let userName = barrage.sender.displayName
         let userNameAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: userNameColor,
@@ -150,9 +165,9 @@ extension GiftBarrageCell {
             make.width.lessThanOrEqualTo(Self.barrageContentMaxWidth)
         }
         barrageLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(8)
+            make.leading.equalToSuperview().offset(5)
             make.trailing.equalToSuperview().inset(8)
-            make.top.bottom.equalToSuperview().inset(5)
+            make.top.bottom.equalToSuperview().inset(4)
         }
     }
 }

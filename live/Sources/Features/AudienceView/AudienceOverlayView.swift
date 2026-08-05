@@ -26,7 +26,9 @@ public class AudienceOverlayView: UIView {
 
     // MARK: - Private Properties
 
-    lazy var barrageStore: BarrageStore = .create(liveID: manager.liveID)
+    var barrageStore: BarrageStore {
+        return BarrageStore.create(liveID: manager.liveID)
+    }
     private let manager: AudienceStore
     private let routerManager: AudienceRouterManager
     private lazy var netWorkInfoManager = NetWorkInfoManager(liveID: manager.liveID)

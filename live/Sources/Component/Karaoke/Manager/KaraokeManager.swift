@@ -428,7 +428,7 @@ public class KaraokeManager: NSObject {
             getMetadata()
             getWaitingList(cursor: "")
         } else {
-            enableScore(enable: true)
+            enableScore(enable: false)
         }
     }
     
@@ -457,7 +457,6 @@ public class KaraokeManager: NSObject {
         }
         
         enableRequestMusic(enable: false)
-        enableScore(enable: false)
     }
     
     private func enableRequestMusic(enable: Bool) {

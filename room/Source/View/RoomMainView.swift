@@ -53,8 +53,6 @@ public class RoomMainView: UIView, BaseView {
     private let localUserID: String = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
     private var localParticipant: RoomParticipant?
     private let deviceOperator = DeviceOperator()
-    private var currentScreenSharerID: String?
-    private var isCurrentlyLandscape: Bool = false
     
     // MARK: - UI Components
     private lazy var topBarView: RoomTopBarView = {
@@ -94,17 +92,6 @@ public class RoomMainView: UIView, BaseView {
         let view = RoomRecordingFloatingView(roomID: roomID)
         view.isHidden = true
         return view
-    }()
-    
-    private lazy var orientationSwitchButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(ResourceLoader.loadImage("room_switch_landscape"), for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.contentHorizontalAlignment = .fill
-        button.contentVerticalAlignment = .fill
-        button.addTarget(self, action: #selector(onOrientationSwitchButtonTapped), for: .touchUpInside)
-        button.isHidden = true
-        return button
     }()
     
     private lazy var listView: ParticipantListView = {
@@ -156,7 +143,7 @@ public class RoomMainView: UIView, BaseView {
     }
     
     private func getRoomType(_ roomID: String) -> RoomType {
-        return !roomID.hasPrefix("webinar_") ? .standard : .webinar
+        return !roomID.hasPrefix("webinar_") ? .standard : .webinar 
     }
     
     // MARK: - BaseView Implementation
@@ -164,7 +151,6 @@ public class RoomMainView: UIView, BaseView {
         addSubview(topBarView)
         addSubview(roomView)
         roomView.addSubview(screenShareOverlay)
-        roomView.addSubview(orientationSwitchButton)
         
         addSubview(barrageStreamView)
         addSubview(barrageInputView)
@@ -215,12 +201,6 @@ public class RoomMainView: UIView, BaseView {
             make.top.equalTo(topBarView.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(16)
         }
-        
-        orientationSwitchButton.snp.makeConstraints { make in
-            make.width.height.equalTo(32)
-            make.trailing.equalToSuperview().offset(-12)
-            make.bottom.equalToSuperview().offset(-12)
-        }
     }
     
     public func setupStyles() {
@@ -253,16 +233,6 @@ public class RoomMainView: UIView, BaseView {
                 localParticipant = participant
                 let screenShareStatus = participant?.screenShareStatus ?? .off
                 screenShareOverlay.isHidden = screenShareStatus == .off
-            }
-            .store(in: &cancellableSet)
-        
-        participantStore.state.subscribe(StatePublisherSelector(keyPath: \.participantWithScreen))
-            .map { $0?.userID }
-            .removeDuplicates()
-            .receive(on: RunLoop.main)
-            .sink { [weak self] userID in
-                guard let self = self else { return }
-                onScreenSharerChanged(newSharerID: userID)
             }
             .store(in: &cancellableSet)
         
@@ -327,104 +297,6 @@ public class RoomMainView: UIView, BaseView {
             }
             .store(in: &cancellableSet)
         
-    }
-    
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        let landscape = resolveIsLandscape()
-        if landscape != isCurrentlyLandscape {
-            isCurrentlyLandscape = landscape
-            applyOrientationLayout(isLandscape: landscape)
-            updateOrientationSwitchButtonImage(isLandscape: landscape)
-        }
-    }
-}
-
-// MARK: - Orientation
-extension RoomMainView {
-    @objc private func onOrientationSwitchButtonTapped() {
-        switchOrientation()
-    }
-    
-    private func switchOrientation() {
-        guard let viewController = routerContext as? UIViewController else { return }
-        
-        let isCurrentlyLandscape = bounds.width > bounds.height
-        let targetLandscape = !isCurrentlyLandscape
-        
-        if let roomVC = viewController as? RoomMainViewController {
-            roomVC.isLandscapeMode = targetLandscape
-        }
-        
-        if #available(iOS 16.0, *) {
-            viewController.setNeedsUpdateOfSupportedInterfaceOrientations()
-            if let windowScene = viewController.view.window?.windowScene {
-                let mask: UIInterfaceOrientationMask = targetLandscape ? .landscape : .portrait
-                let geometry = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: mask)
-                windowScene.requestGeometryUpdate(geometry)
-            }
-        } else {
-            let targetOrientation: UIInterfaceOrientation = targetLandscape ? .landscapeRight : .portrait
-            UIDevice.current.setValue(targetOrientation.rawValue, forKey: "orientation")
-            UIViewController.attemptRotationToDeviceOrientation()
-        }
-    }
-    
-    private func forcePortraitIfLandscape() {
-        guard let viewController = routerContext as? RoomMainViewController else { return }
-        if viewController.isLandscapeMode {
-            viewController.isLandscapeMode = false
-        }
-    }
-    
-    private func resolveIsLandscape() -> Bool {
-        guard let viewController = routerContext as? RoomMainViewController else { return false }
-        return viewController.isLandscapeMode
-    }
-    
-    private func onScreenSharerChanged(newSharerID: String?) {
-        if currentScreenSharerID == newSharerID { return }
-        currentScreenSharerID = newSharerID
-        updateOrientationSwitchButtonVisibility()
-        if newSharerID == nil || newSharerID?.isEmpty == true {
-            forcePortraitIfLandscape()
-        }
-    }
-    
-    private func updateOrientationSwitchButtonVisibility() {
-        let localUserID = LoginStore.shared.state.value.loginUserInfo?.userID
-        let hasRemoteSharer = currentScreenSharerID != nil
-            && !(currentScreenSharerID?.isEmpty ?? true)
-            && currentScreenSharerID != localUserID
-        let shouldShow = roomType != .webinar && hasRemoteSharer
-        orientationSwitchButton.isHidden = !shouldShow
-    }
-    
-    private func updateOrientationSwitchButtonImage(isLandscape: Bool) {
-        let name = isLandscape ? "room_switch_portrait" : "room_switch_landscape"
-        orientationSwitchButton.setImage(ResourceLoader.loadImage(name), for: .normal)
-    }
-    
-    private func applyOrientationLayout(isLandscape: Bool) {
-        topBarView.isHidden = isLandscape
-        bottomBarView.isHidden = isLandscape
-        subtitleView?.isHidden = isLandscape
-        if roomType == .webinar {
-            barrageInputView.isHidden = isLandscape
-            barrageStreamView.isHidden = isLandscape
-        }
-        recordingFloatingView.alpha = isLandscape ? 0 : 1
-        roomView.setScrollEnabled(!isLandscape)
-        
-        roomView.snp.remakeConstraints { make in
-            if isLandscape {
-                make.edges.equalTo(safeAreaLayoutGuide)
-            } else {
-                make.left.right.equalToSuperview()
-                make.top.equalTo(topBarView.snp.bottom)
-                make.bottom.equalTo(bottomBarView.snp.top).offset(-10)
-            }
-        }
     }
 }
 

@@ -71,3 +71,5 @@ public struct Constants {
         static let floatLayout = "livekit_video_layout_float"
     }
 }
+
+public let ENABLE_LIVEKIT_BARRAGE_USER_LEVEL: Bool = true

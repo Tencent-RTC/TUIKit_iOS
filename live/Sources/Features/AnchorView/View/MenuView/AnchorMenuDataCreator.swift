@@ -116,45 +116,28 @@ extension AnchorMenuDataCreator {
         battle.bindStateClosure = { [weak self] button, cancellableSet in
             guard let self = self else { return }
             let selfUserId = store.selfUserID
-            let battleUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers))
-            let connectedUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected))
-            let displayResultPublisher = store.subscribeState(StatePublisherSelector(keyPath: \AnchorBattleState.isOnDisplayResult))
-          
-            battleUsersPublisher
-                .removeDuplicates()
-                .receive(on: RunLoop.main)
-                .sink { [weak button] battleUsers in
-                    let isOnBattle = battleUsers.contains(where: { $0.userID == selfUserId })
-                    let imageName = isOnBattle ? "live_battle_exit_icon" : "live_battle_icon"
-                    button?.setImage(internalImage(imageName), for: .normal)
-                }
-                .store(in: &cancellableSet)
+            let battleUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \BattleState.battleUsers)).removeDuplicates()
+            let connectedUsersPublisher = store.subscribeState(StatePublisherSelector(keyPath: \CoHostState.connected)).removeDuplicates()
+            let displayResultPublisher = store.subscribeState(StatePublisherSelector(keyPath: \AnchorBattleState.isOnDisplayResult)).removeDuplicates()
 
-            displayResultPublisher
-                .removeDuplicates()
+            battleUsersPublisher
+                .combineLatest(connectedUsersPublisher, displayResultPublisher)
                 .receive(on: RunLoop.main)
-                .sink { [weak button] display in
-                    let imageName = display ?
-                        "live_battle_disable_icon" :
-                        "live_battle_icon"
+                .sink { [weak button] battleUsers, connectedUsers, isOnDisplayResult in
+                    let isSelfInConnection = connectedUsers.contains(where: { $0.userID == selfUserId })
+                    let isSelfInBattle = battleUsers.contains(where: { $0.userID == selfUserId })
+
+                    let imageName: String
+                    if !isSelfInConnection || isOnDisplayResult {
+                        imageName = "live_battle_disable_icon"
+                    } else if isSelfInBattle {
+                        imageName = "live_battle_exit_icon"
+                    } else {
+                        imageName = "live_battle_icon"
+                    }
                     button?.setImage(internalImage(imageName), for: .normal)
                 }
                 .store(in: &cancellableSet)
-            
-            connectedUsersPublisher
-                .removeDuplicates()
-                .combineLatest(battleUsersPublisher)
-                .receive(on: RunLoop.main)
-                .sink { [weak button] connectedUsers, battleUsers in
-                    let isSelfInBattle = battleUsers.contains(where: { $0.userID == selfUserId })
-                    guard !isSelfInBattle else { return }
-                    let isSelfInConnection = connectedUsers.contains(where: { $0.userID == selfUserId })
-                    
-                    let imageName = isSelfInConnection ?
-                        "live_battle_icon" :
-                        "live_battle_disable_icon"
-                    button?.setImage(internalImage(imageName), for: .normal)
-                }.store(in: &cancellableSet)
         }
         return battle
     }
@@ -214,7 +197,7 @@ extension AnchorMenuDataCreator {
         let selfUserId = store.selfUserID
         let isSelfInBattle = store.battleState.battleUsers.contains(where: { $0.userID == selfUserId })
         if isSelfInBattle {
-            confirmToExitBattle()
+            return
         } else {
             let isOnDisplayResult = store.anchorBattleState.isOnDisplayResult
             let isSelfInConnection = store.coHostState.connected.isOnSeat()
@@ -224,10 +207,13 @@ extension AnchorMenuDataCreator {
 
             var config = BattleConfig()
             config.duration = anchorBattleDuration
-            config.needResponse = true
+            config.needResponse = false
             config.extensionInfo = ""
-            store.willApplyingBattle()
-            store.battleStore.requestBattle(config: config, userIDList: store.coHostState.connected.filter { $0.userID != selfUserId }.map { $0.userID }, timeout: anchorBattleRequestTimeout) { [weak self] result in
+            if config.needResponse {
+                store.willApplyingBattle()
+            }
+            let requestTimeout = config.needResponse ? anchorBattleRequestTimeout : 0
+            store.battleStore.requestBattle(config: config, userIDList: store.coHostState.connected.filter { $0.userID != selfUserId }.map { $0.userID }, timeout: requestTimeout) { [weak self] result in
                 guard let self = self else { return }
                 switch result {
                 case .success((let battleInfo, _)):
@@ -238,6 +224,7 @@ extension AnchorMenuDataCreator {
                     store.onError(err)
                 }
             }
+            guard config.needResponse else { return }
 
             if let value = lastApplyHashValue {
                 for item in cancellableSet.filter({ $0.hashValue == value }) {

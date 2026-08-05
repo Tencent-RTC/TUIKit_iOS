@@ -16,7 +16,7 @@ enum LiveKitClickEvent {
 
 class FeatureCollectionViewDesignConfig {
     var scrollDirection: UICollectionView.ScrollDirection = .horizontal
-    var itemSize:CGSize = CGSize(width: 56.scale375(), height: 80.scale375())
+    var itemSize:CGSize = CGSize(width: 56.scale375(), height: 92.scale375())
     var itemSpacing: CGFloat = 12.scale375()
     var hasHeader: Bool = true
 }
@@ -178,6 +178,8 @@ class FeatureCell: UICollectionViewCell {
                             font: theme.typography.Regular12)
         }
         view.textAlignment = .center
+        view.numberOfLines = 2
+        view.lineBreakMode = .byCharWrapping
         self.contentView.addSubview(view)
         return view
     }()
@@ -211,7 +213,7 @@ class FeatureCell: UICollectionViewCell {
             make.top.equalTo(imageBgView.snp.bottom).offset(6.scale375Height())
             make.centerX.equalToSuperview()
             make.width.equalToSuperview()
-            make.height.equalTo(18.scale375Height())
+            make.height.equalTo(34)
         }
     }
 

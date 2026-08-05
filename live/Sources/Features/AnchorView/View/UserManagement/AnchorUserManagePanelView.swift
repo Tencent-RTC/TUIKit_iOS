@@ -61,6 +61,14 @@ class AnchorUserManagePanelView: RTCBaseView {
         !(store.coGuestState.connected.filter { $0.userID == user.userID }.first?.allowOpenCamera ?? true)
     }
 
+    private var isFeaturedHostSupported: Bool {
+        store.liveListState.currentLive.seatTemplate == .videoFixedFloat7Seats
+    }
+
+    private var isUserFeaturedHost: Bool {
+        store.seatState.seatList.contains { $0.userInfo.userID == user.userID && $0.isFeaturedHost }
+    }
+
     private var cancellableSet = Set<AnyCancellable>()
     
     init(user: LiveUserInfo, store: AnchorStore, routerManager: AnchorRouterManager, type: AnchorUserManagePanelType) {
@@ -238,6 +246,15 @@ class AnchorUserManagePanelView: RTCBaseView {
                 }
             }
             .store(in: &cancellableSet)
+
+        store.subscribeState(StatePublisherSelector(keyPath: \LiveSeatState.seatList))
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                updateFeatureItems()
+            }
+            .store(in: &cancellableSet)
     }
     
     private func checkFollowStatus() {
@@ -279,6 +296,10 @@ class AnchorUserManagePanelView: RTCBaseView {
                 if !isScreenShareLive {
                     model.items.append(disableCameraItem)
                 }
+                // TODO by xander, 之前未提测主咖功能，先屏蔽入口。
+//                if isFeaturedHostSupported {
+//                    model.items.append(featuredHostItem)
+//                }
                 model.items.append(kickOffSeatItem)
             }
         case .userInfo:
@@ -297,6 +318,7 @@ class AnchorUserManagePanelView: RTCBaseView {
             debugPrint("test: isAudioLocked:\(isAudioLocked), videoLock:\(isCameraLocked)")
             disableAudioItem.isSelected = isAudioLocked
             disableCameraItem.isSelected = isCameraLocked
+            featuredHostItem.isSelected = isUserFeaturedHost
         }
         if userManagePanelType == .messageAndKickOut {
             disableChatItem.isSelected = isMessageDisabled
@@ -407,6 +429,17 @@ class AnchorUserManagePanelView: RTCBaseView {
                                                                     guard let self = self else { return }
                                                                     self.kickOffSeatClick()
                                                                 })
+
+    private lazy var featuredHostItem: AnchorFeatureItem = .init(normalTitle: .setFeaturedHostText,
+                                                                 normalImage: internalImage("live_set_featured_host_icon"),
+                                                                 selectedTitle: .revokeFeaturedHostText,
+                                                                 selectedImage: internalImage("live_revoke_featured_host_icon"),
+                                                                 isSelected: isUserFeaturedHost,
+                                                                 designConfig: designConfig,
+                                                                 actionClosure: { [weak self] _ in
+                                                                     guard let self = self else { return }
+                                                                     self.featuredHostClick()
+                                                                 })
 }
 
 // MARK: - Action
@@ -630,6 +663,22 @@ extension AnchorUserManagePanelView {
         let alertView = AtomicAlertView(config: alertConfig)
         alertView.show()
     }
+
+    private func featuredHostClick() {
+        let completion: (Result<(), ErrorInfo>) -> () = { [weak self] result in
+            guard let self = self else { return }
+            if case .failure(let error) = result {
+                let err = InternalError(errorInfo: error)
+                store.toastSubject.send((err.localizedMessage, .error))
+            }
+        }
+        if isUserFeaturedHost {
+            store.seatStore.revokeFeaturedHost(userID: user.userID, completion: completion)
+        } else {
+            store.seatStore.setFeaturedHost(userID: user.userID, completion: completion)
+        }
+        routerManager.router(action: .dismiss())
+    }
 }
 
 private extension String {
@@ -654,4 +703,6 @@ private extension String {
     static let hangupAlertText = internalLocalized("common_disconnect_guest_tips")
     static let disconnectText = internalLocalized("common_end_link")
     static let userIDText = internalLocalized("common_user_id")
+    static let setFeaturedHostText = internalLocalized("live_anchor_manager_set_featured_host")
+    static let revokeFeaturedHostText = internalLocalized("live_anchor_manager_revoke_featured_host")
 }

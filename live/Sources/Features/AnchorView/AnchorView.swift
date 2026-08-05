@@ -601,6 +601,9 @@ extension AnchorView {
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
+                    case .onBattleRequestReceived(battleID: let battleID, inviter: let inviter, invitee: let invitee):
+                        guard invitee.userID == store.selfUserID else { return }
+                        onReceivedBattleRequestChanged(battleID: battleID, inviter: inviter)
                     case .onBattleStarted(battleInfo: _, inviter: _, invitees: _):
                         routerManager.router(action: .dismiss(AnchorDismissType.panel, completion: nil))
                     case .onBattleRequestCancelled(battleID: _, inviter: let inviter, invitee: _):
@@ -611,8 +614,6 @@ extension AnchorView {
                         showAtomicToast(text: .battleRequestTimeoutText, style: .info)
                     case .onBattleRequestReject(battleID: _, inviter: _, invitee: let invitee):
                         showAtomicToast(text: .rejectBattleText.replacingOccurrences(of: "xxx", with: invitee.displayName), style: .info)
-                    case .onBattleRequestReceived(battleID: let battleID, inviter: let inviter, invitee: _):
-                        onReceivedBattleRequestChanged(battleID: battleID, inviter: inviter)
                     default: break
                 }
             }
@@ -753,13 +754,7 @@ extension AnchorView {
         let isSelfInBattle = store.battleState.battleUsers.contains(where: { $0.userID == selfUserId }) && isSelfInCoHostConnection
 
         if isSelfInBattle {
-            title = .endLiveOnBattleText
-            let endBattleItem = AlertButtonConfig(text: .endLiveBattleText, type: .red) { [weak self] _ in
-                guard let self = self else { return }
-                exitBattle()
-                routerManager.dismiss()
-            }
-            items.append(endBattleItem)
+            title = .endLiveOnAnchorBattleText
         } else if isSelfInCoHostConnection {
             title = .endLiveOnConnectionText
             let endConnectionItem = AlertButtonConfig(text: .endLiveDisconnectText, type: .red) { [weak self] _ in
@@ -788,7 +783,7 @@ extension AnchorView {
         }
 
         let text: String = store.liveListState.currentLive.keepOwnerOnSeat ? .confirmCloseText : .confirmExitText
-        let colorType: TextColorPreset = title == .endLiveOnLinkMicText ? .red : .primary
+        let colorType: TextColorPreset = (title == .endLiveOnLinkMicText || title == .endLiveOnAnchorBattleText) ? .red : .primary
         let endLiveItem = AlertButtonConfig(text: text, type: colorType) { [weak self] _ in
             guard let self = self else { return }
             self.exitBattle()
@@ -876,7 +871,6 @@ private extension String {
     static let endLiveOnConnectionText = internalLocalized("common_end_connection_tips")
     static let endLiveDisconnectText = internalLocalized("common_end_connection")
     static let endLiveOnLinkMicText = internalLocalized("common_anchor_end_link_tips")
-    static let endLiveOnBattleText = internalLocalized("common_end_pk_tips")
-    static let endLiveBattleText = internalLocalized("common_end_pk")
+    static let endLiveOnAnchorBattleText = internalLocalized("common_anchor_end_pk_tips")
     static let cancelText = internalLocalized("common_cancel")
 }

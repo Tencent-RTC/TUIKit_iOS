@@ -1821,6 +1821,41 @@
         }
       }
     },
+    "common_anchor_end_pk_tips": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You are currently in PK mode. Would you like to [End Live] ?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前处于PK状态，是否需要「关闭直播间」"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "當前處於PK狀態，是否需要「關閉直播間」"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、PKステータスです。「ライブブロードキャストルームを閉じる」必要がありますか？"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أنت حالياً في وضع المنافسة. هل تريد [إنهاء البث]؟"
+          }
+        }
+      }
+    },
     "common_kick_out_of_room": {
       "extractionState": "manual",
       "localizations": {
@@ -9288,13 +9323,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "请参数非法，请根据错误描述检查请求是否正确"
+            "value": "请求参数非法，请根据错误描述检查请求参数是否正确"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "請參數非法，請根據錯誤描述檢查請求是否正確"
+            "value": "請求參數非法，請根據錯誤描述檢查請求參數是否正確"
           }
         },
         "ja": {
@@ -15852,6 +15887,146 @@
           "stringUnit": {
             "state": "translated",
             "value": "غير معروف"
+          }
+        }
+      }
+    },
+    "live_anchor_manager_set_featured_host": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set as Featured"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设为主咖"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設為主咖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインホストに設定"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعيين كمضيف رئيسي"
+          }
+        }
+      }
+    },
+    "live_anchor_manager_revoke_featured_host": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke Featured"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消主咖"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消主咖"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "メインホストを解除"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إلغاء المضيف الرئيسي"
+          }
+        }
+      }
+    },
+    "common_enter_anchor_live_room": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter Live Room"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去TA的直播间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去TA的直播間"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配信ルームへ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الذهاب إلى غرفة البث"
+          }
+        }
+      }
+    },
+    "common_battle_all_member_exit_win": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All PK members exited early, this round is judged as a victory for the current host"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有PK成员提前退出，本局判当前主播胜利"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有PK成員提前退出，本局判當前主播勝利"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのPKメンバーが途中で退場しました。今回は現在のホストの勝利として判定されます"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غادر جميع أعضاء المنافسة مبكرًا، يمنح الفوز للمضيف الحالي في هذه الجولة"
           }
         }
       }

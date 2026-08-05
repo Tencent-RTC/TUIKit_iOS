@@ -239,6 +239,28 @@ extension AudienceView: AudienceLiveViewDelegate {
     func scrollToNextPage() {
         sliderView.scrollToNextPage()
     }
+
+    func switchToRoom(liveID: String) {
+        guard !liveID.isEmpty, liveID != self.liveID else { return }
+        
+        if let cached = sliderView.liveInfo(for: liveID) {
+            sliderView.switchToRoom(cached)
+            return
+        }
+
+        LiveListStore.shared.fetchLiveInfo(liveID: liveID) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let liveInfo):
+                    self.sliderView.switchToRoom(liveInfo)
+                case .failure(let error):
+                    LiveKitLog.error("\(#file)", "\(#line)",
+                                     "switchToRoom fetchLiveInfo failed liveID:\(liveID) code:\(error.code) message:\(error.message)")
+                }
+            }
+        }
+    }
     
     func onRoomDismissed(roomId: String, avatarUrl: String, userName: String) {
         guard roomId == liveID else { return }

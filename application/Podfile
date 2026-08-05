@@ -2,7 +2,7 @@ platform :ios, '14.0'
 source 'https://cdn.cocoapods.org/'
 
 # ── Unified TXLiteAVSDK version ──
-TXLITEAVSDK_VERSION = '13.2.20652'
+TXLITEAVSDK_VERSION = '13.4.21067'
 
 # ── Shared dependency definition ──
 def shared_pods
@@ -12,6 +12,7 @@ def shared_pods
   pod 'Alamofire', '5.0.0'
   pod 'SnapKit', '5.0.1'
   pod 'Kingfisher', '6.3.1'
+  pod 'AtomicXCore', '4.3.0'
   pod 'Toast-Swift'
 
   # ── Shell project local pods ──

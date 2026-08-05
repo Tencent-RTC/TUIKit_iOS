@@ -46,13 +46,11 @@ class PictureInPictureStore {
     }
 
     private func callEnablePictureInPicture(enable: Bool, liveID: String, isLandscape: Bool = false) {
-        let canvasWidth: CGFloat = 720
-        let canvasHeight: CGFloat = 1280
+        let baseWidth: CGFloat = 720
+        let baseHeight: CGFloat = 1280
         
-        let w: CGFloat = 1.0
-        let h: CGFloat = isLandscape ? (9.0 / 16.0 * canvasWidth / canvasHeight) : 1.0
-        let x: CGFloat = 0.0
-        let y: CGFloat = isLandscape ? ((1.0 - h) / 2.0) : 0.0
+        let canvasWidth: CGFloat = isLandscape ? baseHeight : baseWidth
+        let canvasHeight: CGFloat = isLandscape ? baseWidth : baseHeight
         
         let jsonObject: [String: Any] = [
             "api": "enablePictureInPicture",
@@ -70,10 +68,10 @@ class PictureInPictureStore {
                         "userId": "",
                         "userName": "",
                         "backgroundColor": "#000000",
-                        "width": w,
-                        "height": h,
-                        "x": x,
-                        "y": y,
+                        "width": 1.0,
+                        "height": 1.0,
+                        "x": 0.0,
+                        "y": 0.0,
                         "fillMode": 1,
                         "streamType": "high",
                         "backgroundImage": ""

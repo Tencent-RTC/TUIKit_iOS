@@ -152,14 +152,19 @@ class IncomingBannerViewController: UIViewController {
     
     @objc func rejectTouchEvent(sender: UIButton) {
         view.removeFromSuperview()
-        CallStore.shared.reject(completion: nil)
+        CallManager.shared.reject(completion: nil)
         WindowManager.shared.closeWindow()
     }
     
     @objc func acceptTouchEvent(sender: UIButton) {
-        view.removeFromSuperview()
-        CallStore.shared.accept(completion: nil)
-        WindowManager.shared.showCallingWindow()
+        CallManager.shared.accept { result in
+            switch result {
+            case .success:
+                break
+            case .failure:
+                WindowManager.shared.closeWindow()
+            }
+        }
     }
 
     private func updateUserInfoUI() {

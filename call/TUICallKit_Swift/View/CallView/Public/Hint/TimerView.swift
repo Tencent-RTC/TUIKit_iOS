@@ -59,26 +59,33 @@ extension TimerView {
     }
     
     private func updateTimerView() {
-        timerLabel.text = CallStore.shared.state.value.selfInfo.status == .accept ?
-        GCDTimer.secondToHMSString(second: Int(CallStore.shared.state.value.activeCall.duration)) : CallKitLocalization.localized("waitAccept")
+        let state = CallStore.shared.state.value
+        let status = state.selfInfo.status
+        let activeCall = state.activeCall
+        let selfInfo = state.selfInfo
+        let isOneToOne = activeCall.chatGroupId.isEmpty && activeCall.inviteeIds.count == 1
 
-        if CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1 {
-            if CallStore.shared.state.value.selfInfo.status == .accept {
-                timerLabel.isHidden = false
-            } else {
-                timerLabel.isHidden = true
-            }
-            return
+        switch status {
+        case .accept:
+            timerLabel.text = GCDTimer.secondToHMSString(second: Int(activeCall.duration))
+        case .waiting:
+            timerLabel.text = CallKitLocalization.localized("waitAccept")
+        default:
+            timerLabel.text = ""
         }
-        
-        if !(CallStore.shared.state.value.activeCall.chatGroupId.isEmpty == true && CallStore.shared.state.value.activeCall.inviteeIds.count == 1) {
-           
-            if CallStore.shared.state.value.selfInfo.status == .waiting && !(CallStore.shared.state.value.selfInfo.id == CallStore.shared.state.value.activeCall.inviterId) {
+
+        switch status {
+        case .accept:
+            timerLabel.isHidden = false
+        case .waiting:
+            if isOneToOne {
                 timerLabel.isHidden = true
             } else {
-                timerLabel.isHidden = false
+                let isInviter = selfInfo.id == activeCall.inviterId
+                timerLabel.isHidden = !isInviter
             }
-            return
+        default:
+            timerLabel.isHidden = true
         }
     }
 }

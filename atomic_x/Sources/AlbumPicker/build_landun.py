@@ -419,10 +419,15 @@ end
         return xcframework_path
 
     def copy_resource_bundle(self):
+        """从 DerivedData 中复制 resource bundle（只取真机/iphoneos 产物）"""
         self.log("查找 resource bundle...")
         bundle_name = f"{self.bundle_name}.bundle"
 
         for root, dirs, _files in os.walk(self.derived_data_path):
+            # 跳过模拟器产物，避免顶层 bundle 的 CFBundleSupportedPlatforms
+            # 被写成 [iPhoneSimulator]，导致提交 App Store 报 409
+            if "simulator" in root.lower():
+                continue
             if bundle_name in dirs:
                 src = Path(root) / bundle_name
                 dst = self.output_dir / bundle_name

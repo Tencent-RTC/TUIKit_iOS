@@ -147,15 +147,21 @@ class AnchorBattleInfoView: RTCBaseView {
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
-                case .onBattleEnded(battleInfo: _, reason: _):
-                    onBattleEnd()
+                case .onBattleEnded(battleInfo: _, reason: let reason):
                     store.updateBattleDurationCountDown(0)
                     timer?.cancel()
                     timer = nil
-                    onResultDisplay(display: true)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + audienceBattleEndInfoDuration) { [weak self] in
-                        guard let self = self else { return }
-                        onResultDisplay(display: false)
+                    if reason == .allMemberExit {
+                        store.toastSubject.send((.allMemberExitWinText, .info))
+                        store.stopShowBattleResult()
+                        stopDisplayBattleResult()
+                    } else {
+                        onBattleEnd()
+                        onResultDisplay(display: true)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + audienceBattleEndInfoDuration) { [weak self] in
+                            guard let self = self else { return }
+                            onResultDisplay(display: false)
+                        }
                     }
                 default: break
                 }
@@ -271,4 +277,5 @@ class AnchorBattleInfoView: RTCBaseView {
 
 private extension String {
     static let battleEndText = internalLocalized("common_battle_pk_end")
+    static let allMemberExitWinText = internalLocalized("common_battle_all_member_exit_win")
 }

@@ -25,7 +25,7 @@ final class ScenesApplicationModule: ModuleProvider {
             cardStyle: .banner,
             gradientColors: stubUIComponentGradient,
             targetProvider: { nil },
-            analyticsEvent: ""
+            analyticsEvent: "scenes_application"
         )
         return ScenesApplicationModule(config: config)
     }

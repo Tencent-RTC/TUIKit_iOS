@@ -97,18 +97,18 @@ class TUICallKitImpl: TUICallKit {
             return
         }
         
-        if !Permission.hasPermission(callMediaType: mediaType, completion: nil) {
-            return
-        }
-        
-        CallStore.shared.calls(participantIds: userIdList, mediaType: mediaType, params: params ?? getCallParams()) { [weak self] result in
+        CallManager.shared.calls(participantIds: userIdList,
+                                 mediaType: mediaType,
+                                 params: params) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
                 completion?(.success(()))
             case .failure(let error):
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-                    self?.showIMErrorMessage(code: Int32(error.code), message: error.message)
+                if Int32(error.code) != ERROR_PERMISSION_DENIED {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                        self?.showIMErrorMessage(code: Int32(error.code), message: error.message)
+                    }
                 }
                 completion?(.failure(error))
             }
@@ -123,7 +123,7 @@ class TUICallKitImpl: TUICallKit {
             return
         }
         
-        CallStore.shared.join(callId: callId) { [weak self] result in
+        CallManager.shared.join(callId: callId) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success:
@@ -227,13 +227,6 @@ extension TUICallKitImpl {
                                                selector: #selector(applicationWillTerminate),
                                                name: UIApplication.willTerminateNotification,
                                                object: nil)
-        
-        NotificationCenter.default.publisher(for: NSNotification.Name(EVENT_SHOW_TOAST))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] notification in
-                self?.handleShowToast(notification)
-            }
-            .store(in: &cancellables)
     }
     
     func removeNotificationObserver() {
@@ -309,10 +302,7 @@ extension TUICallKitImpl {
     
     private func closeCallKitViewController() {
         WindowManager.shared.closeWindow()
-        TUICore.notifyEvent(TUICore_PrivacyService_ROOM_STATE_EVENT_CHANGED,
-                            subKey: TUICore_PrivacyService_ROOM_STATE_EVENT_SUB_KEY_END,
-                            object: nil,
-                            param: nil)
+        WindowManager.shared.notifyRoomStateEnded()
     }
     
     private func syncVoIPStatus() {
@@ -336,11 +326,6 @@ extension TUICallKitImpl {
         }
     }
     
-    @objc func handleShowToast(_ notification: Notification) {
-        guard let data = notification.object as? String else { return }
-        showInfoToast(message: data)
-    }
-    
     @objc func setupCallEngine() {
         LoginStore.shared.login(sdkAppID: TUILogin.getSdkAppID(), userID: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "", completion: nil)
         TUICallEngine.createInstance().`init`(TUILogin.getSdkAppID(), userId: TUILogin.getUserID() ?? "", userSig: TUILogin.getUserSig() ?? "") { [weak self] in
@@ -356,7 +341,7 @@ extension TUICallKitImpl {
     }
     
     @objc func logoutSuccess() {
-        CallStore.shared.hangup(completion: nil)
+        CallManager.shared.hangup(completion: nil)
         TUICallEngine.destroyInstance()
     }
     
@@ -368,20 +353,14 @@ extension TUICallKitImpl {
         let isCaller = selfInfo.id == activeCall.inviterId
         
         if isCaller {
-            CallStore.shared.hangup(completion: nil)
+            CallManager.shared.hangup(completion: nil)
         } else {
             if selfInfo.status == .waiting {
-                CallStore.shared.reject(completion: nil)
+                CallManager.shared.reject(completion: nil)
             } else {
-                CallStore.shared.hangup(completion: nil)
+                CallManager.shared.hangup(completion: nil)
             }
         }
-    }
-    
-    private func getCallParams() -> CallParams {
-        var callParams = CallParams()
-        callParams.timeout = Int(TUI_CALLKIT_SIGNALING_MAX_TIME)
-        return callParams
     }
     
     private func setExcludeFromHistoryMessage() {
@@ -488,48 +467,59 @@ extension TUICallKitImpl {
                 hasSetDefaultDeviceState = true
             }
             showCallKitViewController(isCaller: true)
-        case let .onCallReceived(callId, _, _):
+        case let .onCallReceived(callId, mediaType, _):
             KeyMetrics.countUV(eventId: .received, callId: callId)
+            if mediaType == .video {
+                CallManager.shared.openLocalCameraIfPermitted()
+            }
             showCallKitViewController(isCaller: false)
             
         case let .onCallEnded(callId: _, mediaType: _, reason: reason, userId: userId):
             TranscriberSettings.reset()
             hasSetDefaultDeviceState = false
             TEBeautyView.releaseSharedInstance()
-            closeCallKitViewController()
-            handleCallEnded(reason: reason, userId: userId)
+            handleCallEndedWithResidence(reason: reason, userId: userId)
         default:
             break
         }
     }
-    
-    func handleCallEnded(reason: CallEndReason, userId: String) {
-        if CallStore.shared.state.value.selfInfo.id.isEmpty || userId == CallStore.shared.state.value.selfInfo.id {
+
+    func handleCallEndedWithResidence(reason: CallEndReason, userId: String) {
+        let selfInfo = CallStore.shared.state.value.selfInfo
+        let activeCall = CallStore.shared.state.value.activeCall
+        let isGroupCall = !activeCall.chatGroupId.isEmpty || activeCall.inviteeIds.count > 1
+        let triggeredBySelf = !selfInfo.id.isEmpty && userId == selfInfo.id
+
+        guard !selfInfo.id.isEmpty else { closeCallKitViewController(); return }
+        guard !triggeredBySelf else { closeCallKitViewController(); return }
+        guard !isGroupCall else { closeCallKitViewController(); return }
+        guard let messageKey = endCallHintKey(for: reason) else { closeCallKitViewController(); return }
+
+        let message = TUICallKitLocalize(key: messageKey)
+        guard !message.isEmpty else { closeCallKitViewController(); return }
+        guard let callMainViewController = WindowManager.shared.currentCallMainViewController() else {
+            closeCallKitViewController()
             return
         }
-        let isGroupCall = !CallStore.shared.state.value.activeCall.chatGroupId.isEmpty || CallStore.shared.state.value.activeCall.inviteeIds.count > 1
-        if isGroupCall {
-            return
-        }
-        let messageKey: String?
+
+        callMainViewController.showEndCallHint(text: message)
+    }
+
+    private func endCallHintKey(for reason: CallEndReason) -> String? {
         switch reason {
         case .hangup:
-            messageKey = "TUICallKit.otherPartyHangup"
+            return "TUICallKit.otherPartyHangup"
         case .reject:
-            messageKey = "TUICallKit.otherPartyReject"
+            return "TUICallKit.otherPartyReject"
         case .lineBusy:
-            messageKey = "TUICallKit.lineBusy"
+            return "TUICallKit.lineBusy"
         case .noResponse:
-            messageKey = "TUICallKit.otherPartyNoResponse"
+            return "TUICallKit.otherPartyNoResponse"
         case .canceled:
-            messageKey = "TUICallKit.otherPartyCanceled"
+            return "TUICallKit.otherPartyCanceled"
         default:
-            messageKey = nil
+            return nil
         }
-        guard let messageKey = messageKey else { return }
-        let message = TUICallKitLocalize(key: messageKey)
-        if message.isEmpty { return }
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: EVENT_SHOW_TOAST), object: message)
     }
     
     func setDefaultDeviceState() {
@@ -616,15 +606,6 @@ extension TUICallKitImpl {
             style: .error,
             position: .center,
             duration: .long
-        )
-    }
-    
-    private func showInfoToast(message: String) {
-        UIApplication.shared.keyWindow?.showAtomicToast(
-            text: message,
-            style: .info,
-            position: .center,
-            duration: .short
         )
     }
 }

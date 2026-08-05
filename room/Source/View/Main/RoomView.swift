@@ -76,11 +76,6 @@ public class RoomView: UIView, BaseView {
             webinarRoomView.delegate = self
         }
     }
-    
-    public func setScrollEnabled(_ enabled: Bool) {
-        guard roomType == .standard else { return }
-        standardRoomView.setScrollEnabled(enabled)
-    }
 }
 
 extension RoomView: WebinarRoomViewDelegate {

@@ -5,6 +5,11 @@ import UIKit
 internal protocol WeChatBottomBarDelegate: AnyObject {
     func bottomBarDidTapSend(_ bar: WeChatBottomBar)
     func bottomBarDidTapPreview(_ bar: WeChatBottomBar)
+    func bottomBarDidTapEdit(_ bar: WeChatBottomBar)
+}
+
+internal extension WeChatBottomBarDelegate {
+    func bottomBarDidTapEdit(_ bar: WeChatBottomBar) {}
 }
 
 internal class WeChatBottomBar: UIView {
@@ -13,6 +18,8 @@ internal class WeChatBottomBar: UIView {
     private static let doneIconSize: CGFloat = 14
     private static let doneIconScale: CGFloat = 0.7
     private static let borderWidth: CGFloat = 1
+    private static let editHitPaddingHorizontal: CGFloat = 12
+    private static let editHitPaddingVertical: CGFloat = 14
 
     internal weak var delegate: WeChatBottomBarDelegate?
 
@@ -26,6 +33,8 @@ internal class WeChatBottomBar: UIView {
     private var previewTitleLabel: UILabel?
     private var previewCountLabel: UILabel?
     private var previewContainer: UIView?
+    private var editContainer: UIView?
+    private var editLabel: UILabel?
     private var originalContainer: UIView!
     private var originalIndicator: UIView!
     private var originalDoneIcon: UIImageView!
@@ -57,7 +66,11 @@ private extension WeChatBottomBar {
         backgroundColor = bgColor
         setupSendButton()
         setupOriginalButton()
-        if !isPreview { setupPreviewButton() }
+        if isPreview {
+            setupEditButton()
+        } else {
+            setupPreviewButton()
+        }
     }
 
     func setupSendButton() {
@@ -135,11 +148,7 @@ private extension WeChatBottomBar {
         let container = UIView()
         addSubview(container)
         container.snp.makeConstraints { make in
-            if isPreview {
-                make.leading.equalToSuperview().offset(AlbumPickerCoreTheme.spacing16)
-            } else {
-                make.centerX.equalToSuperview()
-            }
+            make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
         }
         originalContainer = container
@@ -260,6 +269,42 @@ private extension WeChatBottomBar {
         previewCountLabel = countLabel
     }
 
+    func setupEditButton() {
+        let font = UIFont.systemFont(
+            ofSize: theme.normalFontSize, weight: .medium
+        )
+
+        let container = UIView()
+        addSubview(container)
+        container.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(
+                AlbumPickerCoreTheme.spacing16 - Self.editHitPaddingHorizontal
+            )
+            make.centerY.equalToSuperview()
+        }
+        editContainer = container
+
+        let tap = UITapGestureRecognizer(
+            target: self, action: #selector(handleEdit)
+        )
+        container.addGestureRecognizer(tap)
+
+        let label = UILabel()
+        label.text = "edit".albumPickerLocalized()
+        label.font = font
+        label.textColor = .white
+        container.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(Self.editHitPaddingVertical)
+            make.bottom.equalToSuperview().offset(-Self.editHitPaddingVertical)
+            make.leading.equalToSuperview().offset(Self.editHitPaddingHorizontal)
+            make.trailing.equalToSuperview().offset(
+                -Self.editHitPaddingHorizontal
+            )
+        }
+        editLabel = label
+    }
+
     func startObserving() {
         store.state.$selectedMedias
             .receive(on: DispatchQueue.main)
@@ -279,6 +324,15 @@ private extension WeChatBottomBar {
                 self?.updateOriginalButton()
             }
             .store(in: &cancellables)
+
+        if isPreview {
+            store.state.$currentPreviewMedia
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] media in
+                    self?.updateEditButtonState(media: media)
+                }
+                .store(in: &cancellables)
+        }
     }
 
     func activeCount(from selectedMedias: [SelectedMediaItem]) -> Int {
@@ -394,6 +448,17 @@ private extension WeChatBottomBar {
         if selectedCount > 0 {
             delegate?.bottomBarDidTapPreview(self)
         }
+    }
+
+    @objc func handleEdit() {
+        guard editContainer?.isUserInteractionEnabled != false else { return }
+        delegate?.bottomBarDidTapEdit(self)
+    }
+
+    func updateEditButtonState(media: AlbumMediaModel?) {
+        let isVideo = media?.type == .video
+        editContainer?.alpha = isVideo ? 0.4 : 1.0
+        editContainer?.isUserInteractionEnabled = !isVideo
     }
 
     @objc func handleOriginalToggle() {

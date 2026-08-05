@@ -378,14 +378,15 @@ extension LiveListView: UICollectionViewDataSource {
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: LiveListViewCell.cellReuseIdentifier, for: indexPath)
-        if let liveListViewCell = cell as? LiveListViewCell {
-            let info = liveList[indexPath.item]
-            liveListViewCell.updateView(liveInfo: info)
-            if currentStyle == .singleColumn {
-                liveListViewCell.addBlurEffect()
-            }
-            setLiveInfoView(cell: liveListViewCell, info: info)
+        guard indexPath.item < liveList.count, let liveListViewCell = cell as? LiveListViewCell else {
+            return cell
         }
+        let info = liveList[indexPath.item]
+        liveListViewCell.updateView(liveInfo: info)
+        if currentStyle == .singleColumn {
+            liveListViewCell.addBlurEffect()
+        }
+        setLiveInfoView(cell: liveListViewCell, info: info)
         return cell
     }
     

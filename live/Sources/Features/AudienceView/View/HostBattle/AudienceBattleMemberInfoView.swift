@@ -119,11 +119,15 @@ class AudienceBattleMemberInfoView: RTCBaseView {
             .sink { [weak self] event in
                 guard let self = self else { return }
                 switch event {
-                case .onBattleEnded(battleInfo: _, reason: _):
-                    onBattleEnd()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + audienceBattleEndInfoDuration) { [weak self] in
-                        guard let self = self else { return }
+                case .onBattleEnded(battleInfo: _, reason: let reason):
+                    if reason == .allMemberExit {
                         reset()
+                    } else {
+                        onBattleEnd()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + audienceBattleEndInfoDuration) { [weak self] in
+                            guard let self = self else { return }
+                            reset()
+                        }
                     }
                 default: break
                 }

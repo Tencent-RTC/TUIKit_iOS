@@ -64,6 +64,7 @@ class AudienceStore {
         let toastSubject = PassthroughSubject<(String, ToastStyle), Never>()
         let floatWindowSubject = PassthroughSubject<Void, Never>()
         let exitLiveRequestSubject = PassthroughSubject<Void, Never>()
+        let switchRoomSubject = PassthroughSubject<String, Never>()
 
         init(liveID: String) {
             self.liveID = liveID
@@ -136,6 +137,10 @@ extension AudienceStore {
 
     var exitLiveRequestSubject: PassthroughSubject<Void, Never> {
         context.exitLiveRequestSubject
+    }
+
+    var switchRoomSubject: PassthroughSubject<String, Never> {
+        context.switchRoomSubject
     }
 }
 

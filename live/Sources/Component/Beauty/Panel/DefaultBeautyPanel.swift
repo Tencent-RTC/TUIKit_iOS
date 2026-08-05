@@ -136,6 +136,7 @@ class DefaultBeautyPanel: UIView {
         view.textColor = .g6
         view.font = .customFont(ofSize: 12)
         view.adjustsFontSizeToFitWidth = true
+        view.minimumScaleFactor = 0.6
         view.isHidden = true
         return view
     }()
@@ -166,6 +167,7 @@ class DefaultBeautyPanel: UIView {
         let config = FeatureCollectionViewDesignConfig()
         config.scrollDirection = .vertical
         config.hasHeader = false
+        config.itemSize = CGSize(width: 56.scale375(), height: 100.scale375())
         return config
     }()
     
@@ -272,6 +274,7 @@ extension DefaultBeautyPanel {
             }
         }
         beautyTypeLabel.snp.makeConstraints { make in
+            make.leading.greaterThanOrEqualToSuperview().offset(20.scale375())
             make.trailing.equalTo(slider.snp.leading).offset(-9.scale375())
             if hasRenderView {
                 make.top.equalTo(previewView.snp.bottom).offset(16.scale375Height())

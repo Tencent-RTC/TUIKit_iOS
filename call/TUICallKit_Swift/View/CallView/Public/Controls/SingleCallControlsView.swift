@@ -310,7 +310,7 @@ extension SingleCallControlsView {
 // MARK: Event Action
 extension SingleCallControlsView {
     private func acceptTouchEvent(sender: UIButton) {
-        CallStore.shared.accept { result in
+        CallManager.shared.accept { result in
             switch result {
             case .success:
                 Logger.info("SingleCallControlsView - accept success in acceptTouchEvent.")
@@ -321,7 +321,7 @@ extension SingleCallControlsView {
     }
     
     private func rejectTouchEvent(sender: UIButton) {
-        CallStore.shared.reject { result in
+        CallManager.shared.reject { result in
             switch result {
             case .success:
                 Logger.info("SingleCallControlsView - reject success in rejectTouchEvent.")
@@ -332,40 +332,28 @@ extension SingleCallControlsView {
     }
     
     private func muteMicEvent(sender: UIButton) {
-        let isMicrophoneOpened = deviceStore.state.value.microphoneStatus == .on
-        if isMicrophoneOpened {
-            deviceStore.closeLocalMicrophone()
+        if deviceStore.state.value.microphoneStatus == .on {
+            CallManager.shared.closeLocalMicrophone()
         } else {
-            deviceStore.openLocalMicrophone(completion: nil)
+            CallManager.shared.openLocalMicrophone()
         }
     }
-    
+
     private func closeCameraTouchEvent(sender: UIButton) {
         if deviceStore.state.value.cameraStatus == .on {
-            deviceStore.closeLocalCamera()
+            CallManager.shared.closeLocalCamera()
         } else {
-            deviceStore.openLocalCamera(isFront: deviceStore.state.value.isFrontCamera) {  result in
-                switch result {
-                case .success:
-                    Logger.info("SingleCallControlsView - openLocalCamera success in closeCameraTouchEvent.")
-                case .failure(let error):
-                    Logger.error("SingleCallControlsView - openLocalCamera failed in closeCameraTouchEvent. Code: \(error.code), Message: \(error.message)")
-                }
-            }
+            CallManager.shared.openLocalCamera(isFront: deviceStore.state.value.isFrontCamera)
         }
     }
-    
+
     private func changeSpeakerEvent(sender: UIButton) {
-        let route = deviceStore.state.value.currentAudioRoute
-        if route == .speakerphone {
-            deviceStore.setAudioRoute(.earpiece)
-        } else {
-            deviceStore.setAudioRoute(.speakerphone)
-        }
+        let next: AudioRoute = deviceStore.state.value.currentAudioRoute == .speakerphone ? .earpiece : .speakerphone
+        CallManager.shared.setAudioRoute(next)
     }
     
     private func hangupEvent(sender: UIButton) {
-        CallStore.shared.hangup() { result in
+        CallManager.shared.hangup { result in
             switch result {
             case .success:
                 Logger.info("SingleCallControlsView - hangup success")
@@ -376,7 +364,7 @@ extension SingleCallControlsView {
     }
     
     private func switchCameraTouchEvent(sender: UIButton) {
-        deviceStore.switchCamera(isFront: !deviceStore.state.value.isFrontCamera)
+        CallManager.shared.switchCamera(isFront: !deviceStore.state.value.isFrontCamera)
     }
     
     private func virtualBackgroundTouchEvent(sender: UIButton) {

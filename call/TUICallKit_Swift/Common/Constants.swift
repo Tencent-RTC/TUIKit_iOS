@@ -77,7 +77,6 @@ let kBtnSmallSize = CGSize(width: 60.scale375Width(), height: 60.scale375Width()
 let EVENT_SHOW_TUICALLKIT_VIEWCONTROLLER = "eventShowTUICallKitViewController"
 let EVENT_CLOSE_TUICALLKIT_VIEWCONTROLLER = "eventCloseTUICallKitViewController"
 let EVENT_TAP_FLOATWINDOW = "eventTapFloatWindow"
-let EVENT_SHOW_TOAST = "eventShowToast"
 
 let AI_TRANSLATION_ROBOT = "TAI_Robot"
 
