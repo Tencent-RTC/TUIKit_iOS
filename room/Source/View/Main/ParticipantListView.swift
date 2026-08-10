@@ -40,10 +40,12 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     private let roomStore: RoomStore = RoomStore.shared
     private var participantList: [RoomParticipant] = []
     private var audienceList: [RoomParticipant] = []
+    private var pendingList: [RoomParticipant] = []
     private var cancellableSet = Set<AnyCancellable>()
     private let roomID: String
     private let roomType: RoomType
     private var isSegmentTapping: Bool = false
+    private var isAdminVisible: Bool = false
     
     // MARK: - UI Components
     private lazy var containerView: UIView = {
@@ -71,8 +73,14 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     
     private lazy var topSegmentView: UISegmentedControl = {
         let topSegmentView = UISegmentedControl(frame: .zero)
-        topSegmentView.insertSegment(withTitle: .participant.localizedReplace("0"), at: 0, animated: true)
-        topSegmentView.insertSegment(withTitle: .audience.localizedReplace("0"), at: 1, animated: true)
+        let firstTitle = roomType == .standard
+            ? String.joined.localizedReplace("0")
+            : String.participant.localizedReplace("0")
+        let secondTitle = roomType == .standard
+            ? String.notJoined.localizedReplace("0")
+            : String.audience.localizedReplace("0")
+        topSegmentView.insertSegment(withTitle: firstTitle, at: 0, animated: true)
+        topSegmentView.insertSegment(withTitle: secondTitle, at: 1, animated: true)
         topSegmentView.selectedSegmentIndex = 0
         topSegmentView.selectedSegmentTintColor = RoomColors.g3
         topSegmentView.setTitleTextAttributes([
@@ -121,6 +129,18 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         tableView.register(AudienceListCell.self, forCellReuseIdentifier: AudienceListCell.cellReuseIdentifier)
         return tableView
     }()
+
+    private lazy var pendingTableView: UITableView = {
+        let tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.showsVerticalScrollIndicator = false
+        tableView.tag = 2
+        tableView.register(PendingListCell.self, forCellReuseIdentifier: PendingListCell.cellReuseIdentifier)
+        return tableView
+    }()
     
     private lazy var bottomBarView: UIView = {
         let view = UIView()
@@ -153,6 +173,17 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         button.isHidden = true
         return button
     }()
+
+    private lazy var callAllButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = RoomFonts.pingFangSCFont(size: 14, weight: .regular)
+        button.backgroundColor = RoomColors.b1
+        button.layer.cornerRadius = 6
+        button.setTitle(.callAll, for: .normal)
+        button.isHidden = true
+        return button
+    }()
     
     // MARK: - Initialization
     public init(roomID: String, roomType: RoomType) {
@@ -173,18 +204,21 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     func setupViews() {
         addSubview(containerView)
         containerView.addSubview(dropButton)
+        containerView.addSubview(topSegmentView)
+        containerView.addSubview(scrollContainerView)
+        scrollContainerView.addSubview(participantTableView)
         if roomType == .standard {
-            containerView.addSubview(titleLabel)
-            containerView.addSubview(participantTableView)
-            
+            scrollContainerView.addSubview(pendingTableView)
+        } else {
+            scrollContainerView.addSubview(audienceTableView)
+        }
+        
+        if roomType == .standard {
             containerView.addSubview(bottomBarView)
             bottomBarView.addSubview(muteAllAudioButton)
             bottomBarView.addSubview(muteAllVideoButton)
+            containerView.addSubview(callAllButton)
         } else {
-            containerView.addSubview(topSegmentView)
-            containerView.addSubview(scrollContainerView)
-            scrollContainerView.addSubview(participantTableView)
-            scrollContainerView.addSubview(audienceTableView)
             containerView.addSubview(muteAllAudioButton)
         }
     }
@@ -193,37 +227,65 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         containerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
+
         dropButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
             make.centerX.equalToSuperview()
         }
-        
+
+        topSegmentView.snp.makeConstraints { make in
+            make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
+            make.left.equalToSuperview().offset(RoomSpacing.medium)
+            make.right.equalToSuperview().offset(-RoomSpacing.medium)
+        }
+
         if roomType == .standard {
-            titleLabel.snp.makeConstraints { make in
-                make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
-                make.left.equalToSuperview().offset(RoomSpacing.standard)
-                make.right.equalToSuperview().offset(-RoomSpacing.standard)
-            }
-            
-            participantTableView.snp.makeConstraints { make in
-                make.top.equalTo(titleLabel.snp.bottom).offset(RoomSpacing.medium)
-                make.left.right.equalToSuperview()
-                make.bottom.equalTo(bottomBarView.snp.top)
-            }
-            
             bottomBarView.snp.makeConstraints { make in
                 make.left.right.bottom.equalToSuperview()
                 make.height.equalTo(88)
             }
-            
+            callAllButton.snp.makeConstraints { make in
+                make.left.equalToSuperview().offset(RoomSpacing.medium)
+                make.right.equalToSuperview().offset(-RoomSpacing.medium)
+                make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+                make.height.equalTo(40)
+            }
+            scrollContainerView.snp.makeConstraints { make in
+                make.top.equalTo(topSegmentView.snp.bottom).offset(RoomSpacing.medium)
+                make.left.right.equalToSuperview()
+                make.bottom.equalTo(bottomBarView.snp.top)
+            }
+        } else {
+            scrollContainerView.snp.makeConstraints { make in
+                make.top.equalTo(topSegmentView.snp.bottom).offset(RoomSpacing.medium)
+                make.left.right.equalToSuperview()
+                make.bottom.equalTo(muteAllAudioButton.snp.top).offset(-5)
+            }
+        }
+
+        participantTableView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.left.equalToSuperview()
+            make.width.equalTo(scrollContainerView.snp.width)
+            make.height.equalTo(scrollContainerView.snp.height)
+        }
+
+        let secondTableView: UITableView = roomType == .standard ? pendingTableView : audienceTableView
+        secondTableView.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.left.equalTo(participantTableView.snp.right)
+            make.width.equalTo(scrollContainerView.snp.width)
+            make.height.equalTo(scrollContainerView.snp.height)
+            make.right.equalToSuperview()
+        }
+
+        if roomType == .standard {
             muteAllAudioButton.snp.makeConstraints { make in
-                make.top.equalToSuperview().offset(RoomSpacing.medium)
+                make.top.equalTo(bottomBarView).offset(RoomSpacing.medium)
                 make.right.equalTo(bottomBarView.snp.centerX).offset(-RoomSpacing.large)
                 make.width.equalTo(108)
                 make.height.equalTo(40)
             }
-            
             muteAllVideoButton.snp.makeConstraints { make in
                 make.centerY.equalTo(muteAllAudioButton)
                 make.left.equalTo(bottomBarView.snp.centerX).offset(RoomSpacing.medium)
@@ -231,33 +293,6 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
                 make.height.equalTo(40)
             }
         } else {
-            topSegmentView.snp.makeConstraints { make in
-                make.top.equalTo(dropButton.snp.bottom).offset(RoomSpacing.large)
-                make.left.equalToSuperview().offset(RoomSpacing.medium)
-                make.right.equalToSuperview().offset(-RoomSpacing.medium)
-            }
-            
-            scrollContainerView.snp.makeConstraints { make in
-                make.top.equalTo(topSegmentView.snp.bottom).offset(RoomSpacing.medium)
-                make.left.right.equalToSuperview()
-                make.bottom.equalTo(muteAllAudioButton.snp.top).offset(-5)
-            }
-            
-            participantTableView.snp.makeConstraints { make in
-                make.top.bottom.equalToSuperview()
-                make.left.equalToSuperview()
-                make.width.equalTo(scrollContainerView.snp.width)
-                make.height.equalTo(scrollContainerView.snp.height)
-            }
-            
-            audienceTableView.snp.makeConstraints { make in
-                make.top.bottom.equalToSuperview()
-                make.left.equalTo(participantTableView.snp.right)
-                make.width.equalTo(scrollContainerView.snp.width)
-                make.height.equalTo(scrollContainerView.snp.height)
-                make.right.equalToSuperview()
-            }
-            
             muteAllAudioButton.snp.makeConstraints { make in
                 make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
                 make.left.equalToSuperview().offset(RoomSpacing.medium)
@@ -275,14 +310,15 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
         dropButton.addTarget(self, action: #selector(dropButtonTapped), for: .touchUpInside)
         muteAllAudioButton.addTarget(self, action: #selector(muteAllAudioButtonTapped), for: .touchUpInside)
         muteAllVideoButton.addTarget(self, action: #selector(muteAllVideoButtonTapped), for: .touchUpInside)
-        
+        callAllButton.addTarget(self, action: #selector(callAllButtonTapped), for: .touchUpInside)
+        topSegmentView.addTarget(self, action: #selector(topSegmentViewValueChanged(sender:)), for: .valueChanged)
+
         if roomType == .standard {
             bindingStandardState()
         } else {
-            topSegmentView.addTarget(self, action: #selector(topSegmentViewValueChanged(sender:)), for: .valueChanged)
             bindingWebinarState()
         }
-        
+
         participantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantList))
             .receive(on: RunLoop.main)
@@ -296,22 +332,29 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
     private func bindingStandardState() {
         roomStore.state
             .subscribe(StatePublisherSelector(keyPath: \.currentRoom?.participantCount))
-             .receive(on: RunLoop.main)
-             .sink { [weak self] participantCount in
-                 guard let self = self else { return }
-                 titleLabel.text = .members.localizedReplace("\(participantCount ?? 0)")
-             }
-             .store(in: &cancellableSet)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] participantCount in
+                guard let self = self else { return }
+                let count = participantCount ?? 0
+                self.topSegmentView.setTitle(
+                    .joined.localizedReplace("\(count)"),
+                    forSegmentAt: 0
+                )
+            }
+            .store(in: &cancellableSet)
+
         
         participantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .receive(on: RunLoop.main)
             .sink { [weak self] participant in
                 guard let self = self else { return }
-                bottomBarView.isHidden = !(participant?.role == .admin || participant?.role == .owner)
+                let isAdmin = participant?.role == .admin || participant?.role == .owner
+                self.isAdminVisible = isAdmin
+                self.refreshStandardBottomVisibility()
             }
             .store(in: &cancellableSet)
-        
+
         roomStore.state
             .subscribe(StatePublisherSelector(keyPath: \.currentRoom))
             .receive(on: RunLoop.main)
@@ -327,6 +370,21 @@ public class ParticipantListView: UIView, BasePanel, PanelHeightProvider {
                     muteAllAudioButton.isHidden = true
                     muteAllVideoButton.isHidden = true
                 }
+            }
+            .store(in: &cancellableSet)
+
+        participantStore.state
+            .subscribe(StatePublisherSelector(keyPath: \.pendingParticipantList))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] pendingList in
+                guard let self = self else { return }
+                let filtered = pendingList.filter { $0.roomStatus != .inRoom }
+                self.pendingList = filtered
+                self.topSegmentView.setTitle(
+                    .notJoined.localizedReplace("\(filtered.count)"),
+                    forSegmentAt: 1
+                )
+                self.pendingTableView.reloadData()
             }
             .store(in: &cancellableSet)
     }
@@ -442,6 +500,13 @@ extension ParticipantListView {
         if participant.microphoneStatus == .on { return 3 }
         return 4
     }
+
+    private func refreshStandardBottomVisibility() {
+        guard roomType == .standard else { return }
+        let isNotJoinedTab = topSegmentView.selectedSegmentIndex == 1
+        bottomBarView.isHidden = isNotJoinedTab || !isAdminVisible
+        callAllButton.isHidden = !isNotJoinedTab
+    }
 }
 
 // MARK: - Actions
@@ -463,6 +528,17 @@ extension ParticipantListView {
         let index = sender.selectedSegmentIndex
         let offsetX = CGFloat(index) * scrollContainerView.bounds.width
         scrollContainerView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: true)
+        refreshStandardBottomVisibility()
+    }
+
+    @objc private func callAllButtonTapped() {
+        let userIDs = pendingList.map { $0.userID }
+        guard !userIDs.isEmpty else { return }
+        roomStore.callUserToRoom(roomID: roomID,
+                                 userIDList: userIDs,
+                                 timeout: 10,
+                                 extensionInfo: nil) { _ in
+        }
     }
     
 }
@@ -496,29 +572,51 @@ extension ParticipantListView: UITableViewDataSource {
         if tableView == participantTableView {
             return participantList.count
         }
-        
+
+        if tableView == pendingTableView {
+            return pendingList.count
+        }
+
         if tableView == audienceTableView {
             return audienceList.count
         }
         return 0
     }
-    
+
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView == participantTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: ParticipantListCell.cellReuseIdentifier, for: indexPath) as? ParticipantListCell else {
                 return UITableViewCell()
             }
-            
+
             let participant = participantList[indexPath.row]
             cell.configure(with: participant, roomID: roomID, roomType: roomType)
             return cell
         }
-        
+
+        if tableView == pendingTableView {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: PendingListCell.cellReuseIdentifier, for: indexPath) as? PendingListCell else {
+                return UITableViewCell()
+            }
+            let pending = pendingList[indexPath.row]
+            cell.configure(with: pending, roomID: roomID)
+            cell.onCallTapped = { [weak self] participant in
+                guard let self = self else { return }
+                self.roomStore.callUserToRoom(
+                    roomID: self.roomID,
+                    userIDList: [participant.userID],
+                    extensionInfo: nil
+                ) { _ in
+                }
+            }
+            return cell
+        }
+
         if tableView == audienceTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AudienceListCell.cellReuseIdentifier, for: indexPath) as? AudienceListCell else {
                 return UITableViewCell()
             }
-            
+
             let audience = audienceList[indexPath.row]
             cell.configure(with: audience, roomID: roomID)
             return cell
@@ -539,7 +637,11 @@ extension ParticipantListView: UITableViewDelegate {
         if tableView == participantTableView {
             participant = participantList[indexPath.row]
         }
-        
+
+        if tableView == pendingTableView {
+            return
+        }
+
         if tableView == audienceTableView {
             participant = audienceList[indexPath.row]
             isAudience = true
@@ -582,7 +684,7 @@ private class BaseParticipantCell: UITableViewCell {
     lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 24
+        imageView.layer.cornerRadius = 20
         imageView.layer.masksToBounds = true
         return imageView
     }()
@@ -826,13 +928,13 @@ private class AudienceListCell: BaseParticipantCell {
     // MARK: - Setup Methods
     override func setupConstraints() {
         super.setupConstraints()
-        
+
         containerView.snp.makeConstraints { make in
             make.left.equalTo(avatarImageView.snp.right).offset(RoomSpacing.medium)
             make.centerY.equalTo(avatarImageView.snp.centerY)
             make.right.equalToSuperview().offset(-RoomSpacing.large)
         }
-        
+
         dividerLine.snp.makeConstraints { make in
             make.bottom.equalToSuperview()
             make.left.equalTo(nameLabel.snp.left)
@@ -840,10 +942,86 @@ private class AudienceListCell: BaseParticipantCell {
             make.height.equalTo(1)
         }
     }
-    
+
     // MARK: - Public Methods
     func configure(with audience: RoomParticipant, roomID: String) {
         configureBasicInfo(participant: audience, roomID: roomID)
+    }
+}
+
+// MARK: - PendingListCell
+private class PendingListCell: BaseParticipantCell {
+    // MARK: - Additional UI Components
+    private lazy var callButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = RoomFonts.pingFangSCFont(size: 12, weight: .regular)
+        button.backgroundColor = RoomColors.b1
+        button.layer.cornerRadius = 4
+        button.setTitle(.call, for: .normal)
+        button.addTarget(self, action: #selector(callButtonTapped), for: .touchUpInside)
+        return button
+    }()
+
+    // MARK: - State
+    var inCalling: Bool = false {
+        didSet {
+            if inCalling {
+                callButton.setTitle(.calling, for: .normal)
+                callButton.backgroundColor = .clear
+                callButton.setTitleColor(RoomColors.segmentTitleColor, for: .normal)
+                callButton.isEnabled = false
+            } else {
+                callButton.setTitle(.call, for: .normal)
+                callButton.backgroundColor = RoomColors.b1
+                callButton.setTitleColor(.white, for: .normal)
+                callButton.isEnabled = true
+            }
+        }
+    }
+
+    var onCallTapped: ((RoomParticipant) -> Void)?
+    private var participant: RoomParticipant?
+
+    // MARK: - Setup Methods
+    override func setupConstraints() {
+        super.setupConstraints()
+
+        contentView.addSubview(callButton)
+
+        containerView.snp.makeConstraints { make in
+            make.left.equalTo(avatarImageView.snp.right).offset(RoomSpacing.medium)
+            make.centerY.equalTo(avatarImageView.snp.centerY)
+            make.right.lessThanOrEqualTo(callButton.snp.left).offset(-8)
+        }
+
+        callButton.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-RoomSpacing.large)
+            make.centerY.equalToSuperview()
+            make.width.equalTo(68)
+            make.height.equalTo(28)
+        }
+
+        dividerLine.snp.makeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.left.equalTo(nameLabel.snp.left)
+            make.right.equalTo(callButton.snp.right)
+            make.height.equalTo(1)
+        }
+    }
+
+    // MARK: - Public Methods
+    func configure(with participant: RoomParticipant, roomID: String) {
+        configureBasicInfo(participant: participant, roomID: roomID)
+        self.participant = participant
+        self.inCalling = participant.roomStatus == .inCalling
+    }
+
+    // MARK: - Actions
+    @objc private func callButtonTapped() {
+        guard let participant = participant else { return }
+        inCalling = true
+        onCallTapped?(participant)
     }
 }
 
@@ -859,4 +1037,9 @@ fileprivate extension String {
     static let administrator = "roomkit_role_admin".localized
     static let participant = "roomkit_participant".localized
     static let audience = "roomkit_audience".localized
+    static let joined = "roomkit_tab_joined"
+    static let notJoined = "roomkit_tab_pending"
+    static let calling = "roomkit_calling".localized
+    static let call = "roomkit_call".localized
+    static let callAll = "roomkit_call_everyone".localized
 }

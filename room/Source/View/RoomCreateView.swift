@@ -342,13 +342,6 @@ extension RoomCreateView {
     }
 }
 
-// MARK: - UIStackView Convenience
-private extension UIStackView {
-    func addArrangedSubviews(_ views: UIView...) {
-        views.forEach { addArrangedSubview($0) }
-    }
-}
-
 fileprivate extension String {
     static let createRoom = "roomkit_create_room".localized
     static let yourName = "roomkit_your_name".localized

@@ -250,18 +250,18 @@ class RoomViewScreenStreamCell: UICollectionViewCell {
         let participantView = RoomParticipantView()
         return participantView
     }()
-    
+
     private(set) lazy var containerView: UIView = {
         let view = UIView()
         return view
     }()
-    
+
     private(set) lazy var participantInfoContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = RoomColors.g2.withAlphaComponent(0.8)
         return view
     }()
-    
+
     private(set) lazy var nameLabel: UILabel = {
         let label = UILabel()
         label.font = RoomFonts.pingFangSCFont(size: 12, weight: .regular)
@@ -269,18 +269,29 @@ class RoomViewScreenStreamCell: UICollectionViewCell {
         label.textAlignment = .center
         return label
     }()
-    
+
     private(set) lazy var roleIconImageView: UIImageView = {
         let imageView = UIImageView(frame: .zero)
         return imageView
     }()
-    
+
     private(set) lazy var micStatusImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
         return view
     }()
-    
+
+    private lazy var orientationSwitchButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(ResourceLoader.loadImage("room_switch_landscape"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
+        button.addTarget(self, action: #selector(orientationSwitchButtonTapped), for: .touchUpInside)
+        button.isHidden = true
+        return button
+    }()
+
     // MARK: - Initialization
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -288,84 +299,132 @@ class RoomViewScreenStreamCell: UICollectionViewCell {
         setupConstraints()
         setupStyles()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Setup Methods
     func setupViews() {
         contentView.addSubview(containerView)
         contentView.addSubview(participantInfoContainerView)
-        
+        contentView.addSubview(orientationSwitchButton)
+
         containerView.addSubview(participantView)
         participantInfoContainerView.addSubview(roleIconImageView)
         participantInfoContainerView.addSubview(micStatusImageView)
         participantInfoContainerView.addSubview(nameLabel)
     }
-    
+
     func setupConstraints() {
         containerView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(2)
         }
-        
+
         participantView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
+
         participantInfoContainerView.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(4)
             make.bottom.equalToSuperview().offset(-4)
             make.right.lessThanOrEqualToSuperview().offset(-4)
             make.height.equalTo(24)
         }
-        
+
         roleIconImageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.centerY.equalToSuperview()
             make.height.equalTo(24)
             make.width.equalTo(24)
         }
-        
+
         micStatusImageView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.left.equalTo(roleIconImageView.snp.right).offset(6)
             make.width.equalTo(14)
             make.height.equalTo(14)
         }
-        
+
         nameLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.left.equalTo(micStatusImageView.snp.right).offset(2)
             make.right.equalToSuperview().offset(-8)
         }
+
+        orientationSwitchButton.snp.makeConstraints { make in
+            make.width.height.equalTo(32)
+            make.trailing.equalToSuperview().offset(-12)
+            make.bottom.equalToSuperview().offset(-12)
+        }
     }
-    
+
     func setupStyles() {
         backgroundColor = .clear
         containerView.layer.cornerRadius = 16
         containerView.layer.masksToBounds = true
-        
+
         participantInfoContainerView.layer.cornerRadius = 12
-        
+
         roleIconImageView.layer.cornerRadius = 12
         roleIconImageView.layer.masksToBounds = true
         containerView.backgroundColor = RoomColors.g2.withAlphaComponent(0.5)
     }
-    
+
     func reset() {
         participant = nil
         cancellableSet.removeAll()
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         reset()
     }
-    
+
     deinit {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
         debugPrint("deinit \(self)")
+    }
+
+    // MARK: - Actions
+    @objc private func orientationSwitchButtonTapped() {
+        guard let viewController = self.findViewController() as? RoomMainViewController else { return }
+        let isCurrentlyLandscape = viewController.view.bounds.width > viewController.view.bounds.height
+        viewController.isLandscapeMode = !isCurrentlyLandscape
+
+        if #available(iOS 16.0, *) {
+            viewController.setNeedsUpdateOfSupportedInterfaceOrientations()
+            if let windowScene = viewController.view.window?.windowScene {
+                let mask: UIInterfaceOrientationMask = !isCurrentlyLandscape ? .landscape : .portrait
+                let geometry = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: mask)
+                windowScene.requestGeometryUpdate(geometry)
+            }
+        } else {
+            let targetOrientation: UIInterfaceOrientation = !isCurrentlyLandscape ? .landscapeRight : .portrait
+            UIDevice.current.setValue(targetOrientation.rawValue, forKey: "orientation")
+            UIViewController.attemptRotationToDeviceOrientation()
+        }
+    }
+
+    // MARK: - Public
+    func setOrientationSwitchButtonHidden(_ hidden: Bool) {
+        orientationSwitchButton.isHidden = hidden
+    }
+
+    func updateOrientationSwitchButtonImage(isLandscape: Bool) {
+        let name = isLandscape ? "room_switch_portrait" : "room_switch_landscape"
+        orientationSwitchButton.setImage(ResourceLoader.loadImage(name), for: .normal)
+    }
+
+    private func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let next = responder?.next {
+            if let vc = next as? UIViewController {
+                return vc
+            }
+            responder = next
+        }
+        return nil
     }
 }
 

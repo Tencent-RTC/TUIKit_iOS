@@ -45,6 +45,10 @@ class StandardRoomView: UIView, BaseView {
     private var cancellableSet = Set<AnyCancellable>()
     private var currentPage: Int = 0
     private var totalPages: Int = 0
+
+    private var orientationButtonHidden: Bool = true
+    private var orientationButtonIsLandscape: Bool = false
+    private var currentScreenSharerID: String?
     
     // MARK: - UI Components
     lazy var collectionView: UICollectionView = {
@@ -121,6 +125,36 @@ class StandardRoomView: UIView, BaseView {
         backgroundColor = .clear
     }
     
+    public func setScrollEnabled(_ enabled: Bool) {
+        collectionView.isScrollEnabled = enabled
+    }
+
+    func setScreenStreamOrientationButtonHidden(_ hidden: Bool) {
+        orientationButtonHidden = hidden
+        for cell in collectionView.visibleCells {
+            if let screenCell = cell as? RoomViewScreenStreamCell {
+                screenCell.setOrientationSwitchButtonHidden(hidden)
+            }
+        }
+    }
+
+    func updateScreenStreamOrientationButtonImage(isLandscape: Bool) {
+        orientationButtonIsLandscape = isLandscape
+        for cell in collectionView.visibleCells {
+            if let screenCell = cell as? RoomViewScreenStreamCell {
+                screenCell.updateOrientationSwitchButtonImage(isLandscape: isLandscape)
+            }
+        }
+    }
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        let isLandscape = bounds.width > bounds.height
+        if isLandscape != orientationButtonIsLandscape {
+            updateScreenStreamOrientationButtonImage(isLandscape: isLandscape)
+        }
+    }
+
     public func setupBindings() {
         // MARK: - Real Data Binding
         roomParticipantStore.state
@@ -139,6 +173,7 @@ class StandardRoomView: UIView, BaseView {
             .sink { [weak self] participant in
                 guard let self = self else { return }
                 updateScreenShareParticipant(participant)
+                onScreenSharerChanged(newSharerID: participant?.userID)
             }
             .store(in: &cancellableSet)
         
@@ -150,6 +185,54 @@ class StandardRoomView: UIView, BaseView {
                 updateVisibleCellsSpeakingStatus(speakingUsers)
             }
             .store(in: &cancellableSet)
+    }
+
+    // MARK: - Screen Sharer & Orientation
+
+    private func onScreenSharerChanged(newSharerID: String?) {
+        if currentScreenSharerID == newSharerID { return }
+        currentScreenSharerID = newSharerID
+        updateOrientationSwitchButtonVisibility()
+        if newSharerID == nil || newSharerID?.isEmpty == true {
+            forcePortraitIfLandscape()
+        }
+    }
+
+    private func updateOrientationSwitchButtonVisibility() {
+        let localUserID = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
+        let hasRemoteSharer = currentScreenSharerID != nil
+            && !(currentScreenSharerID?.isEmpty ?? true)
+            && currentScreenSharerID != localUserID
+        let shouldShow = hasRemoteSharer
+        setScreenStreamOrientationButtonHidden(!shouldShow)
+    }
+
+    private func forcePortraitIfLandscape() {
+        guard let viewController = findViewController() as? RoomMainViewController else { return }
+        if viewController.isLandscapeMode {
+            viewController.isLandscapeMode = false
+            if #available(iOS 16.0, *) {
+                viewController.setNeedsUpdateOfSupportedInterfaceOrientations()
+                if let windowScene = viewController.view.window?.windowScene {
+                    let geometry = UIWindowScene.GeometryPreferences.iOS(interfaceOrientations: .portrait)
+                    windowScene.requestGeometryUpdate(geometry)
+                }
+            } else {
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+                UIViewController.attemptRotationToDeviceOrientation()
+            }
+        }
+    }
+
+    private func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let next = responder?.next {
+            if let vc = next as? UIViewController {
+                return vc
+            }
+            responder = next
+        }
+        return nil
     }
 
 }
@@ -184,6 +267,8 @@ extension StandardRoomView: UICollectionViewDataSource {
                 }
                 cell.updateUI(with: screenShareParticipant)
                 bindScreenStreamState(cell: cell, with: screenShareParticipant)
+                cell.setOrientationSwitchButtonHidden(orientationButtonHidden)
+                cell.updateOrientationSwitchButtonImage(isLandscape: orientationButtonIsLandscape)
                 return cell
             } else {
                 participant = participantList.1[indexPath.item]

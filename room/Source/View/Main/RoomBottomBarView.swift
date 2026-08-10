@@ -13,6 +13,7 @@ import AtomicX
 public protocol RoomBottomBarViewDelegate: AnyObject {
     func onMembersButtonTapped()
     func onAIToolsButtonTapped()
+    func onInviteButtonTapped()
     func onHandsUpManagerButtonTapped()
     func onShowToast(message: String, style: ToastStyle)
 }
@@ -97,6 +98,10 @@ extension RoomBottomBarView: StandardRoomBottomBarViewDelegate, WebinarRoomBotto
         delegate?.onAIToolsButtonTapped()
     }
     
+    public func onInviteButtonTapped() {
+        delegate?.onInviteButtonTapped()
+    }
+
     public func onMembersButtonTapped(bottomBar: StandardRoomBottomBarView) {
         delegate?.onMembersButtonTapped()
     }

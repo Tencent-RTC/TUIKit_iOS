@@ -32,6 +32,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     
     private var cancellableSet = Set<AnyCancellable>()
     private let roomID: String
+    private let titleOverride: String?
     private var owner: RoomUser?
     
     // MARK: - UI Components
@@ -89,8 +90,9 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     }()
     
     // MARK: - Initialization
-    public init(roomID: String) {
+    public init(roomID: String, titleOverride: String? = nil) {
         self.roomID = roomID
+        self.titleOverride = titleOverride
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false
         setupViews()
@@ -192,7 +194,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
     
     // MARK: - Private Methods
     private func updateRoomInfo(_ roomInfo: RoomInfo) {
-        titleLabel.text = roomInfo.roomName
+        titleLabel.text = titleOverride ?? roomInfo.roomName
         
         ownerInfoRow.configure(
             title: .owner,
