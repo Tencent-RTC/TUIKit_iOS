@@ -172,6 +172,12 @@ public struct RoomColors {
         darkHex: "#4F586B"
     )
     
+    /// 行右侧 value 文本色 (#2B2E38B2)
+    public static let valueText = RoomThemeManager.dynamicColor(
+        lightHex: "#2B2E38",
+        darkHex: "#2B2E38"
+    ).withAlphaComponent(178.0 / 255.0)
+    
     /// G5 - 主题灰色
     public static let g5 = RoomThemeManager.dynamicColor(
         lightHex: "#99A2B2",
@@ -233,6 +239,16 @@ public struct RoomColors {
     public static let endTitleColor = RoomThemeManager.dynamicColor(
         lightHex: "#ED414D",
         darkHex: "#ED414D"
+    )
+
+    public static let statusNotStartedColor = RoomThemeManager.dynamicColor(
+        lightHex: "#FF643D",
+        darkHex: "#FF643D"
+    )
+    
+    public static let scheduleEnterButtonBgColor = RoomThemeManager.dynamicColor(
+        lightHex: "#F0F3FA",
+        darkHex: "#F0F3FA"
     )
     
     public static let actionSheetTitleColor = RoomThemeManager.dynamicColor(

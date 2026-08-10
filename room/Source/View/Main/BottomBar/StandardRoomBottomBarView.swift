@@ -8,10 +8,12 @@
 import AtomicXCore
 import Combine
 import AtomicX
+import SnapKit
 
 public protocol StandardRoomBottomBarViewDelegate: AnyObject {
     func onMembersButtonTapped(bottomBar: StandardRoomBottomBarView)
     func onAIToolsButtonTapped()
+    func onInviteButtonTapped()
     func onShowToast(message: String, style: ToastStyle)
 }
 
@@ -35,14 +37,61 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private weak var recordingConfirmAlertView: AtomicAlertView?
     private let roomID: String
     private var cancellableSet = Set<AnyCancellable>()
-    
-    // MARK: - UI Components
-    private lazy var buttonStackView: UIStackView = {
+    private var isExpanded: Bool = false
+    private var row2HeightConstraint: Constraint?
+    private let maxButtonsPerRow = 5
+
+    private var allButtons: [RoomIconButton] {
+        [membersButton, microphoneButton, cameraButton,
+         screenShareButton, recordingButton, inviteButton, aiToolsButton]
+    }
+
+    private var visibleButtons: [RoomIconButton] {
+        allButtons.filter { !$0.isHidden }
+    }
+
+    private var row1Buttons: [RoomIconButton] {
+        Array(visibleButtons.prefix(maxButtonsPerRow))
+    }
+
+    private var row2Buttons: [RoomIconButton] {
+        Array(visibleButtons.dropFirst(maxButtonsPerRow))
+    }
+
+    private lazy var contentContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.layer.cornerRadius = 16
+        view.clipsToBounds = true
+        return view
+    }()
+
+    private lazy var containerStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        stackView.spacing = 0
+        return stackView
+    }()
+
+    private lazy var row1StackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
         stackView.alignment = .center
-        stackView.spacing = 0
+        stackView.spacing = 10
+        return stackView
+    }()
+
+    private lazy var row2StackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .equalSpacing
+        stackView.alignment = .center
+        stackView.spacing = 10
+        stackView.clipsToBounds = true
+        stackView.alpha = 0
         return stackView
     }()
     
@@ -69,9 +118,13 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private lazy var recordingButton: RoomIconButton = {
         return makeIconButton(title: .record, imageName: "room_recording")
     }()
-    
-    private lazy var buttons: [RoomIconButton] = {
-        [membersButton, microphoneButton, cameraButton, screenShareButton, aiToolsButton, recordingButton]
+
+    private lazy var inviteButton: RoomIconButton = {
+        return makeIconButton(title: .invite, imageName: "room_invite_member")
+    }()
+
+    private lazy var moreButton: RoomIconButton = {
+        return makeIconButton(title: .expand, imageName: "room_more_up")
     }()
     
     // MARK: - Initialization
@@ -90,23 +143,82 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     
     // MARK: - Setup
     public func setupViews() {
-        addSubview(buttonStackView)
-        buttons.forEach { [weak self] button in
-            guard let self = self else { return }
-            buttonStackView.addArrangedSubview(button)
-        }
+        addSubview(contentContainerView)
+        contentContainerView.addSubview(containerStackView)
+        containerStackView.addArrangedSubview(row1StackView)
+        containerStackView.addArrangedSubview(row2StackView)
+        rebuildLayout()
     }
-    
-    public func setupConstraints() {
-        buttonStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+
+    private func rebuildLayout() {
+        for view in row1StackView.arrangedSubviews {
+            row1StackView.removeArrangedSubview(view)
+        }
+        for button in row1Buttons {
+            row1StackView.addArrangedSubview(button)
         }
         
-        buttons.forEach { button in
+        if !row2Buttons.isEmpty {
+            row1StackView.addArrangedSubview(moreButton)
+        }
+
+        for view in row2StackView.arrangedSubviews {
+            row2StackView.removeArrangedSubview(view)
+        }
+        
+        for button in row2Buttons {
+            row2StackView.addArrangedSubview(button)
+        }
+        
+        let remainingSlots = maxButtonsPerRow - row2Buttons.count
+        for _ in 0..<remainingSlots {
+            row2StackView.addArrangedSubview(makeSpacer(width: 52))
+        }
+        row2StackView.addArrangedSubview(makeSpacer(width: 32))
+
+        if row2Buttons.isEmpty {
+            moreButton.isHidden = true
+            row2HeightConstraint?.update(offset: 0)
+            row2StackView.alpha = 0
+            isExpanded = false
+        } else {
+            moreButton.isHidden = false
+        }
+    }
+
+    public func setupConstraints() {
+        contentContainerView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        containerStackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 8, left: 8,
+                                                              bottom: 8, right: 8))
+        }
+
+        row1StackView.snp.makeConstraints { make in
+            make.height.equalTo(52)
+        }
+        row2StackView.snp.makeConstraints { make in
+            self.row2HeightConstraint = make.height.equalTo(0).constraint
+        }
+
+        allButtons.forEach { button in
             button.snp.makeConstraints { make in
                 make.size.equalTo(CGSize(width: 52, height: 52))
             }
         }
+
+        moreButton.snp.makeConstraints { make in
+            make.width.equalTo(32)
+            make.height.equalTo(52)
+        }
+    }
+
+    private func makeSpacer(width: CGFloat) -> UIView {
+        let view = UIView()
+        view.isUserInteractionEnabled = false
+        view.snp.makeConstraints { $0.width.equalTo(width) }
+        return view
     }
     
     public func setupStyles() {}
@@ -118,6 +230,8 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         screenShareButton.addTarget(self, action: #selector(screenShareButtonTapped), for: .touchUpInside)
         aiToolsButton.addTarget(self, action: #selector(aiToolsButtonTapped), for: .touchUpInside)
         recordingButton.addTarget(self, action: #selector(recordingButtonTapped), for: .touchUpInside)
+        inviteButton.addTarget(self, action: #selector(inviteButtonTapped), for: .touchUpInside)
+        moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
         
         participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .map { $0?.role ?? .generalUser }
@@ -234,6 +348,7 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         let wasRecording = isRecording
         isRecording = status == .recording
         let canManage = role == .owner || role == .admin
+        let wasHidden = recordingButton.isHidden
         recordingButton.isHidden = !canManage
         if isRecording {
             recordingButton.setIcon(ResourceLoader.loadImage("room_recording_on"))
@@ -244,6 +359,9 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         }
         if !canManage || wasRecording != isRecording {
             dismissRecordingConfirmAlertView()
+        }
+        if wasHidden != recordingButton.isHidden {
+            rebuildLayout()
         }
     }
 
@@ -398,6 +516,48 @@ extension StandardRoomBottomBarView {
     @objc private func aiToolsButtonTapped() {
         delegate?.onAIToolsButtonTapped()
     }
+
+    @objc private func inviteButtonTapped() {
+        delegate?.onInviteButtonTapped()
+    }
+
+    @objc private func moreButtonTapped() {
+        isExpanded.toggle()
+        moreButton.setTitle(isExpanded ? .close : .expand)
+        moreButton.setIcon(ResourceLoader.loadImage(isExpanded ? "room_more_down" : "room_more_up"))
+
+        if isExpanded {
+            row2HeightConstraint?.update(offset: 52)
+            containerStackView.spacing = 4
+            UIView.animate(withDuration: 0.2,
+                           delay: 0,
+                           options: .curveEaseInOut) {
+                self.contentContainerView.backgroundColor = RoomColors.g2
+                self.superview?.layoutIfNeeded()
+            } completion: { _ in
+                UIView.animate(withDuration: 0.15,
+                               delay: 0,
+                               options: .curveEaseInOut) {
+                    self.row2StackView.alpha = 1
+                }
+            }
+        } else {
+            UIView.animate(withDuration: 0.15,
+                           delay: 0,
+                           options: .curveEaseInOut) {
+                self.row2StackView.alpha = 0
+                self.contentContainerView.backgroundColor = .clear
+            } completion: { _ in
+                self.row2HeightConstraint?.update(offset: 0)
+                self.containerStackView.spacing = 0
+                UIView.animate(withDuration: 0.2,
+                               delay: 0,
+                               options: .curveEaseInOut) {
+                    self.window?.layoutIfNeeded()
+                }
+            }
+        }
+    }
     
     @objc private func recordingButtonTapped() {
         if isRecording {
@@ -507,6 +667,9 @@ fileprivate extension String {
     static let notAllowedToScreenShare = "roomkit_not_allowed_to_screen_share".localized
     static let record = "roomkit_cloud_record".localized
     static let recordStartConfirm = "roomkit_cloud_record_start_confirm".localized
+    static let expand = "roomkit_item_expand".localized
+    static let close = "roomkit_item_close".localized
+    static let invite = "roomkit_invite".localized
     static let recording = "roomkit_cloud_record_recording".localized
     static let recordStop = "roomkit_cloud_record_stop".localized
     static let recordStartTitle = "roomkit_cloud_record_start_title".localized

@@ -29,7 +29,7 @@ Pod::Spec.new do |spec|
   spec.dependency 'TXLiteAVSDK_Professional'
   spec.source_files = 'Source/**/*.{swift,h,m}'
   spec.resource_bundles = {
-    'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings']
+    'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings', 'Resources/AudioFile/*.mp3']
   }
   
 end

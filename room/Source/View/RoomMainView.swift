@@ -53,6 +53,7 @@ public class RoomMainView: UIView, BaseView {
     private let localUserID: String = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
     private var localParticipant: RoomParticipant?
     private let deviceOperator = DeviceOperator()
+    private var isCurrentlyLandscape: Bool = false
     
     // MARK: - UI Components
     private lazy var topBarView: RoomTopBarView = {
@@ -93,7 +94,7 @@ public class RoomMainView: UIView, BaseView {
         view.isHidden = true
         return view
     }()
-    
+
     private lazy var listView: ParticipantListView = {
         let listView = ParticipantListView(roomID: roomID, roomType: roomType)
         return listView
@@ -151,7 +152,7 @@ public class RoomMainView: UIView, BaseView {
         addSubview(topBarView)
         addSubview(roomView)
         roomView.addSubview(screenShareOverlay)
-        
+
         addSubview(barrageStreamView)
         addSubview(barrageInputView)
         addSubview(bottomBarView)
@@ -168,7 +169,7 @@ public class RoomMainView: UIView, BaseView {
         roomView.snp.makeConstraints { make in
             make.left.right.equalToSuperview()
             make.top.equalTo(topBarView.snp.bottom)
-            make.bottom.equalTo(bottomBarView.snp.top).offset(-10)
+            make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-70)
         }
         
         screenShareOverlay.snp.makeConstraints { make in
@@ -183,7 +184,6 @@ public class RoomMainView: UIView, BaseView {
         }
         
         barrageInputView.snp.makeConstraints { make in
-
             make.left.equalToSuperview().offset(RoomSpacing.standard)
             make.height.equalTo(40)
             make.width.equalTo(130)
@@ -194,7 +194,7 @@ public class RoomMainView: UIView, BaseView {
             make.leading.equalToSuperview().offset(12)
             make.trailing.equalToSuperview().offset(-12)
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
-            make.height.equalTo(52)
+            make.height.greaterThanOrEqualTo(52)
         }
         
         recordingFloatingView.snp.makeConstraints { make in
@@ -235,7 +235,7 @@ public class RoomMainView: UIView, BaseView {
                 screenShareOverlay.isHidden = screenShareStatus == .off
             }
             .store(in: &cancellableSet)
-        
+
         participantStore.participantEventPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] event in
@@ -297,6 +297,45 @@ public class RoomMainView: UIView, BaseView {
             }
             .store(in: &cancellableSet)
         
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        let landscape = resolveIsLandscape()
+        if landscape != isCurrentlyLandscape {
+            isCurrentlyLandscape = landscape
+            applyOrientationLayout(isLandscape: landscape)
+        }
+    }
+}
+
+// MARK: - Orientation
+extension RoomMainView {
+    private func resolveIsLandscape() -> Bool {
+        guard let viewController = routerContext as? RoomMainViewController else { return false }
+        return viewController.isLandscapeMode
+    }
+
+    private func applyOrientationLayout(isLandscape: Bool) {
+        topBarView.isHidden = isLandscape
+        bottomBarView.isHidden = isLandscape
+        subtitleView?.isHidden = isLandscape
+        if roomType == .webinar {
+            barrageInputView.isHidden = isLandscape
+            barrageStreamView.isHidden = isLandscape
+        }
+        recordingFloatingView.alpha = isLandscape ? 0 : 1
+        roomView.setScrollEnabled(!isLandscape)
+        
+        roomView.snp.remakeConstraints { make in
+            if isLandscape {
+                make.edges.equalTo(safeAreaLayoutGuide)
+            } else {
+                make.left.right.equalToSuperview()
+                make.top.equalTo(topBarView.snp.bottom)
+                make.bottom.equalTo(bottomBarView.snp.top).offset(-10)
+            }
+        }
     }
 }
 
@@ -852,6 +891,10 @@ extension RoomMainView: RoomBottomBarViewDelegate {
     public func onShowToast(message: String, style: AtomicX.ToastStyle) {
         showAtomicToast(text: message, style: style)
     }
+
+    public func onInviteButtonTapped() {
+        showInviteActionSheet()
+    }
     
     public func onAIToolsButtonTapped() {
         let isSubtitleShow = subtitleView != nil
@@ -1082,6 +1125,55 @@ extension RoomMainView: RoomScreenShareOverlayViewDelegate {
                                      confirmButton: stopButtonConfig)
         AtomicAlertView(config: config).show()
     }
+
+    private func showInviteActionSheet() {
+        let actionSheet = RoomActionSheet(actions: [
+            RoomActionSheet.Action(icon: ResourceLoader.loadImage("room_invite"),
+                                   title: .selectMembers,
+                                   titleColor: RoomColors.segmentTitleColor,
+                                   titleFont: RoomFonts.pingFangSCFont(size: 14, weight: .regular),
+                                   handler: { [weak self] _ in
+                                       guard let self = self else { return }
+                                       let picker = RoomSelectAttendeesViewController(
+                                           initialSelectedUserIDs: [],
+                                           mode: .invite
+                                       )
+                                       picker.onConfirm = { [weak self] selected in
+                                           guard let self = self else { return }
+                                           let userIDs = selected.map { $0.userID }
+                                           self.roomStore.callUserToRoom(
+                                               roomID: self.roomID,
+                                               userIDList: userIDs,
+                                               timeout: 60,
+                                               extensionInfo: nil
+                                           ) { result in
+                                               DispatchQueue.main.async {
+                                                   switch result {
+                                                   case .success:
+                                                       self.showAtomicToast(text: .inviteSentWait, style: .success)
+                                                   case .failure(let err):
+                                                       self.showAtomicToast(
+                                                           text: InternalError(code: err.code, message: err.message).localizedMessage,
+                                                           style: .error
+                                                       )
+                                                   }
+                                               }
+                                           }
+                                       }
+                                       self.routerContext?.push(picker, animated: true)
+                                   }),
+            RoomActionSheet.Action(icon: ResourceLoader.loadImage("room_share_invite"),
+                                   title: .shareRoom,
+                                   titleColor: RoomColors.segmentTitleColor,
+                                   titleFont: RoomFonts.pingFangSCFont(size: 14, weight: .regular),
+                                   handler: { [weak self] _ in
+                                       guard let self = self else { return }
+                                       RoomInfoView(roomID: self.roomID, titleOverride: .inviteMembers)
+                                           .show(in: self, animated: true)
+                                   })
+        ])
+        actionSheet.show(in: self, animated: true)
+    }
 }
 
 fileprivate extension String {
@@ -1165,7 +1257,12 @@ fileprivate extension String {
     
     static let closeSubtitle = "roomkit_transcription_close_subtitle".localized
     static let closeMinutes = "roomkit_transcription_close_minutes".localized
-    
+
+    // Invite panel
+    static let selectMembers = "roomkit_select_attendee_title".localized
+    static let inviteMembers = "roomkit_scheduled_invite_members".localized
+    static let inviteSentWait = "roomkit_invite_success".localized
+    static let shareRoom = "roomkit_share_room".localized
     static let ownerChangedSourceLanguage = "roomkit_transcription_owner_changed_source_language".localized
 
     // Screen Share
