@@ -19,7 +19,6 @@ Pod::Spec.new do |spec|
   spec.dependency 'SnapKit'
   spec.dependency 'TUICore'
   spec.dependency 'Kingfisher'
-  spec.dependency 'Protobuf', '~> 3.22.1'
   spec.dependency "MJRefresh"
   spec.dependency 'AtomicX'
   spec.dependency 'TXIMSDK_Plus_iOS_XCFramework', '>= 8.7.7021'
