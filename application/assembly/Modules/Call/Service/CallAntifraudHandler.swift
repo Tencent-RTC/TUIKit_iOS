@@ -24,7 +24,9 @@ final class CallAntifraudHandler {
             .sink { status in
                 if status == .accept {
                     guard Bundle.main.bundleIdentifier != "com.tencent.rtc.app" else { return }
+                    #if APPASSEMBLY_FULL
                     if let user = LoginManager.shared.getCurrentUser(), user.isMoa() { return }
+                    #endif
 
                     AppAssembly.shared.privacyActionHandler?(.showAntifraudReminder)
                 }

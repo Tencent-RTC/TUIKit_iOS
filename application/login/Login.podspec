@@ -15,29 +15,21 @@ Pod::Spec.new do |spec|
 
   spec.source = { :path => './' }
 
-  spec.dependency 'TUICore'
-  spec.dependency 'Alamofire'
-  spec.dependency 'SnapKit'
-  spec.dependency 'Kingfisher'
-  spec.dependency 'Toast-Swift'
-  spec.dependency 'AtomicX'
-
   spec.default_subspecs = 'OpenSource'
 
   spec.subspec 'OpenSource' do |ss|
-    ss.source_files = '**/*.{swift,h,m}'
-    ss.exclude_files = [
-      'Frameworks/**/*',
-      'IOAAuth/*',
-      'IOAAuth/**/*',
-    ]
+    ss.source_files = 'Opensource/**/*.{swift,h,m}'
     ss.resource_bundles = {
       'LoginResources' => [
         'Resource/**/*.xcassets',
-        'Resource/**/*.xcstrings',
-        'Resource/**/*.html',
+        'Opensource/Resource/**/*.xcstrings',
       ]
     }
+    ss.dependency 'TUICore'
+    ss.dependency 'AtomicX'
+    ss.dependency 'SnapKit'
+    ss.dependency 'Kingfisher'
+    ss.dependency 'Toast-Swift'
   end
 
 end

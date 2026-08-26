@@ -99,7 +99,7 @@ class MineRootView: UIView {
         return tableView
     }()
     
-    #if !RTCUBE_OVERSEAS
+    #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
     private let rtcExperienceRoomBtn: RTCExperienceRoomButtonView = {
         let btn = RTCExperienceRoomButtonView()
         btn.configure(
@@ -130,7 +130,7 @@ class MineRootView: UIView {
                                   byRoundingCorners: .allCorners,
                                   cornerRadii: CGSize(width: 10, height: 10))
         
-        #if !RTCUBE_OVERSEAS
+        #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         rtcExperienceRoomBtn.roundedRect(rect: rtcExperienceRoomBtn.bounds,
                                          byRoundingCorners: .allCorners,
                                          cornerRadii: CGSize(width: 10, height: 10))
@@ -160,7 +160,7 @@ class MineRootView: UIView {
         addSubview(userIdLabel)
         addSubview(containerView)
         containerView.addSubview(tableView)
-        #if !RTCUBE_OVERSEAS
+        #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         addSubview(rtcExperienceRoomBtn)
         #endif
         addSubview(logoutBtn)
@@ -211,7 +211,7 @@ class MineRootView: UIView {
             make.leading.trailing.equalToSuperview()
             make.bottom.equalToSuperview().offset(-8)
         }
-        #if !RTCUBE_OVERSEAS
+        #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         rtcExperienceRoomBtn.snp.makeConstraints { make in
             make.top.equalTo(containerView.snp.bottom).offset(12)
             make.leading.equalToSuperview().offset(20)
@@ -219,9 +219,9 @@ class MineRootView: UIView {
             make.height.equalTo(60)
         }
         #endif
-        
+
         logoutBtn.snp.makeConstraints { make in
-            #if !RTCUBE_OVERSEAS
+            #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
             make.top.equalTo(rtcExperienceRoomBtn.snp.bottom).offset(12)
             #else
             make.top.equalTo(containerView.snp.bottom).offset(12)
@@ -245,7 +245,7 @@ class MineRootView: UIView {
         headImageView.addGestureRecognizer(tap)
         headImageView.isUserInteractionEnabled = true
         
-        #if !RTCUBE_OVERSEAS
+        #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
         rtcExperienceRoomBtn.onClicked = { [weak self] in
             self?.delegate?.jumpExperienceRoom()
         }
@@ -362,8 +362,10 @@ extension MineRootView: UITableViewDelegate {
             delegate?.navigationController?.pushViewController(vc, animated: true)
             
         case .privacy:
+            #if !OPEN_SOURCE
             PrivacyEntry.pushPrivacyPage(.privacyCenter, from: delegate)
-            
+            #endif
+
         case .disclaimer:
             let alert = UIAlertController(
                 title: MineLocalize("mine_info_statement_detail")

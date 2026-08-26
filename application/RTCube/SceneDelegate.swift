@@ -147,6 +147,7 @@ extension SceneDelegate {
             GenerateTestUserSig.genTestUserSig(identifier: identifier, sdkAppId: sdkAppId, secretKey: secretKey)
         }
 
+        #if !OPEN_SOURCE
         LoginEntry.shared.privacyLinkHandler = { linkType, viewController in
             let pageType: PrivacyPageType
             switch linkType {
@@ -165,10 +166,13 @@ extension SceneDelegate {
             }
             PrivacyEntry.pushPrivacyPage(pageType, from: viewController)
         }
+        #endif
 
+        #if !OPEN_SOURCE
         LoginEntry.shared.onEnvironmentChanged = { env in
             EnvironmentOperation.switchEnvironment(testEnv: env == .test)
         }
+        #endif
 
         LoginEntry.shared.onPrivacyAgreed = { isAgree in
             if isAgree {

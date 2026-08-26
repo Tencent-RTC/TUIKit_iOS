@@ -37,7 +37,7 @@ Pod::Spec.new do |spec|
   spec.default_subspecs = 'OpenSource'
 
   spec.subspec 'OpenSource' do |ss|
-    modules = %w[Resource Call Live VoiceRoom Room Interpretation ScenesApplication]
+    modules = %w[Resource Call Live VoiceRoom Room ScenesApplication]
 
     ss.dependency 'Login/OpenSource'
 

@@ -59,11 +59,15 @@ public class TRTCCallingContactView: UIView {
         searchBar.backgroundColor = UIColor.clear
         searchBar.returnKeyType = .search
 
+        #if APPASSEMBLY_FULL
         if LoginManager.shared.currentUser?.isMoa() == true {
             searchBar.keyboardType = .default
         } else {
             searchBar.keyboardType = .phonePad
         }
+        #else
+        searchBar.keyboardType = .phonePad
+        #endif
 
         searchBar.layer.cornerRadius = 0
         return searchBar
@@ -91,7 +95,7 @@ public class TRTCCallingContactView: UIView {
         let label = UILabel(frame: .zero)
         let copyStr = CallingLocalize("assembly_call_btn_copy")
         let str = CallingLocalize("assembly_call_your_id") + " "
-            + (LoginManager.shared.getCurrentUser()?.userId ?? "") + "  "
+            + (LoginEntry.shared.userModel?.userId ?? "") + "  "
             + copyStr
         let font = ThemeStore.shared.typographyTokens.Regular12
         let fontAttr: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: ThemeStore.shared.colorTokens.textColorPrimary]
@@ -296,9 +300,13 @@ extension TRTCCallingContactView: UITextFieldDelegate, UISearchBarDelegate {
     }
 
     public func searchUser(input: String) {
-        if LoginManager.shared.getCurrentUser() != nil &&
+        #if APPASSEMBLY_FULL
+        let canSearch = LoginManager.shared.getCurrentUser() != nil &&
             UserOverdueLogicManager.sharedManager().userOverdueState == .alreadyLogged
-        {
+        #else
+        let canSearch = LoginEntry.shared.hasLoggedIn
+        #endif
+        if canSearch {
 #if RTCUBE_LAB
             V2TIMManager.sharedInstance()?.getUsersInfo([input], succ: { [weak self] infos in
                 guard let self = self else { return }
@@ -318,9 +326,11 @@ extension TRTCCallingContactView: UITextFieldDelegate, UISearchBarDelegate {
                 self.searchResult = nil
                 self.callingGuideView.isHidden = false
                 self.makeToast(err)
+                #if APPASSEMBLY_FULL
                 if UserOverdueLogicManager.sharedManager().userOverdueState == .notLogin {
                     self.makeToast(CallingLocalize("assembly_call_login_failed"))
                 }
+                #endif
             })
 #else
             let param = ["searchUserId": input]
@@ -415,7 +425,7 @@ extension TRTCCallingContactView {
     }
 
     @objc private func copyUserIDClicked() {
-        if let stringToCopy = LoginManager.shared.getCurrentUser()?.userId {
+        if let stringToCopy = LoginEntry.shared.userModel?.userId {
             UIPasteboard.general.string = stringToCopy
             self.makeToast(CallingLocalize("assembly_call_copied_to_clipboard"))
         } else {

@@ -140,7 +140,7 @@ class EntranceViewController: UIViewController {
                 AppAnalytics.trackModuleEvent(moduleId: "simultaneous_interpretation", event: name, params: params)
             }
         }
-        #else
+        #elseif !OPEN_SOURCE
         PrivacyEntry.enableIdCardVerification = false
         #endif
 
@@ -286,10 +286,7 @@ class EntranceViewController: UIViewController {
     // MARK: - Risk Check Entry Point
 
     private func performRiskCheckIfNeeded() {
-        #if RTCUBE_LAB
-        return
-        #endif
-
+        #if !RTCUBE_LAB
         if presentedViewController != nil {
             hasPerformedRiskCheck = false
             return
@@ -306,9 +303,10 @@ class EntranceViewController: UIViewController {
             showSafetyReminderAlert()
         }
         #endif
+        #endif
     }
 
-    #if !RTCUBE_OVERSEAS
+    #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
     private func showFaceAuthAlert(user: BSUserModel) {
         AppAssembly.shared.privacyActionHandler?(.showFaceIdTokenVerify(userId: user.userId, token: user.token, completion: { [weak self] isAuth, faceToken in
             guard let self = self else { return }
@@ -423,7 +421,7 @@ extension EntranceViewController: UICollectionViewDelegate {
         let module = visibleModules[indexPath.row]
 
         guard ModulePermissionService.shared.isModuleEnabled(module) else {
-            #if !RTCUBE_OVERSEAS
+            #if !RTCUBE_OVERSEAS && !OPEN_SOURCE
             if ModulePermissionService.shared.isNeedFaceAuth,
                let user = LoginManager.shared.getCurrentUser()
             {
@@ -608,6 +606,7 @@ extension EntranceViewController {
     }
 
     private func resolveLoginType() -> String {
+        #if !OPEN_SOURCE
         guard let userModel = LoginManager.shared.getCurrentUser() else {
             return "external"
         }
@@ -635,5 +634,8 @@ extension EntranceViewController {
         }
 
         return "external"
+        #else
+        return "external"
+        #endif
     }
 }
