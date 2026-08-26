@@ -8,10 +8,6 @@ import UIKit
 final class DemoLoginManager {
     static let shared = DemoLoginManager()
 
-    static let localSdkAppID = ""
-
-    static let localSecretKey = ""
-
     private(set) var currentUserID = ""
 
     func login(sdkAppID: Int32, userID: String, userSig: String, completion: @escaping (Bool, String?) -> Void) {
@@ -89,8 +85,8 @@ final class AutoLoginViewController: UIViewController {
     private func performAutoLogin() {
         let type = UserDefaults.standard.string(forKey: LoginPersist.loginType) ?? ""
         let userID = UserDefaults.standard.string(forKey: LoginPersist.loginUser) ?? ""
-        if type == LoginPersist.loginTypeLocal, !userID.isEmpty, let appID = Int32(DemoLoginManager.localSdkAppID) {
-            let userSig = GenerateTestUserSig.genTestUserSig(userID: userID, sdkAppID: Int(appID), secretKey: DemoLoginManager.localSecretKey)
+        if type == LoginPersist.loginTypeLocal, !userID.isEmpty, let appID = Int32(SDKAPPID) {
+            let userSig = GenerateTestUserSig.genTestUserSig(userID: userID)
             performLogin(sdkAppID: appID, userID: userID, userSig: userSig, extraSave: nil)
             return
         }

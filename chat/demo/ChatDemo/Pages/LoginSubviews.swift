@@ -145,12 +145,12 @@ final class LocalLoginViewController: UIViewController {
     }
 
     @objc private func handleLoginTapped() {
-        guard let appID = Int32(DemoLoginManager.localSdkAppID) else {
+        guard let appID = Int32(SDKAPPID) else {
             errorLabel.text = LocalizedChatString("InvalidSDKAppID")
             return
         }
         let userID = userIDField.text ?? ""
-        let userSig = GenerateTestUserSig.genTestUserSig(userID: userID, sdkAppID: Int(appID), secretKey: DemoLoginManager.localSecretKey)
+        let userSig = GenerateTestUserSig.genTestUserSig(userID: userID)
         isLoggingIn = true
         loginButton.setTitle(nil, for: .normal)
         loadingIndicator.startAnimating()

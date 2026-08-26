@@ -2,17 +2,14 @@ import CommonCrypto
 import Foundation
 import zlib
 
+let SDKAPPID = ""
+
+let SECRETKEY = ""
+
 @objc
 public class GenerateTestUserSig: NSObject {
     @objc
-    public class func genTestUserSig(identifier: String) -> String {
-        let sdkAppID = 1_400_187_352
-        let secretKey = "f442d0cca069bbcc8ced55f4f113b965999b928c78e3cd83495728133a06f4cb"
-        return genTestUserSig(userID: identifier, sdkAppID: sdkAppID, secretKey: secretKey)
-    }
-
-    @objc
-    public class func genTestUserSig(userID: String, sdkAppID: Int, secretKey: String) -> String {
+    public class func genTestUserSig(userID: String) -> String {
 
         let EXPIRETIME = 604_800
         let current = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970
@@ -20,7 +17,7 @@ public class GenerateTestUserSig: NSObject {
         var obj: [String: Any] = [
             "TLS.ver": "2.0",
             "TLS.identifier": userID,
-            "TLS.sdkappid": sdkAppID,
+            "TLS.sdkappid": Int(SDKAPPID) ?? 0,
             "TLS.expire": EXPIRETIME,
             "TLS.time": TLSTime,
         ]
@@ -37,7 +34,7 @@ public class GenerateTestUserSig: NSObject {
             }
         }
         print("string to sign: \(stringToSign)")
-        guard var sig = hmac(plainText: stringToSign, secretKey: secretKey) else {
+        guard var sig = hmac(plainText: stringToSign, secretKey: SECRETKEY) else {
             print("hmac error: \(stringToSign)")
             return ""
         }
