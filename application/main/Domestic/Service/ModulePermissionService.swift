@@ -28,6 +28,7 @@ final class ModulePermissionService {
     private(set) var isNeedFaceAuth: Bool = false
 
     func loadUserBlackList() {
+        #if !OPEN_SOURCE
         LoginManager.shared.getUserModuleBlackList(success: { [weak self] _ in
             guard let self = self else { return }
             if let modules = LoginManager.shared.currentUser?.bannedModules {
@@ -37,9 +38,11 @@ final class ModulePermissionService {
         }, failed: { errorCode, errorMessage in
             AppLogger.App.error(" loadUserBlackList failed: \(errorCode) \(errorMessage ?? "")")
         })
+        #endif
     }
 
     func checkHighRiskUser() -> Bool {
+        #if !OPEN_SOURCE
         guard let user = LoginManager.shared.getCurrentUser() else { return false }
         let result = user.isHighRiskUser
         if result {
@@ -48,6 +51,9 @@ final class ModulePermissionService {
         }
         AppLogger.App.info(" checkHighRiskUser called, isHighRisk: \(result)")
         return result
+        #else
+        return false
+        #endif
     }
 
     func updateBannedModules(_ modules: [String: Bool]) {

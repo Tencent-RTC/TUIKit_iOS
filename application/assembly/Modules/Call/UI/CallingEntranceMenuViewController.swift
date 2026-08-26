@@ -268,6 +268,7 @@ extension CallingEntranceMenuViewController {
 
 extension CallingEntranceMenuViewController {
     func updateBotCells() {
+        #if APPASSEMBLY_FULL
         if CallingRobotItems.count == 0 && UserOverdueLogicManager.sharedManager().userOverdueState == .alreadyLogged {
             CallingRobotItems = [
                 CallingRobotModel(imageName: "calling_robot_A",
@@ -287,6 +288,9 @@ extension CallingEntranceMenuViewController {
                 self.view.makeToast(CallingLocalize("assembly_call_login_failed"))
             }
         }
+        #else
+        CallingRobotItems.removeAll()
+        #endif
         tableView.reloadData()
     }
 }

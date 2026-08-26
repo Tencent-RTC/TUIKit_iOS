@@ -182,7 +182,9 @@ extension AnchorViewController: AnchorViewDelegate {
     }
     
     func onStartLiving() {
+        #if APPASSEMBLY_FULL
         guard LoginManager.shared.currentUser?.isMoa() != true else { return }
+        #endif
         AppAssembly.shared.privacyActionHandler?(.showLiveTimeLimitAlert)
         startRemainingTimer()
         startTimeOutTimer()

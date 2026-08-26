@@ -82,19 +82,21 @@ extension MusicCatalogServiceImpl {
         failed: @escaping (Int32, String?) -> Void
     ) {
         var requestParams = params
-        if let userId = LoginManager.shared.getCurrentUser()?.userId, requestParams["userId"] == nil {
+        if let userId = LoginEntry.shared.userModel?.userId, requestParams["userId"] == nil {
             requestParams["userId"] = userId
         }
-        if let token = LoginManager.shared.getCurrentUser()?.token, requestParams["token"] == nil {
+        if let token = LoginEntry.shared.userModel?.token, requestParams["token"] == nil {
             requestParams["token"] = token
         }
+        #if APPASSEMBLY_FULL
         if let apaasUserId = LoginManager.shared.getCurrentUser()?.apaasUserId,
            !apaasUserId.isEmpty, requestParams["apaasUserId"] == nil
         {
             requestParams["apaasUserId"] = apaasUserId
         }
+        #endif
         if requestParams["appId"] == nil {
-            requestParams["appId"] = HttpLogicRequest.sdkAppId
+            requestParams["appId"] = LoginEntry.shared.config.sdkAppId
         }
 
         AF.request(url, method: .post, parameters: requestParams, encoding: JSONEncoding.default)

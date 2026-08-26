@@ -11,9 +11,11 @@ import Login
 class HTTPRequstBotService: NSObject {
 
     private var parameters: Dictionary<String, String?> = {
-        let parameters = ["userId": LoginManager.shared.getCurrentUser()?.userId,
-                          "token": LoginManager.shared.getCurrentUser()?.token,
-                          "apaasAppId": LoginManager.shared.getCurrentUser()?.apaasAppId]
+        var parameters = ["userId": LoginEntry.shared.userModel?.userId,
+                          "token": LoginEntry.shared.userModel?.token]
+        #if APPASSEMBLY_FULL
+        parameters["apaasAppId"] = LoginManager.shared.getCurrentUser()?.apaasAppId
+        #endif
         return parameters
     }()
 

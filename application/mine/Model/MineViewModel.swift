@@ -54,7 +54,11 @@ class MineViewModel: NSObject {
     }()
     
     lazy var tableTypeSource: [MineListType] = {
+        #if OPEN_SOURCE
+        return [.disclaimer, .icp, .about]
+        #else
         return [.privacy, .disclaimer, .icp, .about]
+        #endif
     }()
     
     func validate(userName: String) -> Bool {

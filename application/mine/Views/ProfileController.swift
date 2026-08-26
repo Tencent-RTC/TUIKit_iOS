@@ -220,7 +220,9 @@ extension ProfileController {
             let info = V2TIMUserFullInfo()
             info.faceURL = urlString
             V2TIMManager.sharedInstance().setSelfInfo(info: info) {
+                #if !OPEN_SOURCE
                 LoginManager.shared.getCurrentUser()?.avatar = urlString
+                #endif
                 self.profile?.faceURL = urlString
                 self.configData()
             } fail: { code, err in
