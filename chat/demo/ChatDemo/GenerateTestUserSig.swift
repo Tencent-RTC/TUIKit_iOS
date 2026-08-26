@@ -13,8 +13,7 @@ public class GenerateTestUserSig: NSObject {
 
     @objc
     public class func genTestUserSig(userID: String, sdkAppID: Int, secretKey: String) -> String {
-        // Signature expiration time, it is recommended not to set it too short.
-        // Default time: 7 x 24 x 60 x 60 = 604800 = 7 days
+
         let EXPIRETIME = 604_800
         let current = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970
         let TLSTime = CLong(floor(current))

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "demo_login_hero_bg.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

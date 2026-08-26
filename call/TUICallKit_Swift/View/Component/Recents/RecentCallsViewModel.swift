@@ -18,7 +18,7 @@ enum RecentCallsType: Int {
     case missed
 }
 
-enum RecentCallsUIStyle: Int {
+public enum RecentCallsUIStyle: Int {
     case classic
     case minimalist
 }

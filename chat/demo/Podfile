@@ -3,33 +3,13 @@ platform :ios, '15.0'
 target 'ChatDemo' do
   use_frameworks! :linkage => :static
   
-  pod 'AtomicXCore', :path => '../../../../../tuikit_engine/atomicx/swift/AtomicXCore'
-  pod 'AtomicX/Chat', :path => '../../../ios_swiftui/AtomicX.podspec'
+  #pod 'AtomicXCore', :path => '../../../../../tuikit_engine/atomicx/swift/AtomicXCore'
   pod 'ChatUIKit', :path => '../uikit/ChatUIKit.podspec'
-  pod 'RTCRoomEngine', :path => '../../../../../tuikit_engine/RTCRoomEngine.podspec'
-#  pod 'MessageList', :path => '../../atomic-x/Sources/MessageList'
-#  pod 'MessageInput', :path => '../../atomic-x/Sources/MessageInput'
-#  pod 'ConversationList', :path => '../../atomic-x/Sources/ConversationList'
-#  pod 'ContactList', :path => '../../atomic-x/Sources/ContactList'
-#  pod 'ChatSetting', :path => '../../atomic-x/Sources/ChatSetting'
-#  pod 'Search', :path => '../../atomic-x/Sources/Search'
-#  pod 'BaseComponent', :path => '../../atomic-x/Sources/BaseComponent'
-#  pod 'AudioPlayer', :path => '../../atomic-x/Sources/AudioPlayer'
-#  pod 'VideoPlayer', :path => '../../atomic-x/Sources/VideoPlayer'
-#  pod 'ImageViewer', :path => '../../atomic-x/Sources/ImageViewer'
-#  pod 'VideoPicker', :path => '../../atomic-x/Sources/VideoPicker'
-#  pod 'ImagePicker', :path => '../../atomic-x/Sources/ImagePicker'
-#  pod 'FilePicker', :path => '../../atomic-x/Sources/FilePicker'
-#  pod 'EmojiPicker', :path => '../../atomic-x/Sources/EmojiPicker'
-#  pod 'AudioRecorder', :path => '../../atomic-x/Sources/AudioRecorder'
-#  pod 'VideoRecorder', :path => '../../atomic-x/Sources/VideoRecorder'
+  pod 'TUICallKit_Swift', :path => '../../call/TUICallKit_Swift.podspec'
+  #pod 'RTCRoomEngine', :path => '../../../../../tuikit_engine/RTCRoomEngine.podspec'
+  pod 'TXIMSDK_Plus_iOS_XCFramework', '9.0.7661'
 
-#测试
-#pod 'TXLiteAVSDK_Professional', :path => '/Users/lzmlsfe/Desktop/project/eddardliu/TXLiteAVSDK_Professional_IMUGC'
-
-#  # 添加TXIMSDK_Plus_Swift_iOS_XCFramework依赖
-#  pod 'TXIMSDK_Plus_Swift_iOS_XCFramework'
-end 
+end
 
 #Pods config
 post_install do |installer|
@@ -51,5 +31,6 @@ post_install do |installer|
             
         end
     end
+    
 end
 
