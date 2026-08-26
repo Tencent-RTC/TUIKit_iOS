@@ -1,134 +1,116 @@
-import AtomicX
 import AtomicXCore
-import SwiftUI
+import ChatUIKit
+import RTCRoomEngine
+import SnapKit
+import TUICallKit_Swift
+import UIKit
 
-class LoginStatusManager: ObservableObject {
-    @Published var isLoggedIn: Bool = false
-    @Published var currentUserID: String = ""
-    @Published var isLoggingIn: Bool = false
-    @Published var loginError: String? = nil
-    static let shared = LoginStatusManager()
+final class DemoLoginManager {
+    static let shared = DemoLoginManager()
 
-    private init() {
-        isLoggedIn = LoginStore.shared.state.value.loginStatus == .logined
-        if isLoggedIn, let userInfo = LoginStore.shared.state.value.loginUserInfo {
-            currentUserID = userInfo.userID
+    static let localSdkAppID = ""
+
+    static let localSecretKey = ""
+
+    private(set) var currentUserID = ""
+
+    func login(sdkAppID: Int32, userID: String, userSig: String, completion: @escaping (Bool, String?) -> Void) {
+        LoginStore.shared.login(sdkAppID: sdkAppID, userID: userID, userSig: userSig) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.currentUserID = userID
+                    self?.initCallEngine(sdkAppID: sdkAppID, userID: userID, userSig: userSig)
+                    completion(true, nil)
+                case .failure(let error):
+                    completion(false, "\(LocalizedChatString("LoginFailed")): \(error.code), \(error.message)")
+                }
+            }
         }
     }
 
-    func login(sdkAppID: Int32, userID: String, userSig: String, completion: @escaping (Bool) -> Void) {
-        isLoggingIn = true
-        loginError = nil
-        LoginStore.shared.login(sdkAppID: sdkAppID, userID: userID, userSig: userSig, completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.isLoggedIn = true
-                    self.currentUserID = userID
-                    self.isLoggingIn = false
+    private func initCallEngine(sdkAppID: Int32, userID: String, userSig: String) {
+        TUICallEngine.createInstance().`init`(sdkAppID, userId: userID, userSig: userSig) {
+            TUICallEngine.createInstance().enableMultiDeviceAbility(enable: true) {
+            } fail: { code, message in
+                print("[Login] enableMultiDeviceAbility failed: \(code), \(message ?? "")")
+            }
+            TUICallKit.createInstance().enableIncomingBanner(enable: true)
+        } fail: { code, message in
+            print("[Login] initCallEngine failed: \(code), \(message ?? "")")
+        }
+    }
+
+    func logout(completion: @escaping (Bool) -> Void) {
+        UserDefaults.standard.set("", forKey: LoginPersist.loginUser)
+        UserDefaults.standard.set("", forKey: LoginPersist.loginType)
+        LoginStore.shared.logout(completion: { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.currentUserID = ""
                     completion(true)
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loginError = "\(LocalizedChatString("LoginFailed")): \(error.code), \(error.message)"
-                    self.isLoggingIn = false
+                case .failure:
                     completion(false)
                 }
             }
         })
     }
-
-    func logout(completion: @escaping (Bool) -> Void) {
-        LoginStore.shared.logout(completion: { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.isLoggedIn = false
-                    self.currentUserID = ""
-                    self.isLoggingIn = false
-                    completion(true)
-                }
-            case .failure(let error):
-                completion(false)
-            }
-        })
-    }
 }
 
-struct LoginPage: View {
-    @EnvironmentObject var themeState: ThemeState
-    @EnvironmentObject var languageState: LanguageState
-    @StateObject private var loginManager = LoginStatusManager.shared
-    @State private var userID: String = ""
-    @State private var sdkAppID: String = "1400187352"
-    @State private var secretKey: String = "f442d0cca069bbcc8ced55f4f113b965999b928c78e3cd83495728133a06f4cb"
-    @State private var isShowingSettings: Bool = false
+private enum LoginPersist {
+    static let loginUser = "LoginUser"
+    static let loginType = "LoginType"
+    static let loginTypeLocal = "local"
+}
 
-    var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 16) {
-                Image(systemName: "bubble.left.and.bubble.right.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(themeState.colors.buttonColorPrimaryDefault)
-                    .padding(.bottom, 8)
-                Text(LocalizedChatString("AppTitle"))
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(themeState.colors.textColorPrimary)
-                Text(LocalizedChatString("AppSubtitle"))
-                    .font(.subheadline)
-                    .foregroundColor(Colors.GrayLight6)
-            }
-            .padding(.top, 40)
-            .padding(.bottom, 20)
-            VStack(spacing: 16) {
-                TextField(LocalizedChatString("EnterUserID"), text: $userID)
-                    .padding()
-                    .background(themeState.colors.buttonColorSecondaryDefault)
-                    .cornerRadius(8)
-                    .foregroundColor(themeState.colors.textColorPrimary)
-                if loginManager.loginError != nil {
-                    Text(loginManager.loginError!)
-                        .font(.caption)
-                        .foregroundColor(themeState.colors.textColorTertiary)
-                        .padding(.vertical, 4)
-                }
-                Button(action: {
-                    login()
-                }) {
-                    if loginManager.isLoggingIn {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .padding(.vertical, 14)
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        Text(LocalizedChatString("login"))
-                            .fontWeight(.semibold)
-                            .padding(.vertical, 14)
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                .background((userID.isEmpty || loginManager.isLoggingIn) ? themeState.colors.buttonColorPrimaryDisabled : themeState.colors.buttonColorPrimaryDefault)
-                .foregroundColor(themeState.colors.textColorButton)
-                .cornerRadius(8)
-                .disabled(userID.isEmpty || loginManager.isLoggingIn)
-            }
-            .padding(.horizontal, 32)
-            Spacer()
-        }
-        .background(themeState.colors.bgColorOperate.ignoresSafeArea())
+final class AutoLoginViewController: UIViewController {
+    static let didFailNotification = Notification.Name("DemoAutoLoginDidFailNotification")
+
+    static var hasSavedCredentials: Bool {
+        let type = UserDefaults.standard.string(forKey: LoginPersist.loginType) ?? ""
+        let userID = UserDefaults.standard.string(forKey: LoginPersist.loginUser) ?? ""
+        return type == LoginPersist.loginTypeLocal && !userID.isEmpty
     }
 
-    private func login() {
-        guard let appID = Int32(sdkAppID) else {
-            loginManager.loginError = LocalizedChatString("InvalidSDKAppID")
+    private let loadingIndicator = UIActivityIndicatorView(style: .large)
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.addSubview(loadingIndicator)
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+        loadingIndicator.startAnimating()
+        performAutoLogin()
+    }
+
+    private func performAutoLogin() {
+        let type = UserDefaults.standard.string(forKey: LoginPersist.loginType) ?? ""
+        let userID = UserDefaults.standard.string(forKey: LoginPersist.loginUser) ?? ""
+        if type == LoginPersist.loginTypeLocal, !userID.isEmpty, let appID = Int32(DemoLoginManager.localSdkAppID) {
+            let userSig = GenerateTestUserSig.genTestUserSig(userID: userID, sdkAppID: Int(appID), secretKey: DemoLoginManager.localSecretKey)
+            performLogin(sdkAppID: appID, userID: userID, userSig: userSig, extraSave: nil)
             return
         }
-        let userSig = GenerateTestUserSig.genTestUserSig(userID: userID, sdkAppID: Int(appID), secretKey: secretKey)
-        loginManager.login(sdkAppID: appID, userID: userID, userSig: userSig) { _ in
-            loginManager.isLoggingIn = false
+        handleFailure()
+    }
+
+    private func performLogin(sdkAppID: Int32, userID: String, userSig: String, extraSave: (() -> Void)?) {
+        DemoLoginManager.shared.login(sdkAppID: sdkAppID, userID: userID, userSig: userSig) { [weak self] success, _ in
+            guard let self = self else { return }
+            if success {
+                extraSave?()
+            } else {
+                self.handleFailure()
+            }
         }
+    }
+
+    private func handleFailure() {
+        UserDefaults.standard.set("", forKey: LoginPersist.loginUser)
+        UserDefaults.standard.set("", forKey: LoginPersist.loginType)
+        NotificationCenter.default.post(name: Self.didFailNotification, object: nil)
     }
 }

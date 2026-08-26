@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aspect</key>
+	<string>جوانب</string>
+	<key>authorization_prompter_no_liteav_sdk</key>
+	<string>بسبب التكوين الهندسي الخاص بك ، سوف تكون محدودة في الوظيفة الحالية الخاصة بك ، يمكنك إخفاء الميزات ذات الصلة في config ، أو يمكنك تغيير التكوين الهندسي الخاص بك على الاستمرار في استخدام هذه الميزة ، يرجى قراءة الملف read.me تحت الوحدة للحصول على مزيد من التفاصيل</string>
+	<key>authorization_prompter_no_signature</key>
+	<string>بسبب عدم فتح الوسائط المتعددة المكونات في استخدام السلطة ، سوف تكون محدودة في الوظيفة الحالية الخاصة بك ، يمكنك منع في config وظائف ذات الصلة ، أو يمكنك فتح الوسائط المتعددة المكونات في استخدام السلطة على الاستمرار في استخدام هذه الميزة ، يرجى قراءة الملف تحت read.me الوحدة لمزيد من التفاصيل</string>
+	<key>beautify</key>
+	<string>تجميل</string>
+	<key>beautify_natural</key>
+	<string>الجمال ( الطبيعة )</string>
+	<key>beautify_none</key>
+	<string>هل أنت بخير ؟ - لا -</string>
+	<key>beautify_pitu</key>
+	<string>جميل ( س )</string>
+	<key>beautify_ruddy</key>
+	<string>رودي</string>
+	<key>beautify_smooth</key>
+	<string>سلاسة</string>
+	<key>beautify_whitness</key>
+	<string>البياض</string>
+	<key>best</key>
+	<string>أفضل .</string>
+	<key>bgm_source_unknown</key>
+	<string>المغني المجهول</string>
+	<key>bgm_test_name</key>
+	<string>اختبار الموسيقى</string>
+	<key>cancel</key>
+	<string>ألغى</string>
+	<key>custom</key>
+	<string>عرف</string>
+	<key>default</key>
+	<string>خرق</string>
+	<key>default_1</key>
+	<string>القيمة الافتراضية</string>
+	<key>default_2</key>
+	<string>القيمة الافتراضية</string>
+	<key>default_3</key>
+	<string>القيمة الافتراضية</string>
+	<key>delete</key>
+	<string>حذف .</string>
+	<key>done</key>
+	<string>دون</string>
+	<key>editor_bgm</key>
+	<string>بگم</string>
+	<key>editor_origin_audio</key>
+	<string>فيديو صوتي</string>
+	<key>filter</key>
+	<string>فلاتر</string>
+	<key>filter_bailan</key>
+	<string>بساتين الفاكهة</string>
+	<key>filter_baixi</key>
+	<string>أبيض .</string>
+	<key>filter_biaozhun</key>
+	<string>ستاندرد</string>
+	<key>filter_chaotuo</key>
+	<string>سوبر</string>
+	<key>filter_chunzhen</key>
+	<string>نقاء</string>
+	<key>filter_fennen</key>
+	<string>روسي</string>
+	<key>filter_huaijiu</key>
+	<string>حنين</string>
+	<key>filter_landiao</key>
+	<string>بلوز .</string>
+	<key>filter_langman</key>
+	<string>رومانسي</string>
+	<key>filter_none</key>
+	<string>هل أنت بخير ؟ - لا -</string>
+	<key>filter_qingliang</key>
+	<string>هذا رائع</string>
+	<key>filter_qingxin</key>
+	<string>نضارة</string>
+	<key>filter_rixi</key>
+	<string>حلو .</string>
+	<key>filter_weimei</key>
+	<string>جماليات</string>
+	<key>filter_white</key>
+	<string>أبيض .</string>
+	<key>filter_xiangfen</key>
+	<string>عطر</string>
+	<key>filter_yinghong</key>
+	<string>سعيد !</string>
+	<key>filter_yuanqi</key>
+	<string>حيوية</string>
+	<key>filter_yunshang</key>
+	<string>سحابة</string>
+	<key>filter_ziran</key>
+	<string>الطبيعة .</string>
+	<key>flash</key>
+	<string>فلاش</string>
+	<key>modify_load_assert_failed</key>
+	<string>لا يمكن تحميل موارد الفيديو</string>
+	<key>ok</key>
+	<string>حَسَناً</string>
+	<key>photo_failed</key>
+	<string>غير قادر على التقاط الصور</string>
+	<key>record_failed</key>
+	<string>غير قادر على تسجيل</string>
+	<key>record_failed_reason_camera</key>
+	<string>يرجى التحقق من ما إذا كان يسمح بالدخول إلى الكاميرا</string>
+	<key>record_failed_reason_license</key>
+	<string>لا يمكن التحقق من الترخيص</string>
+	<key>record_failed_reason_microphone</key>
+	<string>يرجى التحقق من أن الميكروفون هو مسموح</string>
+	<key>record_failed_reason_unknown</key>
+	<string>سبب غير معروف</string>
+	<key>record_mode_mix_tip</key>
+	<string>اضغط على الصورة ، اضغط على تسجيل طويل</string>
+	<key>record_mode_photo_tip</key>
+	<string>انقر على الصورة</string>
+	<key>record_mode_video_tip</key>
+	<string>اضغط مطولاً لتسجيل</string>
+	<key>remove_paster</key>
+	<string>حذف لصق</string>
+	<key>restore</key>
+	<string>اختزال</string>
+	<key>send</key>
+	<string>أرسل</string>
+	<key>strength</key>
+	<string>قوة</string>
+</dict>
+</plist>

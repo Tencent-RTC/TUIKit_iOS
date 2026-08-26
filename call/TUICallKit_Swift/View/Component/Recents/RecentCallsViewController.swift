@@ -16,7 +16,7 @@ import AtomicXCore
     
     private var cancellables = Set<AnyCancellable>()
     
-    init(recordCallsUIStyle: RecentCallsUIStyle) {
+    public init(recordCallsUIStyle: RecentCallsUIStyle) {
         super.init(nibName: nil, bundle: nil)
         
         viewModel.recordCallsUIStyle = recordCallsUIStyle
@@ -38,8 +38,8 @@ import AtomicXCore
             view.backgroundColor = TUICoreDefineConvert.getTUICoreDynamicColor(colorKey: "head_bg_gradient_start_color",
                                                                                defaultHex:  "#EBF0F6")
         } else {
-            view.backgroundColor = TUICoreDefineConvert.getTUICoreDynamicColor(colorKey: "callkit_recents_bg_color",
-                                                                               defaultHex:  "#FFFFFF")
+            view.backgroundColor = TUICoreDefineConvert.getTUICallKitDynamicColor(colorKey: "callkit_recents_bg_color",
+                                                                                  defaultHex:  "#FFFFFF")
         }
         return view
     }()

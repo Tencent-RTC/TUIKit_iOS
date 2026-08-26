@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aspect</key>
+	<string>Aspect</string>
+	<key>authorization_prompter_no_liteav_sdk</key>
+	<string>Due to your project configuration, your current functionality will be restricted. You can disable the relevant features in CONFIG or change your project configuration to continue using the feature. For details, please refer to the READ.ME file under the module</string>
+	<key>authorization_prompter_no_signature</key>
+	<string>Due to your lack of permission to use the multimedia plugin, your current functionality will be restricted. You can either disable the relevant features in CONFIG or enable the multimedia plugin permission to continue using the feature. For details, please refer to the READ.ME file under the module</string>
+	<key>beautify</key>
+	<string>Beautify</string>
+	<key>beautify_natural</key>
+	<string>Beauty(Natural)</string>
+	<key>beautify_none</key>
+	<string>None</string>
+	<key>beautify_pitu</key>
+	<string>Beauty(PS)</string>
+	<key>beautify_ruddy</key>
+	<string>Ruddy</string>
+	<key>beautify_smooth</key>
+	<string>Smooth</string>
+	<key>beautify_whitness</key>
+	<string>Whiteness</string>
+	<key>best</key>
+	<string>Best</string>
+	<key>bgm_source_unknown</key>
+	<string>Unknown Singer</string>
+	<key>bgm_test_name</key>
+	<string>Test Music </string>
+	<key>cancel</key>
+	<string>Cancel</string>
+	<key>custom</key>
+	<string>Custom</string>
+	<key>default</key>
+	<string>Default</string>
+	<key>default_1</key>
+	<string>Defaults1</string>
+	<key>default_2</key>
+	<string>Defaults2</string>
+	<key>default_3</key>
+	<string>Defaults3</string>
+	<key>delete</key>
+	<string>Delete</string>
+	<key>done</key>
+	<string>Done</string>
+	<key>editor_bgm</key>
+	<string>BGM</string>
+	<key>editor_origin_audio</key>
+	<string>Video Sound</string>
+	<key>filter</key>
+	<string>Filter</string>
+	<key>filter_bailan</key>
+	<string>Orchid</string>
+	<key>filter_baixi</key>
+	<string>White</string>
+	<key>filter_biaozhun</key>
+	<string>Standard</string>
+	<key>filter_chaotuo</key>
+	<string>Super</string>
+	<key>filter_chunzhen</key>
+	<string>Pure</string>
+	<key>filter_fennen</key>
+	<string>Rosy</string>
+	<key>filter_huaijiu</key>
+	<string>Nostalgic</string>
+	<key>filter_landiao</key>
+	<string>Blues</string>
+	<key>filter_langman</key>
+	<string>Romantic</string>
+	<key>filter_none</key>
+	<string>None</string>
+	<key>filter_qingliang</key>
+	<string>Cool</string>
+	<key>filter_qingxin</key>
+	<string>Fresh</string>
+	<key>filter_rixi</key>
+	<string>Sweet</string>
+	<key>filter_weimei</key>
+	<string>Aesthetic</string>
+	<key>filter_white</key>
+	<string>white</string>
+	<key>filter_xiangfen</key>
+	<string>Fragrance</string>
+	<key>filter_yinghong</key>
+	<string>Cheery</string>
+	<key>filter_yuanqi</key>
+	<string>Vitality</string>
+	<key>filter_yunshang</key>
+	<string>Cloud</string>
+	<key>filter_ziran</key>
+	<string>Nature</string>
+	<key>flash</key>
+	<string>Flash</string>
+	<key>link_error</key>
+	<string>Unable to open link</string>
+	<key>modify_load_assert_failed</key>
+	<string>Unable to load video asset</string>
+	<key>ok</key>
+	<string>OK</string>
+	<key>photo_failed</key>
+	<string>Unable to photograph</string>
+	<key>prompter</key>
+	<string>Debug Version Prompt</string>
+	<key>record_failed</key>
+	<string>Unable to record</string>
+	<key>record_failed_reason_camera</key>
+	<string>Please check if camera access is allowed</string>
+	<key>record_failed_reason_license</key>
+	<string>Unable to verify license</string>
+	<key>record_failed_reason_microphone</key>
+	<string>Please check if microphone access is allowed</string>
+	<key>record_failed_reason_unknown</key>
+	<string>Unknown reason</string>
+	<key>record_mode_mix_tip</key>
+	<string>Tap to take a photo, long press to record</string>
+	<key>record_mode_photo_tip</key>
+	<string>Click to take a photo</string>
+	<key>record_mode_video_tip</key>
+	<string>Long press to record</string>
+	<key>remove_paster</key>
+	<string>Delete Paster</string>
+	<key>restore</key>
+	<string>Restore</string>
+	<key>send</key>
+	<string>Send</string>
+	<key>strength</key>
+	<string>Strength</string>
+</dict>
+</plist>
