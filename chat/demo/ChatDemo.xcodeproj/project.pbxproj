@@ -7,38 +7,60 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		16EAAEE22EEC0CAE00286EA3 /* ChatNavPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */; };
+		161326BF2F693A6F00EBFF2E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */; };
+		16CF01AA000000000000AA03 /* Navigation/ChatFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */; };
+		16CF01AA000000000000BB03 /* VoiceMessageSettingPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */; };
 		4AE6172335A14D917199DD62 /* Pods_ChatDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */; };
 		A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DB2E6EC0050075F614 /* SettingsPage.swift */; };
-		A32424E82E6EC0050075F614 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E32E6EC0050075F614 /* SceneDelegate.swift */; };
-		A32424E92E6EC0050075F614 /* StyleSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E42E6EC0050075F614 /* StyleSettings.swift */; };
 		A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DE2E6EC0050075F614 /* AppDelegate.swift */; };
 		A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424D92E6EC0050075F614 /* HomePage.swift */; };
-		A32424ED2E6EC0050075F614 /* TUIKitDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E52E6EC0050075F614 /* TUIKitDemoApp.swift */; };
 		A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */; };
 		A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DA2E6EC0050075F614 /* LoginPage.swift */; };
-		A32424F02E6EC0050075F614 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E02E6EC0050075F614 /* ContentView.swift */; };
 		A32424F12E6EC0050075F614 /* appConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = A32424DD2E6EC0050075F614 /* appConfig.json */; };
+		AB00000000000000000000AC /* LoginSubviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AD /* LoginSubviews.swift */; };
+		AB00000000000000000000AE /* telephone_area_code.json in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AF /* telephone_area_code.json */; };
+		AB00000000000000000000B1 /* verification.html in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000B2 /* verification.html */; };
+		AB00000000000000000000C1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000C2 /* SceneDelegate.swift */; };
 		A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A32424DF2E6EC0050075F614 /* Assets.xcassets */; };
+		A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424F42E6EC0050075F614 /* RootViewController.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		161326E32F6A7E7600EBFF2E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0CB983487A575C830063379D /* Pods-TUIKitDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TUIKitDemo.debug.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.debug.xcconfig"; sourceTree = "<group>"; };
-		16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatNavPage.swift; sourceTree = "<group>"; };
+		161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		161326D12F697B0000EBFF2E /* ChatDemo-Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Debug.entitlements"; sourceTree = "<group>"; };
+		161326D22F697B0100EBFF2E /* ChatDemo-Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Release.entitlements"; sourceTree = "<group>"; };
+		16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation/ChatFlowCoordinator.swift; sourceTree = "<group>"; };
+		16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMessageSettingPages.swift; sourceTree = "<group>"; };
+		16E6A6AB2FDAE2A40032F383 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		A30527642E6EC1B700276146 /* ChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A32424D92E6EC0050075F614 /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
 		A32424DA2E6EC0050075F614 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		A32424DB2E6EC0050075F614 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		A32424DD2E6EC0050075F614 /* appConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appConfig.json; sourceTree = "<group>"; };
+		AB00000000000000000000AD /* LoginSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSubviews.swift; sourceTree = "<group>"; };
+		AB00000000000000000000AF /* telephone_area_code.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = telephone_area_code.json; sourceTree = "<group>"; };
+		AB00000000000000000000B2 /* verification.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = verification.html; sourceTree = "<group>"; };
+		AB00000000000000000000C2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A32424DE2E6EC0050075F614 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A32424DF2E6EC0050075F614 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A32424E02E6EC0050075F614 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateTestUserSig.swift; sourceTree = "<group>"; };
 		A32424E22E6EC0050075F614 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A32424E32E6EC0050075F614 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		A32424E42E6EC0050075F614 /* StyleSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleSettings.swift; sourceTree = "<group>"; };
-		A32424E52E6EC0050075F614 /* TUIKitDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TUIKitDemoApp.swift; sourceTree = "<group>"; };
+		A32424F42E6EC0050075F614 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		ADA16EB7C9F14EC0FDEC6E5F /* Pods-ChatDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.release.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.release.xcconfig"; sourceTree = "<group>"; };
 		D13DF48F95F478A5C9C94A2B /* Pods-ChatApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatApp.release.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E89B2374B3E641FC68E9F381 /* Pods-TUIKitDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TUIKitDemo.release.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -51,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				161326BF2F693A6F00EBFF2E /* CoreTelephony.framework in Frameworks */,
 				4AE6172335A14D917199DD62 /* Pods_ChatDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +107,7 @@
 		65D6509523A1AF803D6EEA96 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */,
 				F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */,
 			);
 			name = Frameworks;
@@ -100,10 +124,11 @@
 		A32424DC2E6EC0050075F614 /* Pages */ = {
 			isa = PBXGroup;
 			children = (
-				16EAAEE12EEC0CAE00286EA3 /* ChatNavPage.swift */,
 				A32424D92E6EC0050075F614 /* HomePage.swift */,
 				A32424DA2E6EC0050075F614 /* LoginPage.swift */,
 				A32424DB2E6EC0050075F614 /* SettingsPage.swift */,
+				16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */,
+				AB00000000000000000000AD /* LoginSubviews.swift */,
 			);
 			path = Pages;
 			sourceTree = "<group>";
@@ -111,16 +136,19 @@
 		A32424E62E6EC0050075F614 /* ChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				161326D12F697B0000EBFF2E /* ChatDemo-Debug.entitlements */,
+				161326D22F697B0100EBFF2E /* ChatDemo-Release.entitlements */,
+				16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */,
 				A32424DC2E6EC0050075F614 /* Pages */,
 				A32424DD2E6EC0050075F614 /* appConfig.json */,
+				AB00000000000000000000AF /* telephone_area_code.json */,
+				AB00000000000000000000B2 /* verification.html */,
 				A32424DE2E6EC0050075F614 /* AppDelegate.swift */,
+				AB00000000000000000000C2 /* SceneDelegate.swift */,
+				A32424F42E6EC0050075F614 /* RootViewController.swift */,
 				A32424DF2E6EC0050075F614 /* Assets.xcassets */,
-				A32424E02E6EC0050075F614 /* ContentView.swift */,
 				A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */,
 				A32424E22E6EC0050075F614 /* Info.plist */,
-				A32424E32E6EC0050075F614 /* SceneDelegate.swift */,
-				A32424E42E6EC0050075F614 /* StyleSettings.swift */,
-				A32424E52E6EC0050075F614 /* TUIKitDemoApp.swift */,
 			);
 			path = ChatDemo;
 			sourceTree = "<group>";
@@ -138,6 +166,7 @@
 				1658FB48197F6F185AF1F61E /* [CP] Embed Pods Frameworks */,
 				147293C1E5D25EB6974D2BC5 /* [CP] Copy Pods Resources */,
 				CEAD06132DA9128900E92F24 /* Resources */,
+				161326E32F6A7E7600EBFF2E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -155,6 +184,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1430;
 			};
 			buildConfigurationList = 11AB62D2545EF2D0C5E3D465 /* Build configuration list for PBXProject "ChatDemo" */;
@@ -182,6 +212,8 @@
 			files = (
 				A32424F12E6EC0050075F614 /* appConfig.json in Resources */,
 				A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */,
+				AB00000000000000000000AE /* telephone_area_code.json in Resources */,
+				AB00000000000000000000B1 /* verification.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,13 +228,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChatDemo/Pods-ChatDemo-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChatDemo/Pods-ChatDemo-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -217,13 +245,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChatDemo/Pods-ChatDemo-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChatDemo/Pods-ChatDemo-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -260,15 +284,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */,
-				A32424E82E6EC0050075F614 /* SceneDelegate.swift in Sources */,
-				A32424E92E6EC0050075F614 /* StyleSettings.swift in Sources */,
+				16CF01AA000000000000BB03 /* VoiceMessageSettingPages.swift in Sources */,
 				A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */,
+				A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */,
 				A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */,
-				16EAAEE22EEC0CAE00286EA3 /* ChatNavPage.swift in Sources */,
-				A32424ED2E6EC0050075F614 /* TUIKitDemoApp.swift in Sources */,
+				16CF01AA000000000000AA03 /* Navigation/ChatFlowCoordinator.swift in Sources */,
 				A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */,
 				A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */,
-				A32424F02E6EC0050075F614 /* ContentView.swift in Sources */,
+				AB00000000000000000000AC /* LoginSubviews.swift in Sources */,
+				AB00000000000000000000C1 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,18 +304,19 @@
 			baseConfigurationReference = ADA16EB7C9F14EC0FDEC6E5F /* Pods-ChatDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = FN2V63AD2J;
+				CODE_SIGN_ENTITLEMENTS = "ChatDemo/ChatDemo-Release.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8W4RR7HL62;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.imchat.imchat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.imchat.imchat.uikit;
 				PRODUCT_NAME = ChatDemo;
-				PROVISIONING_PROFILE_SPECIFIER = com.imchat.imchat_Production_SignProvision;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -368,21 +393,19 @@
 			baseConfigurationReference = 8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "ChatDemo/ChatDemo-Debug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8W4RR7HL62;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuikit.demo.xa;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuikit.demo.xa.uikit;
 				PRODUCT_NAME = ChatDemo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = tuikitdemo_dev;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

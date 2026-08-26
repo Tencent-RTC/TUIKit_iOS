@@ -1,0 +1,141 @@
+import AtomicXCore
+import Combine
+import SnapKit
+import UIKit
+
+protocol ContactListConfigProtocol {
+    var showNewContacts: Bool { get }
+    var showGroupApplications: Bool { get }
+    var showMyGroups: Bool { get }
+    var showBlacklist: Bool { get }
+    var showSearchBar: Bool { get }
+    var itemCustomizer: ContactListItemCustomizer? { get }
+}
+
+extension ContactListConfigProtocol {
+    var showNewContacts: Bool { true }
+    var showGroupApplications: Bool { true }
+    var showMyGroups: Bool { true }
+    var showBlacklist: Bool { true }
+    var showSearchBar: Bool { true }
+    var itemCustomizer: ContactListItemCustomizer? { nil }
+}
+
+struct ChatContactListConfig: ContactListConfigProtocol {
+    var showNewContacts: Bool {
+        return userShowNewContacts ?? true
+    }
+
+    var showGroupApplications: Bool {
+        return userShowGroupApplications ?? true
+    }
+
+    var showMyGroups: Bool {
+        return userShowMyGroups ?? true
+    }
+
+    var showBlacklist: Bool {
+        return userShowBlacklist ?? true
+    }
+
+    var showSearchBar: Bool {
+        return userShowSearchBar ?? true
+    }
+
+    var itemCustomizer: ContactListItemCustomizer? {
+        return userItemCustomizer
+    }
+
+    private let userShowNewContacts: Bool?
+
+    private let userShowGroupApplications: Bool?
+
+    private let userShowMyGroups: Bool?
+
+    private let userShowBlacklist: Bool?
+
+    private let userShowSearchBar: Bool?
+
+    private let userItemCustomizer: ContactListItemCustomizer?
+
+    init() {
+        self.userShowNewContacts = nil
+        self.userShowGroupApplications = nil
+        self.userShowMyGroups = nil
+        self.userShowBlacklist = nil
+        self.userShowSearchBar = nil
+        self.userItemCustomizer = nil
+    }
+
+    init(showNewContacts: Bool? = nil,
+         showGroupApplications: Bool? = nil,
+         showMyGroups: Bool? = nil,
+         showBlacklist: Bool? = nil,
+         showSearchBar: Bool? = nil,
+         itemCustomizer: ContactListItemCustomizer? = nil) {
+        self.userShowNewContacts = showNewContacts
+        self.userShowGroupApplications = showGroupApplications
+        self.userShowMyGroups = showMyGroups
+        self.userShowBlacklist = showBlacklist
+        self.userShowSearchBar = showSearchBar
+        self.userItemCustomizer = itemCustomizer
+    }
+}
+
+typealias ContactListItemCustomizer = (CustomEditor<ContactCustomItem>) -> Void
+
+struct ContactCustomItem: CustomItem {
+    var ID: String
+
+    let title: String
+
+    let iconName: String
+
+    let badgeCount: AnyPublisher<Int, Never>?
+
+    let onClick: () -> Void
+
+    init(ID: String,
+         title: String,
+         iconName: String,
+         badgeCount: AnyPublisher<Int, Never>? = nil,
+         onClick: @escaping () -> Void) {
+        self.ID = ID
+        self.title = title
+        self.iconName = iconName
+        self.badgeCount = badgeCount
+        self.onClick = onClick
+    }
+}
+
+enum ContactDisplayFormatter {
+    static func name(for contact: ContactInfo) -> String {
+        if let remark = contact.friendRemark, !remark.isEmpty { return remark }
+        if let nickname = contact.nickname, !nickname.isEmpty { return nickname }
+        return contact.userID
+    }
+
+    static func name(for group: GroupInfo) -> String {
+        if let groupName = group.groupName, !groupName.isEmpty { return groupName }
+        return group.groupID
+    }
+}
+
+final class ContactListView: UIView {
+    private let impl: ContactListViewImpl
+
+    init(onContactClick: @escaping (AZOrderedListItem) -> Void,
+         onGroupClick: @escaping (AZOrderedListItem) -> Void,
+         config: ContactListConfigProtocol = ChatContactListConfig()) {
+        impl = ContactListViewImpl(onContactClick: onContactClick, onGroupClick: onGroupClick, config: config)
+        super.init(frame: .zero)
+        addSubview(impl)
+        impl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
