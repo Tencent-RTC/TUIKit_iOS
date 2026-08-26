@@ -1,97 +1,143 @@
-import AtomicX
 import AtomicXCore
-import SwiftUI
+import SnapKit
+import UIKit
 
-public struct ContactsPage: View {
-    @EnvironmentObject var themeState: ThemeState
-    @State private var showAddContactMenu = false
-    @State private var showAddFriend = false
-    @State private var showJoinGroup = false
-    private let contactStore: ContactListStore
-    let onContactClick: ((AZOrderedListItem) -> Void)?
-    let onGroupClick: ((AZOrderedListItem) -> Void)?
+public final class ContactsPage: UIViewController {
+    private static let headerVerticalPadding: CGFloat = CGFloat(SpacingScheme.iconIconSpacing)
+
+    private static let horizontalPadding: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
+
+    private static let addButtonSize: CGFloat = 24
+
+    private static let titleFontSize: CGFloat = 17
+
+    private let onContactClick: ((AZOrderedListItem) -> Void)?
+
+    private let onGroupClick: ((AZOrderedListItem) -> Void)?
+
+    private let headerView = UIView()
+
+    private let titleLabel = UILabel()
+
+    private let addButton = UIButton(type: .system)
+
+    private lazy var contactListView = ContactListView(
+        onContactClick: { [weak self] user in self?.onContactClick?(user) },
+        onGroupClick: { [weak self] group in self?.onGroupClick?(group) }
+    )
+
+    // MARK: - Init
 
     public init(
-        contactStore: ContactListStore = ContactListStore.create(),
         onContactClick: ((AZOrderedListItem) -> Void)? = nil,
         onGroupClick: ((AZOrderedListItem) -> Void)? = nil
     ) {
-        self.contactStore = contactStore
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
+        super.init(nibName: nil, bundle: nil)
     }
 
-    public var body: some View {
-        VStack(spacing: 0) {
-            headerView
-            ContactList(
-                contactStore: contactStore,
-                onContactClick: onContactClick,
-                onGroupClick: onGroupClick
-            )
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Lifecycle
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        ChatUIKitLayoutDirection.install()
+        constructViewHierarchy()
+        activateConstraints()
+        bindInteraction()
+        setupViewStyle()
+    }
+
+    // MARK: - Actions
+
+    private func constructViewHierarchy() {
+        view.addSubview(headerView)
+        headerView.addSubview(titleLabel)
+        headerView.addSubview(addButton)
+        view.addSubview(contactListView)
+    }
+
+    private func activateConstraints() {
+        headerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.equalToSuperview()
         }
-        .background(themeState.colors.bgColorOperate.ignoresSafeArea(edges: .top))
-        .overlay(
-            Group {
-                if showAddContactMenu {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            AddContactPopView(
-                                onDismiss: {
-                                    showAddContactMenu = false
-                                },
-                                onShowAddFriend: {
-                                    showAddFriend = true
-                                },
-                                onShowJoinGroup: {
-                                    showJoinGroup = true
-                                }
-                            )
-                            .padding(.trailing, 16)
-                            .padding(.top, 50)
-                        }
-                        Spacer()
-                    }
-                    .background(
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                showAddContactMenu = false
-                            }
-                    )
-                    .animation(.easeInOut(duration: 0.2), value: showAddContactMenu)
-                }
-            }
+        titleLabel.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.leading.greaterThanOrEqualToSuperview().offset(Self.horizontalPadding + Self.addButtonSize)
+            make.trailing.lessThanOrEqualTo(addButton.snp.leading).offset(-Self.horizontalPadding)
+            make.top.equalToSuperview().offset(Self.headerVerticalPadding)
+            make.bottom.equalToSuperview().offset(-Self.headerVerticalPadding)
+        }
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-Self.horizontalPadding)
+            make.centerY.equalTo(titleLabel)
+            make.width.height.equalTo(Self.addButtonSize)
+        }
+        contactListView.snp.makeConstraints { make in
+            make.top.equalTo(headerView.snp.bottom)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+
+    private func bindInteraction() {
+        addButton.addTarget(self, action: #selector(handleAddTapped), for: .touchUpInside)
+    }
+
+    private func setupViewStyle() {
+        let colors = ChatUIKitTheme.colors
+        view.backgroundColor = colors.bgColorOperate
+        headerView.backgroundColor = colors.bgColorOperate
+
+        titleLabel.text = LocalizedChatString("ContactsPageTitle")
+        titleLabel.font = .systemFont(ofSize: Self.titleFontSize, weight: .bold)
+        titleLabel.textColor = colors.textColorPrimary
+        titleLabel.textAlignment = .center
+
+        addButton.setImage(AtomicXChatResources.image(named: "contact_add_circle"), for: .normal)
+        addButton.tintColor = colors.textColorPrimary
+    }
+
+    @objc private func handleAddTapped() {
+        let menu = BubbleMenuViewController(
+            anchorView: addButton,
+            items: [
+                BubbleMenuViewController.Item(
+                    icon: AtomicXChatResources.image(named: "contact_add_friend"),
+                    title: LocalizedChatString("ContactsAddFriends"),
+                    action: { [weak self] in self?.presentAddFriend() }
+                ),
+                BubbleMenuViewController.Item(
+                    icon: AtomicXChatResources.image(named: "contact_add_group"),
+                    title: LocalizedChatString("ContactsJoinGroup"),
+                    action: { [weak self] in self?.presentJoinGroup() }
+                ),
+            ]
         )
-        .sheet(isPresented: $showAddFriend) {
-            AddFriendView(contactStore: contactStore)
-        }
-        .sheet(isPresented: $showJoinGroup) {
-            JoinGroupView(contactStore: contactStore)
-        }
+        present(menu, animated: false)
     }
 
-    private var headerView: some View {
-        HStack {
-            Text(LocalizedChatString("TabContacts"))
-                .font(.system(size: 34, weight: .semibold))
-                .tracking(0.3)
-                .foregroundColor(themeState.colors.textColorPrimary)
-                .padding(.leading, 16)
-            Spacer()
-            Button(action: {
-                showAddContactMenu = true
-            }) {
-                Image(systemName: "plus")
-                    .font(.system(size: 20))
-                    .foregroundColor(themeState.colors.buttonColorPrimaryDefault)
-                    .frame(width: 28, height: 28)
-                    .cornerRadius(14)
-            }
-            .padding(.trailing, 16)
+    private func presentAddFriend() {
+        let addFriend = AddFriendViewController()
+        addFriend.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(addFriend, animated: true)
+    }
+
+    private func presentJoinGroup() {
+        let joinGroup = JoinGroupViewController()
+        joinGroup.onEnterGroupChat = { [weak self] group in
+            let item = AZOrderedListItem(
+                userID: group.groupID,
+                avatarURL: group.avatarURL,
+                title: ContactDisplayFormatter.name(for: group)
+            )
+            self?.onGroupClick?(item)
         }
-        .padding(.top, 12)
-        .padding(.bottom, 16)
+        joinGroup.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(joinGroup, animated: true)
     }
 }
