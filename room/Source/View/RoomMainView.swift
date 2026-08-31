@@ -191,8 +191,8 @@ public class RoomMainView: UIView, BaseView {
         }
         
         bottomBarView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(12)
-            make.trailing.equalToSuperview().offset(-12)
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
             make.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             make.height.greaterThanOrEqualTo(52)
         }

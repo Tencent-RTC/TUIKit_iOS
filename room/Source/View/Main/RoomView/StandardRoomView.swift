@@ -10,16 +10,6 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-struct DataChanges {
-    let deletions: [IndexPath]
-    let insertions: [IndexPath]
-    let moves: [(from: IndexPath, to: IndexPath)]
-    
-    var hasChanges: Bool {
-        return !deletions.isEmpty || !insertions.isEmpty || !moves.isEmpty
-    }
-}
-
 // MARK: - StandardRoomView Component
 class StandardRoomView: UIView, BaseView {
     public weak var routerContext: RouterContext?
@@ -31,7 +21,6 @@ class StandardRoomView: UIView, BaseView {
     
     // MARK: - Constants
     private struct LayoutConstants {
-        static let itemSize: CGSize = CGSize(width: 176, height: 176)
         static let itemSpacing: CGFloat = RoomSpacing.small // 8pt
         static let lineSpacing: CGFloat = RoomSpacing.small // 8pt
         static let maxItemsPerPage: Int = 6
@@ -49,6 +38,46 @@ class StandardRoomView: UIView, BaseView {
     private var orientationButtonHidden: Bool = true
     private var orientationButtonIsLandscape: Bool = false
     private var currentScreenSharerID: String?
+    
+    private lazy var streamManager: SingleStreamManager = {
+        let manager = SingleStreamManager(roomID: roomID, hostView: self)
+        manager.onRenderReleased = { [weak self] userID in
+            self?.restoreGridCellRender(userID: userID)
+        }
+        return manager
+    }()
+
+    private enum LayoutMode: Equatable {
+        case singleFullScreen
+        case remoteFullScreenWithLocal
+        case grid
+        case screenShareSingle
+        case screenShareWithSpeaker
+    }
+
+    private var layoutMode: LayoutMode {
+        let count = participantList.1.count
+        let hasScreenShare = participantList.0 != nil
+        if hasScreenShare {
+            return count >= 2 ? .screenShareWithSpeaker : .screenShareSingle
+        }
+        if count == 1 { return .singleFullScreen }
+        if count == 2 { return .remoteFullScreenWithLocal }
+        return .grid
+    }
+
+    private var localUserID: String {
+        LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
+    }
+    
+    private var displayParticipants: [RoomParticipant] {
+        switch layoutMode {
+        case .remoteFullScreenWithLocal:
+            return participantList.1.filter { $0.userID != localUserID }
+        default:
+            return participantList.1
+        }
+    }
     
     // MARK: - UI Components
     lazy var collectionView: UICollectionView = {
@@ -79,7 +108,11 @@ class StandardRoomView: UIView, BaseView {
         button.isHidden = true
         return button
     }()
-    
+
+    private var singleStreamView: RoomSingleStreamView {
+        return streamManager.singleStreamView
+    }
+
     // MARK: - Initialization
     public init(roomID: String) {
         self.roomID = roomID
@@ -103,6 +136,7 @@ class StandardRoomView: UIView, BaseView {
         addSubview(collectionView)
         addSubview(previousPageButton)
         addSubview(nextPageButton)
+        addSubview(singleStreamView)
     }
     
     public func setupConstraints() {
@@ -153,6 +187,7 @@ class StandardRoomView: UIView, BaseView {
         if isLandscape != orientationButtonIsLandscape {
             updateScreenStreamOrientationButtonImage(isLandscape: isLandscape)
         }
+        streamManager.updateFrame()
     }
 
     public func setupBindings() {
@@ -160,7 +195,7 @@ class StandardRoomView: UIView, BaseView {
         roomParticipantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantList))
             .removeDuplicates()
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] participantList in
                 guard let self = self else { return }
                 updateParticipantList(participantList)
@@ -169,7 +204,8 @@ class StandardRoomView: UIView, BaseView {
         
         roomParticipantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.participantWithScreen))
-            .receive(on: RunLoop.main)
+            .removeDuplicates { $0?.userID == $1?.userID }
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] participant in
                 guard let self = self else { return }
                 updateScreenShareParticipant(participant)
@@ -179,7 +215,7 @@ class StandardRoomView: UIView, BaseView {
         
         roomParticipantStore.state
             .subscribe(StatePublisherSelector(keyPath: \.speakingUsers))
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] speakingUsers in
                 guard let self = self else { return }
                 updateVisibleCellsSpeakingStatus(speakingUsers)
@@ -252,10 +288,10 @@ extension StandardRoomView: UICollectionViewDataSource {
             if section == 0 {
                 return 1
             } else {
-                return participantList.1.count
+                return displayParticipants.count
             }
         }
-        return participantList.1.count
+        return displayParticipants.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -271,10 +307,10 @@ extension StandardRoomView: UICollectionViewDataSource {
                 cell.updateOrientationSwitchButtonImage(isLandscape: orientationButtonIsLandscape)
                 return cell
             } else {
-                participant = participantList.1[indexPath.item]
+                participant = displayParticipants[indexPath.item]
             }
         } else {
-            participant = participantList.1[indexPath.item]
+            participant = displayParticipants[indexPath.item]
         }
         
         guard let cell = collectionView.dequeueReusableCell(
@@ -295,7 +331,6 @@ extension StandardRoomView: UICollectionViewDataSource {
     private func bindScreenStreamState(cell: RoomViewScreenStreamCell, with participant: RoomParticipant) {
         let screenParticipantPublisher = createScreenParticipantPublisher(for: participant.userID)
         screenParticipantPublisher
-            .receive(on: RunLoop.main)
             .removeDuplicates { oldParticipant, newParticipant in
                 oldParticipant.screenShareStatus == newParticipant.screenShareStatus
             }
@@ -317,7 +352,6 @@ extension StandardRoomView: UICollectionViewDataSource {
             .store(in: &cell.cancellableSet)
         
         screenParticipantPublisher
-            .receive(on: RunLoop.main)
             .removeDuplicates { oldParticipant, newParticipant in
                 oldParticipant.name == newParticipant.name &&
                 oldParticipant.role == newParticipant.role &&
@@ -333,7 +367,6 @@ extension StandardRoomView: UICollectionViewDataSource {
     private func bindVideoStreamState(cell: RoomViewVideoStreamCell, with participant: RoomParticipant) {
         let videoParticipantPublisher = createVideoParticipantPublisher(for: participant.userID)
         videoParticipantPublisher
-            .receive(on: RunLoop.main)
             .removeDuplicates { oldParticipant, newParticipant in
                 oldParticipant.cameraStatus == newParticipant.cameraStatus
             }
@@ -355,7 +388,6 @@ extension StandardRoomView: UICollectionViewDataSource {
             .store(in: &cell.cancellableSet)
         
         videoParticipantPublisher
-            .receive(on: RunLoop.main)
             .removeDuplicates { oldParticipant, newParticipant in
                 oldParticipant.name == newParticipant.name &&
                 oldParticipant.role == newParticipant.role &&
@@ -377,7 +409,7 @@ extension StandardRoomView: UICollectionViewDataSource {
             .eraseToAnyPublisher()
         return participantPublisher
             .compactMap{ $0 }
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .share()
             .eraseToAnyPublisher()
     }
@@ -394,7 +426,7 @@ extension StandardRoomView: UICollectionViewDataSource {
         
         return participantPublisher
             .compactMap{ $0 }
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .share()
             .eraseToAnyPublisher()
     }
@@ -409,25 +441,36 @@ extension StandardRoomView: UICollectionViewDataSource {
 extension StandardRoomView: UICollectionViewDelegate {
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let videoStreamCell = cell as? RoomViewVideoStreamCell else { return }
-        guard let videoParticipant = participantList.1[safe: indexPath.item] else { return }
-        guard let participant = videoStreamCell.participant else { return }
+        guard let videoParticipant = displayParticipants[safe: indexPath.item] else { return }
 
-        if videoParticipant.userID != participant.userID {
+        if videoStreamCell.participant?.userID != videoParticipant.userID {
             videoStreamCell.reset()
             videoStreamCell.updateUI(with: videoParticipant)
             bindVideoStreamState(cell: videoStreamCell, with: videoParticipant)
-        } else {
-            if participant.cameraStatus == .on {
-                videoStreamCell.participantView.setActive(isActive: true)
-            } else {
-                videoStreamCell.participantView.setActive(isActive: false)
-            }
         }
+        activateVideoRender(for: videoStreamCell, userID: videoParticipant.userID)
+    }
+
+    private func activateVideoRender(for cell: RoomViewVideoStreamCell, userID: String) {
+        let latest = roomParticipantStore.state.value.participantList.first { $0.userID == userID }
+        guard let participant = latest ?? cell.participant else { return }
+        cell.updateUI(with: participant)
+        cell.participantView.setFillMode(fillMode: .fill)
+        cell.participantView.updateStreamType(streamType: .camera)
+        cell.participantView.updateParticipant(participant: participant)
+        cell.participantView.setActive(isActive: participant.cameraStatus == .on)
     }
     
     public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let videoStreamCell = cell as? RoomViewVideoStreamCell else { return }
+        if let currentIndexPath = collectionView.indexPath(for: cell), currentIndexPath != indexPath {
+            return
+        }
+        let releasedUserID = videoStreamCell.participant?.userID
         videoStreamCell.participantView.setActive(isActive: false)
+        if let releasedUserID = releasedUserID {
+            streamManager.restoreRenderIfShowing(userID: releasedUserID)
+        }
     }
     
     // MARK: - Custom Paging Logic
@@ -466,8 +509,23 @@ extension StandardRoomView: UICollectionViewDelegate {
             self.currentPage = currentPage
             updatePageButtons(targetPage: currentPage)
         }
+
+        streamManager.handleScroll(offsetX: scrollView.contentOffset.x, pageWidth: pageWidth)
     }
 
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        notifyStreamManagerScrollEnd(scrollView)
+    }
+
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        notifyStreamManagerScrollEnd(scrollView)
+    }
+
+    private func notifyStreamManagerScrollEnd(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.bounds.width
+        guard pageWidth > 0 else { return }
+        streamManager.handleScrollEnd(offsetX: scrollView.contentOffset.x, pageWidth: pageWidth)
+    }
 }
 
 // MARK: - Page Navigation
@@ -481,7 +539,7 @@ extension StandardRoomView {
     
     private func updateTotalPages() {
         let screenSharePages = participantList.0 != nil ? 1 : 0
-        let participantPages = Int(ceil(Double(participantList.1.count) / Double(LayoutConstants.maxItemsPerPage)))
+        let participantPages = Int(ceil(Double(displayParticipants.count) / Double(LayoutConstants.maxItemsPerPage)))
         totalPages = screenSharePages + participantPages
         
         updatePageButtons(targetPage: currentPage)
@@ -491,138 +549,91 @@ extension StandardRoomView {
 // MARK: - Data Source Update
 extension StandardRoomView {
     private func updateParticipantList(_ newParticipantList: [RoomParticipant]) {
-        let oldList = self.participantList.1
-        
-        let changes = calculateParticipantListChanges(from: oldList, to: newParticipantList)
-    
-        guard changes.hasChanges else {return}
-        
-        freshCollectionView { [ weak self] in
-            guard let self = self else { return }
-            collectionView.performBatchUpdates { [weak self] in
-                guard let self = self else { return }
-                participantList.1 = newParticipantList
-                collectionView.deleteItems(at: changes.deletions)
-                collectionView.insertItems(at: changes.insertions)
-                changes.moves.forEach { [weak self] move in
-                    guard let self = self else { return }
-                    collectionView.moveItem(at: move.from, to: move.to)
-                }
+        let oldDisplayIDs = displayParticipants.map { $0.userID }
+        participantList.1 = newParticipantList
+        let newDisplayIDs = displayParticipants.map { $0.userID }
+
+        if oldDisplayIDs == newDisplayIDs {
+            updateVisibleCells()
+        } else {
+            reloadData()
+        }
+
+        streamManager.updateLayoutMode(participants: newParticipantList,
+                                       hasScreenShare: participantList.0 != nil,
+                                       speakingUsers: speakingUsers)
+        updateTotalPages()
+    }
+
+    private func updateVisibleCells() {
+        let participantSection = participantList.0 != nil ? 1 : 0
+        collectionView.visibleCells.forEach { cell in
+            guard let videoCell = cell as? RoomViewVideoStreamCell else { return }
+            guard let indexPath = collectionView.indexPath(for: cell) else { return }
+            guard indexPath.section == participantSection else { return }
+            guard indexPath.item < displayParticipants.count else { return }
+            let participant = displayParticipants[indexPath.item]
+
+            if videoCell.participant?.userID == participant.userID {
+                guard videoCell.participant != participant else { return }
+                videoCell.updateUI(with: participant)
+            } else {
+                videoCell.cancellableSet.removeAll()
+                videoCell.updateUI(with: participant)
+                bindVideoStreamState(cell: videoCell, with: participant)
+                let volume = speakingUsers[participant.userID] ?? 0
+                videoCell.updateSpeakingStatus(with: participant, isSpeaking: volume > 0)
             }
         }
-        
+    }
+
+    private func updateScreenShareParticipant(_ newParticipant: RoomParticipant?) {
+        let oldSharerID = participantList.0?.userID
+        participantList.0 = newParticipant
+
+        if oldSharerID != newParticipant?.userID {
+            reloadData()
+        } else {
+            updateVisibleCells()
+        }
+
+        streamManager.updateLayoutMode(participants: participantList.1,
+                                       hasScreenShare: newParticipant != nil,
+                                       speakingUsers: speakingUsers)
         updateTotalPages()
     }
     
-    private func updateScreenShareParticipant(_ newParticipant: RoomParticipant?) {
-        let oldParticipant = participantList.0
-        
-        if oldParticipant == nil && newParticipant == nil {
-            return
-        }
-        
-        if oldParticipant == nil && newParticipant != nil {
-            participantList.0 = newParticipant
-            collectionView.performBatchUpdates {
-                collectionView.insertSections(IndexSet(integer: 0))
-            }
-            updateTotalPages()
-            return
-        }
-        
-        if oldParticipant != nil && newParticipant == nil {
-            participantList.0 = nil
-            collectionView.performBatchUpdates {
-                collectionView.deleteSections(IndexSet(integer: 0))
-            }
-            updateTotalPages()
-            return
-        }
-        
-        if oldParticipant?.userID != newParticipant?.userID {
-            participantList.0 = newParticipant
-            collectionView.reloadSections(IndexSet(integer: 0))
-            return
-        }
-        
-        participantList.0 = newParticipant
-        if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: 0)) as? RoomViewScreenStreamCell,
-           let participant = newParticipant {
-            cell.updateUI(with: participant)
-            bindScreenStreamState(cell: cell, with: participant)
-        }
-    }
-    
     private func updateVisibleCellsSpeakingStatus(_ speakingUsers: [String: Int]) {
-           self.speakingUsers = speakingUsers
-           collectionView.visibleCells.forEach { cell in
-               guard let indexPath = collectionView.indexPath(for: cell) else { return }
-               
-               var participantOpt: RoomParticipant?
-               if participantList.0 != nil {
-                   if indexPath.section != 0 {
-                       participantOpt = participantList.1[indexPath.item]
-                   }
-               } else {
-                   participantOpt = participantList.1[indexPath.item]
-               }
-               
-               guard let participant = participantOpt else { return }
-               
-               if let participantCell = cell as? RoomViewVideoStreamCell {
-                   let volume = speakingUsers[participant.userID] ?? 0
-                   let isSpeaking = volume > 0
-                   participantCell.updateSpeakingStatus(with: participant, isSpeaking: isSpeaking)
-               }
-           }
-       }
+        self.speakingUsers = speakingUsers
+        collectionView.visibleCells.forEach { cell in
+            guard let indexPath = collectionView.indexPath(for: cell) else { return }
+
+            var participantOpt: RoomParticipant?
+            if participantList.0 != nil {
+                if indexPath.section != 0 {
+                    participantOpt = displayParticipants[safe: indexPath.item]
+                }
+            } else {
+                participantOpt = displayParticipants[safe: indexPath.item]
+            }
+
+            guard let participant = participantOpt else { return }
+
+            if let participantCell = cell as? RoomViewVideoStreamCell {
+                let volume = speakingUsers[participant.userID] ?? 0
+                let isSpeaking = volume > 0
+                participantCell.updateSpeakingStatus(with: participant, isSpeaking: isSpeaking)
+            }
+        }
+
+        streamManager.updateSpeakingStatus(participants: participantList.1,
+                                           speakingUsers: speakingUsers,
+                                           collectionViewOffsetX: collectionView.contentOffset.x)
+    }
 }
 
-// MARK: - Incremental Update Helpers
+// MARK: - Helpers
 extension StandardRoomView {
-    private func calculateParticipantListChanges(from oldList: [RoomParticipant], to newList: [RoomParticipant]) -> DataChanges {
-        let section = participantList.0 != nil ? 1 : 0
-        var deletions: [IndexPath] = []
-        var insertions: [IndexPath] = []
-        var moves: [(from: IndexPath, to: IndexPath)] = []
-        
-        let oldIDs = oldList.map { $0.userID }
-        let newIDs = newList.map { $0.userID }
-        
-        let oldIDToIndex = Dictionary(uniqueKeysWithValues: oldIDs.enumerated().map { ($1, $0) })
-        let newIDToIndex = Dictionary(uniqueKeysWithValues: newIDs.enumerated().map { ($1, $0) })
-        
-        let deletedKeys = Set(oldIDs).subtracting(newIDs)
-        let insertedKeys = Set(newIDs).subtracting(oldIDs)
-        let retainedKeys = Set(oldIDs).intersection(newIDs)
-        
-        deletions = deletedKeys.compactMap { oldIDToIndex[$0] }.map { IndexPath(item: $0, section: section) }.sorted { $0.item > $1.item }
-        insertions = insertedKeys.compactMap { newIDToIndex[$0] }.map { IndexPath(item: $0, section: section) }.sorted { $0.item < $1.item }
-   
-        var processedIndices = Set<String>()
-        for key in retainedKeys {
-            guard let oldIndex = oldIDToIndex[key],
-                  let newIndex = newIDToIndex[key],
-                  oldIndex != newIndex,
-                  !processedIndices.contains(key) else {
-                continue
-            }
-            let fromPath = IndexPath(item: oldIndex, section: section)
-            let toPath = IndexPath(item: newIndex, section: section)
-            if !deletions.contains(fromPath) && !insertions.contains(toPath) {
-                moves.append((from: fromPath, to: toPath))
-                processedIndices.insert(key)
-            }
-        }
-        moves.sort { $0.from.item < $1.from.item }
-        
-        return DataChanges(
-            deletions: deletions,
-            insertions: insertions,
-            moves: moves
-        )
-    }
-    
     private func freshCollectionView(block: () -> Void) {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
@@ -647,5 +658,20 @@ extension StandardRoomView {
             }
         }) as? RoomViewVideoStreamCell else { return nil }
         return cell
+    }
+
+    private func restoreGridCellRender(userID: String) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let participantSection = participantList.0 != nil ? 1 : 0
+            for cell in collectionView.visibleCells {
+                guard let videoCell = cell as? RoomViewVideoStreamCell else { continue }
+                guard let indexPath = collectionView.indexPath(for: cell),
+                      indexPath.section == participantSection else { continue }
+                guard let participant = videoCell.participant, participant.userID == userID else { continue }
+                guard participant.cameraStatus == .on || participant.screenShareStatus == .on else { continue }
+                videoCell.participantView.setActive(isActive: true)
+            }
+        }
     }
 }

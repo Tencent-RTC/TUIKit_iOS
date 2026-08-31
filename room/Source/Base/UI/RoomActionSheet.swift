@@ -114,12 +114,7 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
         return view
     }()
     
-    private lazy var dropButton: UIButton = {
-        let button = UIButton()
-        button.setImage(ResourceLoader.loadImage("room_drop_arrow"), for: .normal)
-        button.imageView?.contentMode = .center
-        return button
-    }()
+    private lazy var dropButton: RoomDragHandleButton = RoomDragHandleButton()
     
     private lazy var messageLabel: UILabel = {
         let label = UILabel()
@@ -209,7 +204,7 @@ class RoomActionSheet: UIView, BasePanel, PanelHeightProvider {
         
         dropButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
         // Message label (if exists)

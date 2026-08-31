@@ -56,12 +56,7 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
         return view
     }()
     
-    private lazy var dropButton: UIButton = {
-        let button = UIButton()
-        button.setImage(ResourceLoader.loadImage("room_drop_arrow"), for: .normal)
-        button.imageView?.contentMode = .center
-        return button
-    }()
+    private lazy var dropButton: RoomDragHandleButton = RoomDragHandleButton()
     
     private lazy var avatarImageView: UIImageView = {
         let imageView = UIImageView()
@@ -123,7 +118,7 @@ public class AudienceManagerView: UIView, BasePanel, PanelHeightProvider {
         
         dropButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
         avatarImageView.snp.makeConstraints { make in

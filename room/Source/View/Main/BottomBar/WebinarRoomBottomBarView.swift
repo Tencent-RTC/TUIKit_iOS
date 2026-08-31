@@ -45,7 +45,7 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     }()
     
     private lazy var membersButton: RoomIconButton = {
-        return makeIconButton(title: .members.localizedReplace("0"), imageName: "room_members")
+        return makeIconButton(title: .members, imageName: "room_members")
     }()
     
     private lazy var handsUpManagerButton: RoomIconButton = {
@@ -234,7 +234,7 @@ public class WebinarRoomBottomBarView: UIView, BaseView {
     
     private func updateParticipantCount(count: Int) {
         RoomKitLog.info("updateParticipantCount count:\(count)")
-        membersButton.setTitle(.members.localizedReplace("\(count)"))
+        membersButton.setTitle(count == 0 ? .members : .membersCount.localizedReplace("\(count)"))
     }
     
     private func updateStackViewSpacing() {
@@ -629,7 +629,8 @@ extension WebinarRoomBottomBarView {
 fileprivate extension String {
     static let cancel = "roomkit_cancel".localized
     static let ok = "roomkit_ok".localized
-    static let members = "roomkit_member_count"
+    static let members = "roomkit_member".localized
+    static let membersCount = "roomkit_member_count"
     static let mute = "roomkit_mute".localized
     static let unmute = "roomkit_unmute".localized
     static let stopVideo = "roomkit_stop_video".localized

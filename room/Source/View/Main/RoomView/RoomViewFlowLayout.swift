@@ -17,13 +17,21 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
     
     // MARK: - Constants
     private struct LayoutConfig {
-        static let itemSize: CGSize = CGSize(width: 176, height: 176)
+        static let preferredItemSize: CGFloat = 176
         static let itemSpacing: CGFloat = 8.0
         static let lineSpacing: CGFloat = 8.0
+        static let horizontalPadding: CGFloat = 8.0
         static let maxColumns: Int = 2
         static let maxRows: Int = 3
         static let maxItemsPerPage: Int = 6
         static let screenSharingPadding: CGFloat = 0
+
+        static func calculatedItemSize(for containerWidth: CGFloat) -> CGSize {
+            let cols = CGFloat(maxColumns)
+            let available = containerWidth - 2 * horizontalPadding - (cols - 1) * itemSpacing
+            let width = min(preferredItemSize, floor(available / cols))
+            return CGSize(width: max(width, 80), height: max(width, 80))
+        }
     }
     
     // MARK: - Initialization
@@ -39,7 +47,7 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
     
     private func setupDefaults() {
         scrollDirection = .horizontal
-        itemSize = LayoutConfig.itemSize
+        itemSize = LayoutConfig.calculatedItemSize(for: UIScreen.main.bounds.width)
         minimumInteritemSpacing = LayoutConfig.itemSpacing
         minimumLineSpacing = LayoutConfig.lineSpacing
     }
@@ -62,11 +70,10 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
         }
         
         var currentPageOffsetX: CGFloat = 0
-        
         let hasScreenSharing = numberOfSections == 2
         
         if hasScreenSharing {
-            let screenSharingAttributes = layoutScreenSharingSection(
+            let screenSharingAttributes = layoutFullScreenSection(
                 section: 0,
                 pageOffsetX: currentPageOffsetX,
                 containerWidth: containerWidth,
@@ -91,7 +98,16 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
             }
         } else {
             let participantCount = collectionView.numberOfItems(inSection: 0)
-            if participantCount > 0 {
+            if participantCount == 1 {
+                let fullAttributes = layoutFullScreenSection(
+                    section: 0,
+                    pageOffsetX: currentPageOffsetX,
+                    containerWidth: containerWidth,
+                    containerHeight: containerHeight
+                )
+                layoutAttributes.append(contentsOf: fullAttributes)
+                currentPageOffsetX += containerWidth
+            } else if participantCount > 1 {
                 let participantAttributes = layoutParticipantsSection(
                     section: 0,
                     itemCount: participantCount,
@@ -109,23 +125,20 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
         contentSize = CGSize(width: currentPageOffsetX, height: containerHeight)
     }
     
-    private func layoutScreenSharingSection(
+    private func layoutFullScreenSection(
         section: Int,
         pageOffsetX: CGFloat,
         containerWidth: CGFloat,
         containerHeight: CGFloat
     ) -> [UICollectionViewLayoutAttributes] {
-        
         let indexPath = IndexPath(item: 0, section: section)
         let attribute = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-        
         attribute.frame = CGRect(
             x: pageOffsetX + LayoutConfig.screenSharingPadding,
             y: LayoutConfig.screenSharingPadding,
             width: containerWidth - 2 * LayoutConfig.screenSharingPadding,
             height: containerHeight - 2 * LayoutConfig.screenSharingPadding
         )
-        
         return [attribute]
     }
     
@@ -140,6 +153,13 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
         var attributes: [UICollectionViewLayoutAttributes] = []
         
         let numberOfPages = Int(ceil(Double(itemCount) / Double(LayoutConfig.maxItemsPerPage)))
+        let itemSize = LayoutConfig.calculatedItemSize(for: containerWidth)
+        
+        let firstPageItemCount = min(itemCount, LayoutConfig.maxItemsPerPage)
+        let firstPageRows = Int(ceil(Double(firstPageItemCount) / Double(LayoutConfig.maxColumns)))
+        let firstPageGridHeight = CGFloat(firstPageRows) * itemSize.height +
+                                  CGFloat(max(0, firstPageRows - 1)) * LayoutConfig.lineSpacing
+        let topOffset = max(0, (containerHeight - firstPageGridHeight) / 2.0)
         
         for pageIndex in 0..<numberOfPages {
             let startItemIndex = pageIndex * LayoutConfig.maxItemsPerPage
@@ -151,10 +171,9 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
                 section: section,
                 itemsInPage: itemsInPage,
                 startItemIndex: startItemIndex,
-                pageIndex: pageIndex,
                 pageOffsetX: pageOffsetX,
                 containerWidth: containerWidth,
-                containerHeight: containerHeight
+                topOffset: topOffset
             )
             
             attributes.append(contentsOf: pageAttributes)
@@ -167,56 +186,30 @@ class RoomViewFlowLayout: UICollectionViewFlowLayout {
         section: Int,
         itemsInPage: Int,
         startItemIndex: Int,
-        pageIndex: Int,
         pageOffsetX: CGFloat,
         containerWidth: CGFloat,
-        containerHeight: CGFloat
+        topOffset: CGFloat
     ) -> [UICollectionViewLayoutAttributes] {
         
         var attributes: [UICollectionViewLayoutAttributes] = []
+        let itemSize = LayoutConfig.calculatedItemSize(for: containerWidth)
         
-        let rows = Int(ceil(Double(itemsInPage) / Double(LayoutConfig.maxColumns)))
-        let totalGridWidth = CGFloat(LayoutConfig.maxColumns) * LayoutConfig.itemSize.width +
+        let totalGridWidth = CGFloat(LayoutConfig.maxColumns) * itemSize.width +
                             CGFloat(LayoutConfig.maxColumns - 1) * LayoutConfig.itemSpacing
-        let totalGridHeight = CGFloat(LayoutConfig.maxRows) * LayoutConfig.itemSize.height +
-                             CGFloat(LayoutConfig.maxRows - 1) * LayoutConfig.lineSpacing
-        
         let standardHorizontalOffset = (containerWidth - totalGridWidth) / 2.0
-        let standardVerticalOffset = (containerHeight - totalGridHeight) / 2.0
-        
-        if pageIndex == 0 && itemsInPage == 1 {
-            let indexPath = IndexPath(item: startItemIndex, section: section)
-            let attribute = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-            attribute.frame = CGRect(
-                x: pageOffsetX + (containerWidth - LayoutConfig.itemSize.width) / 2.0,
-                y: (containerHeight - LayoutConfig.itemSize.height) / 2.0,
-                width: LayoutConfig.itemSize.width,
-                height: LayoutConfig.itemSize.height
-            )
-            return [attribute]
-        }
-        
-        let verticalOffset: CGFloat
-        if pageIndex == 0 {
-            let actualGridHeight = CGFloat(rows) * LayoutConfig.itemSize.height +
-                                  CGFloat(max(0, rows - 1)) * LayoutConfig.lineSpacing
-            verticalOffset = (containerHeight - actualGridHeight) / 2.0
-        } else {
-            verticalOffset = standardVerticalOffset
-        }
         
         for itemIndexInPage in 0..<itemsInPage {
             let row = itemIndexInPage / LayoutConfig.maxColumns
             let column = itemIndexInPage % LayoutConfig.maxColumns
             
             let x = pageOffsetX + standardHorizontalOffset +
-                   CGFloat(column) * (LayoutConfig.itemSize.width + LayoutConfig.itemSpacing)
-            let y = verticalOffset +
-                   CGFloat(row) * (LayoutConfig.itemSize.height + LayoutConfig.lineSpacing)
+                   CGFloat(column) * (itemSize.width + LayoutConfig.itemSpacing)
+            let y = topOffset +
+                   CGFloat(row) * (itemSize.height + LayoutConfig.lineSpacing)
             
             let indexPath = IndexPath(item: startItemIndex + itemIndexInPage, section: section)
             let attribute = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-            attribute.frame = CGRect(x: x, y: y, width: LayoutConfig.itemSize.width, height: LayoutConfig.itemSize.height)
+            attribute.frame = CGRect(x: x, y: y, width: itemSize.width, height: itemSize.height)
             
             attributes.append(attribute)
         }

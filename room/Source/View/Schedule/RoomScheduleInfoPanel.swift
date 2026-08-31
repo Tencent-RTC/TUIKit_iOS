@@ -95,13 +95,7 @@ public class RoomScheduleInfoPanel: UIView, BasePanel, PanelHeightProvider {
 
     // MARK: - UI Components
 
-    private lazy var dragHandleView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = ResourceLoader.loadImage("room_drop_arrow")
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = true
-        return imageView
-    }()
+    private lazy var dragHandleView: RoomDragHandleButton = RoomDragHandleButton()
 
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -163,14 +157,13 @@ public class RoomScheduleInfoPanel: UIView, BasePanel, PanelHeightProvider {
         addSubview(copyRoomInfoButton)
 
         // Tap the drag handle to dismiss the panel.
-        let dragTap = UITapGestureRecognizer(target: self, action: #selector(handleDragHandleTapped))
-        dragHandleView.addGestureRecognizer(dragTap)
+        dragHandleView.addTarget(self, action: #selector(handleDragHandleTapped), for: .touchUpInside)
     }
 
     private func setupConstraints() {
         dragHandleView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(Layout.dragHandleTop)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(Layout.titleTop)

@@ -163,6 +163,7 @@ class RoomViewVideoStreamCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         reset()
+        participantView.setActive(isActive: false)
     }
     
     deinit {
@@ -368,7 +369,7 @@ class RoomViewScreenStreamCell: UICollectionViewCell {
 
         roleIconImageView.layer.cornerRadius = 12
         roleIconImageView.layer.masksToBounds = true
-        containerView.backgroundColor = RoomColors.g2.withAlphaComponent(0.5)
+        containerView.backgroundColor = .clear
     }
 
     func reset() {

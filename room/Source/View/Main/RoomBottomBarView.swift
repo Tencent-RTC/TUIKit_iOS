@@ -19,7 +19,6 @@ public protocol RoomBottomBarViewDelegate: AnyObject {
 }
 
 let buttonItemSizeForStandard: CGFloat = 52
-let buttonItemSizeForWebinar: CGFloat = 40
 
 // MARK: - RoomBottomBarView Component
 public class RoomBottomBarView: UIView, BaseView {

@@ -200,7 +200,7 @@ public class RoomIconButton: UIControl {
         
         badgeView.isHidden = false
         if count > 99 {
-            badgeView.text = "99+"
+            badgeView.text = "99"
         } else {
             badgeView.text = "\(count)"
         }
