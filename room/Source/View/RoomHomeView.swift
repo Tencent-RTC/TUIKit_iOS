@@ -44,7 +44,7 @@ public class RoomHomeView: UIView, BaseView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = RoomCornerRadius.circle(size: 40)
+        imageView.layer.cornerRadius = RoomCornerRadius.circle(size: 30)
         imageView.backgroundColor = RoomColors.g3
         return imageView
     }()
@@ -140,8 +140,8 @@ public class RoomHomeView: UIView, BaseView {
         userAvatarContainerView.addSubview(userNameLabel)
         
         addSubview(functionCardsStackView)
-        functionCardsStackView.addArrangedSubview(createRoomButton)
         functionCardsStackView.addArrangedSubview(joinRoomButton)
+        functionCardsStackView.addArrangedSubview(createRoomButton)
         functionCardsStackView.addArrangedSubview(scheduleRoomButton)
         addSubview(historyRoomSeparatorView)
         

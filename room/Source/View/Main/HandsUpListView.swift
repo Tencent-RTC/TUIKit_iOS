@@ -46,12 +46,7 @@ public class HandsUpListView: UIView, BasePanel, PanelHeightProvider {
         return view
     }()
     
-    private lazy var dropButton: UIButton = {
-        let dropButton = UIButton()
-        dropButton.setImage(ResourceLoader.loadImage("room_drop_arrow"), for: .normal)
-        dropButton.imageView?.contentMode = .center
-        return dropButton
-    }()
+    private lazy var dropButton: RoomDragHandleButton = RoomDragHandleButton()
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -112,7 +107,7 @@ public class HandsUpListView: UIView, BasePanel, PanelHeightProvider {
         
         dropButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in

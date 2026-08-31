@@ -15,6 +15,7 @@ import UserNotifications
 public protocol RoomInvitationObserver: AnyObject {
     func onCallReceived(roomInfo: RoomInfo, call: RoomCall, extensionInfo: String)
     func onCallCancelled(roomInfo: RoomInfo, call: RoomCall)
+    func onCallTimeout(roomInfo: RoomInfo, call: RoomCall)
     func onRoomEnded(roomInfo: RoomInfo)
     func onScheduledRoomCancelled(roomInfo: RoomInfo, operatorUser: RoomUser)
     func onRemovedFromScheduledRoom(roomInfo: RoomInfo, operatorUser: RoomUser)
@@ -23,6 +24,7 @@ public protocol RoomInvitationObserver: AnyObject {
 public extension RoomInvitationObserver {
     func onCallReceived(roomInfo: RoomInfo, call: RoomCall, extensionInfo: String) {}
     func onCallCancelled(roomInfo: RoomInfo, call: RoomCall) {}
+    func onCallTimeout(roomInfo: RoomInfo, call: RoomCall) {}
     func onRoomEnded(roomInfo: RoomInfo) {}
     func onScheduledRoomCancelled(roomInfo: RoomInfo, operatorUser: RoomUser) {}
     func onRemovedFromScheduledRoom(roomInfo: RoomInfo, operatorUser: RoomUser) {}
@@ -66,8 +68,6 @@ public class RoomInvitationManager: NSObject {
 
     public func stopRoomEventObserver() {
         cancellableSet.removeAll()
-        stopCallingBell()
-        stopVibration()
         dismissInvitation()
     }
 
@@ -102,6 +102,8 @@ public class RoomInvitationManager: NSObject {
             handleCallReceived(roomInfo: roomInfo, call: call, extensionInfo: extensionInfo)
         case .onCallCancelled(let roomInfo, let call):
             handleCallCancelled(roomInfo: roomInfo, call: call)
+        case .onCallTimeout(let roomInfo, let call):
+            handleCallTimeout(roomInfo: roomInfo, call: call)
         case .onRoomEnded(let roomInfo):
             notifyObservers { $0.onRoomEnded(roomInfo: roomInfo) }
         case .onScheduledRoomCancelled(let roomInfo, let operatorUser):
@@ -125,6 +127,11 @@ public class RoomInvitationManager: NSObject {
     private func handleCallCancelled(roomInfo: RoomInfo, call: RoomCall) {
         dismissInvitation()
         notifyObservers { $0.onCallCancelled(roomInfo: roomInfo, call: call) }
+    }
+
+    private func handleCallTimeout(roomInfo: RoomInfo, call: RoomCall) {
+        dismissInvitation()
+        notifyObservers { $0.onCallTimeout(roomInfo: roomInfo, call: call) }
     }
 
     // MARK: - Invitation Presentation
@@ -162,26 +169,27 @@ public class RoomInvitationManager: NSObject {
                     completion(nil)
                 case .failure(let error):
                     completion(error)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
+                        guard let self = self else { return }
+                        dismissInvitation()
+                    }
                 }
             }
         }
     }
 
     public func rejectCall(roomID: String, completion: @escaping (ErrorInfo?) -> Void) {
-        stopCallingBell()
-        stopVibration()
-        roomStore.rejectCall(roomID: roomID, reason: .rejected) { [weak self] result in
+        roomStore.rejectCall(roomID: roomID, reason: .rejected) { result in
             DispatchQueue.main.async {
-                guard let self = self else { return }
                 switch result {
                 case .success:
-                    self.dismissInvitation()
                     completion(nil)
                 case .failure(let error):
                     completion(error)
                 }
             }
         }
+        dismissInvitation()
     }
 
     public func enterRoom(roomInfo: RoomInfo) {

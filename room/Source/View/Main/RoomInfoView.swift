@@ -44,12 +44,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
         return view
     }()
     
-    private lazy var dropButton: UIButton = {
-        let button = UIButton()
-        button.setImage(ResourceLoader.loadImage("room_drop_arrow"), for: .normal)
-        button.imageView?.contentMode = .center
-        return button
-    }()
+    private lazy var dropButton: RoomDragHandleButton = RoomDragHandleButton()
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -125,7 +120,7 @@ public class RoomInfoView: UIView, BasePanel, PanelHeightProvider {
         
         dropButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in

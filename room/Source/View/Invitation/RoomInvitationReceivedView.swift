@@ -225,8 +225,10 @@ public class RoomInvitationReceivedView: UIView, BaseView {
                 RoomInvitationManager.shared.acceptCall(roomInfo: roomInfo) { [weak self] error in
                     guard let self = self else { return }
                     if let error = error {
-                        self.showToastAndDismiss(
-                            text: InternalError(code: error.code, message: error.message).localizedMessage
+                        showAtomicToast(
+                            text: InternalError(code: error.code, message: error.message).localizedMessage,
+                            style: .warning,
+                            position: .center
                         )
                     }
                 }
@@ -245,26 +247,7 @@ public class RoomInvitationReceivedView: UIView, BaseView {
 
     // MARK: - Actions
     @objc private func handleDeclineTapped() {
-        RoomInvitationManager.shared.rejectCall(roomID: roomInfo.roomID) { [weak self] error in
-            guard let self = self else { return }
-            if let error = error {
-                self.showToastAndDismiss(
-                    text: InternalError(code: error.code, message: error.message).localizedMessage
-                )
-            }
-        }
-    }
-
-    private func showToastAndDismiss(text: String) {
-        showAtomicToast(
-            text: text,
-            style: .warning,
-            position: .center
-        )
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [weak self] in
-            guard let self = self else { return }
-            RoomInvitationManager.shared.dismissInvitation()
-        }
+        RoomInvitationManager.shared.rejectCall(roomID: roomInfo.roomID) { _ in }
     }
 }
 

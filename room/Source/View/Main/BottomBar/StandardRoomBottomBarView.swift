@@ -38,24 +38,41 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private let roomID: String
     private var cancellableSet = Set<AnyCancellable>()
     private var isExpanded: Bool = false
-    private var row2HeightConstraint: Constraint?
-    private let maxButtonsPerRow = 5
+    private var isAnimating: Bool = false
+
+    private var rowHeightConstraints: [Constraint] = []
+    private let maxButtonsPerRow = 6
+
+    private var currentButtonSize: CGFloat = buttonItemSizeForStandard
+    private var currentSpacing: CGFloat = 10
+    private let preferredSpacing: CGFloat = 10
+    private let minSpacing: CGFloat = 4
+    private let moreButtonWidth: CGFloat = 32
+
+    private func buttonWidth(for button: RoomIconButton) -> CGFloat {
+        button === moreButton ? moreButtonWidth : currentButtonSize
+    }
 
     private var allButtons: [RoomIconButton] {
         [membersButton, microphoneButton, cameraButton,
-         screenShareButton, recordingButton, inviteButton, aiToolsButton]
+         screenShareButton, recordingButton, moreButton, inviteButton, aiToolsButton]
     }
 
+
     private var visibleButtons: [RoomIconButton] {
-        allButtons.filter { !$0.isHidden }
+        allButtons.filter { $0 !== moreButton && !$0.isHidden }
+    }
+
+    private var needsSecondRow: Bool {
+        visibleButtons.count > maxButtonsPerRow
     }
 
     private var row1Buttons: [RoomIconButton] {
-        Array(visibleButtons.prefix(maxButtonsPerRow))
+        needsSecondRow ? Array(visibleButtons.prefix(maxButtonsPerRow - 1)) : visibleButtons
     }
 
     private var row2Buttons: [RoomIconButton] {
-        Array(visibleButtons.dropFirst(maxButtonsPerRow))
+        needsSecondRow ? Array(visibleButtons.dropFirst(maxButtonsPerRow - 1)) : []
     }
 
     private lazy var contentContainerView: UIView = {
@@ -92,11 +109,12 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         stackView.spacing = 10
         stackView.clipsToBounds = true
         stackView.alpha = 0
+        stackView.isHidden = true
         return stackView
     }()
-    
+
     private lazy var membersButton: RoomIconButton = {
-        return makeIconButton(title: .members.localizedReplace("0"), imageName: "room_members")
+        return makeIconButton(title: .members, imageName: "room_members")
     }()
     
     private lazy var microphoneButton: RoomIconButton = {
@@ -153,36 +171,31 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     private func rebuildLayout() {
         for view in row1StackView.arrangedSubviews {
             row1StackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
         }
-        for button in row1Buttons {
-            row1StackView.addArrangedSubview(button)
-        }
-        
-        if !row2Buttons.isEmpty {
-            row1StackView.addArrangedSubview(moreButton)
-        }
+        row1Buttons.forEach { row1StackView.addArrangedSubview($0) }
 
         for view in row2StackView.arrangedSubviews {
             row2StackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
         }
-        
-        for button in row2Buttons {
-            row2StackView.addArrangedSubview(button)
-        }
-        
-        let remainingSlots = maxButtonsPerRow - row2Buttons.count
-        for _ in 0..<remainingSlots {
-            row2StackView.addArrangedSubview(makeSpacer(width: 52))
-        }
-        row2StackView.addArrangedSubview(makeSpacer(width: 32))
 
-        if row2Buttons.isEmpty {
-            moreButton.isHidden = true
-            row2HeightConstraint?.update(offset: 0)
+        moreButton.isHidden = !needsSecondRow
+        if needsSecondRow {
+            row1StackView.addArrangedSubview(moreButton)
+            row2Buttons.forEach { row2StackView.addArrangedSubview($0) }
+            let normalSlots = maxButtonsPerRow - 1
+            for _ in 0..<max(0, normalSlots - row2Buttons.count) {
+                row2StackView.addArrangedSubview(makeSpacer(width: currentButtonSize))
+            }
+            row2StackView.addArrangedSubview(makeSpacer(width: moreButtonWidth))
+        } else {
+            row2StackView.isHidden = true
             row2StackView.alpha = 0
             isExpanded = false
-        } else {
-            moreButton.isHidden = false
+            moreButton.setTitle(.expand)
+            moreButton.setIcon(ResourceLoader.loadImage("room_more_up"))
+            contentContainerView.backgroundColor = .clear
         }
     }
 
@@ -191,27 +204,61 @@ public class StandardRoomBottomBarView: UIView, BaseView {
             make.edges.equalToSuperview()
         }
         containerStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(UIEdgeInsets(top: 8, left: 8,
-                                                              bottom: 8, right: 8))
+            make.edges.equalToSuperview().inset(
+                UIEdgeInsets(top: 10, left: RoomSpacing.small, bottom: 10, right: RoomSpacing.small)
+            )
         }
 
-        row1StackView.snp.makeConstraints { make in
-            make.height.equalTo(52)
-        }
-        row2StackView.snp.makeConstraints { make in
-            self.row2HeightConstraint = make.height.equalTo(0).constraint
+        for row in [row1StackView, row2StackView] {
+            row.snp.makeConstraints { make in
+                self.rowHeightConstraints.append(make.height.equalTo(currentButtonSize).constraint)
+            }
         }
 
         allButtons.forEach { button in
             button.snp.makeConstraints { make in
-                make.size.equalTo(CGSize(width: 52, height: 52))
+                make.width.equalTo(buttonWidth(for: button))
+                make.height.equalTo(currentButtonSize)
             }
         }
+    }
 
-        moreButton.snp.makeConstraints { make in
-            make.width.equalTo(32)
-            make.height.equalTo(52)
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        updateAdaptiveMetrics()
+    }
+
+    private func updateAdaptiveMetrics() {
+        let innerWidth = bounds.width - RoomSpacing.small * 2
+        guard innerWidth > 0 else { return }
+        let normalCols = CGFloat(maxButtonsPerRow - 1)
+        let gaps = CGFloat(maxButtonsPerRow - 1)
+
+        var spacing = preferredSpacing
+        var buttonSize = buttonItemSizeForStandard
+        if innerWidth < normalCols * buttonSize + moreButtonWidth + gaps * spacing {
+            spacing = max(minSpacing,
+                          floor((innerWidth - normalCols * buttonSize - moreButtonWidth) / gaps))
         }
+        if innerWidth < normalCols * buttonSize + moreButtonWidth + gaps * spacing {
+            buttonSize = floor((innerWidth - moreButtonWidth - gaps * spacing) / normalCols)
+        }
+
+        guard buttonSize != currentButtonSize || spacing != currentSpacing else { return }
+        currentButtonSize = buttonSize
+        currentSpacing = spacing
+
+        for row in [row1StackView, row2StackView] {
+            row.spacing = spacing
+        }
+        allButtons.forEach { button in
+            button.snp.updateConstraints { make in
+                make.width.equalTo(buttonWidth(for: button))
+                make.height.equalTo(buttonSize)
+            }
+        }
+        rowHeightConstraints.forEach { $0.update(offset: buttonSize) }
+        rebuildLayout()
     }
 
     private func makeSpacer(width: CGFloat) -> UIView {
@@ -291,7 +338,7 @@ public class StandardRoomBottomBarView: UIView, BaseView {
             .sink { [weak self] participantCount in
                 guard let self = self else { return }
                 if let participantCount = participantCount {
-                    membersButton.setTitle(.members.localizedReplace("\(participantCount)"))
+                    membersButton.setTitle(participantCount == 0 ? .member : .membersCount.localizedReplace("\(participantCount)"))
                 }
             }
             .store(in: &cancellableSet)
@@ -522,38 +569,35 @@ extension StandardRoomBottomBarView {
     }
 
     @objc private func moreButtonTapped() {
+        guard !isAnimating else { return }
+        isAnimating = true
         isExpanded.toggle()
+        moreButton.isUserInteractionEnabled = false
         moreButton.setTitle(isExpanded ? .close : .expand)
         moreButton.setIcon(ResourceLoader.loadImage(isExpanded ? "room_more_down" : "room_more_up"))
 
         if isExpanded {
-            row2HeightConstraint?.update(offset: 52)
-            containerStackView.spacing = 4
-            UIView.animate(withDuration: 0.2,
-                           delay: 0,
-                           options: .curveEaseInOut) {
+            UIView.animate(withDuration: 0.25) {
                 self.contentContainerView.backgroundColor = RoomColors.g2
-                self.superview?.layoutIfNeeded()
             } completion: { _ in
-                UIView.animate(withDuration: 0.15,
-                               delay: 0,
-                               options: .curveEaseInOut) {
+                UIView.animate(withDuration: 0.25) {
+                    self.row2StackView.isHidden = false
                     self.row2StackView.alpha = 1
+                } completion: { _ in
+                    self.moreButton.isUserInteractionEnabled = true
+                    self.isAnimating = false
                 }
             }
         } else {
-            UIView.animate(withDuration: 0.15,
-                           delay: 0,
-                           options: .curveEaseInOut) {
+            UIView.animate(withDuration: 0.25) {
+                self.row2StackView.isHidden = true
                 self.row2StackView.alpha = 0
-                self.contentContainerView.backgroundColor = .clear
             } completion: { _ in
-                self.row2HeightConstraint?.update(offset: 0)
-                self.containerStackView.spacing = 0
-                UIView.animate(withDuration: 0.2,
-                               delay: 0,
-                               options: .curveEaseInOut) {
-                    self.window?.layoutIfNeeded()
+                UIView.animate(withDuration: 0.25) {
+                    self.contentContainerView.backgroundColor = .clear
+                } completion: { _ in
+                    self.moreButton.isUserInteractionEnabled = true
+                    self.isAnimating = false
                 }
             }
         }
@@ -646,7 +690,8 @@ fileprivate extension String {
     static let ok = "roomkit_ok".localized
     static let cancel = "roomkit_cancel".localized
     static let stop = "roomkit_btn_stop".localized
-    static let members = "roomkit_member_count"
+    static let members = "roomkit_member".localized
+    static let membersCount = "roomkit_member_count"
     static let mute = "roomkit_mute".localized
     static let unmute = "roomkit_unmute".localized
     static let stopVideo = "roomkit_stop_video".localized

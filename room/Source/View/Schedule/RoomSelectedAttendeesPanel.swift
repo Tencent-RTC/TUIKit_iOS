@@ -47,13 +47,7 @@ class RoomSelectedAttendeesPanel: UIView, BasePanel, PanelHeightProvider {
         return view
     }()
     
-    private lazy var dragHandleView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = ResourceLoader.loadImage("room_drop_arrow")
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = true
-        return imageView
-    }()
+    private lazy var dragHandleView: RoomDragHandleButton = RoomDragHandleButton()
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -111,8 +105,7 @@ class RoomSelectedAttendeesPanel: UIView, BasePanel, PanelHeightProvider {
         addSubview(separator)
         addSubview(tableView)
 
-        let dragTap = UITapGestureRecognizer(target: self, action: #selector(handleDragHandleTapped))
-        dragHandleView.addGestureRecognizer(dragTap)
+        dragHandleView.addTarget(self, action: #selector(handleDragHandleTapped), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -122,7 +115,7 @@ class RoomSelectedAttendeesPanel: UIView, BasePanel, PanelHeightProvider {
         }
         dragHandleView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(10)
-            make.centerX.equalToSuperview()
+            make.left.right.equalToSuperview()
         }
         titleLabel.snp.makeConstraints { make in
             make.left.equalToSuperview().offset(20)
