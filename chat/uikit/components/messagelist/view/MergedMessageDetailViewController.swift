@@ -56,7 +56,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
     private let emptyLabel: UILabel = {
         let label = UILabel()
         label.font = FontScheme.caption2Regular
-        label.textColor = ChatUIKitTheme.colors.textColorSecondary
+        label.textColor = TUIChatKitTheme.colors.textColorSecondary
         label.text = LocalizedChatString("RelayNoMessage")
         label.isHidden = true
         return label
@@ -64,7 +64,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
 
     // MARK: - Init
 
-    init(mergedMessage: MessageInfo, conversationID: String, config: MessageListConfigProtocol = ChatMessageListConfig(alignment: LanguageHelper.isRTL ? 2 : 1)) {
+    init(mergedMessage: MessageInfo, conversationID: String, config: MessageListConfigProtocol = ChatMessageListConfig(alignment: LanguageHelper.isRTL ? .right : .left)) {
         self.mergedMessage = mergedMessage
         self.conversationID = conversationID
         self.config = config
@@ -99,18 +99,11 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
 
     private func setupNavigation() {
         title = Self.title(from: mergedMessage)
-        let backIcon = AtomicXChatResources.image(named: "contact_info_back")?
-            .withRenderingMode(.alwaysTemplate)
-            ?? UIImage(systemName: "chevron.left")?
-            .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.backIconPointSize, weight: .semibold))
-        let back = UIBarButtonItem(
-            image: backIcon,
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleBack)
+            action: #selector(handleBack),
+            tintColor: TUIChatKitTheme.colors.textColorPrimary
         )
-        back.tintColor = ChatUIKitTheme.colors.textColorPrimary
-        navigationItem.leftBarButtonItem = back
     }
 
     @objc private func handleBack() {
@@ -143,7 +136,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
     }
 
     private func setupViewStyle() {
-        let listColor = ChatUIKitTheme.colors.listColorDefault
+        let listColor = TUIChatKitTheme.colors.listColorDefault
         view.backgroundColor = listColor
         tableView.backgroundColor = listColor
     }
@@ -235,9 +228,9 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
 
     private func isLeft(for message: MessageInfo) -> Bool {
         switch config.alignment {
-        case 1: return true
-        case 2: return false
-        default: return !message.isSentBySelf
+        case .left: return true
+        case .right: return false
+        case .twoSided: return !message.isSentBySelf
         }
     }
 

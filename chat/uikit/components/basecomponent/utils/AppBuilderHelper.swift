@@ -1,6 +1,6 @@
 import Foundation
 
-enum MessageAlignment: String, CaseIterable {
+public enum MessageAlignment: String, CaseIterable {
     case left
     case right
     case twoSided = "two-sided"
@@ -9,7 +9,7 @@ enum MessageAlignment: String, CaseIterable {
 enum MessageAction: String, CaseIterable {
     case copy
     case recall
-
+    case quote
     case forward
     case delete
 
@@ -35,30 +35,65 @@ public class AppBuilderConfig {
     var primaryColor: String = "#1C66E5"
     var messageAlignment: MessageAlignment = .twoSided
     public var enableReadReceipt: Bool = false
-    public var translateTargetLanguage: String = ""
 
-    var messageActionList: [MessageAction] = [.copy, .recall, .delete]
+    private static let translateTargetLanguageKey = "com.atomicx.translateTargetLanguage"
+
+    public var translateTargetLanguage: String {
+        get {
+            if let stored = UserDefaults.standard.string(forKey: Self.translateTargetLanguageKey), !stored.isEmpty {
+                return stored
+            }
+            return Locale.current.languageCode ?? "en"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Self.translateTargetLanguageKey)
+        }
+    }
+
+    var messageActionList: [MessageAction] = MessageAction.allCases
     var enableCreateConversation: Bool = true
     var conversationActionList: [ConversationAction] = [.delete, .mute, .pin, .markUnread, .clearHistory]
     var hideSendButton: Bool = false
 
     var hideSearch: Bool = false
-    var avatarShape: GlobalAvatarShape = .circular
-    private init() {}
+    var avatarShape: GlobalAvatarShape = .rounded
+    private init() {
+        AppBuilderHelper.loadBundledConfig(into: self)
+    }
 }
 
 public class AppBuilderHelper {
-    public static func setJsonPath(path: String) {
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
-              let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-        else {
+    static func loadBundledConfig(into config: AppBuilderConfig) {
+        // bundle 中不存在 appConfig.json 属正常情况（接入方未提供），静默跳过
+        guard let url = Bundle.main.url(forResource: "appConfig", withExtension: "json") else {
             return
         }
-        parseConfig(from: json)
+        do {
+            let data = try Data(contentsOf: url)
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                print("[AppBuilder] appConfig.json 解析失败：顶层结构不是字典")
+                return
+            }
+            parseConfig(from: json, into: config)
+        } catch {
+            print("[AppBuilder] appConfig.json 加载失败: \(error.localizedDescription)")
+        }
     }
 
-    private static func parseConfig(from json: [String: Any]) {
-        let config = AppBuilderConfig.shared
+    public static func setJsonPath(path: String) {
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: path))
+            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                print("[AppBuilder] setJsonPath 解析失败：顶层结构不是字典, path=\(path)")
+                return
+            }
+            parseConfig(from: json, into: AppBuilderConfig.shared)
+        } catch {
+            print("[AppBuilder] setJsonPath 加载失败: \(error.localizedDescription), path=\(path)")
+        }
+    }
+
+    private static func parseConfig(from json: [String: Any], into config: AppBuilderConfig) {
         if let theme = json["theme"] as? [String: Any] {
             if let modeString = theme["mode"] as? String,
                let mode = ThemeMode(rawValue: modeString)

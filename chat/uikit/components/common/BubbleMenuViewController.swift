@@ -141,7 +141,7 @@ final class BubbleMenuViewController: UIViewController {
     }
 
     private func makeRow(item: Item) -> UIControl {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let control = MenuItemControl { [weak self] in
             self?.dismiss(animated: false, completion: {
                 item.action()
@@ -176,7 +176,7 @@ final class BubbleMenuViewController: UIViewController {
     private func makeDivider() -> UIView {
         let wrapper = UIView()
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorSecondary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorSecondary
         wrapper.addSubview(divider)
         divider.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview()
@@ -208,7 +208,7 @@ private final class MenuItemControl: UIControl {
     override var isHighlighted: Bool {
         didSet {
             backgroundColor = isHighlighted
-                ? ChatUIKitTheme.colors.textColorPrimary.withAlphaComponent(Self.highlightAlpha)
+                ? TUIChatKitTheme.colors.textColorPrimary.withAlphaComponent(Self.highlightAlpha)
                 : .clear
         }
     }
@@ -252,7 +252,7 @@ final class BubbleMenuBubbleView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
-        contentView.backgroundColor = ChatUIKitTheme.colors.bgColorDialog
+        contentView.backgroundColor = TUIChatKitTheme.colors.bgColorDialog
         contentView.layer.cornerRadius = Self.cornerRadius
         contentView.layer.masksToBounds = true
         addSubview(contentView)
@@ -279,7 +279,7 @@ final class BubbleMenuBubbleView: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        ChatUIKitTheme.colors.bgColorDialog.setFill()
+        TUIChatKitTheme.colors.bgColorDialog.setFill()
         bubblePath().fill()
     }
 

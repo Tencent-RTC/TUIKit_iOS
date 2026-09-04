@@ -202,7 +202,7 @@ final class ConversationCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
 
         avatarContainer.backgroundColor = colors.bgColorAvatar
         avatarContainer.layer.cornerRadius = Self.avatarCornerRadius
@@ -356,9 +356,9 @@ private final class ConversationAvatarBadgeView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = ChatUIKitTheme.colors.textColorError
+        backgroundColor = TUIChatKitTheme.colors.textColorError
         textLabel.font = Self.textFont
-        textLabel.textColor = ChatUIKitTheme.colors.textColorButton
+        textLabel.textColor = TUIChatKitTheme.colors.textColorButton
         textLabel.textAlignment = .center
         addSubview(textLabel)
         textLabel.snp.makeConstraints { make in

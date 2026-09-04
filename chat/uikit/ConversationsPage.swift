@@ -27,6 +27,8 @@ public final class ConversationsPage: UIViewController {
 
     private let onConversationClick: ((NavigationInfo) -> Void)?
 
+    private let config: ConversationActionConfigProtocol
+
     private let headerView = UIView()
 
     private let titleLabel = UILabel()
@@ -40,12 +42,17 @@ public final class ConversationsPage: UIViewController {
     private lazy var conversationListView = ConversationListView(
         onConversationClick: { [weak self] conversation in
             self?.onConversationClick?(NavigationInfo(conversation: conversation))
-        }
+        },
+        config: config
     )
 
     // MARK: - Init
 
-    public init(onConversationClick: ((NavigationInfo) -> Void)? = nil) {
+    public init(
+        config: ConversationActionConfigProtocol = ChatConversationActionConfig(),
+        onConversationClick: ((NavigationInfo) -> Void)? = nil
+    ) {
+        self.config = config
         self.onConversationClick = onConversationClick
         super.init(nibName: nil, bundle: nil)
     }
@@ -58,7 +65,7 @@ public final class ConversationsPage: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        ChatUIKitLayoutDirection.install()
+        TUIChatKitLayoutDirection.install()
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
@@ -109,7 +116,7 @@ public final class ConversationsPage: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
 
         titleLabel.text = LocalizedChatString("TabChats")

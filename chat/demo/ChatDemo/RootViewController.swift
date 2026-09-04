@@ -1,5 +1,5 @@
 import AtomicXCore
-import ChatUIKit
+import TUIChatKit
 import Combine
 import UIKit
 
@@ -44,7 +44,7 @@ final class RootViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         applyLayoutDirection()
         bindLoginStatus()
         bindLanguageChange()
@@ -89,13 +89,13 @@ final class RootViewController: UIViewController {
 
     @objc private func handleLanguageDidChange() {
         applyLayoutDirection()
-        guard currentChild is HomeTabBarController else {
+        guard let home = currentChild as? HomeTabBarController else {
             if currentChild is LocalLoginViewController {
                 switchTo(LocalLoginViewController(), rebuild: true)
             }
             return
         }
-        switchTo(HomeTabBarController(), rebuild: true)
+        switchTo(HomeTabBarController(initialSelectedIndex: home.selectedIndex), rebuild: true)
     }
 
     private func bindPrimaryColorChange() {
@@ -111,8 +111,8 @@ final class RootViewController: UIViewController {
     }
 
     private func rebuildCurrentChild() {
-        if currentChild is HomeTabBarController {
-            switchTo(HomeTabBarController(), rebuild: true)
+        if let home = currentChild as? HomeTabBarController {
+            switchTo(HomeTabBarController(initialSelectedIndex: home.selectedIndex), rebuild: true)
         } else if currentChild is LocalLoginViewController {
             switchTo(LocalLoginViewController(), rebuild: true)
         }
@@ -128,7 +128,10 @@ final class RootViewController: UIViewController {
         switch status {
         case .logined:
             if !(currentChild is HomeTabBarController) {
-                switchTo(HomeTabBarController())
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self, !(self.currentChild is HomeTabBarController) else { return }
+                    self.switchTo(HomeTabBarController())
+                }
             }
         case .unlogin:
             if currentChild is AutoLoginViewController {

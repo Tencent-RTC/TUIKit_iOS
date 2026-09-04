@@ -434,7 +434,7 @@ final class MessageInputViewImpl: UIView {
         setContentHuggingPriority(.required, for: .vertical)
         setContentCompressionResistancePriority(.required, for: .vertical)
 
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         topDivider.backgroundColor = colors.strokeColorPrimary
         inputRow.backgroundColor = colors.bgColorOperate
@@ -464,12 +464,12 @@ final class MessageInputViewImpl: UIView {
     private func configureIconButton(_ button: UIButton, imageName: String) {
         let image = AtomicXChatResources.image(named: imageName)?.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
-        button.tintColor = ChatUIKitTheme.colors.textColorSecondary
+        button.tintColor = TUIChatKitTheme.colors.textColorSecondary
         button.imageView?.contentMode = .scaleAspectFit
     }
 
     private func configureSendButton() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         sendButton.backgroundColor = colors.buttonColorPrimaryDefault
         sendButton.layer.cornerRadius = Self.sendButtonCornerRadius
         sendButton.layer.masksToBounds = true
@@ -481,7 +481,7 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func configureVoiceLabel() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         voiceLabel.text = LocalizedChatString("InputHoldToTalk")
         voiceLabel.font = FontScheme.caption1Regular
         voiceLabel.textAlignment = .center
@@ -525,7 +525,7 @@ final class MessageInputViewImpl: UIView {
         let attributed = EmojiManager.shared.createAttributedStringWithTextAndStyle(
             text: mentionText,
             withFont: FontScheme.caption1Regular,
-            textColor: ChatUIKitTheme.colors.textColorPrimary
+            textColor: TUIChatKitTheme.colors.textColorPrimary
         )
         mentionList.append(mention)
         messageTextView.appendText(attributed)
@@ -563,7 +563,7 @@ final class MessageInputViewImpl: UIView {
         let newAttributedString = EmojiManager.shared.createAttributedStringWithTextAndStyle(
             text: currentText,
             withFont: FontScheme.caption1Regular,
-            textColor: ChatUIKitTheme.colors.textColorPrimary
+            textColor: TUIChatKitTheme.colors.textColorPrimary
         )
         messageTextView.setContent(newAttributedString)
     }

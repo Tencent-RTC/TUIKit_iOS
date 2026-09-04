@@ -111,7 +111,7 @@ final class ReactionEmojiPickerViewController: UIViewController {
 
         let handleIcon = UIImageView()
         handleIcon.contentMode = .scaleAspectFit
-        handleIcon.tintColor = ChatUIKitTheme.colors.strokeColorPrimary
+        handleIcon.tintColor = TUIChatKitTheme.colors.strokeColorPrimary
         handleIcon.image = AtomicXChatResources.image(named: "message_chevron_down")?.withRenderingMode(.alwaysTemplate)
             ?? UIImage(systemName: "chevron.down")
         handleIcon.isUserInteractionEnabled = false
@@ -149,7 +149,7 @@ final class ReactionEmojiPickerViewController: UIViewController {
     private func setupViewStyle() {
         backdropView.backgroundColor = UIColor.black.withAlphaComponent(Self.backdropDimAlpha)
         backdropView.alpha = 0
-        sheetView.backgroundColor = ChatUIKitTheme.colors.bgColorDialog
+        sheetView.backgroundColor = TUIChatKitTheme.colors.bgColorDialog
         sheetView.layer.cornerRadius = Self.topCornerRadius
         sheetView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         sheetView.layer.masksToBounds = true
@@ -372,7 +372,7 @@ private final class ReactionPickerHeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         titleLabel.font = FontScheme.caption3Regular
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()

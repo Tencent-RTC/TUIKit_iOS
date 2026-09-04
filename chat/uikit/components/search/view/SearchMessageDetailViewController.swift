@@ -122,7 +122,7 @@ final class SearchMessageDetailViewController: UIViewController {
     }
 
     private func setupStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         tableView.backgroundColor = colors.bgColorOperate
         dividerView.backgroundColor = colors.strokeColorPrimary
@@ -196,7 +196,7 @@ extension SearchMessageDetailViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let message = messages[indexPath.row]
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let senderName = ChatUtil.getMessageSenderName(message)
         let abstract = MessageListHelper.getMessageAbstract(message, showMergedTitle: true)
         let title = SearchHighlightBuilder.attributedText(
@@ -321,7 +321,7 @@ final class SearchConversationHeaderView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorTopBar
         nameLabel.font = FontScheme.caption1Bold
         nameLabel.textColor = colors.textColorPrimary

@@ -106,7 +106,7 @@ final class SearchResultMoreViewController: UIViewController {
     }
 
     private func setupStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         tableView.backgroundColor = colors.bgColorOperate
     }

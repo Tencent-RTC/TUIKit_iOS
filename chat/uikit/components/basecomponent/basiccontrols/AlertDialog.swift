@@ -120,7 +120,7 @@ private final class AlertDialogView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorDialog
         layer.cornerRadius = Self.cornerRadius
         layer.masksToBounds = true
@@ -149,7 +149,7 @@ private final class AlertDialogView: UIView {
                 string: message ?? "",
                 attributes: [
                     .font: ThemeState.shared.fonts.caption1Regular,
-                    .foregroundColor: ChatUIKitTheme.colors.textColorSecondary,
+                    .foregroundColor: TUIChatKitTheme.colors.textColorSecondary,
                     .paragraphStyle: paragraphStyle
                 ]
             )
@@ -166,16 +166,16 @@ private final class AlertDialogView: UIView {
         }
 
         if let cancelText = cancelText {
-            let cancelButton = makeButton(title: cancelText, color: ChatUIKitTheme.colors.textColorPrimary)
+            let cancelButton = makeButton(title: cancelText, color: TUIChatKitTheme.colors.textColorPrimary)
             cancelButton.addTarget(self, action: #selector(handleCancel), for: .touchUpInside)
             buttonStack.addArrangedSubview(cancelButton)
             let divider = UIView()
-            divider.backgroundColor = ChatUIKitTheme.colors.strokeColorModule
+            divider.backgroundColor = TUIChatKitTheme.colors.strokeColorModule
             divider.translatesAutoresizingMaskIntoConstraints = false
             divider.widthAnchor.constraint(equalToConstant: Self.dividerWidth).isActive = true
             buttonStack.addArrangedSubview(divider)
         }
-        let confirmButton = makeButton(title: confirmText, color: ChatUIKitTheme.colors.textColorLink)
+        let confirmButton = makeButton(title: confirmText, color: TUIChatKitTheme.colors.textColorLink)
         confirmButton.addTarget(self, action: #selector(handleConfirm), for: .touchUpInside)
         buttonStack.addArrangedSubview(confirmButton)
     }

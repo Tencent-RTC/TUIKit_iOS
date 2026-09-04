@@ -112,7 +112,7 @@ final class GroupCallMemberPickerViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         headerBar.backgroundColor = colors.bgColorOperate
         tableView.backgroundColor = colors.bgColorOperate
@@ -195,7 +195,7 @@ final class GroupCallMemberPickerViewController: UIViewController {
     }
 
     private func updateConfirmButtonState() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let enabled = !selectedMemberIDs.isEmpty
         confirmButton.isEnabled = enabled
         confirmButton.setTitleColor(enabled ? colors.textColorLink : colors.textColorTertiary, for: .normal)

@@ -67,7 +67,9 @@ final class AZOrderedListView: RTCBaseView {
         table.separatorStyle = .none
         table.rowHeight = Self.rowHeight
         table.sectionFooterHeight = 0
-        table.sectionHeaderTopPadding = 0
+        if #available(iOS 15.0, *) {
+            table.sectionHeaderTopPadding = 0
+        }
         table.keyboardDismissMode = .onDrag
         table.register(AZOrderedListCell.self, forCellReuseIdentifier: AZOrderedListCell.reuseIdentifier)
         return table
@@ -91,7 +93,7 @@ final class AZOrderedListView: RTCBaseView {
         let label = UILabel()
         label.text = LocalizedChatString("NoUser")
         label.font = FontScheme.caption2Regular
-        label.textColor = ChatUIKitTheme.colors.textColorTertiary
+        label.textColor = TUIChatKitTheme.colors.textColorTertiary
         label.textAlignment = .center
         return label
     }()
@@ -153,7 +155,7 @@ final class AZOrderedListView: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        let color = ChatUIKitTheme.colors.bgColorOperate
+        let color = TUIChatKitTheme.colors.bgColorOperate
         backgroundColor = color
         tableView.backgroundColor = color
     }
@@ -243,7 +245,7 @@ extension AZOrderedListView: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard showIndexBar else { return nil }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorInput
         let label = UILabel()

@@ -868,6 +868,8 @@
 "EnterUserID" = "أدخل معرف المستخدم";
 "LoginFailed" = "فشل تسجيل الدخول";
 "InvalidSDKAppID" = "معرف SDK غير صالح";
+"LoginConfigGuide" = "يرجى التحقق من تكوين SDKAPPID و SECRETKEY في GenerateTestUserSig.swift بشكل صحيح. راجع: Tencent Cloud Documentation > Instant Messaging > Demo Zone > Quick Start > Mobile > iOS (UIKit).";
+"ViewDocument" = "عرض الوثائق";
 "ColorRed" = "أحمر";
 "ColorOrange" = "برتقالي";
 "ColorYellow" = "أصفر";

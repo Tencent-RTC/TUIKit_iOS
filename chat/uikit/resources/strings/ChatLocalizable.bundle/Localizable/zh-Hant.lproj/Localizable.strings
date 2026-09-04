@@ -868,6 +868,8 @@
 "EnterUserID" = "請輸入用戶ID";
 "LoginFailed" = "登入失敗";
 "InvalidSDKAppID" = "無效的 SDKAPPID";
+"LoginConfigGuide" = "請檢查 GenerateTestUserSig.swift 中的 SDKAPPID 和 SECRETKEY 是否已正確填寫，配置方法請參考文檔：騰訊雲文檔中心>即時通信 IM>Demo 專區>快速跑通>移動端>iOS（UIKit）。";
+"ViewDocument" = "查看文檔";
 "ColorRed" = "紅色";
 "ColorOrange" = "橙色";
 "ColorYellow" = "黃色";

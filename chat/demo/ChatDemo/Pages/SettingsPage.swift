@@ -1,5 +1,5 @@
 import AtomicXCore
-import ChatUIKit
+import TUIChatKit
 import Combine
 import ImSDK_Plus
 import SnapKit
@@ -155,7 +155,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorTopBar
         headerBackgroundView.backgroundColor = colors.bgColorOperate
         headerLabel.backgroundColor = colors.bgColorOperate
@@ -201,17 +201,17 @@ final class SettingsViewController: UIViewController {
     }
 
     private func makeProfileSection() -> UIView {
-        profileRow.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        profileRow.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         let textColumn = UIStackView()
         textColumn.axis = .vertical
         textColumn.spacing = 2
         nicknameLabel.font = .systemFont(ofSize: 18)
-        nicknameLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        nicknameLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         nicknameLabel.lineBreakMode = .byTruncatingTail
         userIDLabel.font = .systemFont(ofSize: 13)
-        userIDLabel.textColor = ChatUIKitTheme.colors.textColorTertiary
+        userIDLabel.textColor = TUIChatKitTheme.colors.textColorTertiary
         signatureLabel.font = .systemFont(ofSize: 13)
-        signatureLabel.textColor = ChatUIKitTheme.colors.textColorTertiary
+        signatureLabel.textColor = TUIChatKitTheme.colors.textColorTertiary
         signatureLabel.lineBreakMode = .byTruncatingTail
         textColumn.addArrangedSubview(nicknameLabel)
         textColumn.addArrangedSubview(userIDLabel)
@@ -235,7 +235,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func makeEntryRow(title: String, valueLabel: UILabel?, action: Selector) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIControl()
         row.backgroundColor = colors.bgColorOperate
         row.addTarget(self, action: action, for: .touchUpInside)
@@ -278,7 +278,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func makePrimaryColorRow() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIControl()
         row.backgroundColor = colors.bgColorOperate
         row.addTarget(self, action: #selector(handlePrimaryColorTapped), for: .touchUpInside)
@@ -317,7 +317,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func makeReadReceiptRow() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorOperate
         let titleLabel = UILabel()
@@ -351,7 +351,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func makeCallsTabRow() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorOperate
         let titleLabel = UILabel()
@@ -377,7 +377,7 @@ final class SettingsViewController: UIViewController {
 
     private func makeGroupSpacer() -> UIView {
         let spacer = UIView()
-        spacer.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        spacer.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         spacer.snp.makeConstraints { make in
             make.height.equalTo(Self.groupSpacerHeight)
         }
@@ -386,7 +386,7 @@ final class SettingsViewController: UIViewController {
 
     private func makeRowDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
         divider.snp.makeConstraints { make in
             make.height.equalTo(Self.dividerHeight)
         }
@@ -395,11 +395,11 @@ final class SettingsViewController: UIViewController {
 
     private func makeLogoutSection() -> UIView {
         let container = UIView()
-        container.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        container.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         logoutButton.setTitle(LocalizedChatString("logout"), for: .normal)
-        logoutButton.setTitleColor(ChatUIKitTheme.colors.textColorError, for: .normal)
+        logoutButton.setTitleColor(TUIChatKitTheme.colors.textColorError, for: .normal)
         logoutButton.titleLabel?.font = .systemFont(ofSize: 16)
-        logoutButton.backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        logoutButton.backgroundColor = TUIChatKitTheme.colors.bgColorInput
         logoutButton.layer.cornerRadius = Self.logoutCornerRadius
         container.addSubview(logoutButton)
         logoutButton.snp.makeConstraints { make in
@@ -446,7 +446,7 @@ final class SettingsViewController: UIViewController {
         primaryColorPreview.backgroundColor = UIColor(demoHex: currentPrimaryColorHex())
         primaryColorPreview.layer.cornerRadius = Self.primaryColorPreviewSize / 2
         primaryColorPreview.layer.borderWidth = 1.5
-        primaryColorPreview.layer.borderColor = ChatUIKitTheme.colors.strokeColorPrimary.cgColor
+        primaryColorPreview.layer.borderColor = TUIChatKitTheme.colors.strokeColorPrimary.cgColor
     }
 
     @objc private func handlePrimaryColorTapped() {
@@ -565,20 +565,12 @@ final class SettingsViewController: UIViewController {
     }
 
     private func presentActionSheet(options: [(String, () -> Void)], completion: (() -> Void)? = nil) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        for (title, handler) in options {
-            alert.addAction(UIAlertAction(title: title, style: .default) { _ in
-                handler()
-                completion?()
-            })
+        let panel = BottomOptionSheetPanel(optionTitles: options.map { $0.0 }) { selectedIndex in
+            options[selectedIndex].1()
+            completion?()
         }
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        if let popover = alert.popoverPresentationController {
-            popover.sourceView = view
-            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.maxY, width: 0, height: 0)
-            popover.permittedArrowDirections = []
-        }
-        present(alert, animated: true)
+        panel.modalPresentationStyle = .overFullScreen
+        present(panel, animated: false)
     }
 }
 
@@ -645,7 +637,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileGender"), valueLabel: genderValueLabel, showArrow: true, action: #selector(handleGenderTapped)))
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileBirthday"), valueLabel: birthdayValueLabel, showArrow: true, action: #selector(handleBirthdayTapped), showDivider: false))
         let entryWrapper = UIView()
-        entryWrapper.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        entryWrapper.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         entryWrapper.addSubview(entryContainer)
         entryContainer.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
@@ -666,7 +658,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
     }
 
     private func setupViewStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         title = LocalizedChatString("ProfileDetails")
     }
 
@@ -691,7 +683,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
             make.edges.equalToSuperview()
         }
         displayNameLabel.font = .systemFont(ofSize: 16)
-        displayNameLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        displayNameLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         displayNameLabel.textAlignment = .center
         displayNameLabel.numberOfLines = 3
         container.addSubview(avatarButton)
@@ -710,7 +702,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
     }
 
     private func makeInfoRow(title: String, valueLabel: UILabel, showArrow: Bool, action: Selector?, showDivider: Bool = true) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIControl()
         row.backgroundColor = .clear
         if let action = action {
@@ -851,23 +843,16 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
     }
 
     @objc private func handleGenderTapped() {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Male"), style: .default) { _ in
-            self.updateGender(.male)
-        })
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Female"), style: .default) { _ in
-            self.updateGender(.female)
-        })
-        alert.addAction(UIAlertAction(title: LocalizedChatString("GenderSecret"), style: .default) { _ in
-            self.updateGender(.unknown)
-        })
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        if let popover = alert.popoverPresentationController {
-            popover.sourceView = view
-            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.maxY, width: 0, height: 0)
-            popover.permittedArrowDirections = []
+        let options: [(String, () -> Void)] = [
+            (LocalizedChatString("Male"), { self.updateGender(.male) }),
+            (LocalizedChatString("Female"), { self.updateGender(.female) }),
+            (LocalizedChatString("GenderSecret"), { self.updateGender(.unknown) })
+        ]
+        let panel = BottomOptionSheetPanel(optionTitles: options.map { $0.0 }) { selectedIndex in
+            options[selectedIndex].1()
         }
-        present(alert, animated: true)
+        panel.modalPresentationStyle = .overFullScreen
+        present(panel, animated: false)
     }
 
     @objc private func handleBirthdayTapped() {
@@ -934,7 +919,7 @@ private final class BirthdayPickerViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundDimView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         panelView.backgroundColor = colors.bgColorOperate
         panelView.layer.cornerRadius = Self.panelCornerRadius
@@ -1027,7 +1012,7 @@ private final class AvatarPickerPanel: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = UIColor.black.withAlphaComponent(0.4)
         panelView.backgroundColor = colors.bgColorOperate
         panelView.layer.cornerRadius = Self.panelCornerRadius
@@ -1195,7 +1180,7 @@ final class AboutViewController: UIViewController {
         }
 
         let spacer = UIView()
-        spacer.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        spacer.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         spacer.snp.makeConstraints { make in
             make.height.equalTo(Self.groupSpacerHeight)
         }
@@ -1221,17 +1206,17 @@ final class AboutViewController: UIViewController {
         footerStack.alignment = .center
         let icpButton = UIButton(type: .custom)
         icpButton.setTitle("ICP备案号：粤B2-20090059-2674A >", for: .normal)
-        icpButton.setTitleColor(ChatUIKitTheme.colors.textColorTertiary, for: .normal)
+        icpButton.setTitleColor(TUIChatKitTheme.colors.textColorTertiary, for: .normal)
         icpButton.titleLabel?.font = .systemFont(ofSize: 12)
         icpButton.addTarget(self, action: #selector(handleICPTapped), for: .touchUpInside)
         let copyrightLineOne = UILabel()
         copyrightLineOne.text = "腾讯公司 版权所有"
         copyrightLineOne.font = .systemFont(ofSize: 12)
-        copyrightLineOne.textColor = ChatUIKitTheme.colors.textColorTertiary
+        copyrightLineOne.textColor = TUIChatKitTheme.colors.textColorTertiary
         let copyrightLineTwo = UILabel()
         copyrightLineTwo.text = "Copyright © 2020-2024 Tencent. All Rights Reserved."
         copyrightLineTwo.font = .systemFont(ofSize: 12)
-        copyrightLineTwo.textColor = ChatUIKitTheme.colors.textColorTertiary
+        copyrightLineTwo.textColor = TUIChatKitTheme.colors.textColorTertiary
         footerStack.addArrangedSubview(icpButton)
         footerStack.addArrangedSubview(copyrightLineOne)
         footerStack.addArrangedSubview(copyrightLineTwo)
@@ -1257,19 +1242,19 @@ final class AboutViewController: UIViewController {
     private func activateConstraints() {}
 
     private func setupViewStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         titleLabel.text = LocalizedChatString("AboutTencentIM")
         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         let backImage = AtomicXChatResources.image(named: "contact_info_back")?.withRenderingMode(.alwaysTemplate)
             ?? UIImage(systemName: "chevron.left")?.withRenderingMode(.alwaysTemplate)
         backButton.setImage(backImage, for: .normal)
-        backButton.tintColor = ChatUIKitTheme.colors.textColorPrimary
+        backButton.tintColor = TUIChatKitTheme.colors.textColorPrimary
         backButton.addTarget(self, action: #selector(handleBackTapped), for: .touchUpInside)
     }
 
     private func makeInfoRow(title: String, value: String, showArrow: Bool, url: String?, isDisclaimer: Bool = false) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIControl()
         row.backgroundColor = colors.bgColorOperate
         let titleLabel = UILabel()
@@ -1329,7 +1314,7 @@ final class AboutViewController: UIViewController {
 
     private func makeDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
         divider.snp.makeConstraints { make in
             make.height.equalTo(Self.dividerHeight)
         }
@@ -1541,6 +1526,7 @@ final class PrimaryColorPickerViewController: UIViewController {
         modalPresentationStyle = .overFullScreen
         modalTransitionStyle = .crossDissolve
         UIColor(demoHex: selectedHex).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: nil)
+        hue *= 360
     }
 
     required init?(coder: NSCoder) {
@@ -1572,7 +1558,7 @@ final class PrimaryColorPickerViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         containerView.backgroundColor = colors.bgColorDialog
         containerView.layer.cornerRadius = Self.cornerRadius
         containerView.clipsToBounds = true
@@ -1638,7 +1624,7 @@ final class PrimaryColorPickerViewController: UIViewController {
         let label = UILabel()
         label.text = title
         label.font = .systemFont(ofSize: 11)
-        label.textColor = ChatUIKitTheme.colors.textColorSecondary
+        label.textColor = TUIChatKitTheme.colors.textColorSecondary
         stack.addArrangedSubview(label)
         stack.setCustomSpacing(4, after: label)
         stack.addArrangedSubview(bar)
@@ -1718,6 +1704,7 @@ final class PrimaryColorPickerViewController: UIViewController {
 
     @objc private func handleResetTapped() {
         UIColor(demoHex: Self.defaultPrimaryHex).getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: nil)
+        hue *= 360
         hueBar.progress = hue / 360
         saturationBar.progress = saturation
         brightnessBar.progress = brightness
@@ -1732,5 +1719,222 @@ final class PrimaryColorPickerViewController: UIViewController {
     @objc private func handleConfirmTapped() {
         onColorSelected(currentColor().demoHexString)
         dismiss(animated: true)
+    }
+}
+
+// MARK: - Bottom Option Sheet
+
+private final class BottomOptionSheetPanel: UIViewController {
+    private static let panelCornerRadius: CGFloat = 16
+
+    private static let rowHeight: CGFloat = 56
+
+    private static let horizontalMargin: CGFloat = 8
+
+    private static let groupSpacing: CGFloat = 8
+
+    private static let bottomMargin: CGFloat = 8
+
+    private static let separatorHeight: CGFloat = 0.5
+
+    private static let titleFontSize: CGFloat = 16
+
+    private static let dimAlpha: CGFloat = 0.4
+
+    private static let animationDuration: TimeInterval = 0.25
+
+    private static let maxPanelRatio: CGFloat = 0.75
+
+    private let optionTitles: [String]
+
+    private let onSelect: (Int) -> Void
+
+    private let dimView = UIControl()
+
+    private let contentView = UIView()
+
+    private let optionsGroupView = UIView()
+
+    private let optionsScrollView = UIScrollView()
+
+    private let optionsContentView = UIView()
+
+    private let cancelButton = UIButton(type: .custom)
+
+    init(optionTitles: [String], onSelect: @escaping (Int) -> Void) {
+        self.optionTitles = optionTitles
+        self.onSelect = onSelect
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViews()
+        activateConstraints()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        applyMaxHeightLimit()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        playPresentAnimationIfNeeded()
+    }
+
+    private func setupViews() {
+        let colors = TUIChatKitTheme.colors
+        view.backgroundColor = .clear
+        dimView.backgroundColor = UIColor.black.withAlphaComponent(Self.dimAlpha)
+        dimView.alpha = 0
+        dimView.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+
+        optionsGroupView.backgroundColor = colors.bgColorOperate
+        optionsGroupView.layer.cornerRadius = Self.panelCornerRadius
+        optionsGroupView.clipsToBounds = true
+        optionsScrollView.showsVerticalScrollIndicator = true
+        optionsScrollView.alwaysBounceVertical = false
+        optionsScrollView.contentInsetAdjustmentBehavior = .never
+
+        cancelButton.backgroundColor = colors.bgColorOperate
+        cancelButton.layer.cornerRadius = Self.panelCornerRadius
+        cancelButton.clipsToBounds = true
+        cancelButton.setTitle(LocalizedChatString("Cancel"), for: .normal)
+        cancelButton.setTitleColor(colors.textColorLink, for: .normal)
+        cancelButton.titleLabel?.font = .systemFont(ofSize: Self.titleFontSize, weight: .semibold)
+        cancelButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
+
+        view.addSubview(dimView)
+        view.addSubview(contentView)
+        contentView.addSubview(optionsGroupView)
+        optionsGroupView.addSubview(optionsScrollView)
+        optionsScrollView.addSubview(optionsContentView)
+        contentView.addSubview(cancelButton)
+        buildOptionRows()
+    }
+
+    private func buildOptionRows() {
+        let colors = TUIChatKitTheme.colors
+        var previousRow: UIView?
+        for (index, title) in optionTitles.enumerated() {
+            let row = UIButton(type: .custom)
+            row.tag = index
+            row.setTitle(title, for: .normal)
+            row.setTitleColor(colors.textColorLink, for: .normal)
+            row.titleLabel?.font = .systemFont(ofSize: Self.titleFontSize)
+            row.addTarget(self, action: #selector(handleOptionTapped(_:)), for: .touchUpInside)
+            optionsContentView.addSubview(row)
+            row.snp.makeConstraints { make in
+                make.leading.trailing.equalToSuperview()
+                make.height.equalTo(Self.rowHeight)
+                if let previousRow = previousRow {
+                    make.top.equalTo(previousRow.snp.bottom)
+                } else {
+                    make.top.equalToSuperview()
+                }
+            }
+            if index > 0 {
+                let separator = UIView()
+                separator.backgroundColor = colors.strokeColorPrimary
+                optionsContentView.addSubview(separator)
+                separator.snp.makeConstraints { make in
+                    make.leading.trailing.equalToSuperview()
+                    make.top.equalTo(row.snp.top)
+                    make.height.equalTo(Self.separatorHeight)
+                }
+            }
+            previousRow = row
+        }
+        if let lastRow = previousRow {
+            optionsContentView.snp.makeConstraints { make in
+                make.bottom.equalTo(lastRow.snp.bottom)
+            }
+        }
+    }
+
+    private func activateConstraints() {
+        dimView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        contentView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(Self.horizontalMargin)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-Self.bottomMargin)
+            make.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.top)
+        }
+        optionsGroupView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+        }
+        optionsScrollView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        optionsContentView.snp.makeConstraints { make in
+            make.edges.equalTo(optionsScrollView.contentLayoutGuide)
+            make.width.equalTo(optionsScrollView.frameLayoutGuide)
+        }
+        cancelButton.snp.makeConstraints { make in
+            make.top.equalTo(optionsGroupView.snp.bottom).offset(Self.groupSpacing)
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(Self.rowHeight)
+        }
+    }
+
+    private func applyMaxHeightLimit() {
+        let availableHeight = view.bounds.height
+            - view.safeAreaInsets.top
+            - view.safeAreaInsets.bottom
+            - Self.bottomMargin
+        let cancelAreaHeight = Self.rowHeight + Self.groupSpacing
+        let maxOptionsHeight = min(
+            view.bounds.height * Self.maxPanelRatio,
+            availableHeight - cancelAreaHeight
+        )
+        guard maxOptionsHeight > 0 else { return }
+        let contentHeight = CGFloat(optionTitles.count) * Self.rowHeight
+        optionsGroupView.snp.remakeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(contentHeight).priority(.high)
+            make.height.lessThanOrEqualTo(maxOptionsHeight)
+        }
+    }
+
+    private func playPresentAnimationIfNeeded() {
+        guard dimView.alpha == 0 else { return }
+        view.layoutIfNeeded()
+        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height + Self.bottomMargin)
+        UIView.animate(withDuration: Self.animationDuration) {
+            self.dimView.alpha = 1
+            self.contentView.transform = .identity
+        }
+    }
+
+    @objc private func handleOptionTapped(_ sender: UIButton) {
+        let index = sender.tag
+        guard index >= 0, index < optionTitles.count else { return }
+        dismissPanel { [weak self] in
+            self?.onSelect(index)
+        }
+    }
+
+    @objc private func handleDismiss() {
+        dismissPanel(completion: nil)
+    }
+
+    private func dismissPanel(completion: (() -> Void)?) {
+        UIView.animate(withDuration: Self.animationDuration) {
+            self.dimView.alpha = 0
+            self.contentView.transform = CGAffineTransform(
+                translationX: 0,
+                y: self.contentView.bounds.height + Self.bottomMargin
+            )
+        } completion: { _ in
+            self.dismiss(animated: false) {
+                completion?()
+            }
+        }
     }
 }

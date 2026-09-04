@@ -140,7 +140,7 @@ final class MessageInputAudioRecorderView: UIView {
         let action = action(for: state)
         statusLabel.text = statusText(for: action, durationMs: durationMs, maxDurationMs: maxDurationMs)
 
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let cancelActive = action == .cancel
         let transcribeActive = action == .transcribe
 
@@ -215,11 +215,11 @@ final class MessageInputAudioRecorderView: UIView {
 
     private func setupStyle() {
         backgroundColor = .clear
-        backgroundView.setGradientSpec(gradientColors(base: ChatUIKitTheme.colors.bgColorOperate), Self.gradientLocations)
+        backgroundView.setGradientSpec(gradientColors(base: TUIChatKitTheme.colors.bgColorOperate), Self.gradientLocations)
         statusLabel.font = FontScheme.caption2Medium
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 0
-        statusLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        statusLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         statusLabel.text = LocalizedChatString("message_input_release_send_hint")
 
         cancelButton.setTitle(LocalizedChatString("message_input_cancel"))

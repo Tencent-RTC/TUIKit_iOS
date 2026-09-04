@@ -76,7 +76,7 @@ final class AddFriendViewControllerImpl: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         searchBar.placeholder = LocalizedChatString("ProfileUserID")
         myIDLabel.font = FontScheme.caption2Regular

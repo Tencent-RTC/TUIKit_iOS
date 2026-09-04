@@ -281,7 +281,7 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private func setupStyle() {
         backgroundColor = .clear
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundView.setGradientSpec(
             Self.overlayGradientColors(base: colors.bgColorOperate),
             Self.gradientLocations
@@ -316,8 +316,8 @@ final class VoiceTranscriptionOverlayView: UIView {
         cancelLabel.text = LocalizedChatString("message_input_cancel")
         sendAudioLabel.text = LocalizedChatString("message_input_send_original_voice")
 
-        waveformView.setBubbleColor(ChatUIKitTheme.colors.bgColorInput)
-        waveformView.setContentColor(ChatUIKitTheme.colors.textColorPrimary)
+        waveformView.setBubbleColor(TUIChatKitTheme.colors.bgColorInput)
+        waveformView.setContentColor(TUIChatKitTheme.colors.textColorPrimary)
         waveformView.setDuration(originalAudioDurationMs)
         waveformView.setPowerLevel(Self.waveformPreviewPowerLevel)
         waveformView.setFlat(true)
@@ -365,7 +365,7 @@ final class VoiceTranscriptionOverlayView: UIView {
     }
 
     private func applyTheme() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundView.setGradientSpec(
             Self.overlayGradientColors(base: colors.bgColorOperate),
             Self.gradientLocations
@@ -487,9 +487,9 @@ final class VoiceTranscriptionOverlayView: UIView {
         let chip = UIButton(type: .system)
         chip.setTitle(title, for: .normal)
         chip.titleLabel?.font = FontScheme.caption3Regular
-        chip.setTitleColor(enabled ? ChatUIKitTheme.colors.textColorSecondary : ChatUIKitTheme.colors.textColorDisable, for: .normal)
+        chip.setTitleColor(enabled ? TUIChatKitTheme.colors.textColorSecondary : TUIChatKitTheme.colors.textColorDisable, for: .normal)
         chip.contentEdgeInsets = Self.chipContentInsets
-        chip.backgroundColor = ChatUIKitTheme.colors.buttonColorSecondaryDefault
+        chip.backgroundColor = TUIChatKitTheme.colors.buttonColorSecondaryDefault
         chip.layer.cornerRadius = chipCornerRadius
         chip.contentHorizontalAlignment = .center
         chip.setContentHuggingPriority(.required, for: .horizontal)
@@ -940,7 +940,7 @@ final class TranscriptionDualPillView: UIView {
                    rightTitle: String,
                    onLeft: @escaping () -> Void,
                    onRight: @escaping () -> Void) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.buttonColorSecondaryDefault
         leftButton.setTitle(leftTitle, for: .normal)
         rightButton.setTitle(rightTitle, for: .normal)

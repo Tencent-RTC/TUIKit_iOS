@@ -113,7 +113,7 @@ final class UserPickerView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         tableView.backgroundColor = colors.bgColorOperate
 
@@ -220,11 +220,11 @@ extension UserPickerView: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let header = UIView()
-        header.backgroundColor = ChatUIKitTheme.colors.bgColorDialog
+        header.backgroundColor = TUIChatKitTheme.colors.bgColorDialog
         let label = UILabel()
         label.text = sectionedItems[section].letter
         label.font = FontScheme.caption2Bold
-        label.textColor = ChatUIKitTheme.colors.textColorPrimary
+        label.textColor = TUIChatKitTheme.colors.textColorPrimary
         header.addSubview(label)
         label.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.horizontalPadding)
@@ -304,7 +304,7 @@ private final class UserPickerRowCell: UITableViewCell {
     }
 
     func configure(item: UserPickerItem, isSelected: Bool, isLocked: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         checkboxView.isChecked = isSelected
         checkboxView.isLocked = isLocked
         nameLabel.text = item.title
@@ -337,7 +337,7 @@ private final class UserPickerRowCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
         nameLabel.font = FontScheme.body4Regular

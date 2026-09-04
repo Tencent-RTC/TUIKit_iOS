@@ -142,14 +142,14 @@ final class MessageListViewImpl: RTCBaseView {
     private lazy var topLoadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
-        indicator.color = ChatUIKitTheme.colors.textColorSecondary
+        indicator.color = TUIChatKitTheme.colors.textColorSecondary
         return indicator
     }()
 
     private lazy var bottomLoadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
-        indicator.color = ChatUIKitTheme.colors.textColorSecondary
+        indicator.color = TUIChatKitTheme.colors.textColorSecondary
         return indicator
     }()
 
@@ -347,6 +347,7 @@ final class MessageListViewImpl: RTCBaseView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        configBackgroundGradientLayer?.frame = bounds
         glueContentToBottomForBoundsChange()
         performInitialScrollToBottomIfNeeded()
     }
@@ -372,9 +373,45 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func applyOpaqueListBackground() {
-        let listColor = ChatUIKitTheme.colors.bgColorOperate
+        if let configuredBackground = viewModel.config.background {
+            applyConfiguredListBackground(configuredBackground)
+            return
+        }
+        removeConfigBackgroundGradientLayer()
+        let listColor = TUIChatKitTheme.colors.bgColorOperate
         backgroundColor = listColor
         tableView.backgroundColor = listColor
+    }
+
+    private var configBackgroundGradientLayer: CAGradientLayer?
+
+    private func removeConfigBackgroundGradientLayer() {
+        configBackgroundGradientLayer?.removeFromSuperlayer()
+        configBackgroundGradientLayer = nil
+    }
+
+    private func applyConfiguredListBackground(_ configuredBackground: MessageListBackground) {
+        removeConfigBackgroundGradientLayer()
+        switch configuredBackground {
+        case .color(let color):
+            backgroundColor = color
+            tableView.backgroundColor = color
+        case .gradient(let colors, let startPoint, let endPoint):
+            let gradient = CAGradientLayer()
+            gradient.colors = colors.map { $0.cgColor }
+            gradient.startPoint = startPoint
+            gradient.endPoint = endPoint
+            gradient.frame = bounds
+            layer.insertSublayer(gradient, at: 0)
+            configBackgroundGradientLayer = gradient
+            backgroundColor = .clear
+            tableView.backgroundColor = .clear
+        case .image(let image):
+            backgroundImageView.image = image
+            backgroundImageView.isHidden = false
+            backgroundColor = .clear
+            tableView.backgroundColor = .clear
+        }
     }
 
     private func updateLoadingIndicators() {
@@ -975,9 +1012,9 @@ final class MessageListViewImpl: RTCBaseView {
 
     private func isLeft(for message: MessageInfo) -> Bool {
         switch viewModel.config.alignment {
-        case 1: return true
-        case 2: return false
-        default: return !message.isSentBySelf
+        case .left: return true
+        case .right: return false
+        case .twoSided: return !message.isSentBySelf
         }
     }
 

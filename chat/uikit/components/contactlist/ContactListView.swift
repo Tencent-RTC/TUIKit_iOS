@@ -3,7 +3,7 @@ import Combine
 import SnapKit
 import UIKit
 
-protocol ContactListConfigProtocol {
+public protocol ContactListConfigProtocol {
     var showNewContacts: Bool { get }
     var showGroupApplications: Bool { get }
     var showMyGroups: Bool { get }
@@ -12,7 +12,7 @@ protocol ContactListConfigProtocol {
     var itemCustomizer: ContactListItemCustomizer? { get }
 }
 
-extension ContactListConfigProtocol {
+public extension ContactListConfigProtocol {
     var showNewContacts: Bool { true }
     var showGroupApplications: Bool { true }
     var showMyGroups: Bool { true }
@@ -21,28 +21,28 @@ extension ContactListConfigProtocol {
     var itemCustomizer: ContactListItemCustomizer? { nil }
 }
 
-struct ChatContactListConfig: ContactListConfigProtocol {
-    var showNewContacts: Bool {
+public struct ChatContactListConfig: ContactListConfigProtocol {
+    public var showNewContacts: Bool {
         return userShowNewContacts ?? true
     }
 
-    var showGroupApplications: Bool {
+    public var showGroupApplications: Bool {
         return userShowGroupApplications ?? true
     }
 
-    var showMyGroups: Bool {
+    public var showMyGroups: Bool {
         return userShowMyGroups ?? true
     }
 
-    var showBlacklist: Bool {
+    public var showBlacklist: Bool {
         return userShowBlacklist ?? true
     }
 
-    var showSearchBar: Bool {
+    public var showSearchBar: Bool {
         return userShowSearchBar ?? true
     }
 
-    var itemCustomizer: ContactListItemCustomizer? {
+    public var itemCustomizer: ContactListItemCustomizer? {
         return userItemCustomizer
     }
 
@@ -58,7 +58,7 @@ struct ChatContactListConfig: ContactListConfigProtocol {
 
     private let userItemCustomizer: ContactListItemCustomizer?
 
-    init() {
+    public init() {
         self.userShowNewContacts = nil
         self.userShowGroupApplications = nil
         self.userShowMyGroups = nil
@@ -67,12 +67,12 @@ struct ChatContactListConfig: ContactListConfigProtocol {
         self.userItemCustomizer = nil
     }
 
-    init(showNewContacts: Bool? = nil,
-         showGroupApplications: Bool? = nil,
-         showMyGroups: Bool? = nil,
-         showBlacklist: Bool? = nil,
-         showSearchBar: Bool? = nil,
-         itemCustomizer: ContactListItemCustomizer? = nil) {
+    public init(showNewContacts: Bool? = nil,
+                showGroupApplications: Bool? = nil,
+                showMyGroups: Bool? = nil,
+                showBlacklist: Bool? = nil,
+                showSearchBar: Bool? = nil,
+                itemCustomizer: ContactListItemCustomizer? = nil) {
         self.userShowNewContacts = showNewContacts
         self.userShowGroupApplications = showGroupApplications
         self.userShowMyGroups = showMyGroups
@@ -82,24 +82,24 @@ struct ChatContactListConfig: ContactListConfigProtocol {
     }
 }
 
-typealias ContactListItemCustomizer = (CustomEditor<ContactCustomItem>) -> Void
+public typealias ContactListItemCustomizer = (CustomEditor<ContactCustomItem>) -> Void
 
-struct ContactCustomItem: CustomItem {
-    var ID: String
+public struct ContactCustomItem: CustomItem {
+    public var ID: String
 
-    let title: String
+    public let title: String
 
-    let iconName: String
+    public let iconName: String
 
-    let badgeCount: AnyPublisher<Int, Never>?
+    public let badgeCount: AnyPublisher<Int, Never>?
 
-    let onClick: () -> Void
+    public let onClick: () -> Void
 
-    init(ID: String,
-         title: String,
-         iconName: String,
-         badgeCount: AnyPublisher<Int, Never>? = nil,
-         onClick: @escaping () -> Void) {
+    public init(ID: String,
+                title: String,
+                iconName: String,
+                badgeCount: AnyPublisher<Int, Never>? = nil,
+                onClick: @escaping () -> Void) {
         self.ID = ID
         self.title = title
         self.iconName = iconName
@@ -124,8 +124,8 @@ enum ContactDisplayFormatter {
 final class ContactListView: UIView {
     private let impl: ContactListViewImpl
 
-    init(onContactClick: @escaping (AZOrderedListItem) -> Void,
-         onGroupClick: @escaping (AZOrderedListItem) -> Void,
+    init(onContactClick: @escaping (ContactInfo) -> Void,
+         onGroupClick: @escaping (GroupInfo) -> Void,
          config: ContactListConfigProtocol = ChatContactListConfig()) {
         impl = ContactListViewImpl(onContactClick: onContactClick, onGroupClick: onGroupClick, config: config)
         super.init(frame: .zero)

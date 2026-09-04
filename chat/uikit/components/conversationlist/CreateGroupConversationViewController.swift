@@ -28,16 +28,14 @@ final class CreateGroupConversationViewController: UIViewController, SystemNavig
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         title = LocalizedChatString("CreateGroupTitle")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: AtomicXChatResources.image(named: "contact_info_back") ?? UIImage(systemName: "chevron.left"),
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleCancel)
+            action: #selector(handleCancel),
+            tintColor: colors.textColorPrimary
         )
-        navigationItem.leftBarButtonItem?.tintColor = colors.textColorPrimary
     }
 
     private func pushConfigGroupInfo(members: [UserPickerItem]) {

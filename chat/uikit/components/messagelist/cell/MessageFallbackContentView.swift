@@ -79,7 +79,7 @@ final class MessageFallbackContentView: UIView, MessageContentView {
     }
 
     private func applyBubbleStyle(isSelf: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         textLabel.textColor = isSelf ? colors.textColorAntiPrimary : colors.textColorPrimary
     }
 }

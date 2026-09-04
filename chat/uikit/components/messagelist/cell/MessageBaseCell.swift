@@ -69,7 +69,6 @@ final class MessageBaseCell: UITableViewCell {
 
     private static let quoteMaxWidth: CGFloat = UIScreen.main.bounds.width * 0.72
 
-    private static let twoSidedAlignment = 0
 
     private static let nicknameDetailTimeSpacing = CGFloat(SpacingScheme.iconTextSpacing)
 
@@ -82,6 +81,14 @@ final class MessageBaseCell: UITableViewCell {
     private var lastContext: MessageContentContext?
 
     private var normalBubbleColor: UIColor?
+
+    private var activeBubbleAppearance: MessageBubbleAppearance?
+
+    private var bubbleMinWidthConstraint: NSLayoutConstraint?
+
+    private var bubbleMinHeightConstraint: NSLayoutConstraint?
+
+    private var reactionBarMinWidthConstraint: Constraint?
 
     private var highlightGeneration = 0
 
@@ -303,22 +310,22 @@ final class MessageBaseCell: UITableViewCell {
         contentView.backgroundColor = .clear
         timeLabel.textAlignment = .center
         timeLabel.font = FontScheme.caption2Regular
-        timeLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        timeLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         nicknameLabel.font = FontScheme.caption3Regular
-        nicknameLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        nicknameLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         detailTimeLabel.font = FontScheme.caption3Regular
-        detailTimeLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        detailTimeLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         detailTimeLabel.isHidden = true
         statusImageView.contentMode = .scaleAspectFit
-        statusImageView.tintColor = ChatUIKitTheme.colors.textColorError
+        statusImageView.tintColor = TUIChatKitTheme.colors.textColorError
         sendingIndicator.hidesWhenStopped = true
         sendingIndicator.transform = CGAffineTransform(scaleX: Self.sendingIndicatorScale, y: Self.sendingIndicatorScale)
         checkboxView.contentMode = .scaleAspectFit
         readReceiptLabel.font = FontScheme.caption3Regular
-        readReceiptLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        readReceiptLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         readReceiptLabel.isHidden = true
         violationLabel.font = FontScheme.caption3Regular
-        violationLabel.textColor = ChatUIKitTheme.colors.textColorError
+        violationLabel.textColor = TUIChatKitTheme.colors.textColorError
         violationLabel.isHidden = true
     }
 
@@ -438,6 +445,34 @@ final class MessageBaseCell: UITableViewCell {
         contentKind = kind
     }
 
+    private func applyBubbleContentInsets() {
+        guard let contentView = contentView0 else { return }
+        let insets = activeBubbleAppearance?.contentInsets ?? .zero
+        contentView.snp.remakeConstraints { make in
+            make.top.equalToSuperview().offset(insets.top)
+            make.leading.equalToSuperview().offset(insets.left)
+            make.trailing.equalToSuperview().offset(-insets.right)
+            make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)
+        }
+    }
+
+    private func applyBubbleMinimumSize(_ size: MessageBubbleSize?) {
+        bubbleMinWidthConstraint?.isActive = false
+        bubbleMinHeightConstraint?.isActive = false
+        bubbleMinWidthConstraint = nil
+        bubbleMinHeightConstraint = nil
+        if let width = size?.width {
+            let constraint = contentContainer.widthAnchor.constraint(greaterThanOrEqualToConstant: width)
+            constraint.isActive = true
+            bubbleMinWidthConstraint = constraint
+        }
+        if let height = size?.height {
+            let constraint = contentContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: height)
+            constraint.isActive = true
+            bubbleMinHeightConstraint = constraint
+        }
+    }
+
     private func shouldShowAvatar(context: MessageContentContext) -> Bool {
         return context.isLeft ? context.config.isShowLeftAvatar : context.config.isShowRightAvatar
     }
@@ -468,7 +503,7 @@ final class MessageBaseCell: UITableViewCell {
 
     private func applyNickname(message: MessageInfo, context: MessageContentContext) {
         let show = context.isSelf
-            ? context.config.alignment != Self.twoSidedAlignment
+            ? context.config.alignment != .twoSided
             : context.isGroupChat
         if show {
             nicknameLabel.text = Self.senderDisplayName(of: message.from)
@@ -546,7 +581,7 @@ final class MessageBaseCell: UITableViewCell {
         checkboxView.isHidden = !isMultiSelectMode
         readReceiptTapGesture.isEnabled = !isMultiSelectMode
         guard isMultiSelectMode else { return }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         if isSelected {
             checkboxView.image = UIImage(systemName: "checkmark.circle.fill")
             checkboxView.tintColor = colors.textColorLink
@@ -557,9 +592,12 @@ final class MessageBaseCell: UITableViewCell {
     }
 
     private func applyBubbleBackground(context: MessageContentContext) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
 
         if isMergedPayload {
+            activeBubbleAppearance = nil
+            contentContainer.applyAppearance(background: nil, stroke: nil)
+            contentContainer.customCornerRadii = nil
             let showReactions = !reactionBar.isHidden
             contentContainer.layer.mask = nil
             contentContainer.clipsToBounds = true
@@ -582,6 +620,9 @@ final class MessageBaseCell: UITableViewCell {
         normalBubbleColor = context.isSelf ? colors.bgColorBubbleOwn : colors.bgColorBubbleReciprocal
 
         if isMediaPayload, !shouldWrapMediaInBubble {
+            activeBubbleAppearance = nil
+            contentContainer.applyAppearance(background: nil, stroke: nil)
+            contentContainer.customCornerRadii = nil
             contentContainer.backgroundColor = .clear
             contentContainer.layer.mask = nil
             contentContainer.layer.cornerRadius = 0
@@ -593,6 +634,14 @@ final class MessageBaseCell: UITableViewCell {
             return
         }
 
+        if let appearance = context.config.resolvedBubbleAppearance(isSelf: context.isSelf, isLeft: context.isLeft) {
+            applyCustomBubbleAppearance(appearance, context: context)
+            return
+        }
+
+        activeBubbleAppearance = nil
+        contentContainer.applyAppearance(background: nil, stroke: nil)
+        contentContainer.customCornerRadii = nil
         contentContainer.layer.cornerRadius = 0
         contentContainer.layer.borderWidth = 0
         contentContainer.layer.borderColor = nil
@@ -603,6 +652,30 @@ final class MessageBaseCell: UITableViewCell {
         MessageBubbleStyler.apply(to: contentContainer,
                                   isSelf: context.isSelf,
                                   isLeft: context.isLeft)
+    }
+
+    private func applyCustomBubbleAppearance(_ appearance: MessageBubbleAppearance, context: MessageContentContext) {
+        activeBubbleAppearance = appearance
+        contentContainer.applyAppearance(background: appearance.background, stroke: appearance.stroke)
+        if case .color(let color) = appearance.background {
+            normalBubbleColor = color
+        }
+        if let cornerRadius = appearance.cornerRadius {
+            contentContainer.isCustomMaskEnabled = false
+            contentContainer.layer.mask = nil
+            contentContainer.customCornerRadii = (
+                topLeft: cornerRadius.topLeft ?? MessageBubbleStyler.cornerRadius,
+                topRight: cornerRadius.topRight ?? MessageBubbleStyler.cornerRadius,
+                bottomLeft: cornerRadius.bottomLeft ?? MessageBubbleStyler.cornerRadius,
+                bottomRight: cornerRadius.bottomRight ?? MessageBubbleStyler.cornerRadius
+            )
+        } else {
+            contentContainer.customCornerRadii = nil
+            contentContainer.isLeftBubble = context.isLeft
+            contentContainer.isCustomMaskEnabled = true
+        }
+        contentContainer.clipsToBounds = true
+        contentContainer.setNeedsLayout()
     }
 
     @objc private func handleAvatarTap() {
@@ -626,6 +699,8 @@ final class MessageBaseCell: UITableViewCell {
                               showStatus: Bool,
                               multiSelect: Bool) {
         applyBubbleBackground(context: context)
+        applyBubbleContentInsets()
+        applyBubbleMinimumSize(activeBubbleAppearance?.minimumSize)
         let hp = context.config.horizontalPadding
         let avatarSpacing = context.config.avatarSpacing
         let cellSpacing = context.config.cellSpacing
@@ -810,8 +885,13 @@ final class MessageBaseCell: UITableViewCell {
         if showReaction {
             contentView.snp.remakeConstraints { make in
                 make.top.equalToSuperview().offset(insets.contentPadding)
-                make.leading.equalToSuperview().offset(insets.contentPadding)
-                make.trailing.equalToSuperview().offset(-insets.contentPadding)
+                if isLeft {
+                    make.leading.equalToSuperview().offset(insets.contentPadding)
+                    make.trailing.lessThanOrEqualToSuperview().offset(-insets.contentPadding)
+                } else {
+                    make.trailing.equalToSuperview().offset(-insets.contentPadding)
+                    make.leading.greaterThanOrEqualToSuperview().offset(insets.contentPadding)
+                }
                 make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)
                 make.bottom.equalTo(reactionBar.snp.top).offset(-insets.top)
             }
@@ -820,13 +900,23 @@ final class MessageBaseCell: UITableViewCell {
                 make.bottom.equalToSuperview().offset(-insets.bottom)
                 if isLeft {
                     make.leading.equalToSuperview().offset(insets.horizontal)
-                    make.trailing.equalToSuperview().offset(-insets.horizontal)
+                    make.trailing.lessThanOrEqualToSuperview().offset(-insets.horizontal)
                 } else {
                     make.trailing.equalToSuperview().offset(-insets.horizontal)
-                    make.leading.equalToSuperview().offset(insets.horizontal)
+                    make.leading.greaterThanOrEqualToSuperview().offset(insets.horizontal)
+                }
+            }
+            let minBubbleWidth = reactionBar.contentWidth + 2 * insets.horizontal
+            if let constraint = reactionBarMinWidthConstraint {
+                constraint.update(offset: minBubbleWidth)
+                constraint.activate()
+            } else {
+                contentContainer.snp.makeConstraints { make in
+                    reactionBarMinWidthConstraint = make.width.greaterThanOrEqualTo(minBubbleWidth).constraint
                 }
             }
         } else {
+            reactionBarMinWidthConstraint?.deactivate()
             contentView.snp.remakeConstraints { make in
                 make.top.leading.trailing.equalToSuperview()
                 make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)

@@ -132,7 +132,7 @@ final class ConversationPopupMenuController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = .clear
         menuContainer.backgroundColor = colors.bgColorOperate
         menuContainer.layer.cornerRadius = Self.menuCornerRadius
@@ -144,7 +144,7 @@ final class ConversationPopupMenuController: UIViewController {
     }
 
     private func makeMenuItemView(item: MenuItem) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let control = UIControl()
         let label = UILabel()
         label.text = item.title
@@ -161,7 +161,7 @@ final class ConversationPopupMenuController: UIViewController {
             self?.dismissMenu(afterDismiss: item.action)
         }, for: .touchUpInside)
         control.addAction(UIAction { [weak control] _ in
-            control?.backgroundColor = ChatUIKitTheme.colors.textColorPrimary.withAlphaComponent(Self.itemHighlightAlpha)
+            control?.backgroundColor = TUIChatKitTheme.colors.textColorPrimary.withAlphaComponent(Self.itemHighlightAlpha)
         }, for: .touchDown)
         let clearHighlight = UIAction { [weak control] _ in
             control?.backgroundColor = .clear
@@ -173,7 +173,7 @@ final class ConversationPopupMenuController: UIViewController {
 
     private func makeDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorSecondary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorSecondary
         divider.snp.makeConstraints { make in
             make.height.equalTo(Self.dividerHeight)
         }

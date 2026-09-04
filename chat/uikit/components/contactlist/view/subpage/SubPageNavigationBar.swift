@@ -48,7 +48,7 @@ final class SubPageNavigationBar: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.font = FontScheme.caption1Medium
         titleLabel.textColor = colors.textColorPrimary

@@ -34,6 +34,8 @@ public final class TextInputDialogViewController: UIViewController {
 
     private static let keyboardBottomSpacing: CGFloat = CGFloat(SpacingScheme.iconIconSpacing)
 
+    private static let keyboardDefaultAnimationDuration: Double = 0.25
+
     private let dialogTitle: String
 
     private let initialText: String
@@ -57,6 +59,8 @@ public final class TextInputDialogViewController: UIViewController {
     private let counterLabel = UILabel()
 
     private let confirmButton = UIButton(type: .custom)
+
+    private var keyboardBottomConstraint: Constraint?
 
     private var showsCounter: Bool {
         return multiline && maxLength > 0
@@ -126,7 +130,12 @@ public final class TextInputDialogViewController: UIViewController {
             make.trailing.lessThanOrEqualToSuperview().offset(-Self.panelHorizontalMargin)
             make.width.lessThanOrEqualTo(Self.panelMaxWidth)
             make.width.equalTo(UIScreen.main.bounds.width - Self.panelHorizontalMargin * 2).priority(.high)
-            make.bottom.lessThanOrEqualTo(view.keyboardLayoutGuide.snp.top).offset(-Self.keyboardBottomSpacing)
+            if #available(iOS 15.0, *) {
+                make.bottom.lessThanOrEqualTo(view.keyboardLayoutGuide.snp.top).offset(-Self.keyboardBottomSpacing)
+            } else {
+                keyboardBottomConstraint = make.bottom.lessThanOrEqualTo(view.snp.bottom)
+                    .offset(-Self.keyboardBottomSpacing).constraint
+            }
         }
         titleLabel.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview().inset(Self.contentPadding)
@@ -167,30 +176,55 @@ public final class TextInputDialogViewController: UIViewController {
         dimView.addTarget(self, action: #selector(handleDimTap), for: .touchUpInside)
         confirmButton.addTarget(self, action: #selector(handleConfirmTap), for: .touchUpInside)
         textView.delegate = self
+        if #unavailable(iOS 15.0) {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleKeyboardFrameChange(_:)),
+                name: UIResponder.keyboardWillChangeFrameNotification,
+                object: nil
+            )
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(handleKeyboardFrameChange(_:)),
+                name: UIResponder.keyboardWillHideNotification,
+                object: nil
+            )
+        }
+    }
+
+    @objc private func handleKeyboardFrameChange(_ notification: Notification) {
+        let isHiding = notification.name == UIResponder.keyboardWillHideNotification
+        let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue
+        let keyboardHeight = isHiding ? 0 : (keyboardFrame?.cgRectValue.height ?? 0)
+        keyboardBottomConstraint?.update(offset: -(keyboardHeight + Self.keyboardBottomSpacing))
+        let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double
+        UIView.animate(withDuration: duration ?? Self.keyboardDefaultAnimationDuration) {
+            self.view.layoutIfNeeded()
+        }
     }
 
     private func setupViewStyle() {
         view.backgroundColor = .clear
         dimView.backgroundColor = UIColor.black.withAlphaComponent(Self.dimAlpha)
-        panelView.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        panelView.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         panelView.layer.cornerRadius = Self.panelCornerRadius
         panelView.layer.masksToBounds = true
         titleLabel.font = FontScheme.caption1Bold
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         titleLabel.textAlignment = .center
         let inputFont = FontScheme.caption1Regular
         textView.font = inputFont
         textField.font = inputFont
-        textView.textColor = ChatUIKitTheme.colors.textColorPrimary
-        textField.textColor = ChatUIKitTheme.colors.textColorPrimary
-        textView.backgroundColor = ChatUIKitTheme.colors.bgColorDialog
-        textField.backgroundColor = ChatUIKitTheme.colors.bgColorDialog
+        textView.textColor = TUIChatKitTheme.colors.textColorPrimary
+        textField.textColor = TUIChatKitTheme.colors.textColorPrimary
+        textView.backgroundColor = TUIChatKitTheme.colors.bgColorDialog
+        textField.backgroundColor = TUIChatKitTheme.colors.bgColorDialog
         textView.layer.cornerRadius = Self.inputCornerRadius
         textField.layer.cornerRadius = Self.inputCornerRadius
         textView.layer.borderWidth = Self.inputBorderWidth
         textField.layer.borderWidth = Self.inputBorderWidth
-        textView.layer.borderColor = ChatUIKitTheme.colors.strokeColorPrimary.cgColor
-        textField.layer.borderColor = ChatUIKitTheme.colors.strokeColorPrimary.cgColor
+        textView.layer.borderColor = TUIChatKitTheme.colors.strokeColorPrimary.cgColor
+        textField.layer.borderColor = TUIChatKitTheme.colors.strokeColorPrimary.cgColor
         if multiline {
             textView.textContainerInset = UIEdgeInsets(
                 top: Self.inputVerticalPadding,
@@ -218,12 +252,12 @@ public final class TextInputDialogViewController: UIViewController {
             textField.rightViewMode = .always
         }
         counterLabel.font = FontScheme.caption3Regular
-        counterLabel.textColor = ChatUIKitTheme.colors.textColorTertiary
+        counterLabel.textColor = TUIChatKitTheme.colors.textColorTertiary
         counterLabel.textAlignment = LanguageHelper.isRTL ? .left : .right
         confirmButton.setTitle(LocalizedChatString("Confirm"), for: .normal)
-        confirmButton.setTitleColor(ChatUIKitTheme.colors.textColorButton, for: .normal)
+        confirmButton.setTitleColor(TUIChatKitTheme.colors.textColorButton, for: .normal)
         confirmButton.titleLabel?.font = FontScheme.caption1Regular
-        confirmButton.backgroundColor = ChatUIKitTheme.colors.buttonColorPrimaryDefault
+        confirmButton.backgroundColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
         confirmButton.layer.cornerRadius = Self.confirmButtonHeight / 2
         confirmButton.layer.masksToBounds = true
     }

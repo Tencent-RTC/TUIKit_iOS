@@ -74,7 +74,7 @@ final class ForwardBottomBar: UIView {
     }
 
     private func setupUI() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
 
         addSubview(scrollView)
@@ -113,7 +113,7 @@ final class ForwardBottomBar: UIView {
     }
 
     private func updateConfirmButton(count: Int) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let enabled = count > 0
         let title = LocalizedChatString("Forward") + (count > 0 ? "(\(count))" : "")
         if title != currentConfirmTitle {
@@ -138,7 +138,7 @@ final class ForwardBottomBar: UIView {
         let size = CGSize(width: Self.avatarSize, height: Self.avatarSize)
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { context in
-            let colors = ChatUIKitTheme.colors
+            let colors = TUIChatKitTheme.colors
             colors.buttonColorPrimaryDefault.setFill()
             context.fill(CGRect(origin: .zero, size: size))
             let initial = String(name.prefix(1)).uppercased()

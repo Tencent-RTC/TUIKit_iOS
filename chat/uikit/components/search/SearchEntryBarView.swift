@@ -68,7 +68,7 @@ final class SearchEntryBarView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.clearColor
         inputContainer.backgroundColor = colors.bgColorInput
         inputContainer.layer.cornerRadius = Self.barCornerRadius

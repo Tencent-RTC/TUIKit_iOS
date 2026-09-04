@@ -54,8 +54,8 @@ final class MessageCallContentView: UIView, MessageContentView {
         currentCallModel = callModel
 
         let contentColor = context.isSelf
-            ? ChatUIKitTheme.colors.textColorAntiPrimary
-            : ChatUIKitTheme.colors.textColorPrimary
+            ? TUIChatKitTheme.colors.textColorAntiPrimary
+            : TUIChatKitTheme.colors.textColorPrimary
 
         textLabel.text = callModel.displayString(
             senderShowName: MessageListHelper.senderShowName(of: message)

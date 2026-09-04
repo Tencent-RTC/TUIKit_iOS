@@ -1,6 +1,6 @@
 class BundleHelper {
     static func atomicXBundle() -> Bundle {
-        let bundlePath = getBundlePath(bundleName: "ChatUIKitBundle", classType: BundleHelper.self, frameworkName: "")
+        let bundlePath = getBundlePath(bundleName: "TUIChatKitBundle", classType: BundleHelper.self, frameworkName: "")
         guard let atomicXBundle = Bundle(path: bundlePath) else {
             return Bundle.main
         }
@@ -59,7 +59,7 @@ class BundleHelper {
 public class AtomicXChatResources {
     static let frameworkBundle = Bundle(for: AtomicXChatResources.self)
     static var resourceBundle: Bundle {
-        if let bundlePath = frameworkBundle.path(forResource: "ChatUIKitBundle", ofType: "bundle"),
+        if let bundlePath = frameworkBundle.path(forResource: "TUIChatKitBundle", ofType: "bundle"),
            let bundle = Bundle(path: bundlePath)
         {
             return bundle

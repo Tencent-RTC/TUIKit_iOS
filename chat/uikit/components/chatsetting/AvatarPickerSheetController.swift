@@ -115,7 +115,7 @@ final class AvatarPickerSheetController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = .clear
         dimView.backgroundColor = UIColor.black.withAlphaComponent(Self.dimAlpha)
         panelView.backgroundColor = colors.bgColorOperate
@@ -192,7 +192,7 @@ private final class AvatarPickerSheetCell: UICollectionViewCell {
         avatarImageView.contentMode = .scaleAspectFill
         avatarImageView.layer.cornerRadius = AvatarPickerSheetController.cellAvatarCornerRadius
         avatarImageView.layer.masksToBounds = true
-        avatarImageView.backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        avatarImageView.backgroundColor = TUIChatKitTheme.colors.bgColorInput
     }
 
     required init?(coder: NSCoder) {

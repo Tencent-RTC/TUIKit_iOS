@@ -59,7 +59,7 @@ final class GroupMemberListViewController: ChatSettingBaseViewController {
             make.top.equalTo(contentTopItem)
             make.leading.trailing.bottom.equalToSuperview()
         }
-        tableView.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        tableView.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         tableView.separatorStyle = .none
         tableView.rowHeight = Self.rowHeight
         tableView.register(GroupMemberListCell.self, forCellReuseIdentifier: GroupMemberListCell.reuseIdentifier)
@@ -288,7 +288,7 @@ private final class GroupMemberListCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
         nameLabel.font = FontScheme.body4Regular

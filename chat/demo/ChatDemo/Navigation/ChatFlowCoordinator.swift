@@ -1,4 +1,4 @@
-import ChatUIKit
+import TUIChatKit
 import AtomicXCore
 import SnapKit
 import UIKit
@@ -56,14 +56,16 @@ final class ChatFlowCoordinator {
         let page = ChatPage(
             conversation: conversation,
             locateMessage: locateMessage,
+            messageListConfig: makeMessageListConfig(),
             messageInputConfig: makeMessageInputConfig(conversationID: conversation.conversationID),
+            isShowMoreButton: true,
             onBack: { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
             },
-            onUserAvatarClick: { [weak self] userID in
+            onUserClick: { [weak self] userID in
                 self?.pushC2CSetting(userID: userID, parentConversationID: conversation.conversationID)
             },
-            onNavigationAvatarClick: { [weak self] in
+            onMoreClick: { [weak self] in
                 self?.handleNavigationAvatarClick(for: conversation)
             }
         )
@@ -74,6 +76,10 @@ final class ChatFlowCoordinator {
         page.topBannerView = warningView
         return page
     }
+    
+    private func makeMessageListConfig() -> ChatMessageListConfig {
+        return ChatMessageListConfig(isShowRightAvatar: true)
+    }
 
     private func makeMessageInputConfig(conversationID: String) -> ChatMessageInputConfig {
         return ChatMessageInputConfig(actionCustomizer: { editor in
@@ -82,7 +88,7 @@ final class ChatFlowCoordinator {
                 title: LocalizedChatString("DemoChatCustomMessageMenuTitle"),
                 iconName: "",
                 icon: UIImage(systemName: "paperplane.fill")?
-                    .withTintColor(ChatUIKitTheme.colors.textColorSecondary, renderingMode: .alwaysOriginal),
+                    .withTintColor(TUIChatKitTheme.colors.textColorSecondary, renderingMode: .alwaysOriginal),
                 onClick: {
                     ChatFlowCoordinator.sendCustomLinkMessage(conversationID: conversationID)
                 }
@@ -389,7 +395,7 @@ final class CustomLinkMessageContentView: UIView, MessageContentView {
 
     func bind(message: MessageInfo, context: MessageContentContext) {
         let linkMessage = CustomLinkMessage.from(message: message)
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let textColor = message.isSentBySelf ? colors.textColorAntiPrimary : colors.textColorPrimary
         textLabel.attributedText = makeAttributedText(
             linkMessage?.text ?? "",

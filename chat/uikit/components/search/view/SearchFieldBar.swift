@@ -110,7 +110,7 @@ final class SearchFieldBar: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         inputContainer.backgroundColor = colors.bgColorInput
         inputContainer.layer.cornerRadius = Self.inputCornerRadius

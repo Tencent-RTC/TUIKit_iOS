@@ -324,7 +324,7 @@ final class MessageActionMenuController: NSObject {
 
     private func makeRowDivider(width: CGFloat) -> UIView {
         let line = UIView()
-        line.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary.withAlphaComponent(Metric.rowDividerAlpha)
+        line.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary.withAlphaComponent(Metric.rowDividerAlpha)
         line.snp.makeConstraints { make in
             make.width.equalTo(width - Metric.rowDividerSideMargin * 2)
             make.height.equalTo(Metric.rowDividerHeight)
@@ -555,7 +555,7 @@ private final class MessageActionMenuPager: UIView, UIScrollViewDelegate {
     }
 
     private func updateIndicator(currentPage: Int) {
-        let activeColor = ChatUIKitTheme.colors.textColorPrimary
+        let activeColor = TUIChatKitTheme.colors.textColorPrimary
         for (index, dot) in indicatorDots.enumerated() {
             dot.backgroundColor = activeColor.withAlphaComponent(
                 index == currentPage ? 1.0 : Self.indicatorInactiveAlpha
@@ -593,7 +593,7 @@ final class MessageActionMenuBubbleView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.addSublayer(shapeLayer)
-        shapeLayer.fillColor = ChatUIKitTheme.colors.dropdownColorDefault.cgColor
+        shapeLayer.fillColor = TUIChatKitTheme.colors.dropdownColorDefault.cgColor
         layer.shadowColor = UIColor(white: 0, alpha: Metric.shadowAlpha).cgColor
         layer.shadowRadius = Metric.shadowRadius
         layer.shadowOpacity = 1
@@ -724,7 +724,7 @@ final class MessageActionMenuButton: UIControl {
     }
 
     private func buildUI(action: MessageActionMenuAction, metrics: MessageActionMenuButtonMetrics) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         iconView.contentMode = .scaleAspectFit
         iconView.tintColor = colors.textColorPrimary
         iconView.image = Self.icon(named: action.iconName, fallback: action.systemIconFallback)

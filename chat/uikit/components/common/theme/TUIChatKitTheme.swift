@@ -1,13 +1,13 @@
 import UIKit
 
-public enum ChatUIKitTheme {
+public enum TUIChatKitTheme {
 
-    public static var colors: ChatUIKitColorScheme {
-        return ChatUIKitColorScheme()
+    public static var colors: TUIChatKitColorScheme {
+        return TUIChatKitColorScheme()
     }
 }
 
-public struct ChatUIKitColorScheme {
+public struct TUIChatKitColorScheme {
     public var bgColorOperate: UIColor { dynamic(\.bgColorOperate) }
 
     public var bgColorInput: UIColor { dynamic(\.bgColorInput) }

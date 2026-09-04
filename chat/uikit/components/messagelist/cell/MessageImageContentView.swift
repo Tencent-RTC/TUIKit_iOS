@@ -84,7 +84,7 @@ final class MessageImageContentView: UIView, MessageContentView {
         imageView.layer.cornerRadius = Self.cornerRadius
         placeholderIcon.contentMode = .scaleAspectFit
         placeholderIcon.image = UIImage(systemName: "photo")
-        placeholderIcon.tintColor = ChatUIKitTheme.colors.textColorSecondary
+        placeholderIcon.tintColor = TUIChatKitTheme.colors.textColorSecondary
         isUserInteractionEnabled = true
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleMediaTap)))
     }
@@ -135,7 +135,7 @@ final class MessageImageContentView: UIView, MessageContentView {
            !urlString.isEmpty,
            let url = URL(string: urlString) {
             placeholderIcon.isHidden = true
-            imageView.backgroundColor = ChatUIKitTheme.colors.bgColorBubbleReciprocal
+            imageView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
             imageView.kf.setImage(with: url)
             return
         }
@@ -146,7 +146,7 @@ final class MessageImageContentView: UIView, MessageContentView {
     private func showPlaceholder() {
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
-        imageView.backgroundColor = ChatUIKitTheme.colors.bgColorBubbleReciprocal
+        imageView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
         placeholderIcon.isHidden = false
     }
 

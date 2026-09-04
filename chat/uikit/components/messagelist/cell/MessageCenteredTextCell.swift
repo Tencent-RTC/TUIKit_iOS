@@ -79,10 +79,10 @@ final class MessageCenteredTextCell: UITableViewCell {
         contentView.backgroundColor = .clear
         timeLabel.textAlignment = .center
         timeLabel.font = FontScheme.caption2Regular
-        timeLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        timeLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         tipLabel.textAlignment = .center
         tipLabel.numberOfLines = 0
         tipLabel.font = FontScheme.caption2Regular
-        tipLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        tipLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
     }
 }

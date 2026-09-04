@@ -32,7 +32,7 @@ final class SelectionCheckBox: UIView {
     }
 
     override func draw(_ rect: CGRect) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let centerX = bounds.width / 2
         let centerY = bounds.height / 2
         let radius = bounds.width / 2

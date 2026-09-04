@@ -77,7 +77,7 @@ final class MessageListMultiSelectBar: UIView {
     }
 
     private func setupViewStyle() {
-        backgroundColor = ChatUIKitTheme.colors.bgColorBottomBar
+        backgroundColor = TUIChatKitTheme.colors.bgColorBottomBar
         separateForwardItem.configure(
             icon: Self.icon(named: "message_multi_forward_separate"),
             title: LocalizedChatString("RelayOneByOneForward")
@@ -136,9 +136,9 @@ private final class MultiSelectBarActionItem: UIControl {
             make.width.height.equalTo(Self.iconSize)
         }
         iconView.contentMode = .scaleAspectFit
-        iconView.tintColor = ChatUIKitTheme.colors.textColorSecondary
+        iconView.tintColor = TUIChatKitTheme.colors.textColorSecondary
         titleLabel.font = FontScheme.caption3Regular
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 1
         addTarget(self, action: #selector(handleTap), for: .touchUpInside)

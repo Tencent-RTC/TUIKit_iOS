@@ -8,7 +8,7 @@ public struct ChatMessageListConfig {
 
     static let defaultAvatarSpacing = CGFloat(SpacingScheme.smallSpacing)
 
-    var userAlignment: Int? = nil
+    var userAlignment: MessageAlignment? = nil
 
     var userIsShowTimeMessage: Bool? = nil
 
@@ -36,6 +36,8 @@ public struct ChatMessageListConfig {
 
     var userIsSupportForward: Bool? = nil
 
+    var userIsSupportQuote: Bool? = nil
+
     var userIsSupportMultiSelect: Bool? = nil
 
     var userIsSupportConvertToText: Bool? = nil
@@ -54,31 +56,38 @@ public struct ChatMessageListConfig {
 
     var userEnableTyping: Bool? = nil
 
+    var userBackground: MessageListBackground? = nil
+
+    var userDefaultBubbleAppearance: MessageBubbleAppearance? = nil
+
+    var userOwnBubbleAppearance: MessageBubbleAppearance? = nil
+
+    var userIncomingBubbleAppearance: MessageBubbleAppearance? = nil
+
+    var userLeftBubbleAppearance: MessageBubbleAppearance? = nil
+
+    var userRightBubbleAppearance: MessageBubbleAppearance? = nil
+
     var exclusionMatchers: [MessageMatcher] = []
 }
 
 extension ChatMessageListConfig {
     public init(
-        textFont: UIFont? = nil,
-        textBubbleCornerRadius: CGFloat? = nil,
-        alignment: Int? = nil,
+        alignment: MessageAlignment? = nil,
         isShowTimeMessage: Bool? = nil,
         isShowLeftAvatar: Bool? = nil,
         isShowLeftNickname: Bool? = nil,
         isShowRightAvatar: Bool? = nil,
         isShowRightNickname: Bool? = nil,
-        nicknameFont: UIFont? = nil,
         isShowTimeInBubble: Bool? = nil,
         cellSpacing: CGFloat? = nil,
-        displayName: String? = nil,
-        bottomViewCornerRadius: CGFloat? = nil,
-        bottomViewBorderWidth: CGFloat? = nil,
         isShowSystemMessage: Bool? = nil,
         isShowUnsupportMessage: Bool? = nil,
         isSupportCopy: Bool? = nil,
         isSupportDelete: Bool? = nil,
         isSupportRecall: Bool? = nil,
         isSupportForward: Bool? = nil,
+        isSupportQuote: Bool? = nil,
         isSupportMultiSelect: Bool? = nil,
         isSupportConvertToText: Bool? = nil,
         isSupportTranslate: Bool? = nil,
@@ -87,7 +96,13 @@ extension ChatMessageListConfig {
         horizontalPadding: CGFloat? = nil,
         avatarSpacing: CGFloat? = nil,
         isSupportReaction: Bool? = nil,
-        enableTyping: Bool? = nil
+        enableTyping: Bool? = nil,
+        background: MessageListBackground? = nil,
+        defaultBubbleAppearance: MessageBubbleAppearance? = nil,
+        ownBubbleAppearance: MessageBubbleAppearance? = nil,
+        incomingBubbleAppearance: MessageBubbleAppearance? = nil,
+        leftBubbleAppearance: MessageBubbleAppearance? = nil,
+        rightBubbleAppearance: MessageBubbleAppearance? = nil
     ) {
         self.userAlignment = alignment
         self.userIsShowTimeMessage = isShowTimeMessage
@@ -103,6 +118,7 @@ extension ChatMessageListConfig {
         self.userIsSupportDelete = isSupportDelete
         self.userIsSupportRecall = isSupportRecall
         self.userIsSupportForward = isSupportForward
+        self.userIsSupportQuote = isSupportQuote
         self.userIsSupportMultiSelect = isSupportMultiSelect
         self.userIsSupportConvertToText = isSupportConvertToText
         self.userIsSupportTranslate = isSupportTranslate
@@ -112,5 +128,11 @@ extension ChatMessageListConfig {
         self.userAvatarSpacing = avatarSpacing
         self.userIsSupportReaction = isSupportReaction
         self.userEnableTyping = enableTyping
+        self.userBackground = background
+        self.userDefaultBubbleAppearance = defaultBubbleAppearance
+        self.userOwnBubbleAppearance = ownBubbleAppearance
+        self.userIncomingBubbleAppearance = incomingBubbleAppearance
+        self.userLeftBubbleAppearance = leftBubbleAppearance
+        self.userRightBubbleAppearance = rightBubbleAppearance
     }
 }

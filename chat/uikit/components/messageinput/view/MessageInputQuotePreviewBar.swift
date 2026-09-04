@@ -38,7 +38,7 @@ final class MessageInputQuotePreviewBar: UIView {
     }
 
     func configure(senderName: String, summary: String) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let attributedText = NSMutableAttributedString()
         let nameAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: Self.senderNameFontSize, weight: .semibold),
@@ -82,7 +82,7 @@ final class MessageInputQuotePreviewBar: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorDefault
         clipsToBounds = true
         isHidden = true

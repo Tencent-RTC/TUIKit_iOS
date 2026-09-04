@@ -112,7 +112,7 @@ final class FriendApplicationCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
         nameLabel.font = FontScheme.caption2Regular

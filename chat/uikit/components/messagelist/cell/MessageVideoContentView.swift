@@ -169,7 +169,7 @@ final class MessageVideoContentView: UIView, MessageContentView {
         if let urlString = payload.videoSnapshotURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
-            snapshotView.backgroundColor = ChatUIKitTheme.colors.bgColorBubbleReciprocal
+            snapshotView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
             snapshotView.kf.setImage(with: url)
             playIconView.isHidden = false
             return
@@ -181,7 +181,7 @@ final class MessageVideoContentView: UIView, MessageContentView {
     private func showPlaceholder() {
         snapshotView.kf.cancelDownloadTask()
         snapshotView.image = nil
-        snapshotView.backgroundColor = ChatUIKitTheme.colors.bgColorBubbleReciprocal
+        snapshotView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
         playIconView.isHidden = false
     }
 

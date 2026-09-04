@@ -109,27 +109,27 @@ final class ListenPlaybackBar: UIView {
     }
 
     private func setupViewStyle() {
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         layer.cornerRadius = Self.rowHeight / 2
         layer.masksToBounds = false
         layer.borderWidth = Self.borderWidth
-        layer.borderColor = ChatUIKitTheme.colors.strokeColorPrimary.cgColor
+        layer.borderColor = TUIChatKitTheme.colors.strokeColorPrimary.cgColor
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = Self.shadowOpacity
         layer.shadowRadius = Self.shadowRadius
         layer.shadowOffset = Self.shadowOffset
 
         iconImageView.image = AtomicXChatResources.image(named: "message_listen")
-        iconImageView.tintColor = ChatUIKitTheme.colors.textColorLink
+        iconImageView.tintColor = TUIChatKitTheme.colors.textColorLink
         iconImageView.contentMode = .scaleAspectFit
-        loadingIndicator.color = ChatUIKitTheme.colors.textColorLink
+        loadingIndicator.color = TUIChatKitTheme.colors.textColorLink
 
         textLabel.font = .systemFont(ofSize: Self.textFontSize)
-        textLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        textLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         textLabel.lineBreakMode = .byTruncatingTail
 
         closeButton.setImage(AtomicXChatResources.image(named: "message_listen_close"), for: .normal)
-        closeButton.tintColor = ChatUIKitTheme.colors.textColorPrimary
+        closeButton.tintColor = TUIChatKitTheme.colors.textColorPrimary
     }
 
     private func bindInteraction() {

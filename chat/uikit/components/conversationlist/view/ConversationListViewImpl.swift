@@ -54,7 +54,7 @@ final class ConversationListViewImpl: RTCBaseView {
         let label = UILabel()
         label.text = LocalizedChatString("EmptyContent")
         label.font = FontScheme.caption2Regular
-        label.textColor = ChatUIKitTheme.colors.textColorTertiary
+        label.textColor = TUIChatKitTheme.colors.textColorTertiary
         label.textAlignment = .center
         return label
     }()
@@ -126,7 +126,7 @@ final class ConversationListViewImpl: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        let listColor = ChatUIKitTheme.colors.bgColorTopBar
+        let listColor = TUIChatKitTheme.colors.bgColorTopBar
         backgroundColor = listColor
         tableView.backgroundColor = listColor
     }
@@ -198,7 +198,7 @@ final class ConversationListViewImpl: RTCBaseView {
             })
         }
         alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        if let popover = alert.popoverPresentationController {
+        if traitCollection.userInterfaceIdiom == .pad, let popover = alert.popoverPresentationController {
             popover.sourceView = self
             popover.sourceRect = bounds
         }
@@ -232,7 +232,7 @@ extension ConversationListViewImpl: UITableViewDataSource {
         }
         let conversation = conversations[indexPath.row]
         cell.configure(with: conversation)
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         cell.backgroundColor = conversation.isPinned ? colors.bgColorInput : colors.bgColorOperate
         cell.setSeparatorHidden(indexPath.row == conversations.count - 1)
         return cell
@@ -268,7 +268,7 @@ extension ConversationListViewImpl: UITableViewDelegate {
                     action.action(conversation)
                     completion(true)
                 }
-                markAction.backgroundColor = ChatUIKitTheme.colors.buttonColorPrimaryDefault
+                markAction.backgroundColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
                 markContextualAction = markAction
             default:
                 sheetActions.append(action)

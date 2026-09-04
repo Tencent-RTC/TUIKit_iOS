@@ -112,7 +112,7 @@ final class ChatBackgroundPickerViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = .clear
         dimView.backgroundColor = UIColor.black.withAlphaComponent(Self.dimAlpha)
         panelView.backgroundColor = colors.bgColorOperate
@@ -194,7 +194,7 @@ final class ChatBackgroundPreviewCell: UICollectionViewCell {
         defaultLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         contentView.backgroundColor = colors.bgColorTopBar
         contentView.layer.cornerRadius = Self.contentCornerRadius
         contentView.layer.masksToBounds = true
@@ -210,7 +210,7 @@ final class ChatBackgroundPreviewCell: UICollectionViewCell {
     }
 
     func configure(with item: ChatBackgroundPresetItem, isSelected: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         contentView.layer.borderWidth = isSelected ? Self.selectedBorderWidth : 0
         contentView.layer.borderColor = isSelected ? colors.buttonColorPrimaryDefault.cgColor : nil
         if item.isDefault {

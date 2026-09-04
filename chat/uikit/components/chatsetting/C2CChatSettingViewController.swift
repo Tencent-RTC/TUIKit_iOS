@@ -31,6 +31,8 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
 
     private let onContactDelete: (() -> Void)?
 
+    private let config: C2CChatSettingConfigProtocol
+
     private var remark: String = ""
 
     private var nick: String = ""
@@ -85,12 +87,14 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
 
     public init(
         userID: String,
+        config: C2CChatSettingConfigProtocol = C2CChatSettingConfig(),
         onSendMessageClick: (() -> Void)? = nil,
         onContactDelete: (() -> Void)? = nil
     ) {
         self.userID = userID
         self.contactStore = ContactStore.shared
         self.conversationStore = ConversationListStore.create()
+        self.config = config
         self.onSendMessageClick = onSendMessageClick
         self.onContactDelete = onContactDelete
         super.init(nibName: nil, bundle: nil)
@@ -104,6 +108,7 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
         super.viewDidLoad()
         setNavTitle(LocalizedChatString("ProfileContactInfo"))
         constructViewHierarchy()
+        applyCustomItems()
         activateConstraints()
         setupViewStyle()
         bindInteraction()
@@ -124,29 +129,53 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
         headerTextStack.addArrangedSubview(signatureLabel)
         headerView.addSubview(headerTextStack)
 
-        stackView.addArrangedSubview(headerView)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(remarkRow)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        let switchSection = makeSectionContainer(arrangedSubviews: [
-            doNotDisturbRow,
-            makeChatSettingRowDivider(),
-            pinRow,
-        ])
-        stackView.addArrangedSubview(switchSection)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(backgroundRow)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(blacklistRow)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(makeActionSection())
+        var sections: [(UIView, Bool)] = [
+            (headerView, config.isShowHeader),
+            (remarkRow, config.isShowRemark),
+        ]
+        if let switchSection = makeSwitchSection() {
+            sections.append((switchSection, true))
+        }
+        sections.append((backgroundRow, config.isShowChatBackground))
+        sections.append((blacklistRow, config.isShowBlacklist))
+        if let actionSection = makeActionSection() {
+            sections.append((actionSection, true))
+        }
+
+        var isFirstVisible = true
+        for (sectionView, isVisible) in sections where isVisible {
+            if !isFirstVisible {
+                stackView.addArrangedSubview(makeChatSettingSectionSpacer())
+            }
+            stackView.addArrangedSubview(sectionView)
+            isFirstVisible = false
+        }
+    }
+
+    private func makeSwitchSection() -> UIStackView? {
+        var rows: [UIView] = []
+        if config.isShowDoNotDisturb {
+            rows.append(doNotDisturbRow)
+        }
+        if config.isShowPin {
+            rows.append(pinRow)
+        }
+        guard !rows.isEmpty else { return nil }
+        var arranged: [UIView] = []
+        for (index, row) in rows.enumerated() {
+            if index > 0 {
+                arranged.append(makeChatSettingRowDivider())
+            }
+            arranged.append(row)
+        }
+        return makeSectionContainer(arrangedSubviews: arranged)
     }
 
     private func makeSectionContainer(arrangedSubviews: [UIView]) -> UIStackView {
         let section = UIStackView(arrangedSubviews: arrangedSubviews)
         section.axis = .vertical
         section.spacing = 0
-        section.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        section.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         return section
     }
 
@@ -156,19 +185,66 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
         return row
     }
 
-    private func makeActionSection() -> UIStackView {
-        let colors = ChatUIKitTheme.colors
-        return makeSectionContainer(arrangedSubviews: [
-            makeActionRow(titleKey: "ProfileSendMessages", textColor: colors.textColorLink, action: #selector(handleSendMessageTapped)),
-            makeChatSettingRowDivider(),
-            makeActionRow(titleKey: "MoreVoiceCall", textColor: colors.textColorLink, action: #selector(handleVoiceCallTapped)),
-            makeChatSettingRowDivider(),
-            makeActionRow(titleKey: "MoreVideoCall", textColor: colors.textColorLink, action: #selector(handleVideoCallTapped)),
-            makeChatSettingRowDivider(),
-            makeActionRow(titleKey: "ClearAllChatHistory", textColor: colors.textColorError, action: #selector(handleClearHistoryTapped)),
-            makeChatSettingRowDivider(),
-            makeActionRow(titleKey: "ProfileDeleteFirend", textColor: colors.textColorError, action: #selector(handleDeleteFriendTapped)),
-        ])
+    private func makeActionSection() -> UIStackView? {
+        let colors = TUIChatKitTheme.colors
+        var rows: [UIView] = []
+        if config.isShowSendMessage {
+            rows.append(makeActionRow(titleKey: "ProfileSendMessages", textColor: colors.textColorLink, action: #selector(handleSendMessageTapped)))
+        }
+        if config.isShowVoiceCall {
+            rows.append(makeActionRow(titleKey: "MoreVoiceCall", textColor: colors.textColorLink, action: #selector(handleVoiceCallTapped)))
+        }
+        if config.isShowVideoCall {
+            rows.append(makeActionRow(titleKey: "MoreVideoCall", textColor: colors.textColorLink, action: #selector(handleVideoCallTapped)))
+        }
+        if config.isShowClearHistory {
+            rows.append(makeActionRow(titleKey: "ClearAllChatHistory", textColor: colors.textColorError, action: #selector(handleClearHistoryTapped)))
+        }
+        if config.isShowDeleteFriend {
+            rows.append(makeActionRow(titleKey: "ProfileDeleteFirend", textColor: colors.textColorError, action: #selector(handleDeleteFriendTapped)))
+        }
+        guard !rows.isEmpty else { return nil }
+        var arranged: [UIView] = []
+        for (index, row) in rows.enumerated() {
+            if index > 0 {
+                arranged.append(makeChatSettingRowDivider())
+            }
+            arranged.append(row)
+        }
+        return makeSectionContainer(arrangedSubviews: arranged)
+    }
+
+    private func applyCustomItems() {
+        guard let customizer = config.itemCustomizer else { return }
+        let editor = ChatSettingItemEditor<C2CChatSettingSection>()
+        customizer(editor)
+        var lastInsertedByAnchor: [UIView] = []
+        for (section, row) in editor.customRows {
+            guard let anchor = anchorView(for: section) else {
+                stackView.addArrangedSubview(row)
+                continue
+            }
+            let base = lastInsertedByAnchor.first(where: { $0 === anchor }) ?? anchor
+            if let index = stackView.arrangedSubviews.firstIndex(of: base) {
+                stackView.insertArrangedSubview(row, at: index + 1)
+            } else {
+                stackView.addArrangedSubview(row)
+            }
+            lastInsertedByAnchor.removeAll { $0 === anchor }
+            lastInsertedByAnchor.append(row)
+        }
+    }
+
+    private func anchorView(for section: C2CChatSettingSection) -> UIView? {
+        switch section {
+        case .header: return config.isShowHeader ? headerView : nil
+        case .remark: return config.isShowRemark ? remarkRow : nil
+        case .switches: return stackView.arrangedSubviews.first { $0 is UIStackView && ($0 as? UIStackView)?.arrangedSubviews.contains(where: { $0 === doNotDisturbRow || $0 === pinRow }) == true }
+        case .background: return config.isShowChatBackground ? backgroundRow : nil
+        case .blacklist: return config.isShowBlacklist ? blacklistRow : nil
+        case .actions: return stackView.arrangedSubviews.last
+        case .end: return nil
+        }
     }
 
     private func activateConstraints() {
@@ -195,7 +271,7 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorTopBar
         scrollView.backgroundColor = colors.bgColorTopBar
         stackView.axis = .vertical

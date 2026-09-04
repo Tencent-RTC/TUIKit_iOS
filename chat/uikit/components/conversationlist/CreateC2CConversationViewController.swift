@@ -28,19 +28,14 @@ final class CreateC2CConversationViewController: UIViewController, SystemNavigat
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         title = LocalizedChatString("ChatsNewChatText")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: AtomicXChatResources.image(named: "contact_info_back")?
-                .withRenderingMode(.alwaysTemplate)
-                ?? UIImage(systemName: "chevron.left")?
-                .withConfiguration(UIImage.SymbolConfiguration(pointSize: 18, weight: .semibold)),
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleCancel)
+            action: #selector(handleCancel),
+            tintColor: colors.textColorPrimary
         )
-        navigationItem.leftBarButtonItem?.tintColor = colors.textColorPrimary
     }
 
     @objc private func handleCancel() {

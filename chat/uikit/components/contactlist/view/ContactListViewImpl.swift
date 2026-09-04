@@ -13,9 +13,9 @@ enum ContactListItemIDs {
 final class ContactListViewImpl: RTCBaseView {
     private static let itemTitleFontSize: CGFloat = 18
 
-    private let onContactClick: (AZOrderedListItem) -> Void
+    private let onContactClick: (ContactInfo) -> Void
 
-    private let onGroupClick: (AZOrderedListItem) -> Void
+    private let onGroupClick: (GroupInfo) -> Void
 
     private let config: ContactListConfigProtocol
 
@@ -29,7 +29,8 @@ final class ContactListViewImpl: RTCBaseView {
 
     private lazy var listView: AZOrderedListView = {
         let listView = AZOrderedListView(showIndexBar: true) { [weak self] item in
-            self?.onContactClick(item)
+            guard let contact = item.extraData as? ContactInfo else { return }
+            self?.onContactClick(contact)
         }
         listView.itemTitleFontSize = Self.itemTitleFontSize
         return listView
@@ -39,8 +40,8 @@ final class ContactListViewImpl: RTCBaseView {
 
     private let headerView = ContactNavigationHeaderView()
 
-    init(onContactClick: @escaping (AZOrderedListItem) -> Void,
-         onGroupClick: @escaping (AZOrderedListItem) -> Void,
+    init(onContactClick: @escaping (ContactInfo) -> Void,
+         onGroupClick: @escaping (GroupInfo) -> Void,
          config: ContactListConfigProtocol = ChatContactListConfig()) {
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
@@ -87,7 +88,7 @@ final class ContactListViewImpl: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 
     private func buildHeaderItems() -> [ContactCustomItem] {
@@ -152,7 +153,8 @@ final class ContactListViewImpl: RTCBaseView {
             AZOrderedListItem(
                 userID: contact.userID,
                 avatarURL: contact.avatarURL,
-                title: ContactDisplayNameFormatter.name(for: contact)
+                title: ContactDisplayNameFormatter.name(for: contact),
+                extraData: contact
             )
         }
         listView.setItems(items)
@@ -188,7 +190,8 @@ final class ContactListViewImpl: RTCBaseView {
 
     private func presentGroupList() {
         let controller = GroupListViewController { [weak self] item in
-            self?.onGroupClick(item)
+            guard let group = item.extraData as? GroupInfo else { return }
+            self?.onGroupClick(group)
         }
         controller.hidesBottomBarWhenPushed = true
         if let navigationController = findViewController()?.navigationController {
@@ -200,7 +203,8 @@ final class ContactListViewImpl: RTCBaseView {
 
     private func presentBlackList() {
         let controller = BlackListViewController { [weak self] item in
-            self?.onContactClick(item)
+            guard let contact = item.extraData as? ContactInfo else { return }
+            self?.onContactClick(contact)
         }
         controller.hidesBottomBarWhenPushed = true
         if let navigationController = findViewController()?.navigationController {

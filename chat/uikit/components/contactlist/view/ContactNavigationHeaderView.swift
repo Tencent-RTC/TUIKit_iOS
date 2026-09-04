@@ -88,7 +88,7 @@ final class ContactNavigationRowView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.font = FontScheme.caption1Regular
         titleLabel.textColor = colors.textColorPrimary
@@ -158,7 +158,7 @@ final class ContactNavigationHeaderView: UIView {
 
     private func makeDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorSecondary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorSecondary
         divider.snp.makeConstraints { make in
             make.height.equalTo(Self.dividerHeight)
         }
@@ -178,6 +178,6 @@ final class ContactNavigationHeaderView: UIView {
     }
 
     private func setupViewStyle() {
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 }

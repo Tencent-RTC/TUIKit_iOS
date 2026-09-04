@@ -10,7 +10,7 @@ enum SearchResultCellConfigurator {
                                 friend: FriendSearchInfo,
                                 keyword: String,
                                 showDivider: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let displayName = SearchDisplayHelper.friendDisplayName(friend)
         let title = SearchHighlightBuilder.attributedText(
             text: displayName, keyword: keyword, font: titleFont,
@@ -28,7 +28,7 @@ enum SearchResultCellConfigurator {
                                group: GroupSearchInfo,
                                keyword: String,
                                showDivider: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let displayName = SearchDisplayHelper.groupDisplayName(group)
         let title = SearchHighlightBuilder.attributedText(
             text: displayName, keyword: keyword, font: titleFont,
@@ -47,7 +47,7 @@ enum SearchResultCellConfigurator {
                                  item: MessageSearchResultItem,
                                  keyword: String,
                                  showDivider: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let title = SearchHighlightBuilder.attributedText(
             text: item.conversationShowName, keyword: keyword, font: titleFont,
             normalColor: colors.textColorPrimary, highlightColor: colors.textColorLink

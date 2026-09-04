@@ -15,6 +15,7 @@ public protocol MessageInputConfigProtocol {
     var isShowVideoCall: Bool { get }
     var isShowAudioCall: Bool { get }
     var enableTyping: Bool { get }
+    var audioMaxRecordDurationMs: Int { get }
     var actionCustomizer: MessageInputActionCustomizer? { get }
 }
 
@@ -22,6 +23,7 @@ extension MessageInputConfigProtocol {
     public var isShowVideoCall: Bool { true }
     public var isShowAudioCall: Bool { true }
     public var enableTyping: Bool { true }
+    public var audioMaxRecordDurationMs: Int { 60_000 }
     public var actionCustomizer: MessageInputActionCustomizer? { nil }
 }
 
@@ -78,6 +80,10 @@ public struct ChatMessageInputConfig: MessageInputConfigProtocol {
         return userEnableTyping ?? true
     }
 
+    public var audioMaxRecordDurationMs: Int {
+        return userAudioMaxRecordDurationMs ?? 60_000
+    }
+
     public var actionCustomizer: MessageInputActionCustomizer? {
         return userActionCustomizer
     }
@@ -104,6 +110,8 @@ public struct ChatMessageInputConfig: MessageInputConfigProtocol {
 
     private let userEnableTyping: Bool?
 
+    private let userAudioMaxRecordDurationMs: Int?
+
     private let userActionCustomizer: MessageInputActionCustomizer?
 
     public init() {
@@ -118,6 +126,7 @@ public struct ChatMessageInputConfig: MessageInputConfigProtocol {
         self.userIsShowVideoCall = nil
         self.userIsShowAudioCall = nil
         self.userEnableTyping = nil
+        self.userAudioMaxRecordDurationMs = nil
         self.userActionCustomizer = nil
     }
 
@@ -133,6 +142,7 @@ public struct ChatMessageInputConfig: MessageInputConfigProtocol {
         isShowVideoCall: Bool? = nil,
         isShowAudioCall: Bool? = nil,
         enableTyping: Bool? = nil,
+        audioMaxRecordDurationMs: Int? = nil,
         actionCustomizer: MessageInputActionCustomizer? = nil
     ) {
         self.userIsShowAudioRecorder = isShowAudioRecorder
@@ -146,6 +156,7 @@ public struct ChatMessageInputConfig: MessageInputConfigProtocol {
         self.userIsShowVideoCall = isShowVideoCall
         self.userIsShowAudioCall = isShowAudioCall
         self.userEnableTyping = enableTyping
+        self.userAudioMaxRecordDurationMs = audioMaxRecordDurationMs
         self.userActionCustomizer = actionCustomizer
     }
 }

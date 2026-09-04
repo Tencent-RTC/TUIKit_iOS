@@ -91,7 +91,7 @@ final class ReactionEmojiPanelView: UIView {
         let titleLabel = UILabel()
         titleLabel.text = LocalizedChatString("Reaction")
         titleLabel.font = FontScheme.caption3Regular
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         header.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.horizontalPadding)
@@ -101,7 +101,7 @@ final class ReactionEmojiPanelView: UIView {
         let collapseButton = TappableControl { [weak self] in self?.onCollapse?() }
         let collapseIcon = UIImageView()
         collapseIcon.contentMode = .scaleAspectFit
-        collapseIcon.tintColor = ChatUIKitTheme.colors.textColorPrimary
+        collapseIcon.tintColor = TUIChatKitTheme.colors.textColorPrimary
         collapseIcon.image = Self.icon(named: "message_reaction_collapse", fallback: "chevron.up")
         collapseButton.addSubview(collapseIcon)
         collapseIcon.snp.makeConstraints { make in
@@ -155,7 +155,7 @@ final class ReactionEmojiPanelView: UIView {
 
             if rowIndex < Self.rows - 1 {
                 let divider = UIView()
-                divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+                divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
                     .withAlphaComponent(Self.rowDividerAlpha)
                 container.addSubview(divider)
                 divider.snp.makeConstraints { make in
@@ -184,13 +184,13 @@ final class ReactionEmojiPanelView: UIView {
     private func buildMoreCell() -> UIView {
         let control = TappableControl { [weak self] in self?.onMore?() }
         let circle = UIView()
-        circle.backgroundColor = ChatUIKitTheme.colors.dropdownColorHover
+        circle.backgroundColor = TUIChatKitTheme.colors.dropdownColorHover
         circle.layer.cornerRadius = Self.moreButtonSize / 2
         circle.layer.masksToBounds = true
         circle.isUserInteractionEnabled = false
         let icon = UIImageView()
         icon.contentMode = .scaleAspectFit
-        icon.tintColor = ChatUIKitTheme.colors.textColorPrimary
+        icon.tintColor = TUIChatKitTheme.colors.textColorPrimary
         icon.image = Self.icon(named: "message_more", fallback: "ellipsis")
         circle.addSubview(icon)
         icon.snp.makeConstraints { make in

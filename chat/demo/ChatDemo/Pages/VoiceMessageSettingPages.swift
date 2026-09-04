@@ -1,5 +1,5 @@
 import AtomicXCore
-import ChatUIKit
+import TUIChatKit
 import SnapKit
 import UIKit
 
@@ -10,7 +10,7 @@ private final class SettingSubPageHeaderView: UIView {
 
     private static let backButtonSize: CGFloat = 24
 
-    private let backButton = UIButton(type: .custom)
+    private let backButton = ExpandedHitButton(type: .custom)
 
     private let titleLabel = UILabel()
 
@@ -19,7 +19,7 @@ private final class SettingSubPageHeaderView: UIView {
     init(title: String, onBack: @escaping () -> Void) {
         self.onBack = onBack
         super.init(frame: .zero)
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 17, weight: .bold)
@@ -68,7 +68,7 @@ private final class SettingEntryRowView: UIControl {
 
     init(title: String) {
         super.init(frame: .zero)
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 16)
@@ -120,14 +120,14 @@ final class VoiceMessageSettingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         let header = SettingSubPageHeaderView(title: LocalizedChatString("VoiceMessageSettings")) { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
         let spacer = UIView()
-        spacer.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+        spacer.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         view.addSubview(header)
         view.addSubview(spacer)
         view.addSubview(cloneRow)
@@ -193,7 +193,7 @@ final class VoiceSelectViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         let header = SettingSubPageHeaderView(title: LocalizedChatString("VoiceSelect")) { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         }
@@ -207,7 +207,7 @@ final class VoiceSelectViewController: UIViewController {
             make.top.equalTo(header.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
         }
-        tableView.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        tableView.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "VoiceCell")
@@ -271,7 +271,7 @@ extension VoiceSelectViewController: UITableViewDataSource, UITableViewDelegate 
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "VoiceCell", for: indexPath)
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         cell.backgroundColor = colors.bgColorOperate
         cell.selectionStyle = .none
         cell.contentView.subviews.forEach { $0.removeFromSuperview() }
@@ -380,10 +380,10 @@ private final class WaveformView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         layer.cornerRadius = 12
-        backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        backgroundColor = TUIChatKitTheme.colors.bgColorInput
         for _ in 0 ..< Self.barCount {
             let bar = UIView()
-            bar.backgroundColor = ChatUIKitTheme.colors.buttonColorPrimaryDefault
+            bar.backgroundColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
             bar.layer.cornerRadius = Self.barCornerRadius
             addSubview(bar)
             bars.append(bar)
@@ -477,7 +477,7 @@ final class VoiceCloneViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         let header = SettingSubPageHeaderView(title: LocalizedChatString("VoiceClone")) { [weak self] in
             self?.cancelRecordingIfNeeded()
             self?.navigationController?.popViewController(animated: true)
@@ -508,7 +508,7 @@ final class VoiceCloneViewController: UIViewController {
     }
 
     private func buildContent() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         tipLabel.text = LocalizedChatString("VoiceCloneTip")
         tipLabel.font = .systemFont(ofSize: 14)
         tipLabel.textColor = colors.textColorSecondary
@@ -600,13 +600,13 @@ final class VoiceCloneViewController: UIViewController {
     }
 
     private func refreshSubmitButton() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         submitButton.isEnabled = canSubmit
         submitButton.backgroundColor = canSubmit ? colors.buttonColorPrimaryDefault : colors.buttonColorPrimaryDisabled
     }
 
     private func refreshRecordButton() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         recordButton.setImage(UIImage(systemName: isRecording ? "stop.fill" : "mic.fill"), for: .normal)
         recordButton.backgroundColor = isRecording ? colors.textColorError : colors.buttonColorPrimaryDefault
     }

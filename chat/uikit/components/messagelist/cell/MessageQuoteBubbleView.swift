@@ -101,7 +101,7 @@ final class MessageQuoteBubbleView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorBubbleReciprocal
         layer.cornerRadius = Self.cornerRadius
         clipsToBounds = true
@@ -181,7 +181,7 @@ final class MessageQuoteBubbleView: UIView {
         let mutable = NSMutableAttributedString(attributedString: source)
         let fullRange = NSRange(location: 0, length: mutable.length)
         let emojiSize = FontScheme.caption3Regular.pointSize * Self.emojiToFontSizeRatio
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         mutable.enumerateAttribute(.attachment, in: fullRange, options: []) { value, range, _ in
             if let attachment = value as? NSTextAttachment {
                 attachment.bounds = CGRect(
