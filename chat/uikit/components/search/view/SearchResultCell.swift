@@ -103,7 +103,7 @@ final class SearchResultCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         contentView.backgroundColor = colors.bgColorOperate
         titleLabel.numberOfLines = 1
         titleLabel.lineBreakMode = .byTruncatingTail

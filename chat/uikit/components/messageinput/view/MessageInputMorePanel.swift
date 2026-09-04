@@ -115,7 +115,7 @@ final class MessageInputMorePanel: UIView {
     }
 
     private func setupView() {
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         collectionView.backgroundColor = .clear
         collectionView.isScrollEnabled = false
         collectionView.dataSource = self
@@ -202,7 +202,7 @@ private final class MorePanelCell: UICollectionViewCell {
     }
 
     private func setupCell() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
 
         iconTileView.backgroundColor = colors.bgColorInput
         iconTileView.layer.cornerRadius = MessageInputMorePanel.iconTileCornerRadius

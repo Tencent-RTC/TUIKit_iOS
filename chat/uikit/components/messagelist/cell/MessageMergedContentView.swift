@@ -67,7 +67,7 @@ final class MessageMergedContentView: UIView, MessageContentView {
     }
 
     func setCardChromeHidden(_ hidden: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         cardView.backgroundColor = hidden ? .clear : colors.bgColorDialog
         cardView.layer.borderWidth = hidden ? 0 : Self.cardBorderWidth
     }
@@ -118,7 +118,7 @@ final class MessageMergedContentView: UIView, MessageContentView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
 
         cardView.backgroundColor = colors.bgColorDialog
         cardView.layer.cornerRadius = Self.cornerRadius
@@ -157,7 +157,7 @@ final class MessageMergedContentView: UIView, MessageContentView {
     private func makeAbstractLabel(_ abstract: String) -> UILabel {
         let label = UILabel()
         label.font = FontScheme.caption3Regular
-        label.textColor = ChatUIKitTheme.colors.textColorSecondary
+        label.textColor = TUIChatKitTheme.colors.textColorSecondary
         label.numberOfLines = Self.abstractMaxLines
         label.lineBreakMode = .byTruncatingTail
         label.textAlignment = .natural
@@ -165,7 +165,7 @@ final class MessageMergedContentView: UIView, MessageContentView {
             label.attributedText = EmojiManager.shared.createStyledAttributedString(
                 fromEmojiCodes: abstract,
                 font: FontScheme.caption3Regular,
-                textColor: ChatUIKitTheme.colors.textColorSecondary
+                textColor: TUIChatKitTheme.colors.textColorSecondary
             )
         } else {
             label.text = abstract

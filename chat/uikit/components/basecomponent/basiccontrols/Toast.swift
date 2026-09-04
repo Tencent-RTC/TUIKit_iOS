@@ -30,7 +30,7 @@ enum ToastType {
     }
 
     var iconColor: UIColor {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         switch self {
         case .loading, .info, .help:
             return colors.textColorLink
@@ -124,7 +124,7 @@ private final class ToastContentView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.floatingColorDefault
         layer.cornerRadius = Self.cornerRadius
         layer.borderWidth = Self.borderWidth

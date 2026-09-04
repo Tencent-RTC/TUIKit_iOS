@@ -5,10 +5,70 @@ final class MessageBubbleContainerView: UIView {
 
     var isCustomMaskEnabled = false
 
+    var customCornerRadii: (topLeft: CGFloat, topRight: CGFloat, bottomLeft: CGFloat, bottomRight: CGFloat)?
+
+    private var fillLayer: CALayer?
+
+    private var strokeLayer: CAShapeLayer?
+
     override func layoutSubviews() {
         super.layoutSubviews()
-        guard isCustomMaskEnabled else { return }
-        MessageBubbleStyler.updateBubbleMask(for: self, isLeft: isLeftBubble)
+        fillLayer?.frame = bounds
+        var currentMaskPath: CGPath?
+        if let radii = customCornerRadii, bounds.width > 0, bounds.height > 0 {
+            let path = MessageBubbleStyler.customBubblePath(in: bounds, radii: radii).cgPath
+            let maskLayer = (layer.mask as? CAShapeLayer) ?? CAShapeLayer()
+            maskLayer.path = path
+            if layer.mask !== maskLayer {
+                layer.mask = maskLayer
+            }
+            currentMaskPath = path
+        } else if isCustomMaskEnabled {
+            MessageBubbleStyler.updateBubbleMask(for: self, isLeft: isLeftBubble)
+            currentMaskPath = (layer.mask as? CAShapeLayer)?.path
+        }
+        if let strokeLayer = strokeLayer {
+            strokeLayer.frame = bounds
+            strokeLayer.path = currentMaskPath
+        }
+    }
+
+    func applyAppearance(background: MessageBubbleBackground?, stroke: MessageBubbleStroke?) {
+        fillLayer?.removeFromSuperlayer()
+        fillLayer = nil
+        strokeLayer?.removeFromSuperlayer()
+        strokeLayer = nil
+        backgroundColor = .clear
+        switch background {
+        case .color(let color):
+            backgroundColor = color
+        case .gradient(let colors, let startPoint, let endPoint):
+            let gradient = CAGradientLayer()
+            gradient.colors = colors.map { $0.cgColor }
+            gradient.startPoint = startPoint
+            gradient.endPoint = endPoint
+            gradient.frame = bounds
+            layer.insertSublayer(gradient, at: 0)
+            fillLayer = gradient
+        case .image(let image):
+            let imageLayer = CALayer()
+            imageLayer.contents = image.cgImage
+            imageLayer.contentsGravity = .resizeAspectFill
+            imageLayer.frame = bounds
+            layer.insertSublayer(imageLayer, at: 0)
+            fillLayer = imageLayer
+        case nil:
+            break
+        }
+        if let stroke = stroke, stroke.width > 0 {
+            let shape = CAShapeLayer()
+            shape.fillColor = nil
+            shape.strokeColor = stroke.color.cgColor
+            shape.lineWidth = stroke.width * 2
+            layer.addSublayer(shape)
+            strokeLayer = shape
+        }
+        setNeedsLayout()
     }
 }
 
@@ -47,7 +107,7 @@ enum MessageBubbleStyler {
         var warningGreen: CGFloat = 0
         var warningBlue: CGFloat = 0
         var warningAlpha: CGFloat = 0
-        ChatUIKitTheme.colors.textColorWarning.resolvedColor(with: traitCollection).getRed(&warningRed, green: &warningGreen, blue: &warningBlue, alpha: &warningAlpha)
+        TUIChatKitTheme.colors.textColorWarning.resolvedColor(with: traitCollection).getRed(&warningRed, green: &warningGreen, blue: &warningBlue, alpha: &warningAlpha)
         let lightenRatio = isDarkBubble ? highlightDarkBubbleLightenRatio : 0
         let flashColor = UIColor(
             red: warningRed + (1 - warningRed) * lightenRatio,
@@ -63,17 +123,20 @@ enum MessageBubbleStyler {
 
     static func apply(to bubble: UIView, isSelf: Bool, isLeft: Bool) {
         bubble.clipsToBounds = true
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         bubble.backgroundColor = isSelf ? colors.bgColorBubbleOwn : colors.bgColorBubbleReciprocal
         updateBubbleMask(for: bubble, isLeft: isLeft)
     }
 
     static func updateBubbleMask(for bubble: UIView, isLeft: Bool) {
         guard bubble.bounds.width > 0, bubble.bounds.height > 0 else { return }
-        let maskLayer = CAShapeLayer()
         let isRTL = bubble.effectiveUserInterfaceLayoutDirection == .rightToLeft
-        maskLayer.path = bubblePath(in: bubble.bounds, isLeft: isLeft != isRTL).cgPath
-        bubble.layer.mask = maskLayer
+        let path = bubblePath(in: bubble.bounds, isLeft: isLeft != isRTL).cgPath
+        let maskLayer = (bubble.layer.mask as? CAShapeLayer) ?? CAShapeLayer()
+        maskLayer.path = path
+        if bubble.layer.mask !== maskLayer {
+            bubble.layer.mask = maskLayer
+        }
     }
 
     static func squaredCornerMask(isLeft: Bool) -> CACornerMask {
@@ -81,6 +144,30 @@ enum MessageBubbleStyler {
             return [.layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         }
         return [.layerMinXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+    }
+
+    static func customBubblePath(in rect: CGRect, radii: (topLeft: CGFloat, topRight: CGFloat, bottomLeft: CGFloat, bottomRight: CGFloat)) -> UIBezierPath {
+        let maxRadius = min(rect.width, rect.height) / 2
+        let tl = min(radii.topLeft, maxRadius)
+        let tr = min(radii.topRight, maxRadius)
+        let bl = min(radii.bottomLeft, maxRadius)
+        let br = min(radii.bottomRight, maxRadius)
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: rect.minX + tl, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX - tr, y: rect.minY))
+        path.addArc(withCenter: CGPoint(x: rect.maxX - tr, y: rect.minY + tr), radius: tr,
+                    startAngle: -.pi / 2, endAngle: 0, clockwise: true)
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - br))
+        path.addArc(withCenter: CGPoint(x: rect.maxX - br, y: rect.maxY - br), radius: br,
+                    startAngle: 0, endAngle: .pi / 2, clockwise: true)
+        path.addLine(to: CGPoint(x: rect.minX + bl, y: rect.maxY))
+        path.addArc(withCenter: CGPoint(x: rect.minX + bl, y: rect.maxY - bl), radius: bl,
+                    startAngle: .pi / 2, endAngle: .pi, clockwise: true)
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + tl))
+        path.addArc(withCenter: CGPoint(x: rect.minX + tl, y: rect.minY + tl), radius: tl,
+                    startAngle: .pi, endAngle: -.pi / 2, clockwise: true)
+        path.close()
+        return path
     }
 
     private static func bubblePath(in rect: CGRect, isLeft: Bool) -> UIBezierPath {

@@ -35,7 +35,7 @@ final class ForwardConversationCell: UITableViewCell {
     }
 
     func configure(conversation: ConversationInfo, isSelected: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         contentView.backgroundColor = colors.bgColorOperate
         titleLabel.textColor = colors.textColorPrimary
 
@@ -47,7 +47,7 @@ final class ForwardConversationCell: UITableViewCell {
     }
 
     private func setupUI() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         contentView.backgroundColor = colors.bgColorOperate
 
         contentView.addSubview(checkboxView)
@@ -88,7 +88,7 @@ final class ForwardConversationCell: UITableViewCell {
     }
 
     private func updateCheckbox(isSelected: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         if isSelected {
             let config = UIImage.SymbolConfiguration(pointSize: Self.checkboxIconPointSize, weight: .regular)
             let image = UIImage(systemName: "checkmark.circle.fill", withConfiguration: config)
@@ -106,7 +106,7 @@ final class ForwardConversationCell: UITableViewCell {
         let size = CGSize(width: Self.avatarSize, height: Self.avatarSize)
         let renderer = UIGraphicsImageRenderer(size: size)
         return renderer.image { context in
-            let colors = ChatUIKitTheme.colors
+            let colors = TUIChatKitTheme.colors
             colors.buttonColorPrimaryDefault.setFill()
             context.fill(CGRect(origin: .zero, size: size))
             let initial = String(name.prefix(1)).uppercased()

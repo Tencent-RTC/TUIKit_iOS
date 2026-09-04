@@ -62,7 +62,7 @@ final class MessageFileContentView: UIView, MessageContentView {
         self.message = message
         guard case .file(let payload) = message.messagePayload else { return }
 
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let isSelf = context.isSelf
         iconView.image = AtomicXChatResources.image(named: Self.fileTypeIcon(for: payload.fileName ?? ""))
         nameLabel.text = payload.fileName ?? LocalizedChatString("UnknownFile")

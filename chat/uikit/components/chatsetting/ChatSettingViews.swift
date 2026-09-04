@@ -24,7 +24,7 @@ public class ChatSettingBaseViewController: UIViewController {
 
     private let statusBarBackgroundView = UIView()
 
-    private let backButton = UIButton(type: .custom)
+    private let backButton = ExpandedHitButton(type: .custom)
 
     private let titleLabel = UILabel()
 
@@ -133,7 +133,7 @@ public class ChatSettingBaseViewController: UIViewController {
     }
 
     private func setupNavigationBarStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         statusBarBackgroundView.backgroundColor = colors.bgColorOperate
         navigationBar.backgroundColor = colors.bgColorOperate
         divider.backgroundColor = colors.strokeColorSecondary
@@ -273,7 +273,7 @@ final class ChatSettingRowView: UIControl {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.font = FontScheme.caption1Regular
         titleLabel.textColor = colors.textColorSecondary
@@ -335,7 +335,7 @@ final class ChatSettingToggleRowView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         titleLabel.font = FontScheme.caption1Regular
         titleLabel.textColor = colors.textColorSecondary
@@ -367,7 +367,7 @@ final class ChatSettingActionRowView: UIControl {
             make.top.equalToSuperview().offset(Self.verticalPadding)
             make.bottom.equalToSuperview().offset(-Self.verticalPadding)
         }
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         titleLabel.font = .systemFont(ofSize: Self.fontSize)
         titleLabel.textColor = textColor
         titleLabel.text = title
@@ -386,7 +386,7 @@ private let chatSettingRowDividerHeight: CGFloat = 0.5
 
 func makeChatSettingSectionSpacer() -> UIView {
     let spacer = UIView()
-    spacer.backgroundColor = ChatUIKitTheme.colors.bgColorTopBar
+    spacer.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
     spacer.snp.makeConstraints { make in
         make.height.equalTo(chatSettingSectionSpacerHeight)
     }
@@ -395,7 +395,7 @@ func makeChatSettingSectionSpacer() -> UIView {
 
 func makeChatSettingRowDivider() -> UIView {
     let divider = UIView()
-    divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+    divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
     divider.snp.makeConstraints { make in
         make.height.equalTo(chatSettingRowDividerHeight)
     }

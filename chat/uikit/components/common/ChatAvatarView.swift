@@ -51,14 +51,14 @@ public final class ChatAvatarView: UIView {
 
     public init(cornerRadius: CGFloat = 4, fontSize: CGFloat = 16) {
         super.init(frame: .zero)
-        backgroundColor = ChatUIKitTheme.colors.bgColorAvatar
+        backgroundColor = TUIChatKitTheme.colors.bgColorAvatar
         layer.cornerRadius = cornerRadius
         layer.masksToBounds = true
 
         imageView.contentMode = .scaleAspectFill
         imageView.isHidden = true
         textLabel.font = .systemFont(ofSize: fontSize, weight: .medium)
-        textLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        textLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         textLabel.textAlignment = .center
 
         addSubview(imageView)

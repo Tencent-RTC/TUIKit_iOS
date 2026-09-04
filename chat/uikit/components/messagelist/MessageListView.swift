@@ -5,7 +5,7 @@ import AtomicXCore
 public typealias MessageMatcher = (MessageInfo) -> Bool
 
 public protocol MessageListConfigProtocol {
-    var alignment: Int { get }
+    var alignment: MessageAlignment { get }
     var isShowTimeMessage: Bool { get }
     var isShowLeftAvatar: Bool { get }
     var isShowLeftNickname: Bool { get }
@@ -18,17 +18,41 @@ public protocol MessageListConfigProtocol {
     var horizontalPadding: CGFloat { get }
     var avatarSpacing: CGFloat { get }
     var isSupportReaction: Bool { get }
+    var isSupportQuote: Bool { get }
     var enableTyping: Bool { get }
     var messageExclusionMatchers: [MessageMatcher] { get }
+    var background: MessageListBackground? { get }
+    var defaultBubbleAppearance: MessageBubbleAppearance? { get }
+    var ownBubbleAppearance: MessageBubbleAppearance? { get }
+    var incomingBubbleAppearance: MessageBubbleAppearance? { get }
+    var leftBubbleAppearance: MessageBubbleAppearance? { get }
+    var rightBubbleAppearance: MessageBubbleAppearance? { get }
 }
 
 extension MessageListConfigProtocol {
+    public var isSupportQuote: Bool { true }
     public var enableTyping: Bool { true }
     public var messageExclusionMatchers: [MessageMatcher] { [] }
-}
+    public var background: MessageListBackground? { nil }
+    public var defaultBubbleAppearance: MessageBubbleAppearance? { nil }
+    public var ownBubbleAppearance: MessageBubbleAppearance? { nil }
+    public var incomingBubbleAppearance: MessageBubbleAppearance? { nil }
+    public var leftBubbleAppearance: MessageBubbleAppearance? { nil }
+    public var rightBubbleAppearance: MessageBubbleAppearance? { nil }
 
-extension MessageListConfigProtocol {
-    var isSupportQuote: Bool { true }
+    public func resolvedBubbleAppearance(isSelf: Bool, isLeft: Bool) -> MessageBubbleAppearance? {
+        let slot: MessageBubbleAppearance?
+        switch alignment {
+        case .left:
+            slot = leftBubbleAppearance
+        case .right:
+            slot = rightBubbleAppearance
+        case .twoSided:
+            slot = isSelf ? ownBubbleAppearance : incomingBubbleAppearance
+        }
+        guard let slot = slot else { return defaultBubbleAppearance }
+        return slot.merged(over: defaultBubbleAppearance)
+    }
 }
 
 public protocol MessageActionConfigProtocol {
@@ -36,6 +60,7 @@ public protocol MessageActionConfigProtocol {
     var isSupportDelete: Bool { get }
     var isSupportRecall: Bool { get }
     var isSupportForward: Bool { get }
+    var isSupportQuote: Bool { get }
     var isSupportMultiSelect: Bool { get }
     var isSupportConvertToText: Bool { get }
     var isSupportTranslate: Bool { get }
@@ -44,24 +69,13 @@ public protocol MessageActionConfigProtocol {
 }
 
 extension MessageActionConfigProtocol {
+    public var isSupportQuote: Bool { true }
     public var actionCustomizer: MessageActionCustomizer? { nil }
 }
 
 extension ChatMessageListConfig: MessageListConfigProtocol, MessageActionConfigProtocol {
-    public var alignment: Int {
-        if let userAlignment = userAlignment {
-            return userAlignment
-        } else {
-            let config = AppBuilderConfig.shared
-            switch config.messageAlignment {
-            case .left:
-                return 1
-            case .right:
-                return 2
-            case .twoSided:
-                return 0
-            }
-        }
+    public var alignment: MessageAlignment {
+        return userAlignment ?? AppBuilderConfig.shared.messageAlignment
     }
 
     public var isShowTimeMessage: Bool {
@@ -128,7 +142,19 @@ extension ChatMessageListConfig: MessageListConfigProtocol, MessageActionConfigP
     }
 
     public var isSupportForward: Bool {
-        return userIsSupportForward ?? true
+        if let userIsSupportForward = userIsSupportForward {
+            return userIsSupportForward
+        } else {
+            return AppBuilderConfig.shared.messageActionList.contains(.forward)
+        }
+    }
+
+    public var isSupportQuote: Bool {
+        if let userIsSupportQuote = userIsSupportQuote {
+            return userIsSupportQuote
+        } else {
+            return AppBuilderConfig.shared.messageActionList.contains(.quote)
+        }
     }
 
     public var isSupportMultiSelect: Bool {
@@ -165,6 +191,30 @@ extension ChatMessageListConfig: MessageListConfigProtocol, MessageActionConfigP
 
     public var enableTyping: Bool {
         return userEnableTyping ?? true
+    }
+
+    public var background: MessageListBackground? {
+        return userBackground
+    }
+
+    public var defaultBubbleAppearance: MessageBubbleAppearance? {
+        return userDefaultBubbleAppearance
+    }
+
+    public var ownBubbleAppearance: MessageBubbleAppearance? {
+        return userOwnBubbleAppearance
+    }
+
+    public var incomingBubbleAppearance: MessageBubbleAppearance? {
+        return userIncomingBubbleAppearance
+    }
+
+    public var leftBubbleAppearance: MessageBubbleAppearance? {
+        return userLeftBubbleAppearance
+    }
+
+    public var rightBubbleAppearance: MessageBubbleAppearance? {
+        return userRightBubbleAppearance
     }
 
     public var messageExclusionMatchers: [MessageMatcher] {

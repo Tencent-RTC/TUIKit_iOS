@@ -55,7 +55,7 @@ final class ForwardContactPickerViewController: UIViewController {
     }
 
     private func setupUI() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
 
         let topBar = UIView()

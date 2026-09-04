@@ -171,22 +171,17 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func setupNavigationBar() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         title = LocalizedChatString("CreateGroupTitle")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: AtomicXChatResources.image(named: "contact_info_back")?
-                .withRenderingMode(.alwaysTemplate)
-                ?? UIImage(systemName: "chevron.left")?
-                .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.backButtonSymbolPointSize, weight: .semibold)),
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleCancel)
+            action: #selector(handleCancel),
+            tintColor: colors.textColorPrimary
         )
-        navigationItem.leftBarButtonItem?.tintColor = colors.textColorPrimary
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         bottomBar.backgroundColor = colors.bgColorOperate
         contentStack.axis = .vertical
@@ -227,7 +222,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func makeEditableRow(title: String, field: UITextField, hint: String) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIView()
         row.backgroundColor = colors.bgColorTopBar
 
@@ -269,7 +264,7 @@ final class ConfigGroupInfoViewController: UIViewController {
 
     private func makeDivider() -> UIView {
         let divider = UIView()
-        divider.backgroundColor = ChatUIKitTheme.colors.strokeColorPrimary
+        divider.backgroundColor = TUIChatKitTheme.colors.strokeColorPrimary
         divider.snp.makeConstraints { make in
             make.height.equalTo(Self.dividerHeight)
         }
@@ -277,7 +272,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func makeGroupTypeRow() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let row = UIControl()
         row.backgroundColor = colors.bgColorTopBar
         row.addTarget(self, action: #selector(handleSelectGroupType), for: .touchUpInside)
@@ -321,7 +316,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     private func makeDescContainer() -> UIView {
         let container = UIView()
         groupTypeDescLabel.font = FontScheme.caption3Regular
-        groupTypeDescLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        groupTypeDescLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         groupTypeDescLabel.numberOfLines = 0
         container.addSubview(groupTypeDescLabel)
         groupTypeDescLabel.snp.makeConstraints { make in
@@ -334,7 +329,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func makeAvatarSection() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorTopBar
 
@@ -413,7 +408,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func makeMembersSection() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorTopBar
 
@@ -473,7 +468,7 @@ final class ConfigGroupInfoViewController: UIViewController {
     }
 
     private func refreshCreateButtonState() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let nameEmpty = (groupNameField.text ?? "").isEmpty
         let enabled = !nameEmpty && !members.isEmpty
         createButton.isEnabled = enabled
@@ -680,19 +675,14 @@ private final class ChooseGroupTypeViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorTopBar
         title = LocalizedChatString("ConfigSelectGroupTypeTitle")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: AtomicXChatResources.image(named: "contact_info_back")?
-                .withRenderingMode(.alwaysTemplate)
-                ?? UIImage(systemName: "chevron.left")?
-                .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.backButtonSymbolPointSize, weight: .semibold)),
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleBack)
+            action: #selector(handleBack),
+            tintColor: colors.textColorPrimary
         )
-        navigationItem.leftBarButtonItem?.tintColor = colors.textColorPrimary
 
         let scrollView = UIScrollView()
         view.addSubview(scrollView)
@@ -714,7 +704,7 @@ private final class ChooseGroupTypeViewController: UIViewController {
     }
 
     private func makeOption(_ type: GroupTypeSelection) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let isSelected = type == selected
 
         let card = GroupTypeOptionControl(type: type) { [weak self] selectedType in
@@ -834,7 +824,7 @@ private final class GroupAvatarGridItem: UIControl {
 
     func setSelected(_ selected: Bool) {
         layer.borderWidth = selected ? Self.selectedBorderWidth : 0
-        layer.borderColor = ChatUIKitTheme.colors.textColorLink.cgColor
+        layer.borderColor = TUIChatKitTheme.colors.textColorLink.cgColor
     }
 
     @objc private func handleTap() {

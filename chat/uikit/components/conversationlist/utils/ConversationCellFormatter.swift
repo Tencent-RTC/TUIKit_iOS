@@ -43,7 +43,7 @@ enum ConversationCellFormatter {
     // MARK: - Subtitle
 
     static func subtitleAttributedText(for conversation: ConversationInfo) -> NSAttributedString {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
 
         let font = FontScheme.caption2Regular
         let secondary = colors.textColorSecondary

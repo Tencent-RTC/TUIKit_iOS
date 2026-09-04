@@ -37,7 +37,7 @@ final class ContactSearchResultCell: UIControl {
     func configure(avatarURL: String?, name: String, identityLabelText: String, identityValue: String, tip: String? = nil) {
         avatar.configure(avatarURL: avatarURL, fallbackName: name)
         nameLabel.text = name
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let fullText = String(format: LocalizedChatString("ContactLabelValueFormat"), identityLabelText, identityValue)
         let attributed = NSMutableAttributedString(
             string: fullText,
@@ -81,7 +81,7 @@ final class ContactSearchResultCell: UIControl {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         nameLabel.font = FontScheme.caption1Regular
         nameLabel.textColor = colors.textColorPrimary

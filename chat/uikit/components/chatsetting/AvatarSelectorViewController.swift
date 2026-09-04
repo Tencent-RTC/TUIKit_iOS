@@ -80,7 +80,7 @@ public final class AvatarSelectorViewController: ChatSettingBaseViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         collectionView?.backgroundColor = colors.bgColorOperate
         doneButton.setTitle(LocalizedChatString("Done"), for: .normal)
@@ -193,11 +193,11 @@ private final class AvatarSelectorCell: UICollectionViewCell {
         avatarImageView.contentMode = .scaleAspectFill
         avatarImageView.layer.cornerRadius = AvatarSelectorViewController.cellCornerRadius
         avatarImageView.layer.masksToBounds = true
-        avatarImageView.backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        avatarImageView.backgroundColor = TUIChatKitTheme.colors.bgColorInput
         selectionBorderView.layer.cornerRadius = AvatarSelectorViewController.cellCornerRadius
         selectionBorderView.layer.borderWidth = AvatarSelectorViewController.selectedBorderWidth
-        selectionBorderView.layer.borderColor = ChatUIKitTheme.colors.textColorLink.cgColor
+        selectionBorderView.layer.borderColor = TUIChatKitTheme.colors.textColorLink.cgColor
         checkmarkImageView.image = UIImage(systemName: "checkmark.circle.fill")
-        checkmarkImageView.tintColor = ChatUIKitTheme.colors.textColorLink
+        checkmarkImageView.tintColor = TUIChatKitTheme.colors.textColorLink
     }
 }

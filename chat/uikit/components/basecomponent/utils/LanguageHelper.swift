@@ -24,7 +24,7 @@ public class LanguageHelper {
     }
 
     class func localizedChatString(_ key: String) -> String {
-        return getLocalizedString(forKey: key, bundle: "ChatLocalizable", classType: LanguageHelper.self, frameworkName: "ChatUIKitBundle")
+        return getLocalizedString(forKey: key, bundle: "ChatLocalizable", classType: LanguageHelper.self, frameworkName: "TUIChatKitBundle")
     }
 
 

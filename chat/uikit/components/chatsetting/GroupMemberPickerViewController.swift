@@ -107,11 +107,11 @@ final class GroupMemberPickerViewController: ChatSettingBaseViewController {
     }
 
     private func setupViewStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 
     private func setupNavActions() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         setNavBackHidden(true)
         cancelButton.setTitle(LocalizedChatString("Cancel"), for: .normal)
         cancelButton.titleLabel?.font = FontScheme.caption1Regular
@@ -237,7 +237,7 @@ final class GroupMemberPickerViewController: ChatSettingBaseViewController {
 
     private func updateConfirmButton() {
         guard usesNavConfirm else { return }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let hasSelection = !currentSelection.isEmpty
         confirmButton.setTitleColor(hasSelection ? colors.textColorLink : colors.textColorDisable, for: .normal)
     }

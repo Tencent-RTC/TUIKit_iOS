@@ -121,8 +121,8 @@ final class AddContactViewController: ChatSettingBaseViewController {
             make.top.equalTo(contentTopItem)
             make.leading.trailing.bottom.equalToSuperview()
         }
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorDefault
-        contentContainer.backgroundColor = ChatUIKitTheme.colors.bgColorDefault
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorDefault
+        contentContainer.backgroundColor = TUIChatKitTheme.colors.bgColorDefault
         onBack = { [weak self] in
             self?.handleStepBack()
         }
@@ -287,7 +287,7 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeInfoCard() -> UIView {
         let card = UIView()
-        card.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        card.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         card.addSubview(avatarView)
         let textStack = UIStackView(arrangedSubviews: [nameLabel, userIDLabel, signatureLabel])
         textStack.axis = .vertical
@@ -309,7 +309,7 @@ final class AddContactViewController: ChatSettingBaseViewController {
             make.top.greaterThanOrEqualToSuperview().offset(Self.infoCardVerticalPadding)
             make.bottom.lessThanOrEqualToSuperview().offset(-Self.infoCardVerticalPadding)
         }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         nameLabel.font = FontScheme.caption1Bold
         nameLabel.textColor = colors.textColorPrimary
         nameLabel.lineBreakMode = .byTruncatingTail
@@ -339,7 +339,7 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeSectionSpacer() -> UIView {
         let spacer = UIView()
-        spacer.backgroundColor = ChatUIKitTheme.colors.bgColorDefault
+        spacer.backgroundColor = TUIChatKitTheme.colors.bgColorDefault
         spacer.snp.makeConstraints { make in
             make.height.equalTo(Self.sectionSpacerHeight)
         }
@@ -348,11 +348,11 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeSectionTitle(_ text: String) -> UIView {
         let container = UIView()
-        container.backgroundColor = ChatUIKitTheme.colors.bgColorDefault
+        container.backgroundColor = TUIChatKitTheme.colors.bgColorDefault
         let label = UILabel()
         label.text = text
         label.font = FontScheme.caption2Regular
-        label.textColor = ChatUIKitTheme.colors.textColorSecondary
+        label.textColor = TUIChatKitTheme.colors.textColorSecondary
         container.addSubview(label)
         label.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(UIEdgeInsets(
@@ -367,11 +367,11 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeActionCard(title: String, action: Selector) -> UIView {
         let row = UIControl()
-        row.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        row.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         let label = UILabel()
         label.text = title
         label.font = FontScheme.caption1Regular
-        label.textColor = ChatUIKitTheme.colors.textColorLink
+        label.textColor = TUIChatKitTheme.colors.textColorLink
         label.textAlignment = .center
         row.addSubview(label)
         label.snp.makeConstraints { make in
@@ -386,14 +386,14 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeWordingInputCard() -> UIView {
         let card = UIView()
-        card.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        card.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         card.addSubview(wordingTextView)
         wordingTextView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(Self.inputCardPadding)
             make.height.greaterThanOrEqualTo(Self.inputCardMinHeight - Self.inputCardPadding * 2)
         }
         wordingTextView.font = FontScheme.caption1Regular
-        wordingTextView.textColor = ChatUIKitTheme.colors.textColorPrimary
+        wordingTextView.textColor = TUIChatKitTheme.colors.textColorPrimary
         wordingTextView.backgroundColor = .clear
         wordingTextView.textContainer.lineFragmentPadding = 0
         wordingTextView.textContainerInset = .zero
@@ -402,11 +402,11 @@ final class AddContactViewController: ChatSettingBaseViewController {
 
     private func makeRemarkRow() -> UIView {
         let row = UIView()
-        row.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        row.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         let label = UILabel()
         label.text = LocalizedChatString("ContactListRemark")
         label.font = FontScheme.caption1Regular
-        label.textColor = ChatUIKitTheme.colors.textColorPrimary
+        label.textColor = TUIChatKitTheme.colors.textColorPrimary
         row.addSubview(label)
         row.addSubview(remarkTextField)
         label.snp.makeConstraints { make in
@@ -423,7 +423,7 @@ final class AddContactViewController: ChatSettingBaseViewController {
         }
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         remarkTextField.font = FontScheme.caption1Regular
-        remarkTextField.textColor = ChatUIKitTheme.colors.textColorPrimary
+        remarkTextField.textColor = TUIChatKitTheme.colors.textColorPrimary
         remarkTextField.textAlignment = LanguageHelper.isRTL ? .left : .right
         return row
     }

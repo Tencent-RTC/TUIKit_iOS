@@ -73,7 +73,7 @@ final class GroupListViewController: UIViewController {
     }
 
     private func setupStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 
     private func bindInteraction() {
@@ -120,7 +120,8 @@ final class GroupListViewController: UIViewController {
         AZOrderedListItem(
             userID: group.groupID,
             avatarURL: group.avatarURL,
-            title: ContactDisplayNameFormatter.name(for: group)
+            title: ContactDisplayNameFormatter.name(for: group),
+            extraData: group
         )
     }
 }

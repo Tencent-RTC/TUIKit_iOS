@@ -80,6 +80,8 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     private let onGroupMemberClick: ((String) -> Void)?
 
+    private let config: GroupChatSettingConfigProtocol
+
     private var groupName: String = ""
 
     private var avatar: String = ""
@@ -193,6 +195,7 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     public init(
         groupID: String,
+        config: GroupChatSettingConfigProtocol = GroupChatSettingConfig(),
         onSendMessageClick: (() -> Void)? = nil,
         onGroupDelete: (() -> Void)? = nil,
         onGroupMemberClick: ((String) -> Void)? = nil
@@ -201,6 +204,7 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         self.groupStore = GroupStore.shared
         self.memberStore = GroupMemberStore.create(groupID: groupID)
         self.conversationStore = ConversationListStore.create()
+        self.config = config
         self.onSendMessageClick = onSendMessageClick
         self.onGroupDelete = onGroupDelete
         self.onGroupMemberClick = onGroupMemberClick
@@ -215,6 +219,7 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         super.viewDidLoad()
         setNavTitle(LocalizedChatString("GroupChatInfoTitle"))
         constructViewHierarchy()
+        applyCustomItems()
         activateConstraints()
         setupViewStyle()
         bindInteraction()
@@ -253,17 +258,24 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         memberSection.addArrangedSubview(memberHeaderRow)
         memberSection.addArrangedSubview(gridContainer)
 
-        stackView.addArrangedSubview(headerView)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(memberSection)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(settingsSection)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(aliasRow)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(switchSection)
-        stackView.addArrangedSubview(makeChatSettingSectionSpacer())
-        stackView.addArrangedSubview(backgroundRow)
+        let showsAnySettingsRow = config.isShowNotice || config.isShowManagement
+            || config.isShowGroupType || config.isShowJoinMethod || config.isShowInviteMethod
+        let sections: [(UIView, Bool)] = [
+            (headerView, config.isShowHeader),
+            (memberSection, config.isShowMemberPreview),
+            (settingsSection, showsAnySettingsRow),
+            (aliasRow, config.isShowAlias),
+            (switchSection, config.isShowDoNotDisturb || config.isShowPin),
+            (backgroundRow, config.isShowChatBackground),
+        ]
+        var isFirstVisible = true
+        for (sectionView, isVisible) in sections where isVisible {
+            if !isFirstVisible {
+                stackView.addArrangedSubview(makeChatSettingSectionSpacer())
+            }
+            stackView.addArrangedSubview(sectionView)
+            isFirstVisible = false
+        }
         stackView.addArrangedSubview(actionSpacer)
         stackView.addArrangedSubview(actionSection)
     }
@@ -302,7 +314,7 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorTopBar
         scrollView.backgroundColor = colors.bgColorTopBar
         stackView.axis = .vertical
@@ -546,7 +558,7 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         let nameLabel = UILabel()
         nameLabel.text = gridDisplayName(for: member)
         nameLabel.font = FontScheme.caption3Regular
-        nameLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        nameLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         nameLabel.textAlignment = .center
         nameLabel.lineBreakMode = .byTruncatingTail
         container.addSubview(avatarView)
@@ -569,9 +581,9 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         let symbolBox = UILabel()
         symbolBox.text = symbol
         symbolBox.font = .systemFont(ofSize: Self.memberSymbolFontSize)
-        symbolBox.textColor = ChatUIKitTheme.colors.textColorSecondary
+        symbolBox.textColor = TUIChatKitTheme.colors.textColorSecondary
         symbolBox.textAlignment = .center
-        symbolBox.backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        symbolBox.backgroundColor = TUIChatKitTheme.colors.bgColorInput
         symbolBox.layer.cornerRadius = Self.memberSymbolCornerRadius
         symbolBox.layer.masksToBounds = true
         symbolBox.isUserInteractionEnabled = false
@@ -594,42 +606,50 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     private func rebuildSettingsSection() {
         settingsSection.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let canEditNotice = canPerformAction(.setGroupNotice)
-        let trimmedNotice = notice.trimmingCharacters(in: .whitespacesAndNewlines)
-        noticeRow.update(
-            value: trimmedNotice.isEmpty ? LocalizedChatString("GroupNoticeNull") : trimmedNotice,
-            accessory: canEditNotice ? .edit : .none
-        )
-        noticeRow.isEnabled = canEditNotice
-        settingsSection.addArrangedSubview(noticeRow)
-
-        if canPerformAction(.setGroupManagement) {
-            settingsSection.addArrangedSubview(makeChatSettingRowDivider())
-            settingsSection.addArrangedSubview(manageRow)
+        var rows: [UIView] = []
+        if config.isShowNotice {
+            let canEditNotice = canPerformAction(.setGroupNotice)
+            let trimmedNotice = notice.trimmingCharacters(in: .whitespacesAndNewlines)
+            noticeRow.update(
+                value: trimmedNotice.isEmpty ? LocalizedChatString("GroupNoticeNull") : trimmedNotice,
+                accessory: canEditNotice ? .edit : .none
+            )
+            noticeRow.isEnabled = canEditNotice
+            rows.append(noticeRow)
         }
-
-        settingsSection.addArrangedSubview(makeChatSettingRowDivider())
-        typeRow.update(value: groupTypeDisplayName, accessory: .none)
-        typeRow.isEnabled = false
-        settingsSection.addArrangedSubview(typeRow)
-
-        settingsSection.addArrangedSubview(makeChatSettingRowDivider())
-        let canEditJoin = canPerformAction(.setJoinGroupApprovalType)
-        joinRow.update(value: joinGroupDisplayName(joinGroupApprovalType), accessory: canEditJoin ? .arrow : .none)
-        joinRow.isEnabled = canEditJoin
-        settingsSection.addArrangedSubview(joinRow)
-
-        settingsSection.addArrangedSubview(makeChatSettingRowDivider())
-        let canEditInvite = canPerformAction(.setInviteToGroupApprovalType)
-        inviteRow.update(value: inviteOptionDisplayName(inviteToGroupApprovalType), accessory: canEditInvite ? .arrow : .none)
-        inviteRow.isEnabled = canEditInvite
-        settingsSection.addArrangedSubview(inviteRow)
+        if config.isShowManagement, canPerformAction(.setGroupManagement) {
+            rows.append(manageRow)
+        }
+        if config.isShowGroupType {
+            typeRow.update(value: groupTypeDisplayName, accessory: .none)
+            typeRow.isEnabled = false
+            rows.append(typeRow)
+        }
+        if config.isShowJoinMethod {
+            let canEditJoin = canPerformAction(.setJoinGroupApprovalType)
+            joinRow.update(value: joinGroupDisplayName(joinGroupApprovalType), accessory: canEditJoin ? .arrow : .none)
+            joinRow.isEnabled = canEditJoin
+            rows.append(joinRow)
+        }
+        if config.isShowInviteMethod {
+            let canEditInvite = canPerformAction(.setInviteToGroupApprovalType)
+            inviteRow.update(value: inviteOptionDisplayName(inviteToGroupApprovalType), accessory: canEditInvite ? .arrow : .none)
+            inviteRow.isEnabled = canEditInvite
+            rows.append(inviteRow)
+        }
+        for (index, row) in rows.enumerated() {
+            if index > 0 {
+                settingsSection.addArrangedSubview(makeChatSettingRowDivider())
+            }
+            settingsSection.addArrangedSubview(row)
+        }
+        settingsSection.isHidden = rows.isEmpty
     }
 
     private func rebuildSwitchSection() {
         switchSection.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let showDoNotDisturb = canPerformAction(.setDoNotDisturb)
-        let showPin = canPerformAction(.pinGroup)
+        let showDoNotDisturb = config.isShowDoNotDisturb && canPerformAction(.setDoNotDisturb)
+        let showPin = config.isShowPin && canPerformAction(.pinGroup)
         if showDoNotDisturb {
             switchSection.addArrangedSubview(doNotDisturbRow)
         }
@@ -644,30 +664,30 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     private func rebuildActionSection() {
         actionSection.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         var rows: [UIView] = []
-        if canPerformAction(.transferOwner) {
+        if config.isShowTransferOwner, canPerformAction(.transferOwner) {
             rows.append(makeActionRow(
                 titleKey: "GroupTransferOwner",
                 textColor: colors.textColorLink,
                 action: #selector(handleTransferTapped)
             ))
         }
-        if canPerformAction(.clearHistoryMessages) {
+        if config.isShowClearHistory, canPerformAction(.clearHistoryMessages) {
             rows.append(makeActionRow(
                 titleKey: "ClearAllChatHistory",
                 textColor: colors.textColorError,
                 action: #selector(handleClearHistoryTapped)
             ))
         }
-        if canPerformAction(.deleteAndQuit) {
+        if config.isShowDeleteAndQuit, canPerformAction(.deleteAndQuit) {
             rows.append(makeActionRow(
                 titleKey: "GroupProfileDeleteAndExit",
                 textColor: colors.textColorError,
                 action: #selector(handleQuitTapped)
             ))
         }
-        if canPerformAction(.dismissGroup) {
+        if config.isShowDismiss, canPerformAction(.dismissGroup) {
             rows.append(makeActionRow(
                 titleKey: "GroupProfileDissolve",
                 textColor: colors.textColorError,
@@ -682,6 +702,40 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
         }
         actionSection.isHidden = rows.isEmpty
         actionSpacer.isHidden = rows.isEmpty
+    }
+
+    private func applyCustomItems() {
+        guard let customizer = config.itemCustomizer else { return }
+        let editor = ChatSettingItemEditor<GroupChatSettingSection>()
+        customizer(editor)
+        var lastInsertedByAnchor: [UIView] = []
+        for (section, row) in editor.customRows {
+            guard let anchor = anchorView(for: section) else {
+                stackView.addArrangedSubview(row)
+                continue
+            }
+            let base = lastInsertedByAnchor.first(where: { $0 === anchor }) ?? anchor
+            if let index = stackView.arrangedSubviews.firstIndex(of: base) {
+                stackView.insertArrangedSubview(row, at: index + 1)
+            } else {
+                stackView.addArrangedSubview(row)
+            }
+            lastInsertedByAnchor.removeAll { $0 === anchor }
+            lastInsertedByAnchor.append(row)
+        }
+    }
+
+    private func anchorView(for section: GroupChatSettingSection) -> UIView? {
+        switch section {
+        case .header: return config.isShowHeader ? headerView : nil
+        case .memberPreview: return config.isShowMemberPreview ? memberSection : nil
+        case .settings: return settingsSection.isHidden ? nil : settingsSection
+        case .alias: return config.isShowAlias ? aliasRow : nil
+        case .switches: return switchSection.isHidden ? nil : switchSection
+        case .background: return config.isShowChatBackground ? backgroundRow : nil
+        case .actions: return actionSection.isHidden ? nil : actionSection
+        case .end: return nil
+        }
     }
 
     private func makeActionRow(titleKey: String, textColor: UIColor, action: Selector) -> ChatSettingActionRowView {

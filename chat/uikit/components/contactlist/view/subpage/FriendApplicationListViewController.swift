@@ -36,7 +36,7 @@ final class FriendApplicationListViewController: UIViewController {
         let label = UILabel()
         label.text = LocalizedChatString("ContactNoFriendApplication")
         label.font = .systemFont(ofSize: Self.emptyFontSize)
-        label.textColor = ChatUIKitTheme.colors.textColorSecondary
+        label.textColor = TUIChatKitTheme.colors.textColorSecondary
         label.textAlignment = .center
         label.isHidden = true
         return label
@@ -74,8 +74,8 @@ final class FriendApplicationListViewController: UIViewController {
     }
 
     private func setupStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
-        tableView.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
+        tableView.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 
     private func bindViewModel() {

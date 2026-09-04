@@ -129,7 +129,7 @@ final class MessageAudioContentView: UIView, MessageContentView {
     }
 
     private func applyColors(isSelf: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let contentColor = isSelf ? colors.textColorAntiPrimary : colors.textColorPrimary
         durationLabel.textColor = contentColor
         voiceIconView.setColor(contentColor)

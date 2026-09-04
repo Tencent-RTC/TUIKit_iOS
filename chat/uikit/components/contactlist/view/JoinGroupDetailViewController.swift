@@ -137,7 +137,7 @@ final class JoinGroupDetailViewController: ChatSettingBaseViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorDefault
         setNavTitle(LocalizedChatString("GroupDetailTitle"))
         contentStack.axis = .vertical

@@ -88,7 +88,7 @@ final class ReactionDetailViewController: UIViewController {
     // MARK: - User Ordering (自己置顶)
 
     private func setupUI() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
 
         tabScrollView.showsHorizontalScrollIndicator = false
         tabStack.axis = .horizontal
@@ -220,7 +220,7 @@ private final class ReactionTabButton: UIControl {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     private func buildUI(reaction: MessageReaction, isSelected: Bool) {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         layer.cornerRadius = Self.cornerRadius
         layer.borderWidth = isSelected ? Self.selectedBorderWidth : 0
         layer.borderColor = isSelected ? colors.buttonColorPrimaryDefault.cgColor : UIColor.clear.cgColor
@@ -275,7 +275,7 @@ private final class ReactionUserCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
         backgroundColor = .clear
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         nameLabel.font = FontScheme.caption2Medium
         nameLabel.textColor = colors.textColorPrimary
         hintLabel.font = FontScheme.caption3Regular

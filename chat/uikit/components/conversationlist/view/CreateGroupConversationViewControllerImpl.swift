@@ -98,7 +98,7 @@ final class CreateGroupConversationViewControllerImpl: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         bottomBar.backgroundColor = colors.bgColorOperate
         bottomDivider.backgroundColor = colors.strokeColorSecondary
@@ -165,7 +165,7 @@ final class CreateGroupConversationViewControllerImpl: RTCBaseView {
     }
 
     private func updateConfirmButton() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let count = currentSelection.count
         confirmButton.setTitle(String(format: LocalizedChatString("ConfirmSelectionFormat"), count), for: .normal)
         confirmButton.backgroundColor = count > 0 ? colors.textColorLink : colors.textColorDisable

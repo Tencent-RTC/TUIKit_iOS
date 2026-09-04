@@ -63,7 +63,7 @@ final class MessageTextContentView: UIView, MessageContentView {
     }
 
     private func applyText(_ text: String, isSelf: Bool) {
-        let textColor = isSelf ? ChatUIKitTheme.colors.textColorAntiPrimary : ChatUIKitTheme.colors.textColorPrimary
+        let textColor = isSelf ? TUIChatKitTheme.colors.textColorAntiPrimary : TUIChatKitTheme.colors.textColorPrimary
         textLabel.textAlignment = .natural
         if text.contains("[TUIEmoji_") {
             textLabel.attributedText = emojiAttributedString(from: text, textColor: textColor)

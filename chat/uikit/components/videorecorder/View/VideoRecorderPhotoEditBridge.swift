@@ -9,7 +9,7 @@ final class VideoRecorderPhotoEditBridge: NSObject {
                                image: UIImage,
                                onConfirm: @escaping (UIImage) -> Void,
                                onCancel: @escaping () -> Void) {
-        AlbumPickerCoreTheme.shared.currentPrimaryColor = ChatUIKitTheme.colors.buttonColorPrimaryDefault
+        AlbumPickerCoreTheme.shared.currentPrimaryColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
         let editor = VideoRecorderPhotoEditViewController(image: image, onConfirm: onConfirm, onCancel: onCancel)
         editor.modalPresentationStyle = .fullScreen
         source.present(editor, animated: true)

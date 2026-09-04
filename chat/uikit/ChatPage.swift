@@ -62,13 +62,15 @@ public final class ChatPage: UIViewController {
 
     private let onBack: (() -> Void)?
 
-    private let onUserAvatarClick: ((String) -> Void)?
+    private let onUserClick: ((String) -> Void)?
 
-    private let onNavigationAvatarClick: (() -> Void)?
+    private let onMoreClick: (() -> Void)?
+
+    private let isShowMoreButton: Bool
 
     private let navigationBar = UIView()
 
-    private let backButton = UIButton(type: .system)
+    private let backButton = ExpandedHitButton(type: .system)
 
     private let unreadBadgeView = UIView()
 
@@ -100,11 +102,7 @@ public final class ChatPage: UIViewController {
 
     private let messageInputConfig: MessageInputConfigProtocol
 
-    private lazy var messageListConfig: ChatMessageListConfig = {
-        var config = ChatMessageListConfig(isShowRightAvatar: true)
-        config.excludeCustomMessagesByBusinessID(MessageInputView.typingMessageBusinessID)
-        return config
-    }()
+    private let messageListConfig: MessageListConfigProtocol & MessageActionConfigProtocol
 
     private var typingCancellable: AnyCancellable?
 
@@ -115,7 +113,7 @@ public final class ChatPage: UIViewController {
             config: messageListConfig,
             locateMessage: locateMessage,
             onUserClick: { [weak self] userID in
-                self?.onUserAvatarClick?(userID)
+                self?.onUserClick?(userID)
             }
         )
         view.onMultiSelectModeChange = { [weak self] isMultiSelect in
@@ -150,17 +148,26 @@ public final class ChatPage: UIViewController {
     public init(
         conversation: ConversationInfo,
         locateMessage: MessageInfo? = nil,
+        messageListConfig: (MessageListConfigProtocol & MessageActionConfigProtocol) = ChatMessageListConfig(isShowRightAvatar: true),
         messageInputConfig: MessageInputConfigProtocol = ChatMessageInputConfig(),
+        isShowMoreButton: Bool = true,
         onBack: (() -> Void)? = nil,
-        onUserAvatarClick: ((String) -> Void)? = nil,
-        onNavigationAvatarClick: (() -> Void)? = nil
+        onUserClick: ((String) -> Void)? = nil,
+        onMoreClick: (() -> Void)? = nil
     ) {
         self.conversation = conversation
         self.locateMessage = locateMessage
+        if var listConfig = messageListConfig as? ChatMessageListConfig {
+            listConfig.excludeCustomMessagesByBusinessID(MessageInputView.typingMessageBusinessID)
+            self.messageListConfig = listConfig
+        } else {
+            self.messageListConfig = messageListConfig
+        }
         self.messageInputConfig = messageInputConfig
         self.onBack = onBack
-        self.onUserAvatarClick = onUserAvatarClick
-        self.onNavigationAvatarClick = onNavigationAvatarClick
+        self.onUserClick = onUserClick
+        self.onMoreClick = onMoreClick
+        self.isShowMoreButton = isShowMoreButton
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -180,7 +187,7 @@ public final class ChatPage: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        ChatUIKitLayoutDirection.install()
+        TUIChatKitLayoutDirection.install()
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
@@ -366,7 +373,7 @@ public final class ChatPage: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
 
         sendFailureBar.backgroundColor = colors.bgColorOperate
@@ -416,6 +423,7 @@ public final class ChatPage: UIViewController {
             for: .normal
         )
         moreButton.tintColor = colors.textColorSecondary
+        moreButton.isHidden = !isShowMoreButton
 
         cancelMultiSelectButton.setTitle(LocalizedChatString("Cancel"), for: .normal)
         cancelMultiSelectButton.setTitleColor(colors.textColorLink, for: .normal)
@@ -486,7 +494,7 @@ public final class ChatPage: UIViewController {
         messageInputView.isHidden = multiSelect
         inputCollapseConstraint?.isActive = multiSelect
         backButton.isHidden = multiSelect
-        moreButton.isHidden = multiSelect
+        moreButton.isHidden = multiSelect || !isShowMoreButton
         cancelMultiSelectButton.isHidden = !multiSelect
         updateUnreadBadge(latestUnreadTotal)
     }
@@ -500,6 +508,6 @@ public final class ChatPage: UIViewController {
     }
 
     @objc private func handleMoreTapped() {
-        onNavigationAvatarClick?()
+        onMoreClick?()
     }
 }

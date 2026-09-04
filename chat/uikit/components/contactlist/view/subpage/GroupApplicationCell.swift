@@ -149,7 +149,7 @@ final class GroupApplicationCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
         typeLabel.font = FontScheme.caption2Regular

@@ -72,7 +72,7 @@ final class ForwardTargetSelectorViewController: UIViewController {
     // MARK: - Actions
 
     private func setupUI() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
 
         view.addSubview(topBar)
@@ -186,7 +186,7 @@ final class ForwardTargetSelectorViewController: UIViewController {
     }
 
     private func buildTopBar() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let bar = UIView()
         bar.backgroundColor = colors.bgColorOperate
 
@@ -215,7 +215,7 @@ final class ForwardTargetSelectorViewController: UIViewController {
     }
 
     private func buildContactEntry() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let container = UIView()
         container.backgroundColor = colors.bgColorOperate
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleContactEntryTapped))
@@ -246,7 +246,7 @@ final class ForwardTargetSelectorViewController: UIViewController {
     }
 
     private func buildSectionLabel() -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let label = UILabel()
         label.text = LocalizedChatString("RelayRecentMessages")
         label.font = FontScheme.caption3Regular

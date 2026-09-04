@@ -22,7 +22,7 @@ final class AlbumPickerMediaSendCoordinator {
             return
         }
         guard let presenter = Self.topMostViewController() else { return }
-        AlbumPickerCoreTheme.shared.currentPrimaryColor = ChatUIKitTheme.colors.buttonColorPrimaryDefault
+        AlbumPickerCoreTheme.shared.currentPrimaryColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
 
         let pickerController = UIViewController()
         pickerController.modalPresentationStyle = .fullScreen
@@ -63,7 +63,7 @@ final class AlbumPickerMediaSendCoordinator {
     }
 
     private static func makeTheme() -> AlbumPickerTheme {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         return AlbumPickerTheme(
             currentPrimaryColor: colors.buttonColorPrimaryDefault
         )

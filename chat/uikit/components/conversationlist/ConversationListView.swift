@@ -2,7 +2,7 @@ import AtomicXCore
 import SnapKit
 import UIKit
 
-protocol ConversationActionConfigProtocol {
+public protocol ConversationActionConfigProtocol {
     var isSupportDelete: Bool { get }
     var isSupportMute: Bool { get }
     var isSupportPin: Bool { get }
@@ -11,12 +11,12 @@ protocol ConversationActionConfigProtocol {
     var actionCustomizer: ConversationActionCustomizer? { get }
 }
 
-extension ConversationActionConfigProtocol {
+public extension ConversationActionConfigProtocol {
     var actionCustomizer: ConversationActionCustomizer? { nil }
 }
 
-struct ChatConversationActionConfig: ConversationActionConfigProtocol {
-    var isSupportDelete: Bool {
+public struct ChatConversationActionConfig: ConversationActionConfigProtocol {
+    public var isSupportDelete: Bool {
         if let userIsSupportDelete = userIsSupportDelete {
             return userIsSupportDelete
         } else {
@@ -25,7 +25,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
         }
     }
 
-    var isSupportMute: Bool {
+    public var isSupportMute: Bool {
         if let userIsSupportMute = userIsSupportMute {
             return userIsSupportMute
         } else {
@@ -34,7 +34,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
         }
     }
 
-    var isSupportPin: Bool {
+    public var isSupportPin: Bool {
         if let userIsSupportPin = userIsSupportPin {
             return userIsSupportPin
         } else {
@@ -43,7 +43,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
         }
     }
 
-    var isSupportMarkUnread: Bool {
+    public var isSupportMarkUnread: Bool {
         if let userIsSupportMarkUnread = userIsSupportMarkUnread {
             return userIsSupportMarkUnread
         } else {
@@ -52,7 +52,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
         }
     }
 
-    var isSupportClearHistory: Bool {
+    public var isSupportClearHistory: Bool {
         if let userIsSupportClearHistory = userIsSupportClearHistory {
             return userIsSupportClearHistory
         } else {
@@ -69,7 +69,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
 
     private let userIsSupportMarkUnread: Bool?
 
-    var actionCustomizer: ConversationActionCustomizer? {
+    public var actionCustomizer: ConversationActionCustomizer? {
         return userActionCustomizer
     }
 
@@ -77,7 +77,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
 
     private let userActionCustomizer: ConversationActionCustomizer?
 
-    init() {
+    public init() {
         self.userIsSupportDelete = nil
         self.userIsSupportMute = nil
         self.userIsSupportPin = nil
@@ -86,7 +86,7 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
         self.userActionCustomizer = nil
     }
 
-    init(
+    public init(
         isSupportDelete: Bool? = nil,
         isSupportMute: Bool? = nil,
         isSupportPin: Bool? = nil,
@@ -103,9 +103,9 @@ struct ChatConversationActionConfig: ConversationActionConfigProtocol {
     }
 }
 
-typealias ConversationActionCustomizer = (CustomEditor<ConversationCustomAction>) -> Void
+public typealias ConversationActionCustomizer = (CustomEditor<ConversationCustomAction>) -> Void
 
-struct ConversationCustomAction: CustomItem {
+public struct ConversationCustomAction: CustomItem {
     public var ID: String
     public let title: String
     public let dangerous: Bool
@@ -118,7 +118,7 @@ struct ConversationCustomAction: CustomItem {
         self.action = action
     }
 
-    init(title: String, action: @escaping (ConversationInfo) -> Void) {
+    public init(title: String, action: @escaping (ConversationInfo) -> Void) {
         self.init(ID: UUID().uuidString, title: title, dangerous: false, action: action)
     }
 }

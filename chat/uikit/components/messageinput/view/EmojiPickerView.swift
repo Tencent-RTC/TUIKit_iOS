@@ -212,7 +212,7 @@ final class EmojiPickerView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         clipsToBounds = true
 
@@ -502,7 +502,7 @@ private final class EmojiSectionHeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         titleLabel.font = FontScheme.caption2Regular
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.titleLeadingInset)

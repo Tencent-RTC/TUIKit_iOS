@@ -176,7 +176,7 @@ final class MentionMemberPickerViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorInput
         headerBar.backgroundColor = colors.bgColorOperate
         atAllRow.backgroundColor = colors.bgColorOperate

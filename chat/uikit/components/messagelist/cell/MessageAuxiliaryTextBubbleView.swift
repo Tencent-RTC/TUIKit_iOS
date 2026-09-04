@@ -183,7 +183,7 @@ final class MessageAuxiliaryTextBubbleView: UIView {
     }
 
     private func applyColors() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = lastIsSelf ? colors.bgColorBubbleOwn : colors.bgColorBubbleReciprocal
         footerLabel.textColor = lastIsSelf
             ? colors.textColorAntiPrimary.withAlphaComponent(Self.footerSelfAlpha)
@@ -199,7 +199,7 @@ final class MessageAuxiliaryTextBubbleView: UIView {
         }
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineHeightMultiple = Self.contentLineHeightMultiple
-        let contentColor = lastIsSelf ? ChatUIKitTheme.colors.textColorAntiPrimary : ChatUIKitTheme.colors.textColorPrimary
+        let contentColor = lastIsSelf ? TUIChatKitTheme.colors.textColorAntiPrimary : TUIChatKitTheme.colors.textColorPrimary
         contentLabel.attributedText = NSAttributedString(string: text, attributes: [
             .font: FontScheme.caption2Regular,
             .foregroundColor: contentColor,

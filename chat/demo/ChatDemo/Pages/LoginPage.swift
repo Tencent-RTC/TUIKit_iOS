@@ -1,5 +1,5 @@
 import AtomicXCore
-import ChatUIKit
+import TUIChatKit
 import RTCRoomEngine
 import SnapKit
 import TUICallKit_Swift
@@ -73,7 +73,7 @@ final class AutoLoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         view.addSubview(loadingIndicator)
         loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()

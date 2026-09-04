@@ -116,7 +116,7 @@ final class SearchResultViewController: UIViewController {
     }
 
     private func setupStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorDefault
         topBackdropView.backgroundColor = colors.bgColorOperate
         tableView.backgroundColor = colors.bgColorDefault
@@ -360,15 +360,15 @@ final class SearchSectionHeaderView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = ChatUIKitTheme.colors.bgColorDefault
-        contentBackground.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorDefault
+        contentBackground.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         addSubview(contentBackground)
         contentBackground.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(Self.sectionTopGap)
             make.leading.trailing.bottom.equalToSuperview()
         }
         titleLabel.font = FontScheme.caption2Regular
-        titleLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         contentBackground.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.titleLeadingPadding)
@@ -398,10 +398,10 @@ final class SearchSectionMoreCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
-        backgroundColor = ChatUIKitTheme.colors.bgColorOperate
-        contentView.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
+        contentView.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         moreLabel.font = FontScheme.caption2Regular
-        moreLabel.textColor = ChatUIKitTheme.colors.textColorLink
+        moreLabel.textColor = TUIChatKitTheme.colors.textColorLink
         contentView.addSubview(moreLabel)
         moreLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.moreLeadingPadding)

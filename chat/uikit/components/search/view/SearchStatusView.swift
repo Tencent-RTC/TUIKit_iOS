@@ -114,7 +114,7 @@ final class SearchStatusView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         indicator.color = colors.textColorSecondary
         indicator.hidesWhenStopped = true
 

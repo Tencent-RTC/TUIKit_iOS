@@ -58,7 +58,7 @@ final class AtomicIndexBarView: UIView {
 
     override func draw(_ rect: CGRect) {
         guard !letters.isEmpty, let context = UIGraphicsGetCurrentContext() else { return }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let centerX = bounds.width / 2
 
         for (index, letter) in letters.enumerated() {

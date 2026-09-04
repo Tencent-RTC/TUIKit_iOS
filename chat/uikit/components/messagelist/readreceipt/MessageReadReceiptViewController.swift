@@ -87,7 +87,7 @@ final class MessageReadReceiptViewController: UIViewController, SystemNavigation
     override func viewDidLoad() {
         super.viewDidLoad()
         title = LocalizedChatString("MessageReadDetail")
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         setupNavigationBar()
         setupTabRow()
         setupTableView()
@@ -97,17 +97,11 @@ final class MessageReadReceiptViewController: UIViewController, SystemNavigation
     }
 
     private func setupNavigationBar() {
-        let backIcon = AtomicXChatResources.image(named: "contact_info_back")?
-            .withRenderingMode(.alwaysTemplate)
-            ?? UIImage(systemName: "chevron.left")?
-            .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.backIconPointSize, weight: .semibold))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: backIcon,
-            style: .plain,
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
             target: self,
-            action: #selector(handleClose)
+            action: #selector(handleClose),
+            tintColor: TUIChatKitTheme.colors.textColorPrimary
         )
-        navigationItem.leftBarButtonItem?.tintColor = ChatUIKitTheme.colors.textColorPrimary
     }
 
     private func setupTabRow() {
@@ -130,7 +124,7 @@ final class MessageReadReceiptViewController: UIViewController, SystemNavigation
         }
         readTabButton.addTarget(self, action: #selector(handleReadTabTap), for: .touchUpInside)
         unreadTabButton.addTarget(self, action: #selector(handleUnreadTabTap), for: .touchUpInside)
-        dividerView.backgroundColor = ChatUIKitTheme.colors.strokeColorSecondary
+        dividerView.backgroundColor = TUIChatKitTheme.colors.strokeColorSecondary
         view.addSubview(dividerView)
         dividerView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
@@ -221,7 +215,7 @@ final class MessageReadReceiptViewController: UIViewController, SystemNavigation
     }
 
     private func refreshTabState() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         readTabButton.setTitle("\(LocalizedChatString("MessageReadC2CRead")) (\(readMembers.count))", for: .normal)
         unreadTabButton.setTitle("\(LocalizedChatString("MessageReadC2CUnRead")) (\(unreadMembers.count))", for: .normal)
         readTabButton.backgroundColor = selectedReadTab ? colors.bgColorAvatar : colors.bgColorDefault
@@ -298,7 +292,7 @@ private final class ReceiptMemberCell: UITableViewCell {
             make.trailing.lessThanOrEqualToSuperview().offset(-(MessageReadReceiptViewController.contentHorizontalInset + MessageReadReceiptViewController.rowHorizontalInset))
         }
         nameLabel.font = FontScheme.caption2Regular
-        nameLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        nameLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
     }
 
     required init?(coder: NSCoder) {

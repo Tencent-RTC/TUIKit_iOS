@@ -33,7 +33,7 @@ final class MessageReactionBarView: UIView {
 
     private var lastReactionSignature = ""
 
-    private var contentWidth: CGFloat = 0 {
+    private(set) var contentWidth: CGFloat = 0 {
         didSet {
             if contentWidth != oldValue {
                 invalidateIntrinsicContentSize()
@@ -173,7 +173,7 @@ final class MessageReactionBarView: UIView {
     }
 
     private func makeChip(reaction: MessageReaction, isSelf: Bool) -> UIView {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let baseTextColor = isSelf ? colors.textColorAntiPrimary : colors.textColorPrimary
 
         let chip = UIView()

@@ -61,7 +61,7 @@ final class JoinGroupViewControllerImpl: RTCBaseView {
     }
 
     public override func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         searchBar.placeholder = LocalizedChatString("GroupID")
         resultCell.isHidden = true

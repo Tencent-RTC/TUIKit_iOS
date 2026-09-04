@@ -1,6 +1,6 @@
 import UIKit
 
-enum ChatUIKitLayoutDirection {
+enum TUIChatKitLayoutDirection {
     private static let installOnce: Void = {
         guard let originalMethod = class_getInstanceMethod(UIViewController.self, #selector(UIViewController.viewDidLoad)),
               let swizzledMethod = class_getInstanceMethod(UIViewController.self, #selector(UIViewController.chatUIKitLayoutDirection_viewDidLoad)) else {

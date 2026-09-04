@@ -1,4 +1,4 @@
-import ChatUIKit
+import TUIChatKit
 import SnapKit
 import UIKit
 
@@ -21,7 +21,7 @@ final class LocalLoginViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         constructViewHierarchy()
         activateConstraints()
         setupViewStyle()
@@ -79,7 +79,7 @@ final class LocalLoginViewController: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         logoImageView.image = UIImage(systemName: "bubble.left.and.bubble.right.fill")
         logoImageView.tintColor = colors.buttonColorPrimaryDefault
         logoImageView.contentMode = .scaleAspectFit
@@ -125,7 +125,7 @@ final class LocalLoginViewController: UIViewController {
     }
 
     private func refreshLoginButtonState() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let enabled = !(userIDField.text ?? "").isEmpty && !isLoggingIn
         loginButton.isEnabled = enabled
         loginButton.backgroundColor = enabled ? colors.buttonColorPrimaryDefault : colors.buttonColorPrimaryDisabled
@@ -145,8 +145,9 @@ final class LocalLoginViewController: UIViewController {
     }
 
     @objc private func handleLoginTapped() {
-        guard let appID = Int32(SDKAPPID) else {
+        guard let appID = Int32(SDKAPPID), appID > 0 else {
             errorLabel.text = LocalizedChatString("InvalidSDKAppID")
+            showConfigGuideAlert(errorMessage: nil)
             return
         }
         let userID = userIDField.text ?? ""
@@ -166,9 +167,26 @@ final class LocalLoginViewController: UIViewController {
                 self.dismiss(animated: true)
             } else {
                 self.errorLabel.text = errorMessage
+                self.showConfigGuideAlert(errorMessage: errorMessage)
             }
             self.refreshLoginButtonState()
         }
+    }
+
+    private func showConfigGuideAlert(errorMessage: String?) {
+        let message = (errorMessage ?? LocalizedChatString("LoginFailed"))
+            + "\n\n" + LocalizedChatString("LoginConfigGuide")
+        let alert = UIAlertController(
+            title: LocalizedChatString("LoginFailed"),
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: LocalizedChatString("ViewDocument"), style: .default) { _ in
+            guard let url = URL(string: "https://cloud.tencent.com/document/product/269/68228") else { return }
+            UIApplication.shared.open(url)
+        })
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
+        present(alert, animated: true)
     }
 }
 

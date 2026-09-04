@@ -44,7 +44,7 @@ final class MessageTongueView: UIControl {
     }
 
     private func buildUI() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.floatingColorDefault
         layer.cornerRadius = Style.cornerRadius
         layer.shadowColor = UIColor.black.cgColor

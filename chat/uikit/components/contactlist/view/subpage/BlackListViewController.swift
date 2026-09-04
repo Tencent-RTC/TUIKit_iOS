@@ -73,7 +73,7 @@ final class BlackListViewController: UIViewController {
     }
 
     private func setupStyle() {
-        view.backgroundColor = ChatUIKitTheme.colors.bgColorOperate
+        view.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
     }
 
     private func bindInteraction() {
@@ -129,7 +129,8 @@ final class BlackListViewController: UIViewController {
         AZOrderedListItem(
             userID: contact.userID,
             avatarURL: contact.avatarURL,
-            title: ContactDisplayNameFormatter.name(for: contact)
+            title: ContactDisplayNameFormatter.name(for: contact),
+            extraData: contact
         )
     }
 }

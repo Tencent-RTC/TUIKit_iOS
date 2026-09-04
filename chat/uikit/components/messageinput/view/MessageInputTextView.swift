@@ -227,7 +227,7 @@ final class MessageInputTextView: UIView {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         textView.font = Self.normalFont
         textView.backgroundColor = .clear
         textView.isScrollEnabled = false
@@ -265,7 +265,7 @@ final class MessageInputTextView: UIView {
     }
 
     private func resetTextStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         let wholeRange = NSRange(location: 0, length: textView.textStorage.length)
         textView.textStorage.removeAttribute(.font, range: wholeRange)
         textView.textStorage.removeAttribute(.foregroundColor, range: wholeRange)
@@ -334,7 +334,7 @@ extension MessageInputTextView: UITextViewDelegate {
             textView.textStorage.deleteCharacters(in: selectedRange)
         }
         let textChange = EmojiManager.shared.createAttributedStringWithTextAndStyle(
-            text: text, withFont: Self.normalFont, textColor: ChatUIKitTheme.colors.textColorPrimary
+            text: text, withFont: Self.normalFont, textColor: TUIChatKitTheme.colors.textColorPrimary
         )
         textView.textStorage.insert(textChange, at: selectedRange.location)
         let cursorLocation = selectedRange.location + textChange.length

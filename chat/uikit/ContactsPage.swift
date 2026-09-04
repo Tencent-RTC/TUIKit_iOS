@@ -11,9 +11,11 @@ public final class ContactsPage: UIViewController {
 
     private static let titleFontSize: CGFloat = 17
 
-    private let onContactClick: ((AZOrderedListItem) -> Void)?
+    private let onContactClick: ((ContactInfo) -> Void)?
 
-    private let onGroupClick: ((AZOrderedListItem) -> Void)?
+    private let onGroupClick: ((GroupInfo) -> Void)?
+
+    private let config: ContactListConfigProtocol
 
     private let headerView = UIView()
 
@@ -23,15 +25,18 @@ public final class ContactsPage: UIViewController {
 
     private lazy var contactListView = ContactListView(
         onContactClick: { [weak self] user in self?.onContactClick?(user) },
-        onGroupClick: { [weak self] group in self?.onGroupClick?(group) }
+        onGroupClick: { [weak self] group in self?.onGroupClick?(group) },
+        config: config
     )
 
     // MARK: - Init
 
     public init(
-        onContactClick: ((AZOrderedListItem) -> Void)? = nil,
-        onGroupClick: ((AZOrderedListItem) -> Void)? = nil
+        config: ContactListConfigProtocol = ChatContactListConfig(),
+        onContactClick: ((ContactInfo) -> Void)? = nil,
+        onGroupClick: ((GroupInfo) -> Void)? = nil
     ) {
+        self.config = config
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
         super.init(nibName: nil, bundle: nil)
@@ -45,7 +50,7 @@ public final class ContactsPage: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        ChatUIKitLayoutDirection.install()
+        TUIChatKitLayoutDirection.install()
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
@@ -89,7 +94,7 @@ public final class ContactsPage: UIViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         headerView.backgroundColor = colors.bgColorOperate
 
@@ -130,12 +135,7 @@ public final class ContactsPage: UIViewController {
     private func presentJoinGroup() {
         let joinGroup = JoinGroupViewController()
         joinGroup.onEnterGroupChat = { [weak self] group in
-            let item = AZOrderedListItem(
-                userID: group.groupID,
-                avatarURL: group.avatarURL,
-                title: ContactDisplayFormatter.name(for: group)
-            )
-            self?.onGroupClick?(item)
+            self?.onGroupClick?(group)
         }
         joinGroup.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(joinGroup, animated: true)

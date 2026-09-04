@@ -97,7 +97,7 @@ final class AZOrderedListCell: UITableViewCell {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
 

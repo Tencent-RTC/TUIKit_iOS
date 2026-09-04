@@ -5,13 +5,13 @@ import Kingfisher
 
 let defaultEmojiSize = CGSize(width: 23, height: 23)
 class EmojiBundleHelper {
-    static var bundlePath: String = BundleHelper.getBundlePath(bundleName: "EmojiFace", classType: EmojiBundleHelper.self, frameworkName: "ChatUIKitBundle")
+    static var bundlePath: String = BundleHelper.getBundlePath(bundleName: "EmojiFace", classType: EmojiBundleHelper.self, frameworkName: "TUIChatKitBundle")
     static func appendPath(_ path: String) -> String {
         return (bundlePath as NSString).appendingPathComponent(path)
     }
 
     static func getLocalizedString(_ key: String) -> String {
-        return LanguageHelper.getLocalizedString(forKey: key, bundle: "EmojiFace", classType: EmojiBundleHelper.self, frameworkName: "ChatUIKitBundle")
+        return LanguageHelper.getLocalizedString(forKey: key, bundle: "EmojiFace", classType: EmojiBundleHelper.self, frameworkName: "TUIChatKitBundle")
     }
 }
 

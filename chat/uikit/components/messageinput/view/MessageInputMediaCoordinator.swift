@@ -19,7 +19,9 @@ final class MessageInputMediaCoordinator: NSObject {
 
     private var currentGestureState: AudioRecorderRecordUiState = .recording
 
-    private let recordMaxDurationMs: Int = 60000
+    private var recordMaxDurationMs: Int {
+        return viewModel.config.audioMaxRecordDurationMs
+    }
 
     private var lastReleaseAction: AudioRecorderReleaseAction = .sendAudio
 

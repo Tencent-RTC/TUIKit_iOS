@@ -1,12 +1,10 @@
 import AtomicXCore
-import ChatUIKit
+import TUIChatKit
 import Combine
 import TUICallKit_Swift
 import UIKit
 
 final class HomeTabBarController: UITabBarController {
-    static var lastSelectedIndex = 0
-
     private static let showCallsTabKey = "show_calls_tab"
 
     static var isCallsTabVisible: Bool {
@@ -49,6 +47,10 @@ final class HomeTabBarController: UITabBarController {
 
     private static let badgeVerticalOffset: CGFloat = 4
 
+    private static let tabBarContentTopInset: CGFloat = 8
+
+    private static let tabIconSizeTolerance: CGFloat = 8
+
     private static let badgePressScale: CGFloat = 1.08
 
     private static let badgeDragMaxScaleGain: CGFloat = 0.2
@@ -63,7 +65,26 @@ final class HomeTabBarController: UITabBarController {
 
     private let messageUnreadBadge = TabUnreadBadgeView()
 
+    private let contactsUnreadBadge = TabUnreadBadgeView()
+
     private var isDraggingMessageBadge = false
+
+    private var didForceRebuildTabItems = false
+
+    private let initialSelectedIndex: Int
+
+    init(initialSelectedIndex: Int = 0) {
+        self.initialSelectedIndex = initialSelectedIndex
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private static var contactsTabIndex: Int {
+        return isCallsTabVisible ? 2 : 1
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,9 +94,28 @@ final class HomeTabBarController: UITabBarController {
         bindUnreadBadge()
         bindContactsBadge()
         bindTheme()
-        delegate = self
-        selectedIndex = Self.lastSelectedIndex
         conversationListStore.loadConversations(option: nil, completion: nil)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateTabBarAppearance()
+        tabBar.setNeedsLayout()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if !self.didForceRebuildTabItems {
+                self.didForceRebuildTabItems = true
+                self.setupTabs()
+                let maxIndex = (self.viewControllers?.count ?? 1) - 1
+                self.selectedIndex = min(self.initialSelectedIndex, maxIndex)
+            }
+            self.updateTabBarAppearance()
+            self.tabBar.setNeedsLayout()
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -83,6 +123,7 @@ final class HomeTabBarController: UITabBarController {
         if !isDraggingMessageBadge {
             updateMessageBadgePosition()
         }
+        updateContactsBadgePosition()
     }
 
     private func setupTabs() {
@@ -138,6 +179,7 @@ final class HomeTabBarController: UITabBarController {
     private func makeContactsTab() -> UIViewController {
         let coordinator = ChatFlowCoordinator()
         let contactsPage = ContactsPage(
+            config: ChatContactListConfig(showNewContacts:true),
             onContactClick: { [weak coordinator] user in
                 coordinator?.pushChat(Self.makeC2CConversation(from: user))
             },
@@ -168,18 +210,18 @@ final class HomeTabBarController: UITabBarController {
         return navigationController
     }
 
-    private static func makeGroupConversation(from group: AZOrderedListItem) -> ConversationInfo {
-        var conversation = ConversationInfo(conversationID: ChatUtil.getGroupConversationID(group.userID))
+    private static func makeGroupConversation(from group: GroupInfo) -> ConversationInfo {
+        var conversation = ConversationInfo(conversationID: ChatUtil.getGroupConversationID(group.groupID))
         conversation.type = .group
-        conversation.title = group.title ?? group.userID
+        conversation.title = group.groupName ?? group.groupID
         conversation.avatarURL = group.avatarURL
         return conversation
     }
 
-    private static func makeC2CConversation(from user: AZOrderedListItem) -> ConversationInfo {
+    private static func makeC2CConversation(from user: ContactInfo) -> ConversationInfo {
         var conversation = ConversationInfo(conversationID: ChatUtil.getC2CConversationID(user.userID))
         conversation.type = .c2c
-        conversation.title = user.title ?? user.userID
+        conversation.title = user.friendRemark ?? user.nickname ?? user.userID
         conversation.avatarURL = user.avatarURL
         return conversation
     }
@@ -190,6 +232,9 @@ final class HomeTabBarController: UITabBarController {
         tabBar.addSubview(messageUnreadBadge)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handleMessageBadgePan(_:)))
         messageUnreadBadge.addGestureRecognizer(pan)
+        contactsUnreadBadge.isHidden = true
+        contactsUnreadBadge.isUserInteractionEnabled = false
+        tabBar.addSubview(contactsUnreadBadge)
     }
 
     private func bindUnreadBadge() {
@@ -222,17 +267,67 @@ final class HomeTabBarController: UITabBarController {
     }
 
     private func updateMessageBadgePosition() {
-        guard !messageUnreadBadge.isHidden else { return }
-        let tabButtons = tabBar.subviews
-            .filter { String(describing: type(of: $0)).contains("TabBarButton") }
-            .sorted { $0.frame.minX < $1.frame.minX }
+        positionBadge(messageUnreadBadge, tabIndex: 0)
+    }
+
+    private func updateContactsBadgePosition() {
+        positionBadge(contactsUnreadBadge, tabIndex: Self.contactsTabIndex)
+    }
+
+    private func positionBadge(_ badge: TabUnreadBadgeView, tabIndex: Int) {
+        guard !badge.isHidden else { return }
+        guard let items = tabBar.items, !items.isEmpty else { return }
         let isRTL = tabBar.effectiveUserInterfaceLayoutDirection == .rightToLeft
-        guard let anchor = isRTL ? tabButtons.last : tabButtons.first,
-              let iconView = anchor.subviews.first(where: { $0 is UIImageView }) else { return }
-        tabBar.bringSubviewToFront(messageUnreadBadge)
-        let iconFrame = anchor.convert(iconView.frame, to: tabBar)
-        let badgeCenterX = isRTL ? iconFrame.minX : iconFrame.maxX
-        messageUnreadBadge.center = CGPoint(x: badgeCenterX, y: iconFrame.minY + Self.badgeVerticalOffset)
+        tabBar.bringSubviewToFront(badge)
+        let anchorFrame = tabIconFrame(tabIndex: tabIndex, itemCount: items.count, isRTL: isRTL)
+        let badgeCenterX = isRTL ? anchorFrame.minX : anchorFrame.maxX
+        badge.center = CGPoint(x: badgeCenterX, y: anchorFrame.minY + Self.badgeVerticalOffset)
+    }
+
+    private func tabIconFrame(tabIndex: Int, itemCount: Int, isRTL: Bool) -> CGRect {
+        let fallback = geometricIconFrame(tabIndex: tabIndex, itemCount: itemCount, isRTL: isRTL)
+        guard tabBar.bounds.width > 0, itemCount > 0 else { return fallback }
+        var iconFrames: [CGRect] = []
+        appendTabIconFrames(in: tabBar, into: &iconFrames)
+        let tabWidth = tabBar.bounds.width / CGFloat(itemCount)
+        let segmentMinX = isRTL
+            ? tabBar.bounds.width - CGFloat(tabIndex + 1) * tabWidth
+            : CGFloat(tabIndex) * tabWidth
+        let segment = CGRect(x: segmentMinX, y: 0, width: tabWidth, height: tabBar.bounds.height)
+        let candidate = iconFrames
+            .filter { segment.contains(CGPoint(x: $0.midX, y: $0.midY)) }
+            .min { abs($0.midX - fallback.midX) < abs($1.midX - fallback.midX) }
+        return candidate ?? fallback
+    }
+
+    private func geometricIconFrame(tabIndex: Int, itemCount: Int, isRTL: Bool) -> CGRect {
+        let tabWidth = tabBar.bounds.width / CGFloat(itemCount)
+        let itemCenterX = isRTL
+            ? tabBar.bounds.width - (CGFloat(tabIndex) + 0.5) * tabWidth
+            : (CGFloat(tabIndex) + 0.5) * tabWidth
+        return CGRect(
+            x: itemCenterX - Self.tabIconSize / 2,
+            y: Self.tabBarContentTopInset,
+            width: Self.tabIconSize,
+            height: Self.tabIconSize
+        )
+    }
+
+    private func appendTabIconFrames(in view: UIView, into frames: inout [CGRect]) {
+        for subview in view.subviews {
+            if subview !== messageUnreadBadge, subview !== contactsUnreadBadge, isTabIconView(subview) {
+                frames.append(subview.convert(subview.bounds, to: tabBar))
+            }
+            appendTabIconFrames(in: subview, into: &frames)
+        }
+    }
+
+    private func isTabIconView(_ view: UIView) -> Bool {
+        guard view is UIImageView else { return false }
+        let size = view.bounds.size
+        guard size.width > 0, size.height > 0 else { return false }
+        return abs(size.width - Self.tabIconSize) <= Self.tabIconSizeTolerance
+            && abs(size.height - Self.tabIconSize) <= Self.tabIconSizeTolerance
     }
 
     @objc private func handleMessageBadgePan(_ gesture: UIPanGestureRecognizer) {
@@ -320,7 +415,16 @@ final class HomeTabBarController: UITabBarController {
 
     private func updateContactsBadge() {
         let count = friendApplicationUnreadCount + groupApplicationUnreadCount
-        contactsNavigationController?.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+        contactsNavigationController?.tabBarItem.badgeValue = nil
+        if count <= 0 {
+            contactsUnreadBadge.isHidden = true
+            return
+        }
+        contactsUnreadBadge.setText(count > 99 ? "99+" : "\(count)")
+        if contactsUnreadBadge.isHidden {
+            contactsUnreadBadge.isHidden = false
+        }
+        updateContactsBadgePosition()
     }
 
     private func bindTheme() {
@@ -424,12 +528,6 @@ final class HomeTabBarController: UITabBarController {
         }
     }
 
-}
-
-extension HomeTabBarController: UITabBarControllerDelegate {
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        Self.lastSelectedIndex = selectedIndex
-    }
 }
 
 final class HiddenBarNavigationController: UINavigationController, UIGestureRecognizerDelegate, UINavigationControllerDelegate {

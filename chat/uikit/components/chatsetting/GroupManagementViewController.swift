@@ -191,7 +191,7 @@ final class GroupManagementViewController: ChatSettingBaseViewController {
     }
 
     private func setupViewStyle() {
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorTopBar
         headerStack.axis = .vertical
         headerStack.spacing = 0
@@ -310,7 +310,7 @@ final class GroupManagementViewController: ChatSettingBaseViewController {
 
         let nameLabel = UILabel()
         nameLabel.font = FontScheme.caption3Regular
-        nameLabel.textColor = ChatUIKitTheme.colors.textColorPrimary
+        nameLabel.textColor = TUIChatKitTheme.colors.textColorPrimary
         nameLabel.textAlignment = .center
         nameLabel.lineBreakMode = .byTruncatingTail
         nameLabel.text = displayName
@@ -330,7 +330,7 @@ final class GroupManagementViewController: ChatSettingBaseViewController {
         container.alignment = .center
 
         let tile = UIControl()
-        tile.backgroundColor = ChatUIKitTheme.colors.bgColorInput
+        tile.backgroundColor = TUIChatKitTheme.colors.bgColorInput
         tile.layer.cornerRadius = Self.adminTileCornerRadius
         tile.snp.makeConstraints { make in
             make.width.height.equalTo(Self.adminAvatarSize.size)
@@ -339,7 +339,7 @@ final class GroupManagementViewController: ChatSettingBaseViewController {
         let symbolLabel = UILabel()
         symbolLabel.text = isAdd ? "+" : "−"
         symbolLabel.font = .systemFont(ofSize: Self.adminActionSymbolFontSize)
-        symbolLabel.textColor = ChatUIKitTheme.colors.textColorSecondary
+        symbolLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         symbolLabel.textAlignment = .center
         tile.addSubview(symbolLabel)
         symbolLabel.snp.makeConstraints { make in
@@ -401,7 +401,7 @@ final class GroupManagementViewController: ChatSettingBaseViewController {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: actionTitle, style: .default) { _ in action() })
         alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        if let popover = alert.popoverPresentationController {
+        if traitCollection.userInterfaceIdiom == .pad, let popover = alert.popoverPresentationController {
             popover.sourceView = anchorView ?? view
             popover.sourceRect = anchorView?.bounds ?? view.bounds
         }
@@ -458,7 +458,7 @@ private final class MutedMemberCell: UITableViewCell {
             make.centerY.equalToSuperview()
             make.trailing.lessThanOrEqualToSuperview().offset(-GroupManagementViewController.horizontalPadding)
         }
-        let colors = ChatUIKitTheme.colors
+        let colors = TUIChatKitTheme.colors
         backgroundColor = colors.bgColorOperate
         contentView.backgroundColor = colors.bgColorOperate
         nameLabel.font = FontScheme.caption2Regular

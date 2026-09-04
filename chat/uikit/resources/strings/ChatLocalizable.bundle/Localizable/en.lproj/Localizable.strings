@@ -868,6 +868,8 @@
 "EnterUserID" = "Enter User ID";
 "LoginFailed" = "Login failed";
 "InvalidSDKAppID" = "Invalid SDK App ID";
+"LoginConfigGuide" = "Please check whether SDKAPPID and SECRETKEY in GenerateTestUserSig.swift are configured correctly. Refer to: Tencent Cloud Documentation > Instant Messaging > Demo Zone > Quick Start > Mobile > iOS (UIKit).";
+"ViewDocument" = "View Document";
 "ColorRed" = "Red";
 "ColorOrange" = "Orange";
 "ColorYellow" = "Yellow";
