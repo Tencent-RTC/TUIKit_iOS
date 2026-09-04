@@ -7,9 +7,12 @@ final class GroupCallMemberPickerViewController: UIViewController {
 
     private static let navButtonHorizontalInset: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
 
-    private static let rowHeight: CGFloat = 56
+    /// 与 Android CALL_MEMBER_LIMIT 对齐
+    private static let maxSelectableCount = 9
 
     private let groupID: String
+
+    private let pageTitle: String
 
     private let onConfirm: ([String]) -> Void
 
@@ -35,20 +38,13 @@ final class GroupCallMemberPickerViewController: UIViewController {
 
     private let loadingIndicator = UIActivityIndicatorView(style: .medium)
 
-    private lazy var tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .plain)
-        table.separatorStyle = .none
-        table.rowHeight = Self.rowHeight
-        table.register(MentionMemberCell.self, forCellReuseIdentifier: MentionMemberCell.reuseIdentifier)
-        table.dataSource = self
-        table.delegate = self
-        return table
-    }()
+    private let pickerView = UserPickerView()
 
     // MARK: - Init
 
-    init(groupID: String, onConfirm: @escaping ([String]) -> Void) {
+    init(groupID: String, title: String, onConfirm: @escaping ([String]) -> Void) {
         self.groupID = groupID
+        self.pageTitle = title
         self.onConfirm = onConfirm
         self.memberStore = GroupMemberStore.create(groupID: groupID)
         super.init(nibName: nil, bundle: nil)
@@ -76,7 +72,7 @@ final class GroupCallMemberPickerViewController: UIViewController {
         headerBar.addSubview(cancelButton)
         headerBar.addSubview(titleLabel)
         headerBar.addSubview(confirmButton)
-        view.addSubview(tableView)
+        view.addSubview(pickerView)
         view.addSubview(loadingIndicator)
     }
 
@@ -97,28 +93,34 @@ final class GroupCallMemberPickerViewController: UIViewController {
         titleLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
-        tableView.snp.makeConstraints { make in
+        pickerView.snp.makeConstraints { make in
             make.top.equalTo(headerBar.snp.bottom)
             make.leading.trailing.bottom.equalToSuperview()
         }
         loadingIndicator.snp.makeConstraints { make in
-            make.center.equalTo(tableView)
+            make.center.equalTo(pickerView)
         }
     }
 
     private func bindInteraction() {
         cancelButton.addTarget(self, action: #selector(handleCancel), for: .touchUpInside)
         confirmButton.addTarget(self, action: #selector(handleConfirm), for: .touchUpInside)
+        pickerView.onSelectionChanged = { [weak self] selection in
+            self?.selectedMemberIDs = Set(selection.map { $0.userID })
+            self?.updateConfirmButtonState()
+        }
+        pickerView.onReachEnd = { [weak self] in
+            self?.loadMoreMembers()
+        }
     }
 
     private func setupViewStyle() {
         let colors = TUIChatKitTheme.colors
         view.backgroundColor = colors.bgColorOperate
         headerBar.backgroundColor = colors.bgColorOperate
-        tableView.backgroundColor = colors.bgColorOperate
 
-        titleLabel.text = LocalizedChatString("MentionSelectMember")
-        titleLabel.font = FontScheme.caption1Medium
+        titleLabel.text = pageTitle
+        titleLabel.font = FontScheme.caption1Bold
         titleLabel.textColor = colors.textColorPrimary
 
         cancelButton.setTitle(LocalizedChatString("Cancel"), for: .normal)
@@ -169,7 +171,16 @@ final class GroupCallMemberPickerViewController: UIViewController {
             hasMoreData = false
         }
         members = newMembers
-        tableView.reloadData()
+        pickerView.configure(
+            userList: members.map {
+                UserPickerItem(
+                    userID: $0.userID,
+                    avatarURL: $0.avatarURL,
+                    title: MentionMemberPickerViewController.displayName(for: $0)
+                )
+            },
+            maxCount: Self.maxSelectableCount
+        )
     }
 
     @objc private func handleCancel() {
@@ -185,57 +196,10 @@ final class GroupCallMemberPickerViewController: UIViewController {
         dismiss(animated: true)
     }
 
-    private func toggleSelection(_ userID: String) {
-        if selectedMemberIDs.contains(userID) {
-            selectedMemberIDs.remove(userID)
-        } else {
-            selectedMemberIDs.insert(userID)
-        }
-        updateConfirmButtonState()
-    }
-
     private func updateConfirmButtonState() {
         let colors = TUIChatKitTheme.colors
         let enabled = !selectedMemberIDs.isEmpty
         confirmButton.isEnabled = enabled
         confirmButton.setTitleColor(enabled ? colors.textColorLink : colors.textColorTertiary, for: .normal)
-    }
-}
-
-// MARK: - UITableViewDataSource / Delegate
-
-extension GroupCallMemberPickerViewController: UITableViewDataSource, UITableViewDelegate {
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return members.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: MentionMemberCell.reuseIdentifier,
-            for: indexPath
-        ) as? MentionMemberCell else {
-            return UITableViewCell()
-        }
-        let member = members[indexPath.row]
-        let name = MentionMemberPickerViewController.displayName(for: member)
-        cell.configure(
-            name: name,
-            avatarURL: member.avatarURL,
-            isSelected: selectedMemberIDs.contains(member.userID)
-        )
-        return cell
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-        let member = members[indexPath.row]
-        toggleSelection(member.userID)
-        tableView.reloadRows(at: [indexPath], with: .none)
-    }
-
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard indexPath.row >= members.count - 1 else { return }
-        loadMoreMembers()
     }
 }
