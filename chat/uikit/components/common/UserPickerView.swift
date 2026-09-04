@@ -190,6 +190,7 @@ final class UserPickerView: UIView {
             }
         } else {
             if willSelect {
+                if maxCount > 1, selectedIDs.count >= maxCount { return }
                 selectedIDs.insert(item.userID)
                 selectedOrder.append(item.userID)
             } else {

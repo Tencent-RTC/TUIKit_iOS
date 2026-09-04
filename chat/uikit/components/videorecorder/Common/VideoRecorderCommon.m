@@ -26,7 +26,7 @@
 + (NSBundle *)assetsBundle {
     NSBundle *modleBundle = [self modleNSBundle];
     if (!modleBundle) {
-        NSLog(@"error: can not find ChatUIKitBundle");
+        NSLog(@"error: can not find TUIChatKitBundle");
         return nil;
     }
     NSURL *videoRecorderURL = [modleBundle URLForResource:@"VideoRecorder"
@@ -49,7 +49,7 @@
 + (NSBundle *)stringBundle {
     NSBundle *modleBundle = [self modleNSBundle];
     if (!modleBundle) {
-        NSLog(@"error: can not find ChatUIKitBundle");
+        NSLog(@"error: can not find TUIChatKitBundle");
         return nil;
     }
     
@@ -72,7 +72,7 @@
 
 + (NSBundle *)modleNSBundle {
     NSBundle *mainBundle = [NSBundle bundleForClass:[self class]];
-    NSURL *atomicBundleURL = [mainBundle URLForResource:@"ChatUIKitBundle" withExtension:@"bundle"];
+    NSURL *atomicBundleURL = [mainBundle URLForResource:@"TUIChatKitBundle" withExtension:@"bundle"];
     if (!atomicBundleURL) {
         return nil;
     }

@@ -1045,7 +1045,8 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
     private func presentGroupCallMemberPicker(mediaType: CallMediaType) {
         let groupID = viewModel.groupID
         guard !groupID.isEmpty, let presenter = findViewController() else { return }
-        let picker = GroupCallMemberPickerViewController(groupID: groupID) { userIDs in
+        let title = mediaType == .video ? LocalizedChatString("MoreVideoCall") : LocalizedChatString("MoreVoiceCall")
+        let picker = GroupCallMemberPickerViewController(groupID: groupID, title: title) { userIDs in
             DataReport.reportInteractionMetrics(.chatInvokeCall)
             TUICallKit.createInstance().calls(
                 userIdList: userIDs,
@@ -1054,7 +1055,10 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
                 completion: nil
             )
         }
-        presenter.present(UINavigationController(rootViewController: picker), animated: true)
+        let navigationController = UINavigationController(rootViewController: picker)
+        navigationController.isNavigationBarHidden = true
+        navigationController.modalPresentationStyle = .fullScreen
+        presenter.present(navigationController, animated: true)
     }
 }
 
