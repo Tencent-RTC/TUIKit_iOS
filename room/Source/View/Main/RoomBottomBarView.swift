@@ -14,6 +14,7 @@ public protocol RoomBottomBarViewDelegate: AnyObject {
     func onMembersButtonTapped()
     func onAIToolsButtonTapped()
     func onInviteButtonTapped()
+    func onChatButtonTapped()
     func onHandsUpManagerButtonTapped()
     func onShowToast(message: String, style: ToastStyle)
 }
@@ -99,6 +100,10 @@ extension RoomBottomBarView: StandardRoomBottomBarViewDelegate, WebinarRoomBotto
     
     public func onInviteButtonTapped() {
         delegate?.onInviteButtonTapped()
+    }
+
+    public func onChatButtonTapped() {
+        delegate?.onChatButtonTapped()
     }
 
     public func onMembersButtonTapped(bottomBar: StandardRoomBottomBarView) {

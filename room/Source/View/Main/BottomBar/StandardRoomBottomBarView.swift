@@ -14,6 +14,7 @@ public protocol StandardRoomBottomBarViewDelegate: AnyObject {
     func onMembersButtonTapped(bottomBar: StandardRoomBottomBarView)
     func onAIToolsButtonTapped()
     func onInviteButtonTapped()
+    func onChatButtonTapped()
     func onShowToast(message: String, style: ToastStyle)
 }
 
@@ -31,6 +32,13 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     }()
     
     private let deviceOperator: DeviceOperator = DeviceOperator()
+
+    private lazy var messageListStore: MessageListStore = {
+        MessageListStore.create(conversationID: "group_\(roomID)")
+    }()
+
+    private var chatUnreadCount: Int = 0
+
     private var isAllCameraDisabled: Bool = false
     private var isAllMicrophoneDisabled: Bool = false
     private var isRecording: Bool = false
@@ -54,10 +62,9 @@ public class StandardRoomBottomBarView: UIView, BaseView {
     }
 
     private var allButtons: [RoomIconButton] {
-        [membersButton, microphoneButton, cameraButton,
-         screenShareButton, recordingButton, moreButton, inviteButton, aiToolsButton]
+        [membersButton, microphoneButton, cameraButton, screenShareButton, chatButton,
+         moreButton, inviteButton, aiToolsButton, recordingButton]
     }
-
 
     private var visibleButtons: [RoomIconButton] {
         allButtons.filter { $0 !== moreButton && !$0.isHidden }
@@ -139,6 +146,13 @@ public class StandardRoomBottomBarView: UIView, BaseView {
 
     private lazy var inviteButton: RoomIconButton = {
         return makeIconButton(title: .invite, imageName: "room_invite_member")
+    }()
+
+    private lazy var chatButton: RoomIconButton = {
+        let button = makeIconButton(title: .chat, imageName: "room_chat")
+        button.setBadgeDotSize(6)
+        button.setBadgeOffset(CGPoint(x: 12, y: -4))
+        return button
     }()
 
     private lazy var moreButton: RoomIconButton = {
@@ -278,7 +292,17 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         aiToolsButton.addTarget(self, action: #selector(aiToolsButtonTapped), for: .touchUpInside)
         recordingButton.addTarget(self, action: #selector(recordingButtonTapped), for: .touchUpInside)
         inviteButton.addTarget(self, action: #selector(inviteButtonTapped), for: .touchUpInside)
+        chatButton.addTarget(self, action: #selector(chatButtonTapped), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(moreButtonTapped), for: .touchUpInside)
+
+        messageListStore.messageEventPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] event in
+                guard let self = self else { return }
+                guard case .onReceiveNewMessage(let message) = event else { return }
+                handleReceivedMessage(message)
+            }
+            .store(in: &cancellableSet)
         
         participantStore.state.subscribe(StatePublisherSelector(keyPath: \.localParticipant))
             .map { $0?.role ?? .generalUser }
@@ -378,8 +402,18 @@ public class StandardRoomBottomBarView: UIView, BaseView {
         }
     }
     
-    private func makeIconButton(title: String,imageName: String) -> RoomIconButton {
-        let button = RoomIconButton()
+    private func handleReceivedMessage(_ message: MessageInfo) {
+        guard !message.isSentBySelf else { return }
+        chatUnreadCount += 1
+        chatButton.setBadgeCount(chatUnreadCount)
+    }
+
+    private func clearChatUnreadCount() {
+        chatUnreadCount = 0
+        chatButton.setBadgeCount(0)
+    }
+
+    private func makeIconButton(title: String,imageName: String) -> RoomIconButton {        let button = RoomIconButton()
         button.setIcon(ResourceLoader.loadImage(imageName))
         button.setTitle(title)
         button.setTitleColor(.white)
@@ -568,6 +602,12 @@ extension StandardRoomBottomBarView {
         delegate?.onInviteButtonTapped()
     }
 
+    @objc private func chatButtonTapped() {
+        RoomKitLog.info("chatButtonTapped")
+        clearChatUnreadCount()
+        delegate?.onChatButtonTapped()
+    }
+
     @objc private func moreButtonTapped() {
         guard !isAnimating else { return }
         isAnimating = true
@@ -715,6 +755,7 @@ fileprivate extension String {
     static let expand = "roomkit_item_expand".localized
     static let close = "roomkit_item_close".localized
     static let invite = "roomkit_invite".localized
+    static let chat = "roomkit_chat".localized
     static let recording = "roomkit_cloud_record_recording".localized
     static let recordStop = "roomkit_cloud_record_stop".localized
     static let recordStartTitle = "roomkit_cloud_record_start_title".localized

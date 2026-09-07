@@ -29,6 +29,7 @@ def shared_pods
   pod 'TUICallKit_Swift/Professional', :path => '../call/'
   pod 'TUILiveKit', :path => '../live/TUILiveKit.podspec'
   pod 'TUIRoomKit', :path => '../room/TUIRoomKit.podspec'
+  pod 'TUIChatKit', :path => '../chat/uikit/TUIChatKit.podspec'
 
 end
 
