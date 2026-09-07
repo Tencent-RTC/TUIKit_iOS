@@ -11,6 +11,7 @@ import SnapKit
 import Combine
 import AtomicXCore
 import AtomicX
+import TUIChatKit
 
 public enum RoomBehavior {
     case create(options: CreateRoomOptions)
@@ -895,6 +896,51 @@ extension RoomMainView: RoomBottomBarViewDelegate {
     public func onInviteButtonTapped() {
         showInviteActionSheet()
     }
+
+    public func onChatButtonTapped() {
+        RoomKitLog.info("onChatButtonTapped")
+        let inputConfig = ChatMessageInputConfig(
+            isShowAudioRecorder: false,
+            isShowPhotoTaker: false,
+            enableMention: false,
+            enableLongPressToTalk: false,
+            isShowVideoCall: false,
+            isShowAudioCall: false
+        )
+
+        let listConfig = ChatMessageListConfig(
+            isShowRightAvatar: true,
+            isSupportCopy: true,
+            isSupportDelete: true,
+            isSupportRecall: true,
+            isSupportForward: false,
+            isSupportQuote: false,
+            isSupportMultiSelect: false,
+            isSupportConvertToText: false,
+            isSupportTranslate: false,
+            isSupportListenFromHere: false,
+            isSupportReaction: true
+        )
+        
+        var conversationInfo = ConversationInfo(conversationID: "group_\(roomID)")
+        conversationInfo.title = .chatTitle
+
+        let chatPage = ChatPage(
+            conversation: conversationInfo,
+            messageListConfig: listConfig,
+            messageInputConfig: inputConfig,
+            isShowMoreButton: false,
+            onBack: { [weak self] in
+                self?.routerContext?.dismiss(animated: true, completion: nil)
+            }
+        )
+
+        let chatNavigationController = UINavigationController(rootViewController: chatPage)
+        chatNavigationController.setNavigationBarHidden(true, animated: false)
+        chatNavigationController.modalPresentationStyle = .overFullScreen
+        chatNavigationController.modalTransitionStyle = .coverVertical
+        routerContext?.present(chatNavigationController, animated: true, completion: nil)
+    }
     
     public func onAIToolsButtonTapped() {
         let isSubtitleShow = subtitleView != nil
@@ -1283,4 +1329,7 @@ fileprivate extension String {
     static let iKnow = "roomkit_i_know".localized
     static let recordStartedTitle = "roomkit_cloud_record_started_title".localized
     static let recordStartedTips = "roomkit_cloud_record_started_tips"
+    
+    // Chat
+    static let chatTitle = "roomkit_chat".localized
 }
