@@ -145,6 +145,9 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
         for identifier in MessageContentKind.allReuseIdentifiers {
             tableView.register(MessageBaseCell.self, forCellReuseIdentifier: identifier)
         }
+        for identifier in MessageCellRegistry.shared.customReuseIdentifiers {
+            tableView.register(MessageBaseCell.self, forCellReuseIdentifier: identifier)
+        }
         tableView.register(MessageCenteredTextCell.self,
                            forCellReuseIdentifier: MessageCellRegistry.systemTipReuseIdentifier)
         tableView.register(MessageCenteredTextCell.self,
@@ -419,8 +422,8 @@ extension MergedMessageDetailViewController: UITableViewDataSource {
             return centeredTextCell(for: message, kind: kind, timeString: nil, at: indexPath)
         case .bubble(let contentKind):
             return bubbleCell(for: message, contentKind: contentKind, timeString: nil, at: indexPath)
-        case .custom:
-            return bubbleCell(for: message, contentKind: .unsupported, timeString: nil, at: indexPath)
+        case .custom(let businessID):
+            return bubbleCell(for: message, contentKind: .custom(businessID), timeString: nil, at: indexPath)
         }
     }
 

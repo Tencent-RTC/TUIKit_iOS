@@ -1,0 +1,17 @@
+${PODS_ROOT}/Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini-resources.sh
+${PODS_ROOT}/AlbumPicker/AlbumPickerBundle.bundle
+${PODS_ROOT}/AlbumPickerCore/AlbumPickerCoreBundle.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/AtomicX/AtomicXBundle.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/Kingfisher/Kingfisher.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/SnapKit/SnapKit_Privacy.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/TUICallKit_Swift/TUICallKit_Swift_Privacy.bundle
+${PODS_ROOT}/../../../call/TUICallKit_Swift/Resources/TUICallKitTheme.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/TUICallKit_Swift/TUICallKitBundle.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/TUIChatKit/TUIChatKitBundle.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/TUICore/TUICore_Privacy.bundle
+${PODS_ROOT}/TUICore/TUICore/Resources/TUICore.bundle
+${PODS_ROOT}/TUICore/TUICore/Resources/TUICoreTheme.bundle
+${PODS_ROOT}/TUICore/TUICore/Resources/TUICoreTheme_Minimalist.bundle
+${PODS_ROOT}/TUICore/TUICore/Resources/TUIKitLocalizable.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/TXIMSDK_Plus_iOS_XCFramework/TXIMSDK_Plus_iOS_XCFramework_Privacy.bundle

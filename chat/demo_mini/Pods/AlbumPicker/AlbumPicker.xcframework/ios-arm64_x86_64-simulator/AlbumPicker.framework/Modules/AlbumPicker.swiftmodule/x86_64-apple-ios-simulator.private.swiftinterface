@@ -1,0 +1,101 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target x86_64-apple-ios14.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name AlbumPicker
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import AVFoundation
+@_exported import AlbumPicker
+import AlbumPickerCore
+import Combine
+import Photos
+import PhotosUI
+import Swift
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public typealias AlbumPickerLanguage = AlbumPickerCore.AlbumPickerCoreLanguage.Language
+public typealias AlbumPickerCompressQuality = AlbumPickerCore.CompressQuality
+public enum AlbumMediaType {
+  case image
+  case video
+  public static func == (a: AlbumPicker.AlbumMediaType, b: AlbumPicker.AlbumMediaType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum AlbumPickerStyle {
+  case likeWeChat
+  case likeWhatsApp
+  public static func == (a: AlbumPicker.AlbumPickerStyle, b: AlbumPicker.AlbumPickerStyle) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum AlbumPickerMediaFilter {
+  case imageOnly
+  case videoOnly
+  case imageAndVideo
+  public static func == (a: AlbumPicker.AlbumPickerMediaFilter, b: AlbumPicker.AlbumPickerMediaFilter) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public class AlbumMedia {
+  final public let id: Swift.UInt64
+  public var asset: Photos.PHAsset?
+  public var mediaPath: Swift.String?
+  public var mediaType: AlbumPicker.AlbumMediaType
+  public var videoThumbnailPath: Swift.String?
+  public var duration: Swift.Int64
+  public init(id: Swift.UInt64, asset: Photos.PHAsset? = nil, mediaPath: Swift.String? = nil, mediaType: AlbumPicker.AlbumMediaType = .image, videoThumbnailPath: Swift.String? = nil, duration: Swift.Int64 = 0)
+  @objc deinit
+}
+public struct AlbumPickerConfig {
+  public var maxSelectionCount: Swift.Int?
+  public var itemsPerRow: Swift.Int?
+  public var showsCameraItem: Swift.Bool
+  public var style: AlbumPicker.AlbumPickerStyle
+  public var mediaFilter: AlbumPicker.AlbumPickerMediaFilter
+  public var language: AlbumPicker.AlbumPickerLanguage?
+  public var compressQuality: AlbumPicker.AlbumPickerCompressQuality
+  public var maxVideoDurationInSeconds: Swift.Int
+  public var maxOutputFileSizeInMB: Swift.Int
+  public init(maxSelectionCount: Swift.Int? = nil, itemsPerRow: Swift.Int? = nil, showsCameraItem: Swift.Bool = false, style: AlbumPicker.AlbumPickerStyle = .likeWeChat, mediaFilter: AlbumPicker.AlbumPickerMediaFilter = .imageAndVideo, language: AlbumPicker.AlbumPickerLanguage? = nil, compressQuality: AlbumPicker.AlbumPickerCompressQuality = .standard)
+}
+public struct AlbumPickerTheme {
+  public var currentPrimaryColor: UIKit.UIColor?
+  public var backgroundColor: UIKit.UIColor?
+  public var backgroundColorSecondary: UIKit.UIColor?
+  public var textColor: UIKit.UIColor?
+  public var textColorSecondary: UIKit.UIColor?
+  public var confirmButtonIcon: UIKit.UIImage?
+  public var bigFontSize: CoreFoundation.CGFloat?
+  public var normalFontSize: CoreFoundation.CGFloat?
+  public var smallFontSize: CoreFoundation.CGFloat?
+  public var bigRadius: CoreFoundation.CGFloat?
+  public var normalRadius: CoreFoundation.CGFloat?
+  public var smallRadius: CoreFoundation.CGFloat?
+  public init(currentPrimaryColor: UIKit.UIColor? = nil, backgroundColor: UIKit.UIColor? = nil, backgroundColorSecondary: UIKit.UIColor? = nil, textColor: UIKit.UIColor? = nil, textColorSecondary: UIKit.UIColor? = nil, confirmButtonIcon: UIKit.UIImage? = nil, bigFontSize: CoreFoundation.CGFloat? = nil, normalFontSize: CoreFoundation.CGFloat? = nil, smallFontSize: CoreFoundation.CGFloat? = nil, bigRadius: CoreFoundation.CGFloat? = nil, normalRadius: CoreFoundation.CGFloat? = nil, smallRadius: CoreFoundation.CGFloat? = nil)
+}
+public protocol AlbumPickerDelegate : AnyObject {
+  func onPickConfirm(pickedAlbumMedias: [AlbumPicker.AlbumMedia], textMessage: Swift.String?)
+  func onMediaProcessing(albumMedia: AlbumPicker.AlbumMedia, progress: Swift.Float, error: Swift.Bool)
+  func onMediaProcessed()
+  func onCancel()
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency public class AlbumPickerView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency weak public var delegate: (any AlbumPicker.AlbumPickerDelegate)?
+  @_Concurrency.MainActor @preconcurrency public func initialize(config: AlbumPicker.AlbumPickerConfig, theme: AlbumPicker.AlbumPickerTheme)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+extension AlbumPicker.AlbumMediaType : Swift.Equatable {}
+extension AlbumPicker.AlbumMediaType : Swift.Hashable {}
+extension AlbumPicker.AlbumPickerStyle : Swift.Equatable {}
+extension AlbumPicker.AlbumPickerStyle : Swift.Hashable {}
+extension AlbumPicker.AlbumPickerMediaFilter : Swift.Equatable {}
+extension AlbumPicker.AlbumPickerMediaFilter : Swift.Hashable {}

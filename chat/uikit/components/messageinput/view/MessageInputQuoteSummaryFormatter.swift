@@ -22,7 +22,10 @@ enum MessageInputQuoteSummaryFormatter {
             return LocalizedChatString("MessageTypeMerged")
         case .face(let facePayload):
             return facePayload.faceData ?? LocalizedChatString("MessageTypeCustom")
-        case .custom:
+        case .custom(let payload):
+            if let summary = CustomMessageSummaryRegistry.shared.summary(for: payload), !summary.isEmpty {
+                return summary
+            }
             return LocalizedChatString("MessageTypeCustom")
         case .tips:
             return ""

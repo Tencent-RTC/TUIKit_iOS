@@ -1,0 +1,6 @@
+framework module RTCRoomEngine {
+  umbrella header "RTCRoomEngine.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,20 @@
+platform :ios, '14.0'
+
+project 'ChatDemoMini.xcodeproj'
+
+target 'ChatDemoMini' do
+  use_frameworks! :linkage => :static
+
+  pod 'TUIChatKit', :path => '../uikit/TUIChatKit.podspec'
+  pod 'TUICallKit_Swift', :path => '../../call/TUICallKit_Swift.podspec'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+    end
+  end
+end

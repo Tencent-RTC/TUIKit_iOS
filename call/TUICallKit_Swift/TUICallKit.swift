@@ -15,6 +15,7 @@ public class TUICallKit: NSObject {
      */
     @objc
     public static func createInstance() -> TUICallKit {
+        ChatCallEventSubscriber.shared.ensureSubscribed()
         return TUICallKitImpl.shared
     }
     

@@ -165,6 +165,10 @@ final class MessageListViewImpl: RTCBaseView {
         return bar
     }()
 
+    private let joinCallBannerContainer = UIView()
+
+    private lazy var joinCallBannerController = MessageListJoinCallBannerController(container: joinCallBannerContainer)
+
     private let listenController = ListenFromHereController()
 
     // MARK: - Init
@@ -186,12 +190,17 @@ final class MessageListViewImpl: RTCBaseView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        joinCallBannerController.release()
+    }
+
     // MARK: - RTCBaseView Lifecycle
 
     public override func constructViewHierarchy() {
         LanguageHelper.applyLayoutDirection(to: self)
         addSubview(backgroundImageView)
         addSubview(tableView)
+        addSubview(joinCallBannerContainer)
         addSubview(topLoadingIndicator)
         addSubview(bottomLoadingIndicator)
         addSubview(tongueView)
@@ -203,8 +212,13 @@ final class MessageListViewImpl: RTCBaseView {
         backgroundImageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        // 群通话横幅位于消息列表顶部，可见时将列表向下推（对齐 Android）
+        joinCallBannerContainer.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+        }
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalTo(joinCallBannerContainer.snp.bottom)
+            make.leading.trailing.bottom.equalToSuperview()
         }
         listenPlaybackBar.snp.makeConstraints { make in
 
@@ -220,7 +234,7 @@ final class MessageListViewImpl: RTCBaseView {
         }
         topLoadingIndicator.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalTo(safeAreaLayoutGuide).offset(Self.loadingIndicatorMargin)
+            make.top.equalTo(joinCallBannerContainer.snp.bottom).offset(Self.loadingIndicatorMargin)
             make.width.height.equalTo(Self.loadingIndicatorSize)
         }
         bottomLoadingIndicator.snp.makeConstraints { make in
@@ -256,6 +270,7 @@ final class MessageListViewImpl: RTCBaseView {
         if let locateMsgID = viewModel.locateMessage?.msgID, !locateMsgID.isEmpty {
             pendingInitialLocateMsgID = locateMsgID
         }
+        joinCallBannerController.bind(conversationID: viewModel.conversationID)
         viewModel.fetchInitialMessages()
     }
 
@@ -268,6 +283,11 @@ final class MessageListViewImpl: RTCBaseView {
     override func didMoveToWindow() {
         super.didMoveToWindow()
         refreshResumedAndShown()
+        if window != nil {
+            joinCallBannerController.bind(conversationID: viewModel.conversationID)
+        } else {
+            joinCallBannerController.release()
+        }
     }
 
     func hostVisibilityDidChange(_ isVisible: Bool) {
@@ -717,6 +737,14 @@ final class MessageListViewImpl: RTCBaseView {
             return !callModel.isExcludeFromHistory
         }
         let oldMessages = messages
+
+        var recalledNewMessageRemoved = false
+        for message in list where message.status == .revoked {
+            recalledNewMessageRemoved = floatingEntryController.onMessageRecalled(msgID: message.msgID) || recalledNewMessageRemoved
+        }
+        if recalledNewMessageRemoved {
+            refreshTongue()
+        }
 
         if let progressMsgIDs = mediaProgressOnlyChangedMsgIDs(old: oldMessages, new: list) {
             messages = list

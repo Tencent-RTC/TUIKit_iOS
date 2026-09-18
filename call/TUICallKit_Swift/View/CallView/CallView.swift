@@ -102,12 +102,13 @@ extension CallView {
         addSubview(backgroundBlurView)
         addSubview(callCoreView)
         addSubview(waitingParticipantsView)
-        addSubview(singleCallControlsView)
         addSubview(multiCallControlsView)
         addSubview(aiSubtitle)
         addSubview(callTranscriberView)
         addSubview(timerView)
         addSubview(hintView)
+
+        callCoreView.callViewAdapter = self
     }
     
     private func activateConstraints() {
@@ -135,11 +136,6 @@ extension CallView {
             make.width.equalToSuperview()
             make.height.equalTo(65.scale375Width())
             make.centerY.equalToSuperview()
-        }
-        
-        singleCallControlsView.snp.remakeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(260.scale375Height())
         }
         
         multiCallControlsView.snp.remakeConstraints { make in
@@ -352,24 +348,14 @@ extension CallView {
 // MARK: - Subscribe
 extension CallView {
     private func subscribeCallState() {
-        let callStateSelector = StatePublisherSelector { (state: CallState) -> (CallParticipantStatus, String, String, String, [String]) in
-            let selfInfo = CallStore.shared.state.value.selfInfo
-            let activeCall = state.activeCall
-            return (selfInfo.status, selfInfo.id, activeCall.inviterId, activeCall.chatGroupId, activeCall.inviteeIds)
-        }
-        
-        CallStore.shared.state.subscribe(callStateSelector)
-            .removeDuplicates { prev, current in
-                return prev.0 == current.0 &&
-                prev.1 == current.1 &&
-                prev.2 == current.2 &&
-                prev.3 == current.3 &&
-                prev.4 == current.4
-            }
+        CallStore.shared.state
+            .subscribe(StatePublisherSelector(keyPath: \.selfInfo.status))
+            .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                self?.updateControlsView()
-                self?.updateCamera()
+                guard let self = self else { return }
+                self.updateControlsView()
+                self.updateCamera()
             }
             .store(in: &cancellables)
         
@@ -416,5 +402,37 @@ extension CallView: MultiCallControlsViewDelegate {
         }
         
         updateTranscriberViewConstraints()
+    }
+}
+
+// MARK: - CallViewAdapter
+extension CallView: CallViewAdapter {
+    public func onCreateOverlayView(layout: CallLayoutTemplate) -> UIView? {
+        guard layout == .float else { return nil }
+
+        let container = OverlayContainerView()
+        container.backgroundColor = .clear
+        container.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        singleCallControlsView.removeFromSuperview()
+        container.addSubview(singleCallControlsView)
+
+        let isSingleAudioCall = CallStore.shared.state.value.activeCall.mediaType == .audio
+        let controlsHeight: CGFloat = isSingleAudioCall ? 144.scale375Height() : 260.scale375Height()
+
+        singleCallControlsView.snp.remakeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.height.equalTo(controlsHeight)
+        }
+
+        return container
+    }
+}
+
+private final class OverlayContainerView: UIView {
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        guard let superview = superview else { return }
+        frame = superview.bounds
     }
 }

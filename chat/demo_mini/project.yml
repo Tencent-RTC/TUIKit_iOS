@@ -1,0 +1,23 @@
+name: ChatDemoMini
+options:
+  bundleIdPrefix: com.tencent.tuikit
+  developmentLanguage: en
+targets:
+  ChatDemoMini:
+    type: application
+    platform: iOS
+    deploymentTarget: "14.0"
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tencent.tuikit.chatdemomini
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDevelopmentRegion: en
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "需要访问麦克风以录制语音"
+        INFOPLIST_KEY_NSCameraUsageDescription: "需要访问相机以拍照"
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "需要访问相册以保存照片"
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "需要访问相册以保存照片和视频"

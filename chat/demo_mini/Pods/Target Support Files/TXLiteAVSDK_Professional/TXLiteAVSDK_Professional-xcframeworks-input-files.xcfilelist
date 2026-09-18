@@ -1,0 +1,4 @@
+${PODS_ROOT}/Target Support Files/TXLiteAVSDK_Professional/TXLiteAVSDK_Professional-xcframeworks.sh
+${PODS_ROOT}/TXLiteAVSDK_Professional/TXLiteAVSDK_Professional/TXLiteAVSDK_Professional.xcframework
+${PODS_ROOT}/TXLiteAVSDK_Professional/TXLiteAVSDK_Professional/TXSoundTouch.xcframework
+${PODS_ROOT}/TXLiteAVSDK_Professional/TXLiteAVSDK_Professional/TXFFmpeg.xcframework

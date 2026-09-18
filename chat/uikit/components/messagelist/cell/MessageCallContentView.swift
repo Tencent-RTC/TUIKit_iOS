@@ -1,7 +1,6 @@
 import UIKit
 import SnapKit
 import AtomicXCore
-import TUICallKit_Swift
 
 final class MessageCallContentView: UIView, MessageContentView {
     private static let horizontalInset = CGFloat(SpacingScheme.iconIconSpacing)
@@ -163,13 +162,8 @@ final class MessageCallContentView: UIView, MessageContentView {
             targetUserID = callModel.caller.trimmingCharacters(in: .whitespaces)
         }
         guard !targetUserID.isEmpty else { return }
-        let mediaType: CallMediaType = callModel.streamMediaType == .video ? .video : .audio
+        let mediaType: ChatCallEventPublisher.MediaType = callModel.streamMediaType == .video ? .video : .audio
         DataReport.reportInteractionMetrics(.chatInvokeCall)
-        TUICallKit.createInstance().calls(
-            userIdList: [targetUserID],
-            mediaType: mediaType,
-            params: nil,
-            completion: nil
-        )
+        ChatCallEventPublisher.publishStartCall(participantIDs: [targetUserID], mediaType: mediaType)
     }
 }

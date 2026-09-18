@@ -1,0 +1,110 @@
+PODS:
+  - AlbumPicker (1.0.8):
+    - AlbumPickerCore (= 1.0.8)
+  - AlbumPickerCore (1.0.8):
+    - TXIMSDK_Plus_iOS_XCFramework
+  - AtomicX (4.2.0):
+    - AtomicXCore
+    - Kingfisher
+    - RTCRoomEngine/Professional
+    - SnapKit
+    - TUICore
+    - TXIMSDK_Plus_iOS_XCFramework (>= 8.8.7357)
+    - TXLiteAVSDK_Professional (>= 13.0.20278)
+  - AtomicXCore (4.3.8):
+    - AtomicXCore/Core (= 4.3.8)
+    - RTCRoomEngine/Professional (>= 4.3.3)
+    - TXIMSDK_Plus_iOS_XCFramework (>= 9.0.7661)
+    - TXLiteAVSDK_Professional (>= 13.4.21067)
+  - AtomicXCore/Core (4.3.8):
+    - RTCRoomEngine/Professional (>= 4.3.3)
+    - TXIMSDK_Plus_iOS_XCFramework (>= 9.0.7661)
+    - TXLiteAVSDK_Professional (>= 13.4.21067)
+  - Kingfisher (8.12.0)
+  - Masonry (1.1.0)
+  - RTCRoomEngine/Professional (4.3.9):
+    - TXIMSDK_Plus_iOS_XCFramework (>= 8.4.6676)
+    - TXLiteAVSDK_Professional (>= 12.8.0.19666)
+  - SDWebImage (5.21.7):
+    - SDWebImage/Core (= 5.21.7)
+  - SDWebImage/Core (5.21.7)
+  - SnapKit (5.7.1)
+  - TUICallKit_Swift (1.0.0):
+    - AtomicX
+    - AtomicXCore
+    - SDWebImage
+    - SnapKit
+    - TUICallKit_Swift/Professional (= 1.0.0)
+    - TUICore
+  - TUICallKit_Swift/Professional (1.0.0):
+    - AtomicX
+    - AtomicXCore
+    - RTCRoomEngine/Professional
+    - SDWebImage
+    - SnapKit
+    - TUICore
+    - TXLiteAVSDK_Professional
+  - TUIChatKit (1.0.0):
+    - AlbumPicker
+    - AtomicXCore
+    - Kingfisher
+    - Masonry
+    - SnapKit
+  - TUICore (9.0.7660):
+    - SDWebImage
+    - TUICore/ImSDK_Plus (= 9.0.7660)
+  - TUICore/Base (9.0.7660):
+    - SDWebImage
+  - TUICore/ImSDK_Plus (9.0.7660):
+    - SDWebImage
+    - TUICore/Base
+    - TXIMSDK_Plus_iOS_XCFramework
+  - TXIMSDK_Plus_iOS_XCFramework (9.1.7818)
+  - TXLiteAVSDK_Professional (13.5.21355):
+    - TXLiteAVSDK_Professional/Professional (= 13.5.21355)
+  - TXLiteAVSDK_Professional/Professional (13.5.21355)
+
+DEPENDENCIES:
+  - TUICallKit_Swift (from `../../call/TUICallKit_Swift.podspec`)
+  - TUIChatKit (from `../uikit/TUIChatKit.podspec`)
+
+SPEC REPOS:
+  trunk:
+    - AlbumPicker
+    - AlbumPickerCore
+    - AtomicX
+    - AtomicXCore
+    - Kingfisher
+    - Masonry
+    - RTCRoomEngine
+    - SDWebImage
+    - SnapKit
+    - TUICore
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+
+EXTERNAL SOURCES:
+  TUICallKit_Swift:
+    :path: "../../call/TUICallKit_Swift.podspec"
+  TUIChatKit:
+    :path: "../uikit/TUIChatKit.podspec"
+
+SPEC CHECKSUMS:
+  AlbumPicker: 812fc5e6aeba0c0877bbc125e030ca1efbfdf109
+  AlbumPickerCore: 6b2819051b1b30e0764c271924f22181226cec14
+  AtomicX: d14d2fbf3d7f5acfff64dc3110dfd71245f53c4b
+  AtomicXCore: 901137ec0c935de0669cd70deeda75bdefd03dc1
+  Kingfisher: 64e06c7d1a9851ecff9d1b14f92ad01141263dae
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  RTCRoomEngine: 91ccc9bf10b5951e3941e22199636a66e3902c48
+  SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  TUICallKit_Swift: 0188f845d3cdeddc4e3f4fc9d27496e986b1c91e
+  TUIChatKit: 58174be577c2ebe30eb467efd6d0f722c9e763f5
+  TUICore: f23efd42114613206437cfd1cd6934c30d232d3f
+  TXIMSDK_Plus_iOS_XCFramework: 5e451a76880a59c99d4abf77eef80b9adf4f8e6b
+  TXLiteAVSDK_Professional: 914aa2e59545c8cdff80ab70c1bc8191c683ecfc
+
+PODFILE CHECKSUM: d5e32a2e03821db7b44408e7a62c13c6788b69d8
+
+COCOAPODS: 1.16.2

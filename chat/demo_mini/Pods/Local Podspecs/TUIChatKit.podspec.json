@@ -1,0 +1,46 @@
+{
+  "name": "TUIChatKit",
+  "version": "1.0.0",
+  "summary": "AtomicX Chat Component",
+  "description": "Chat streaming component for AtomicX",
+  "homepage": "https://cloud.tencent.com/document/product/269",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Tencent Cloud": "im@tencent.com"
+  },
+  "source": {
+    "git": "https://github.com/TencentCloud/chat-uikit-ios.git",
+    "tag": "1.0.0"
+  },
+  "platforms": {
+    "ios": "14.0"
+  },
+  "swift_versions": "5.0",
+  "static_framework": true,
+  "frameworks": [
+    "UIKit",
+    "Foundation",
+    "AVFoundation",
+    "AVKit",
+    "SwiftUI",
+    "SafariServices"
+  ],
+  "dependencies": {
+    "Kingfisher": [],
+    "AtomicXCore": [],
+    "Masonry": [],
+    "SnapKit": [],
+    "AlbumPicker": []
+  },
+  "source_files": "**/*.{swift,h,m}",
+  "resource_bundles": {
+    "TUIChatKitBundle": [
+      "resources/strings/**/*.{bundle,xcstrings}",
+      "resources/assets/chat/**/*.{xcassets,json,png,bundle}"
+    ]
+  },
+  "swift_version": "5.0"
+}

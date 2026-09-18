@@ -1,0 +1,3459 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target arm64-apple-ios14.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name AtomicXCore
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import AVFAudio
+import AVFoundation
+@_exported import AtomicXCore
+import Combine
+import CommonCrypto
+import CoreGraphics
+import Foundation
+import ImSDK_Plus
+import LiveCommunicationKit
+import ObjectiveC
+import PushKit
+import RTCRoomEngine
+import Swift
+import SwiftUI
+import TXLiteAVSDK_Professional
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+extension AtomicXCore.TranscriptionConfig : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.InterpretationVoice : Swift.Codable {
+}
+extension AtomicXCore.InterpretationConfig : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.TranslationLanguage : Swift.Codable {
+}
+extension AtomicXCore.TranscriberMessage : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+public enum SourceLanguage : Swift.String {
+  case chineseEnglish
+  case chinese
+  case english
+  case cantonese
+  case vietnamese
+  case japanese
+  case korean
+  case indonesian
+  case thai
+  case portuguese
+  case turkish
+  case arabic
+  case spanish
+  case hindi
+  case french
+  case malay
+  case filipino
+  case german
+  case italian
+  case russian
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum TranslationLanguage : Swift.String, Swift.CaseIterable {
+  case chinese
+  case english
+  case vietnamese
+  case japanese
+  case korean
+  case indonesian
+  case thai
+  case portuguese
+  case arabic
+  case spanish
+  case french
+  case malay
+  case german
+  case italian
+  case russian
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [AtomicXCore.TranslationLanguage]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [AtomicXCore.TranslationLanguage] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum InterpretationVoice : Swift.String, Swift.CaseIterable {
+  case female
+  case male
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [AtomicXCore.InterpretationVoice]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [AtomicXCore.InterpretationVoice] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct TranscriberMessage {
+  public let segmentId: Swift.String
+  public var speakerUserId: Swift.String
+  public var speakerUserName: Swift.String
+  public var sourceText: Swift.String
+  public var translationTexts: [AtomicXCore.TranslationLanguage : Swift.String]
+  public var timestamp: Swift.Int64
+  public var isCompleted: Swift.Bool
+  public init(segmentId: Swift.String, speakerUserId: Swift.String = "", speakerUserName: Swift.String = "", sourceText: Swift.String = "", translationTexts: [AtomicXCore.TranslationLanguage : Swift.String] = [:], timestamp: Swift.Int64 = 0, isCompleted: Swift.Bool = false)
+}
+public struct TranscriptionConfig {
+  public var enableTranslation: Swift.Bool
+  public init(enableTranslation: Swift.Bool = false)
+}
+public struct InterpretationConfig {
+  public var voice: AtomicXCore.InterpretationVoice
+  public init(voice: AtomicXCore.InterpretationVoice = .female)
+}
+@available(*, deprecated)
+public struct TranscriberConfig {
+  public var sourceLanguage: AtomicXCore.SourceLanguage
+  public var translationLanguages: [AtomicXCore.TranslationLanguage]
+  public init(sourceLanguage: AtomicXCore.SourceLanguage = .chineseEnglish, translationLanguages: [AtomicXCore.TranslationLanguage] = [])
+}
+public struct TranscriberState {
+  public var selfLanguage: AtomicXCore.SourceLanguage
+  public var realtimeMessageList: [AtomicXCore.TranscriberMessage]
+  public var isTranscriptionRunning: Swift.Bool
+  public var transcriptionConfig: AtomicXCore.TranscriptionConfig
+  public var isInterpretationRunning: Swift.Bool
+  public var interpretationConfig: AtomicXCore.InterpretationConfig
+  public var interpretationVolume: Swift.Int
+}
+@available(*, deprecated)
+public enum AITranscriberStoreEvent {
+  case onReceiveTranscriberMessage(roomID: Swift.String, message: AtomicXCore.TranscriberMessage)
+  case onRealtimeTranscriberStarted(roomID: Swift.String, transcriberRobotID: Swift.String)
+  case onRealtimeTranscriberStopped(roomID: Swift.String, transcriberRobotID: Swift.String, reason: Swift.Int)
+  case onRealtimeTranscriberError(roomID: Swift.String, transcriberRobotID: Swift.String, code: Swift.Int, message: Swift.String)
+}
+@objc @_inheritsConvenienceInitializers public class AITranscriberStore : ObjectiveC.NSObject {
+  public static func create(roomID: Swift.String) -> AtomicXCore.AITranscriberStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.TranscriberState>
+  @available(*, deprecated)
+  final public let aiTranscriberEventPublisher: Combine.PassthroughSubject<AtomicXCore.AITranscriberStoreEvent, Swift.Never>
+  public func startTranscription(myLanguage: AtomicXCore.SourceLanguage, config: AtomicXCore.TranscriptionConfig = TranscriptionConfig(), completion: AtomicXCore.CompletionClosure? = nil)
+  public func updateTranscription(myLanguage: AtomicXCore.SourceLanguage, config: AtomicXCore.TranscriptionConfig = TranscriptionConfig(), completion: AtomicXCore.CompletionClosure? = nil)
+  public func stopTranscription(completion: AtomicXCore.CompletionClosure? = nil)
+  public func startInterpretation(myLanguage: AtomicXCore.SourceLanguage, config: AtomicXCore.InterpretationConfig = InterpretationConfig(), completion: AtomicXCore.CompletionClosure? = nil)
+  public func updateInterpretation(myLanguage: AtomicXCore.SourceLanguage, config: AtomicXCore.InterpretationConfig = InterpretationConfig(), completion: AtomicXCore.CompletionClosure? = nil)
+  public func stopInterpretation(completion: AtomicXCore.CompletionClosure? = nil)
+  public func setInterpretationVolume(_ volume: Swift.Int, completion: AtomicXCore.CompletionClosure? = nil)
+  @available(*, deprecated)
+  public func startRealtimeTranscriber(config: AtomicXCore.TranscriberConfig, completion: AtomicXCore.CompletionClosure? = nil)
+  @available(*, deprecated)
+  public func updateRealtimeTranscriber(config: AtomicXCore.TranscriberConfig, completion: AtomicXCore.CompletionClosure? = nil)
+  @available(*, deprecated)
+  public func stopRealtimeTranscriber(completion: AtomicXCore.CompletionClosure? = nil)
+  @objc override dynamic public init()
+  @objc deinit
+}
+public enum AudioChangerType : Swift.Int {
+  case none
+  case child
+  case littleGirl
+  case man
+  case heavyMetal
+  case cold
+  case foreigner
+  case trappedBeast
+  case fatso
+  case strongCurrent
+  case heavyMachinery
+  case ethereal
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum AudioReverbType : Swift.Int {
+  case none
+  case ktv
+  case smallRoom
+  case auditorium
+  case deep
+  case loud
+  case metallic
+  case magnetic
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct AudioEffectState {
+  public var audioChangerType: AtomicXCore.AudioChangerType
+  public var audioReverbType: AtomicXCore.AudioReverbType
+  public var isEarMonitorOpened: Swift.Bool
+  public var earMonitorVolume: Swift.Int
+  public init()
+}
+@_hasMissingDesignatedInitializers public class AudioEffectStore {
+  public static let shared: AtomicXCore.AudioEffectStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.AudioEffectState> {
+    get
+  }
+  public func setAudioChangerType(type: AtomicXCore.AudioChangerType)
+  public func setAudioReverbType(type: AtomicXCore.AudioReverbType)
+  public func setVoiceEarMonitorEnable(enable: Swift.Bool)
+  public func setVoiceEarMonitorVolume(volume: Swift.Int)
+  public func reset()
+  @objc deinit
+}
+public enum BarrageType : Swift.Int {
+  case text
+  case custom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct Barrage {
+  public var liveID: Swift.String
+  public var sender: AtomicXCore.LiveUserInfo
+  public var sequence: Swift.Int
+  public var timestampInSecond: Swift.Double
+  public var messageType: AtomicXCore.BarrageType
+  public var textContent: Swift.String
+  public var extensionInfo: [Swift.String : Swift.String]?
+  public var businessID: Swift.String
+  public var data: Swift.String
+  public init()
+}
+public struct BarrageState {
+  public var messageList: [AtomicXCore.Barrage]
+  public init()
+}
+public enum CustomMessageEvent {
+  case customMessageReceived(barrage: AtomicXCore.Barrage)
+}
+@_hasMissingDesignatedInitializers public class BarrageStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.BarrageStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.BarrageState> {
+    get
+  }
+  final public let CustomMessageEventPublisher: Combine.PassthroughSubject<AtomicXCore.CustomMessageEvent, Swift.Never>
+  public func sendTextMessage(text: Swift.String, extensionInfo: [Swift.String : Swift.String]?, completion: AtomicXCore.CompletionClosure?)
+  public func sendCustomMessage(businessID: Swift.String, data: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func appendLocalTip(message: AtomicXCore.Barrage)
+  @objc deinit
+}
+public struct BaseBeautyState {
+  public var smoothLevel: Swift.Float
+  public var whitenessLevel: Swift.Float
+  public var ruddyLevel: Swift.Float
+  public init()
+}
+@_hasMissingDesignatedInitializers public class BaseBeautyStore {
+  public static let shared: AtomicXCore.BaseBeautyStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.BaseBeautyState> {
+    get
+  }
+  public func setSmoothLevel(smoothLevel: Swift.Float)
+  public func setWhitenessLevel(whitenessLevel: Swift.Float)
+  public func setRuddyLevel(ruddyLevel: Swift.Float)
+  public func reset()
+  @objc deinit
+}
+public enum BattleEndedReason : Swift.Int {
+  case timeOver
+  case allMemberExit
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct BattleConfig {
+  public var duration: Swift.Double
+  public var needResponse: Swift.Bool
+  public var extensionInfo: Swift.String
+  public init(duration: Foundation.TimeInterval = 0, needResponse: Swift.Bool = false, extensionInfo: Swift.String = "")
+}
+public struct BattleInfo {
+  public var battleID: Swift.String
+  public var config: AtomicXCore.BattleConfig
+  public var startTime: Swift.UInt
+  public var endTime: Swift.UInt
+  public init(battleID: Swift.String = "", config: AtomicXCore.BattleConfig = .init(), startTime: Swift.UInt = 0, endTime: Swift.UInt = 0)
+}
+public struct BattleState {
+  public var currentBattleInfo: AtomicXCore.BattleInfo?
+  public var battleUsers: [AtomicXCore.SeatUserInfo]
+  public var battleScore: [Swift.String : Swift.UInt]
+  public init()
+}
+public enum BattleEvent {
+  case onBattleStarted(battleInfo: AtomicXCore.BattleInfo, inviter: AtomicXCore.SeatUserInfo, invitees: [AtomicXCore.SeatUserInfo])
+  case onBattleEnded(battleInfo: AtomicXCore.BattleInfo, reason: AtomicXCore.BattleEndedReason)
+  case onUserJoinBattle(battleID: Swift.String, battleUser: AtomicXCore.SeatUserInfo)
+  case onUserExitBattle(battleID: Swift.String, battleUser: AtomicXCore.SeatUserInfo)
+  case onBattleRequestReceived(battleID: Swift.String, inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+  case onBattleRequestCancelled(battleID: Swift.String, inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+  case onBattleRequestTimeout(battleID: Swift.String, inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+  case onBattleRequestAccept(battleID: Swift.String, inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+  case onBattleRequestReject(battleID: Swift.String, inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+}
+public typealias BattleRequestClosure = (Swift.Result<(AtomicXCore.BattleInfo, [Swift.String : Swift.Int]), AtomicXCore.ErrorInfo>) -> Swift.Void
+@_hasMissingDesignatedInitializers public class BattleStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.BattleStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.BattleState> {
+    get
+  }
+  public var battleEventPublisher: Combine.PassthroughSubject<AtomicXCore.BattleEvent, Swift.Never> {
+    get
+  }
+  public func requestBattle(config: AtomicXCore.BattleConfig, userIDList: [Swift.String], timeout: Foundation.TimeInterval, completion: AtomicXCore.BattleRequestClosure?)
+  public func cancelBattleRequest(battleId: Swift.String, userIdList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func acceptBattle(battleID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectBattle(battleID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func exitBattle(battleID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+extension AtomicXCore.BattleConfig : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.BattleConfig, rhs: AtomicXCore.BattleConfig) -> Swift.Bool
+}
+extension AtomicXCore.BattleInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.BattleInfo, rhs: AtomicXCore.BattleInfo) -> Swift.Bool
+}
+public enum CallLayoutTemplate {
+  case float
+  case grid
+  case pip
+  public static func == (a: AtomicXCore.CallLayoutTemplate, b: AtomicXCore.CallLayoutTemplate) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum VolumeLevel : Swift.Int {
+  case mute
+  case low
+  case medium
+  case high
+  case peak
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol CallViewAdapter : AnyObject {
+  func onCreateOverlayView(layout: AtomicXCore.CallLayoutTemplate) -> UIKit.UIView?
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class CallCoreView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public static var defaultAvatarImage: UIKit.UIImage?
+  @_Concurrency.MainActor @preconcurrency public static var waitingAnimationImage: UIKit.UIImage?
+  @_Concurrency.MainActor @preconcurrency public static var volumeImages: [AtomicXCore.VolumeLevel : UIKit.UIImage]
+  @_Concurrency.MainActor @preconcurrency public static var networkQualityImages: [AtomicXCore.NetworkQuality : UIKit.UIImage]
+  @_Concurrency.MainActor @preconcurrency public static var participantAvatars: [Swift.String : UIKit.UIImage]
+  @_Concurrency.MainActor @preconcurrency weak public var callViewAdapter: (any AtomicXCore.CallViewAdapter)? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency public func setLayoutTemplate(_ template: AtomicXCore.CallLayoutTemplate)
+  @_Concurrency.MainActor @preconcurrency public func setWaitingAnimation(path: Swift.String)
+  @_Concurrency.MainActor @preconcurrency public func setVolumeLevelIcons(icons: [AtomicXCore.VolumeLevel : Swift.String])
+  @_Concurrency.MainActor @preconcurrency public func setNetworkQualityIcons(icons: [AtomicXCore.NetworkQuality : Swift.String])
+  @_Concurrency.MainActor @preconcurrency public func setParticipantAvatars(avatars: [Swift.String : Swift.String])
+  @objc deinit
+}
+extension AtomicXCore.CallCoreView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+}
+@objc @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class CallParticipantView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func layoutSubviews()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class CallPipView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+  @objc deinit
+}
+public enum CallMediaType : Swift.Int {
+  case audio
+  case video
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CallEndReason : Swift.Int {
+  case unknown
+  case hangup
+  case reject
+  case noResponse
+  case offline
+  case lineBusy
+  case canceled
+  case otherDeviceAccepted
+  case otherDeviceReject
+  case endByServer
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CallDirection : Swift.Int {
+  case unknown
+  case missed
+  case incoming
+  case outgoing
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CallParticipantStatus : Swift.Int {
+  case none
+  case waiting
+  case accept
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CloudRecordPolicy : Swift.Int {
+  case followConsoleConfig
+  case enable
+  case disable
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct CallParams {
+  public var roomId: Swift.String
+  public var timeout: Swift.Int
+  public var userData: Swift.String
+  public var chatGroupId: Swift.String
+  public var isEphemeralCall: Swift.Bool
+  public var cloudRecordPolicy: AtomicXCore.CloudRecordPolicy
+  public var offlinePushTitle: Swift.String
+  public var offlinePushDescription: Swift.String
+  public init()
+}
+public struct CallParticipantInfo : Swift.Equatable {
+  public var id: Swift.String
+  public var name: Swift.String
+  public var avatarURL: Swift.String
+  public var remark: Swift.String
+  public var status: AtomicXCore.CallParticipantStatus
+  public var isMicrophoneOpened: Swift.Bool
+  public var isCameraOpened: Swift.Bool
+  public init()
+  public static func == (a: AtomicXCore.CallParticipantInfo, b: AtomicXCore.CallParticipantInfo) -> Swift.Bool
+}
+public struct CallInfo {
+  public var callId: Swift.String
+  public var roomId: Swift.String
+  public var inviterId: Swift.String
+  public var inviteeIds: [Swift.String]
+  public var chatGroupId: Swift.String
+  public var mediaType: AtomicXCore.CallMediaType?
+  public var result: AtomicXCore.CallDirection
+  public var startTime: Swift.Double
+  public var duration: Swift.Double
+  public init()
+}
+public struct CallState {
+  public var activeCall: AtomicXCore.CallInfo
+  public var recentCalls: [AtomicXCore.CallInfo]
+  public var cursor: Swift.String
+  public var selfInfo: AtomicXCore.CallParticipantInfo
+  public var allParticipants: [AtomicXCore.CallParticipantInfo]
+  public var speakerVolumes: [Swift.String : Swift.Int]
+  public var networkQualities: [Swift.String : AtomicXCore.NetworkQuality]
+  public init()
+}
+public enum CallEvent {
+  case onCallStarted(callId: Swift.String, mediaType: AtomicXCore.CallMediaType)
+  case onCallReceived(callId: Swift.String, mediaType: AtomicXCore.CallMediaType, userData: Swift.String)
+  case onCallEnded(callId: Swift.String, mediaType: AtomicXCore.CallMediaType, reason: AtomicXCore.CallEndReason, userId: Swift.String)
+  case onSuggestSwitchToCellular
+}
+@objc @_inheritsConvenienceInitializers public class CallStore : ObjectiveC.NSObject {
+  public static let shared: AtomicXCore.CallStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.CallState>
+  final public let callEventPublisher: Combine.PassthroughSubject<AtomicXCore.CallEvent, Swift.Never>
+  public func calls(participantIds: [Swift.String], mediaType: AtomicXCore.CallMediaType, params: AtomicXCore.CallParams?, completion: AtomicXCore.CompletionClosure?)
+  public func accept(completion: AtomicXCore.CompletionClosure?)
+  public func reject(completion: AtomicXCore.CompletionClosure?)
+  public func hangup(completion: AtomicXCore.CompletionClosure?)
+  public func join(callId: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func invite(participantIds: [Swift.String], params: AtomicXCore.CallParams?, completion: AtomicXCore.CompletionClosure?)
+  public func queryRecentCalls(cursor: Swift.String, count: Swift.UInt, completion: AtomicXCore.CompletionClosure?)
+  public func deleteRecentCalls(callIdList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func callExperimentalAPI(jsonStr: Swift.String)
+  @objc override dynamic public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class ChatUtil {
+  public static func dictionary2JsonData(_ dictionary: [Swift.String : Any]) -> Foundation.Data?
+  public static func jsonData2Dictionary(jsonData: Foundation.Data?) -> [Swift.String : Any]?
+  public static func convertDateToHMStr(_ date: Foundation.Date?) -> Swift.String?
+  public static func getHomePath() -> Swift.String
+  public static func getMediaHomePath(messageType: AtomicXCore.MessageType) -> Swift.String
+  public static func generateMediaPath(messageType: AtomicXCore.MessageType, withExtension: Swift.String?) -> Swift.String
+  public static func getUserID(_ conversationID: Swift.String) -> Swift.String?
+  public static func getGroupID(_ conversationID: Swift.String) -> Swift.String?
+  public static func isCommunityGroup(_ groupID: Swift.String?) -> Swift.Bool
+  public static func getC2CConversationID(_ userID: Swift.String) -> Swift.String
+  public static func getGroupConversationID(_ userID: Swift.String) -> Swift.String
+  public static func getMemberShowName(_ info: ImSDK_Plus.V2TIMGroupMemberInfo?) -> Swift.String
+  public static func getMemberShowName(_ tips: ImSDK_Plus.V2TIMGroupTipsElem?, with userId: Swift.String?) -> Swift.String
+  public static func getMembersShowName(_ infoList: [ImSDK_Plus.V2TIMGroupMemberInfo]?) -> [Swift.String]
+  public static func getMessageSenderName(_ message: AtomicXCore.MessageInfo?) -> Swift.String
+  public static func getActualMediaPath(_ messageType: AtomicXCore.MessageType, mediaPath: Swift.String?, uuid: Swift.String?, fileExtension: Swift.String?, isLocalExist: inout Swift.Bool) -> Swift.String
+  public static func convertToMessageReceipt(from v2Receipt: ImSDK_Plus.V2TIMMessageReceipt) -> AtomicXCore.MessageReceipt
+  public static func convertToGroupMember(from v2Member: ImSDK_Plus.V2TIMGroupMemberInfo) -> AtomicXCore.GroupMember
+  public static func convertToMessageReactions(from v2Reactions: [Any]) -> [AtomicXCore.MessageReaction]
+  public static func convertToMessageExtensions(from v2Extensions: [Any]) -> [AtomicXCore.MessageExtension]
+  public static func convertToUserProfile(from v2UserInfo: ImSDK_Plus.V2TIMUserInfo) -> AtomicXCore.UserProfile
+  public static func convertToUserFullProfile(from v2UserInfo: ImSDK_Plus.V2TIMUserFullInfo) -> AtomicXCore.UserProfile
+  public static func convertToV2TIMReceiveMessageOpt(_ opt: AtomicXCore.ReceiveMessageOption) -> ImSDK_Plus.V2TIMReceiveMessageOpt
+  public static func convertToReceiveMessageOpt(_ v2Opt: ImSDK_Plus.V2TIMReceiveMessageOpt) -> AtomicXCore.ReceiveMessageOption
+  @objc deinit
+}
+extension AtomicXCore.ChatUtil {
+  public static func convertToMessageInfo(rawMessage: ImSDK_Plus.V2TIMMessage) -> AtomicXCore.MessageInfo
+  public static func applyRevokeInfo(to messageInfo: inout AtomicXCore.MessageInfo, rawMessage: ImSDK_Plus.V2TIMMessage, operateUser: ImSDK_Plus.V2TIMUserInfo?, reason: Swift.String?)
+  public static func convertToMessageQuoteInfo(from rawMessage: ImSDK_Plus.V2TIMMessage) -> AtomicXCore.MessageQuoteInfo?
+  public static func convertToMessageStatus(_ rawMessage: ImSDK_Plus.V2TIMMessage) -> AtomicXCore.MessageStatus
+  public static func convertToMessageType(_ rawMessage: ImSDK_Plus.V2TIMMessage) -> AtomicXCore.MessageType
+  public static func convertToMessagePayload(rawMessage: ImSDK_Plus.V2TIMMessage) -> AtomicXCore.MessagePayload?
+}
+public enum NoResponseReason : Swift.Int {
+  case timeout
+  case alreadySeated
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct CoGuestState {
+  public var connected: [AtomicXCore.SeatUserInfo]
+  public var invitees: [AtomicXCore.LiveUserInfo]
+  public var applicants: [AtomicXCore.LiveUserInfo]
+  public var candidates: [AtomicXCore.LiveUserInfo]
+  public init()
+}
+public enum HostEvent {
+  case onGuestApplicationReceived(guestUser: AtomicXCore.LiveUserInfo)
+  case onGuestApplicationCancelled(guestUser: AtomicXCore.LiveUserInfo)
+  case onGuestApplicationProcessedByOtherHost(guestUser: AtomicXCore.LiveUserInfo, hostUser: AtomicXCore.LiveUserInfo)
+  case onHostInvitationResponded(isAccept: Swift.Bool, guestUser: AtomicXCore.LiveUserInfo)
+  case onHostInvitationNoResponse(guestUser: AtomicXCore.LiveUserInfo, reason: AtomicXCore.NoResponseReason)
+}
+public enum GuestEvent {
+  case onHostInvitationReceived(hostUser: AtomicXCore.LiveUserInfo)
+  case onHostInvitationCancelled(hostUser: AtomicXCore.LiveUserInfo)
+  case onGuestApplicationResponded(isAccept: Swift.Bool, hostUser: AtomicXCore.LiveUserInfo)
+  case onGuestApplicationNoResponse(reason: AtomicXCore.NoResponseReason)
+  case onKickedOffSeat(seatIndex: Swift.Int, hostUser: AtomicXCore.LiveUserInfo)
+}
+@_hasMissingDesignatedInitializers public class CoGuestStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.CoGuestStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.CoGuestState>
+  final public let guestEventPublisher: Combine.PassthroughSubject<AtomicXCore.GuestEvent, Swift.Never>
+  final public let hostEventPublisher: Combine.PassthroughSubject<AtomicXCore.HostEvent, Swift.Never>
+  public func applyForSeat(seatIndex: Swift.Int = -1, timeout: Foundation.TimeInterval, extraInfo: Swift.String?, completion: AtomicXCore.CompletionClosure?)
+  public func cancelApplication(completion: AtomicXCore.CompletionClosure?)
+  public func acceptApplication(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectApplication(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func inviteToSeat(userID: Swift.String, seatIndex: Swift.Int = -1, timeout: Foundation.TimeInterval, extraInfo: Swift.String?, completion: AtomicXCore.CompletionClosure?)
+  public func cancelInvitation(inviteeID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func acceptInvitation(inviterID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectInvitation(inviterID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func disConnect(completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public enum CoHostStatus : Swift.Int {
+  case connected
+  case disconnected
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CoHostLayoutTemplate : Swift.Int {
+  case hostVoiceConnection
+  case hostVideoLandscapeFixed2Seats
+  case hostDynamicGrid
+  case hostDynamic1v6
+  case hostVideoLeftFocus9Seats
+  case hostVideoUniformGrid9Seats
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct CoHostState {
+  public var coHostStatus: AtomicXCore.CoHostStatus
+  public var connected: [AtomicXCore.SeatUserInfo]
+  public var invitees: [AtomicXCore.SeatUserInfo]
+  public var applicant: AtomicXCore.SeatUserInfo?
+  public var candidatesCursor: Swift.String
+  public var candidates: [AtomicXCore.SeatUserInfo]
+  public init()
+}
+public enum CoHostEvent {
+  case onCoHostRequestReceived(inviter: AtomicXCore.SeatUserInfo, extensionInfo: Swift.String)
+  case onCoHostRequestCancelled(inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo?)
+  case onCoHostRequestAccepted(invitee: AtomicXCore.SeatUserInfo)
+  case onCoHostRequestRejected(invitee: AtomicXCore.SeatUserInfo)
+  case onCoHostRequestTimeout(inviter: AtomicXCore.SeatUserInfo, invitee: AtomicXCore.SeatUserInfo)
+  case onCoHostUserJoined(userInfo: AtomicXCore.SeatUserInfo)
+  case onCoHostUserLeft(userInfo: AtomicXCore.SeatUserInfo)
+}
+@_hasMissingDesignatedInitializers public class CoHostStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.CoHostStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.CoHostState>
+  final public let coHostEventPublisher: Combine.PassthroughSubject<AtomicXCore.CoHostEvent, Swift.Never>
+  public func requestHostConnection(targetHost liveId: Swift.String, layoutTemplate: AtomicXCore.CoHostLayoutTemplate, timeout: Foundation.TimeInterval, extraInfo: Swift.String = "", completion: AtomicXCore.CompletionClosure?)
+  public func cancelHostConnection(toHostLiveID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func acceptHostConnection(fromHostLiveID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectHostConnection(fromHostLiveID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func exitHostConnection(completion: AtomicXCore.CompletionClosure? = nil)
+  public func getCoHostCandidates(cursor: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func muteRemoteHostAudio(liveID: Swift.String, isMuted: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct ContactState {
+  public var friendList: [AtomicXCore.ContactInfo]
+  public var friendApplicationList: [AtomicXCore.FriendApplicationInfo]
+  public var friendApplicationUnreadCount: Swift.Int
+  public var blackList: [AtomicXCore.ContactInfo]
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class ContactStore : ObjectiveC.NSObject {
+  public static let shared: AtomicXCore.ContactStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.ContactState>
+  public func loadFriends(completion: AtomicXCore.CompletionClosure?)
+  public func addFriend(userID: Swift.String, remark: Swift.String?, addWording: Swift.String?, completion: AtomicXCore.CompletionClosure?)
+  public func deleteFriend(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func setFriendRemark(userID: Swift.String, remark: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func getContactInfo(userIDList: [Swift.String], completion: any AtomicXCore.GetContactInfoCompletionHandler)
+  public func loadBlackList(completion: AtomicXCore.CompletionClosure?)
+  public func addToBlacklist(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func removeFromBlacklist(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func loadFriendApplications(completion: AtomicXCore.CompletionClosure?)
+  public func acceptFriendApplication(info: AtomicXCore.FriendApplicationInfo, completion: AtomicXCore.CompletionClosure?)
+  public func refuseFriendApplication(info: AtomicXCore.FriendApplicationInfo, completion: AtomicXCore.CompletionClosure?)
+  public func clearFriendApplicationUnreadCount(completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct ContactInfo : Swift.Identifiable, Swift.Equatable {
+  public var id: Swift.String {
+    get
+  }
+  public var userID: Swift.String
+  public var avatarURL: Swift.String?
+  public var nickname: Swift.String?
+  public var aboutMe: Swift.String?
+  public var onlineStatus: AtomicXCore.ContactOnlineStatus
+  public var isInBlacklist: Swift.Bool
+  public var isFriend: Swift.Bool
+  public var friendRemark: Swift.String?
+  public init(userID: Swift.String)
+  public static func == (lhs: AtomicXCore.ContactInfo, rhs: AtomicXCore.ContactInfo) -> Swift.Bool
+  public typealias ID = Swift.String
+}
+public enum ContactOnlineStatus : Swift.Int {
+  case unknown
+  case online
+  case offline
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum FriendApplicationType : Swift.Int {
+  case received
+  case sent
+  case both
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct FriendApplicationInfo : Swift.Identifiable {
+  public var id: Swift.String {
+    get
+  }
+  public var userID: Swift.String
+  public var avatarURL: Swift.String?
+  public var title: Swift.String?
+  public var source: Swift.String?
+  public var type: AtomicXCore.FriendApplicationType
+  public var addWording: Swift.String?
+  public typealias ID = Swift.String
+}
+public protocol GetContactInfoCompletionHandler {
+  func onSuccess(contactInfoList: [AtomicXCore.ContactInfo])
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+public struct ConversationGroupState {
+  public var groupList: [Swift.String] {
+    get
+  }
+  public init()
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class ConversationGroupStore : ObjectiveC.NSObject {
+  public static let shared: AtomicXCore.ConversationGroupStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.ConversationGroupState>
+  public func loadGroups(completion: AtomicXCore.CompletionClosure?)
+  public func createGroup(groupName: Swift.String, conversationIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func deleteGroup(groupName: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func renameGroup(oldName: Swift.String, newName: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func addConversationsToGroup(groupName: Swift.String, conversationIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func deleteConversationsFromGroup(groupName: Swift.String, conversationIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public enum ConversationGroup : Swift.String {
+  case c2c
+  case group
+  case hasUnreadCount
+  case hasGroupAtInfo
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum ConversationType : Swift.Int {
+  case unknown
+  case c2c
+  case group
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct ConversationMarkType : Swift.OptionSet {
+  public let rawValue: Swift.Int64
+  public init(rawValue: Swift.Int64)
+  public static let star: AtomicXCore.ConversationMarkType
+  public static let unread: AtomicXCore.ConversationMarkType
+  public static let fold: AtomicXCore.ConversationMarkType
+  public static let hide: AtomicXCore.ConversationMarkType
+  public typealias ArrayLiteralElement = AtomicXCore.ConversationMarkType
+  public typealias Element = AtomicXCore.ConversationMarkType
+  public typealias RawValue = Swift.Int64
+}
+public enum GroupAtType : Swift.Int {
+  case atMe
+  case atAll
+  case atAllAtMe
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct GroupAtInfo {
+  public let msgSeq: Swift.Int64
+  public let atType: AtomicXCore.GroupAtType
+  public init(msgSeq: Swift.Int64, atType: AtomicXCore.GroupAtType)
+}
+public enum ReceiveMessageOption : Swift.Int {
+  case receive
+  case notReceive
+  case notNotify
+  case notNotifyExceptMention
+  case notReceiveExceptMention
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct ConversationInfo : Swift.Identifiable {
+  public var id: Swift.String {
+    get
+  }
+  public var conversationID: Swift.String
+  public var type: AtomicXCore.ConversationType?
+  public var groupType: AtomicXCore.GroupType?
+  public var avatarURL: Swift.String?
+  public var title: Swift.String?
+  public var lastMessage: AtomicXCore.MessageInfo?
+  public var draft: Swift.String?
+  public var unreadCount: Swift.Int
+  public var isPinned: Swift.Bool
+  public var receiveOption: AtomicXCore.ReceiveMessageOption
+  public var groupAtInfoList: [AtomicXCore.GroupAtInfo]?
+  public var conversationMarkList: [AtomicXCore.ConversationMarkType]
+  public var conversationGroupList: [Swift.String]
+  public init(conversationID: Swift.String)
+  public typealias ID = Swift.String
+}
+public struct ConversationLoadOption {
+  public var count: Swift.Int
+  public var markType: AtomicXCore.ConversationMarkType?
+  public init()
+}
+public struct ConversationListState {
+  public var conversationList: [AtomicXCore.ConversationInfo]
+  public var hasMoreConversations: Swift.Bool
+  public var totalUnreadCount: Swift.Int64
+}
+public protocol GetConversationInfoCompletionHandler {
+  func onSuccess(conversationInfo: AtomicXCore.ConversationInfo)
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+@objc @_hasMissingDesignatedInitializers public class ConversationListStore : ObjectiveC.NSObject {
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.ConversationListState>
+  final public let conversationGroup: Swift.String?
+  public static func create(conversationGroup: Swift.String? = nil) -> AtomicXCore.ConversationListStore
+  public func loadConversations(option: AtomicXCore.ConversationLoadOption?, completion: AtomicXCore.CompletionClosure?)
+  public func loadMoreConversations(completion: AtomicXCore.CompletionClosure?)
+  public func getConversationInfo(conversationID: Swift.String, completion: any AtomicXCore.GetConversationInfoCompletionHandler)
+  public func deleteConversation(conversationID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func pinConversation(conversationID: Swift.String, pin: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func markConversation(conversationIDList: [Swift.String], markType: AtomicXCore.ConversationMarkType, enable: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func setReceiveMessageOpt(conversationID: Swift.String, opt: AtomicXCore.ReceiveMessageOption, completion: AtomicXCore.CompletionClosure?)
+  public func setConversationDraft(conversationID: Swift.String, draft: Swift.String?, completion: AtomicXCore.CompletionClosure?)
+  public func clearConversationMessages(conversationID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func clearConversationUnreadCount(conversationID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public enum AtomicMetrics : Swift.Int {
+  case messageListStore
+  case messageInputStore
+  case messageActionStore
+  case conversationListStore
+  case conversationGroupStore
+  case searchStore
+  case contactStore
+  case groupStore
+  case groupMemberStore
+  case liveList
+  case liveSeat
+  case liveAudience
+  case liveCoGuest
+  case liveCoHost
+  case liveBattle
+  case liveBarrage
+  case liveLike
+  case liveGift
+  case device
+  case audioEffect
+  case baseBeauty
+  case albumPicker
+  case musicStore
+  case room
+  case roomParticipant
+  case callStore
+  case aiTranscriberStore
+  case offlinePush
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum InteractionMetrics : Swift.Int {
+  case chatInvokeCall
+  case chatInvokeRoom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum DataReport {
+  public static func setFramework(_ framework: Swift.Int)
+  public static func reportAtomicMetrics(_ type: AtomicXCore.AtomicMetrics)
+  public static func reportInteractionMetrics(_ type: AtomicXCore.InteractionMetrics)
+  public static func reportUIPlatform(platform: Swift.Int)
+}
+public struct ErrorInfo : Swift.Error {
+  public let code: Swift.Int
+  public let message: Swift.String
+  public init(code: Swift.Int, message: Swift.String)
+}
+public class StatePublisher<State> : Combine.ObservableObject {
+  public typealias StatePublisherUpdateClosure = (inout State) -> Swift.Void
+  @Combine.Published @_projectedValueProperty($value) public var value: State {
+    get
+  }
+  public var $value: Combine.Published<State>.Publisher {
+    get
+  }
+  public init(initialState: State)
+  public func subscribe<Value>(_ selector: AtomicXCore.StatePublisherSelector<State, Value>) -> Combine.AnyPublisher<Value, Swift.Never> where Value : Swift.Equatable
+  public func subscribe<Value>(_ selector: AtomicXCore.StatePublisherSelector<State, Value>) -> Combine.AnyPublisher<Value, Swift.Never>
+  public func subscribe() -> Combine.AnyPublisher<State, Swift.Never>
+  public typealias ObjectWillChangePublisher = Combine.ObservableObjectPublisher
+  @objc deinit
+}
+public protocol StatePropertySelector {
+  associatedtype State
+  associatedtype Value
+  func map(_ state: Self.State) -> Self.Value
+}
+public class StatePublisherSelector<State, Value> : AtomicXCore.StatePropertySelector {
+  convenience public init(keyPath: Swift.KeyPath<State, Value>)
+  public init(projector: @escaping (State) -> Value)
+  public func map(_ state: State) -> Value
+  @objc deinit
+}
+public typealias ListResultCompletionClosure<T> = (Swift.Result<([T], Swift.String), AtomicXCore.ErrorInfo>) -> Swift.Void
+public typealias CompletionClosure = (Swift.Result<Swift.Void, AtomicXCore.ErrorInfo>) -> Swift.Void
+extension AtomicXCore.StatePublisherSelector {
+  public func setResult(value: Value, forStateHash stateHash: Foundation.UUID)
+  public func map(_ state: State, stateHash: Foundation.UUID) -> Value
+}
+public enum DeviceType : Swift.Int {
+  case microphone
+  case camera
+  case screenShare
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum DeviceError : Swift.Int {
+  case noError
+  case noDeviceDetected
+  case noSystemPermission
+  case notSupportCapture
+  case occupiedError
+  case unknownError
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum DeviceStatus : Swift.Int {
+  case off
+  case on
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum AudioRoute : Swift.Int {
+  case speakerphone
+  case earpiece
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum VideoQuality : Swift.UInt {
+  case quality360P
+  case quality540P
+  case quality720P
+  case quality1080P
+  public init?(rawValue: Swift.UInt)
+  public typealias RawValue = Swift.UInt
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+public enum VideoOrientation : Swift.UInt {
+  case landscape
+  case portrait
+  public init?(rawValue: Swift.UInt)
+  public typealias RawValue = Swift.UInt
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+public enum NetworkQuality : Swift.UInt {
+  case unknown
+  case excellent
+  case good
+  case poor
+  case bad
+  case veryBad
+  case down
+  public init?(rawValue: Swift.UInt)
+  public typealias RawValue = Swift.UInt
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+public enum MirrorType : Swift.UInt {
+  case auto
+  case enable
+  case disable
+  public init?(rawValue: Swift.UInt)
+  public typealias RawValue = Swift.UInt
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+public enum NetworkType {
+  case unknown
+  case wifi
+  case cellular
+  public static func == (a: AtomicXCore.NetworkType, b: AtomicXCore.NetworkType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct NetworkInfo {
+  public var userID: Swift.String
+  public var quality: AtomicXCore.NetworkQuality
+  public var upLoss: Swift.UInt32
+  public var downLoss: Swift.UInt32
+  public var delay: Swift.UInt32
+  public init(userID: Swift.String = "", quality: AtomicXCore.NetworkQuality = .excellent, upLoss: Swift.UInt32 = 0, downLoss: Swift.UInt32 = 0, delay: Swift.UInt32 = 0)
+}
+public struct DeviceState {
+  public var microphoneStatus: AtomicXCore.DeviceStatus
+  public var microphoneLastError: AtomicXCore.DeviceError
+  public var captureVolume: Swift.Int
+  public var currentMicVolume: Swift.Int
+  public var outputVolume: Swift.Int
+  public var cameraStatus: AtomicXCore.DeviceStatus
+  public var cameraLastError: AtomicXCore.DeviceError
+  public var isFrontCamera: Swift.Bool
+  public var localMirrorType: AtomicXCore.MirrorType
+  public var localVideoQuality: AtomicXCore.VideoQuality
+  public var currentAudioRoute: AtomicXCore.AudioRoute
+  public var screenStatus: AtomicXCore.DeviceStatus
+  public var networkInfo: AtomicXCore.NetworkInfo
+  public var networkType: AtomicXCore.NetworkType
+  public init()
+}
+@_hasMissingDesignatedInitializers public class DeviceStore {
+  public static let shared: AtomicXCore.DeviceStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.DeviceState> {
+    get
+  }
+  public func openLocalMicrophone(completion: AtomicXCore.CompletionClosure?)
+  public func closeLocalMicrophone()
+  public func setCaptureVolume(volume: Swift.Int)
+  public func setOutputVolume(_ volume: Swift.Int)
+  public func setAudioRoute(_ route: AtomicXCore.AudioRoute)
+  public func startCameraTest(cameraView: UIKit.UIView, completion: AtomicXCore.CompletionClosure?)
+  public func stopCameraTest()
+  public func openLocalCamera(isFront: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func closeLocalCamera()
+  public func switchCamera(isFront: Swift.Bool)
+  public func switchMirror(mirrorType: AtomicXCore.MirrorType)
+  public func updateVideoQuality(_ quality: AtomicXCore.VideoQuality, orientation: AtomicXCore.VideoOrientation = .portrait)
+  public func startScreenShare(appGroup: Swift.String)
+  public func stopScreenShare()
+  public func reset()
+  @objc deinit
+}
+extension AtomicXCore.NetworkInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.NetworkInfo, rhs: AtomicXCore.NetworkInfo) -> Swift.Bool
+}
+extension AtomicXCore.DeviceStatus : Swift.Codable {
+}
+public struct Gift {
+  public let giftID: Swift.String
+  public let name: Swift.String
+  public let desc: Swift.String
+  public let iconURL: Swift.String
+  public let resourceURL: Swift.String
+  public let level: Swift.UInt
+  public let coins: Swift.UInt
+  public let extensionInfo: [Swift.String : Swift.String]
+  public init(giftID: Swift.String, name: Swift.String, desc: Swift.String, iconURL: Swift.String, resourceURL: Swift.String, level: Swift.UInt, coins: Swift.UInt, extensionInfo: [Swift.String : Swift.String])
+}
+public struct GiftCategory {
+  public let categoryID: Swift.String
+  public let name: Swift.String
+  public let desc: Swift.String
+  public let extensionInfo: [Swift.String : Swift.String]
+  public let giftList: [AtomicXCore.Gift]
+  public init(categoryID: Swift.String, name: Swift.String, desc: Swift.String, extensionInfo: [Swift.String : Swift.String], giftList: [AtomicXCore.Gift])
+}
+public struct GiftState {
+  public var usableGifts: [AtomicXCore.GiftCategory]
+}
+public enum GiftEvent {
+  case onReceiveGift(liveID: Swift.String, gift: AtomicXCore.Gift, count: Swift.UInt, sender: AtomicXCore.LiveUserInfo)
+}
+@_hasMissingDesignatedInitializers public class GiftStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.GiftStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.GiftState> {
+    get
+  }
+  public var giftEventPublisher: Combine.PassthroughSubject<AtomicXCore.GiftEvent, Swift.Never> {
+    get
+  }
+  public func setLanguage(_ language: Swift.String)
+  public func refreshUsableGifts(completion: AtomicXCore.CompletionClosure?)
+  public func sendGift(giftID: Swift.String, count: Swift.UInt, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct GroupMemberState {
+  public var memberList: [AtomicXCore.GroupMember]
+  public var hasMoreMembers: Swift.Bool
+}
+@objc @_hasMissingDesignatedInitializers public class GroupMemberStore : ObjectiveC.NSObject {
+  final public let groupID: Swift.String
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.GroupMemberState>
+  public static func create(groupID: Swift.String) -> AtomicXCore.GroupMemberStore
+  public func loadMembers(roleList: [AtomicXCore.GroupMemberFilterRole] = [.all], completion: AtomicXCore.CompletionClosure?)
+  public func loadMoreMembers(completion: AtomicXCore.CompletionClosure?)
+  public func getMemberInfo(userIDList: [Swift.String], completion: any AtomicXCore.GetMemberInfoCompletionHandler)
+  public func addMember(userIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func deleteMember(userIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func muteMember(userID: Swift.String, time: Swift.Int64, completion: AtomicXCore.CompletionClosure?)
+  public func setSelfNameCard(nameCard: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func setMemberRole(userID: Swift.String, role: AtomicXCore.GroupMemberRole, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct GroupMember : Swift.Identifiable, Swift.Equatable {
+  public var id: Swift.String {
+    get
+  }
+  public var userID: Swift.String
+  public var nickname: Swift.String?
+  public var friendRemark: Swift.String?
+  public var nameCard: Swift.String?
+  public var avatarURL: Swift.String?
+  public var role: AtomicXCore.GroupMemberRole
+  public var muteUntil: Swift.Int64
+  public var isMuted: Swift.Bool {
+    get
+  }
+  public init(userID: Swift.String)
+  public static func == (lhs: AtomicXCore.GroupMember, rhs: AtomicXCore.GroupMember) -> Swift.Bool
+  public typealias ID = Swift.String
+}
+public enum GroupMemberFilterRole : Swift.Int {
+  case all
+  case member
+  case admin
+  case owner
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum GroupMemberRole : Swift.Int {
+  case undefined
+  case member
+  case admin
+  case owner
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol GetMemberInfoCompletionHandler {
+  func onSuccess(memberInfoList: [AtomicXCore.GroupMember])
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+public struct GroupState {
+  public var joinedGroupList: [AtomicXCore.GroupInfo]
+  public var applicationList: [AtomicXCore.GroupApplicationInfo]
+  public var unreadApplicationCount: Swift.Int
+  public init()
+}
+public enum GroupEvent {
+  case onGroupDismissed(groupID: Swift.String, opUser: AtomicXCore.GroupMember)
+  case onKickedFromGroup(groupID: Swift.String, opUser: AtomicXCore.GroupMember)
+  case onQuitFromGroup(groupID: Swift.String)
+  case onReceiveJoinApplication(groupID: Swift.String, member: AtomicXCore.GroupMember, opReason: Swift.String?)
+  case onApplicationProcessed(groupID: Swift.String, opUser: AtomicXCore.GroupMember, opResult: Swift.Bool, opReason: Swift.String?)
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class GroupStore : ObjectiveC.NSObject {
+  public static let shared: AtomicXCore.GroupStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.GroupState>
+  final public let groupEventPublisher: Combine.PassthroughSubject<AtomicXCore.GroupEvent, Swift.Never>
+  public func loadJoinedGroups(completion: AtomicXCore.CompletionClosure?)
+  public func loadGroupAttributes(groupID: Swift.String, keys: [Swift.String]?, completion: AtomicXCore.CompletionClosure?)
+  public func getGroupInfo(groupID: Swift.String, completion: any AtomicXCore.GetGroupInfoCompletionHandler)
+  public func createGroup(params: AtomicXCore.GroupCreateParams, completion: any AtomicXCore.CreateGroupCompletionHandler)
+  public func joinGroup(groupID: Swift.String, message: Swift.String?, completion: AtomicXCore.CompletionClosure?)
+  public func quitGroup(groupID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func dismissGroup(groupID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func loadApplications(completion: AtomicXCore.CompletionClosure?)
+  public func acceptApplication(info: AtomicXCore.GroupApplicationInfo, completion: AtomicXCore.CompletionClosure?)
+  public func refuseApplication(info: AtomicXCore.GroupApplicationInfo, completion: AtomicXCore.CompletionClosure?)
+  public func clearApplicationUnreadCount(completion: AtomicXCore.CompletionClosure?)
+  public func changeOwner(groupID: Swift.String, newOwnerID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func updateProfile(groupInfo: AtomicXCore.GroupInfo, completion: AtomicXCore.CompletionClosure?)
+  public func setJoinOption(groupID: Swift.String, option: AtomicXCore.GroupJoinOption, completion: AtomicXCore.CompletionClosure?)
+  public func setInviteOption(groupID: Swift.String, option: AtomicXCore.GroupInviteOption, completion: AtomicXCore.CompletionClosure?)
+  public func muteAllMembers(groupID: Swift.String, isMuted: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct GroupInfo : Swift.Identifiable, Swift.Equatable {
+  public var id: Swift.String {
+    get
+  }
+  public var groupID: Swift.String
+  public var groupName: Swift.String?
+  public var avatarURL: Swift.String?
+  public var groupType: AtomicXCore.GroupType?
+  public var notification: Swift.String?
+  public var joinOption: AtomicXCore.GroupJoinOption?
+  public var inviteOption: AtomicXCore.GroupInviteOption?
+  public var memberCount: Swift.Int?
+  public var isAllMuted: Swift.Bool?
+  public var groupOwner: Swift.String?
+  public var selfRole: AtomicXCore.GroupMemberRole?
+  public var groupAttributes: [Swift.String : Swift.String]?
+  public init(groupID: Swift.String)
+  public static func == (lhs: AtomicXCore.GroupInfo, rhs: AtomicXCore.GroupInfo) -> Swift.Bool
+  public typealias ID = Swift.String
+}
+public enum GroupType : Swift.String, Swift.CaseIterable {
+  case work
+  case publicGroup
+  case meeting
+  case avChatRoom
+  case community
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [AtomicXCore.GroupType]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [AtomicXCore.GroupType] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum GroupJoinOption : Swift.Int {
+  case forbid
+  case auth
+  case any
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum GroupInviteOption : Swift.Int {
+  case forbid
+  case auth
+  case any
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct GroupCreateParams {
+  public var groupType: AtomicXCore.GroupType
+  public var groupName: Swift.String
+  public var groupID: Swift.String?
+  public var avatarURL: Swift.String?
+  public var memberList: [Swift.String]?
+  public init(groupName: Swift.String)
+}
+public struct GroupApplicationInfo : Swift.Identifiable, Swift.Equatable {
+  public var id: Swift.String {
+    get
+  }
+  public var applicationID: Swift.String
+  public var groupID: Swift.String
+  public var fromUser: Swift.String?
+  public var fromUserNickname: Swift.String?
+  public var fromUserAvatarURL: Swift.String?
+  public var toUser: Swift.String?
+  public var addTime: Swift.Int64
+  public var requestMsg: Swift.String?
+  public var handledMsg: Swift.String?
+  public var type: AtomicXCore.GroupApplicationType
+  public var handledStatus: AtomicXCore.GroupApplicationHandledStatus?
+  public var handledResult: AtomicXCore.GroupApplicationHandledResult?
+  public init(applicationID: Swift.String, groupID: Swift.String, type: AtomicXCore.GroupApplicationType)
+  public static func == (lhs: AtomicXCore.GroupApplicationInfo, rhs: AtomicXCore.GroupApplicationInfo) -> Swift.Bool
+  public typealias ID = Swift.String
+}
+public enum GroupApplicationType : Swift.Int {
+  case joinApprovedByAdmin
+  case inviteApprovedByInvitee
+  case inviteApprovedByAdmin
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum GroupApplicationHandledStatus : Swift.Int {
+  case unhandled
+  case byOther
+  case byMyself
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum GroupApplicationHandledResult : Swift.Int {
+  case refused
+  case agreed
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol GetGroupInfoCompletionHandler {
+  func onSuccess(groupInfo: AtomicXCore.GroupInfo)
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+public protocol CreateGroupCompletionHandler {
+  func onSuccess(groupID: Swift.String)
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+public class HybridBridge {
+  public init(eventEmitter: @escaping (Swift.String, Swift.String) -> Swift.Void)
+  public func callAPI(json: Swift.String, callback: @escaping (Swift.String) -> Swift.Void)
+  public func addListener(_ key: Swift.String)
+  public func removeListener(_ key: Swift.String)
+  @objc deinit
+}
+public protocol JSONCodable {
+  func toJson() -> [Swift.String : Any]?
+  static func fromJson(_ json: [Swift.String : Any]) -> Self?
+  func toJsonString() -> Swift.String?
+  static func fromJsonString(_ jsonString: Swift.String) -> Self?
+}
+extension AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public func toJsonString() -> Swift.String?
+  public static func fromJsonString(_ jsonString: Swift.String) -> Self?
+}
+@_hasMissingDesignatedInitializers public class JSONUtil {
+  public static func toJson<T>(_ value: T) -> [Swift.String : Any]?
+  public static func toJsonString<T>(_ value: T) -> Swift.String?
+  public static func fromJson<T>(_ json: [Swift.String : Any], as type: T.Type) -> T? where T : AtomicXCore.JSONCodable
+  public static func fromJsonString<T>(_ jsonString: Swift.String, as type: T.Type) -> T? where T : AtomicXCore.JSONCodable
+  @objc deinit
+}
+extension Swift.Array : AtomicXCore.JSONCodable where Element : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> Swift.Array<Element>?
+  public func toJsonString() -> Swift.String?
+}
+extension Swift.Dictionary : AtomicXCore.JSONCodable where Key == Swift.String, Value : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> Swift.Dictionary<Key, Value>?
+  public func toJsonString() -> Swift.String?
+}
+extension Swift.Dictionary where Key == Swift.String {
+  public func toJsonString() -> Swift.String?
+  public func intValue(for key: Swift.String) -> Swift.Int?
+  public func uintValue(for key: Swift.String) -> Swift.UInt?
+  public func uint32Value(for key: Swift.String) -> Swift.UInt32?
+  public func uint64Value(for key: Swift.String) -> Swift.UInt64?
+  public func int32Value(for key: Swift.String) -> Swift.Int32?
+  public func doubleValue(for key: Swift.String) -> Swift.Double?
+  public func floatValue(for key: Swift.String) -> Swift.Float?
+  public func boolValue(for key: Swift.String) -> Swift.Bool?
+  public func stringValue(for key: Swift.String) -> Swift.String?
+  public func stringValueOrNull(for key: Swift.String) -> Swift.String?
+  public func uintArray(for key: Swift.String) -> [Swift.UInt]?
+  public func stringListValue(for key: Swift.String) -> [Swift.String]
+  public func stringListValueOrNull(for key: Swift.String) -> [Swift.String]?
+}
+#if compiler(>=5.3) && $NoncopyableGenerics
+extension Swift.Optional : AtomicXCore.JSONCodable where Wrapped : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> Swift.Optional<Wrapped>?
+}
+#else
+extension Swift.Optional : AtomicXCore.JSONCodable where Wrapped : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> Swift.Optional<Wrapped>?
+}
+#endif
+extension AtomicXCore.JSONCodable {
+  public func toJsonData() -> Foundation.Data?
+  public static func fromJsonData(_ data: Foundation.Data) -> Self?
+}
+extension AtomicXCore.BattleConfig : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.BattleConfig?
+}
+extension AtomicXCore.BattleInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.BattleInfo?
+}
+extension AtomicXCore.BattleState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.BattleState?
+}
+extension AtomicXCore.BattleEndedReason : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.BattleEndedReason?
+}
+extension AtomicXCore.LiveUserInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveUserInfo?
+}
+extension AtomicXCore.LiveInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveInfo?
+}
+extension AtomicXCore.Gift : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.Gift?
+}
+extension Swift.RawRepresentable where Self : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> Self?
+}
+extension AtomicXCore.AudioChangerType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.AudioReverbType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.AudioEffectState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.AudioEffectState?
+}
+extension AtomicXCore.BaseBeautyState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.BaseBeautyState?
+}
+extension AtomicXCore.DeviceError : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.DeviceStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.AudioRoute : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.VideoQuality : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.NetworkQuality : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MirrorType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.NetworkInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.NetworkInfo?
+}
+extension AtomicXCore.DeviceState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.DeviceState?
+}
+extension AtomicXCore.GiftCategory : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GiftCategory?
+}
+extension AtomicXCore.GiftState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GiftState?
+}
+extension AtomicXCore.NoResponseReason : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.CoGuestState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CoGuestState?
+}
+extension AtomicXCore.CoHostStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.CoHostLayoutTemplate : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.BarrageType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.Barrage : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.Barrage?
+}
+extension AtomicXCore.CoHostState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CoHostState?
+}
+extension AtomicXCore.LikeState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LikeState?
+}
+extension AtomicXCore.Role : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.LiveAudienceState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveAudienceState?
+}
+extension AtomicXCore.LiveEndedReason : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.LiveKickedOutReason : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.LiveListState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveListState?
+}
+extension AtomicXCore.MoveSeatPolicy : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.DeviceControlPolicy : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.SeatUserInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.SeatUserInfo?
+}
+extension AtomicXCore.RegionInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.RegionInfo?
+}
+extension AtomicXCore.SeatInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.SeatInfo?
+}
+extension AtomicXCore.LiveCanvas : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveCanvas?
+}
+extension AtomicXCore.LiveSeatState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveSeatState?
+}
+extension AtomicXCore.LiveSummaryData : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveSummaryData?
+}
+extension AtomicXCore.LiveSummaryState : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LiveSummaryState?
+}
+extension AtomicXCore.LoginStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.AllowType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.Gender : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.UserProfile : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.UserProfile?
+}
+extension AtomicXCore.LoginState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.LoginState?
+}
+extension AtomicXCore.ErrorInfo : AtomicXCore.JSONCodable {
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ErrorInfo?
+}
+extension RTCRoomEngine.TUILiveStatisticsData : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> Self?
+}
+extension AtomicXCore.ContactOnlineStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.FriendApplicationType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.ContactInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ContactInfo?
+}
+extension AtomicXCore.FriendApplicationInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.FriendApplicationInfo?
+}
+extension AtomicXCore.GroupApplicationType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupApplicationHandledStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupApplicationHandledResult : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupApplicationInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupApplicationInfo?
+}
+extension AtomicXCore.GroupMemberRole : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupMemberFilterRole : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.ContactState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ContactState?
+}
+extension AtomicXCore.GroupState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupState?
+}
+extension AtomicXCore.GroupMemberState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupMemberState?
+}
+extension AtomicXCore.GroupInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupInfo?
+}
+extension AtomicXCore.GroupMember : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupMember?
+}
+extension AtomicXCore.ConversationType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.ConversationMarkType : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ConversationMarkType?
+}
+extension AtomicXCore.ConversationLoadOption : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ConversationLoadOption?
+}
+extension AtomicXCore.MessageStatus : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MessageType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MessageForwardType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MessageListType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MessageLoadDirection : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.MediaQuality : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.TextMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.TextMessagePayload?
+}
+extension AtomicXCore.ImageMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ImageMessagePayload?
+}
+extension AtomicXCore.VideoMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.VideoMessagePayload?
+}
+extension AtomicXCore.AudioMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.AudioMessagePayload?
+}
+extension AtomicXCore.FileMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.FileMessagePayload?
+}
+extension AtomicXCore.FaceMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.FaceMessagePayload?
+}
+extension AtomicXCore.TipsMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.TipsMessagePayload?
+}
+extension AtomicXCore.CustomMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CustomMessagePayload?
+}
+extension AtomicXCore.MergedMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MergedMessagePayload?
+}
+extension AtomicXCore.StreamMessagePayload : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.StreamMessagePayload?
+}
+extension AtomicXCore.GroupTipsInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupTipsInfo?
+}
+extension AtomicXCore.MessageListState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageListState?
+}
+extension AtomicXCore.MessageQuoteInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageQuoteInfo?
+}
+extension AtomicXCore.MessageReceipt : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageReceipt?
+}
+extension AtomicXCore.MessageReaction : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageReaction?
+}
+extension AtomicXCore.MessageExtension : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageExtension?
+}
+extension AtomicXCore.MessageSenderInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageSenderInfo?
+}
+extension AtomicXCore.OfflinePushInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.OfflinePushInfo?
+}
+extension AtomicXCore.MessageInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageInfo?
+}
+extension AtomicXCore.MessageLoadOption : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageLoadOption?
+}
+extension AtomicXCore.MergedForwardInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MergedForwardInfo?
+}
+extension AtomicXCore.ForwardMessageOption : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ForwardMessageOption?
+}
+extension AtomicXCore.SendMessageOption : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.SendMessageOption?
+}
+extension AtomicXCore.KeywordListMatchMode : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupJoinOption : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupInviteOption : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupAtType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.ReceiveMessageOption : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.GroupAtInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupAtInfo?
+}
+extension AtomicXCore.ConversationInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ConversationInfo?
+}
+extension AtomicXCore.ConversationListState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.ConversationListState?
+}
+extension AtomicXCore.SearchType : AtomicXCore.JSONCodable {
+}
+extension AtomicXCore.UserSearchFilter : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.UserSearchFilter?
+}
+extension AtomicXCore.GroupMemberSearchFilter : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupMemberSearchFilter?
+}
+extension AtomicXCore.MessageSearchFilter : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageSearchFilter?
+}
+extension AtomicXCore.FriendSearchInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.FriendSearchInfo?
+}
+extension AtomicXCore.GroupSearchInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.GroupSearchInfo?
+}
+extension AtomicXCore.MessageSearchResultItem : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.MessageSearchResultItem?
+}
+extension AtomicXCore.SearchState : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.SearchState?
+}
+extension AtomicXCore.SearchOption : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.SearchOption?
+}
+extension AtomicXCore.CallParams : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CallParams?
+}
+extension AtomicXCore.CallParticipantInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CallParticipantInfo?
+}
+extension AtomicXCore.CallInfo : AtomicXCore.JSONCodable {
+  public func toJson() -> [Swift.String : Any]?
+  public static func fromJson(_ json: [Swift.String : Any]) -> AtomicXCore.CallInfo?
+}
+public struct LikeState {
+  public var totalLikeCount: Swift.UInt
+}
+public enum LikeEvent {
+  case onReceiveLikesMessage(liveID: Swift.String, totalLikesReceived: Swift.UInt, sender: AtomicXCore.LiveUserInfo)
+}
+@_hasMissingDesignatedInitializers public class LikeStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.LikeStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.LikeState> {
+    get
+  }
+  public var likeEventPublisher: Combine.PassthroughSubject<AtomicXCore.LikeEvent, Swift.Never> {
+    get
+  }
+  public func sendLike(count: Swift.UInt = 1, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public enum Role : Swift.Int {
+  case owner
+  case admin
+  case generalUser
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct LiveUserInfo {
+  public var userID: Swift.String
+  public var userName: Swift.String
+  public var avatarURL: Swift.String
+  public var level: Swift.Int
+  public init()
+}
+public struct LiveAudienceState {
+  public var audienceList: [AtomicXCore.LiveUserInfo]
+  public var audienceCount: Swift.UInt
+  public var adminList: [AtomicXCore.LiveUserInfo]
+  public var messageBannedUserList: [AtomicXCore.LiveUserInfo]
+  public init()
+}
+public enum LiveAudienceEvent {
+  case onOwnerJoined(owner: AtomicXCore.LiveUserInfo)
+  case onOwnerLeft(owner: AtomicXCore.LiveUserInfo)
+  case onAdminJoined(admin: AtomicXCore.LiveUserInfo)
+  case onAdminLeft(admin: AtomicXCore.LiveUserInfo)
+  case onAudienceJoined(audience: AtomicXCore.LiveUserInfo)
+  case onAudienceLeft(audience: AtomicXCore.LiveUserInfo)
+  case onAudienceMessageDisabled(audience: AtomicXCore.LiveUserInfo, isDisable: Swift.Bool)
+}
+@_hasMissingDesignatedInitializers public class LiveAudienceStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.LiveAudienceStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.LiveAudienceState> {
+    get
+  }
+  public var liveAudienceEventPublisher: Combine.PassthroughSubject<AtomicXCore.LiveAudienceEvent, Swift.Never> {
+    get
+  }
+  public func fetchAudienceList(completion: AtomicXCore.CompletionClosure?)
+  public func setAdministrator(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func revokeAdministrator(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func kickUserOutOfRoom(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func disableSendMessage(userID: Swift.String, isDisable: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+extension AtomicXCore.LiveUserInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.LiveUserInfo, rhs: AtomicXCore.LiveUserInfo) -> Swift.Bool
+}
+public enum CoreViewType {
+  case playView
+  case pushView
+  public static func == (a: AtomicXCore.CoreViewType, b: AtomicXCore.CoreViewType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc public enum ViewLayer : Swift.Int {
+  case foreground
+  case background
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol VideoViewDelegate : AnyObject {
+  func createCoGuestView(seatInfo: AtomicXCore.SeatInfo, viewLayer: AtomicXCore.ViewLayer) -> UIKit.UIView?
+  func createCoHostView(seatInfo: AtomicXCore.SeatInfo, viewLayer: AtomicXCore.ViewLayer) -> UIKit.UIView?
+  func createBattleView(seatInfo: AtomicXCore.SeatInfo) -> UIKit.UIView?
+  func createBattleContainerView() -> UIKit.UIView?
+}
+@objc @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class LiveCoreView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public static func callExperimentalAPI(_ jsonStr: Swift.String)
+  @_Concurrency.MainActor @preconcurrency weak public var videoViewDelegate: (any AtomicXCore.VideoViewDelegate)?
+  @_Concurrency.MainActor public func setLiveID(_ liveID: Swift.String)
+  @_Concurrency.MainActor @preconcurrency public func startPreviewLiveStream(roomId: Swift.String, isMuteAudio: Swift.Bool, onPlaying: RTCRoomEngine.TUIPlayOnPlayingBlock? = nil, onLoading: RTCRoomEngine.TUIPlayOnLoadingBlock? = nil, onError: RTCRoomEngine.TUIPlayOnErrorBlock? = nil)
+  @_Concurrency.MainActor @preconcurrency public func stopPreviewLiveStream(roomId: Swift.String)
+  @_Concurrency.MainActor @preconcurrency required public init(viewType: AtomicXCore.CoreViewType, frame: CoreFoundation.CGRect = .zero)
+  @objc deinit
+  @available(*, deprecated)
+  @_Concurrency.MainActor @preconcurrency public func setLocalVideoMuteImage(bigImage: UIKit.UIImage?, smallImage: UIKit.UIImage?)
+}
+extension AtomicXCore.LiveCoreView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+}
+public enum LiveState {
+  case scheduled
+  case running
+  case suspended
+  public static func == (a: AtomicXCore.LiveState, b: AtomicXCore.LiveState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum TakeSeatMode {
+  case free
+  case apply
+  public static func == (a: AtomicXCore.TakeSeatMode, b: AtomicXCore.TakeSeatMode) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum SeatLayoutTemplate {
+  case videoDynamicGrid9Seats
+  case videoDynamicFloat7Seats
+  case videoDynamicPip2Seats
+  case videoLeftFocus9Seats
+  case videoUniformGrid9Seats
+  case videoFixedGrid9Seats
+  case videoFixedFloat7Seats
+  case videoLandscape4Seats
+  case videoLandscape10Seats
+  case videoPortrait10Seats
+  case karaoke(seatCount: Swift.Int)
+  case audioSalon(seatCount: Swift.Int)
+}
+public enum LiveEndedReason : Swift.Int {
+  case endedByHost
+  case endedByServer
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum LiveKickedOutReason : Swift.Int {
+  case byAdmin
+  case byLoggedOnOtherDevice
+  case byServer
+  case forNetworkDisconnected
+  case forJoinRoomStatusInvalidDuringOffline
+  case forCountOfJoinedRoomsExceedLimit
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct LiveInfo {
+  public var liveID: Swift.String
+  public var liveName: Swift.String
+  public var status: AtomicXCore.LiveState
+  public var notice: Swift.String
+  public var isMessageDisable: Swift.Bool
+  public var isPublicVisible: Swift.Bool
+  public var keepOwnerOnSeat: Swift.Bool
+  public var seatMode: AtomicXCore.TakeSeatMode
+  public var seatTemplate: AtomicXCore.SeatLayoutTemplate
+  public var coverURL: Swift.String
+  public var backgroundURL: Swift.String
+  public var categoryList: [Foundation.NSNumber]
+  public var activityStatus: Swift.Int
+  public var liveOwner: AtomicXCore.LiveUserInfo {
+    get
+  }
+  public var createTime: Swift.Int {
+    get
+  }
+  public var totalViewerCount: Swift.Int
+  public var isGiftEnabled: Swift.Bool
+  public var metaData: [Swift.String : Swift.String]
+  @available(*, deprecated, message: "Deprecated since 3.7, use ``seatTemplate`` instead. This parameter will be automatically resolved internally.")
+  public var isSeatEnabled: Swift.Bool
+  @available(*, deprecated, message: "Deprecated since 3.7, use ``seatTemplate`` instead. This parameter will be automatically resolved internally.")
+  public var maxSeatCount: Swift.Int
+  @available(*, deprecated, message: "Deprecated since 3.7, use ``seatTemplate`` instead. This parameter will be automatically resolved internally.")
+  public var seatLayoutTemplateID: Swift.UInt
+  public init(seatTemplate: AtomicXCore.SeatLayoutTemplate = .videoDynamicGrid9Seats)
+  public var isEmpty: Swift.Bool {
+    get
+  }
+  public struct ModifyFlag : Swift.OptionSet {
+    public let rawValue: Swift.UInt
+    public static let none: AtomicXCore.LiveInfo.ModifyFlag
+    public static let liveName: AtomicXCore.LiveInfo.ModifyFlag
+    public static let notice: AtomicXCore.LiveInfo.ModifyFlag
+    public static let isMessageDisable: AtomicXCore.LiveInfo.ModifyFlag
+    public static let isPublicVisible: AtomicXCore.LiveInfo.ModifyFlag
+    public static let seatMode: AtomicXCore.LiveInfo.ModifyFlag
+    public static let coverURL: AtomicXCore.LiveInfo.ModifyFlag
+    public static let backgroundURL: AtomicXCore.LiveInfo.ModifyFlag
+    public static let categoryList: AtomicXCore.LiveInfo.ModifyFlag
+    public static let activityStatus: AtomicXCore.LiveInfo.ModifyFlag
+    @available(*, deprecated, message: "Deprecated since 4.2, use `seatTemplate` instead.")
+    public static let seatLayoutTemplateID: AtomicXCore.LiveInfo.ModifyFlag
+    public static let seatTemplate: AtomicXCore.LiveInfo.ModifyFlag
+    public init(rawValue: Swift.UInt)
+    public typealias ArrayLiteralElement = AtomicXCore.LiveInfo.ModifyFlag
+    public typealias Element = AtomicXCore.LiveInfo.ModifyFlag
+    public typealias RawValue = Swift.UInt
+  }
+}
+public struct LiveListState {
+  public var liveList: [AtomicXCore.LiveInfo]
+  public var liveListCursor: Swift.String
+  public var currentLive: AtomicXCore.LiveInfo
+  public init()
+}
+public enum LiveListEvent {
+  case onLiveEnded(liveID: Swift.String, reason: AtomicXCore.LiveEndedReason, message: Swift.String)
+  case onKickedOutOfLive(liveID: Swift.String, reason: AtomicXCore.LiveKickedOutReason, message: Swift.String)
+}
+public typealias LiveInfoCompletionClosure = (Swift.Result<AtomicXCore.LiveInfo, AtomicXCore.ErrorInfo>) -> Swift.Void
+public typealias StopLiveCompletionClosure = (Swift.Result<RTCRoomEngine.TUILiveStatisticsData, AtomicXCore.ErrorInfo>) -> Swift.Void
+public typealias MetaDataCompletionClosure = (Swift.Result<[Swift.String : Swift.String], AtomicXCore.ErrorInfo>) -> Swift.Void
+@_hasMissingDesignatedInitializers public class LiveListStore {
+  public static let shared: AtomicXCore.LiveListStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.LiveListState>
+  final public let liveListEventPublisher: Combine.PassthroughSubject<AtomicXCore.LiveListEvent, Swift.Never>
+  public func fetchLiveList(cursor: Swift.String, count: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func fetchLiveInfo(liveID: Swift.String, completion: AtomicXCore.LiveInfoCompletionClosure?)
+  public func startLive(_ liveInfo: AtomicXCore.LiveInfo, completion: AtomicXCore.LiveInfoCompletionClosure?)
+  public func joinLive(liveID: Swift.String, completion: AtomicXCore.LiveInfoCompletionClosure?)
+  public func leaveLive(completion: AtomicXCore.CompletionClosure?)
+  public func endLive(completion: AtomicXCore.StopLiveCompletionClosure?)
+  public func updateLiveInfo(_ liveInfo: AtomicXCore.LiveInfo, modifyFlag: AtomicXCore.LiveInfo.ModifyFlag, completion: AtomicXCore.CompletionClosure?)
+  public func queryMetaData(keys: [Swift.String], completion: AtomicXCore.MetaDataCompletionClosure?)
+  public func updateLiveMetaData(_ metaData: [Swift.String : Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func reset()
+  @available(*, deprecated, message: "Use startLive(_:completion:) instead")
+  public func createLive(_ liveInfo: AtomicXCore.LiveInfo, completion: AtomicXCore.LiveInfoCompletionClosure?)
+  @objc deinit
+}
+extension AtomicXCore.LiveInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.LiveInfo, rhs: AtomicXCore.LiveInfo) -> Swift.Bool
+}
+extension AtomicXCore.SeatLayoutTemplate : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.SeatLayoutTemplate, rhs: AtomicXCore.SeatLayoutTemplate) -> Swift.Bool
+}
+public enum MoveSeatPolicy : Swift.Int {
+  case abortWhenOccupied
+  case forceReplace
+  case swapPosition
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum DeviceControlPolicy : Swift.Int {
+  case unlockOnly
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum SuspendStatus : Swift.Int {
+  case none
+  case inBackground
+  case inCalling
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct SeatUserInfo {
+  public var userID: Swift.String
+  public var userName: Swift.String
+  public var avatarURL: Swift.String
+  public var role: AtomicXCore.Role
+  public var liveID: Swift.String
+  public var microphoneStatus: AtomicXCore.DeviceStatus
+  public var allowOpenMicrophone: Swift.Bool
+  public var cameraStatus: AtomicXCore.DeviceStatus
+  public var allowOpenCamera: Swift.Bool
+  public var userSuspendStatus: AtomicXCore.SuspendStatus
+  public init(userID: Swift.String = "", userName: Swift.String = "", avatarURL: Swift.String = "", role: AtomicXCore.Role = .generalUser, liveID: Swift.String = "", microphoneStatus: AtomicXCore.DeviceStatus = .off, allowOpenMicrophone: Swift.Bool = true, cameraStatus: AtomicXCore.DeviceStatus = .off, allowOpenCamera: Swift.Bool = true, userSuspendStatus: AtomicXCore.SuspendStatus = .none)
+}
+public struct RegionInfo {
+  public var x: CoreFoundation.CGFloat
+  public var y: CoreFoundation.CGFloat
+  public var w: CoreFoundation.CGFloat
+  public var h: CoreFoundation.CGFloat
+  public var zorder: Swift.Int
+  public init(x: CoreFoundation.CGFloat = 0, y: CoreFoundation.CGFloat = 0, w: CoreFoundation.CGFloat = 0, h: CoreFoundation.CGFloat = 0, zorder: Swift.Int = 0)
+}
+public struct AVStatistics {
+  public var userID: Swift.String
+  public var videoBitrate: Swift.UInt
+  public var videoWidth: CoreFoundation.CGFloat
+  public var videoHeight: CoreFoundation.CGFloat
+  public var frameRate: Swift.UInt
+  public var audioSampleRate: Swift.UInt
+  public var audioBitrate: Swift.UInt
+  public init(userID: Swift.String = "", videoBitrate: Swift.UInt = 0, videoWidth: CoreFoundation.CGFloat = 0, videoHeight: CoreFoundation.CGFloat = 0, frameRate: Swift.UInt = 0, audioSampleRate: Swift.UInt = 0, audioBitrate: Swift.UInt = 0)
+}
+public struct SeatInfo {
+  public var index: Swift.Int
+  public var isLocked: Swift.Bool
+  public var userInfo: AtomicXCore.SeatUserInfo
+  public var region: AtomicXCore.RegionInfo
+  public var isFeaturedHost: Swift.Bool
+  public init(index: Swift.Int = 0, isLocked: Swift.Bool = false, userInfo: AtomicXCore.SeatUserInfo = .init(), region: AtomicXCore.RegionInfo = .init(), isFeaturedHost: Swift.Bool = false)
+}
+public struct LiveCanvas {
+  public var w: CoreFoundation.CGFloat
+  public var h: CoreFoundation.CGFloat
+  public var templateID: Swift.UInt
+  public init(templateID: Swift.UInt = 600, w: CoreFoundation.CGFloat = 0, h: CoreFoundation.CGFloat = 0)
+}
+public struct LiveSeatState {
+  public var seatList: [AtomicXCore.SeatInfo]
+  public var canvas: AtomicXCore.LiveCanvas
+  public var speakingUsers: [Swift.String : Swift.Int]
+  public var avStatistics: [AtomicXCore.AVStatistics]
+  public init()
+}
+public enum LiveSeatEvent {
+  case onLocalCameraOpenedByAdmin(policy: AtomicXCore.DeviceControlPolicy)
+  case onLocalCameraClosedByAdmin
+  case onLocalMicrophoneOpenedByAdmin(policy: AtomicXCore.DeviceControlPolicy)
+  case onLocalMicrophoneClosedByAdmin
+}
+@_hasMissingDesignatedInitializers public class LiveSeatStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.LiveSeatStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.LiveSeatState> {
+    get
+  }
+  public var liveSeatEventPublisher: Combine.PassthroughSubject<AtomicXCore.LiveSeatEvent, Swift.Never> {
+    get
+  }
+  public func takeSeat(seatIndex: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func leaveSeat(completion: AtomicXCore.CompletionClosure? = nil)
+  public func muteMicrophone()
+  public func unmuteMicrophone(completion: AtomicXCore.CompletionClosure?)
+  public func kickUserOutOfSeat(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func moveUserToSeat(userID: Swift.String, targetIndex: Swift.Int, policy: AtomicXCore.MoveSeatPolicy?, completion: AtomicXCore.CompletionClosure?)
+  public func setFeaturedHost(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func revokeFeaturedHost(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func lockSeat(seatIndex: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func unlockSeat(seatIndex: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func openRemoteCamera(userID: Swift.String, policy: AtomicXCore.DeviceControlPolicy, completion: AtomicXCore.CompletionClosure?)
+  public func closeRemoteCamera(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func openRemoteMicrophone(userID: Swift.String, policy: AtomicXCore.DeviceControlPolicy, completion: AtomicXCore.CompletionClosure?)
+  public func closeRemoteMicrophone(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+extension AtomicXCore.SeatUserInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.SeatUserInfo, rhs: AtomicXCore.SeatUserInfo) -> Swift.Bool
+}
+extension AtomicXCore.SeatInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.SeatInfo, rhs: AtomicXCore.SeatInfo) -> Swift.Bool
+}
+extension AtomicXCore.RegionInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RegionInfo, rhs: AtomicXCore.RegionInfo) -> Swift.Bool
+}
+extension AtomicXCore.LiveCanvas : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.LiveCanvas, rhs: AtomicXCore.LiveCanvas) -> Swift.Bool
+}
+extension AtomicXCore.AVStatistics : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.AVStatistics, rhs: AtomicXCore.AVStatistics) -> Swift.Bool
+}
+public struct LiveSummaryData {
+  public var totalDuration: Swift.UInt
+  public var totalViewers: Swift.UInt
+  public var totalGiftsSent: Swift.UInt
+  public var totalGiftUniqueSenders: Swift.UInt
+  public var totalGiftCoins: Swift.UInt
+  public var totalLikesReceived: Swift.UInt
+  public var totalMessageSent: Swift.UInt
+  public init()
+}
+public struct LiveSummaryState {
+  public var summaryData: AtomicXCore.LiveSummaryData
+  public init()
+}
+@_hasMissingDesignatedInitializers public class LiveSummaryStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.LiveSummaryStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.LiveSummaryState> {
+    get
+  }
+  @objc deinit
+}
+public enum LoginStatus : Swift.Int {
+  case unlogin
+  case logined
+  public static func fromV2TIMStatus(_ status: ImSDK_Plus.V2TIMLoginStatus) -> AtomicXCore.LoginStatus
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum AllowType : Swift.Int, Swift.CaseIterable {
+  case allowAny
+  case needConfirm
+  case denyAny
+  public static func fromV2TIMAllowType(_ allowType: ImSDK_Plus.V2TIMFriendAllowType) -> AtomicXCore.AllowType
+  public init?(rawValue: Swift.Int)
+  public typealias AllCases = [AtomicXCore.AllowType]
+  public typealias RawValue = Swift.Int
+  nonisolated public static var allCases: [AtomicXCore.AllowType] {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum Gender : Swift.Int, Swift.CaseIterable {
+  case unknown
+  case male
+  case female
+  public static func fromV2TIMGender(_ gender: ImSDK_Plus.V2TIMGender) -> AtomicXCore.Gender
+  public init?(rawValue: Swift.Int)
+  public typealias AllCases = [AtomicXCore.Gender]
+  public typealias RawValue = Swift.Int
+  nonisolated public static var allCases: [AtomicXCore.Gender] {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct UserProfile {
+  public var userID: Swift.String
+  public var nickname: Swift.String?
+  public var avatarURL: Swift.String?
+  public var selfSignature: Swift.String?
+  public var gender: AtomicXCore.Gender?
+  public var role: Swift.UInt32?
+  public var level: Swift.UInt32?
+  public var birthday: Swift.UInt32?
+  public var allowType: AtomicXCore.AllowType?
+  public var customInfo: [Swift.String : Foundation.Data]?
+  public init(userID: Swift.String, nickname: Swift.String? = nil, avatarURL: Swift.String? = nil)
+}
+public struct LoginState {
+  public var loginStatus: AtomicXCore.LoginStatus
+  public var loginUserInfo: AtomicXCore.UserProfile?
+}
+public enum LoginEvent {
+  case kickedOffline
+  case loginExpired
+  public static func == (a: AtomicXCore.LoginEvent, b: AtomicXCore.LoginEvent) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class LoginStore : ObjectiveC.NSObject {
+  public static let shared: AtomicXCore.LoginStore
+  public var sdkAppID: Swift.Int32
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.LoginState>
+  final public let loginEventPublisher: Combine.PassthroughSubject<AtomicXCore.LoginEvent, Swift.Never>
+  public func login(sdkAppID: Swift.Int32, userID: Swift.String, userSig: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func logout(completion: AtomicXCore.CompletionClosure?)
+  public func setSelfInfo(userProfile: AtomicXCore.UserProfile, completion: AtomicXCore.CompletionClosure?)
+  public func setCertificateID(apnsCertificateID: Swift.Int = 0, voipCertificateID: Swift.Int = 0)
+  @objc deinit
+}
+public struct MessageActionState {
+  public var readMemberList: [AtomicXCore.GroupMember]
+  public var hasMoreReadMembers: Swift.Bool
+  public var unreadMemberList: [AtomicXCore.GroupMember]
+  public var hasMoreUnreadMembers: Swift.Bool
+  public var reactionUserList: [AtomicXCore.UserProfile]
+  public var hasMoreReactionUsers: Swift.Bool
+}
+public enum MediaQuality : Swift.Int {
+  case thumbnail
+  case standard
+  case original
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public protocol MergedMessageListCompletionHandler {
+  func onSuccess(messageList: [AtomicXCore.MessageInfo])
+  func onFailure(code: Swift.Int, desc: Swift.String)
+}
+@_hasMissingDesignatedInitializers public class MessageActionStore {
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.MessageActionState>
+  public static func create(message: AtomicXCore.MessageInfo) -> AtomicXCore.MessageActionStore
+  public func revoke(completion: AtomicXCore.CompletionClosure?)
+  public func delete(completion: AtomicXCore.CompletionClosure?)
+  public func pin(isPinned: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func loadReadMembers(count: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func loadUnreadMembers(count: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func loadMoreMembers(isRead: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func addReaction(reactionID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func removeReaction(reactionID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func loadReactionUsers(reactionID: Swift.String, count: Swift.Int, completion: AtomicXCore.CompletionClosure?)
+  public func loadMoreReactionUsers(completion: AtomicXCore.CompletionClosure?)
+  public func setExtensions(_ extensions: [AtomicXCore.MessageExtension], completion: AtomicXCore.CompletionClosure?)
+  public func deleteExtensions(keys: [Swift.String]?, completion: AtomicXCore.CompletionClosure?)
+  public func translateText(sourceTextList: [Swift.String], sourceLanguage: Swift.String?, targetLanguage: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func convertVoiceToText(language: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func downloadMedia(quality: AtomicXCore.MediaQuality?, completion: AtomicXCore.CompletionClosure?)
+  public func downloadMergedMessageList(completion: any AtomicXCore.MergedMessageListCompletionHandler)
+  @objc deinit
+}
+public enum SendMessagePayload {
+  case text(AtomicXCore.TextSendMessagePayload)
+  case custom(AtomicXCore.CustomSendMessagePayload)
+  case image(AtomicXCore.ImageSendMessagePayload)
+  case audio(AtomicXCore.AudioSendMessagePayload)
+  case video(AtomicXCore.VideoSendMessagePayload)
+  case file(AtomicXCore.FileSendMessagePayload)
+  case face(AtomicXCore.FaceSendMessagePayload)
+}
+public struct TextSendMessagePayload {
+  public var text: Swift.String
+  public init(text: Swift.String)
+}
+public struct CustomSendMessagePayload {
+  public var customData: Swift.String
+  public var description: Swift.String?
+  public var extensionInfo: Swift.String?
+  public init(customData: Swift.String, description: Swift.String? = nil, extensionInfo: Swift.String? = nil)
+}
+public struct ImageSendMessagePayload {
+  public var imagePath: Swift.String
+  public var imageWidth: Swift.Int
+  public var imageHeight: Swift.Int
+  public init(imagePath: Swift.String, imageWidth: Swift.Int = 0, imageHeight: Swift.Int = 0)
+}
+public struct AudioSendMessagePayload {
+  public var audioFilePath: Swift.String
+  public var duration: Swift.Int
+  public init(audioFilePath: Swift.String, duration: Swift.Int)
+}
+public struct VideoSendMessagePayload {
+  public var videoFilePath: Swift.String
+  public var videoType: Swift.String
+  public var duration: Swift.Int
+  public var snapshotPath: Swift.String
+  public var snapshotWidth: Swift.Int
+  public var snapshotHeight: Swift.Int
+  public init(videoFilePath: Swift.String, videoType: Swift.String, duration: Swift.Int, snapshotPath: Swift.String, snapshotWidth: Swift.Int = 0, snapshotHeight: Swift.Int = 0)
+}
+public struct FileSendMessagePayload {
+  public var filePath: Swift.String
+  public var fileName: Swift.String
+  public var fileSize: Swift.Int
+  public init(filePath: Swift.String, fileName: Swift.String, fileSize: Swift.Int = 0)
+}
+public struct FaceSendMessagePayload {
+  public var index: Swift.Int
+  public var data: Swift.String
+  public init(index: Swift.Int, data: Swift.String)
+}
+public struct SendMessageOption {
+  public var atUserList: [Swift.String]?
+  public var quotedMessage: AtomicXCore.MessageInfo?
+  public var needReadReceipt: Swift.Bool
+  public var isExtensionEnabled: Swift.Bool
+  public var onlineUserOnly: Swift.Bool
+  public var offlinePushInfo: AtomicXCore.OfflinePushInfo?
+  public init()
+}
+@_hasMissingDesignatedInitializers public class MessageInputStore {
+  public var conversationID: Swift.String
+  public static func create(conversationID: Swift.String) -> AtomicXCore.MessageInputStore
+  public func sendMessage(payload: AtomicXCore.SendMessagePayload, option: AtomicXCore.SendMessageOption?, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public struct MessageListState {
+  public var messageList: [AtomicXCore.MessageInfo]
+  public var hasOlderMessages: Swift.Bool
+  public var hasNewerMessages: Swift.Bool
+  public var pinnedMessageList: [AtomicXCore.MessageInfo]
+  public init()
+}
+public enum MessageEvent {
+  case onReceiveNewMessage(message: AtomicXCore.MessageInfo)
+}
+@objc @_hasMissingDesignatedInitializers public class MessageListStore : ObjectiveC.NSObject {
+  final public let conversationID: Swift.String
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.MessageListState>
+  final public let messageEventPublisher: Combine.PassthroughSubject<AtomicXCore.MessageEvent, Swift.Never>
+  public static func create(conversationID: Swift.String) -> AtomicXCore.MessageListStore
+  public func loadMessages(option: AtomicXCore.MessageLoadOption? = nil, completion: AtomicXCore.CompletionClosure? = nil)
+  public func loadOlderMessages(completion: AtomicXCore.CompletionClosure? = nil)
+  public func loadNewerMessages(completion: AtomicXCore.CompletionClosure? = nil)
+  public func sendMessageReadReceipts(messageList: [AtomicXCore.MessageInfo], completion: AtomicXCore.CompletionClosure? = nil)
+  public func deleteMessages(messageList: [AtomicXCore.MessageInfo], completion: AtomicXCore.CompletionClosure? = nil)
+  public func forwardMessages(messageList: [AtomicXCore.MessageInfo], option: AtomicXCore.ForwardMessageOption, conversationID: Swift.String, completion: AtomicXCore.CompletionClosure? = nil)
+  @objc deinit
+}
+public struct MessageInfo : Swift.Identifiable {
+  public var id: Swift.String {
+    get
+  }
+  public var msgID: Swift.String
+  public var status: AtomicXCore.MessageStatus
+  public var timestamp: Swift.Int64?
+  public var sequence: Swift.Int64?
+  public var from: AtomicXCore.MessageSenderInfo
+  public var to: Swift.String
+  public var isSentBySelf: Swift.Bool
+  public var conversationType: AtomicXCore.ConversationType
+  public var messageType: AtomicXCore.MessageType
+  public var messagePayload: AtomicXCore.MessagePayload?
+  public var uploadMediaProgress: Swift.Int
+  public var downloadMediaProgress: Swift.Int
+  public var atUserList: [Swift.String]
+  public var quoteInfo: AtomicXCore.MessageQuoteInfo?
+  public var isPinned: Swift.Bool
+  public var needReadReceipt: Swift.Bool
+  public var readReceiptInfo: AtomicXCore.MessageReceipt?
+  public var isExtensionEnabled: Swift.Bool
+  public var extensionList: [AtomicXCore.MessageExtension]
+  public var reactionList: [AtomicXCore.MessageReaction]
+  public var revokerInfo: AtomicXCore.UserProfile?
+  public var revokeReason: Swift.String?
+  public var offlinePushInfo: AtomicXCore.OfflinePushInfo?
+  public init()
+  public typealias ID = Swift.String
+}
+public struct MessageSenderInfo {
+  public var userID: Swift.String
+  public var avatarURL: Swift.String?
+  public var nickname: Swift.String?
+  public var friendRemark: Swift.String?
+  public var nameCard: Swift.String?
+  public init()
+}
+public enum MessageStatus : Swift.Int {
+  case initStatus
+  case sending
+  case sendSuccess
+  case sendFail
+  case revoked
+  case deleted
+  case localImported
+  case violation
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MessageType : Swift.Int {
+  case unknown
+  case text
+  case image
+  case video
+  case audio
+  case file
+  case face
+  case tips
+  case custom
+  case merged
+  case stream
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MessagePayload {
+  case text(AtomicXCore.TextMessagePayload)
+  case image(AtomicXCore.ImageMessagePayload)
+  case video(AtomicXCore.VideoMessagePayload)
+  case audio(AtomicXCore.AudioMessagePayload)
+  case file(AtomicXCore.FileMessagePayload)
+  case face(AtomicXCore.FaceMessagePayload)
+  case tips(AtomicXCore.TipsMessagePayload)
+  case custom(AtomicXCore.CustomMessagePayload)
+  case merged(AtomicXCore.MergedMessagePayload)
+  case stream(AtomicXCore.StreamMessagePayload)
+}
+public struct TextMessagePayload {
+  public var text: Swift.String
+  public var translateLanguage: Swift.String?
+  public var translatedText: [Swift.String : Swift.String]?
+  public init()
+}
+public struct ImageMessagePayload {
+  public var originalImageWidth: Swift.Int
+  public var originalImageHeight: Swift.Int
+  public var originalImageSize: Swift.Int
+  public var originalImagePath: Swift.String?
+  public var originalImageURL: Swift.String?
+  public var largeImagePath: Swift.String?
+  public var largeImageURL: Swift.String?
+  public var thumbImagePath: Swift.String?
+  public var thumbImageURL: Swift.String?
+  public init()
+}
+public struct VideoMessagePayload {
+  public var videoSnapshotWidth: Swift.Int
+  public var videoSnapshotHeight: Swift.Int
+  public var videoSnapshotPath: Swift.String?
+  public var videoSnapshotURL: Swift.String?
+  public var videoType: Swift.String?
+  public var videoSize: Swift.Int
+  public var videoDuration: Swift.Int
+  public var videoPath: Swift.String?
+  public var videoURL: Swift.String?
+  public init()
+}
+public struct AudioMessagePayload {
+  public var audioSize: Swift.Int
+  public var audioDuration: Swift.Int
+  public var audioPath: Swift.String?
+  public var audioURL: Swift.String?
+  public var asrLanguage: Swift.String?
+  public var asrText: Swift.String?
+  public init()
+}
+public struct FileMessagePayload {
+  public var fileName: Swift.String?
+  public var fileSize: Swift.Int
+  public var filePath: Swift.String?
+  public var fileURL: Swift.String?
+  public init()
+}
+public struct FaceMessagePayload {
+  public var faceIndex: Swift.Int
+  public var faceData: Swift.String?
+  public init()
+}
+public struct TipsMessagePayload {
+  public var groupTips: [AtomicXCore.GroupTipsInfo]?
+  public init(groupTips: [AtomicXCore.GroupTipsInfo]? = nil)
+}
+public struct CustomMessagePayload {
+  public var customData: Swift.String
+  public var description: Swift.String?
+  public var extensionInfo: Swift.String?
+  public init()
+}
+public struct MergedMessagePayload {
+  public var title: Swift.String
+  public var abstractList: [Swift.String]?
+  public init()
+}
+public struct StreamMessagePayload {
+  public var markdown: Swift.String
+  public var data: Swift.String
+  public var isStreamEnded: Swift.Bool
+  public init()
+}
+public enum GroupTipsInfo {
+  case unknown
+  case joinGroup(joinMember: AtomicXCore.GroupMember)
+  case inviteToGroup(inviter: AtomicXCore.GroupMember, invitees: [AtomicXCore.GroupMember])
+  case quitGroup(quitMember: AtomicXCore.GroupMember)
+  case kickedFromGroup(opUser: AtomicXCore.GroupMember, kickedMembers: [AtomicXCore.GroupMember])
+  case setGroupAdmin(opUser: AtomicXCore.GroupMember, setAdminMembers: [AtomicXCore.GroupMember])
+  case cancelGroupAdmin(opUser: AtomicXCore.GroupMember, cancelAdminMembers: [AtomicXCore.GroupMember])
+  case changeGroupName(opUser: AtomicXCore.GroupMember, groupName: Swift.String)
+  case changeGroupAvatar(opUser: AtomicXCore.GroupMember, groupAvatar: Swift.String)
+  case changeGroupNotification(opUser: AtomicXCore.GroupMember, groupNotification: Swift.String)
+  case changeGroupIntroduction(opUser: AtomicXCore.GroupMember, groupIntroduction: Swift.String)
+  case changeGroupOwner(opUser: AtomicXCore.GroupMember, groupOwner: Swift.String)
+  case changeGroupMuteAll(opUser: AtomicXCore.GroupMember, isMuteAll: Swift.Bool)
+  case changeJoinGroupApproval(opUser: AtomicXCore.GroupMember, groupJoinOption: AtomicXCore.GroupJoinOption)
+  case changeInviteToGroupApproval(opUser: AtomicXCore.GroupMember, groupInviteOption: AtomicXCore.GroupInviteOption)
+  case muteGroupMember(opUser: AtomicXCore.GroupMember, isSelfMuted: Swift.Bool, mutedGroupMembers: [AtomicXCore.GroupMember], muteTime: Swift.Int64)
+  case pinGroupMessage(opUser: AtomicXCore.GroupMember)
+  case unpinGroupMessage(opUser: AtomicXCore.GroupMember)
+}
+public struct MessageQuoteInfo {
+  public var msgID: Swift.String
+  public var status: AtomicXCore.MessageStatus
+  public var timestamp: Swift.Int64
+  public var sequence: Swift.Int64
+  public var sender: AtomicXCore.MessageSenderInfo
+  public var messageType: AtomicXCore.MessageType
+  public var messagePayload: AtomicXCore.MessagePayload?
+  public init()
+}
+public struct MessageReceipt {
+  public var isPeerRead: Swift.Bool
+  public var readCount: Swift.Int
+  public var unreadCount: Swift.Int
+  public init()
+}
+public struct MessageReaction : Swift.Identifiable {
+  public var id: Swift.String {
+    get
+  }
+  public var reactionID: Swift.String
+  public var totalUserCount: Swift.Int
+  public var partialUserList: [AtomicXCore.UserProfile]
+  public var reactedByMyself: Swift.Bool
+  public init(reactionID: Swift.String)
+  public typealias ID = Swift.String
+}
+public struct MessageExtension {
+  public var extensionKey: Swift.String?
+  public var extensionValue: Swift.String?
+  public init()
+}
+public struct OfflinePushInfo {
+  public var title: Swift.String
+  public var description: Swift.String
+  public var extensionInfo: [Swift.String : Any]
+  public init()
+}
+public enum MessageListType : Swift.Int {
+  case history
+  case pinned
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MessageLoadDirection : Swift.Int {
+  case older
+  case newer
+  case both
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct MessageLoadOption {
+  public var messageListType: AtomicXCore.MessageListType
+  public var cursor: AtomicXCore.MessageInfo?
+  public var direction: AtomicXCore.MessageLoadDirection
+  public var pageCount: Swift.Int
+  public var messageTypeList: [AtomicXCore.MessageType]
+  public init()
+}
+public enum MessageForwardType : Swift.Int {
+  case separate
+  case merged
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct MergedForwardInfo {
+  public var title: Swift.String
+  public var abstractList: [Swift.String]?
+  public var compatibleText: Swift.String
+  public init()
+}
+public struct ForwardMessageOption {
+  public var forwardType: AtomicXCore.MessageForwardType
+  public var mergedForwardInfo: AtomicXCore.MergedForwardInfo?
+  public var sendMessageOption: AtomicXCore.SendMessageOption?
+  public init()
+}
+public enum MusicPlayStatus : Swift.Int {
+  case idle
+  case playing
+  case paused
+  case loading
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct MusicState {
+  public var playURL: Swift.String?
+  public var playStatus: AtomicXCore.MusicPlayStatus
+  public var playProgress: Swift.Int
+  public var totalDuration: Swift.Int
+  public var musicVolume: Swift.Int
+  public init()
+}
+public enum MusicEvent {
+  case playCompleted(playURL: Swift.String)
+  case playError(playURL: Swift.String, code: Swift.Int)
+}
+@_hasMissingDesignatedInitializers public class MusicStore {
+  public static func create(liveID: Swift.String) -> AtomicXCore.MusicStore
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.MusicState> {
+    get
+  }
+  public var musicEventPublisher: Combine.PassthroughSubject<AtomicXCore.MusicEvent, Swift.Never> {
+    get
+  }
+  public func startPlay(url: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func pausePlay()
+  public func resumePlay()
+  public func stopPlay()
+  public func seek(to ms: Swift.Int)
+  public func setMusicVolume(_ volume: Swift.Int)
+  public func setPitch(_ pitch: Swift.Double)
+  @objc deinit
+}
+extension AtomicXCore.RoomParticipant : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RoomParticipant, rhs: AtomicXCore.RoomParticipant) -> Swift.Bool
+}
+extension AtomicXCore.RoomParticipant : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.DeviceRequestInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.DeviceRequestInfo, rhs: AtomicXCore.DeviceRequestInfo) -> Swift.Bool
+}
+extension AtomicXCore.ParticipantRole : Swift.Codable {
+}
+extension AtomicXCore.RoomParticipantStatus : Swift.Codable {
+}
+extension AtomicXCore.DeviceType : Swift.Codable {
+}
+public enum ParticipantRole : Swift.Int {
+  case owner
+  case admin
+  case generalUser
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RoomParticipantStatus : Swift.Int {
+  case scheduled
+  case inCalling
+  case callTimeout
+  case callRejected
+  case inRoom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum KickedOutOfRoomReason : Swift.Int {
+  case kickedByAdmin
+  case replacedByAnotherDevice
+  case kickedByServer
+  case connectionTimeout
+  case invalidStatusOnReconnect
+  case roomLimitExceeded
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct RoomParticipant {
+  public var userID: Swift.String
+  public var userName: Swift.String
+  public var avatarURL: Swift.String
+  public var nameCard: Swift.String
+  public var role: AtomicXCore.ParticipantRole
+  public var roomStatus: AtomicXCore.RoomParticipantStatus
+  public var microphoneStatus: AtomicXCore.DeviceStatus
+  public var cameraStatus: AtomicXCore.DeviceStatus
+  public var screenShareStatus: AtomicXCore.DeviceStatus
+  public var isMessageDisabled: Swift.Bool
+  public var metaData: [Swift.String : Swift.String]
+  public init()
+}
+public struct DeviceRequestInfo {
+  public var timestamp: Swift.Int
+  public var senderUserID: Swift.String
+  public var senderUserName: Swift.String
+  public var senderNameCard: Swift.String
+  public var senderAvatarURL: Swift.String
+  public var content: Swift.String
+  public var device: AtomicXCore.DeviceType
+  public init()
+}
+public struct RoomParticipantState {
+  public var participantList: [AtomicXCore.RoomParticipant]
+  public var participantListCursor: Swift.String
+  public var audienceList: [AtomicXCore.RoomUser]
+  public var audienceListCursor: Swift.String
+  public var adminList: [AtomicXCore.RoomUser]
+  public var messageDisabledUserList: [AtomicXCore.RoomUser]
+  public var participantListWithVideo: [AtomicXCore.RoomParticipant]
+  public var participantWithScreen: AtomicXCore.RoomParticipant?
+  public var pendingDeviceApplications: [AtomicXCore.DeviceRequestInfo]
+  public var pendingDeviceInvitations: [AtomicXCore.DeviceRequestInfo]
+  public var speakingUsers: [Swift.String : Swift.Int]
+  public var networkQualities: [Swift.String : AtomicXCore.NetworkInfo]
+  public var pendingParticipantList: [AtomicXCore.RoomParticipant]
+  public var localParticipant: AtomicXCore.RoomParticipant? {
+    get
+  }
+}
+public enum RoomParticipantEvent {
+  case onParticipantJoined(participant: AtomicXCore.RoomUser)
+  case onParticipantLeft(participant: AtomicXCore.RoomUser)
+  case onAudiencePromotedToParticipant(userInfo: AtomicXCore.RoomUser)
+  case onParticipantDemotedToAudience(userInfo: AtomicXCore.RoomUser)
+  case onOwnerChanged(newOwner: AtomicXCore.RoomUser, oldOwner: AtomicXCore.RoomUser)
+  case onAdminSet(userInfo: AtomicXCore.RoomUser)
+  case onAdminRevoked(userInfo: AtomicXCore.RoomUser)
+  case onKickedFromRoom(reason: AtomicXCore.KickedOutOfRoomReason, message: Swift.String)
+  case onParticipantDeviceClosed(device: AtomicXCore.DeviceType, operator: AtomicXCore.RoomUser)
+  case onUserMessageDisabled(disable: Swift.Bool, operator: AtomicXCore.RoomUser)
+  case onAllDevicesDisabled(device: AtomicXCore.DeviceType, disable: Swift.Bool, operator: AtomicXCore.RoomUser)
+  case onAllMessagesDisabled(disable: Swift.Bool, operator: AtomicXCore.RoomUser)
+  case onDeviceRequestReceived(request: AtomicXCore.DeviceRequestInfo)
+  case onDeviceRequestCancelled(request: AtomicXCore.DeviceRequestInfo)
+  case onDeviceRequestTimeout(request: AtomicXCore.DeviceRequestInfo)
+  case onDeviceRequestApproved(request: AtomicXCore.DeviceRequestInfo, operator: AtomicXCore.RoomUser)
+  case onDeviceRequestRejected(request: AtomicXCore.DeviceRequestInfo, operator: AtomicXCore.RoomUser)
+  case onDeviceRequestProcessed(request: AtomicXCore.DeviceRequestInfo, operator: AtomicXCore.RoomUser)
+  case onDeviceInvitationReceived(invitation: AtomicXCore.DeviceRequestInfo)
+  case onDeviceInvitationCancelled(invitation: AtomicXCore.DeviceRequestInfo)
+  case onDeviceInvitationTimeout(invitation: AtomicXCore.DeviceRequestInfo)
+  case onDeviceInvitationAccepted(invitation: AtomicXCore.DeviceRequestInfo, operator: AtomicXCore.RoomUser)
+  case onDeviceInvitationDeclined(invitation: AtomicXCore.DeviceRequestInfo, operator: AtomicXCore.RoomUser)
+}
+@_hasMissingDesignatedInitializers public class RoomParticipantStore {
+  public static func create(roomID: Swift.String) -> AtomicXCore.RoomParticipantStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.RoomParticipantState>
+  final public let participantEventPublisher: Combine.PassthroughSubject<AtomicXCore.RoomParticipantEvent, Swift.Never>
+  public func getParticipantList(cursor: Swift.String?, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomParticipant>?)
+  public func getAudienceList(cursor: Swift.String?, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomUser>?)
+  public func searchUsers(keyword: Swift.String, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomUser>?)
+  public func promoteAudienceToParticipant(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func demoteParticipantToAudience(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func transferOwner(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func setAdmin(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func revokeAdmin(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func kickUser(userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func updateParticipantNameCard(userID: Swift.String, nameCard: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func updateParticipantMetaData(userID: Swift.String, metaData: [Swift.String : Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func muteMicrophone()
+  public func unmuteMicrophone(completion: AtomicXCore.CompletionClosure?)
+  public func closeParticipantDevice(userID: Swift.String, device: AtomicXCore.DeviceType, completion: AtomicXCore.CompletionClosure?)
+  public func disableUserMessage(userID: Swift.String, disable: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func disableAllDevices(device: AtomicXCore.DeviceType, disable: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func disableAllMessages(disable: Swift.Bool, completion: AtomicXCore.CompletionClosure?)
+  public func requestToOpenDevice(device: AtomicXCore.DeviceType, timeout: Swift.Int = 0, completion: AtomicXCore.CompletionClosure?)
+  public func cancelOpenDeviceRequest(device: AtomicXCore.DeviceType, completion: AtomicXCore.CompletionClosure?)
+  public func approveOpenDeviceRequest(device: AtomicXCore.DeviceType, userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectOpenDeviceRequest(device: AtomicXCore.DeviceType, userID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func inviteToOpenDevice(userID: Swift.String, device: AtomicXCore.DeviceType, timeout: Swift.Int = 0, completion: AtomicXCore.CompletionClosure?)
+  public func cancelOpenDeviceInvitation(userID: Swift.String, device: AtomicXCore.DeviceType, completion: AtomicXCore.CompletionClosure?)
+  public func acceptOpenDeviceInvitation(userID: Swift.String, device: AtomicXCore.DeviceType, completion: AtomicXCore.CompletionClosure?)
+  public func declineOpenDeviceInvitation(userID: Swift.String, device: AtomicXCore.DeviceType, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+public enum VideoStreamType {
+  case camera
+  case screen
+  public static func == (a: AtomicXCore.VideoStreamType, b: AtomicXCore.VideoStreamType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum FillMode {
+  case fill
+  case fit
+  public static func == (a: AtomicXCore.FillMode, b: AtomicXCore.FillMode) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class RoomParticipantView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public func updateStreamType(streamType: AtomicXCore.VideoStreamType)
+  @_Concurrency.MainActor @preconcurrency public func updateParticipant(participant: AtomicXCore.RoomParticipant)
+  @_Concurrency.MainActor @preconcurrency public func setFillMode(fillMode: AtomicXCore.FillMode)
+  @_Concurrency.MainActor @preconcurrency public func setActive(isActive: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency public func setOnClickAction(action: @escaping () -> Swift.Void)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency required public init(streamType: AtomicXCore.VideoStreamType, participant: AtomicXCore.RoomParticipant)
+  @objc deinit
+}
+extension AtomicXCore.RoomParticipantView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func layoutSubviews()
+}
+extension AtomicXCore.RoomParticipantView : UIKit.UIGestureRecognizerDelegate {
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func gestureRecognizer(_ gestureRecognizer: UIKit.UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIKit.UIGestureRecognizer) -> Swift.Bool
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIKit.UIGestureRecognizer) -> Swift.Bool
+}
+public enum RoomType : Swift.Int {
+  case standard
+  case webinar
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RoomStatus : Swift.Int {
+  case scheduled
+  case running
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RoomCallStatus : Swift.Int {
+  case none
+  case calling
+  case timeout
+  case rejected
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RoomCallResult : Swift.Int {
+  case success
+  case alreadyInCalling
+  case alreadyInRoom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum CallRejectionReason : Swift.Int {
+  case rejected
+  case inOtherRoom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RecordingStatus : Swift.Int {
+  case none
+  case recording
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum RecordingStopReason : Swift.Int {
+  case stoppedByUser
+  case recorderLeftRoom
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct RoomUser {
+  public var userID: Swift.String
+  public var userName: Swift.String
+  public var avatarURL: Swift.String
+  public init()
+}
+public struct RecordingInfo {
+  public var status: AtomicXCore.RecordingStatus
+  public var operatorUser: AtomicXCore.RoomUser {
+    get
+  }
+  public var startTime: Swift.Int {
+    get
+  }
+  public init()
+}
+public struct RoomInfo {
+  public var roomID: Swift.String {
+    get
+  }
+  public var roomName: Swift.String
+  public var roomOwner: AtomicXCore.RoomUser
+  public var roomType: AtomicXCore.RoomType
+  public var participantCount: Swift.Int {
+    get
+  }
+  public var audienceCount: Swift.Int {
+    get
+  }
+  public var createTime: Swift.Int {
+    get
+  }
+  public var roomStatus: AtomicXCore.RoomStatus {
+    get
+  }
+  public var scheduledStartTime: Swift.Int
+  public var scheduledEndTime: Swift.Int
+  public var startReminderInSeconds: Swift.Int
+  public var scheduleAttendees: [AtomicXCore.RoomUser]
+  public var password: Swift.String?
+  public var isAllMicrophoneDisabled: Swift.Bool
+  public var isAllCameraDisabled: Swift.Bool
+  public var isAllMessageDisabled: Swift.Bool
+  public var isAllScreenShareDisabled: Swift.Bool
+  public var recordingInfo: AtomicXCore.RecordingInfo {
+    get
+  }
+  public init()
+  public var isEmpty: Swift.Bool {
+    get
+  }
+}
+public struct ScheduleRoomOptions {
+  public var roomName: Swift.String
+  public var password: Swift.String
+  public var scheduleStartTime: Swift.Int
+  public var scheduleEndTime: Swift.Int
+  public var reminderSecondsBeforeStart: Swift.Int
+  public var scheduleAttendees: [Swift.String]
+  public var isAllMicrophoneDisabled: Swift.Bool
+  public var isAllCameraDisabled: Swift.Bool
+  public var isAllScreenShareDisabled: Swift.Bool
+  public var isAllMessageDisabled: Swift.Bool
+  public init()
+  public struct ModifyFlag : Swift.OptionSet {
+    public let rawValue: Swift.UInt
+    public static let roomName: AtomicXCore.ScheduleRoomOptions.ModifyFlag
+    public static let scheduleStartTime: AtomicXCore.ScheduleRoomOptions.ModifyFlag
+    public static let scheduleEndTime: AtomicXCore.ScheduleRoomOptions.ModifyFlag
+    public init(rawValue: Swift.UInt)
+    public typealias ArrayLiteralElement = AtomicXCore.ScheduleRoomOptions.ModifyFlag
+    public typealias Element = AtomicXCore.ScheduleRoomOptions.ModifyFlag
+    public typealias RawValue = Swift.UInt
+  }
+}
+public struct CreateRoomOptions {
+  public var roomName: Swift.String
+  public var password: Swift.String
+  public var isAllMicrophoneDisabled: Swift.Bool
+  public var isAllCameraDisabled: Swift.Bool
+  public var isAllScreenShareDisabled: Swift.Bool
+  public var isAllMessageDisabled: Swift.Bool
+  public init()
+}
+public struct UpdateRoomOptions {
+  public var roomName: Swift.String
+  public var password: Swift.String
+  public init()
+  public struct ModifyFlag : Swift.OptionSet {
+    public let rawValue: Swift.UInt
+    public static let roomName: AtomicXCore.UpdateRoomOptions.ModifyFlag
+    public static let password: AtomicXCore.UpdateRoomOptions.ModifyFlag
+    public init(rawValue: Swift.UInt)
+    public typealias ArrayLiteralElement = AtomicXCore.UpdateRoomOptions.ModifyFlag
+    public typealias Element = AtomicXCore.UpdateRoomOptions.ModifyFlag
+    public typealias RawValue = Swift.UInt
+  }
+}
+public struct StartRecordingOptions {
+  public init()
+}
+public struct RoomCall {
+  public var caller: AtomicXCore.RoomUser
+  public var callee: AtomicXCore.RoomUser
+  public var status: AtomicXCore.RoomCallStatus
+  public init()
+}
+public struct RoomState {
+  public var scheduledRoomList: [AtomicXCore.RoomInfo]
+  public var scheduledRoomListCursor: Swift.String
+  public var currentRoom: AtomicXCore.RoomInfo?
+}
+public enum RoomEvent {
+  case onAddedToScheduledRoom(roomInfo: AtomicXCore.RoomInfo)
+  case onRemovedFromScheduledRoom(roomInfo: AtomicXCore.RoomInfo, operator: AtomicXCore.RoomUser)
+  case onScheduledRoomCancelled(roomInfo: AtomicXCore.RoomInfo, operator: AtomicXCore.RoomUser)
+  case onScheduledRoomStartingSoon(roomInfo: AtomicXCore.RoomInfo)
+  case onRoomEnded(roomInfo: AtomicXCore.RoomInfo)
+  case onCallReceived(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall, extensionInfo: Swift.String)
+  case onCallCancelled(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall)
+  case onCallTimeout(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall)
+  case onCallAccepted(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall)
+  case onCallRejected(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall, reason: AtomicXCore.CallRejectionReason)
+  case onCallHandledByOtherDevice(roomInfo: AtomicXCore.RoomInfo, isAccepted: Swift.Bool)
+  case onCallRevokedByAdmin(roomInfo: AtomicXCore.RoomInfo, call: AtomicXCore.RoomCall, operator: AtomicXCore.RoomUser)
+  case onRecordingStarted(roomInfo: AtomicXCore.RoomInfo, operator: AtomicXCore.RoomUser)
+  case onRecordingStopped(roomInfo: AtomicXCore.RoomInfo, operator: AtomicXCore.RoomUser, reason: AtomicXCore.RecordingStopReason)
+}
+public typealias CallUserToRoomCompletionClosure = (Swift.Result<[Swift.String : AtomicXCore.RoomCallResult], AtomicXCore.ErrorInfo>) -> Swift.Void
+public typealias GetRoomInfoCompletionClosure = (Swift.Result<AtomicXCore.RoomInfo, AtomicXCore.ErrorInfo>) -> Swift.Void
+@_hasMissingDesignatedInitializers public class RoomStore {
+  public static let shared: AtomicXCore.RoomStore
+  final public let state: AtomicXCore.StatePublisher<AtomicXCore.RoomState>
+  final public let roomEventPublisher: Combine.PassthroughSubject<AtomicXCore.RoomEvent, Swift.Never>
+  public func getScheduledRoomList(cursor: Swift.String?, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomInfo>?)
+  public func getScheduledAttendees(roomID: Swift.String, cursor: Swift.String?, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomUser>?)
+  public func scheduleRoom(roomID: Swift.String, options: AtomicXCore.ScheduleRoomOptions, completion: AtomicXCore.CompletionClosure?)
+  public func updateScheduledRoom(roomID: Swift.String, options: AtomicXCore.ScheduleRoomOptions, modifyFlag: AtomicXCore.ScheduleRoomOptions.ModifyFlag, completion: AtomicXCore.CompletionClosure?)
+  public func addScheduledAttendees(roomID: Swift.String, userIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func removeScheduledAttendees(roomID: Swift.String, userIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func cancelScheduledRoom(roomID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func createAndJoinRoom(roomID: Swift.String, roomType: AtomicXCore.RoomType, options: AtomicXCore.CreateRoomOptions, completion: AtomicXCore.CompletionClosure?)
+  public func joinRoom(roomID: Swift.String, roomType: AtomicXCore.RoomType, password: Swift.String? = "", completion: AtomicXCore.CompletionClosure?)
+  public func leaveRoom(completion: AtomicXCore.CompletionClosure?)
+  public func endRoom(completion: AtomicXCore.CompletionClosure?)
+  public func updateRoomInfo(roomID: Swift.String, options: AtomicXCore.UpdateRoomOptions, modifyFlag: AtomicXCore.UpdateRoomOptions.ModifyFlag, completion: AtomicXCore.CompletionClosure?)
+  public func getRoomInfo(roomID: Swift.String, completion: AtomicXCore.GetRoomInfoCompletionClosure?)
+  public func getPendingCalls(roomID: Swift.String, cursor: Swift.String?, completion: AtomicXCore.ListResultCompletionClosure<AtomicXCore.RoomCall>?)
+  public func callUserToRoom(roomID: Swift.String, userIDList: [Swift.String], timeout: Swift.Int = 0, extensionInfo: Swift.String?, completion: AtomicXCore.CallUserToRoomCompletionClosure?)
+  public func cancelCall(roomID: Swift.String, userIDList: [Swift.String], completion: AtomicXCore.CompletionClosure?)
+  public func acceptCall(roomID: Swift.String, completion: AtomicXCore.CompletionClosure?)
+  public func rejectCall(roomID: Swift.String, reason: AtomicXCore.CallRejectionReason, completion: AtomicXCore.CompletionClosure?)
+  public func startRecording(options: AtomicXCore.StartRecordingOptions = .init(), completion: AtomicXCore.CompletionClosure?)
+  public func stopRecording(completion: AtomicXCore.CompletionClosure?)
+  public func reset()
+  @objc deinit
+}
+extension AtomicXCore.RoomUser : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RoomUser, rhs: AtomicXCore.RoomUser) -> Swift.Bool
+}
+extension AtomicXCore.RoomUser : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.RoomInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RoomInfo, rhs: AtomicXCore.RoomInfo) -> Swift.Bool
+}
+extension AtomicXCore.RoomInfo : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.RecordingInfo : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RecordingInfo, rhs: AtomicXCore.RecordingInfo) -> Swift.Bool
+}
+extension AtomicXCore.RecordingInfo : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.UpdateRoomOptions : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.RoomCall : Swift.Equatable {
+  public static func == (lhs: AtomicXCore.RoomCall, rhs: AtomicXCore.RoomCall) -> Swift.Bool
+}
+extension AtomicXCore.CreateRoomOptions : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+extension AtomicXCore.RoomType : Swift.Codable {
+}
+extension AtomicXCore.RoomStatus : Swift.Codable {
+}
+extension AtomicXCore.RecordingStatus : Swift.Codable {
+}
+extension AtomicXCore.StartRecordingOptions : Swift.Codable {
+  public init(from decoder: any Swift.Decoder) throws
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+public enum KeywordListMatchMode : Swift.Int {
+  case or
+  case and
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum SearchType : Swift.Int {
+  case friend
+  case group
+  case groupMember
+  case message
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct UserSearchFilter {
+  public var gender: AtomicXCore.Gender
+  public var minBirthday: Swift.Int
+  public var maxBirthday: Swift.Int?
+  public init()
+}
+public struct GroupMemberSearchFilter {
+  public var groupIDList: [Swift.String]
+  public init()
+}
+public struct MessageSearchFilter {
+  public var conversationID: Swift.String?
+  public var searchTimePosition: Swift.Int
+  public var searchTimePeriod: Swift.Int
+  public var senderUserIDList: [Swift.String]?
+  public var messageTypeList: [AtomicXCore.MessageType]?
+  public init()
+}
+public struct SearchOption {
+  public var keywordListMatchMode: AtomicXCore.KeywordListMatchMode
+  public var searchScope: [AtomicXCore.SearchType]
+  public var pageSize: Swift.Int
+  public var userFilter: AtomicXCore.UserSearchFilter?
+  public var groupMemberFilter: AtomicXCore.GroupMemberSearchFilter?
+  public var messageFilter: AtomicXCore.MessageSearchFilter?
+  public init()
+}
+public struct FriendSearchInfo {
+  public var userID: Swift.String
+  public var friendRemark: Swift.String?
+  public var friendAddTime: Swift.Int64
+  public var friendCustomInfo: [Swift.String : Foundation.Data]?
+  public var userInfo: AtomicXCore.UserProfile?
+  public init(userID: Swift.String)
+}
+public struct GroupSearchInfo {
+  public var groupID: Swift.String
+  public var groupType: AtomicXCore.GroupType
+  public var groupName: Swift.String?
+  public var memberCount: Swift.Int
+  public var groupAvatarURL: Swift.String?
+  public var introduction: Swift.String?
+  public var joinGroupApprovalType: AtomicXCore.GroupJoinOption
+  public var inviteToGroupApprovalType: AtomicXCore.GroupInviteOption
+  public init()
+}
+public struct MessageSearchResultItem {
+  public var conversationID: Swift.String
+  public var conversationShowName: Swift.String
+  public var conversationAvatarURL: Swift.String?
+  public var messageCount: Swift.Int
+  public var messageList: [AtomicXCore.MessageInfo]
+  public init()
+}
+public struct SearchState {
+  public var userList: [AtomicXCore.UserProfile]
+  public var userTotalCount: Swift.Int
+  public var hasMoreUsers: Swift.Bool
+  public var friendList: [AtomicXCore.FriendSearchInfo]
+  public var friendTotalCount: Swift.Int
+  public var hasMoreFriends: Swift.Bool
+  public var groupList: [AtomicXCore.GroupSearchInfo]
+  public var groupTotalCount: Swift.Int
+  public var hasMoreGroups: Swift.Bool
+  public var groupMemberList: [Swift.String : [AtomicXCore.GroupMember]]
+  public var groupMemberTotalCount: Swift.Int
+  public var hasMoreGroupMembers: Swift.Bool
+  public var messageResults: [AtomicXCore.MessageSearchResultItem]
+  public var messageResultTotalCount: Swift.Int
+  public var hasMoreMessageResults: Swift.Bool
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class SearchStore : ObjectiveC.NSObject {
+  public var state: AtomicXCore.StatePublisher<AtomicXCore.SearchState>
+  public static func create() -> AtomicXCore.SearchStore
+  public func search(keywordList: [Swift.String], option: AtomicXCore.SearchOption = SearchOption(), completion: AtomicXCore.CompletionClosure?)
+  public func searchMore(searchType: AtomicXCore.SearchType, completion: AtomicXCore.CompletionClosure?)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @objc @_Concurrency.MainActor @preconcurrency public class SignalVideoView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func didMoveToWindow()
+  @objc deinit
+}
+extension UIKit.UIWindow {
+  @_Concurrency.MainActor @preconcurrency public static func getKeyWindow() -> UIKit.UIWindow?
+  @_Concurrency.MainActor @preconcurrency public static var isPortrait: Swift.Bool {
+    get
+  }
+}
+extension AtomicXCore.InterpretationVoice : Swift.Equatable {}
+extension AtomicXCore.InterpretationVoice : Swift.Hashable {}
+extension AtomicXCore.InterpretationVoice : Swift.RawRepresentable {}
+extension AtomicXCore.TranslationLanguage : Swift.Equatable {}
+extension AtomicXCore.TranslationLanguage : Swift.Hashable {}
+extension AtomicXCore.TranslationLanguage : Swift.RawRepresentable {}
+extension AtomicXCore.SourceLanguage : Swift.Equatable {}
+extension AtomicXCore.SourceLanguage : Swift.Hashable {}
+extension AtomicXCore.SourceLanguage : Swift.RawRepresentable {}
+extension AtomicXCore.AudioChangerType : Swift.Equatable {}
+extension AtomicXCore.AudioChangerType : Swift.Hashable {}
+extension AtomicXCore.AudioChangerType : Swift.RawRepresentable {}
+extension AtomicXCore.AudioReverbType : Swift.Equatable {}
+extension AtomicXCore.AudioReverbType : Swift.Hashable {}
+extension AtomicXCore.AudioReverbType : Swift.RawRepresentable {}
+extension AtomicXCore.BarrageType : Swift.Equatable {}
+extension AtomicXCore.BarrageType : Swift.Hashable {}
+extension AtomicXCore.BarrageType : Swift.RawRepresentable {}
+extension AtomicXCore.BattleEndedReason : Swift.Equatable {}
+extension AtomicXCore.BattleEndedReason : Swift.Hashable {}
+extension AtomicXCore.BattleEndedReason : Swift.RawRepresentable {}
+extension AtomicXCore.CallLayoutTemplate : Swift.Equatable {}
+extension AtomicXCore.CallLayoutTemplate : Swift.Hashable {}
+extension AtomicXCore.VolumeLevel : Swift.Equatable {}
+extension AtomicXCore.VolumeLevel : Swift.Hashable {}
+extension AtomicXCore.VolumeLevel : Swift.RawRepresentable {}
+extension AtomicXCore.CallMediaType : Swift.Equatable {}
+extension AtomicXCore.CallMediaType : Swift.Hashable {}
+extension AtomicXCore.CallMediaType : Swift.RawRepresentable {}
+extension AtomicXCore.CallEndReason : Swift.Equatable {}
+extension AtomicXCore.CallEndReason : Swift.Hashable {}
+extension AtomicXCore.CallEndReason : Swift.RawRepresentable {}
+extension AtomicXCore.CallDirection : Swift.Equatable {}
+extension AtomicXCore.CallDirection : Swift.Hashable {}
+extension AtomicXCore.CallDirection : Swift.RawRepresentable {}
+extension AtomicXCore.CallParticipantStatus : Swift.Equatable {}
+extension AtomicXCore.CallParticipantStatus : Swift.Hashable {}
+extension AtomicXCore.CallParticipantStatus : Swift.RawRepresentable {}
+extension AtomicXCore.CloudRecordPolicy : Swift.Equatable {}
+extension AtomicXCore.CloudRecordPolicy : Swift.Hashable {}
+extension AtomicXCore.CloudRecordPolicy : Swift.RawRepresentable {}
+extension AtomicXCore.NoResponseReason : Swift.Equatable {}
+extension AtomicXCore.NoResponseReason : Swift.Hashable {}
+extension AtomicXCore.NoResponseReason : Swift.RawRepresentable {}
+extension AtomicXCore.CoHostStatus : Swift.Equatable {}
+extension AtomicXCore.CoHostStatus : Swift.Hashable {}
+extension AtomicXCore.CoHostStatus : Swift.RawRepresentable {}
+extension AtomicXCore.CoHostLayoutTemplate : Swift.Equatable {}
+extension AtomicXCore.CoHostLayoutTemplate : Swift.Hashable {}
+extension AtomicXCore.CoHostLayoutTemplate : Swift.RawRepresentable {}
+extension AtomicXCore.ContactOnlineStatus : Swift.Equatable {}
+extension AtomicXCore.ContactOnlineStatus : Swift.Hashable {}
+extension AtomicXCore.ContactOnlineStatus : Swift.RawRepresentable {}
+extension AtomicXCore.FriendApplicationType : Swift.Equatable {}
+extension AtomicXCore.FriendApplicationType : Swift.Hashable {}
+extension AtomicXCore.FriendApplicationType : Swift.RawRepresentable {}
+extension AtomicXCore.ConversationGroup : Swift.Equatable {}
+extension AtomicXCore.ConversationGroup : Swift.Hashable {}
+extension AtomicXCore.ConversationGroup : Swift.RawRepresentable {}
+extension AtomicXCore.ConversationType : Swift.Equatable {}
+extension AtomicXCore.ConversationType : Swift.Hashable {}
+extension AtomicXCore.ConversationType : Swift.RawRepresentable {}
+extension AtomicXCore.GroupAtType : Swift.Equatable {}
+extension AtomicXCore.GroupAtType : Swift.Hashable {}
+extension AtomicXCore.GroupAtType : Swift.RawRepresentable {}
+extension AtomicXCore.ReceiveMessageOption : Swift.Equatable {}
+extension AtomicXCore.ReceiveMessageOption : Swift.Hashable {}
+extension AtomicXCore.ReceiveMessageOption : Swift.RawRepresentable {}
+extension AtomicXCore.AtomicMetrics : Swift.Equatable {}
+extension AtomicXCore.AtomicMetrics : Swift.Hashable {}
+extension AtomicXCore.AtomicMetrics : Swift.RawRepresentable {}
+extension AtomicXCore.InteractionMetrics : Swift.Equatable {}
+extension AtomicXCore.InteractionMetrics : Swift.Hashable {}
+extension AtomicXCore.InteractionMetrics : Swift.RawRepresentable {}
+extension AtomicXCore.DeviceType : Swift.Equatable {}
+extension AtomicXCore.DeviceType : Swift.Hashable {}
+extension AtomicXCore.DeviceType : Swift.RawRepresentable {}
+extension AtomicXCore.DeviceError : Swift.Equatable {}
+extension AtomicXCore.DeviceError : Swift.Hashable {}
+extension AtomicXCore.DeviceError : Swift.RawRepresentable {}
+extension AtomicXCore.DeviceStatus : Swift.Equatable {}
+extension AtomicXCore.DeviceStatus : Swift.Hashable {}
+extension AtomicXCore.DeviceStatus : Swift.RawRepresentable {}
+extension AtomicXCore.AudioRoute : Swift.Equatable {}
+extension AtomicXCore.AudioRoute : Swift.Hashable {}
+extension AtomicXCore.AudioRoute : Swift.RawRepresentable {}
+extension AtomicXCore.VideoQuality : Swift.Equatable {}
+extension AtomicXCore.VideoQuality : Swift.Hashable {}
+extension AtomicXCore.VideoQuality : Swift.RawRepresentable {}
+extension AtomicXCore.VideoOrientation : Swift.Equatable {}
+extension AtomicXCore.VideoOrientation : Swift.Hashable {}
+extension AtomicXCore.VideoOrientation : Swift.RawRepresentable {}
+extension AtomicXCore.NetworkQuality : Swift.Equatable {}
+extension AtomicXCore.NetworkQuality : Swift.Hashable {}
+extension AtomicXCore.NetworkQuality : Swift.RawRepresentable {}
+extension AtomicXCore.MirrorType : Swift.Equatable {}
+extension AtomicXCore.MirrorType : Swift.Hashable {}
+extension AtomicXCore.MirrorType : Swift.RawRepresentable {}
+extension AtomicXCore.NetworkType : Swift.Equatable {}
+extension AtomicXCore.NetworkType : Swift.Hashable {}
+extension AtomicXCore.GroupMemberFilterRole : Swift.Equatable {}
+extension AtomicXCore.GroupMemberFilterRole : Swift.Hashable {}
+extension AtomicXCore.GroupMemberFilterRole : Swift.RawRepresentable {}
+extension AtomicXCore.GroupMemberRole : Swift.Equatable {}
+extension AtomicXCore.GroupMemberRole : Swift.Hashable {}
+extension AtomicXCore.GroupMemberRole : Swift.RawRepresentable {}
+extension AtomicXCore.GroupType : Swift.Equatable {}
+extension AtomicXCore.GroupType : Swift.Hashable {}
+extension AtomicXCore.GroupType : Swift.RawRepresentable {}
+extension AtomicXCore.GroupJoinOption : Swift.Equatable {}
+extension AtomicXCore.GroupJoinOption : Swift.Hashable {}
+extension AtomicXCore.GroupJoinOption : Swift.RawRepresentable {}
+extension AtomicXCore.GroupInviteOption : Swift.Equatable {}
+extension AtomicXCore.GroupInviteOption : Swift.Hashable {}
+extension AtomicXCore.GroupInviteOption : Swift.RawRepresentable {}
+extension AtomicXCore.GroupApplicationType : Swift.Equatable {}
+extension AtomicXCore.GroupApplicationType : Swift.Hashable {}
+extension AtomicXCore.GroupApplicationType : Swift.RawRepresentable {}
+extension AtomicXCore.GroupApplicationHandledStatus : Swift.Equatable {}
+extension AtomicXCore.GroupApplicationHandledStatus : Swift.Hashable {}
+extension AtomicXCore.GroupApplicationHandledStatus : Swift.RawRepresentable {}
+extension AtomicXCore.GroupApplicationHandledResult : Swift.Equatable {}
+extension AtomicXCore.GroupApplicationHandledResult : Swift.Hashable {}
+extension AtomicXCore.GroupApplicationHandledResult : Swift.RawRepresentable {}
+extension AtomicXCore.Role : Swift.Equatable {}
+extension AtomicXCore.Role : Swift.Hashable {}
+extension AtomicXCore.Role : Swift.RawRepresentable {}
+extension AtomicXCore.LiveEndedReason : Swift.Equatable {}
+extension AtomicXCore.LiveEndedReason : Swift.Hashable {}
+extension AtomicXCore.LiveEndedReason : Swift.RawRepresentable {}
+extension AtomicXCore.LiveKickedOutReason : Swift.Equatable {}
+extension AtomicXCore.LiveKickedOutReason : Swift.Hashable {}
+extension AtomicXCore.LiveKickedOutReason : Swift.RawRepresentable {}
+extension AtomicXCore.MoveSeatPolicy : Swift.Equatable {}
+extension AtomicXCore.MoveSeatPolicy : Swift.Hashable {}
+extension AtomicXCore.MoveSeatPolicy : Swift.RawRepresentable {}
+extension AtomicXCore.DeviceControlPolicy : Swift.Equatable {}
+extension AtomicXCore.DeviceControlPolicy : Swift.Hashable {}
+extension AtomicXCore.DeviceControlPolicy : Swift.RawRepresentable {}
+extension AtomicXCore.LoginStatus : Swift.Equatable {}
+extension AtomicXCore.LoginStatus : Swift.Hashable {}
+extension AtomicXCore.LoginStatus : Swift.RawRepresentable {}
+extension AtomicXCore.AllowType : Swift.Equatable {}
+extension AtomicXCore.AllowType : Swift.Hashable {}
+extension AtomicXCore.AllowType : Swift.RawRepresentable {}
+extension AtomicXCore.Gender : Swift.Equatable {}
+extension AtomicXCore.Gender : Swift.Hashable {}
+extension AtomicXCore.Gender : Swift.RawRepresentable {}
+extension AtomicXCore.MessageStatus : Swift.Equatable {}
+extension AtomicXCore.MessageStatus : Swift.Hashable {}
+extension AtomicXCore.MessageStatus : Swift.RawRepresentable {}
+extension AtomicXCore.MessageType : Swift.Equatable {}
+extension AtomicXCore.MessageType : Swift.Hashable {}
+extension AtomicXCore.MessageType : Swift.RawRepresentable {}
+extension AtomicXCore.MessageForwardType : Swift.Equatable {}
+extension AtomicXCore.MessageForwardType : Swift.Hashable {}
+extension AtomicXCore.MessageForwardType : Swift.RawRepresentable {}
+extension AtomicXCore.MessageListType : Swift.Equatable {}
+extension AtomicXCore.MessageListType : Swift.Hashable {}
+extension AtomicXCore.MessageListType : Swift.RawRepresentable {}
+extension AtomicXCore.MessageLoadDirection : Swift.Equatable {}
+extension AtomicXCore.MessageLoadDirection : Swift.Hashable {}
+extension AtomicXCore.MessageLoadDirection : Swift.RawRepresentable {}
+extension AtomicXCore.MediaQuality : Swift.Equatable {}
+extension AtomicXCore.MediaQuality : Swift.Hashable {}
+extension AtomicXCore.MediaQuality : Swift.RawRepresentable {}
+extension AtomicXCore.KeywordListMatchMode : Swift.Equatable {}
+extension AtomicXCore.KeywordListMatchMode : Swift.Hashable {}
+extension AtomicXCore.KeywordListMatchMode : Swift.RawRepresentable {}
+extension AtomicXCore.SearchType : Swift.Equatable {}
+extension AtomicXCore.SearchType : Swift.Hashable {}
+extension AtomicXCore.SearchType : Swift.RawRepresentable {}
+extension AtomicXCore.CoreViewType : Swift.Equatable {}
+extension AtomicXCore.CoreViewType : Swift.Hashable {}
+extension AtomicXCore.ViewLayer : Swift.Equatable {}
+extension AtomicXCore.ViewLayer : Swift.Hashable {}
+extension AtomicXCore.ViewLayer : Swift.RawRepresentable {}
+extension AtomicXCore.LiveState : Swift.Equatable {}
+extension AtomicXCore.LiveState : Swift.Hashable {}
+extension AtomicXCore.TakeSeatMode : Swift.Equatable {}
+extension AtomicXCore.TakeSeatMode : Swift.Hashable {}
+extension AtomicXCore.SuspendStatus : Swift.Equatable {}
+extension AtomicXCore.SuspendStatus : Swift.Hashable {}
+extension AtomicXCore.SuspendStatus : Swift.RawRepresentable {}
+extension AtomicXCore.LoginEvent : Swift.Equatable {}
+extension AtomicXCore.LoginEvent : Swift.Hashable {}
+extension AtomicXCore.MusicPlayStatus : Swift.Equatable {}
+extension AtomicXCore.MusicPlayStatus : Swift.Hashable {}
+extension AtomicXCore.MusicPlayStatus : Swift.RawRepresentable {}
+extension AtomicXCore.ParticipantRole : Swift.Equatable {}
+extension AtomicXCore.ParticipantRole : Swift.Hashable {}
+extension AtomicXCore.ParticipantRole : Swift.RawRepresentable {}
+extension AtomicXCore.KickedOutOfRoomReason : Swift.Equatable {}
+extension AtomicXCore.KickedOutOfRoomReason : Swift.Hashable {}
+extension AtomicXCore.KickedOutOfRoomReason : Swift.RawRepresentable {}
+extension AtomicXCore.RoomParticipantStatus : Swift.Equatable {}
+extension AtomicXCore.RoomParticipantStatus : Swift.Hashable {}
+extension AtomicXCore.RoomParticipantStatus : Swift.RawRepresentable {}
+extension AtomicXCore.VideoStreamType : Swift.Equatable {}
+extension AtomicXCore.VideoStreamType : Swift.Hashable {}
+extension AtomicXCore.FillMode : Swift.Equatable {}
+extension AtomicXCore.FillMode : Swift.Hashable {}
+extension AtomicXCore.RoomType : Swift.Equatable {}
+extension AtomicXCore.RoomType : Swift.Hashable {}
+extension AtomicXCore.RoomType : Swift.RawRepresentable {}
+extension AtomicXCore.RoomStatus : Swift.Equatable {}
+extension AtomicXCore.RoomStatus : Swift.Hashable {}
+extension AtomicXCore.RoomStatus : Swift.RawRepresentable {}
+extension AtomicXCore.RoomCallStatus : Swift.Equatable {}
+extension AtomicXCore.RoomCallStatus : Swift.Hashable {}
+extension AtomicXCore.RoomCallStatus : Swift.RawRepresentable {}
+extension AtomicXCore.RoomCallResult : Swift.Equatable {}
+extension AtomicXCore.RoomCallResult : Swift.Hashable {}
+extension AtomicXCore.RoomCallResult : Swift.RawRepresentable {}
+extension AtomicXCore.CallRejectionReason : Swift.Equatable {}
+extension AtomicXCore.CallRejectionReason : Swift.Hashable {}
+extension AtomicXCore.CallRejectionReason : Swift.RawRepresentable {}
+extension AtomicXCore.RecordingStatus : Swift.Equatable {}
+extension AtomicXCore.RecordingStatus : Swift.Hashable {}
+extension AtomicXCore.RecordingStatus : Swift.RawRepresentable {}
+extension AtomicXCore.RecordingStopReason : Swift.Equatable {}
+extension AtomicXCore.RecordingStopReason : Swift.Hashable {}
+extension AtomicXCore.RecordingStopReason : Swift.RawRepresentable {}

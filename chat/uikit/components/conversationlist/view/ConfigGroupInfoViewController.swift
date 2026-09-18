@@ -557,7 +557,8 @@ final class ConfigGroupInfoViewController: UIViewController {
 
     private static func sendGroupCreateTipsMessage(groupID: String, groupType: String) {
         guard !groupID.isEmpty else { return }
-        let showName = LoginStore.shared.state.value.loginUserInfo?.userID ?? "用户"
+        let loginUserInfo = LoginStore.shared.state.value.loginUserInfo
+        let showName = (loginUserInfo?.nickname?.isEmpty == false ? loginUserInfo?.nickname : nil) ?? loginUserInfo?.userID ?? ""
         let isCommunity = groupType == "Community"
         let content = isCommunity
             ? LocalizedChatString("TUICommunityCreateTipsMessage")

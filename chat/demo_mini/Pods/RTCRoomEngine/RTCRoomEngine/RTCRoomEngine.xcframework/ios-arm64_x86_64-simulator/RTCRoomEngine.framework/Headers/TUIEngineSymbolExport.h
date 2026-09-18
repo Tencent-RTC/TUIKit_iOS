@@ -1,0 +1,12 @@
+// Copyright (c) 2022 Tencent. All rights reserved.
+
+#ifndef TUIKIT_ENGINE_API_COMMON_APPLE_TUIENGINESYMBOLEXPORT_H_
+#define TUIKIT_ENGINE_API_COMMON_APPLE_TUIENGINESYMBOLEXPORT_H_
+
+#if defined(BUILD_TUIENGINE)
+#define TUIENGINE_EXPORT __attribute__((visibility("default")))
+#else
+#define TUIENGINE_EXPORT
+#endif
+
+#endif  // TUIKIT_ENGINE_API_COMMON_APPLE_TUIENGINESYMBOLEXPORT_H_

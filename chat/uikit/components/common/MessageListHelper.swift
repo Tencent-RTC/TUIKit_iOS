@@ -2,8 +2,6 @@ import AtomicXCore
 import Foundation
 
 class MessageListHelper {
-    private static let mergedTitleMaxSenderCount = 2
-
     private static let mergedAbstractMaxCount = 4
 
     static func getGroupTipsDisplayString(_ groupTips: [GroupTipsInfo]?) -> String {
@@ -216,38 +214,27 @@ class MessageListHelper {
         let isGroupChat = conversationID.hasPrefix("group_")
 
         if isGroupChat {
-
+            // 群聊：群聊的聊天记录
             return LocalizedChatString("RelayGroupChatHistory")
-        } else {
-
-            var senderNames: [String] = []
-            var seenSenders: Set<String> = []
-
-            for message in messages {
-            let sender = message.from.userID
-                if !seenSenders.contains(sender) {
-                    seenSenders.insert(sender)
-
-                    let name = message.from.nickname ?? sender
-                    senderNames.append(name)
-                }
-
-                if senderNames.count >= mergedTitleMaxSenderCount {
-                    break
-                }
-            }
-
-            if senderNames.count == mergedTitleMaxSenderCount {
-
-                return String(format: LocalizedChatString("RelayChatHistoryForSomebodyFormat"), senderNames[0], senderNames[1])
-            } else if senderNames.count == 1 {
-
-                return String(format: LocalizedChatString("RelayC2CChatHistoryFormat"), senderNames[0])
-            } else {
-
-                return LocalizedChatString("RelayChatHistory")
-            }
         }
+
+        // 单聊：{自己显示名}和{对方显示名}的聊天记录（与 Android 对齐）
+        let loginUserInfo = LoginStore.shared.state.value.loginUserInfo
+        let selfName = (loginUserInfo?.nickname?.isEmpty == false ? loginUserInfo?.nickname : loginUserInfo?.userID) ?? ""
+
+        var peerName = ""
+        for message in messages where !message.isSentBySelf {
+            peerName = (message.from.nickname?.isEmpty == false ? message.from.nickname : nil) ?? message.from.userID
+            break
+        }
+        if peerName.isEmpty {
+            peerName = ChatUtil.getUserID(conversationID) ?? messages.first?.to ?? ""
+        }
+
+        if !selfName.isEmpty, !peerName.isEmpty {
+            return String(format: LocalizedChatString("RelayChatHistoryForSomebodyFormat"), selfName, peerName)
+        }
+        return LocalizedChatString("RelayChatHistory")
     }
 
     static func generateAbstractList(messages: [MessageInfo]) -> [String] {

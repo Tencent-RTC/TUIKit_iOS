@@ -60,9 +60,7 @@ enum MessageListFloatingEntryPolicy {
 }
 
 final class MessageListFloatingEntryStateController {
-    private var firstNewMessage: MessageInfo?
-
-    private var newMessageCount: Int = 0
+    private var newMessages: [MessageInfo] = []
 
     private var mentionTarget: MessageListMentionTarget?
 
@@ -77,8 +75,7 @@ final class MessageListFloatingEntryStateController {
     private var showBackToQuote: Bool = false
 
     func reset() {
-        firstNewMessage = nil
-        newMessageCount = 0
+        newMessages.removeAll()
         mentionTarget = nil
         mentionTargetVisibility = .unknown
         shouldShowBackToLatest = false
@@ -137,10 +134,16 @@ final class MessageListFloatingEntryStateController {
             clearNewMessages()
             return
         }
-        if firstNewMessage == nil {
-            firstNewMessage = message
-        }
-        newMessageCount += 1
+        guard !newMessages.contains(where: { $0.msgID == message.msgID }) else { return }
+        newMessages.append(message)
+    }
+
+    @discardableResult
+    func onMessageRecalled(msgID: String) -> Bool {
+        guard !msgID.isEmpty else { return false }
+        let countBeforeRemoval = newMessages.count
+        newMessages.removeAll { $0.msgID == msgID }
+        return newMessages.count != countBeforeRemoval
     }
 
     func onScroll(distanceFromLatest: CGFloat,
@@ -176,10 +179,8 @@ final class MessageListFloatingEntryStateController {
             return .mention(target: target)
         }
         if isBeyondDisplayThreshold,
-           newMessageCount > 0,
-           let newMessage = firstNewMessage,
-           !newMessage.msgID.isEmpty {
-            return .newMessages(count: newMessageCount, firstMessage: newMessage)
+           let newMessage = newMessages.first {
+            return .newMessages(count: newMessages.count, firstMessage: newMessage)
         }
         guard isBeyondDisplayThreshold else { return nil }
         return shouldShowBackToLatest ? .backToLatest : nil
@@ -200,7 +201,6 @@ final class MessageListFloatingEntryStateController {
     }
 
     private func clearNewMessages() {
-        firstNewMessage = nil
-        newMessageCount = 0
+        newMessages.removeAll()
     }
 }

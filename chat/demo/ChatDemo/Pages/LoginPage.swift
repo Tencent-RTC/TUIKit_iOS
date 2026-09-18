@@ -17,6 +17,7 @@ final class DemoLoginManager {
                 case .success:
                     self?.currentUserID = userID
                     self?.initCallEngine(sdkAppID: sdkAppID, userID: userID, userSig: userSig)
+                    CustomerServiceManager.initAndStart(sdkAppID: sdkAppID, userID: userID, userSig: userSig)
                     completion(true, nil)
                 case .failure(let error):
                     completion(false, "\(LocalizedChatString("LoginFailed")): \(error.code), \(error.message)")
