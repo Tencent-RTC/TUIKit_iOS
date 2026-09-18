@@ -16,8 +16,6 @@ enum ConversationSendStatusIndicator {
 
 enum ConversationCellFormatter {
 
-    private static let unreadCountBadgeThreshold = 2
-
     // MARK: - Time
 
     static func timeText(for conversation: ConversationInfo) -> String? {
@@ -74,19 +72,18 @@ enum ConversationCellFormatter {
                                                    countUnit: String,
                                                    color: UIColor,
                                                    font: UIFont) {
-        guard conversation.receiveOption == .notNotify, conversation.unreadCount >= unreadCountBadgeThreshold else {
+        guard conversation.receiveOption != .receive, conversation.unreadCount > 0 else {
             return
         }
-        result.append(makeAttr("[\(conversation.unreadCount)\(countUnit)]", color, font))
+        result.append(makeAttr("[\(conversation.unreadCount)\(countUnit)] ", color, font))
     }
 
     private static func finalSubtitleText(for conversation: ConversationInfo, countUnit: String) -> String {
         let subtitle = MessageListHelper.getMessageAbstract(conversation.lastMessage)
-        let stripped = strippingMentionBlocks(from: subtitle, message: conversation.lastMessage)
-        if conversation.receiveOption == .notNotify, conversation.unreadCount >= unreadCountBadgeThreshold {
-            return "[\(conversation.unreadCount)\(countUnit)] \(stripped)"
+        if conversation.receiveOption != .receive, conversation.unreadCount > 0 {
+            return "[\(conversation.unreadCount)\(countUnit)] \(subtitle)"
         }
-        return stripped
+        return subtitle
     }
 
     private static func emojiRenderedAttr(_ text: String, color: UIColor, font: UIFont) -> NSAttributedString {
@@ -94,15 +91,6 @@ enum ConversationCellFormatter {
             return makeAttr(text, color, font)
         }
         return EmojiManager.shared.createStyledAttributedString(fromEmojiCodes: text, font: font, textColor: color)
-    }
-
-    private static func strippingMentionBlocks(from text: String, message: MessageInfo?) -> String {
-        guard let message = message,
-              message.messageType == .text,
-              !message.atUserList.isEmpty else {
-            return text
-        }
-        return text.replacingOccurrences(of: "@[^\\s@]+\\s", with: "", options: .regularExpression)
     }
 
     private static func atTagText(for conversation: ConversationInfo) -> String {

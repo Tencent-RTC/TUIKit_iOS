@@ -1,0 +1,6 @@
+framework module TUIChatKit {
+  umbrella header "TUIChatKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

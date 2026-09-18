@@ -1,0 +1,8 @@
+${PODS_ROOT}/Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini-frameworks.sh
+${PODS_XCFRAMEWORKS_BUILD_DIR}/AlbumPicker/AlbumPicker.framework/AlbumPicker
+${PODS_XCFRAMEWORKS_BUILD_DIR}/AlbumPickerCore/AlbumPickerCore.framework/AlbumPickerCore
+${PODS_XCFRAMEWORKS_BUILD_DIR}/RTCRoomEngine/Professional/RTCRoomEngine.framework/RTCRoomEngine
+${PODS_XCFRAMEWORKS_BUILD_DIR}/TXIMSDK_Plus_iOS_XCFramework/ImSDK_Plus.framework/ImSDK_Plus
+${PODS_XCFRAMEWORKS_BUILD_DIR}/TXLiteAVSDK_Professional/Professional/TXLiteAVSDK_Professional.framework/TXLiteAVSDK_Professional
+${PODS_XCFRAMEWORKS_BUILD_DIR}/TXLiteAVSDK_Professional/Professional/TXSoundTouch.framework/TXSoundTouch
+${PODS_XCFRAMEWORKS_BUILD_DIR}/TXLiteAVSDK_Professional/Professional/TXFFmpeg.framework/TXFFmpeg

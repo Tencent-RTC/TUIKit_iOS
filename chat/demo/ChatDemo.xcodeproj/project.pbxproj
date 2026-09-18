@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		161326BF2F693A6F00EBFF2E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */; };
 		16CF01AA000000000000AA03 /* Navigation/ChatFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */; };
+		16CF01AA000000000000AA05 /* Navigation/CustomerServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000AA04 /* Navigation/CustomerServiceManager.swift */; };
 		16CF01AA000000000000BB03 /* VoiceMessageSettingPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */; };
 		4AE6172335A14D917199DD62 /* Pods_ChatDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */; };
 		A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DB2E6EC0050075F614 /* SettingsPage.swift */; };
@@ -17,13 +18,22 @@
 		A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */; };
 		A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DA2E6EC0050075F614 /* LoginPage.swift */; };
 		A32424F12E6EC0050075F614 /* appConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = A32424DD2E6EC0050075F614 /* appConfig.json */; };
+		A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A32424DF2E6EC0050075F614 /* Assets.xcassets */; };
+		A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424F42E6EC0050075F614 /* RootViewController.swift */; };
 		AB00000000000000000000AC /* LoginSubviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AD /* LoginSubviews.swift */; };
 		AB00000000000000000000AE /* telephone_area_code.json in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AF /* telephone_area_code.json */; };
 		AB00000000000000000000B1 /* verification.html in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000B2 /* verification.html */; };
 		AB00000000000000000000C1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000C2 /* SceneDelegate.swift */; };
-		A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A32424DF2E6EC0050075F614 /* Assets.xcassets */; };
-		A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424F42E6EC0050075F614 /* RootViewController.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		161326E02F6A7E7600EBFF2E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E6F3900DD7B5D309DE65B878 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 161326DA2F6A7E7600EBFF2E;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		161326E32F6A7E7600EBFF2E /* Embed Foundation Extensions */ = {
@@ -44,6 +54,7 @@
 		161326D12F697B0000EBFF2E /* ChatDemo-Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Debug.entitlements"; sourceTree = "<group>"; };
 		161326D22F697B0100EBFF2E /* ChatDemo-Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Release.entitlements"; sourceTree = "<group>"; };
 		16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation/ChatFlowCoordinator.swift; sourceTree = "<group>"; };
+		16CF01AA000000000000AA04 /* Navigation/CustomerServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation/CustomerServiceManager.swift; sourceTree = "<group>"; };
 		16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMessageSettingPages.swift; sourceTree = "<group>"; };
 		16E6A6AB2FDAE2A40032F383 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -52,15 +63,15 @@
 		A32424DA2E6EC0050075F614 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		A32424DB2E6EC0050075F614 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		A32424DD2E6EC0050075F614 /* appConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appConfig.json; sourceTree = "<group>"; };
-		AB00000000000000000000AD /* LoginSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSubviews.swift; sourceTree = "<group>"; };
-		AB00000000000000000000AF /* telephone_area_code.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = telephone_area_code.json; sourceTree = "<group>"; };
-		AB00000000000000000000B2 /* verification.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = verification.html; sourceTree = "<group>"; };
-		AB00000000000000000000C2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A32424DE2E6EC0050075F614 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A32424DF2E6EC0050075F614 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateTestUserSig.swift; sourceTree = "<group>"; };
 		A32424E22E6EC0050075F614 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A32424F42E6EC0050075F614 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+		AB00000000000000000000AD /* LoginSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSubviews.swift; sourceTree = "<group>"; };
+		AB00000000000000000000AF /* telephone_area_code.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = telephone_area_code.json; sourceTree = "<group>"; };
+		AB00000000000000000000B2 /* verification.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = verification.html; sourceTree = "<group>"; };
+		AB00000000000000000000C2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		ADA16EB7C9F14EC0FDEC6E5F /* Pods-ChatDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.release.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.release.xcconfig"; sourceTree = "<group>"; };
 		D13DF48F95F478A5C9C94A2B /* Pods-ChatApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatApp.release.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E89B2374B3E641FC68E9F381 /* Pods-TUIKitDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TUIKitDemo.release.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.release.xcconfig"; sourceTree = "<group>"; };
@@ -69,6 +80,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		161326D82F6A7E7600EBFF2E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		736B3438CD4CFAA7939F606F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -139,6 +157,7 @@
 				161326D12F697B0000EBFF2E /* ChatDemo-Debug.entitlements */,
 				161326D22F697B0100EBFF2E /* ChatDemo-Release.entitlements */,
 				16CF01AA000000000000AA02 /* Navigation/ChatFlowCoordinator.swift */,
+				16CF01AA000000000000AA04 /* Navigation/CustomerServiceManager.swift */,
 				A32424DC2E6EC0050075F614 /* Pages */,
 				A32424DD2E6EC0050075F614 /* appConfig.json */,
 				AB00000000000000000000AF /* telephone_area_code.json */,
@@ -171,6 +190,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				161326E12F6A7E7600EBFF2E /* PBXTargetDependency */,
 			);
 			name = ChatDemo;
 			productName = ChatApp;
@@ -186,6 +206,11 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					161326DA2F6A7E7600EBFF2E = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+				};
 			};
 			buildConfigurationList = 11AB62D2545EF2D0C5E3D465 /* Build configuration list for PBXProject "ChatDemo" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -206,6 +231,13 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		161326D92F6A7E7600EBFF2E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CEAD06132DA9128900E92F24 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -276,9 +308,51 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		AB1CCF25D0A3329D27639BF3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C87265DE508D24B174BAA576 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		161326D72F6A7E7600EBFF2E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		960AC3DB982879A761D2CE93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -289,6 +363,7 @@
 				A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */,
 				A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */,
 				16CF01AA000000000000AA03 /* Navigation/ChatFlowCoordinator.swift in Sources */,
+				16CF01AA000000000000AA05 /* Navigation/CustomerServiceManager.swift in Sources */,
 				A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */,
 				A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */,
 				AB00000000000000000000AC /* LoginSubviews.swift in Sources */,
@@ -298,6 +373,13 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		161326E12F6A7E7600EBFF2E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			targetProxy = 161326E02F6A7E7600EBFF2E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		125C9F740FAC230133E7F6D4 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -306,10 +388,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ChatDemo/ChatDemo-Release.entitlements";
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -317,10 +401,88 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.imchat.imchat.uikit;
 				PRODUCT_NAME = ChatDemo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		161326E42F6A7E7600EBFF2E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		161326E52F6A7E7600EBFF2E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -376,7 +538,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -395,10 +557,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ChatDemo/ChatDemo-Debug.entitlements";
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				INFOPLIST_FILE = ChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -406,11 +570,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuikit.demo.xa.uikit;
 				PRODUCT_NAME = ChatDemo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -459,7 +624,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -161,10 +161,17 @@ final class HomeTabBarController: UITabBarController {
 
     private func makeChatsTab() -> UIViewController {
         let coordinator = ChatFlowCoordinator()
+        weak var weakNav: HiddenBarNavigationController?
         let conversationsPage = ConversationsPage(onConversationClick: { [weak coordinator] info in
+            if info.conversation.conversationID == CustomerServiceManager.customerServiceConversationID,
+               let viewController = weakNav?.topViewController {
+                CustomerServiceManager.openCustomerServiceChat(from: viewController)
+                return
+            }
             coordinator?.pushChat(info.conversation, locateMessage: info.locateMessage)
         })
         let nav = HiddenBarNavigationController(rootViewController: conversationsPage)
+        weakNav = nav
         coordinator.navigationController = nav
         nav.tabBarItem = UITabBarItem(
             title: LocalizedChatString("TabChats"),
@@ -445,14 +452,23 @@ final class HomeTabBarController: UITabBarController {
         appearance.configureWithTransparentBackground()
         appearance.backgroundColor = themeColors.bgColorTopBar
         appearance.shadowColor = .clear
-        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: tertiaryColor, .font: titleFont]
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: linkColor, .font: titleFont]
+        appearance.selectionIndicatorTintColor = .clear
+        let itemAppearances = [
+            appearance.stackedLayoutAppearance,
+            appearance.inlineLayoutAppearance,
+            appearance.compactInlineLayoutAppearance
+        ]
+        for itemAppearance in itemAppearances {
+            itemAppearance.normal.titleTextAttributes = [.foregroundColor: tertiaryColor, .font: titleFont]
+            itemAppearance.selected.titleTextAttributes = [.foregroundColor: linkColor, .font: titleFont]
+        }
         tabBar.isTranslucent = false
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance
         }
         tabBar.tintColor = linkColor
+        tabBar.unselectedItemTintColor = tertiaryColor
         renderTabIcons()
         if messageUnreadBadge.superview === tabBar {
             tabBar.bringSubviewToFront(messageUnreadBadge)

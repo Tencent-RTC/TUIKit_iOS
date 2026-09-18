@@ -13,6 +13,8 @@ typedef NS_ENUM(NSInteger, VideoRecordSignatureResultCode) {
     VIDEO_RECORD_SIGNATURE_ERROR_NO_SIGNATURE = -10
 };
 
+extern NSNotificationName const VideoRecordSignatureDidUpdateNotification;
+
 @interface VideoRecordSignatureChecker : NSObject
 + (instancetype)shareInstance;
 - (void)startUpdateSignature:(NSString*)sdkAppId;

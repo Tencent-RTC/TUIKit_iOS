@@ -9,6 +9,7 @@
 #import "VideoRecorderRecordButtonView.h"
 #include "videoRecorderConfigInternal.h"
 #import "VideoRecorderAuthorizationPrompterController.h"
+#import "VideoRecordSignatureChecker.h"
 
 #define MIXED_RECORD_MODE 0
 #define PHOTO_ONLY_RECORD_MODE 1
@@ -70,7 +71,21 @@ const static BOOL ShowDurationLabel = YES;
         _beautifySettings = [[VideoRecorderBeautifySettings alloc] init];
     }
     [self initUI];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onSignatureDidUpdate:)
+                                                 name:VideoRecordSignatureDidUpdateNotification
+                                               object:nil];
     return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)onSignatureDidUpdate:(NSNotification *)notification {
+    if (_btnBeautify == nil) {
+        [self initBeautyView];
+    }
 }
 
 - (void)setProgress:(float)progress duration:(float)duration {
@@ -188,19 +203,22 @@ const static BOOL ShowDurationLabel = YES;
     if (![[VideoRecorderConfigInternal sharedInstance] isSupportRecordBeauty]) {
         return;
     }
-    
-    
+    if (_btnBeautify != nil) {
+        return;
+    }
+
+
 #ifndef DEBUG
     if (![VideoRecorderAuthorizationPrompterController isHasSignature]
         || ![VideoRecorderAuthorizationPrompterController isHasLiteavProSdk]) {
         return;
     }
 #endif
-    
+
     _btnBeautify = [self newFunctionButtonWithImage:VideoRecorderBundleThemeImage(@"beauty_record")
                                               title:[VideoRecorderCommon localizedStringForKey:@"beautify"]
                                     onTouchUpInside:@selector(onBtnBeautifyClick)];
-    
+
     [_btnBeautify mas_makeConstraints:^(MASConstraintMaker *make) {
         if (_lastFuncitonBtn == nil) {
             make.top.equalTo(self).inset(FunctionBtnToToTop);
@@ -209,8 +227,16 @@ const static BOOL ShowDurationLabel = YES;
             make.centerX.equalTo(_lastFuncitonBtn);
             make.top.equalTo(_lastFuncitonBtn.mas_bottom).inset(BtnExtendFunctionGap);
         }
-        _lastFuncitonBtn = _btnBeautify;
     }];
+    _lastFuncitonBtn = _btnBeautify;
+
+    if (_btnAspect != nil) {
+        [_btnAspect mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(_btnBeautify);
+            make.top.equalTo(_btnBeautify.mas_bottom).inset(BtnExtendFunctionGap);
+        }];
+        _lastFuncitonBtn = _btnAspect;
+    }
 }
 
 - (void) initAspectView {
@@ -236,8 +262,8 @@ const static BOOL ShowDurationLabel = YES;
             make.centerX.equalTo(_lastFuncitonBtn);
             make.top.equalTo(_lastFuncitonBtn.mas_bottom).inset(BtnExtendFunctionGap);
         }
-        _lastFuncitonBtn = _btnBeautify;
     }];
+    _lastFuncitonBtn = _btnAspect;
 }
 
 - (UIButton *)newFunctionButtonWithImage:(UIImage *)img title:(NSString *)title onTouchUpInside:(SEL)sel {

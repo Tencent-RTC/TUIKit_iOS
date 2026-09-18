@@ -11,7 +11,6 @@ import UIKit
 import AtomicX
 import AtomicXCore
 import Combine
-import AtomicX
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
@@ -25,7 +24,6 @@ import RTCRoomEngine
 class TUICallKitImpl: TUICallKit {
     static let shared = TUICallKitImpl()
     private var cancellables = Set<AnyCancellable>()
-    private var hasSetDefaultDeviceState = false
     
     let globalState = GlobalState()
     let viewState = ViewState()
@@ -55,7 +53,7 @@ class TUICallKitImpl: TUICallKit {
             completion?(.failure(ErrorInfo(code: Int(ERROR_PARAM_INVALID), message: "Invalid screen orientation value")))
             return
         }
-        globalState.orientation = Orientation(rawValue: orientation) ?? .portrait
+        globalState.orientation = targetOrientation
         completion?(.success(()))
     }
     
@@ -257,18 +255,6 @@ extension TUICallKitImpl {
             .store(in: &cancellables)
     }
     
-    private func handleCallParticipantStatusChanged(_ newStatus: CallParticipantStatus) {
-        switch newStatus {
-        case .accept:
-            if !hasSetDefaultDeviceState {
-                setDefaultDeviceState()
-                hasSetDefaultDeviceState = true
-            }
-        default:
-            break
-        }
-    }
-    
     func unSubscribeCallState() {
         cancellables.removeAll()
     }
@@ -323,6 +309,19 @@ extension TUICallKitImpl {
         if selfStatus == .accept {
             voipDataSyncHandler.callBegin()
             return
+        }
+    }
+    
+    private func handleCallParticipantStatusChanged(_ newStatus: CallParticipantStatus) {
+        if newStatus == .accept {
+            let mediaType = CallStore.shared.state.value.activeCall.mediaType
+            CallManager.shared.openLocalMicrophone()
+            if mediaType == .audio {
+                CallManager.shared.setAudioRoute(.earpiece)
+            } else if mediaType == .video {
+                CallManager.shared.setAudioRoute(.speakerphone)
+                CallManager.shared.openLocalCameraIfPermitted()
+            }
         }
     }
     
@@ -452,7 +451,7 @@ extension TUICallKitImpl {
                 guard let self = self else { return }
                 if !callId.isEmpty {
                     if isCaller() && globalState.enableAITranscriber {
-                        startRealtimeTranscriber(callID: callId)
+                        AITranscriberStore.create(roomID: callId).startRealtimeTranscriber(config: TranscriberSettings.config, completion: nil)
                     }
                 }
             }
@@ -461,12 +460,16 @@ extension TUICallKitImpl {
     
     func handleCallEvent(_ event: CallEvent) {
         switch event {
-        case .onCallStarted(_, _):
-            if !hasSetDefaultDeviceState {
-                setDefaultDeviceState()
-                hasSetDefaultDeviceState = true
+        case let .onCallStarted(callId: _, mediaType: mediaType):
+            CallManager.shared.openLocalMicrophone()
+            if mediaType == .audio {
+                CallManager.shared.setAudioRoute(.earpiece)
+            } else if mediaType == .video {
+                CallManager.shared.setAudioRoute(.speakerphone)
+                CallManager.shared.openLocalCameraIfPermitted()
             }
             showCallKitViewController(isCaller: true)
+            
         case let .onCallReceived(callId, mediaType, _):
             KeyMetrics.countUV(eventId: .received, callId: callId)
             if mediaType == .video {
@@ -474,37 +477,38 @@ extension TUICallKitImpl {
             }
             showCallKitViewController(isCaller: false)
             
-        case let .onCallEnded(callId: _, mediaType: _, reason: reason, userId: userId):
+        case let .onCallEnded(callId: callId, mediaType: _, reason: reason, userId: userId):
+            AITranscriberStore.create(roomID: callId).stopRealtimeTranscriber()
             TranscriberSettings.reset()
-            hasSetDefaultDeviceState = false
             TEBeautyView.releaseSharedInstance()
             handleCallEndedWithResidence(reason: reason, userId: userId)
+            DeviceStore.shared.reset()
         default:
             break
         }
     }
-
+    
     func handleCallEndedWithResidence(reason: CallEndReason, userId: String) {
         let selfInfo = CallStore.shared.state.value.selfInfo
         let activeCall = CallStore.shared.state.value.activeCall
         let isGroupCall = !activeCall.chatGroupId.isEmpty || activeCall.inviteeIds.count > 1
         let triggeredBySelf = !selfInfo.id.isEmpty && userId == selfInfo.id
-
+        
         guard !selfInfo.id.isEmpty else { closeCallKitViewController(); return }
         guard !triggeredBySelf else { closeCallKitViewController(); return }
         guard !isGroupCall else { closeCallKitViewController(); return }
         guard let messageKey = endCallHintKey(for: reason) else { closeCallKitViewController(); return }
-
+        
         let message = TUICallKitLocalize(key: messageKey)
         guard !message.isEmpty else { closeCallKitViewController(); return }
         guard let callMainViewController = WindowManager.shared.currentCallMainViewController() else {
             closeCallKitViewController()
             return
         }
-
+        
         callMainViewController.showEndCallHint(text: message)
     }
-
+    
     private func endCallHintKey(for reason: CallEndReason) -> String? {
         switch reason {
         case .hangup:
@@ -519,21 +523,6 @@ extension TUICallKitImpl {
             return "TUICallKit.otherPartyCanceled"
         default:
             return nil
-        }
-    }
-    
-    func setDefaultDeviceState() {
-        let activeCall = CallStore.shared.state.value.activeCall
-        let mediaType = activeCall.mediaType
-        let deviceStore = DeviceStore.shared
-        
-        deviceStore.openLocalMicrophone(completion: nil)
-        
-        if mediaType == .audio {
-            deviceStore.setAudioRoute(.earpiece)
-        } else {
-            deviceStore.setAudioRoute(.speakerphone)
-            deviceStore.openLocalCamera(isFront: true, completion: nil)
         }
     }
     
@@ -608,41 +597,9 @@ extension TUICallKitImpl {
             duration: .long
         )
     }
-}
-
-// MARK: - AI Transcriber
-extension TUICallKitImpl {
-    private static let vadConfigKey = "Liteav.Audio.common.enable.send.eos.packet.in.dtx"
     
     private func isCaller() -> Bool {
         let state = CallStore.shared.state.value
         return state.selfInfo.id == state.activeCall.inviterId
-    }
-    
-    private func startRealtimeTranscriber(callID: String) {
-        AITranscriberStore.create(roomID: callID).startRealtimeTranscriber(config: TranscriberSettings.config, completion: nil)
-        closeVAD()
-    }
-        
-    private func closeVAD() {
-        callExperimentalAPI(withConfig: [
-            "key": Self.vadConfigKey,
-            "action": "reset"
-        ])
-        callExperimentalAPI(withConfig: [
-            "key": Self.vadConfigKey,
-            "value": 0,
-            "default": 0
-        ])
-    }
-    
-    private func callExperimentalAPI(withConfig config: [String: Any]) {
-        let jsonObj: [String: Any] = [
-            "api": "setPrivateConfig",
-            "params": ["configs": [config]]
-        ]
-        guard let data = try? JSONSerialization.data(withJSONObject: jsonObj),
-              let jsonStr = String(data: data, encoding: .utf8) else { return }
-        TRTCCloud.sharedInstance().callExperimentalAPI(jsonStr)
     }
 }

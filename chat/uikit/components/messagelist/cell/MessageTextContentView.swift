@@ -30,7 +30,7 @@ final class MessageTextContentView: UIView, MessageContentView {
 
     func bind(message: MessageInfo, context: MessageContentContext) {
         let text = Self.currentText(from: message)
-        applyText(text, isSelf: context.isSelf)
+        applyText(text, isSelf: context.isSelf, isLeft: context.isLeft)
     }
 
     // MARK: - Private
@@ -62,7 +62,7 @@ final class MessageTextContentView: UIView, MessageContentView {
         return ""
     }
 
-    private func applyText(_ text: String, isSelf: Bool) {
+    private func applyText(_ text: String, isSelf: Bool, isLeft: Bool) {
         let textColor = isSelf ? TUIChatKitTheme.colors.textColorAntiPrimary : TUIChatKitTheme.colors.textColorPrimary
         textLabel.textAlignment = .natural
         if text.contains("[TUIEmoji_") {
@@ -70,7 +70,7 @@ final class MessageTextContentView: UIView, MessageContentView {
         } else {
             textLabel.attributedText = plainAttributedString(from: text, textColor: textColor)
         }
-        applyLabelPosition(isSelf: isSelf)
+        applyLabelPosition(isLeft: isLeft)
     }
 
     private func plainAttributedString(from text: String, textColor: UIColor) -> NSAttributedString {
@@ -85,16 +85,16 @@ final class MessageTextContentView: UIView, MessageContentView {
         ])
     }
 
-    private func applyLabelPosition(isSelf: Bool) {
+    private func applyLabelPosition(isLeft: Bool) {
         textLabel.snp.remakeConstraints { make in
             make.top.bottom.equalToSuperview().inset(Self.verticalInset)
             make.width.lessThanOrEqualTo(Self.maxBubbleWidth - Self.horizontalInset * 2)
-            if isSelf {
-                make.trailing.equalToSuperview().offset(-Self.horizontalInset)
-                make.leading.greaterThanOrEqualToSuperview().offset(Self.horizontalInset)
-            } else {
+            if isLeft {
                 make.leading.equalToSuperview().offset(Self.horizontalInset)
                 make.trailing.lessThanOrEqualToSuperview().offset(-Self.horizontalInset)
+            } else {
+                make.trailing.equalToSuperview().offset(-Self.horizontalInset)
+                make.leading.greaterThanOrEqualToSuperview().offset(Self.horizontalInset)
             }
         }
     }

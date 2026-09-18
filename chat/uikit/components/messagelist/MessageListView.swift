@@ -261,6 +261,11 @@ public final class MessageListView: UIView {
         )
     }
 
+    /// 注册自定义消息摘要匹配器，返回非 nil 即命中（用于会话列表与引用预览）。
+    public static func registerCustomMessageSummary(matcher: @escaping (CustomMessagePayload) -> String?) {
+        CustomMessageSummaryRegistry.shared.registerMatcher(matcher)
+    }
+
     var onMultiSelectModeChange: ((Bool) -> Void)? {
         get { impl.onMultiSelectModeChange }
         set { impl.onMultiSelectModeChange = newValue }

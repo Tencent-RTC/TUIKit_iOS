@@ -15,7 +15,9 @@ extension NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(initSdkSuccess(_:)),
                                                name: Notification.Name.TUIInitSdkSuccess,
                                                object: nil)
-        
+
+        ChatCallEventSubscriber.shared.ensureSubscribed()
+
         TUICore.registerService(TUICore_TUICallingService, object: TUICallKitService.instance)
         
         TUICore.registerService(TUICore_TUIAudioMessageRecordService, object: TUIAudioMessageRecordService.instance)

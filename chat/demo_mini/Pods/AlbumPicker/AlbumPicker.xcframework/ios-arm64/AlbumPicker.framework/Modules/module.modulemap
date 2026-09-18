@@ -1,0 +1,11 @@
+framework module AlbumPicker {
+  umbrella header "AlbumPicker-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module AlbumPicker.Swift {
+  header "AlbumPicker-Swift.h"
+  requires objc
+}

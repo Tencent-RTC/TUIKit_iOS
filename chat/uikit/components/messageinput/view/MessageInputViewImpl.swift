@@ -1,7 +1,6 @@
 import UIKit
 import SnapKit
 import AtomicXCore
-import TUICallKit_Swift
 
 final class MessageInputViewImpl: UIView {
     var onIntrinsicContentSizeInvalidated: (() -> Void)?
@@ -191,6 +190,7 @@ final class MessageInputViewImpl: UIView {
         activateConstraints()
         bindInteraction()
         setupViewStyle()
+        fetchVideoRecorderSignature()
     }
 
     required init?(coder: NSCoder) {
@@ -1021,15 +1021,10 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
         startCall(mediaType: .audio)
     }
 
-    private func startCall(mediaType: CallMediaType) {
+    private func startCall(mediaType: ChatCallEventPublisher.MediaType) {
         if !viewModel.isGroupChat, let targetUserID = c2cTargetUserID() {
             DataReport.reportInteractionMetrics(.chatInvokeCall)
-            TUICallKit.createInstance().calls(
-                userIdList: [targetUserID],
-                mediaType: mediaType,
-                params: nil,
-                completion: nil
-            )
+            ChatCallEventPublisher.publishStartCall(participantIDs: [targetUserID], mediaType: mediaType)
             return
         }
         presentGroupCallMemberPicker(mediaType: mediaType)
@@ -1042,18 +1037,13 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
         return target.isEmpty ? nil : target
     }
 
-    private func presentGroupCallMemberPicker(mediaType: CallMediaType) {
+    private func presentGroupCallMemberPicker(mediaType: ChatCallEventPublisher.MediaType) {
         let groupID = viewModel.groupID
         guard !groupID.isEmpty, let presenter = findViewController() else { return }
         let title = mediaType == .video ? LocalizedChatString("MoreVideoCall") : LocalizedChatString("MoreVoiceCall")
         let picker = GroupCallMemberPickerViewController(groupID: groupID, title: title) { userIDs in
             DataReport.reportInteractionMetrics(.chatInvokeCall)
-            TUICallKit.createInstance().calls(
-                userIdList: userIDs,
-                mediaType: mediaType,
-                params: nil,
-                completion: nil
-            )
+            ChatCallEventPublisher.publishStartCall(participantIDs: userIDs, mediaType: mediaType, chatGroupID: groupID)
         }
         let navigationController = UINavigationController(rootViewController: picker)
         navigationController.isNavigationBarHidden = true

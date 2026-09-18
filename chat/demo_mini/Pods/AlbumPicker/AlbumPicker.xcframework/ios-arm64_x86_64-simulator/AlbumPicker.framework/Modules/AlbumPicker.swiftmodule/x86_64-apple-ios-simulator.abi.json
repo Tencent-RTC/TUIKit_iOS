@@ -1,0 +1,5415 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "AlbumPicker",
+    "printedName": "AlbumPicker",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Photos",
+        "printedName": "Photos",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumMediaType",
+        "printedName": "AlbumMediaType",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "image",
+            "printedName": "image",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumMediaType.Type) -> AlbumPicker.AlbumMediaType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumMediaType",
+                    "printedName": "AlbumPicker.AlbumMediaType",
+                    "usr": "s:11AlbumPicker0A9MediaTypeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumMediaType.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumMediaType",
+                        "printedName": "AlbumPicker.AlbumMediaType",
+                        "usr": "s:11AlbumPicker0A9MediaTypeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0A9MediaTypeO5imageyA2CmF",
+            "mangledName": "$s11AlbumPicker0A9MediaTypeO5imageyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Var",
+            "name": "video",
+            "printedName": "video",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumMediaType.Type) -> AlbumPicker.AlbumMediaType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumMediaType",
+                    "printedName": "AlbumPicker.AlbumMediaType",
+                    "usr": "s:11AlbumPicker0A9MediaTypeO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumMediaType.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumMediaType",
+                        "printedName": "AlbumPicker.AlbumMediaType",
+                        "usr": "s:11AlbumPicker0A9MediaTypeO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0A9MediaTypeO5videoyA2CmF",
+            "mangledName": "$s11AlbumPicker0A9MediaTypeO5videoyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Function",
+            "name": "==",
+            "printedName": "==(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMediaType",
+                "printedName": "AlbumPicker.AlbumMediaType",
+                "usr": "s:11AlbumPicker0A9MediaTypeO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMediaType",
+                "printedName": "AlbumPicker.AlbumMediaType",
+                "usr": "s:11AlbumPicker0A9MediaTypeO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0A9MediaTypeO2eeoiySbAC_ACtFZ",
+            "mangledName": "$s11AlbumPicker0A9MediaTypeO2eeoiySbAC_ACtFZ",
+            "moduleName": "AlbumPicker",
+            "static": true,
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "hashValue",
+            "printedName": "hashValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A9MediaTypeO9hashValueSivp",
+            "mangledName": "$s11AlbumPicker0A9MediaTypeO9hashValueSivp",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A9MediaTypeO9hashValueSivg",
+                "mangledName": "$s11AlbumPicker0A9MediaTypeO9hashValueSivg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "hash",
+            "printedName": "hash(into:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Hasher",
+                "printedName": "Swift.Hasher",
+                "paramValueOwnership": "InOut",
+                "usr": "s:s6HasherV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0A9MediaTypeO4hash4intoys6HasherVz_tF",
+            "mangledName": "$s11AlbumPicker0A9MediaTypeO4hash4intoys6HasherVz_tF",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11AlbumPicker0A9MediaTypeO",
+        "mangledName": "$s11AlbumPicker0A9MediaTypeO",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerStyle",
+        "printedName": "AlbumPickerStyle",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "likeWeChat",
+            "printedName": "likeWeChat",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumPickerStyle.Type) -> AlbumPicker.AlbumPickerStyle",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerStyle",
+                    "printedName": "AlbumPicker.AlbumPickerStyle",
+                    "usr": "s:11AlbumPicker0aB5StyleO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumPickerStyle.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerStyle",
+                        "printedName": "AlbumPicker.AlbumPickerStyle",
+                        "usr": "s:11AlbumPicker0aB5StyleO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0aB5StyleO10likeWeChatyA2CmF",
+            "mangledName": "$s11AlbumPicker0aB5StyleO10likeWeChatyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Var",
+            "name": "likeWhatsApp",
+            "printedName": "likeWhatsApp",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumPickerStyle.Type) -> AlbumPicker.AlbumPickerStyle",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerStyle",
+                    "printedName": "AlbumPicker.AlbumPickerStyle",
+                    "usr": "s:11AlbumPicker0aB5StyleO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumPickerStyle.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerStyle",
+                        "printedName": "AlbumPicker.AlbumPickerStyle",
+                        "usr": "s:11AlbumPicker0aB5StyleO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0aB5StyleO12likeWhatsAppyA2CmF",
+            "mangledName": "$s11AlbumPicker0aB5StyleO12likeWhatsAppyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Function",
+            "name": "==",
+            "printedName": "==(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerStyle",
+                "printedName": "AlbumPicker.AlbumPickerStyle",
+                "usr": "s:11AlbumPicker0aB5StyleO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerStyle",
+                "printedName": "AlbumPicker.AlbumPickerStyle",
+                "usr": "s:11AlbumPicker0aB5StyleO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB5StyleO2eeoiySbAC_ACtFZ",
+            "mangledName": "$s11AlbumPicker0aB5StyleO2eeoiySbAC_ACtFZ",
+            "moduleName": "AlbumPicker",
+            "static": true,
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "hashValue",
+            "printedName": "hashValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5StyleO9hashValueSivp",
+            "mangledName": "$s11AlbumPicker0aB5StyleO9hashValueSivp",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5StyleO9hashValueSivg",
+                "mangledName": "$s11AlbumPicker0aB5StyleO9hashValueSivg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "hash",
+            "printedName": "hash(into:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Hasher",
+                "printedName": "Swift.Hasher",
+                "paramValueOwnership": "InOut",
+                "usr": "s:s6HasherV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB5StyleO4hash4intoys6HasherVz_tF",
+            "mangledName": "$s11AlbumPicker0aB5StyleO4hash4intoys6HasherVz_tF",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11AlbumPicker0aB5StyleO",
+        "mangledName": "$s11AlbumPicker0aB5StyleO",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerMediaFilter",
+        "printedName": "AlbumPickerMediaFilter",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "imageOnly",
+            "printedName": "imageOnly",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumPickerMediaFilter.Type) -> AlbumPicker.AlbumPickerMediaFilter",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerMediaFilter",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                    "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerMediaFilter",
+                        "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                        "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO9imageOnlyyA2CmF",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO9imageOnlyyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Var",
+            "name": "videoOnly",
+            "printedName": "videoOnly",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumPickerMediaFilter.Type) -> AlbumPicker.AlbumPickerMediaFilter",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerMediaFilter",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                    "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerMediaFilter",
+                        "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                        "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO9videoOnlyyA2CmF",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO9videoOnlyyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Var",
+            "name": "imageAndVideo",
+            "printedName": "imageAndVideo",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(AlbumPicker.AlbumPickerMediaFilter.Type) -> AlbumPicker.AlbumPickerMediaFilter",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerMediaFilter",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                    "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Metatype",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter.Type",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerMediaFilter",
+                        "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                        "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "EnumElement",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO13imageAndVideoyA2CmF",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO13imageAndVideoyA2CmF",
+            "moduleName": "AlbumPicker"
+          },
+          {
+            "kind": "Function",
+            "name": "==",
+            "printedName": "==(_:_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerMediaFilter",
+                "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                "usr": "s:11AlbumPicker0aB11MediaFilterO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerMediaFilter",
+                "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                "usr": "s:11AlbumPicker0aB11MediaFilterO"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO2eeoiySbAC_ACtFZ",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO2eeoiySbAC_ACtFZ",
+            "moduleName": "AlbumPicker",
+            "static": true,
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "hashValue",
+            "printedName": "hashValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO9hashValueSivp",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO9hashValueSivp",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB11MediaFilterO9hashValueSivg",
+                "mangledName": "$s11AlbumPicker0aB11MediaFilterO9hashValueSivg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "hash",
+            "printedName": "hash(into:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Hasher",
+                "printedName": "Swift.Hasher",
+                "paramValueOwnership": "InOut",
+                "usr": "s:s6HasherV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB11MediaFilterO4hash4intoys6HasherVz_tF",
+            "mangledName": "$s11AlbumPicker0aB11MediaFilterO4hash4intoys6HasherVz_tF",
+            "moduleName": "AlbumPicker",
+            "implicit": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11AlbumPicker0aB11MediaFilterO",
+        "mangledName": "$s11AlbumPicker0aB11MediaFilterO",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumMedia",
+        "printedName": "AlbumMedia",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "id",
+            "printedName": "id",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UInt64",
+                "printedName": "Swift.UInt64",
+                "usr": "s:s6UInt64V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC2ids6UInt64Vvp",
+            "mangledName": "$s11AlbumPicker0A5MediaC2ids6UInt64Vvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt64",
+                    "printedName": "Swift.UInt64",
+                    "usr": "s:s6UInt64V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC2ids6UInt64Vvg",
+                "mangledName": "$s11AlbumPicker0A5MediaC2ids6UInt64Vvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "asset",
+            "printedName": "asset",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Photos.PHAsset?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "PHAsset",
+                    "printedName": "Photos.PHAsset",
+                    "usr": "c:objc(cs)PHAsset"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvp",
+            "mangledName": "$s11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Photos.PHAsset?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "PHAsset",
+                        "printedName": "Photos.PHAsset",
+                        "usr": "c:objc(cs)PHAsset"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvg",
+                "mangledName": "$s11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Photos.PHAsset?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "PHAsset",
+                        "printedName": "Photos.PHAsset",
+                        "usr": "c:objc(cs)PHAsset"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvs",
+                "mangledName": "$s11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvM",
+                "mangledName": "$s11AlbumPicker0A5MediaC5assetSo7PHAssetCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "mediaPath",
+            "printedName": "mediaPath",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC9mediaPathSSSgvp",
+            "mangledName": "$s11AlbumPicker0A5MediaC9mediaPathSSSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaPathSSSgvg",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaPathSSSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaPathSSSgvs",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaPathSSSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaPathSSSgvM",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaPathSSSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "mediaType",
+            "printedName": "mediaType",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMediaType",
+                "printedName": "AlbumPicker.AlbumMediaType",
+                "usr": "s:11AlbumPicker0A9MediaTypeO"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovp",
+            "mangledName": "$s11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumMediaType",
+                    "printedName": "AlbumPicker.AlbumMediaType",
+                    "usr": "s:11AlbumPicker0A9MediaTypeO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovg",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumMediaType",
+                    "printedName": "AlbumPicker.AlbumMediaType",
+                    "usr": "s:11AlbumPicker0A9MediaTypeO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovs",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaTypeAA0acE0Ovs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC9mediaTypeAA0acE0OvM",
+                "mangledName": "$s11AlbumPicker0A5MediaC9mediaTypeAA0acE0OvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "videoThumbnailPath",
+            "printedName": "videoThumbnailPath",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvp",
+            "mangledName": "$s11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvg",
+                "mangledName": "$s11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.String?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvs",
+                "mangledName": "$s11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvM",
+                "mangledName": "$s11AlbumPicker0A5MediaC18videoThumbnailPathSSSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "duration",
+            "printedName": "duration",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int64",
+                "printedName": "Swift.Int64",
+                "usr": "s:s5Int64V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0A5MediaC8durations5Int64Vvp",
+            "mangledName": "$s11AlbumPicker0A5MediaC8durations5Int64Vvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int64",
+                    "printedName": "Swift.Int64",
+                    "usr": "s:s5Int64V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC8durations5Int64Vvg",
+                "mangledName": "$s11AlbumPicker0A5MediaC8durations5Int64Vvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int64",
+                    "printedName": "Swift.Int64",
+                    "usr": "s:s5Int64V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC8durations5Int64Vvs",
+                "mangledName": "$s11AlbumPicker0A5MediaC8durations5Int64Vvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0A5MediaC8durations5Int64VvM",
+                "mangledName": "$s11AlbumPicker0A5MediaC8durations5Int64VvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(id:asset:mediaPath:mediaType:videoThumbnailPath:duration:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMedia",
+                "printedName": "AlbumPicker.AlbumMedia",
+                "usr": "s:11AlbumPicker0A5MediaC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UInt64",
+                "printedName": "Swift.UInt64",
+                "usr": "s:s6UInt64V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Photos.PHAsset?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "PHAsset",
+                    "printedName": "Photos.PHAsset",
+                    "usr": "c:objc(cs)PHAsset"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMediaType",
+                "printedName": "AlbumPicker.AlbumMediaType",
+                "hasDefaultArg": true,
+                "usr": "s:11AlbumPicker0A9MediaTypeO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int64",
+                "printedName": "Swift.Int64",
+                "hasDefaultArg": true,
+                "usr": "s:s5Int64V"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11AlbumPicker0A5MediaC2id5asset9mediaPath0F4Type014videoThumbnailG08durationACs6UInt64V_So7PHAssetCSgSSSgAA0acH0OAOs5Int64Vtcfc",
+            "mangledName": "$s11AlbumPicker0A5MediaC2id5asset9mediaPath0F4Type014videoThumbnailG08durationACs6UInt64V_So7PHAssetCSgSSSgAA0acH0OAOs5Int64Vtcfc",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11AlbumPicker0A5MediaC",
+        "mangledName": "$s11AlbumPicker0A5MediaC",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerConfig",
+        "printedName": "AlbumPickerConfig",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "maxSelectionCount",
+            "printedName": "maxSelectionCount",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Int?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.Int?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.Int?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV17maxSelectionCountSiSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "itemsPerRow",
+            "printedName": "itemsPerRow",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Int?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.Int?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "Swift.Int?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11itemsPerRowSiSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "showsCameraItem",
+            "printedName": "showsCameraItem",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV15showsCameraItemSbvp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV15showsCameraItemSbvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15showsCameraItemSbvg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15showsCameraItemSbvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15showsCameraItemSbvs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15showsCameraItemSbvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15showsCameraItemSbvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15showsCameraItemSbvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "style",
+            "printedName": "style",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerStyle",
+                "printedName": "AlbumPicker.AlbumPickerStyle",
+                "usr": "s:11AlbumPicker0aB5StyleO"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerStyle",
+                    "printedName": "AlbumPicker.AlbumPickerStyle",
+                    "usr": "s:11AlbumPicker0aB5StyleO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerStyle",
+                    "printedName": "AlbumPicker.AlbumPickerStyle",
+                    "usr": "s:11AlbumPicker0aB5StyleO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV5styleAA0aB5StyleOvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "mediaFilter",
+            "printedName": "mediaFilter",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerMediaFilter",
+                "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                "usr": "s:11AlbumPicker0aB11MediaFilterO"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerMediaFilter",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                    "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerMediaFilter",
+                    "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                    "usr": "s:11AlbumPicker0aB11MediaFilterO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0Ovs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0OvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV11mediaFilterAA0ab5MediaE0OvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "language",
+            "printedName": "language",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Language",
+                    "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language",
+                    "usr": "s:15AlbumPickerCore0abC8LanguageC0D0O"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Language",
+                        "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language",
+                        "usr": "s:15AlbumPickerCore0abC8LanguageC0D0O"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Language",
+                        "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language",
+                        "usr": "s:15AlbumPickerCore0abC8LanguageC0D0O"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV8language0aB4Core0abE8LanguageC0F0OSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "compressQuality",
+            "printedName": "compressQuality",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "CompressQuality",
+                "printedName": "AlbumPickerCore.CompressQuality",
+                "usr": "s:15AlbumPickerCore15CompressQualityO"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CompressQuality",
+                    "printedName": "AlbumPickerCore.CompressQuality",
+                    "usr": "s:15AlbumPickerCore15CompressQualityO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CompressQuality",
+                    "printedName": "AlbumPickerCore.CompressQuality",
+                    "usr": "s:15AlbumPickerCore15CompressQualityO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0Ovs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0OvM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV15compressQuality0aB4Core08CompressE0OvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "maxVideoDurationInSeconds",
+            "printedName": "maxVideoDurationInSeconds",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV25maxVideoDurationInSecondsSivM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "maxOutputFileSizeInMB",
+            "printedName": "maxOutputFileSizeInMB",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivp",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivg",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivs",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivM",
+                "mangledName": "$s11AlbumPicker0aB6ConfigV21maxOutputFileSizeInMBSivM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(maxSelectionCount:itemsPerRow:showsCameraItem:style:mediaFilter:language:compressQuality:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerConfig",
+                "printedName": "AlbumPicker.AlbumPickerConfig",
+                "usr": "s:11AlbumPicker0aB6ConfigV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Int?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.Int?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "hasDefaultArg": true,
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerStyle",
+                "printedName": "AlbumPicker.AlbumPickerStyle",
+                "hasDefaultArg": true,
+                "usr": "s:11AlbumPicker0aB5StyleO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerMediaFilter",
+                "printedName": "AlbumPicker.AlbumPickerMediaFilter",
+                "hasDefaultArg": true,
+                "usr": "s:11AlbumPicker0aB11MediaFilterO"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Language",
+                    "printedName": "AlbumPickerCore.AlbumPickerCoreLanguage.Language",
+                    "usr": "s:15AlbumPickerCore0abC8LanguageC0D0O"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CompressQuality",
+                "printedName": "AlbumPickerCore.CompressQuality",
+                "hasDefaultArg": true,
+                "usr": "s:15AlbumPickerCore15CompressQualityO"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11AlbumPicker0aB6ConfigV17maxSelectionCount11itemsPerRow15showsCameraItem5style11mediaFilter8language15compressQualityACSiSg_AKSbAA0aB5StyleOAA0ab5MediaO0O0aB4Core0abU8LanguageC0V0OSgAP08CompressR0Otcfc",
+            "mangledName": "$s11AlbumPicker0aB6ConfigV17maxSelectionCount11itemsPerRow15showsCameraItem5style11mediaFilter8language15compressQualityACSiSg_AKSbAA0aB5StyleOAA0ab5MediaO0O0aB4Core0abU8LanguageC0V0OSgAP08CompressR0Otcfc",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:11AlbumPicker0aB6ConfigV",
+        "mangledName": "$s11AlbumPicker0aB6ConfigV",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerTheme",
+        "printedName": "AlbumPickerTheme",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "currentPrimaryColor",
+            "printedName": "currentPrimaryColor",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV19currentPrimaryColorSo7UIColorCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "backgroundColor",
+            "printedName": "backgroundColor",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV15backgroundColorSo7UIColorCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "backgroundColorSecondary",
+            "printedName": "backgroundColorSecondary",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV24backgroundColorSecondarySo7UIColorCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "textColor",
+            "printedName": "textColor",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9textColorSo7UIColorCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "textColorSecondary",
+            "printedName": "textColorSecondary",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIColor?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIColor",
+                        "printedName": "UIKit.UIColor",
+                        "usr": "c:objc(cs)UIColor"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV18textColorSecondarySo7UIColorCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "confirmButtonIcon",
+            "printedName": "confirmButtonIcon",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIImage?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIImage",
+                    "printedName": "UIKit.UIImage",
+                    "usr": "c:objc(cs)UIImage"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIImage?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIImage",
+                        "printedName": "UIKit.UIImage",
+                        "usr": "c:objc(cs)UIImage"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIImage?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIImage",
+                        "printedName": "UIKit.UIImage",
+                        "usr": "c:objc(cs)UIImage"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV17confirmButtonIconSo7UIImageCSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "bigFontSize",
+            "printedName": "bigFontSize",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV11bigFontSize14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV11bigFontSize12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11bigFontSize14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11bigFontSize12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11bigFontSize14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11bigFontSize12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11bigFontSize14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11bigFontSize12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "normalFontSize",
+            "printedName": "normalFontSize",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV14normalFontSize14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV14normalFontSize12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV14normalFontSize14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV14normalFontSize12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV14normalFontSize14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV14normalFontSize12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV14normalFontSize14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV14normalFontSize12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "smallFontSize",
+            "printedName": "smallFontSize",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV13smallFontSize14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV13smallFontSize12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV13smallFontSize14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV13smallFontSize12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV13smallFontSize14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV13smallFontSize12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV13smallFontSize14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV13smallFontSize12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "bigRadius",
+            "printedName": "bigRadius",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV9bigRadius14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV9bigRadius12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9bigRadius14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9bigRadius12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9bigRadius14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9bigRadius12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV9bigRadius14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV9bigRadius12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "normalRadius",
+            "printedName": "normalRadius",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV12normalRadius14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV12normalRadius12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV12normalRadius14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV12normalRadius12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV12normalRadius14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV12normalRadius12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV12normalRadius14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV12normalRadius12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "smallRadius",
+            "printedName": "smallRadius",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB5ThemeV11smallRadius14CoreFoundation7CGFloatVSgvp",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV11smallRadius12CoreGraphics7CGFloatVSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "HasStorage",
+              "AccessControl"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11smallRadius14CoreFoundation7CGFloatVSgvg",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11smallRadius12CoreGraphics7CGFloatVSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "CoreGraphics.CGFloat?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "CGFloat",
+                        "printedName": "CoreGraphics.CGFloat",
+                        "usr": "s:14CoreFoundation7CGFloatV"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11smallRadius14CoreFoundation7CGFloatVSgvs",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11smallRadius12CoreGraphics7CGFloatVSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB5ThemeV11smallRadius14CoreFoundation7CGFloatVSgvM",
+                "mangledName": "$s11AlbumPicker0aB5ThemeV11smallRadius12CoreGraphics7CGFloatVSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(currentPrimaryColor:backgroundColor:backgroundColorSecondary:textColor:textColorSecondary:confirmButtonIcon:bigFontSize:normalFontSize:smallFontSize:bigRadius:normalRadius:smallRadius:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerTheme",
+                "printedName": "AlbumPicker.AlbumPickerTheme",
+                "usr": "s:11AlbumPicker0aB5ThemeV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIColor?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIColor",
+                    "printedName": "UIKit.UIColor",
+                    "usr": "c:objc(cs)UIColor"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIImage?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIImage",
+                    "printedName": "UIKit.UIImage",
+                    "usr": "c:objc(cs)UIImage"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "CoreGraphics.CGFloat?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CGFloat",
+                    "printedName": "CoreGraphics.CGFloat",
+                    "usr": "s:14CoreFoundation7CGFloatV"
+                  }
+                ],
+                "hasDefaultArg": true,
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11AlbumPicker0aB5ThemeV19currentPrimaryColor010backgroundF00gF9Secondary04textF00ifH017confirmButtonIcon11bigFontSize06normalnO005smallnO00M6Radius0pR00qR0ACSo7UIColorCSg_A4RSo7UIImageCSg14CoreFoundation7CGFloatVSgA5Ytcfc",
+            "mangledName": "$s11AlbumPicker0aB5ThemeV19currentPrimaryColor010backgroundF00gF9Secondary04textF00ifH017confirmButtonIcon11bigFontSize06normalnO005smallnO00M6Radius0pR00qR0ACSo7UIColorCSg_A4RSo7UIImageCSg12CoreGraphics7CGFloatVSgA5Ytcfc",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:11AlbumPicker0aB5ThemeV",
+        "mangledName": "$s11AlbumPicker0aB5ThemeV",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerDelegate",
+        "printedName": "AlbumPickerDelegate",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "onPickConfirm",
+            "printedName": "onPickConfirm(pickedAlbumMedias:textMessage:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Array",
+                "printedName": "[AlbumPicker.AlbumMedia]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumMedia",
+                    "printedName": "AlbumPicker.AlbumMedia",
+                    "usr": "s:11AlbumPicker0A5MediaC"
+                  }
+                ],
+                "usr": "s:Sa"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB8DelegateP13onPickConfirm06pickedA6Medias11textMessageySayAA0A5MediaCG_SSSgtF",
+            "mangledName": "$s11AlbumPicker0aB8DelegateP13onPickConfirm06pickedA6Medias11textMessageySayAA0A5MediaCG_SSSgtF",
+            "moduleName": "AlbumPicker",
+            "genericSig": "<τ_0_0 where τ_0_0 : AlbumPicker.AlbumPickerDelegate>",
+            "sugared_genericSig": "<Self where Self : AlbumPicker.AlbumPickerDelegate>",
+            "protocolReq": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "onMediaProcessing",
+            "printedName": "onMediaProcessing(albumMedia:progress:error:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumMedia",
+                "printedName": "AlbumPicker.AlbumMedia",
+                "usr": "s:11AlbumPicker0A5MediaC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Float",
+                "printedName": "Swift.Float",
+                "usr": "s:Sf"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB8DelegateP17onMediaProcessing05albumE08progress5erroryAA0aE0C_SfSbtF",
+            "mangledName": "$s11AlbumPicker0aB8DelegateP17onMediaProcessing05albumE08progress5erroryAA0aE0C_SfSbtF",
+            "moduleName": "AlbumPicker",
+            "genericSig": "<τ_0_0 where τ_0_0 : AlbumPicker.AlbumPickerDelegate>",
+            "sugared_genericSig": "<Self where Self : AlbumPicker.AlbumPickerDelegate>",
+            "protocolReq": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "onMediaProcessed",
+            "printedName": "onMediaProcessed()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB8DelegateP16onMediaProcessedyyF",
+            "mangledName": "$s11AlbumPicker0aB8DelegateP16onMediaProcessedyyF",
+            "moduleName": "AlbumPicker",
+            "genericSig": "<τ_0_0 where τ_0_0 : AlbumPicker.AlbumPickerDelegate>",
+            "sugared_genericSig": "<Self where Self : AlbumPicker.AlbumPickerDelegate>",
+            "protocolReq": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "onCancel",
+            "printedName": "onCancel()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB8DelegateP8onCancelyyF",
+            "mangledName": "$s11AlbumPicker0aB8DelegateP8onCancelyyF",
+            "moduleName": "AlbumPicker",
+            "genericSig": "<τ_0_0 where τ_0_0 : AlbumPicker.AlbumPickerDelegate>",
+            "sugared_genericSig": "<Self where Self : AlbumPicker.AlbumPickerDelegate>",
+            "protocolReq": true,
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11AlbumPicker0aB8DelegateP",
+        "mangledName": "$s11AlbumPicker0aB8DelegateP",
+        "moduleName": "AlbumPicker",
+        "genericSig": "<τ_0_0 : AnyObject>",
+        "sugared_genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "AccessControl"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AlbumPickerView",
+        "printedName": "AlbumPickerView",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "delegate",
+            "printedName": "delegate",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WeakStorage",
+                "printedName": "(any AlbumPicker.AlbumPickerDelegate)?"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvp",
+            "mangledName": "$s11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvp",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "HasInitialValue",
+              "Preconcurrency",
+              "Custom",
+              "HasStorage",
+              "ReferenceOwnership",
+              "AccessControl"
+            ],
+            "ownership": 1,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "(any AlbumPicker.AlbumPickerDelegate)?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerDelegate",
+                        "printedName": "any AlbumPicker.AlbumPickerDelegate",
+                        "usr": "s:11AlbumPicker0aB8DelegateP"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvg",
+                "mangledName": "$s11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvg",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "get"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Set",
+                "printedName": "Set()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "(any AlbumPicker.AlbumPickerDelegate)?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AlbumPickerDelegate",
+                        "printedName": "any AlbumPicker.AlbumPickerDelegate",
+                        "usr": "s:11AlbumPicker0aB8DelegateP"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvs",
+                "mangledName": "$s11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvs",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "set"
+              },
+              {
+                "kind": "Accessor",
+                "name": "Modify",
+                "printedName": "Modify()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvM",
+                "mangledName": "$s11AlbumPicker0aB4ViewC8delegateAA0aB8Delegate_pSgvM",
+                "moduleName": "AlbumPicker",
+                "implicit": true,
+                "accessorKind": "_modify"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "initialize",
+            "printedName": "initialize(config:theme:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerConfig",
+                "printedName": "AlbumPicker.AlbumPickerConfig",
+                "usr": "s:11AlbumPicker0aB6ConfigV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerTheme",
+                "printedName": "AlbumPicker.AlbumPickerTheme",
+                "usr": "s:11AlbumPicker0aB5ThemeV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11AlbumPicker0aB4ViewC10initialize6config5themeyAA0aB6ConfigV_AA0aB5ThemeVtF",
+            "mangledName": "$s11AlbumPicker0aB4ViewC10initialize6config5themeyAA0aB6ConfigV_AA0aB5ThemeVtF",
+            "moduleName": "AlbumPicker",
+            "declAttributes": [
+              "Preconcurrency",
+              "Custom",
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(frame:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AlbumPickerView",
+                "printedName": "AlbumPicker.AlbumPickerView",
+                "usr": "c:@M@AlbumPicker@objc(cs)AlbumPickerView"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "CGRect",
+                "printedName": "CoreFoundation.CGRect",
+                "usr": "c:@S@CGRect"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@AlbumPicker@objc(cs)AlbumPickerView(im)initWithFrame:",
+            "mangledName": "$s11AlbumPicker0aB4ViewC5frameACSo6CGRectV_tcfc",
+            "moduleName": "AlbumPicker",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "initWithFrame:",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Preconcurrency",
+              "Custom",
+              "Override"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(coder:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "AlbumPicker.AlbumPickerView?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AlbumPickerView",
+                    "printedName": "AlbumPicker.AlbumPickerView",
+                    "usr": "c:@M@AlbumPicker@objc(cs)AlbumPickerView"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "NSCoder",
+                "printedName": "Foundation.NSCoder",
+                "usr": "c:objc(cs)NSCoder"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@AlbumPicker@objc(cs)AlbumPickerView(im)initWithCoder:",
+            "mangledName": "$s11AlbumPicker0aB4ViewC5coderACSgSo7NSCoderC_tcfc",
+            "moduleName": "AlbumPicker",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "initWithCoder:",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Preconcurrency",
+              "Custom",
+              "Required"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@AlbumPicker@objc(cs)AlbumPickerView",
+        "mangledName": "$s11AlbumPicker0aB4ViewC",
+        "moduleName": "AlbumPicker",
+        "declAttributes": [
+          "Preconcurrency",
+          "Custom",
+          "AccessControl",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)UIView",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "UIKit.UIView",
+          "UIKit.UIResponder",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObservingPublishing",
+            "printedName": "_KeyValueCodingAndObservingPublishing",
+            "usr": "s:10Foundation37_KeyValueCodingAndObservingPublishingP",
+            "mangledName": "$s10Foundation37_KeyValueCodingAndObservingPublishingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_KeyValueCodingAndObserving",
+            "printedName": "_KeyValueCodingAndObserving",
+            "usr": "s:10Foundation27_KeyValueCodingAndObservingP",
+            "mangledName": "$s10Foundation27_KeyValueCodingAndObservingP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "UITraitChangeObservable",
+            "printedName": "UITraitChangeObservable",
+            "usr": "s:5UIKit23UITraitChangeObservableP",
+            "mangledName": "$s5UIKit23UITraitChangeObservableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "__DefaultCustomPlaygroundQuickLookable",
+            "printedName": "__DefaultCustomPlaygroundQuickLookable",
+            "usr": "s:s38__DefaultCustomPlaygroundQuickLookableP",
+            "mangledName": "$ss38__DefaultCustomPlaygroundQuickLookableP"
+          }
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AVFoundation",
+        "printedName": "AVFoundation",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Photos",
+        "printedName": "Photos",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "PhotosUI",
+        "printedName": "PhotosUI",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Photos",
+        "printedName": "Photos",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Photos",
+        "printedName": "Photos",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "AlbumPickerCore",
+        "printedName": "AlbumPickerCore",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "Combine",
+        "printedName": "Combine",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "AlbumPicker"
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": [
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "IntegerLiteral",
+      "offset": 701,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "IntegerLiteral",
+      "offset": 919,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1287,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1574,
+      "length": 3,
+      "value": "600"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1617,
+      "length": 3,
+      "value": "100"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1747,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/AlbumPicker.swift",
+      "kind": "BooleanLiteral",
+      "offset": 4237,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerAutoLayoutHelper.swift",
+      "kind": "Array",
+      "offset": 3201,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerBundle.swift",
+      "kind": "StringLiteral",
+      "offset": 80,
+      "length": 22,
+      "value": "\"AlbumPickerLocalized\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerBundle.swift",
+      "kind": "Array",
+      "offset": 939,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerBundle.swift",
+      "kind": "StringLiteral",
+      "offset": 994,
+      "length": 19,
+      "value": "\"AlbumPickerBundle\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerBundle.swift",
+      "kind": "StringLiteral",
+      "offset": 1118,
+      "length": 24,
+      "value": "\"AlbumPickerStoreBundle\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerBundle.swift",
+      "kind": "StringLiteral",
+      "offset": 1185,
+      "length": 23,
+      "value": "\"AlbumPickerCoreBundle\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerCameraCapture.swift",
+      "kind": "Array",
+      "offset": 503,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "IntegerLiteral",
+      "offset": 294,
+      "length": 1,
+      "value": "3"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "IntegerLiteral",
+      "offset": 348,
+      "length": 1,
+      "value": "3"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "IntegerLiteral",
+      "offset": 404,
+      "length": 2,
+      "value": "32"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 681,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1447,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1764,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1931,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerMainViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2714,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "FloatLiteral",
+      "offset": 159,
+      "length": 4,
+      "value": "0.25"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "FloatLiteral",
+      "offset": 222,
+      "length": 4,
+      "value": "0.40"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 461,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "IntegerLiteral",
+      "offset": 564,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "IntegerLiteral",
+      "offset": 608,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/AlbumPickerPreviewViewCommon.swift",
+      "kind": "BooleanLiteral",
+      "offset": 866,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "FloatLiteral",
+      "offset": 109,
+      "length": 3,
+      "value": "0.7"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 157,
+      "length": 3,
+      "value": "260"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 217,
+      "length": 2,
+      "value": "24"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 274,
+      "length": 2,
+      "value": "32"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 320,
+      "length": 2,
+      "value": "28"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 371,
+      "length": 2,
+      "value": "18"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 428,
+      "length": 2,
+      "value": "15"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 482,
+      "length": 2,
+      "value": "16"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 536,
+      "length": 1,
+      "value": "8"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 586,
+      "length": 3,
+      "value": "120"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/common\/PermissionOverlayView.swift",
+      "kind": "StringLiteral",
+      "offset": 772,
+      "length": 13,
+      "value": "\"folder.fill\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerMainView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 154,
+      "length": 2,
+      "value": "50"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerMainView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 383,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerPreviewView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 362,
+      "length": 2,
+      "value": "50"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerPreviewView.swift",
+      "kind": "FloatLiteral",
+      "offset": 430,
+      "length": 3,
+      "value": "0.2"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerPreviewView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 586,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerPreviewView.swift",
+      "kind": "Array",
+      "offset": 691,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatAlbumPickerPreviewView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1234,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 466,
+      "length": 2,
+      "value": "20"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 516,
+      "length": 2,
+      "value": "14"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "FloatLiteral",
+      "offset": 567,
+      "length": 3,
+      "value": "0.7"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 617,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 678,
+      "length": 2,
+      "value": "12"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 738,
+      "length": 2,
+      "value": "14"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1506,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1548,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatBottomBar.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1665,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 357,
+      "length": 2,
+      "value": "44"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 408,
+      "length": 2,
+      "value": "20"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 458,
+      "length": 2,
+      "value": "14"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "FloatLiteral",
+      "offset": 509,
+      "length": 3,
+      "value": "0.7"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 562,
+      "length": 2,
+      "value": "24"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 617,
+      "length": 2,
+      "value": "44"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 666,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "StringLiteral",
+      "offset": 1015,
+      "length": 14,
+      "value": "\"chevron.left\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1908,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2044,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2089,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "StringLiteral",
+      "offset": 2449,
+      "length": 11,
+      "value": "\"checkmark\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2699,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2749,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "StringLiteral",
+      "offset": 3025,
+      "length": 8,
+      "value": "\"select\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewechat\/WeChatPreviewHeaderView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 3098,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerMainView.swift",
+      "kind": "FloatLiteral",
+      "offset": 159,
+      "length": 3,
+      "value": "0.6"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerMainView.swift",
+      "kind": "FloatLiteral",
+      "offset": 217,
+      "length": 3,
+      "value": "1.5"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerMainView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 547,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerMainView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 587,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerPreviewView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 528,
+      "length": 2,
+      "value": "56"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerPreviewView.swift",
+      "kind": "FloatLiteral",
+      "offset": 596,
+      "length": 3,
+      "value": "0.2"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerPreviewView.swift",
+      "kind": "Array",
+      "offset": 820,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerPreviewView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1082,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppAlbumPickerPreviewView.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1408,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "IntegerLiteral",
+      "offset": 259,
+      "length": 2,
+      "value": "70"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "IntegerLiteral",
+      "offset": 310,
+      "length": 2,
+      "value": "48"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "IntegerLiteral",
+      "offset": 365,
+      "length": 2,
+      "value": "44"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "IntegerLiteral",
+      "offset": 415,
+      "length": 2,
+      "value": "20"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "StringLiteral",
+      "offset": 458,
+      "length": 22,
+      "value": "\"AddMoreThumbnailCell\""
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "Array",
+      "offset": 679,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomAddMoreRow.swift",
+      "kind": "BooleanLiteral",
+      "offset": 5927,
+      "length": 4,
+      "value": "true"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 540,
+      "length": 2,
+      "value": "56"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 589,
+      "length": 2,
+      "value": "36"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 640,
+      "length": 2,
+      "value": "36"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 707,
+      "length": 2,
+      "value": "18"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 759,
+      "length": 2,
+      "value": "44"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 809,
+      "length": 2,
+      "value": "20"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 856,
+      "length": 2,
+      "value": "22"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 910,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "FloatLiteral",
+      "offset": 975,
+      "length": 3,
+      "value": "0.2"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1627,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1665,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1936,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "IntegerLiteral",
+      "offset": 1988,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppBottomBar.swift",
+      "kind": "BooleanLiteral",
+      "offset": 2052,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 365,
+      "length": 2,
+      "value": "24"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppPreviewHeaderView.swift",
+      "kind": "IntegerLiteral",
+      "offset": 420,
+      "length": 2,
+      "value": "44"
+    },
+    {
+      "filePath": "\/Volumes\/data\/workspace\/client_uikit\/atomic-x\/ios\/atomic_x\/Sources\/AlbumPicker\/likewhatsapp\/WhatsAppPreviewHeaderView.swift",
+      "kind": "FloatLiteral",
+      "offset": 478,
+      "length": 3,
+      "value": "0.4"
+    }
+  ]
+}

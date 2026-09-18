@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>id</key>
+	<string>dark</string>
+	<key>name</key>
+	<string>黑夜</string>
+	<key>name_en</key>
+	<string>Dark</string>
+	<key>primary_color</key>
+	<string>#FFFFFF</string>
+	<key>primary_bg_color</key>
+	<string>#F2F3F5</string>
+	<key>primary_theme_color</key>
+	<string>#2170B1</string>
+	<key>common_switch_on_color</key>
+	<string>#2170B1</string>
+	<key>head_bg_gradient_start_color</key>
+	<string>#111111</string>
+	<key>default_group_head_public_img</key>
+	<string>default_group_head_public.png</string>
+	<key>default_group_head_meeting_img</key>
+	<string>default_group_head_meeting.png</string>
+	<key>default_group_head_avchatroom_img</key>
+	<string>default_group_head_avchatroom.png</string>
+	<key>default_group_head_community_img</key>
+	<string>default_group_head_community.png</string>
+	<key>default_group_head_img</key>
+	<string>default_group_head.png</string>
+	<key>default_c2c_head_img</key>
+	<string>default_c2c_head.png</string>
+	<key>search_textfield_bg_color</key>
+	<string>#292929</string>
+	<key>service_more_video_call_img</key>
+	<string>service_more_video_call.png</string>
+	<key>service_more_voice_call_img</key>
+	<string>service_more_voice_call.png</string>
+	<key>nav_back_img</key>
+	<string>nav_back.png</string>
+</dict>
+</plist>

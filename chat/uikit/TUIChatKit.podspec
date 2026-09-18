@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
     s.dependency 'Masonry'
     s.dependency 'SnapKit'
     s.dependency 'AlbumPicker'
-    s.dependency 'TUICallKit_Swift'
 
     s.source_files     = '**/*.{swift,h,m}'
     s.resource_bundles = {

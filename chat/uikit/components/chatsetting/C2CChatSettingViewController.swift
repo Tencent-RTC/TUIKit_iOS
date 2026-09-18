@@ -1,7 +1,6 @@
 import AtomicXCore
 import Combine
 import SnapKit
-import TUICallKit_Swift
 import UIKit
 
 public final class C2CChatSettingViewController: ChatSettingBaseViewController {
@@ -459,14 +458,9 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
         present(alert, animated: true)
     }
 
-    private func startCall(mediaType: CallMediaType) {
+    private func startCall(mediaType: ChatCallEventPublisher.MediaType) {
         DataReport.reportInteractionMetrics(.chatInvokeCall)
-        TUICallKit.createInstance().calls(
-            userIdList: [userID],
-            mediaType: mediaType,
-            params: nil,
-            completion: nil
-        )
+        ChatCallEventPublisher.publishStartCall(participantIDs: [userID], mediaType: mediaType)
     }
 
     private func setDoNotDisturb(_ value: Bool) {

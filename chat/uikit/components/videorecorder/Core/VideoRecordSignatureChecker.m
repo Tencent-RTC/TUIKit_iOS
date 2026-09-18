@@ -12,6 +12,8 @@
 #define ERR_SDK_INTERFACE_NOT_SUPPORT         7013
 #define ERR_SDK_NOT_INITIALIZED               6013
 
+NSNotificationName const VideoRecordSignatureDidUpdateNotification = @"VideoRecordSignatureDidUpdateNotification";
+
 @interface VideoRecordSignatureChecker () {
     NSTimer* _timer;
     NSInvocation *getSignatureInvocation;
@@ -94,6 +96,9 @@
     
     _resultCode =         VIDEO_RECORD_SIGNATURE_SUCCESS;
     NSLog(@"VideoRecorderSignatureChecker: set signature to sdk success");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:VideoRecordSignatureDidUpdateNotification object:nil];
+    });
     return true;
 }
 

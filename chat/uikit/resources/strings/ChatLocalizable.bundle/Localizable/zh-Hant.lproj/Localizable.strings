@@ -324,6 +324,8 @@
 "MoreFile" = "檔案";
 "MoreVideoCall" = "視訊通話";
 "MoreVoiceCall" = "語音通話";
+"MessageListJoinGroupCall" = "加入";
+"MessageListJoinGroupCallUsers" = "%d 人正在通話中";
 "MoreLink" = "自定義";
 "MoreLinkDetails" = "查看詳情>>";
 "MorePoll" = "投票";
@@ -1008,3 +1010,4 @@
 "TabCalls" = "通話記錄";
 "SettingsShowCalls" = "顯示通話記錄";
 "DemoWelcomeMessage" = "歡迎體驗 Chat Demo！你可以先發送一則訊息，體驗基礎聊天功能。\n如果想新增好友，可以前往聯絡人頁面點擊首頁加號。\n如果想體驗音視訊通話，可以點擊下方加號按鈕 -> 語音通話/視訊通話。";
+"DemoCustomerServiceSummary" = "[智能客服]";

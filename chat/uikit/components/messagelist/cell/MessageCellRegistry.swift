@@ -146,16 +146,27 @@ final class MessageCellRegistry {
             if let callModel = CallMessageParser.parse(message) {
                 return callModel.displayString(senderShowName: MessageListHelper.senderShowName(of: message))
             }
-            return customSystemText(from: payload)
+            return customSystemText(from: payload, message: message)
         default:
             return ""
         }
     }
 
-    private func customSystemText(from payload: CustomMessagePayload) -> String {
+    private func customSystemText(from payload: CustomMessagePayload, message: MessageInfo) -> String {
         guard let data = payload.customData.data(using: .utf8),
               let customInfo = ChatUtil.jsonData2Dictionary(jsonData: data) else {
             return ""
+        }
+        if customInfo["businessID"] as? String == "group_create" {
+            let groupType = customInfo["groupType"] as? String ?? ""
+            let isCommunity = groupType.caseInsensitiveCompare("Community") == .orderedSame || (customInfo["cmd"] as? Int ?? 0) == 1
+            let localContent = LocalizedChatString(isCommunity ? "TUICommunityCreateTipsMessage" : "TUIGroupCreateTipsMessage")
+            if message.isSentBySelf {
+                return localContent
+            }
+            let opUser = MessageListHelper.senderShowName(of: message)
+            let content = customInfo["content"] as? String ?? ""
+            return content.isEmpty ? "\(opUser) \(localContent)" : "\(opUser) \(content)"
         }
         let opUser = customInfo["opUser"] as? String ?? ""
         let content = customInfo["content"] as? String ?? ""
