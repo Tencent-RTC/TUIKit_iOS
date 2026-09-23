@@ -147,7 +147,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Are you sure you want to disconnect xxx?"
+            "value": "Do you want to remove xxx?"
           }
         },
         "zh-Hans": {
@@ -217,7 +217,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You are currently co-guesting with other streamers. Would you like to [End Live] ?"
+            "value": "You have guests connected now. Do you want to end your live stream anyway?"
           }
         },
         "zh-Hans": {
@@ -1512,7 +1512,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allow viewers to apply for continuous microphone"
+            "value": "Allow viewers' request to join as guests"
           }
         },
         "zh-Hans": {
@@ -2282,7 +2282,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Link Application(xxx)"
+            "value": "Join Requests (xxx)"
           }
         },
         "zh-Hans": {
@@ -2317,7 +2317,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Current Mic (xxx)"
+            "value": "Connected (xxx)"
           }
         },
         "zh-Hans": {
@@ -2597,7 +2597,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Are you sure you want to disconnect?"
+            "value": "Do you want to disconnect?"
           }
         },
         "zh-Hans": {
@@ -4032,7 +4032,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Waiting for battlexxx"
+            "value": "Waiting for others to accept..."
           }
         },
         "zh-Hans": {
@@ -4137,7 +4137,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You are currently co-guesting with other streamers. Would you like to [End Co-guest] or [Exit Live] ?"
+            "value": "You're now connected as a guest. Do you want to disconnect or exit the live stream?"
           }
         },
         "zh-Hans": {
@@ -4312,7 +4312,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apply for link mic"
+            "value": "Request to Join"
           }
         },
         "zh-Hans": {
@@ -6307,7 +6307,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Microdermabrasion"
+            "value": "Smooth Skin"
           }
         },
         "zh-Hans": {
@@ -6972,7 +6972,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Co-guest"
+            "value": "Disconnect"
           }
         },
         "zh-Hans": {
@@ -7322,7 +7322,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Link Management"
+            "value": "Manage Guests"
           }
         },
         "zh-Hans": {
@@ -10507,7 +10507,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cancel application for link mic"
+            "value": "Cancel Request"
           }
         },
         "zh-Hans": {
@@ -10542,7 +10542,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Link"
+            "value": "Disconnect"
           }
         },
         "zh-Hans": {
@@ -10577,7 +10577,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apply for audio link"
+            "value": "Join with Audio Only"
           }
         },
         "zh-Hans": {
@@ -10612,7 +10612,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "connect upon host's approval"
+            "value": "The host must accept your request before you can join."
           }
         },
         "zh-Hans": {
@@ -10647,7 +10647,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apply for video link"
+            "value": "Join with Video and Audio"
           }
         },
         "zh-Hans": {
@@ -10717,7 +10717,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose Link Mode"
+            "value": "Join as a Guest"
           }
         },
         "zh-Hans": {
@@ -10752,7 +10752,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Adjust the video link screen"
+            "value": "Camera Preview"
           }
         },
         "zh-Hans": {
@@ -10787,7 +10787,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You have submitted a link mic request, please wait for the author approval"
+            "value": "Request sent. Waiting for host to accept..."
           }
         },
         "zh-Hans": {
