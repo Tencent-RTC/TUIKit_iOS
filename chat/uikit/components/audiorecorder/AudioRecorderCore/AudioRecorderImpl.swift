@@ -182,6 +182,9 @@ internal class AudioRecorderImpl: AudioRecorder {
     }
 
     private func onComplete(_ retCode:AudioRecordResultCode) {
+        executeOnMainThread {
+            self.isRecording = false
+        }
         notifyCompleteOnMainThread(retCode);
     }
 

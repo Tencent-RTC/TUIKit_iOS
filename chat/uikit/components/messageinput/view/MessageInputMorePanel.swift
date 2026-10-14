@@ -13,6 +13,14 @@ protocol MessageInputMorePanelDelegate: AnyObject {
 final class MessageInputMorePanel: UIView {
     weak var delegate: MessageInputMorePanelDelegate?
 
+    /// Called after a tap cleared an item's red dot, so the owner can refresh the
+    /// more button's own dot.
+    var onRedDotDismissed: (() -> Void)?
+
+    var hasVisibleRedDot: Bool {
+        return actions.contains { $0.showRedDot && !dismissedRedDotIDs.contains($0.ID) }
+    }
+
     var bottomSafeAreaInset: CGFloat = 0 {
         didSet {
             guard bottomSafeAreaInset != oldValue else { return }
@@ -30,6 +38,8 @@ final class MessageInputMorePanel: UIView {
 
     fileprivate static let iconGlyphSize: CGFloat = 28
 
+    fileprivate static let redDotSize: CGFloat = 8
+
     fileprivate static let titleTopSpacing: CGFloat = CGFloat(SpacingScheme.iconTextSpacing)
 
     fileprivate static let titleAreaHeight: CGFloat = 29
@@ -43,6 +53,8 @@ final class MessageInputMorePanel: UIView {
     private var collectionBottomConstraint: Constraint?
 
     private var actions: [MessageInputMenuAction] = []
+
+    private var dismissedRedDotIDs: Set<String> = []
 
     init(config: MessageInputConfigProtocol) {
         self.config = config
@@ -146,7 +158,11 @@ extension MessageInputMorePanel: UICollectionViewDataSource {
             withReuseIdentifier: MorePanelCell.reuseID, for: indexPath
         ) as! MorePanelCell
         let item = actions[indexPath.item]
-        cell.configure(icon: item.icon ?? AtomicXChatResources.image(named: item.iconName), title: item.title)
+        cell.configure(
+            icon: item.icon ?? AtomicXChatResources.image(named: item.iconName),
+            title: item.title,
+            showRedDot: item.showRedDot && !dismissedRedDotIDs.contains(item.ID)
+        )
         return cell
     }
 }
@@ -156,7 +172,12 @@ extension MessageInputMorePanel: UICollectionViewDataSource {
 extension MessageInputMorePanel: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        actions[indexPath.item].onClick()
+        let action = actions[indexPath.item]
+        if action.showRedDot, dismissedRedDotIDs.insert(action.ID).inserted {
+            collectionView.reloadItems(at: [indexPath])
+            onRedDotDismissed?()
+        }
+        action.onClick()
     }
 }
 
@@ -187,6 +208,8 @@ private final class MorePanelCell: UICollectionViewCell {
 
     private let titleLabel = UILabel()
 
+    private let redDotView = UIView()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
@@ -196,9 +219,10 @@ private final class MorePanelCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(icon: UIImage?, title: String) {
+    func configure(icon: UIImage?, title: String, showRedDot: Bool) {
         iconImageView.image = icon
         titleLabel.text = title
+        redDotView.isHidden = !showRedDot
     }
 
     private func setupCell() {
@@ -220,10 +244,24 @@ private final class MorePanelCell: UICollectionViewCell {
         titleLabel.lineBreakMode = .byWordWrapping
         contentView.addSubview(titleLabel)
 
+        // Sits on contentView rather than inside the tile, whose masksToBounds
+        // would clip it.
+        redDotView.backgroundColor = colors.textColorError
+        redDotView.layer.cornerRadius = MessageInputMorePanel.redDotSize / 2
+        redDotView.isUserInteractionEnabled = false
+        redDotView.isHidden = true
+        contentView.addSubview(redDotView)
+
         iconTileView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.centerX.equalToSuperview()
             make.width.height.equalTo(MessageInputMorePanel.iconSize)
+        }
+
+        redDotView.snp.makeConstraints { make in
+            make.top.equalTo(iconTileView.snp.top)
+            make.trailing.equalTo(iconTileView.snp.trailing)
+            make.width.height.equalTo(MessageInputMorePanel.redDotSize)
         }
 
         iconImageView.snp.makeConstraints { make in

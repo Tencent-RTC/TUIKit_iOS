@@ -38,9 +38,9 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     private static let headerIDTopSpacing: CGFloat = CGFloat(SpacingScheme.iconTextSpacing)
 
-    private static let memberGridColumns = 5
+    private static let memberGridColumns = 6
 
-    private static let memberGridMaxCount = 10
+    private static let memberGridMaxCount = 12
 
     private static let memberGridItemWidth: CGFloat = 40
 
@@ -881,8 +881,8 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     @objc private func handleClearHistoryTapped() {
         let alert = UIAlertController(
-            title: LocalizedChatString("ClearAllChatHistory"),
-            message: LocalizedChatString("ClearAllChatHistoryTips"),
+            title: LocalizedChatString("ClearGroupHistoryTips"),
+            message: nil,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: LocalizedChatString("Clear"), style: .destructive) { [weak self] _ in
@@ -895,8 +895,8 @@ public final class GroupChatSettingViewController: ChatSettingBaseViewController
 
     @objc private func handleQuitTapped() {
         let alert = UIAlertController(
-            title: LocalizedChatString("DeleteAndQuitConfirmTitle"),
-            message: LocalizedChatString("DeleteAndQuitConfirmMessage"),
+            title: LocalizedChatString("QuitGroupConfirmTips"),
+            message: nil,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: LocalizedChatString("DeleteAndQuit"), style: .destructive) { [weak self] _ in

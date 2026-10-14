@@ -107,6 +107,7 @@ final class AddFriendViewControllerImpl: RTCBaseView {
         }
         let backgroundTap = UITapGestureRecognizer(target: self, action: #selector(handleBackgroundTapped))
         backgroundTap.cancelsTouchesInView = false
+        backgroundTap.delegate = self
         addGestureRecognizer(backgroundTap)
         ContactStore.shared.loadFriends(completion: nil)
     }
@@ -177,5 +178,14 @@ final class AddFriendViewControllerImpl: RTCBaseView {
 
     @objc private func handleBackgroundTapped() {
         searchBar.hideKeyboard()
+    }
+}
+
+extension AddFriendViewControllerImpl: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if let touchView = touch.view, touchView.isDescendant(of: resultCell) {
+            return false
+        }
+        return true
     }
 }

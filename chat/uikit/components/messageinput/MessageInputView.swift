@@ -183,19 +183,23 @@ public struct MessageInputMenuAction: CustomItem {
 
     public var dangerous: Bool
 
-    public let onClick: () -> Void
+    public var showRedDot: Bool
+
+    public var onClick: () -> Void
 
     public init(ID: String,
                 title: String,
                 iconName: String,
                 icon: UIImage? = nil,
                 dangerous: Bool = false,
+                showRedDot: Bool = false,
                 onClick: @escaping () -> Void) {
         self.ID = ID
         self.title = title
         self.iconName = iconName
         self.icon = icon
         self.dangerous = dangerous
+        self.showRedDot = showRedDot
         self.onClick = onClick
     }
 }

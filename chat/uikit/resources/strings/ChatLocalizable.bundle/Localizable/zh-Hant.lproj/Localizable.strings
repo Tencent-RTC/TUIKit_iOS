@@ -438,6 +438,7 @@
 "QuoteOriginalFiltered" = "原訊息未顯示";
 "ClearAllChatHistory" = "清空聊天記錄";
 "ClearAllChatHistoryTips" = "確定清空聊天記錄？";
+"ClearGroupHistoryTips" = "確認刪除該群的聊天記錄";
 "Discline" = "拒絕";
 "Copied" = "已複製";
 "ConfirmDeleteMessage" = "確定刪除已選訊息";
@@ -470,7 +471,6 @@
 "AddContactMyUserIDFormat" = "我的用戶ID: %@";
 "AddUserNoDataTips" = "該用戶不存在";
 "AddGroupNoDataTips" = "該群聊不存在";
-"VideoTranscoding" = "視頻轉碼中...";
 "VideoDownloading" = "視頻下載中...";
 "VideoSavedSuccess" = "視頻保存成功";
 "VideoSavedFailed" = "視頻保存失敗";
@@ -796,6 +796,7 @@
 "Member" = "成員";
 "DeleteAndQuitConfirmTitle" = "刪除並退出";
 "DeleteAndQuitConfirmMessage" = "確定要刪除並退出該群嗎？";
+"QuitGroupConfirmTips" = "確認退出該群聊";
 "DeleteAndQuit" = "刪除並退出";
 "DismissGroupConfirmTitle" = "解散該群";
 "DismissGroupConfirmMessage" = "確定要解散該群嗎？解散後群聊將被永久刪除。";
@@ -810,6 +811,7 @@
 "GroupMemberDetail" = "成員資訊";
 "SetAsAdmin" = "設為管理員";
 "CancelAdmin" = "撤銷管理員";
+"RemoveMemberConfirmTips" = "確定移除該成員？";
 "RemoveMember" = "移除成員";
 "GroupOwnerLabel" = "群主";
 "AdminLabel" = "管理員";
@@ -1011,3 +1013,4 @@
 "SettingsShowCalls" = "顯示通話記錄";
 "DemoWelcomeMessage" = "歡迎體驗 Chat Demo！你可以先發送一則訊息，體驗基礎聊天功能。\n如果想新增好友，可以前往聯絡人頁面點擊首頁加號。\n如果想體驗音視訊通話，可以點擊下方加號按鈕 -> 語音通話/視訊通話。";
 "DemoCustomerServiceSummary" = "[智能客服]";
+"VideoTranscoding" = "視頻壓縮中...";

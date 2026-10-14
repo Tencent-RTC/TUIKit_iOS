@@ -438,6 +438,7 @@
 "QuoteOriginalFiltered" = "The original message is not displayed";
 "ClearAllChatHistory" = "Clear chat history";
 "ClearAllChatHistoryTips" = "Are you sure you want to clear the chat history?";
+"ClearGroupHistoryTips" = "Are you sure you want to delete this group's chat history?";
 "Discline" = "Refuse";
 "Copied" = "Copied";
 "ConfirmDeleteMessage" = "Delete now";
@@ -470,7 +471,6 @@
 "AddContactMyUserIDFormat" = "My User ID: %@";
 "AddUserNoDataTips" = "This user does not exist.";
 "AddGroupNoDataTips" = "This group chat does not exist.";
-"VideoTranscoding" = "Transcoding video...";
 "VideoDownloading" = "Downloading video...";
 "VideoSavedSuccess" = "Video saved successfully.";
 "VideoSavedFailed" = "Failed to save video.";
@@ -796,6 +796,7 @@
 "Member" = "Member";
 "DeleteAndQuitConfirmTitle" = "Delete and Leave";
 "DeleteAndQuitConfirmMessage" = "Are you sure you want to delete and leave this group?";
+"QuitGroupConfirmTips" = "Are you sure you want to leave this group?";
 "DeleteAndQuit" = "Delete and Leave";
 "DismissGroupConfirmTitle" = "Dismiss Group";
 "DismissGroupConfirmMessage" = "Are you sure you want to dismiss this group? The group chat will be permanently deleted.";
@@ -810,6 +811,7 @@
 "GroupMemberDetail" = "Member Info";
 "SetAsAdmin" = "Set as Admin";
 "CancelAdmin" = "Remove Admin";
+"RemoveMemberConfirmTips" = "Remove this member?";
 "RemoveMember" = "Remove Member";
 "GroupOwnerLabel" = "Group Owner";
 "AdminLabel" = "Administrator";
@@ -1011,3 +1013,4 @@
 "SettingsShowCalls" = "Show Recent Calls";
 "DemoWelcomeMessage" = "Welcome to Chat Demo! Send a message to try out the basic chat.\nTo add friends, go to the Contacts page and tap the plus button.\nTo make audio or video calls, tap the plus button below -> Voice Call/Video Call.";
 "DemoCustomerServiceSummary" = "[AI Customer Service]";
+"VideoTranscoding" = "Compressing video...";

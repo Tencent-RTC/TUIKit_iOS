@@ -38,5 +38,8 @@ final class ChatAudioPlaybackCoordinator {
             guard !isPlaying else { return }
             self?.playingSubject.send(nil)
         }
+        NotificationCenter.default.addObserver(forName: .chatVideoPlaybackDidStart, object: nil, queue: .main) { [weak self] _ in
+            self?.stop()
+        }
     }
 }
