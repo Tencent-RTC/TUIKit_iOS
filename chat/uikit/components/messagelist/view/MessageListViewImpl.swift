@@ -505,6 +505,7 @@ final class MessageListViewImpl: RTCBaseView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.listenController.stop()
+                ChatAudioPlaybackCoordinator.shared.stop()
             }
             .store(in: &cancellables)
 

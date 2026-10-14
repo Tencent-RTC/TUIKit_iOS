@@ -82,6 +82,7 @@ final class ChatFlowCoordinator {
     }
 
     private func makeMessageInputConfig(conversationID: String) -> ChatMessageInputConfig {
+        let sdkAppID = LoginStore.shared.sdkAppID
         return ChatMessageInputConfig(actionCustomizer: { editor in
             editor.add(MessageInputMenuAction(
                 ID: "demo.messageInput.customLink",
@@ -93,7 +94,29 @@ final class ChatFlowCoordinator {
                     ChatFlowCoordinator.sendCustomLinkMessage(conversationID: conversationID)
                 }
             ))
+            editor.replace(MessageInputActionIDs.videoCall) { action in
+                ChatFlowCoordinator.withCallRedDotIfNeeded(sdkAppID: sdkAppID, action: action)
+            }
+            editor.replace(MessageInputActionIDs.audioCall) { action in
+                ChatFlowCoordinator.withCallRedDotIfNeeded(sdkAppID: sdkAppID, action: action)
+            }
         })
+    }
+
+    private static func withCallRedDotIfNeeded(
+        sdkAppID: Int32,
+        action: MessageInputMenuAction
+    ) -> MessageInputMenuAction {
+        guard MessageInputCallRedDotStore.shouldShow(sdkAppID: sdkAppID, actionID: action.ID) else {
+            return action
+        }
+        var decorated = action
+        decorated.showRedDot = true
+        decorated.onClick = {
+            MessageInputCallRedDotStore.markClicked(sdkAppID: sdkAppID, actionID: action.ID)
+            action.onClick()
+        }
+        return decorated
     }
 
     private static func sendCustomLinkMessage(conversationID: String) {
@@ -462,6 +485,28 @@ final class CustomLinkMessageContentView: UIView, MessageContentView {
     @objc private func handleTap() {
         guard let url = linkURL else { return }
         UIApplication.shared.open(url)
+    }
+}
+
+// MARK: - Message Input Call Red Dot
+
+/// Remembers whether the user has already tapped a call entry in the more panel,
+/// keyed per SDKAppID so switching accounts brings the dot back.
+private enum MessageInputCallRedDotStore {
+    private static let clickedKeyPrefix = "message_input_call_red_dot_clicked_"
+
+    static func shouldShow(sdkAppID: Int32, actionID: String) -> Bool {
+        guard sdkAppID > 0 else { return false }
+        return !UserDefaults.standard.bool(forKey: storageKey(sdkAppID: sdkAppID, actionID: actionID))
+    }
+
+    static func markClicked(sdkAppID: Int32, actionID: String) {
+        guard sdkAppID > 0 else { return }
+        UserDefaults.standard.set(true, forKey: storageKey(sdkAppID: sdkAppID, actionID: actionID))
+    }
+
+    private static func storageKey(sdkAppID: Int32, actionID: String) -> String {
+        return "\(clickedKeyPrefix)\(sdkAppID)\(actionID)"
     }
 }
 

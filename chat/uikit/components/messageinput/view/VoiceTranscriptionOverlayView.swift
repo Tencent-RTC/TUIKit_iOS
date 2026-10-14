@@ -594,7 +594,7 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private func presentLanguageSelector(onPicked: @escaping (String) -> Void) {
         let sheet = UIAlertController(
-            title: LocalizedChatString("voice_message_select_language"),
+            title: nil,
             message: nil,
             preferredStyle: .actionSheet
         )
