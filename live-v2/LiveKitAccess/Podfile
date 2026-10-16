@@ -1,0 +1,27 @@
+platform :ios, '15.0'
+
+install! 'cocoapods', :deterministic_uuids => false
+
+target 'LiveKitAccess' do
+  use_frameworks! :linkage => :static
+  pod 'AtomicXCore', '5.2.0'
+  # Keep the LiteAV version compatible with the packaged AtomicXCore binary.
+  pod 'TXLiteAVSDK_Professional', '13.5.21355'
+  # Use the MediaX license package; the public pod with the same name is incompatible.
+  pod 'YTCommonXMagic', :podspec => 'https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/YTCommonXMagic_1.3.1/YTCommonXMagic.podspec'
+  pod 'TCMediaX', :podspec => 'https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCMediaX.podspec'
+  pod 'TCEffectPlayer', :podspec => 'https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCEffectPlayer.podspec'
+  pod 'TUILiveKit', :path => '../TUILiveKit'
+  pod 'LookinServer', :configurations => ['Debug']
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |configuration|
+      version = configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if version.nil? || Gem::Version.new(version) < Gem::Version.new('15.0')
+        configuration.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      end
+    end
+  end
+end

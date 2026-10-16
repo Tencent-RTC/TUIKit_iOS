@@ -1,0 +1,337 @@
+/* Common */
+"live.loading" = "Loading…";
+"live.empty" = "No live streams";
+"tuilivekit.common.cancel" = "Cancel";
+"tuilivekit.common.close" = "Close";
+"tuilivekit.common.confirm" = "Confirm";
+"tuilivekit.common.done" = "Done";
+"tuilivekit.common.host" = "Host";
+"tuilivekit.common.more" = "More";
+"tuilivekit.common.processing" = "Processing";
+"tuilivekit.common.send" = "Send";
+"tuilivekit.common.viewer" = "Viewer";
+
+/* Live list */
+"tuilivekit.live_list.viewers" = "%ld viewers";
+
+/* Player */
+"tuilivekit.player.follow" = "Follow";
+"tuilivekit.player.unfollow" = "Unfollow";
+"tuilivekit.player.like_count" = "%ld likes in this live";
+"tuilivekit.player.operation_failed" = "Operation failed";
+"tuilivekit.player.close_room" = "Close live room";
+"tuilivekit.player.audience_count" = "%ld viewers";
+"tuilivekit.player.audience.message_disabled" = "You have been muted in the current room";
+"tuilivekit.player.audience.message_enabled" = "You have been unmuted in the current room";
+"tuilivekit.player.comment_placeholder" = "Say something…";
+"tuilivekit.player.comment" = "Post a comment";
+"tuilivekit.player.comment_host" = "Host";
+"tuilivekit.comment.friendly_placeholder" = "Keep the conversation friendly";
+"tuilivekit.comment.cancel" = "Cancel comment";
+"tuilivekit.comment.character_limit" = "Comments can contain up to %d characters";
+"tuilivekit.pusher.prepare.topic_byte_limit" = "Live title can contain up to %d bytes";
+"tuilivekit.comment.send_failed" = "Failed to send comment. Please try again later.";
+"tuilivekit.comment.muted" = "You are muted and cannot send comments.";
+"tuilivekit.comment.all_muted" = "Comments are disabled for everyone in this live room.";
+"tuilivekit.comment.too_frequent" = "You are sending too quickly. Please try again later.";
+"tuilivekit.comment.content_rejected" = "This comment does not meet the content guidelines. Please edit it and try again.";
+"tuilivekit.comment.too_long" = "Your comment is too long. Please shorten it and try again.";
+"tuilivekit.comment.login_expired" = "Your session has expired. Please log in again.";
+"tuilivekit.comment.login_elsewhere" = "Your account is logged in on another device. Please log in again.";
+"tuilivekit.comment.not_joined" = "Please join the live room before sending comments.";
+"tuilivekit.comment.room_unavailable" = "This live room is unavailable. Comments cannot be sent.";
+"tuilivekit.comment.no_permission" = "You do not have permission to send comments in this live room.";
+"tuilivekit.comment.network_error" = "Network connection error. Please check your connection and try again.";
+"tuilivekit.comment.timeout" = "Sending your comment timed out. Please try again later.";
+"tuilivekit.comment.send_rejected" = "Your comment could not be sent. Please try again later.";
+"tuilivekit.player.comment_send" = "Send";
+"tuilivekit.player.coguest" = "Co-guest";
+"tuilivekit.player.gift" = "Send a gift";
+"tuilivekit.player.more" = "More";
+"tuilivekit.player.like" = "Like";
+"tuilivekit.player.online_audience" = "Online audience";
+"tuilivekit.player.restore_controls" = "Restore";
+"tuilivekit.player.restore_controls_accessibility" = "Restore live room controls";
+"tuilivekit.player.playback_failed" = "Playback failed";
+"tuilivekit.player.enter_room_hint" = "Click to enter the live room";
+"tuilivekit.player.gift.title" = "Send a gift";
+"tuilivekit.player.gift.loading" = "Loading gifts…";
+"tuilivekit.player.gift.empty" = "No gifts available";
+"tuilivekit.player.gift.coins" = "%ld coins";
+"tuilivekit.player.gift.send" = "Send";
+"tuilivekit.player.gift.combo.hint" = "Hold to combo";
+"tuilivekit.player.more.quality" = "Quality";
+"tuilivekit.player.more.super_resolution" = "Premium Quality";
+"tuilivekit.player.more.hdr" = "HDR";
+"tuilivekit.player.more.volume_balance" = "Volume Balance";
+"tuilivekit.player.more.sleep_timer" = "Sleep Timer";
+"tuilivekit.player.coguest.voice" = "Audio Co-guest";
+"tuilivekit.player.coguest.video" = "Video Co-guest";
+"tuilivekit.player.coguest.cancel_application" = "Cancel request";
+"tuilivekit.player.coguest.invitation" = "The host invited you to co-guest";
+"tuilivekit.player.coguest.accept" = "Accept";
+"tuilivekit.player.coguest.error.rejected" = "The host declined your co-guest request";
+"tuilivekit.player.coguest.error.seat_full" = "All co-guest seats are occupied";
+"tuilivekit.player.coguest.error.room_not_exist" = "The live room does not exist or has been dismissed";
+"tuilivekit.player.coguest.error.not_room_member" = "You are not a member of this live room";
+"tuilivekit.player.coguest.error.seat_locked" = "This seat is locked. Try another seat";
+"tuilivekit.player.coguest.error.already_requesting" = "You are already in the co-guest request queue";
+"tuilivekit.player.coguest.error.already_on_seat" = "You are already on a seat";
+"tuilivekit.player.coguest.error.seat_occupied" = "This seat is already taken";
+"tuilivekit.player.coguest.error.not_supported" = "This live room does not support co-guest";
+"tuilivekit.player.coguest.error.apply_failed" = "Failed to request co-guest";
+"tuilivekit.player.coguest.error.timeout" = "The co-guest request timed out";
+"tuilivekit.player.coguest.error.already_seated" = "You are already on a seat";
+"tuilivekit.player.coguest.error.kicked_off" = "Removed from seat by host";
+"tuilivekit.player.coguest.error.ended" = "The host ended the co-guest session";
+"tuilivekit.player.coguest.beauty.preparing" = "Beauty is preparing";
+"tuilivekit.player.coguest.settings.title" = "Adjust Co-guest Video";
+"tuilivekit.player.coguest.settings.subtitle" = "Viewers see changes in real time";
+"tuilivekit.player.live_ended" = "The live stream has ended";
+"tuilivekit.player.summary.next_live_hint" = "See you next time";
+"tuilivekit.player.summary.swipe_more" = "Swipe up to discover more hosts";
+
+/* Pusher shared */
+"tuilivekit.pusher.default_title" = "Welcome to my live stream";
+"tuilivekit.pusher.beauty" = "Beauty";
+"tuilivekit.pusher.beautify" = "Beauty";
+"tuilivekit.pusher.flip_camera" = "Flip";
+"tuilivekit.pusher.quality.fhd" = "Full HD";
+"tuilivekit.pusher.quality.hd" = "HD";
+"tuilivekit.pusher.quality.sd" = "SD";
+"tuilivekit.pusher.quality.fhd_option" = "Full HD (FHD)";
+"tuilivekit.pusher.quality.hd_option" = "High Definition (HD)";
+"tuilivekit.pusher.quality.sd_option" = "Standard Definition (SD)";
+"tuilivekit.pusher.mirror" = "Mirror";
+"tuilivekit.pusher.video_quality" = "Quality";
+"tuilivekit.pusher.audio_effects" = "Audio effects";
+"tuilivekit.pusher.beauty.close" = "Off";
+"tuilivekit.pusher.beauty.smooth" = "Smooth";
+"tuilivekit.pusher.beauty.whiteness" = "Whiten";
+"tuilivekit.pusher.beauty.ruddy" = "Rosy";
+
+/* Prepare and settings */
+"tuilivekit.pusher.prepare.change_cover" = "Change cover";
+"tuilivekit.pusher.prepare.cover_option" = "Cover %ld";
+"tuilivekit.pusher.prepare.edit_topic" = "✎ Edit topic";
+"tuilivekit.pusher.prepare.start_live" = "●  Go Live";
+"tuilivekit.pusher.settings.more" = "More settings";
+"tuilivekit.pusher.settings.ear_monitor" = "In-ear monitor";
+"tuilivekit.pusher.settings.ear_monitor_volume" = "Monitor volume";
+"tuilivekit.pusher.settings.capture_volume" = "Voice volume";
+"tuilivekit.pusher.settings.audio" = "Audio settings";
+"tuilivekit.pusher.settings.voice_changer" = "Voice changer";
+"tuilivekit.pusher.settings.voice.original" = "Original";
+"tuilivekit.pusher.settings.voice.child" = "Child";
+"tuilivekit.pusher.settings.voice.loli" = "Girl";
+"tuilivekit.pusher.settings.voice.uncle" = "Deep";
+"tuilivekit.pusher.settings.voice.spirit" = "Ethereal";
+"tuilivekit.pusher.settings.reverb" = "Reverb";
+"tuilivekit.pusher.settings.reverb.none" = "None";
+"tuilivekit.pusher.settings.reverb.ktv" = "Karaoke";
+"tuilivekit.pusher.settings.reverb.metal" = "Metallic";
+"tuilivekit.pusher.settings.reverb.deep" = "Deep";
+"tuilivekit.pusher.settings.reverb.bright" = "Bright";
+
+/* Living */
+"tuilivekit.pusher.living.coguest" = "Co-guest";
+"tuilivekit.pusher.living.live_duration" = "Live duration";
+"tuilivekit.pusher.living.network_poor" = "Poor network";
+"tuilivekit.pusher.living.network_very_poor" = "Very poor network";
+"tuilivekit.pusher.living.network_disconnected" = "Network disconnected";
+"tuilivekit.pusher.living.like_count" = "%ld likes";
+"tuilivekit.pusher.living.new_messages" = "%ld new messages";
+"tuilivekit.pusher.living.pause" = "Pause live";
+"tuilivekit.pusher.living.paused" = "Video and audio paused";
+"tuilivekit.pusher.living.resume" = "Resume live";
+"tuilivekit.pusher.living.mute" = "Mute";
+"tuilivekit.pusher.living.unmute" = "Unmute";
+"tuilivekit.pusher.living.basic_settings" = "Basic settings";
+"tuilivekit.pusher.living.interaction" = "Interaction";
+"tuilivekit.pusher.living.music" = "Background music";
+"tuilivekit.pusher.living.comment" = "Comments";
+"tuilivekit.pusher.living.audience_entered" = "joined the live room";
+"tuilivekit.pusher.living.audience_count_compact" = "%ldK+";
+
+/* End live */
+"tuilivekit.pusher.end.confirm" = "End the live stream?";
+"tuilivekit.pusher.end.empty_audience" = "More viewers are on the way. Keep streaming to reach more people.";
+"tuilivekit.pusher.end.continue" = "Keep streaming";
+"tuilivekit.pusher.end.end" = "End";
+"tuilivekit.pusher.end.audience_count" = "%ld people are watching your live stream";
+
+/* Co-guest */
+"tuilivekit.pusher.coguest.connected" = "Connected viewers";
+"tuilivekit.pusher.coguest.empty" = "No viewers are participating";
+"tuilivekit.pusher.coguest.applicants" = "Co-guest requests";
+"tuilivekit.player.coguest.apply" = "Apply";
+"tuilivekit.pusher.coguest.candidates" = "Invite viewers";
+"tuilivekit.pusher.coguest.end" = "End";
+"tuilivekit.pusher.coguest.accept" = "Accept";
+"tuilivekit.pusher.coguest.cancel_invitation" = "Cancel invite";
+"tuilivekit.pusher.coguest.invite" = "Invite";
+"tuilivekit.pusher.coguest.settings" = "Co-guest settings";
+"tuilivekit.pusher.coguest.end_all" = "End co-guest";
+"tuilivekit.pusher.coguest.layout" = "Co-guest layout";
+"tuilivekit.pusher.coguest.invite_to_seat" = "Invite a co-guest";
+"tuilivekit.pusher.coguest.layout.floating" = "Floating window";
+"tuilivekit.pusher.coguest.layout.grid2" = "Dynamic grid";
+"tuilivekit.pusher.coguest.layout.fixed" = "Fixed window";
+"tuilivekit.pusher.coguest.layout.grid9" = "9-person grid";
+"tuilivekit.pusher.coguest.error.capacity" = "The current co-guest count exceeds this layout's capacity";
+"tuilivekit.pusher.coguest.error.layout_too_frequent" = "Too many requests. Please try again later.";
+"tuilivekit.pusher.coguest.error.layout_unavailable" = "Cannot switch to this layout right now.";
+"tuilivekit.pusher.coguest.error.layout_failed" = "Couldn't change the layout. Please try again later.";
+"tuilivekit.pusher.coguest.error.layout_not_ready" = "The service is not ready. Please try again later.";
+"tuilivekit.pusher.coguest.error.layout_unsupported" = "Layout changes are currently unavailable.";
+"tuilivekit.pusher.coguest.error.layout_room_unsupported" = "This live room does not support layout changes.";
+"tuilivekit.pusher.coguest.error.layout_login_required" = "Your session has expired. Please log in again.";
+"tuilivekit.pusher.coguest.error.layout_network" = "Network connection error. Check your connection and try again.";
+"tuilivekit.pusher.coguest.error.layout_timeout" = "The request timed out. Please try again later.";
+"tuilivekit.pusher.coguest.error.layout_room_missing" = "The live room does not exist or has ended.";
+"tuilivekit.pusher.coguest.error.layout_permission_denied" = "You do not have permission to change the live layout.";
+"tuilivekit.pusher.coguest.error.max_capacity" = "The current layout supports up to %ld co-guests";
+
+/* Summary */
+"tuilivekit.pusher.summary.gifts_received" = "Gifts received";
+"tuilivekit.pusher.summary.gift_value" = "Gift value";
+"tuilivekit.pusher.summary.viewers" = "Viewers";
+"tuilivekit.pusher.summary.comments" = "Comments";
+"tuilivekit.pusher.summary.gift_senders" = "Gift senders";
+"tuilivekit.pusher.summary.likes" = "Likes";
+"tuilivekit.pusher.summary.unit.items" = "items";
+"tuilivekit.pusher.summary.unit.people" = "people";
+"tuilivekit.pusher.summary.unit.times" = "times";
+"tuilivekit.pusher.summary.unit.coins" = "coins";
+"tuilivekit.pusher.summary.unit.messages" = "msgs";
+"tuilivekit.pusher.summary.session_data" = "Session data";
+"tuilivekit.pusher.summary.statistics" = "Live statistics";
+"tuilivekit.pusher.summary.ended" = "Live stream ended";
+"tuilivekit.pusher.summary.duration" = "Live duration";
+"tuilivekit.pusher.summary.paused_duration" = "Paused duration";
+
+/* Live status */
+"tuilivekit.pusher.status.title" = "Live status";
+"tuilivekit.pusher.status.realtime" = "Live data";
+"tuilivekit.pusher.status.device" = "Device status";
+"tuilivekit.pusher.status.cumulative" = "Session total";
+"tuilivekit.pusher.status.metric.gift_score" = "Gift score";
+"tuilivekit.pusher.status.metric.gift_senders" = "Gift senders";
+"tuilivekit.pusher.status.metric.gifts" = "Gifts";
+"tuilivekit.pusher.status.metric.online" = "Online audience";
+"tuilivekit.pusher.status.metric.likes" = "Likes";
+"tuilivekit.pusher.status.metric.messages" = "Comments";
+"tuilivekit.pusher.status.unit.points" = "pts";
+"tuilivekit.pusher.status.unit.people" = "people";
+"tuilivekit.pusher.status.unit.times" = "times";
+"tuilivekit.pusher.status.unit.count" = "gifts";
+"tuilivekit.pusher.status.unit.messages" = "msgs";
+"tuilivekit.pusher.status.updating" = "Data updates in real time";
+"tuilivekit.pusher.status.update_detail" = "Interaction data accumulates throughout this live stream";
+"tuilivekit.pusher.status.video_info" = "Video info";
+"tuilivekit.pusher.status.audio_info" = "Audio info";
+"tuilivekit.pusher.status.video_fields" = "Quality\nBitrate\nFrame rate";
+"tuilivekit.pusher.status.audio_fields" = "Sample rate\nBitrate";
+"tuilivekit.pusher.status.rtt" = "Round-trip latency";
+"tuilivekit.pusher.status.down_loss" = "Downlink packet loss";
+"tuilivekit.pusher.status.up_loss" = "Uplink packet loss";
+"tuilivekit.pusher.status.voice_volume" = "Voice volume";
+"tuilivekit.pusher.status.video.normal.title" = "Video is normal";
+"tuilivekit.pusher.status.video.off.title" = "Video is off";
+"tuilivekit.pusher.status.video.error.title" = "Video issue detected";
+"tuilivekit.pusher.status.video.normal.detail" = "The live video is smooth";
+"tuilivekit.pusher.status.video.off.detail" = "The camera is off or permission was not granted";
+"tuilivekit.pusher.status.video.device_error.detail" = "Check camera permission or whether another app is using it";
+"tuilivekit.pusher.status.video.stream_error.detail" = "Frame rate or network status is abnormal";
+"tuilivekit.pusher.status.audio.normal.title" = "Audio is normal";
+"tuilivekit.pusher.status.audio.off.title" = "Audio is off";
+"tuilivekit.pusher.status.audio.error.title" = "Audio issue detected";
+"tuilivekit.pusher.status.audio.normal.detail" = "The volume is clear and balanced";
+"tuilivekit.pusher.status.audio.off.detail" = "The microphone is off, muted, or its capture volume is 0";
+"tuilivekit.pusher.status.audio.device_error.detail" = "Check microphone permission or whether another app is using it";
+"tuilivekit.pusher.status.audio.stream_error.detail" = "Audio capture data is abnormal";
+"tuilivekit.pusher.status.temperature.normal.title" = "Device temperature is normal";
+"tuilivekit.pusher.status.temperature.fair.title" = "Device is slightly warm";
+"tuilivekit.pusher.status.temperature.serious.title" = "Device is overheating";
+"tuilivekit.pusher.status.temperature.normal.detail" = "The device is running normally";
+"tuilivekit.pusher.status.temperature.fair.detail" = "The device temperature has risen; monitor its status";
+"tuilivekit.pusher.status.temperature.serious.detail" = "Pause the live stream and let the device cool down";
+"tuilivekit.pusher.status.network.wifi" = "Wi-Fi";
+"tuilivekit.pusher.status.network.cellular" = "Cellular";
+"tuilivekit.pusher.status.network.unknown" = "Current network";
+"tuilivekit.pusher.status.network.title" = "%@ · %@";
+"tuilivekit.pusher.status.network.excellent" = "Excellent";
+"tuilivekit.pusher.status.network.good" = "Good";
+"tuilivekit.pusher.status.network.poor" = "Poor";
+"tuilivekit.pusher.status.network.bad" = "Bad";
+"tuilivekit.pusher.status.network.very_bad" = "Very poor";
+"tuilivekit.pusher.status.network.disconnected" = "Disconnected";
+"tuilivekit.pusher.status.network.checking" = "Checking";
+"tuilivekit.pusher.status.network.keep" = "Keep the current network during the live stream";
+"tuilivekit.pusher.status.network.fluctuating" = "The network is unstable; monitor the live video";
+"tuilivekit.pusher.status.network.switch" = "The network is poor; switch to another network";
+"tuilivekit.pusher.status.network.disconnected_detail" = "The network connection was lost";
+"tuilivekit.pusher.status.network.checking_detail" = "Checking the current network status";
+
+/* Music */
+"tuilivekit.pusher.music.happy" = "Upbeat";
+"tuilivekit.pusher.music.sad" = "Melancholy";
+"tuilivekit.pusher.music.wonder_world" = "Wonder World";
+
+"tuilivekit.pusher.coguest.manage_user" = "Manage · %@";
+"tuilivekit.pusher.coguest.mute_user" = "Mute";
+"tuilivekit.pusher.coguest.unmute_user" = "Unmute";
+"tuilivekit.pusher.coguest.disconnect_user" = "Disconnect";
+"tuilivekit.pusher.audience.follow" = "Follow";
+"tuilivekit.pusher.audience.following" = "Following";
+"tuilivekit.pusher.audience.gift_value" = "Gift score %d";
+"tuilivekit.pusher.audience.room_management" = "ROOM MANAGEMENT";
+"tuilivekit.pusher.audience.mute" = "Mute";
+"tuilivekit.pusher.audience.unmute" = "Unmute";
+"tuilivekit.pusher.audience.mute_description" = "Disable live comments";
+"tuilivekit.pusher.audience.unmute_description" = "Allow live comments";
+"tuilivekit.pusher.audience.remove" = "Remove";
+"tuilivekit.pusher.audience.remove_description" = "Remove from this live room";
+"tuilivekit.pusher.audience.muted_toast" = "%@ has been muted";
+"tuilivekit.pusher.audience.unmuted_toast" = "%@ has been unmuted";
+"tuilivekit.pusher.audience.removed_toast" = "%@ has been removed";
+"tuilivekit.pusher.gift.sent" = "Sent %@";
+"tuilivekit.common.gift.sent" = "sent";
+"tuilivekit.pusher.gift.fallback" = "G";
+
+
+// Co-guest device moderation
+"tuilivekit.player.coguest.microphone_locked" = "The host has muted your microphone";
+"tuilivekit.pusher.coguest.microphone_manual_open" = "The viewer must unmute their microphone";
+"tuilivekit.player.coguest.camera_locked" = "The host has disabled your camera";
+"tuilivekit.pusher.coguest.microphone_closed" = "Muted %@’s microphone";
+"tuilivekit.pusher.coguest.microphone_unlocked" = "Unlocked %@’s microphone";
+"tuilivekit.player.coguest.microphone_unlocked" = "The host has unlocked your microphone";
+
+"tuilivekit.pusher.error.start_failed" = "Unable to start streaming";
+"tuilivekit.pusher.error.content_rejected" = "Live information did not pass review. Please edit it and try again.";
+"tuilivekit.pusher.error.update_failed" = "Unable to update live information. Please try again later.";
+"tuilivekit.pusher.error.operation_failed" = "Operation failed. Please try again later.";
+
+"tuilivekit.pusher.interruption.ended" = "Live ended";
+
+"tuilivekit.pusher.interruption.server" = "Live ended by the server";
+
+"tuilivekit.pusher.interruption.admin" = "Removed by an administrator";
+
+"tuilivekit.pusher.interruption.other_device" = "Signed in on another device";
+
+"tuilivekit.pusher.interruption.network" = "Live ended after network disconnection";
+
+"tuilivekit.pusher.interruption.expired" = "Live channel expired";
+
+"tuilivekit.pusher.interruption.account" = "Account signed out. Live ended";
+
+"tuilivekit.player.interruption.removed" = "You have been removed from this live room";
+"tuilivekit.player.interruption.other_device" = "Your account was signed in on another device";
+"tuilivekit.player.interruption.server" = "You have been removed from the live room by the server";
+"tuilivekit.player.interruption.network" = "Disconnected from the live room due to a network issue";
+"tuilivekit.player.interruption.expired" = "Your live room session has expired";
+
+"tuilivekit.pusher.ending" = "Ending live stream…";
+"tuilivekit.pusher.error.mute_switch_failed" = "Failed to switch microphone state. Please try again.";
