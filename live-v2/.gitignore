@@ -1,0 +1,7 @@
+Pods/
+DerivedData/
+build/
+**/xcuserdata/
+*.xcuserstate
+.DS_Store
+SDKConfig.local.yml

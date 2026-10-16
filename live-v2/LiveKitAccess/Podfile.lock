@@ -1,0 +1,70 @@
+PODS:
+  - AtomicXCore (5.2.0):
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional (>= 13.5.21355)
+  - Kingfisher (8.12.0)
+  - LookinServer (1.2.8):
+    - LookinServer/Core (= 1.2.8)
+  - LookinServer/Core (1.2.8)
+  - SnapKit (5.7.1)
+  - TCEffectPlayer (3.3.256):
+    - TCMediaX
+  - TCMediaX (3.3.256)
+  - TUILiveKit (1.0.0):
+    - AtomicXCore (= 5.2.0)
+    - Kingfisher
+    - SnapKit (~> 5.7)
+    - TCEffectPlayer
+    - TCMediaX
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+    - YTCommonXMagic (= 1.3.1)
+  - TXIMSDK_Plus_iOS_XCFramework (9.0.7667)
+  - TXLiteAVSDK_Professional (13.5.21355):
+    - TXLiteAVSDK_Professional/Professional (= 13.5.21355)
+  - TXLiteAVSDK_Professional/Professional (13.5.21355)
+  - YTCommonXMagic (1.3.1)
+
+DEPENDENCIES:
+  - AtomicXCore (= 5.2.0)
+  - LookinServer
+  - TCEffectPlayer (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCEffectPlayer.podspec`)
+  - TCMediaX (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCMediaX.podspec`)
+  - TUILiveKit (from `../TUILiveKit`)
+  - TXLiteAVSDK_Professional (= 13.5.21355)
+  - YTCommonXMagic (from `https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/YTCommonXMagic_1.3.1/YTCommonXMagic.podspec`)
+
+SPEC REPOS:
+  trunk:
+    - AtomicXCore
+    - Kingfisher
+    - LookinServer
+    - SnapKit
+    - TXIMSDK_Plus_iOS_XCFramework
+    - TXLiteAVSDK_Professional
+
+EXTERNAL SOURCES:
+  TCEffectPlayer:
+    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCEffectPlayer.podspec
+  TCMediaX:
+    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/3.3/3.3.256/TCMediaX.podspec
+  TUILiveKit:
+    :path: "../TUILiveKit"
+  YTCommonXMagic:
+    :podspec: https://mediacloud-76607.gzc.vod.tencent-cloud.com/MediaX/iOS/podspec/release/YTCommonXMagic_1.3.1/YTCommonXMagic.podspec
+
+SPEC CHECKSUMS:
+  AtomicXCore: a1e990dd894b7ead7df23e13b4e3cd6a8aeb043e
+  Kingfisher: 64e06c7d1a9851ecff9d1b14f92ad01141263dae
+  LookinServer: 1b2b61c6402ae29fa22182d48f5cd067b4e99e80
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+  TCEffectPlayer: 82ff257693c69184c6f047430d80da35ef2a1df2
+  TCMediaX: c47980265070cee414668267918ca8e1894813c8
+  TUILiveKit: 37940559c0fb81d2dbf857080e9137bb9afb1934
+  TXIMSDK_Plus_iOS_XCFramework: 7776eb7a18b71a4b9daae8f43b230e9fa06cfc24
+  TXLiteAVSDK_Professional: 914aa2e59545c8cdff80ab70c1bc8191c683ecfc
+  YTCommonXMagic: eeb1ffa7c3d33ae27a151488885ad52bb85c0b77
+
+PODFILE CHECKSUM: adb6c57786e434988570b5d596fa4c333a6d7b5c
+
+COCOAPODS: 1.17.0

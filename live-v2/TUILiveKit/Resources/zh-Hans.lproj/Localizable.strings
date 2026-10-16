@@ -1,0 +1,337 @@
+/* Common */
+"live.loading" = "加载中…";
+"live.empty" = "暂无直播";
+"tuilivekit.common.cancel" = "取消";
+"tuilivekit.common.close" = "关闭";
+"tuilivekit.common.confirm" = "确定";
+"tuilivekit.common.done" = "完成";
+"tuilivekit.common.host" = "主播";
+"tuilivekit.common.more" = "更多";
+"tuilivekit.common.processing" = "处理中";
+"tuilivekit.common.send" = "发送";
+"tuilivekit.common.viewer" = "观众";
+
+/* Live list */
+"tuilivekit.live_list.viewers" = "%ld人看过";
+
+/* Player */
+"tuilivekit.player.follow" = "关注";
+"tuilivekit.player.unfollow" = "已关注";
+"tuilivekit.player.like_count" = "本场直播%ld点赞";
+"tuilivekit.player.operation_failed" = "操作失败";
+"tuilivekit.player.close_room" = "关闭直播间";
+"tuilivekit.player.audience_count" = "%ld 人正在观看";
+"tuilivekit.player.audience.message_disabled" = "当前房间内，您已被禁言";
+"tuilivekit.player.audience.message_enabled" = "当前房间内，您已被解除禁言";
+"tuilivekit.player.comment_placeholder" = "说点什么…";
+"tuilivekit.player.comment" = "发表评论";
+"tuilivekit.player.comment_host" = "主播";
+"tuilivekit.comment.friendly_placeholder" = "友善发言，文明互动";
+"tuilivekit.comment.cancel" = "取消评论";
+"tuilivekit.comment.character_limit" = "评论最多可输入 %d 字";
+"tuilivekit.pusher.prepare.topic_byte_limit" = "直播主题最多可输入 %d 字节";
+"tuilivekit.comment.send_failed" = "评论发送失败，请稍后重试";
+"tuilivekit.comment.muted" = "你已被禁言，暂时无法发送评论";
+"tuilivekit.comment.all_muted" = "当前直播间已开启全员禁言";
+"tuilivekit.comment.too_frequent" = "发送太快了，请稍后再试";
+"tuilivekit.comment.content_rejected" = "评论内容不符合规范，请修改后重试";
+"tuilivekit.comment.too_long" = "评论内容过长，请缩短后发送";
+"tuilivekit.comment.login_expired" = "登录已失效，请重新登录";
+"tuilivekit.comment.login_elsewhere" = "账号已在其他设备登录，请重新登录";
+"tuilivekit.comment.not_joined" = "尚未进入直播间，暂时无法发送评论";
+"tuilivekit.comment.room_unavailable" = "直播间已不可用，无法发送评论";
+"tuilivekit.comment.no_permission" = "暂时无法在当前直播间发送评论";
+"tuilivekit.comment.network_error" = "网络连接异常，请检查网络后重试";
+"tuilivekit.comment.timeout" = "评论发送超时，请稍后重试";
+"tuilivekit.comment.send_rejected" = "评论未能发送，请稍后重试";
+"tuilivekit.player.comment_send" = "发送";
+"tuilivekit.player.coguest" = "连麦";
+"tuilivekit.player.gift" = "送礼";
+"tuilivekit.player.more" = "更多";
+"tuilivekit.player.like" = "点赞";
+"tuilivekit.player.online_audience" = "在线观众";
+"tuilivekit.player.restore_controls" = "恢复";
+"tuilivekit.player.restore_controls_accessibility" = "恢复直播间控件";
+"tuilivekit.player.playback_failed" = "播放失败";
+"tuilivekit.player.enter_room_hint" = "点击进入直播间";
+"tuilivekit.player.gift.title" = "送礼物";
+"tuilivekit.player.gift.loading" = "礼物加载中…";
+"tuilivekit.player.gift.empty" = "暂无可用礼物";
+"tuilivekit.player.gift.coins" = "%ld 金币";
+"tuilivekit.player.gift.send" = "赠送";
+"tuilivekit.player.gift.combo.hint" = "长按连击";
+"tuilivekit.player.more.quality" = "清晰度";
+"tuilivekit.player.more.super_resolution" = "极致画质";
+"tuilivekit.player.more.hdr" = "HDR";
+"tuilivekit.player.more.volume_balance" = "音量均衡";
+"tuilivekit.player.more.sleep_timer" = "定时关闭";
+"tuilivekit.player.coguest.voice" = "语音连麦";
+"tuilivekit.player.coguest.video" = "视频连麦";
+"tuilivekit.player.coguest.cancel_application" = "取消申请";
+"tuilivekit.player.coguest.invitation" = "主播邀请你连麦";
+"tuilivekit.player.coguest.accept" = "接通";
+"tuilivekit.player.coguest.error.rejected" = "主播拒绝了连麦申请";
+"tuilivekit.player.coguest.error.seat_full" = "麦位已满";
+"tuilivekit.player.coguest.error.room_not_exist" = "房间不存在或已被解散";
+"tuilivekit.player.coguest.error.not_room_member" = "上麦用户非房间成员";
+"tuilivekit.player.coguest.error.seat_locked" = "麦位已锁定，可以尝试换一个麦位";
+"tuilivekit.player.coguest.error.already_requesting" = "已经处于排麦状态";
+"tuilivekit.player.coguest.error.already_on_seat" = "已经处于麦上状态";
+"tuilivekit.player.coguest.error.seat_occupied" = "已有用户在麦位上";
+"tuilivekit.player.coguest.error.not_supported" = "该房间不支持连麦";
+"tuilivekit.player.coguest.error.apply_failed" = "申请连麦失败";
+"tuilivekit.player.coguest.error.timeout" = "连麦申请超时";
+"tuilivekit.player.coguest.error.already_seated" = "当前已在麦位上";
+"tuilivekit.player.coguest.error.kicked_off" = "已被主播移下麦位";
+"tuilivekit.player.coguest.error.ended" = "主播已结束连麦";
+"tuilivekit.player.coguest.beauty.preparing" = "美颜功能准备中";
+"tuilivekit.player.coguest.settings.title" = "调整视频连麦画面";
+"tuilivekit.player.coguest.settings.subtitle" = "观众将实时看到效果";
+"tuilivekit.player.live_ended" = "直播已结束";
+"tuilivekit.player.summary.next_live_hint" = "期待下次见";
+"tuilivekit.player.summary.swipe_more" = "上滑发现更多主播";
+
+/* Pusher shared */
+"tuilivekit.pusher.default_title" = "欢迎来到我的直播间";
+"tuilivekit.pusher.beauty" = "美颜";
+"tuilivekit.pusher.beautify" = "美化";
+"tuilivekit.pusher.flip_camera" = "翻转镜头";
+"tuilivekit.pusher.quality.fhd" = "超清";
+"tuilivekit.pusher.quality.hd" = "高清";
+"tuilivekit.pusher.quality.sd" = "标清";
+"tuilivekit.pusher.quality.fhd_option" = "超清 FHD";
+"tuilivekit.pusher.quality.hd_option" = "高清 HD";
+"tuilivekit.pusher.quality.sd_option" = "标清 SD";
+"tuilivekit.pusher.mirror" = "镜像";
+"tuilivekit.pusher.video_quality" = "清晰度";
+"tuilivekit.pusher.audio_effects" = "音效设置";
+"tuilivekit.pusher.beauty.close" = "关闭";
+"tuilivekit.pusher.beauty.smooth" = "磨皮";
+"tuilivekit.pusher.beauty.whiteness" = "美白";
+"tuilivekit.pusher.beauty.ruddy" = "红润";
+
+/* Prepare and settings */
+"tuilivekit.pusher.prepare.change_cover" = "修改封面";
+"tuilivekit.pusher.prepare.cover_option" = "封面 %ld";
+"tuilivekit.pusher.prepare.edit_topic" = "✎ 修改主题";
+"tuilivekit.pusher.prepare.start_live" = "●  开始直播";
+"tuilivekit.pusher.settings.more" = "更多设置";
+"tuilivekit.pusher.settings.ear_monitor" = "耳返";
+"tuilivekit.pusher.settings.ear_monitor_volume" = "耳返音量";
+"tuilivekit.pusher.settings.capture_volume" = "人声音量";
+"tuilivekit.pusher.settings.audio" = "音频设置";
+"tuilivekit.pusher.settings.voice_changer" = "变声";
+"tuilivekit.pusher.settings.voice.original" = "原声";
+"tuilivekit.pusher.settings.voice.child" = "熊孩子";
+"tuilivekit.pusher.settings.voice.loli" = "萝莉";
+"tuilivekit.pusher.settings.voice.uncle" = "大叔";
+"tuilivekit.pusher.settings.voice.spirit" = "空灵";
+"tuilivekit.pusher.settings.reverb" = "混响";
+"tuilivekit.pusher.settings.reverb.none" = "无效果";
+"tuilivekit.pusher.settings.reverb.ktv" = "KTV";
+"tuilivekit.pusher.settings.reverb.metal" = "金属声";
+"tuilivekit.pusher.settings.reverb.deep" = "低沉";
+"tuilivekit.pusher.settings.reverb.bright" = "洪亮";
+
+/* Living */
+"tuilivekit.pusher.living.coguest" = "连麦";
+"tuilivekit.pusher.living.live_duration" = "直播时长";
+"tuilivekit.pusher.living.network_poor" = "网络较差";
+"tuilivekit.pusher.living.network_very_poor" = "网络非常差";
+"tuilivekit.pusher.living.network_disconnected" = "网络已断开";
+"tuilivekit.pusher.living.like_count" = "本场直播 %ld 点赞";
+"tuilivekit.pusher.living.new_messages" = "%ld 条新消息";
+"tuilivekit.pusher.living.pause" = "暂停直播";
+"tuilivekit.pusher.living.paused" = "画面和声音已暂停";
+"tuilivekit.pusher.living.resume" = "继续直播";
+"tuilivekit.pusher.living.mute" = "静音";
+"tuilivekit.pusher.living.unmute" = "取消静音";
+"tuilivekit.pusher.living.basic_settings" = "基础设置";
+"tuilivekit.pusher.living.interaction" = "互动功能";
+"tuilivekit.pusher.living.music" = "背景音乐";
+"tuilivekit.pusher.living.comment" = "评论";
+"tuilivekit.pusher.living.audience_entered" = "进入了直播间";
+"tuilivekit.pusher.living.audience_count_compact" = "%ld万+";
+
+/* End live */
+"tuilivekit.pusher.end.confirm" = "确定结束直播？";
+"tuilivekit.pusher.end.empty_audience" = "许多观众正在赶来，继续直播可获得更多流量。";
+"tuilivekit.pusher.end.continue" = "继续直播";
+"tuilivekit.pusher.end.end" = "结束";
+"tuilivekit.pusher.end.audience_count" = "有 %ld 人正在观看你的直播";
+
+/* Co-guest */
+"tuilivekit.pusher.coguest.connected" = "连麦观众";
+"tuilivekit.pusher.coguest.empty" = "暂无观众参与";
+"tuilivekit.pusher.coguest.applicants" = "申请连麦";
+"tuilivekit.player.coguest.apply" = "申请连麦";
+"tuilivekit.pusher.coguest.candidates" = "邀请观众";
+"tuilivekit.pusher.coguest.end" = "结束";
+"tuilivekit.pusher.coguest.accept" = "接通";
+"tuilivekit.pusher.coguest.cancel_invitation" = "取消邀请";
+"tuilivekit.pusher.coguest.invite" = "邀请";
+"tuilivekit.pusher.coguest.settings" = "连麦设置";
+"tuilivekit.pusher.coguest.end_all" = "结束连麦";
+"tuilivekit.pusher.coguest.layout" = "连麦布局";
+"tuilivekit.pusher.coguest.invite_to_seat" = "邀请连麦";
+"tuilivekit.pusher.coguest.layout.floating" = "浮动小窗";
+"tuilivekit.pusher.coguest.layout.grid2" = "动态宫格";
+"tuilivekit.pusher.coguest.layout.fixed" = "固定小窗";
+"tuilivekit.pusher.coguest.layout.grid9" = "九宫格";
+"tuilivekit.pusher.coguest.error.capacity" = "当前连麦人数超过该布局容量";
+"tuilivekit.pusher.coguest.error.layout_too_frequent" = "操作过于频繁，请稍后重试";
+"tuilivekit.pusher.coguest.error.layout_unavailable" = "当前无法切换到该布局";
+"tuilivekit.pusher.coguest.error.layout_failed" = "布局切换失败，请稍后重试";
+"tuilivekit.pusher.coguest.error.layout_not_ready" = "服务尚未就绪，请稍后重试";
+"tuilivekit.pusher.coguest.error.layout_unsupported" = "当前暂不支持切换布局";
+"tuilivekit.pusher.coguest.error.layout_room_unsupported" = "当前直播间不支持切换布局";
+"tuilivekit.pusher.coguest.error.layout_login_required" = "登录状态已失效，请重新登录";
+"tuilivekit.pusher.coguest.error.layout_network" = "网络连接异常，请检查网络后重试";
+"tuilivekit.pusher.coguest.error.layout_timeout" = "请求超时，请稍后重试";
+"tuilivekit.pusher.coguest.error.layout_room_missing" = "直播间不存在或已结束";
+"tuilivekit.pusher.coguest.error.layout_permission_denied" = "你没有权限切换直播布局";
+"tuilivekit.pusher.coguest.error.max_capacity" = "当前布局最多支持 %ld 位连麦观众";
+
+/* Summary */
+"tuilivekit.pusher.summary.gifts_received" = "收到礼物";
+"tuilivekit.pusher.summary.gift_value" = "礼物收益";
+"tuilivekit.pusher.summary.viewers" = "观众人数";
+"tuilivekit.pusher.summary.comments" = "评论数";
+"tuilivekit.pusher.summary.gift_senders" = "送礼人数";
+"tuilivekit.pusher.summary.likes" = "点赞次数";
+"tuilivekit.pusher.summary.unit.items" = "件";
+"tuilivekit.pusher.summary.unit.people" = "人";
+"tuilivekit.pusher.summary.unit.times" = "次";
+"tuilivekit.pusher.summary.unit.coins" = "币";
+"tuilivekit.pusher.summary.unit.messages" = "条";
+"tuilivekit.pusher.summary.session_data" = "本场数据";
+"tuilivekit.pusher.summary.statistics" = "直播统计";
+"tuilivekit.pusher.summary.ended" = "直播已结束";
+"tuilivekit.pusher.summary.duration" = "本场直播时长";
+"tuilivekit.pusher.summary.paused_duration" = "暂停时长";
+
+/* Live status */
+"tuilivekit.pusher.status.title" = "直播状态";
+"tuilivekit.pusher.status.realtime" = "实时数据";
+"tuilivekit.pusher.status.device" = "设备状态";
+"tuilivekit.pusher.status.cumulative" = "本场累计";
+"tuilivekit.pusher.status.metric.gift_score" = "礼物分";
+"tuilivekit.pusher.status.metric.gift_senders" = "送礼人数";
+"tuilivekit.pusher.status.metric.gifts" = "礼物数";
+"tuilivekit.pusher.status.metric.online" = "在线人数";
+"tuilivekit.pusher.status.metric.likes" = "点赞次数";
+"tuilivekit.pusher.status.metric.messages" = "评论数";
+"tuilivekit.pusher.status.unit.points" = "分";
+"tuilivekit.pusher.status.unit.people" = "人";
+"tuilivekit.pusher.status.unit.times" = "次";
+"tuilivekit.pusher.status.unit.count" = "个";
+"tuilivekit.pusher.status.unit.messages" = "条";
+"tuilivekit.pusher.status.updating" = "数据实时更新";
+"tuilivekit.pusher.status.update_detail" = "互动数据会随本场直播持续累计";
+"tuilivekit.pusher.status.video_info" = "视频信息";
+"tuilivekit.pusher.status.audio_info" = "音频信息";
+"tuilivekit.pusher.status.video_fields" = "清晰度\n码率\n帧率";
+"tuilivekit.pusher.status.audio_fields" = "采样率\n码率";
+"tuilivekit.pusher.status.rtt" = "往返延时";
+"tuilivekit.pusher.status.down_loss" = "下行丢包率";
+"tuilivekit.pusher.status.up_loss" = "上行丢包率";
+"tuilivekit.pusher.status.voice_volume" = "人声音量";
+"tuilivekit.pusher.status.video.normal.title" = "视频状态正常";
+"tuilivekit.pusher.status.video.off.title" = "视频已关闭";
+"tuilivekit.pusher.status.video.error.title" = "视频状态异常";
+"tuilivekit.pusher.status.video.normal.detail" = "开播画面流畅";
+"tuilivekit.pusher.status.video.off.detail" = "摄像头未开启或权限未授权";
+"tuilivekit.pusher.status.video.device_error.detail" = "请检查摄像头权限或占用状态";
+"tuilivekit.pusher.status.video.stream_error.detail" = "推流帧率或网络状态异常";
+"tuilivekit.pusher.status.audio.normal.title" = "音频状态正常";
+"tuilivekit.pusher.status.audio.off.title" = "音频已关闭";
+"tuilivekit.pusher.status.audio.error.title" = "音频状态异常";
+"tuilivekit.pusher.status.audio.normal.detail" = "音量适中，收音清晰";
+"tuilivekit.pusher.status.audio.off.detail" = "麦克风已关闭、静音或采集音量为 0";
+"tuilivekit.pusher.status.audio.device_error.detail" = "请检查麦克风权限或占用状态";
+"tuilivekit.pusher.status.audio.stream_error.detail" = "音频采集数据异常";
+"tuilivekit.pusher.status.temperature.normal.title" = "设备温度正常";
+"tuilivekit.pusher.status.temperature.fair.title" = "设备轻微发热";
+"tuilivekit.pusher.status.temperature.serious.title" = "设备严重发热";
+"tuilivekit.pusher.status.temperature.normal.detail" = "设备运行状态稳定";
+"tuilivekit.pusher.status.temperature.fair.detail" = "设备温度升高，请留意运行状态";
+"tuilivekit.pusher.status.temperature.serious.detail" = "建议暂停直播并让设备降温";
+"tuilivekit.pusher.status.network.wifi" = "Wi-Fi";
+"tuilivekit.pusher.status.network.cellular" = "移动网络";
+"tuilivekit.pusher.status.network.unknown" = "当前网络";
+"tuilivekit.pusher.status.network.title" = "%@ · %@";
+"tuilivekit.pusher.status.network.excellent" = "优秀";
+"tuilivekit.pusher.status.network.good" = "良好";
+"tuilivekit.pusher.status.network.poor" = "较差";
+"tuilivekit.pusher.status.network.bad" = "差";
+"tuilivekit.pusher.status.network.very_bad" = "很差";
+"tuilivekit.pusher.status.network.disconnected" = "已断开";
+"tuilivekit.pusher.status.network.checking" = "检测中";
+"tuilivekit.pusher.status.network.keep" = "建议直播期间保持当前网络";
+"tuilivekit.pusher.status.network.fluctuating" = "当前网络波动，请留意直播画面";
+"tuilivekit.pusher.status.network.switch" = "当前网络较差，建议切换网络";
+"tuilivekit.pusher.status.network.disconnected_detail" = "网络连接已断开";
+"tuilivekit.pusher.status.network.checking_detail" = "正在检测当前网络状态";
+
+/* Music */
+"tuilivekit.pusher.music.happy" = "欢快";
+"tuilivekit.pusher.music.sad" = "忧郁";
+"tuilivekit.pusher.music.wonder_world" = "神奇世界";
+
+"tuilivekit.pusher.coguest.manage_user" = "管理 · %@";
+"tuilivekit.pusher.coguest.mute_user" = "静音";
+"tuilivekit.pusher.coguest.unmute_user" = "取消静音";
+"tuilivekit.pusher.coguest.disconnect_user" = "断开连麦";
+"tuilivekit.pusher.audience.follow" = "关注";
+"tuilivekit.pusher.audience.following" = "已关注";
+"tuilivekit.pusher.audience.gift_value" = "礼物值 %d";
+"tuilivekit.pusher.audience.room_management" = "直播间管理";
+"tuilivekit.pusher.audience.mute" = "禁言";
+"tuilivekit.pusher.audience.unmute" = "解除禁言";
+"tuilivekit.pusher.audience.mute_description" = "禁止发送直播评论";
+"tuilivekit.pusher.audience.unmute_description" = "允许发送直播评论";
+"tuilivekit.pusher.audience.remove" = "拉黑";
+"tuilivekit.pusher.audience.remove_description" = "移出当前直播间";
+"tuilivekit.pusher.audience.muted_toast" = "已禁言 %@";
+"tuilivekit.pusher.audience.unmuted_toast" = "已解除禁言 %@";
+"tuilivekit.pusher.audience.removed_toast" = "已踢出 %@";
+"tuilivekit.pusher.gift.sent" = "送出 %@";
+"tuilivekit.common.gift.sent" = "送出";
+"tuilivekit.pusher.gift.fallback" = "礼";
+
+
+// Co-guest device moderation
+"tuilivekit.player.coguest.microphone_locked" = "已被主播禁麦";
+"tuilivekit.pusher.coguest.microphone_manual_open" = "观众已主动静音，需观众手动开启麦克风";
+"tuilivekit.player.coguest.camera_locked" = "摄像头已被主播禁用";
+"tuilivekit.pusher.coguest.microphone_closed" = "已关闭“%@”的麦克风";
+"tuilivekit.pusher.coguest.microphone_unlocked" = "已解除“%@”的禁麦";
+"tuilivekit.player.coguest.microphone_unlocked" = "主播已解除禁麦";
+
+"tuilivekit.pusher.error.start_failed" = "开播失败";
+"tuilivekit.pusher.error.content_rejected" = "直播信息未通过审核，请修改后重试";
+"tuilivekit.pusher.error.update_failed" = "直播信息更新失败，请稍后重试";
+"tuilivekit.pusher.error.operation_failed" = "操作失败，请稍后重试";
+
+"tuilivekit.pusher.interruption.ended" = "直播已结束";
+
+"tuilivekit.pusher.interruption.server" = "直播已被服务端关闭";
+
+"tuilivekit.pusher.interruption.admin" = "你已被管理员移出直播";
+
+"tuilivekit.pusher.interruption.other_device" = "账号已在其他设备登录";
+
+"tuilivekit.pusher.interruption.network" = "网络断开，直播已结束";
+
+"tuilivekit.pusher.interruption.expired" = "直播间已过期";
+
+"tuilivekit.pusher.interruption.account" = "账号已下线，直播已结束";
+
+"tuilivekit.player.interruption.removed" = "您已被移出当前直播间";
+"tuilivekit.player.interruption.other_device" = "您的账号已在其他设备登录";
+"tuilivekit.player.interruption.server" = "您已被服务器移出直播间";
+"tuilivekit.player.interruption.network" = "网络断开，已退出直播间";
+"tuilivekit.player.interruption.expired" = "直播间会话已过期";
+
+"tuilivekit.pusher.ending" = "正在结束直播…";
+"tuilivekit.pusher.error.mute_switch_failed" = "切换失败，请重试";
