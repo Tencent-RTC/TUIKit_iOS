@@ -46,6 +46,8 @@ final class BubbleMenuViewController: UIViewController {
 
     private let items: [Item]
 
+    private let backdropControl = UIControl()
+
     private let bubbleView = BubbleMenuBubbleView()
 
     private let stackView = UIStackView()
@@ -77,6 +79,11 @@ final class BubbleMenuViewController: UIViewController {
 
     private func constructViewHierarchy() {
         view.alpha = 0
+        view.addSubview(backdropControl)
+        backdropControl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        backdropControl.addTarget(self, action: #selector(handleBackdropTap), for: .touchDown)
         view.addSubview(bubbleView)
         stackView.axis = .vertical
         stackView.spacing = 0
@@ -118,9 +125,6 @@ final class BubbleMenuViewController: UIViewController {
     }
 
     private func bindInteraction() {
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleBackdropTap(_:)))
-        tap.delegate = self
-        view.addGestureRecognizer(tap)
     }
 
     private static func contentWidth(for items: [Item]) -> CGFloat {
@@ -187,18 +191,8 @@ final class BubbleMenuViewController: UIViewController {
         return wrapper
     }
 
-    @objc private func handleBackdropTap(_ gesture: UITapGestureRecognizer) {
+    @objc private func handleBackdropTap() {
         dismiss(animated: false)
-    }
-}
-
-extension BubbleMenuViewController: UIGestureRecognizerDelegate {
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if let touchedView = touch.view, touchedView.isDescendant(of: bubbleView) {
-            return false
-        }
-        return true
     }
 }
 

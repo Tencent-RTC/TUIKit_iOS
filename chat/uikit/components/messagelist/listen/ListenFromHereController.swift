@@ -112,6 +112,21 @@ final class ListenFromHereController {
 
     private var session = 0
 
+    private var videoStartObserver: NSObjectProtocol?
+
+    init() {
+        videoStartObserver = NotificationCenter.default.addObserver(forName: .chatVideoPlaybackDidStart, object: nil, queue: .main) { [weak self] _ in
+            self?.stop()
+        }
+    }
+
+    deinit {
+        if let videoStartObserver = videoStartObserver {
+            NotificationCenter.default.removeObserver(videoStartObserver)
+        }
+        teardownAudioPlayer()
+    }
+
     func start(plan: [ListenItem]) {
         stop()
         guard !plan.isEmpty else { return }
@@ -136,10 +151,6 @@ final class ListenFromHereController {
         if wasActive {
             state = ListenPlaybackState()
         }
-    }
-
-    deinit {
-        teardownAudioPlayer()
     }
 
     private func playCurrent(showLoading: Bool, currentSession: Int) {

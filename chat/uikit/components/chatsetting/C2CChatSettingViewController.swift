@@ -438,10 +438,10 @@ public final class C2CChatSettingViewController: ChatSettingBaseViewController {
             message: nil,
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: LocalizedChatString("AlertConfirm"), style: .default) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Confirm"), style: .destructive) { [weak self] _ in
             self?.clearHistory()
         })
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
         present(alert, animated: true)
     }
 
