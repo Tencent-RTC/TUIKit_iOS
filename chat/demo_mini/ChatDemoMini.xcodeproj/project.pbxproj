@@ -7,45 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		05C85175EAAAA7BA9A4742CF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 802F2D0309EE7E7B14737C9E /* Localizable.strings */; };
-		21458C99249468EB77233A90 /* Pods_ChatDemoMini.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85BCB0F904D1255F7D147EBD /* Pods_ChatDemoMini.framework */; };
 		6298ABB418F6BD781160144B /* CustomLinkMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FF265C1BDC6A40DB05DDFD /* CustomLinkMessage.swift */; };
 		7CEA31F81737309754EDFF18 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49EB06282CBEB1E3767A042B /* AppDelegate.swift */; };
+		D3F31CD37EB868B7B46F231D /* Pods_ChatDemoMini.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4BEDE2E7130CDDE73154F01 /* Pods_ChatDemoMini.framework */; };
 		E51E3228C7A247ACB88C60A3 /* GenerateTestUserSig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48B8C0C6E8A68F93FAD048F /* GenerateTestUserSig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		27858E2100273919A2457E8B /* ChatDemoMini.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemoMini.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		478ED39BDC81C3D4D7B8DB0F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		3012505B29450FCF96254E2F /* Pods-ChatDemoMini.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoMini.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini.debug.xcconfig"; sourceTree = "<group>"; };
 		49EB06282CBEB1E3767A042B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		6F9A350D6DC3A659A3191F08 /* Pods-ChatDemoMini.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoMini.release.xcconfig"; path = "Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini.release.xcconfig"; sourceTree = "<group>"; };
 		74FF265C1BDC6A40DB05DDFD /* CustomLinkMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLinkMessage.swift; sourceTree = "<group>"; };
-		85BCB0F904D1255F7D147EBD /* Pods_ChatDemoMini.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChatDemoMini.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0ED0F2D1CDECB7C623B9157 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		BCB010A6E4595F3D731EEA61 /* Pods-ChatDemoMini.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoMini.release.xcconfig"; path = "Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini.release.xcconfig"; sourceTree = "<group>"; };
 		D48B8C0C6E8A68F93FAD048F /* GenerateTestUserSig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateTestUserSig.swift; sourceTree = "<group>"; };
-		F9FE3B17A34CBA40666D0DB5 /* Pods-ChatDemoMini.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemoMini.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini.debug.xcconfig"; sourceTree = "<group>"; };
+		D4BEDE2E7130CDDE73154F01 /* Pods_ChatDemoMini.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChatDemoMini.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		C1CE85CD49CB3C502D4D893E /* Frameworks */ = {
+		1377FFC00F3F4CDF7CA5EC13 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21458C99249468EB77233A90 /* Pods_ChatDemoMini.framework in Frameworks */,
+				D3F31CD37EB868B7B46F231D /* Pods_ChatDemoMini.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		27E15D67EDFFFB8BC3714E19 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				85BCB0F904D1255F7D147EBD /* Pods_ChatDemoMini.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		8D75BE6BDC3A3F86AFBA892C /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -54,11 +43,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		92A2B1471D06E448C14CCE9A /* Pods */ = {
+		940DC67E8C301F94C7F112E2 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				F9FE3B17A34CBA40666D0DB5 /* Pods-ChatDemoMini.debug.xcconfig */,
-				6F9A350D6DC3A659A3191F08 /* Pods-ChatDemoMini.release.xcconfig */,
+				3012505B29450FCF96254E2F /* Pods-ChatDemoMini.debug.xcconfig */,
+				BCB010A6E4595F3D731EEA61 /* Pods-ChatDemoMini.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -69,7 +58,6 @@
 				49EB06282CBEB1E3767A042B /* AppDelegate.swift */,
 				74FF265C1BDC6A40DB05DDFD /* CustomLinkMessage.swift */,
 				D48B8C0C6E8A68F93FAD048F /* GenerateTestUserSig.swift */,
-				802F2D0309EE7E7B14737C9E /* Localizable.strings */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -79,9 +67,17 @@
 			children = (
 				9C634BD6287AED9AA73B6760 /* Sources */,
 				8D75BE6BDC3A3F86AFBA892C /* Products */,
-				92A2B1471D06E448C14CCE9A /* Pods */,
-				27E15D67EDFFFB8BC3714E19 /* Frameworks */,
+				940DC67E8C301F94C7F112E2 /* Pods */,
+				F87E8436F02EFD7F8634A386 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		F87E8436F02EFD7F8634A386 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D4BEDE2E7130CDDE73154F01 /* Pods_ChatDemoMini.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,12 +87,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 086E57D7206EA81DCC266298 /* Build configuration list for PBXNativeTarget "ChatDemoMini" */;
 			buildPhases = (
-				E0BF837A3AD880D0555CDE87 /* [CP] Check Pods Manifest.lock */,
+				C51E260DA25F4D3A423E614B /* [CP] Check Pods Manifest.lock */,
 				7CFA18B8652602CA4641FD43 /* Sources */,
-				718ACF54C2AE8617D66A3D7E /* Resources */,
-				C1CE85CD49CB3C502D4D893E /* Frameworks */,
-				CF0B8047C4B6C98A3DEA72CD /* [CP] Embed Pods Frameworks */,
-				2593D7CDD7A8422333418253 /* [CP] Copy Pods Resources */,
+				1377FFC00F3F4CDF7CA5EC13 /* Frameworks */,
+				A7FE44E6B40C3C25C4D5B752 /* [CP] Embed Pods Frameworks */,
+				10FF5EFF2408C4D43E61B81F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -122,7 +117,6 @@
 			knownRegions = (
 				Base,
 				en,
-				"zh-Hans",
 			);
 			mainGroup = B1AC43551FC638A24134F16D;
 			minimizedProjectReferenceProxies = 1;
@@ -136,19 +130,8 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		718ACF54C2AE8617D66A3D7E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				05C85175EAAAA7BA9A4742CF /* Localizable.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXShellScriptBuildPhase section */
-		2593D7CDD7A8422333418253 /* [CP] Copy Pods Resources */ = {
+		10FF5EFF2408C4D43E61B81F /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -165,7 +148,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CF0B8047C4B6C98A3DEA72CD /* [CP] Embed Pods Frameworks */ = {
+		A7FE44E6B40C3C25C4D5B752 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -182,7 +165,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ChatDemoMini/Pods-ChatDemoMini-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E0BF837A3AD880D0555CDE87 /* [CP] Check Pods Manifest.lock */ = {
+		C51E260DA25F4D3A423E614B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -219,22 +202,10 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		802F2D0309EE7E7B14737C9E /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C0ED0F2D1CDECB7C623B9157 /* en */,
-				478ED39BDC81C3D4D7B8DB0F /* zh-Hans */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		06CEC58C7A2F8A3B6793FBE0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6F9A350D6DC3A659A3191F08 /* Pods-ChatDemoMini.release.xcconfig */;
+			baseConfigurationReference = BCB010A6E4595F3D731EEA61 /* Pods-ChatDemoMini.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -242,7 +213,6 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDevelopmentRegion = en;
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要访问相机以拍照";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "需要访问麦克风以录制语音";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相册以保存照片和视频";
@@ -320,7 +290,7 @@
 		};
 		54C05D95F4B45C2B7CE1E2E2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F9FE3B17A34CBA40666D0DB5 /* Pods-ChatDemoMini.debug.xcconfig */;
+			baseConfigurationReference = 3012505B29450FCF96254E2F /* Pods-ChatDemoMini.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -328,7 +298,6 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDevelopmentRegion = en;
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要访问相机以拍照";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "需要访问麦克风以录制语音";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相册以保存照片和视频";

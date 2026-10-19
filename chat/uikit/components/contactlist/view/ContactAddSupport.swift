@@ -24,6 +24,7 @@ final class ContactSearchResultCell: UIControl {
     init(handler: @escaping () -> Void) {
         self.handler = handler
         super.init(frame: .zero)
+        accessibilityIdentifier = "contact_search_result_cell"
         constructViewHierarchy()
         activateConstraints()
         setupViewStyle()
@@ -54,6 +55,8 @@ final class ContactSearchResultCell: UIControl {
     private func constructViewHierarchy() {
         textColumn.axis = .vertical
         textColumn.spacing = 0
+        textColumn.isUserInteractionEnabled = false
+        avatar.isUserInteractionEnabled = false
         textColumn.addArrangedSubview(nameLabel)
         textColumn.addArrangedSubview(identityLabel)
         addSubview(avatar)
