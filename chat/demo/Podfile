@@ -3,6 +3,7 @@ platform :ios, '15.0'
 target 'ChatDemo' do
   use_frameworks! :linkage => :static
   
+  pod 'AtomicXCore', '>= 4.3.10', '< 5.0'
   pod 'TUIChatKit', :path => '../uikit/TUIChatKit.podspec'
   pod 'TUICallKit_Swift', :path => '../../call/TUICallKit_Swift.podspec'
   pod 'TencentCloudAIDeskCustomer'
