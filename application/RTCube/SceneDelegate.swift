@@ -7,6 +7,7 @@ import AtomicX
 import Login
 import SnapKit
 import UIKit
+import AppAssembly
 #if RTCUBE_OVERSEAS
 import TCMPPSDK
 #endif
@@ -181,6 +182,10 @@ extension SceneDelegate {
         }
 
         LoginEntry.shared.onPassiveLogout = { [weak self] in
+            self?.showLogin()
+        }
+
+        AppAssembly.shared.showLoginHandler = { [weak self] in
             self?.showLogin()
         }
 

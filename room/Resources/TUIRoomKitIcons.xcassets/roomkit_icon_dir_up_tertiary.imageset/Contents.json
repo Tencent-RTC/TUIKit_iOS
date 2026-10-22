@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "roomkit_icon_dir_up_tertiary.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}
