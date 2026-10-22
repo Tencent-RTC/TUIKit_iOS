@@ -88,10 +88,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask
     {
-        if let topVC = window?.rootViewController?.topMostViewController(),
-           let roomVC = topVC as? RoomMainViewController {
-            return roomVC.isLandscapeMode ? .landscape : .portrait
-        }
         return AppDelegate.allowedOrientations
     }
 

@@ -1,5 +1,9 @@
 PODS:
   - Alamofire (5.0.0)
+  - AlbumPicker (1.0.8):
+    - AlbumPickerCore (= 1.0.8)
+  - AlbumPickerCore (1.0.8):
+    - TXIMSDK_Plus_iOS_XCFramework
   - AppAssembly (1.0.0):
     - Alamofire
     - AppAssembly/OpenSource (= 1.0.0)
@@ -36,32 +40,30 @@ PODS:
     - TUICore
     - TXIMSDK_Plus_iOS_XCFramework (>= 8.8.7357)
     - TXLiteAVSDK_Professional
-  - AtomicXCore (4.3.0):
-    - RTCRoomEngine/Professional (>= 4.3.0)
+  - AtomicXCore (4.3.11):
+    - AtomicXCore/Core (= 4.3.11)
+    - RTCRoomEngine/Professional (>= 4.3.11)
+    - TXIMSDK_Plus_iOS_XCFramework (>= 9.0.7661)
+    - TXLiteAVSDK_Professional (>= 13.4.21067)
+  - AtomicXCore/Core (4.3.11):
+    - RTCRoomEngine/Professional (>= 4.3.11)
     - TXIMSDK_Plus_iOS_XCFramework (>= 9.0.7661)
     - TXLiteAVSDK_Professional (>= 13.4.21067)
   - JXPagingView/Paging (2.1.2)
   - JXSegmentedView (1.3.0)
   - Kingfisher (6.3.1)
   - Login (1.0.0):
-    - Alamofire
-    - AtomicX
-    - Kingfisher
     - Login/OpenSource (= 1.0.0)
-    - SnapKit
-    - Toast-Swift
-    - TUICore
   - Login/OpenSource (1.0.0):
-    - Alamofire
     - AtomicX
     - Kingfisher
     - SnapKit
     - Toast-Swift
     - TUICore
+  - Masonry (1.1.0)
   - MJRefresh (3.7.5)
-  - Protobuf (3.22.5)
   - RTCCommon (1.3.6)
-  - RTCRoomEngine/Professional (4.3.0):
+  - RTCRoomEngine/Professional (4.3.11):
     - TXIMSDK_Plus_iOS_XCFramework (>= 8.4.6676)
     - TXLiteAVSDK_Professional (>= 12.8.0.19666)
   - SDWebImage (5.21.7):
@@ -84,6 +86,12 @@ PODS:
     - SnapKit
     - TUICore
     - TXLiteAVSDK_Professional
+  - TUIChatKit (9.1.7821):
+    - AlbumPicker (~> 1.0.0)
+    - AtomicXCore (< 5.0, >= 4.3.10)
+    - Kingfisher
+    - Masonry
+    - SnapKit
   - TUICore (9.0.7660):
     - SDWebImage
     - TUICore/ImSDK_Plus (= 9.0.7660)
@@ -97,7 +105,6 @@ PODS:
     - AtomicX
     - Kingfisher
     - MJRefresh
-    - Protobuf (~> 3.22.1)
     - SnapKit
     - TUICore
     - TUILiveKit/Professional (= 1.0.0)
@@ -107,18 +114,14 @@ PODS:
     - AtomicXCore
     - Kingfisher
     - MJRefresh
-    - Protobuf (~> 3.22.1)
     - RTCRoomEngine/Professional
     - SnapKit
     - TUICore
     - TXIMSDK_Plus_iOS_XCFramework (>= 8.7.7021)
-  - TUIRoomKit (4.0.0):
-    - AtomicX
+  - TUIRoomKit (0.1.0):
     - AtomicXCore
-    - Kingfisher
     - SnapKit
-    - TXLiteAVSDK_Professional
-  - TXIMSDK_Plus_iOS_XCFramework (9.0.7662)
+  - TXIMSDK_Plus_iOS_XCFramework (9.1.7822)
   - TXLiteAVSDK_Professional (13.4.21067):
     - TXLiteAVSDK_Professional/Professional (= 13.4.21067)
   - TXLiteAVSDK_Professional/Professional (13.4.21067)
@@ -128,13 +131,14 @@ DEPENDENCIES:
   - Alamofire (= 5.0.0)
   - AppAssembly (from `assembly/AppAssembly.podspec`)
   - AtomicX (from `../atomic_x/AtomicX.podspec`)
-  - AtomicXCore (= 4.3.0)
+  - AtomicXCore (>= 4.3.10)
   - Kingfisher (= 6.3.1)
   - Login (from `login/Login.podspec`)
   - MJRefresh (= 3.7.5)
   - SnapKit (= 5.0.1)
   - Toast-Swift
   - TUICallKit_Swift/Professional (from `../call/`)
+  - TUIChatKit (from `../chat/uikit/TUIChatKit.podspec`)
   - TUICore
   - TUILiveKit (from `../live/TUILiveKit.podspec`)
   - TUIRoomKit (from `../room/TUIRoomKit.podspec`)
@@ -144,12 +148,14 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Alamofire
+    - AlbumPicker
+    - AlbumPickerCore
     - AtomicXCore
     - JXPagingView
     - JXSegmentedView
     - Kingfisher
+    - Masonry
     - MJRefresh
-    - Protobuf
     - RTCCommon
     - RTCRoomEngine
     - SDWebImage
@@ -168,6 +174,8 @@ EXTERNAL SOURCES:
     :path: login/Login.podspec
   TUICallKit_Swift:
     :path: "../call/"
+  TUIChatKit:
+    :path: "../chat/uikit/TUIChatKit.podspec"
   TUILiveKit:
     :path: "../live/TUILiveKit.podspec"
   TUIRoomKit:
@@ -175,27 +183,30 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 58ff2bfb8daaacaa233d5c36e37b10a5248f59b1
-  AppAssembly: 946f31ca2e4eda9a06952701c8496d716ad146d9
-  AtomicX: f85743c2e53fe41ebbe807a9a660b1020dbe9477
-  AtomicXCore: f75de6352191d53e7bfa3e9f7c10bd7c4f5dbe6f
+  AlbumPicker: 812fc5e6aeba0c0877bbc125e030ca1efbfdf109
+  AlbumPickerCore: 6b2819051b1b30e0764c271924f22181226cec14
+  AppAssembly: a59184f71a00d3d0547c75410dd2ef1d0a9802fb
+  AtomicX: 20c47ae62de97979f8cf83b1b3b791f7cc42b7f6
+  AtomicXCore: 8ae1ee848b92cff7d06ced339342e0aa6bd32fea
   JXPagingView: 90924b364a2ff7e94db534fad1fa50925ff69ee4
   JXSegmentedView: fec0d335355b6e019c494fe2e030bde8a36d2df6
   Kingfisher: 016c8b653a35add51dd34a3aba36b580041acc74
-  Login: 583ac2a496788621b82fc3f739b27dd36de56f40
+  Login: e69666b7b0514bda8e080ddd68cf231dd31a8dc5
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   MJRefresh: fdf5e979eb406a0341468932d1dfc8b7f9fce961
-  Protobuf: bcec8c9430002f8d11c8a08f964b3ebcdd060536
   RTCCommon: 728b0a48a0f41ebcfc4c5989883abee7f737d54a
-  RTCRoomEngine: 45bc989fd7fd77cbf845e5faf724ac89a99c1300
+  RTCRoomEngine: 27728def998534f35d48dfa59bac60e74219ea3c
   SDWebImage: e9fc87c1aab89a8ab1bbd74eba378c6f53be8abf
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   Toast-Swift: 7a03a532afe3a560d4044bc7c237e2864d295173
-  TUICallKit_Swift: 0188f845d3cdeddc4e3f4fc9d27496e986b1c91e
+  TUICallKit_Swift: 0d68ab2468df4d5ee5c338575b5920e6673fd04f
+  TUIChatKit: 3d3dd14f2ea115c02ca20d2049ce3b180670495f
   TUICore: f23efd42114613206437cfd1cd6934c30d232d3f
-  TUILiveKit: 6672b5707a8aad7953768e72b5f1832920d29348
-  TUIRoomKit: 3482389b6b1057d3f419f55c20f37bf781b81900
-  TXIMSDK_Plus_iOS_XCFramework: 8945dc509d1271c4a5b3361695f996118aafdeae
+  TUILiveKit: 5b127dae396c67ac323b0623a003f3a2a131b69d
+  TUIRoomKit: 7b16236dfc38e4451b3e1bcf6da57526bdd01e4f
+  TXIMSDK_Plus_iOS_XCFramework: 44a00328c7d713206b2bab7219e6e4f82df254dc
   TXLiteAVSDK_Professional: 73d77e84c5a8b6c73bc06445662e3871f247e7a5
 
-PODFILE CHECKSUM: 8269e9d768dceaba92c5c63e8a79199c3b1d98b9
+PODFILE CHECKSUM: 1963b82d3f3ea3e588a9c65b1a2c4bab6254ad2c
 
 COCOAPODS: 1.16.2

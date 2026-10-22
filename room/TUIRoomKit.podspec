@@ -1,36 +1,28 @@
 Pod::Spec.new do |spec|
-  spec.name                  = 'TUIRoomKit'
-  spec.version               = '4.0.0'
-  spec.platform              = :ios
-  spec.ios.deployment_target = '14.0'
-  spec.license               = { :type => 'MIT', :file => 'LICENSE' }
-  spec.homepage              = 'https://cloud.tencent.com/product/trtc'
-  spec.documentation_url     = 'https://cloud.tencent.com/document/product/647'
-  spec.authors               = 'Tencent Cloud'
-  spec.summary               = 'TUIRoomKit V2 for iOS - Room management UI components based on TRTC and IM SDK'
-  spec.description           = <<-DESC
-                               TUIRoomKit V2 is a comprehensive room management UI component library built on top of
-                               Tencent Cloud Real-Time Communication (TRTC) and Instant Messaging (IM) SDK.
-                               It provides complete room creation, joining, and management features with AtomicXCore
-                               state-driven architecture.
-                               DESC
-  
-  spec.static_framework = true
-  spec.xcconfig      = { 'VALID_ARCHS' => 'armv7 arm64 x86_64' }
-  spec.swift_version = '5.0'
-
-  spec.source                = { :path => './' }
-  
-  # Core dependencies
-  spec.dependency 'SnapKit'
-  spec.dependency 'Kingfisher'
-  spec.dependency 'AtomicX'
-  spec.dependency 'AtomicXCore'
-  spec.dependency 'TUIChatKit'
-  spec.dependency 'TXLiteAVSDK_Professional'
-  spec.source_files = 'Source/**/*.{swift,h,m}'
-  spec.resource_bundles = {
-    'TUIRoomKitBundle' => ['Resources/*.xcassets', 'Resources/Localized/**/*.xcstrings', 'Resources/AudioFile/*.mp3']
+  spec.name = 'TUIRoomKit'
+  spec.version = '0.1.0'
+  spec.summary = 'UIKit meeting room components powered by AtomicXCore.'
+  spec.homepage = 'https://github.com/Tencent-RTC'
+  spec.license = { :type => 'MIT' }
+  spec.author = 'Tencent RTC'
+  spec.source = {
+    :git => 'git@git.woa.com:crdc/tuikit/atomic_uikit.git',
+    :tag => spec.version.to_s
   }
-  
+
+  spec.platform = :ios, '14.0'
+  spec.swift_version = '5.0'
+  spec.static_framework = true
+  # 屏幕分享要用 RPSystemBroadcastPickerView 拉起系统广播面板。
+  spec.frameworks = 'ReplayKit'
+
+  spec.source_files = 'Sources/**/*.swift'
+  spec.dependency 'AtomicXCore'
+  spec.dependency 'SnapKit', '~> 5.7'
+  spec.resource_bundles = {
+    'TUIRoomKitBundle' => ['Resources/TUIRoomKitIcons.xcassets', 'Resources/**/*.lproj']
+  }
+
+  spec.dependency 'SnapKit'
+  spec.dependency 'AtomicXCore'
 end

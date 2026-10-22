@@ -3,6 +3,7 @@
 //  main
 //
 
+import Login
 import TUILiveKit
 import TUIRoomKit
 import UIKit
@@ -31,7 +32,16 @@ final class RoomModule: ModuleProvider {
                     AppAssembly.shared.showCannotStartRoomToast()
                     return nil
                 }
-                return RoomHomeViewController()
+                let vc = RoomHomeViewController()
+                vc.onLoggedOut = { [weak vc] in
+                    LoginEntry.shared.logout { _ in
+                        DispatchQueue.main.async {
+                            AppAssembly.shared.showLoginHandler?()
+                            vc?.navigationController?.popToRootViewController(animated: false)
+                        }
+                    }
+                }
+                return vc
             },
             analyticsEvent: "conference",
             keyMetricsEvent: Constants.DataReport.kDataReportDemoClickRoom

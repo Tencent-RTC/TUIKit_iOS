@@ -61,6 +61,10 @@ public final class AppAssembly {
 
     public var analyticEventHandler: ((AnalyticEvent) -> Void)?
 
+    /// Called when a module requests to return to the login page (e.g. after logout).
+    /// The app target should set this to present its login UI.
+    public var showLoginHandler: (() -> Void)?
+
     // MARK: - Public API
 
     public func allModuleProviders(target: AppTarget) -> [ModuleProvider] {

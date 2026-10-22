@@ -12,7 +12,7 @@ def shared_pods
   pod 'Alamofire', '5.0.0'
   pod 'SnapKit', '5.0.1'
   pod 'Kingfisher', '6.3.1'
-  pod 'AtomicXCore', '4.3.0'
+  pod 'AtomicXCore', '>= 4.3.10'
   pod 'Toast-Swift'
 
   # ── Shell project local pods ──
