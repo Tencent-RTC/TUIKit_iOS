@@ -163,14 +163,14 @@ final class VideoRecorderPreviewView: UIView {
             }
         }
 
-        btnSend.backgroundColor = VideoRecorderConfigInternal.sharedInstance().getThemeColor()
+        btnSend.backgroundColor = VideoRecorderConfigInternal.themeColor
         btnSend.setTitleColor(.white, for: .normal)
         btnSend.layer.cornerRadius = Self.sendCornerRadius
-        btnSend.setTitle(VideoRecorderCommon.localizedStringForKey("send"), for: .normal)
+        btnSend.setTitle(LocalizedChatString("send"), for: .normal)
         btnSend.addTarget(self, action: #selector(onBtnSendClicked), for: .touchUpInside)
 
         addSubview(btnCancel)
-        btnCancel.setImage(VideoRecorderCommon.bundleImageByName("return_arrow")?.imageFlippedForRightToLeftLayoutDirection(), for: .normal)
+        btnCancel.setImage(AtomicXChatResources.image(named: "return_arrow")?.imageFlippedForRightToLeftLayoutDirection(), for: .normal)
         btnCancel.addTarget(self, action: #selector(onBtnCancelClicked), for: .touchUpInside)
         btnCancel.snp.makeConstraints { make in
             make.size.equalTo(Self.cancelButtonSize)

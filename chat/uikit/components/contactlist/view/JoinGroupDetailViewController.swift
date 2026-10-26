@@ -3,7 +3,7 @@ import AtomicXCore
 import SnapKit
 import UIKit
 
-final class JoinGroupDetailViewController: ChatSettingBaseViewController {
+final class JoinGroupDetailViewController: CustomNavigationBarViewController {
     private static let cardHorizontalPadding: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
 
     private static let cardVerticalPadding: CGFloat = CGFloat(SpacingScheme.iconIconSpacing)

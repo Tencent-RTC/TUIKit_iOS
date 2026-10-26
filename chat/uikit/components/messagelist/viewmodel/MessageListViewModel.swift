@@ -15,11 +15,22 @@ final class MessageListViewModel {
 
     private static let timeGroupingInterval: TimeInterval = 300
 
+    private static let maxSyncRepairAttempts = 3
+
+    private static let syncRepairSettleSeconds: TimeInterval = 0.6
+
+    private static let syncRepairWindowSeconds: TimeInterval = 30
+
+    private static let syncRepairHoldTimeoutSeconds: TimeInterval = 5
+
     let conversationID: String
 
     let config: MessageListConfigProtocol & MessageActionConfigProtocol
 
     let locateMessage: MessageInfo?
+
+    /// 机器人会话控制器（仅 @RBT# 会话非空），驱动「正在输入」占位气泡与回复状态跟踪。
+    let chatbotController: ChatbotConversationController?
 
     @Published private(set) var messageList: [MessageInfo] = []
 
@@ -36,7 +47,16 @@ final class MessageListViewModel {
     @Published private(set) var hiddenAuxiliaryTextIDs: Set<String> = []
 
     var messageEventPublisher: AnyPublisher<MessageEvent, Never> {
-        store.messageEventPublisher.eraseToAnyPublisher()
+        store.messageEventPublisher
+            .filter { [weak self] event in
+                // 遮挡期间列表里看不到这条消息，放行会让滚动定位指向不存在的目标
+                guard let self = self else { return true }
+                if case .onReceiveNewMessage = event {
+                    return !self.holdingDirtyMessageList
+                }
+                return true
+            }
+            .eraseToAnyPublisher()
     }
 
     var messageListStore: MessageListStore { store }
@@ -62,18 +82,58 @@ final class MessageListViewModel {
 
     private var lastVisiblePlaceholderSignatures: [String] = []
 
+    private var chatbotPlaceholderDeferred = false
+
+    private var streamingGrowthObserver: NSObjectProtocol?
+
+    // MARK: - 登录同步污染修复
+
+    /// 正在遮挡被登录同步污染的列表，此间到达的消息不会出现在 messageList 里。
+    private var holdingDirtyMessageList = false
+
+    private let syncRepairPolicy = MessageListSyncRepairPolicy()
+
+    private let createdAtUptime = ProcessInfo.processInfo.systemUptime
+
+    private var syncRepairHoldReleased = false
+
+    private var lastCleanMessages: [MessageInfo] = []
+
+    private var syncRepairAttempts = 0
+
+    private var syncRepairWorkItem: DispatchWorkItem?
+
+    private var syncRepairHoldTimeoutWorkItem: DispatchWorkItem?
+
     // MARK: - Init
 
     init(conversationID: String,
          config: MessageListConfigProtocol & MessageActionConfigProtocol = ChatMessageListConfig(),
          locateMessage: MessageInfo? = nil,
+         chatbotController: ChatbotConversationController? = nil,
          conversationStore: ConversationListStore = ConversationListStore.create()) {
         self.conversationID = conversationID
         self.config = config
         self.locateMessage = locateMessage
+        self.chatbotController = chatbotController
         self.conversationStore = conversationStore
         self.store = MessageListStore.create(conversationID: conversationID)
         subscribeState()
+        streamingGrowthObserver = NotificationCenter.default.addObserver(
+            forName: .messageListStreamingContentDidGrow,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, self.chatbotPlaceholderDeferred else { return }
+            guard !self.isLastInboundMessageRevealing(self.storeMessages) else { return }
+            self.mergeMessageList()
+        }
+    }
+
+    deinit {
+        if let streamingGrowthObserver {
+            NotificationCenter.default.removeObserver(streamingGrowthObserver)
+        }
     }
 
     // MARK: - Load (分页拉取，对齐声明式 fetchMessages / loadMoreOlder / loadMoreNewer)
@@ -376,9 +436,9 @@ final class MessageListViewModel {
 
     // MARK: - Time Grouping (对齐声明式 getMessageTimeString：300s 聚合窗口)
 
-    func messageTimeString(at index: Int) -> String? {
-        guard index >= 0, index < messageList.count else { return nil }
-        let message = messageList[index]
+    func messageTimeString(at index: Int, in displayedMessages: [MessageInfo]) -> String? {
+        guard index >= 0, index < displayedMessages.count else { return nil }
+        let message = displayedMessages[index]
         guard let messageDate = Self.date(from: message.timestamp) else { return nil }
         switch MessageCellRegistry.shared.renderKind(for: message) {
         case .systemTip, .revoked:
@@ -389,7 +449,7 @@ final class MessageListViewModel {
         if index == 0 {
             return DateHelper.convertDateToMessageTimeStr(messageDate)
         }
-        let previous = messageList[index - 1]
+        let previous = displayedMessages[index - 1]
         guard let previousDate = Self.date(from: previous.timestamp) else { return nil }
         if messageDate.timeIntervalSince(previousDate) > Self.timeGroupingInterval {
             return DateHelper.convertDateToMessageTimeStr(messageDate)
@@ -404,12 +464,22 @@ final class MessageListViewModel {
             .subscribe(StatePublisherSelector(keyPath: \MessageListState.messageList))
             .receive(on: DispatchQueue.main)
             .sink { [weak self] list in
-                self?.storeMessages = list
+                guard let self = self else { return }
+                self.scheduleSyncRepairIfNeeded(list)
+                self.chatbotController?.onMessagesChanged(list)
+                self.storeMessages = list
+                self.mergeMessageList()
+            }
+            .store(in: &cancellables)
+
+        chatbotController?.$state
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
                 self?.mergeMessageList()
             }
             .store(in: &cancellables)
 
-        AlbumPickerPlaceholderStore.shared.placeholdersByConversation
+        MessageListPlaceholderStore.shared.placeholdersByConversation
             .receive(on: DispatchQueue.main)
             .sink { [weak self] placeholdersByConversation in
                 guard let self = self else { return }
@@ -434,27 +504,108 @@ final class MessageListViewModel {
     }
 
     private func mergeMessageList() {
-        let visiblePlaceholders = self.visiblePlaceholders()
-        lastVisiblePlaceholderSignatures = visiblePlaceholders.map { placeholderSignature($0) }
-        guard !visiblePlaceholders.isEmpty else {
-            messageList = storeMessages
-            return
+        // 被登录同步污染期间不把脏数据放出去，继续吐上一份干净快照，
+        // 避免界面先闪一批加载中的气泡再被重拉刷新
+        let corrupted = !syncRepairHoldReleased && syncRepairPolicy.isCorrupted(storeMessages)
+        holdingDirtyMessageList = corrupted
+        let baseMessages: [MessageInfo]
+        if corrupted {
+            baseMessages = lastCleanMessages
+        } else {
+            lastCleanMessages = storeMessages
+            baseMessages = storeMessages
         }
-        messageList = storeMessages + visiblePlaceholders
+
+        let visiblePlaceholders = self.visiblePlaceholders(from: baseMessages)
+        lastVisiblePlaceholderSignatures = visiblePlaceholders.map { placeholderSignature($0) }
+
+        var merged = baseMessages
+        if !visiblePlaceholders.isEmpty {
+            merged += visiblePlaceholders
+        }
+
+        // 等待机器人回复期间，在列表最新端补一条「AI 正在输入」气泡。
+        // 这条消息只存在于展示列表：不进本地库、不参与登录同步。
+        let chatbotPlaceholderTimestamp = config.enableChatbotReplyPlaceholder
+            ? chatbotController?.placeholderTimestampSeconds(baseMessages) : nil
+        chatbotPlaceholderDeferred = chatbotPlaceholderTimestamp != nil && isLastInboundMessageRevealing(baseMessages)
+        if let controller = chatbotController,
+           let timestampSeconds = chatbotPlaceholderTimestamp,
+           !chatbotPlaceholderDeferred {
+            merged.append(ChatbotPlaceholderMessageFactory.create(
+                conversationID: controller.conversationID,
+                timestampSeconds: timestampSeconds,
+                sender: ChatbotPlaceholderMessageFactory.resolveSender(baseMessages)
+            ))
+        }
+
+        messageList = merged
     }
 
-    private func visiblePlaceholders() -> [MessageInfo] {
+    private func isLastInboundMessageRevealing(_ messages: [MessageInfo]) -> Bool {
+        guard let message = messages.last(where: { !$0.isSentBySelf && !$0.msgID.isEmpty }) else { return false }
+        return StreamingMarkdownView.isRevealing(msgID: message.msgID)
+    }
+
+    private func visiblePlaceholders(from baseMessages: [MessageInfo]? = nil) -> [MessageInfo] {
         guard !processingMessages.isEmpty else { return [] }
-        let sentMediaPaths = Set(storeMessages.compactMap { AlbumPickerPlaceholderStore.localMediaPath(of: $0) })
+        let sentMediaPaths = Set((baseMessages ?? storeMessages).compactMap { MessageListPlaceholderStore.localMediaPath(of: $0) })
         guard !sentMediaPaths.isEmpty else { return processingMessages }
         return processingMessages.filter { placeholder in
-            guard let mediaPath = AlbumPickerPlaceholderStore.localMediaPath(of: placeholder) else { return true }
+            guard let mediaPath = MessageListPlaceholderStore.localMediaPath(of: placeholder) else { return true }
             return !sentMediaPaths.contains(mediaPath)
         }
     }
 
+    // MARK: - 登录同步污染修复（对齐 Android MessageListViewModel.scheduleSyncRepairIfNeeded）
+
+    /// 登录同步会把历史消息经由新消息通道重放，污染列表顺序并让流式消息卡在加载态。
+    /// 命中污染特征后等列表不再变化，再用历史接口重拉首屏覆盖掉。
+    ///
+    /// 每次列表变动都会重置延时，所以重拉一定发生在重放结束之后，不依赖同步完成回调的时机。
+    private func scheduleSyncRepairIfNeeded(_ messages: [MessageInfo]) {
+        if syncRepairHoldReleased { return }
+        guard syncRepairPolicy.isCorrupted(messages) else { return }
+
+        let exhausted = syncRepairAttempts >= Self.maxSyncRepairAttempts ||
+            ProcessInfo.processInfo.systemUptime - createdAtUptime > Self.syncRepairWindowSeconds
+        if exhausted {
+            releaseSyncRepairHold()
+            return
+        }
+
+        startSyncRepairHoldTimeout()
+        syncRepairWorkItem?.cancel()
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.syncRepairAttempts += 1
+            self.reloadLatestMessages()
+        }
+        syncRepairWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.syncRepairSettleSeconds, execute: workItem)
+    }
+
+    /// 兜底：无论修复结果如何，都不允许长时间遮着不放。
+    private func startSyncRepairHoldTimeout() {
+        guard syncRepairHoldTimeoutWorkItem == nil else { return }
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.releaseSyncRepairHold()
+        }
+        syncRepairHoldTimeoutWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.syncRepairHoldTimeoutSeconds, execute: workItem)
+    }
+
+    private func releaseSyncRepairHold() {
+        syncRepairWorkItem?.cancel()
+        syncRepairWorkItem = nil
+        syncRepairHoldTimeoutWorkItem?.cancel()
+        syncRepairHoldTimeoutWorkItem = nil
+        syncRepairHoldReleased = true
+        mergeMessageList()
+    }
+
     private func placeholderSignature(_ message: MessageInfo) -> String {
-        let mediaPath = AlbumPickerPlaceholderStore.localMediaPath(of: message) ?? ""
+        let mediaPath = MessageListPlaceholderStore.localMediaPath(of: message) ?? ""
         let thumbnailPath: String
         switch message.messagePayload {
         case .video(let payload): thumbnailPath = payload.videoSnapshotPath ?? ""

@@ -32,7 +32,9 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private static let dismissAnimationDuration: TimeInterval = 0.1
 
-    private static let gradientLocations: [CGFloat] = [0, 0.442, 0.632, 1.0]
+    private static let gradientLocations: [CGFloat] = [0, 0.42, 0.67, 1.0]
+
+    private static let gradientFadeDistance: CGFloat = CGFloat(SpacingScheme.largeSpacing)
 
     private static let editTextContentInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
 
@@ -40,7 +42,7 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private static let smallBubbleHeight: CGFloat = 68
 
-    private static let largeBubbleHeight: CGFloat = 104
+    private static let bubbleTextVerticalPadding: CGFloat = CGFloat(SpacingScheme.iconIconSpacing)
 
     private static let bubbleHeightLineTolerance: CGFloat = 1
 
@@ -122,6 +124,18 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private let chipRow = UIStackView()
 
+    private var languageSelectorContainer: UIView?
+
+    private let languagePanelMaxHeightRatio: CGFloat = 0.6
+
+    private let languagePanelCornerRadius: CGFloat = CGFloat(RadiusScheme.alertRadius)
+
+    private let languageTitleVerticalPadding: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
+
+    private let languageItemHorizontalPadding: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
+
+    private let languageItemVerticalPadding: CGFloat = 14
+
     private let audioPath: String
 
     private let audioDurationSecond: Int
@@ -129,12 +143,15 @@ final class VoiceTranscriptionOverlayView: UIView {
     private let originalAudioDurationMs: Int
 
     private var callbacks: VoiceTranscriptionCallbacks
+    private let allowSendOriginalVoice: Bool
 
     private var state: TranscriptionState
 
     private var originalText: String = ""
 
     private var translatedText: String?
+
+    private var translationFailed = false
 
     private var isTranslating = false
 
@@ -146,6 +163,10 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private var bubbleHeight: CGFloat = VoiceTranscriptionOverlayView.smallBubbleHeight
 
+    private var maxBubbleHeight: CGFloat {
+        RecorderBubbleView.expandedMaxTextHeight + Self.bubbleTextVerticalPadding * 2 + bubbleTriangleHeight
+    }
+
     private var audioPlayer: AVAudioPlayer?
 
     // MARK: - Init
@@ -154,7 +175,9 @@ final class VoiceTranscriptionOverlayView: UIView {
          audioPath: String,
          audioDurationSecond: Int,
          text: String?,
-         callbacks: VoiceTranscriptionCallbacks) {
+         callbacks: VoiceTranscriptionCallbacks,
+         allowSendOriginalVoice: Bool = true) {
+        self.allowSendOriginalVoice = allowSendOriginalVoice
         self.audioPath = audioPath
         self.audioDurationSecond = audioDurationSecond
         self.originalAudioDurationMs = audioDurationSecond * 1000
@@ -215,6 +238,7 @@ final class VoiceTranscriptionOverlayView: UIView {
                 originalText = resultText
             }
             translatedText = nil
+            translationFailed = false
             isTranslating = false
             if isSpeaking {
                 isSpeaking = false
@@ -271,6 +295,8 @@ final class VoiceTranscriptionOverlayView: UIView {
         addSubview(sendTextButton)
         addSubview(cancelLabel)
         addSubview(sendAudioLabel)
+        sendAudioButton.isHidden = !allowSendOriginalVoice
+        sendAudioLabel.isHidden = !allowSendOriginalVoice
 
         bubbleView.addSubview(editTextView)
         bubbleView.addSubview(loadingDotsView)
@@ -283,14 +309,12 @@ final class VoiceTranscriptionOverlayView: UIView {
     private func setupStyle() {
         backgroundColor = .clear
         let colors = TUIChatKitTheme.colors
-        backgroundView.setGradientSpec(
-            Self.overlayGradientColors(base: colors.bgColorOperate),
-            Self.gradientLocations
-        )
+        applyBackgroundGradient()
 
         editTextView.backgroundColor = .clear
         editTextView.font = FontScheme.caption1Regular
         editTextView.textColor = colors.textColorButton
+        editTextView.tintColor = colors.textColorButton
         editTextView.textAlignment = .left
         editTextView.semanticContentAttribute = .forceLeftToRight
         editTextView.textContainerInset = Self.editTextContentInsets
@@ -338,7 +362,15 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     @objc private func handleBackgroundTap(_ gesture: UITapGestureRecognizer) {
         let location = gesture.location(in: self)
-        guard !bubbleView.frame.contains(location) else { return }
+        let interactiveFrames = [
+            bubbleView.frame,
+            chipRow.frame,
+            waveformView.frame,
+            cancelButton.frame,
+            sendAudioButton.frame,
+            sendTextButton.frame
+        ]
+        guard !interactiveFrames.contains(where: { $0.contains(location) }) else { return }
         editTextView.resignFirstResponder()
     }
 
@@ -354,6 +386,7 @@ final class VoiceTranscriptionOverlayView: UIView {
     }
 
     @objc private func handleSendAudio() {
+        guard allowSendOriginalVoice else { return }
         dismiss()
         callbacks.onSendAudio(audioPath, max(audioDurationSecond, 1))
     }
@@ -367,15 +400,13 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private func applyTheme() {
         let colors = TUIChatKitTheme.colors
-        backgroundView.setGradientSpec(
-            Self.overlayGradientColors(base: colors.bgColorOperate),
-            Self.gradientLocations
-        )
+        applyBackgroundGradient()
         bubbleView.bubbleColor = state == .empty ? colors.buttonColorHangupDefault : colors.buttonColorPrimaryDefault
         let arrowCenterX = sendTextButton.frame.midX - bubbleView.frame.minX
         bubbleView.arrowCenterX = arrowCenterX
         loadingDotsView.dotColor = colors.textColorButton
         editTextView.textColor = colors.textColorButton
+        editTextView.tintColor = colors.textColorButton
         cancelButton.backgroundColor = colors.buttonColorSecondaryDefault
         sendAudioButton.backgroundColor = colors.buttonColorSecondaryDefault
         sendTextButton.backgroundColor = state == .text ? colors.buttonColorPrimaryDefault : colors.buttonColorPrimaryDisabled
@@ -413,10 +444,10 @@ final class VoiceTranscriptionOverlayView: UIView {
     }
 
     private func updateBubbleHeightForState(_ resultText: String?) {
-        let exceedsSingleLine = state == .text
-            && renderedTextHeight(resultText ?? "") > Self.singleLineTextHeight + Self.bubbleHeightLineTolerance
-        let next: CGFloat = exceedsSingleLine ? Self.largeBubbleHeight : Self.smallBubbleHeight
-        guard next != bubbleHeight else { return }
+        let textHeight = state == .text ? renderedTextHeight(resultText ?? "") : Self.singleLineTextHeight
+        let contentHeight = textHeight + Self.bubbleTextVerticalPadding * 2 + bubbleTriangleHeight
+        let next = min(max(contentHeight, Self.smallBubbleHeight), maxBubbleHeight)
+        guard abs(next - bubbleHeight) > Self.bubbleHeightLineTolerance else { return }
         bubbleHeight = next
         setNeedsLayout()
     }
@@ -451,6 +482,8 @@ final class VoiceTranscriptionOverlayView: UIView {
                 enabled: true,
                 action: { [weak self] in self?.handleUndoTranslate() }
             ))
+        }
+        if translatedText != nil || translationFailed {
             let speakTitle = isSpeaking
                 ? LocalizedChatString("voice_message_stop")
                 : LocalizedChatString("voice_message_read_aloud")
@@ -482,6 +515,20 @@ final class VoiceTranscriptionOverlayView: UIView {
             base,
             base
         ]
+    }
+
+    private func applyBackgroundGradient() {
+        backgroundView.setGradientSpec(
+            Self.overlayGradientColors(base: TUIChatKitTheme.colors.bgColorOperate),
+            currentGradientLocations()
+        )
+    }
+
+    private func currentGradientLocations() -> [CGFloat] {
+        guard bounds.height > 0 else { return Self.gradientLocations }
+        let opaqueStart = min(max(bubbleView.frame.minY / bounds.height, 0), 1)
+        let fadeStart = max(opaqueStart - Self.gradientFadeDistance / bounds.height, 0)
+        return [0, fadeStart, opaqueStart, 1]
     }
 
     private func makeChip(title: String, enabled: Bool, action: @escaping () -> Void) -> UIButton {
@@ -528,6 +575,7 @@ final class VoiceTranscriptionOverlayView: UIView {
             stopReadAloud()
         }
         translatedText = nil
+        translationFailed = false
         setBubbleText(originalText)
         renderChipRow()
     }
@@ -574,16 +622,21 @@ final class VoiceTranscriptionOverlayView: UIView {
             guard let self = self, !self.isDismissed else { return }
             self.isTranslating = false
             if translated.isEmpty {
+                self.translationFailed = true
                 self.renderChipRow()
+                WindowToastManager.shared.error(LocalizedChatString("voice_message_translate_failed"))
                 return
             }
+            self.translationFailed = false
             self.translatedText = translated
             self.setBubbleText(translated)
             self.renderChipRow()
         }, { [weak self] in
             guard let self = self, !self.isDismissed else { return }
             self.isTranslating = false
+            self.translationFailed = true
             self.renderChipRow()
+            WindowToastManager.shared.error(LocalizedChatString("voice_message_translate_failed"))
         })
     }
 
@@ -594,23 +647,78 @@ final class VoiceTranscriptionOverlayView: UIView {
     }
 
     private func presentLanguageSelector(onPicked: @escaping (String) -> Void) {
-        let sheet = UIAlertController(
-            title: nil,
-            message: nil,
-            preferredStyle: .actionSheet
-        )
+        dismissLanguageSelector()
+        let container = UIView(frame: bounds)
+        container.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        let maskButton = UIButton(type: .custom)
+        maskButton.frame = container.bounds
+        maskButton.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        maskButton.backgroundColor = TUIChatKitTheme.colors.bgColorMask
+        maskButton.addAction(UIAction(handler: { [weak self] _ in
+            self?.dismissLanguageSelector()
+        }), for: .touchUpInside)
+        container.addSubview(maskButton)
+
+        let titleFont = FontScheme.caption3Regular
+        let itemFont = FontScheme.caption1Regular
+        let titleHeight = titleFont.lineHeight + languageTitleVerticalPadding * 2
+        let itemHeight = itemFont.lineHeight + languageItemVerticalPadding * 2
+        let contentHeight = titleHeight + itemHeight * CGFloat(VoiceTranscriptionLanguageStore.options.count)
+        let panelHeight = min(contentHeight, bounds.height * languagePanelMaxHeightRatio)
+
+        let panel = UIView(frame: CGRect(x: 0, y: bounds.height - panelHeight, width: bounds.width, height: panelHeight))
+        panel.autoresizingMask = [.flexibleWidth, .flexibleTopMargin]
+        panel.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
+        panel.layer.cornerRadius = languagePanelCornerRadius
+        panel.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        panel.clipsToBounds = true
+        container.addSubview(panel)
+
+        let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: panel.bounds.width, height: titleHeight))
+        titleLabel.text = LocalizedChatString("voice_message_select_language")
+        titleLabel.font = titleFont
+        titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
+        titleLabel.textAlignment = .center
+        panel.addSubview(titleLabel)
+
+        let scrollView = UIScrollView(frame: CGRect(x: 0, y: titleHeight, width: panel.bounds.width, height: panel.bounds.height - titleHeight))
+        panel.addSubview(scrollView)
+
         let current = VoiceTranscriptionLanguageStore.selected
+        var itemY: CGFloat = 0
         for option in VoiceTranscriptionLanguageStore.options {
-            let action = UIAlertAction(title: option.nativeName, style: .default) { _ in
-                onPicked(option.code)
-            }
-            if option.code == current {
-                action.setValue(true, forKey: "checked")
-            }
-            sheet.addAction(action)
+            let itemButton = UIButton(type: .custom)
+            itemButton.frame = CGRect(x: 0, y: itemY, width: scrollView.bounds.width, height: itemHeight)
+            itemButton.setTitle(option.nativeName, for: .normal)
+            itemButton.titleLabel?.font = itemFont
+            let isSelected = option.code == current
+            itemButton.setTitleColor(isSelected ? TUIChatKitTheme.colors.textColorLink : TUIChatKitTheme.colors.textColorPrimary, for: .normal)
+            itemButton.contentHorizontalAlignment = .leading
+            itemButton.contentEdgeInsets = UIEdgeInsets(
+                top: 0,
+                left: languageItemHorizontalPadding,
+                bottom: 0,
+                right: languageItemHorizontalPadding
+            )
+            let code = option.code
+            itemButton.addAction(UIAction(handler: { [weak self] _ in
+                self?.dismissLanguageSelector()
+                onPicked(code)
+            }), for: .touchUpInside)
+            scrollView.addSubview(itemButton)
+            itemY += itemHeight
         }
-        sheet.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        findViewController()?.present(sheet, animated: true)
+        scrollView.contentSize = CGSize(width: scrollView.bounds.width, height: itemY)
+
+        addSubview(container)
+        bringSubviewToFront(container)
+        languageSelectorContainer = container
+    }
+
+    private func dismissLanguageSelector() {
+        languageSelectorContainer?.removeFromSuperview()
+        languageSelectorContainer = nil
     }
 
     @objc private func toggleWaveformPlayback() {
@@ -636,6 +744,10 @@ final class VoiceTranscriptionOverlayView: UIView {
     private func stopSpeaking() {
         if audioPlayer?.isPlaying == true {
             audioPlayer?.stop()
+        }
+        if isSpeaking {
+            isSpeaking = false
+            callbacks.onStopSpeak()
         }
         waveformView.setPseudoSpeaking(false)
         waveformView.setDuration(originalAudioDurationMs)
@@ -663,24 +775,19 @@ final class VoiceTranscriptionOverlayView: UIView {
         let next = max(height, 0)
         guard next != keyboardHeight else { return }
         keyboardHeight = next
+        let duration = (info[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double) ?? 0.25
+        let curveRaw = (info[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt) ?? UInt(UIView.AnimationCurve.easeInOut.rawValue)
+        let options = UIView.AnimationOptions(rawValue: curveRaw << 16)
         setNeedsLayout()
+        UIView.animate(withDuration: duration, delay: 0, options: [options, .beginFromCurrentState]) {
+            self.layoutIfNeeded()
+        }
     }
 
     private func positionInBubble() {
         let bodyHeight = bubbleHeight - bubbleTriangleHeight
-        editTextView.contentInset = .zero
         editTextView.scrollIndicatorInsets = .zero
         editTextView.frame = CGRect(x: 0, y: 0, width: bubbleView.bounds.width, height: bodyHeight)
-        editTextView.setNeedsLayout()
-        editTextView.layoutIfNeeded()
-        let textViewHeight = min(editTextView.contentSize.height, bodyHeight)
-        let verticalOffset = max(0, (bodyHeight - textViewHeight) / 2)
-        editTextView.frame = CGRect(
-            x: 0,
-            y: verticalOffset,
-            width: bubbleView.bounds.width,
-            height: bodyHeight - verticalOffset
-        )
         loadingDotsView.frame = CGRect(x: Self.loadingDotsLeadingInset, y: (bodyHeight - Self.loadingDotsHeight) / 2, width: Self.loadingDotsWidth, height: Self.loadingDotsHeight)
     }
 
@@ -720,17 +827,20 @@ final class VoiceTranscriptionOverlayView: UIView {
         let chipBlock = showChipRow ? (chipRowHeight + bubbleToChipGap) : 0
 
         let waveformTop = max(safeRootHeight - waveformBottom - waveformHeight, 0)
-        let labelTop = max(waveformTop - labelToWaveformGap - labelHeight, 0)
-        let iconButtonTop = max(labelTop - iconToLabelGap - iconButtonSize, 0)
-        let sendTextButtonTop = max(waveformTop - sendTextToWaveformGap - sendTextButtonSize, 0)
+        var labelTop = max(waveformTop - labelToWaveformGap - labelHeight, 0)
+        var iconButtonTop = max(labelTop - iconToLabelGap - iconButtonSize, 0)
+        var sendTextButtonTop = max(waveformTop - sendTextToWaveformGap - sendTextButtonSize, 0)
+        if keyboardHeight > 0 {
+            let keyboardTop = safeRootHeight - keyboardHeight
+            let stackBottom = keyboardTop - bubbleToKeyboardGap
+            let shift = max(labelTop + labelHeight - stackBottom, 0)
+            labelTop = max(labelTop - shift, 0)
+            iconButtonTop = max(iconButtonTop - shift, 0)
+            sendTextButtonTop = max(sendTextButtonTop - shift, 0)
+        }
         let firstActionTop = min(iconButtonTop, sendTextButtonTop)
 
-        let bubbleTopAboveActions = max(firstActionTop - chipRowToActionGap - chipBlock - bubbleHeight, 0)
-        let maxBubbleTopBeforeKeyboard: CGFloat = keyboardHeight > 0
-            ? max(safeRootHeight - keyboardHeight - bubbleToKeyboardGap - chipBlock - bubbleHeight, 0)
-            : .greatestFiniteMagnitude
-
-        let bubbleTop = min(bubbleTopAboveActions, maxBubbleTopBeforeKeyboard)
+        let bubbleTop = max(firstActionTop - chipRowToActionGap - chipBlock - bubbleHeight, 0)
         return OverlayLayout(
             bubbleTop: bubbleTop,
             chipRowTop: bubbleTop + bubbleHeight + bubbleToChipGap,
@@ -740,17 +850,6 @@ final class VoiceTranscriptionOverlayView: UIView {
             labelTop: labelTop,
             waveformTop: waveformTop
         )
-    }
-
-    private func findViewController() -> UIViewController? {
-        if let root = self.window?.rootViewController {
-            var controller: UIViewController? = root
-            while let presented = controller?.presentedViewController {
-                controller = presented
-            }
-            return controller
-        }
-        return nil
     }
 }
 
@@ -817,9 +916,29 @@ final class TranscriptionBubbleView: UIView {
 // MARK: - 垂直居中文本视图（对齐 Android `Gravity.CENTER_VERTICAL`）
 
 final class VerticalCenterTextView: UITextView {
+    private var contentSizeObserver: NSKeyValueObservation?
+
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        contentSizeObserver = observe(\.contentSize, options: [.new]) { [weak self] _, _ in
+            self?.updateVerticalCentering()
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()
+        updateVerticalCentering()
+    }
+
+    private func updateVerticalCentering() {
+        let offset = max(0, (bounds.height - contentSize.height) / 2)
+        if abs(contentInset.top - offset) > 0.5 {
+            contentInset.top = offset
+        }
     }
 }
 
@@ -1000,11 +1119,9 @@ enum VoiceTranscriptionLanguageStore {
         Option(code: "hi", nativeName: "हिन्दी")
     ]
 
-    private static let key = "AtomicXRecordTranslateTargetLanguage"
-
     static var selected: String {
-        get { UserDefaults.standard.string(forKey: key) ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: key) }
+        get { VoiceMessageConfig.shared.getRecordTranslateTargetLanguage() }
+        set { VoiceMessageConfig.shared.setRecordTranslateTargetLanguage(newValue) }
     }
 }
 

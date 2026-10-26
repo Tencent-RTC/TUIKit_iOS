@@ -3,6 +3,12 @@ import UIKit
 import SnapKit
 import AtomicXCore
 
+enum AuxiliaryTextDisplayState {
+    case hidden
+    case loading
+    case text(content: String, footer: String?)
+}
+
 final class MessageBaseCell: UITableViewCell {
     var onAvatarTap: ((MessageInfo) -> Void)?
 
@@ -40,8 +46,6 @@ final class MessageBaseCell: UITableViewCell {
 
     private static let bubbleMinHeight: CGFloat = 40
 
-    private static let reactionBarMaxWidth: CGFloat = UIScreen.main.bounds.width * 0.72
-
     private static let reactionBarTopInset: CGFloat = 2
 
     private static let reactionBarBottomInset: CGFloat = 6
@@ -68,7 +72,10 @@ final class MessageBaseCell: UITableViewCell {
 
     private static let quoteTopSpacing = CGFloat(SpacingScheme.iconTextSpacing)
 
-    private static let quoteMaxWidth: CGFloat = UIScreen.main.bounds.width * 0.72
+    private var bubbleMaxWidth: CGFloat {
+        let ratio = lastContext?.config.bubbleMaxWidthRatio ?? ChatMessageListConfig.defaultBubbleMaxWidthRatio
+        return UIScreen.main.bounds.width * ratio
+    }
 
 
     private static let nicknameDetailTimeSpacing = CGFloat(SpacingScheme.iconTextSpacing)
@@ -170,6 +177,7 @@ final class MessageBaseCell: UITableViewCell {
                    auxiliaryTextState: AuxiliaryTextDisplayState = .hidden) {
         self.message = message
         self.lastContext = context
+        auxiliaryTextBubbleView.bubbleMaxWidthRatio = context.config.bubbleMaxWidthRatio
         installContentViewIfNeeded(kind: contentKind)
         contentView0?.bind(message: message, context: context)
         applyReadReceipt(message: message, context: context)
@@ -365,7 +373,7 @@ final class MessageBaseCell: UITableViewCell {
         let supportReaction = context.config.isSupportReaction
         if supportReaction, !message.reactionList.isEmpty {
             reactionBar.isHidden = false
-            let maxRowWidth = Self.reactionBarMaxWidth - 2 * reactionBarLayoutInsets().horizontal
+            let maxRowWidth = bubbleMaxWidth - 2 * reactionBarLayoutInsets().horizontal
             reactionBar.bind(message: message, maxWidth: maxRowWidth, isLeft: context.isLeft)
         } else {
             reactionBar.isHidden = true
@@ -446,17 +454,6 @@ final class MessageBaseCell: UITableViewCell {
         contentKind = kind
     }
 
-    private func applyBubbleContentInsets() {
-        guard let contentView = contentView0 else { return }
-        let insets = activeBubbleAppearance?.contentInsets ?? .zero
-        contentView.snp.remakeConstraints { make in
-            make.top.equalToSuperview().offset(insets.top)
-            make.leading.equalToSuperview().offset(insets.left)
-            make.trailing.equalToSuperview().offset(-insets.right)
-            make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)
-        }
-    }
-
     private func applyBubbleMinimumSize(_ size: MessageBubbleSize?) {
         bubbleMinWidthConstraint?.isActive = false
         bubbleMinHeightConstraint?.isActive = false
@@ -503,10 +500,11 @@ final class MessageBaseCell: UITableViewCell {
     }
 
     private func applyNickname(message: MessageInfo, context: MessageContentContext) {
-        let show = context.isSelf
+        let policyShowsNickname = context.isSelf
             ? context.config.alignment != .twoSided
             : context.isGroupChat
-        if show {
+        let configShowsNickname = context.isLeft ? context.config.isShowLeftNickname : context.config.isShowRightNickname
+        if policyShowsNickname && configShowsNickname {
             nicknameLabel.text = Self.senderDisplayName(of: message.from)
             nicknameLabel.isHidden = false
         } else {
@@ -560,7 +558,7 @@ final class MessageBaseCell: UITableViewCell {
             quoteView.snp.remakeConstraints { make in
                 make.top.equalTo(contentContainer.snp.bottom).offset(Self.quoteTopSpacing)
                 make.bottom.equalToSuperview()
-                make.width.lessThanOrEqualTo(Self.quoteMaxWidth)
+                make.width.lessThanOrEqualTo(bubbleMaxWidth)
                 make.width.equalTo(0).priority(.low)
                 if isLeft {
                     make.leading.equalToSuperview()
@@ -700,7 +698,6 @@ final class MessageBaseCell: UITableViewCell {
                               showStatus: Bool,
                               multiSelect: Bool) {
         applyBubbleBackground(context: context)
-        applyBubbleContentInsets()
         applyBubbleMinimumSize(activeBubbleAppearance?.minimumSize)
         let hp = context.config.horizontalPadding
         let avatarSpacing = context.config.avatarSpacing
@@ -883,21 +880,22 @@ final class MessageBaseCell: UITableViewCell {
         guard let contentView = contentView0 else { return }
         let showReaction = !reactionBar.isHidden
         let insets = reactionBarLayoutInsets()
+        let contentInsets = activeBubbleAppearance?.contentInsets ?? .zero
         if showReaction {
             contentView.snp.remakeConstraints { make in
-                make.top.equalToSuperview().offset(insets.contentPadding)
+                make.top.equalToSuperview().offset(insets.contentPadding + contentInsets.top)
                 if isLeft {
-                    make.leading.equalToSuperview().offset(insets.contentPadding)
-                    make.trailing.lessThanOrEqualToSuperview().offset(-insets.contentPadding)
+                    make.leading.equalToSuperview().offset(insets.contentPadding + contentInsets.left)
+                    make.trailing.lessThanOrEqualToSuperview().offset(-insets.contentPadding - contentInsets.right)
                 } else {
-                    make.trailing.equalToSuperview().offset(-insets.contentPadding)
-                    make.leading.greaterThanOrEqualToSuperview().offset(insets.contentPadding)
+                    make.trailing.equalToSuperview().offset(-insets.contentPadding - contentInsets.right)
+                    make.leading.greaterThanOrEqualToSuperview().offset(insets.contentPadding + contentInsets.left)
                 }
                 make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)
-                make.bottom.equalTo(reactionBar.snp.top).offset(-insets.top)
+                make.bottom.equalTo(reactionBar.snp.top).offset(-insets.top - contentInsets.bottom)
             }
             reactionBar.snp.remakeConstraints { make in
-                make.top.equalTo(contentView.snp.bottom).offset(insets.top)
+                make.top.equalTo(contentView.snp.bottom).offset(insets.top + contentInsets.bottom)
                 make.bottom.equalToSuperview().offset(-insets.bottom)
                 if isLeft {
                     make.leading.equalToSuperview().offset(insets.horizontal)
@@ -919,9 +917,11 @@ final class MessageBaseCell: UITableViewCell {
         } else {
             reactionBarMinWidthConstraint?.deactivate()
             contentView.snp.remakeConstraints { make in
-                make.top.leading.trailing.equalToSuperview()
+                make.top.equalToSuperview().offset(contentInsets.top)
+                make.leading.equalToSuperview().offset(contentInsets.left)
+                make.trailing.equalToSuperview().offset(-contentInsets.right)
                 make.height.greaterThanOrEqualTo(Self.bubbleMinHeight)
-                make.bottom.equalToSuperview()
+                make.bottom.equalToSuperview().offset(-contentInsets.bottom)
             }
             reactionBar.snp.removeConstraints()
         }

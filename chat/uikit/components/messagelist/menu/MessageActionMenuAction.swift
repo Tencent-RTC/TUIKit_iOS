@@ -16,40 +16,6 @@ enum MessageActionIDs {
     static let reaction = "message.reaction"
 }
 
-public typealias MessageActionCustomizer = (CustomEditor<MessageActionMenuAction>) -> Void
-
-public struct MessageActionMenuAction: CustomItem {
-    public var ID: String = ""
-
-    public let iconName: String
-
-    public let systemIconFallback: String
-
-    public let label: String
-
-    public var isDangerous: Bool = false
-
-    public var isReactionEntry: Bool = false
-
-    public let handler: (MessageInfo, MessageActionStore) -> Void
-
-    public init(ID: String = "",
-                iconName: String,
-                systemIconFallback: String,
-                label: String,
-                isDangerous: Bool = false,
-                isReactionEntry: Bool = false,
-                handler: @escaping (MessageInfo, MessageActionStore) -> Void) {
-        self.ID = ID
-        self.iconName = iconName
-        self.systemIconFallback = systemIconFallback
-        self.label = label
-        self.isDangerous = isDangerous
-        self.isReactionEntry = isReactionEntry
-        self.handler = handler
-    }
-}
-
 enum MessageActionMenuProvider {
 
     private static let revokeTimeLimit: TimeInterval = 2 * 60
@@ -57,6 +23,7 @@ enum MessageActionMenuProvider {
     static func visibleActions(
         for message: MessageInfo,
         config: MessageListConfigProtocol & MessageActionConfigProtocol,
+        conversationID: String,
         auxiliaryHiddenIDs: Set<String> = []
     ) -> [MessageActionMenuAction] {
         var actions: [MessageActionMenuAction] = []
@@ -68,7 +35,7 @@ enum MessageActionMenuProvider {
             actions.append(forwardAction())
         }
         if canQuote(message, config: config) {
-            actions.append(quoteAction())
+            actions.append(quoteAction(conversationID: conversationID))
         }
         if config.isSupportMultiSelect {
             actions.append(multiSelectAction())
@@ -160,7 +127,7 @@ enum MessageActionMenuProvider {
         }
     }
 
-    private static func quoteAction() -> MessageActionMenuAction {
+    private static func quoteAction(conversationID: String) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.quote,
             iconName: "message_quote",
@@ -170,7 +137,7 @@ enum MessageActionMenuProvider {
             NotificationCenter.default.post(
                 name: NSNotification.Name("quoteMessageNotification"),
                 object: nil,
-                userInfo: ["message": message]
+                userInfo: ["message": message, "conversationID": conversationID]
             )
         }
     }

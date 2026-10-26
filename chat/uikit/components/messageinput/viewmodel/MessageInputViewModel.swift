@@ -18,6 +18,11 @@ final class MessageInputViewModel {
 
     var onSendFailure: ((String) -> Void)?
 
+    /// 文本消息发送成功回调。机器人会话用它驱动「等待回复」状态机，对齐 Android 的
+    /// setTextSendCallbacks(onSent)：钩子挂在 ViewModel 的发送漏斗里，按钮、键盘、
+    /// 语音转文字等所有文本发送路径都会经过。
+    var onTextMessageSent: (() -> Void)?
+
     var isGroupChat: Bool {
         return conversationID.hasPrefix(Self.groupConversationPrefix)
     }
@@ -55,6 +60,9 @@ final class MessageInputViewModel {
         }
         store.sendMessage(payload: .text(TextSendMessagePayload(text: text)), option: option) { [weak self] result in
             self?.handleSendResult(result)
+            if case .success = result {
+                self?.notifyTextMessageSent()
+            }
         }
     }
 
@@ -182,9 +190,21 @@ final class MessageInputViewModel {
     private func handleSendResult(_ result: Result<Void, ErrorInfo>) {
         switch result {
         case .success:
-            break
+            if ChatbotConversationPolicy.isChatbotConversation(conversationID) {
+                AIAssistantUsageReporter.reportSendMessageOnce()
+            }
         case .failure(let error):
             notifySendFailure(Self.failureReason(from: error))
+        }
+    }
+
+    private func notifyTextMessageSent() {
+        if Thread.isMainThread {
+            onTextMessageSent?()
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.onTextMessageSent?()
+            }
         }
     }
 

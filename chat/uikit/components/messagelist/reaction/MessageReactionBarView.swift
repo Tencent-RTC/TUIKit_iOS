@@ -7,7 +7,7 @@ final class MessageReactionBarView: UIView {
     var onTap: (() -> Void)?
 
     private enum Metric {
-        static let maxDisplayReactions = 5
+        static let maxDisplayReactions = 10
         static let chipHorizontalSpacing = CGFloat(SpacingScheme.smallSpacing)
         static let chipVerticalSpacing: CGFloat = 6
         static let chipHorizontalPadding = CGFloat(SpacingScheme.smallSpacing)

@@ -1,26 +1,33 @@
-name: TUIKitDemo
+name: ChatDemo
 options:
-  bundleIdPrefix: com.example
   deploymentTarget:
-    iOS: 14.0
+    iOS: "15.0"
 targets:
-  TUIKitDemo:
+  ChatDemo:
     type: application
     platform: iOS
     sources:
-      - TUIKitDemo
-    info:
-      path: TUIKitDemo/Info.plist
-      properties:
-        CFBundleDisplayName: TUIKitDemo
-        UILaunchStoryboardName: LaunchScreen
-        UIApplicationSceneManifest:
-          UIApplicationSupportsMultipleScenes: false
-          UISceneConfigurations:
-            UIWindowSceneSessionRoleApplication:
-              - UISceneConfigurationName: Default Configuration
-                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+      - path: ChatDemo/Sources
+      - path: ChatDemo/Resources
+        buildPhase: resources
+      - path: ChatDemo/Configuration/appConfig.json
+        buildPhase: resources
     settings:
       base:
-        INFOPLIST_FILE: TUIKitDemo/Info.plist
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.TUIKitDemo 
+        INFOPLIST_FILE: ChatDemo/Configuration/Info.plist
+        PRODUCT_NAME: ChatDemo
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: com.tencent.tuikit.demo.xa.uikit
+          CODE_SIGN_ENTITLEMENTS: ChatDemo/Configuration/ChatDemo-Debug.entitlements
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: com.imchat.imchat.uikit
+          CODE_SIGN_ENTITLEMENTS: ChatDemo/Configuration/ChatDemo-Release.entitlements

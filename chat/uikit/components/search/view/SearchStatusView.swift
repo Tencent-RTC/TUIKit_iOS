@@ -2,8 +2,6 @@ import Foundation
 import UIKit
 import SnapKit
 
-public typealias SearchResultHandler = (Any) -> Void
-
 final class SearchStatusView: UIView {
     private static let horizontalMargin: CGFloat = CGFloat(SpacingScheme.normalSpacing)
 

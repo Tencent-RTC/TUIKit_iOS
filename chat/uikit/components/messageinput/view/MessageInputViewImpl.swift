@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import Combine
 import SnapKit
 import AtomicXCore
 
@@ -26,7 +27,7 @@ final class MessageInputViewImpl: UIView {
         let inputRowHeight = Self.inputRowVerticalPadding + currentInputContainerHeight + Self.inputRowVerticalPadding
         return CGSize(
             width: UIView.noIntrinsicMetric,
-            height: Self.topDividerHeight + currentQuoteBarHeight + inputRowHeight + currentBottomAreaHeight
+            height: (topDivider.isHidden ? 0 : Self.topDividerHeight) + currentQuoteBarHeight + inputRowHeight + currentBottomAreaHeight
         )
     }
 
@@ -36,6 +37,20 @@ final class MessageInputViewImpl: UIView {
     }
 
     private let viewModel: MessageInputViewModel
+
+    private let typingController: TypingIndicatorController?
+
+    var typingPublisher: AnyPublisher<Bool, Never>? {
+        return typingController?.typingPublisher
+    }
+
+    func sendTypingStatus(hasContent: Bool) {
+        typingController?.sendTypingStatus(hasContent: hasContent)
+    }
+
+    func invalidateTypingIndicator() {
+        typingController?.invalidate()
+    }
 
     private let config: MessageInputConfigProtocol
 
@@ -47,7 +62,7 @@ final class MessageInputViewImpl: UIView {
 
     private let inputRow = UIView()
 
-    private let audioButton = UIButton(type: .system)
+    private let audioButton = MessageInputAppearanceButton(type: .system)
 
     private let inputContainer = UIView()
 
@@ -55,13 +70,20 @@ final class MessageInputViewImpl: UIView {
 
     private let voiceLabel = UILabel()
 
-    private let emojiButton = UIButton(type: .system)
+    private let emojiButton = MessageInputAppearanceButton(type: .system)
 
-    private let moreButton = UIButton(type: .system)
+    private let moreButton = MessageInputAppearanceButton(type: .system)
 
     private let moreButtonRedDot = UIView()
 
-    private let sendButton = UIButton(type: .system)
+    private let sendButton = MessageInputAppearanceButton(type: .system)
+
+    /// 机器人流式回复期间的停止按钮（替换发送/更多键），对齐 Android btnChatbotStop。
+    private let chatbotStopButton = MessageInputAppearanceButton(type: .system)
+
+    private let chatbotController: ChatbotConversationController?
+
+    private var chatbotStateCancellable: AnyCancellable?
 
     private let bottomContainer = UIView()
 
@@ -91,7 +113,13 @@ final class MessageInputViewImpl: UIView {
 
     private var didAttachMorePanel = false
 
-    private lazy var mediaCoordinator = MessageInputMediaCoordinator(presentingView: self, viewModel: viewModel)
+    private var createdMediaCoordinator: MessageInputMediaCoordinator?
+
+    private lazy var mediaCoordinator: MessageInputMediaCoordinator = {
+        let coordinator = MessageInputMediaCoordinator(presentingView: self, viewModel: viewModel)
+        createdMediaCoordinator = coordinator
+        return coordinator
+    }()
 
     private let quotePreviewBar = MessageInputQuotePreviewBar()
 
@@ -186,18 +214,33 @@ final class MessageInputViewImpl: UIView {
 
     // MARK: - Init
 
-    init(conversationID: String, config: MessageInputConfigProtocol = ChatMessageInputConfig()) {
+    init(conversationID: String,
+         config: MessageInputConfigProtocol = ChatMessageInputConfig(),
+         chatbotController: ChatbotConversationController? = nil) {
         let viewModel = MessageInputViewModel(conversationID: conversationID, config: config)
         self.viewModel = viewModel
         self.config = viewModel.config
+        self.chatbotController = chatbotController
+        if config.enableTyping, conversationID.hasPrefix(Self.c2cConversationPrefix) {
+            let currentUserID = LoginStore.shared.state.value.loginUserInfo?.userID
+            typingController = TypingIndicatorController(conversationID: conversationID, currentUserID: currentUserID)
+        } else {
+            typingController = nil
+        }
         super.init(frame: .zero)
         viewModel.onSendFailure = { [weak self] reason in
             self?.onSendFailure?(reason)
+        }
+        if let chatbotController {
+            viewModel.onTextMessageSent = { [weak chatbotController] in
+                chatbotController?.onTextMessageSent()
+            }
         }
         constructViewHierarchy()
         activateConstraints()
         bindInteraction()
         setupViewStyle()
+        bindChatbotState()
     }
 
     required init?(coder: NSCoder) {
@@ -207,6 +250,7 @@ final class MessageInputViewImpl: UIView {
     // MARK: - Four-Step Lifecycle
 
     deinit {
+        createdMediaCoordinator?.cancelVoiceRecording()
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -220,8 +264,15 @@ final class MessageInputViewImpl: UIView {
                 loadDraft()
             }
         } else {
+            cancelVoiceRecording()
             saveDraftImmediately()
         }
+    }
+
+    @objc func cancelVoiceRecording() {
+        isLongPressingAudio = false
+        isTextInputLongPressArmed = false
+        createdMediaCoordinator?.cancelVoiceRecording()
     }
 
     // MARK: - Quote (引用)
@@ -239,11 +290,10 @@ final class MessageInputViewImpl: UIView {
         if config.isShowEmoji {
             inputRow.addSubview(emojiButton)
         }
-        if config.isShowMore {
-            inputRow.addSubview(moreButton)
-            moreButton.addSubview(moreButtonRedDot)
-        }
+        inputRow.addSubview(moreButton)
+        moreButton.addSubview(moreButtonRedDot)
         inputRow.addSubview(sendButton)
+        inputRow.addSubview(chatbotStopButton)
         addSubview(bottomContainer)
         bottomContainer.addSubview(emojiPanelContainer)
         bottomContainer.addSubview(morePanelContainer)
@@ -272,39 +322,29 @@ final class MessageInputViewImpl: UIView {
             audioButton.snp.makeConstraints { make in
                 make.leading.equalTo(leftAnchor).offset(leftInset)
                 make.centerY.equalTo(inputContainer)
-                make.width.height.equalTo(Self.inputRowButtonSize)
+                let size = MessageInputAppearanceApplier.buttonSize(config.appearance?.audioRecordButton, fallback: Self.inputRowButtonSize)
+                make.width.equalTo(size.width)
+                make.height.equalTo(size.height)
             }
             leftAnchor = audioButton.snp.trailing
             leftInset = Self.inputRowHorizontalInset
         }
 
-        var rightAnchor = inputRow.snp.trailing
+        moreButtonRedDot.snp.makeConstraints { make in
+            make.top.trailing.equalToSuperview()
+            make.width.height.equalTo(Self.redDotSize)
+        }
+        layoutActionButtons(showSend: false, showMore: config.isShowMore, showStop: false)
+        var rightAnchor = moreButton.snp.leading
         var rightInset: CGFloat = -Self.inputRowHorizontalInset
-
-        if config.isShowMore {
-            moreButton.snp.makeConstraints { make in
-                make.trailing.equalTo(rightAnchor).offset(rightInset)
-                make.centerY.equalTo(inputContainer)
-                make.width.height.equalTo(Self.inputRowButtonSize)
-            }
-            moreButtonRedDot.snp.makeConstraints { make in
-                make.top.trailing.equalToSuperview()
-                make.width.height.equalTo(Self.redDotSize)
-            }
-        }
-        sendButton.snp.makeConstraints { make in
-            make.trailing.equalTo(rightAnchor).offset(rightInset)
-            make.centerY.equalTo(inputContainer)
-            make.width.height.equalTo(Self.inputRowButtonSize)
-        }
-        rightAnchor = config.isShowMore ? moreButton.snp.leading : sendButton.snp.leading
-        rightInset = -Self.inputRowHorizontalInset
 
         if config.isShowEmoji {
             emojiButton.snp.makeConstraints { make in
                 make.trailing.equalTo(rightAnchor).offset(rightInset)
                 make.centerY.equalTo(inputContainer)
-                make.width.height.equalTo(Self.inputRowButtonSize)
+                let size = MessageInputAppearanceApplier.buttonSize(config.appearance?.emojiButton, fallback: Self.inputRowButtonSize)
+                make.width.equalTo(size.width)
+                make.height.equalTo(size.height)
             }
             rightAnchor = emojiButton.snp.leading
             rightInset = -Self.inputRowHorizontalInset
@@ -319,8 +359,9 @@ final class MessageInputViewImpl: UIView {
         }
 
         messageTextView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(Self.textViewHorizontalInset)
-            make.trailing.equalToSuperview().offset(-Self.textViewHorizontalInset)
+            let padding = MessageInputAppearanceApplier.padding(config.appearance?.field?.horizontalPadding, fallback: Self.textViewHorizontalInset)
+            make.leading.equalToSuperview().offset(padding)
+            make.trailing.equalToSuperview().offset(-padding)
             make.top.bottom.equalToSuperview()
         }
 
@@ -346,13 +387,17 @@ final class MessageInputViewImpl: UIView {
         messageTextView.isGroupChat = viewModel.isGroupChat
         messageTextView.enableMention = config.enableMention
         messageTextView.maxLines = Self.textViewMaxLines
-        messageTextView.placeholderText = LocalizedChatString(config.enableLongPressToTalk ? "SendMessage" : "SendMessageTextOnly")
+        messageTextView.placeholderText = config.appearance?.field?.hintText
+            ?? LocalizedChatString(config.enableLongPressToTalk ? "SendMessage" : "SendMessageTextOnly")
+        messageTextView.applyAppearance(config.appearance?.field)
 
         messageTextView.onSend = { [weak self] in self?.sendText() }
         messageTextView.onHeightChanged = { [weak self] height in
             guard let self = self else { return }
-            self.inputContainerHeightConstraint?.update(offset: height)
-            self.currentInputContainerHeight = height
+            let minimumHeight = MessageInputAppearanceApplier.dimension(self.config.appearance?.field?.minHeight, fallback: Self.defaultInputContainerHeight)
+            let resolvedHeight = max(height, minimumHeight)
+            self.inputContainerHeightConstraint?.update(offset: resolvedHeight)
+            self.currentInputContainerHeight = resolvedHeight
             self.invalidateIntrinsicContentSize()
         }
         messageTextView.onContentChanged = { [weak self] _ in
@@ -376,6 +421,7 @@ final class MessageInputViewImpl: UIView {
         moreButton.addTarget(self, action: #selector(handleMoreTapped), for: .touchUpInside)
         emojiButton.addTarget(self, action: #selector(handleEmojiTapped), for: .touchUpInside)
         sendButton.addTarget(self, action: #selector(handleSendTapped), for: .touchUpInside)
+        chatbotStopButton.addTarget(self, action: #selector(handleChatbotStopTapped), for: .touchUpInside)
 
         audioButton.addTarget(self, action: #selector(handleAudioTapped), for: .touchUpInside)
 
@@ -437,6 +483,13 @@ final class MessageInputViewImpl: UIView {
             object: nil
         )
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(cancelVoiceRecording),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+
         quotePreviewBar.onClose = { [weak self] in
             self?.clearQuote()
         }
@@ -479,6 +532,71 @@ final class MessageInputViewImpl: UIView {
         if config.isShowMore {
             updateMoreButtonRedDotVisibility()
         }
+
+        chatbotStopButton.backgroundColor = colors.buttonColorPrimaryDefault
+        chatbotStopButton.layer.cornerRadius = Self.sendButtonCornerRadius
+        chatbotStopButton.layer.masksToBounds = true
+        let stopImage = UIImage(systemName: "stop.fill")?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.sendButtonIconPointSize, weight: .bold))
+            .withRenderingMode(.alwaysTemplate)
+        chatbotStopButton.setImage(stopImage, for: .normal)
+        chatbotStopButton.tintColor = colors.textColorButton
+        chatbotStopButton.isHidden = true
+        applyInputAppearance()
+        updateSendButtonVisibility()
+    }
+
+    private func applyInputAppearance() {
+        let appearance = config.appearance
+        let colors = TUIChatKitTheme.colors
+        MessageInputAppearanceApplier.apply(fill: appearance?.fill, to: self, defaultColor: colors.bgColorOperate)
+        inputRow.backgroundColor = .clear
+        topDivider.isHidden = appearance?.showTopDivider == false
+        topDivider.snp.updateConstraints { make in
+            make.height.equalTo(topDivider.isHidden ? 0 : Self.topDividerHeight)
+        }
+        inputContainer.layer.cornerRadius = MessageInputAppearanceApplier.cornerRadius(
+            appearance?.field?.cornerRadius, fallback: Self.inputContainerCornerRadius,
+            size: CGSize(width: currentInputContainerHeight, height: currentInputContainerHeight)
+        )
+        MessageInputAppearanceApplier.apply(fill: appearance?.field?.fill, to: inputContainer, defaultColor: colors.bgColorInput)
+        voiceLabel.textColor = appearance?.field?.textColor ?? colors.textColorPrimary
+        if let height = appearance?.field?.minHeight, height.isFinite, height > currentInputContainerHeight {
+            currentInputContainerHeight = height
+            inputContainerHeightConstraint?.update(offset: height)
+        }
+    }
+
+    private func applyButtonAppearances() {
+        let colors = TUIChatKitTheme.colors
+        let appearance = config.appearance
+        let buttons: [(MessageInputAppearanceButton, MessageInputButtonAppearance?, Bool, String)] = [
+            (audioButton, appearance?.audioRecordButton, isVoiceInputMode, isVoiceInputMode ? "input_keyboard" : "input_audio"),
+            (emojiButton, appearance?.emojiButton, isEmojiPanelShown, isEmojiPanelShown ? "input_keyboard" : "input_emoji"),
+            (moreButton, appearance?.moreButton, isMorePanelShown, "input_more")
+        ]
+        for (button, style, active, imageName) in buttons {
+            MessageInputAppearanceApplier.applyButton(button, appearance: style, active: active,
+                defaultImage: AtomicXChatResources.image(named: imageName), defaultTint: colors.textColorSecondary,
+                defaultFill: .clear, defaultCornerRadius: 0,
+                size: MessageInputAppearanceApplier.buttonSize(style, fallback: Self.inputRowButtonSize))
+        }
+        let defaultImage = UIImage(systemName: "arrow.up")?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.sendButtonIconPointSize, weight: .bold))
+        MessageInputAppearanceApplier.applyButton(sendButton, appearance: appearance?.sendButton, active: false,
+            defaultImage: defaultImage, defaultTint: colors.textColorButton, defaultFill: colors.buttonColorPrimaryDefault,
+            defaultCornerRadius: Self.sendButtonCornerRadius,
+            size: MessageInputAppearanceApplier.buttonSize(appearance?.sendButton, fallback: Self.inputRowButtonSize, supportsTitle: true),
+            supportsTitle: true)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if config.appearance?.field?.cornerRadius == MessageInputButtonAppearance.cornerRadiusPill {
+            inputContainer.layer.cornerRadius = min(inputContainer.bounds.width, inputContainer.bounds.height) / 2
+        }
+        MessageInputAppearanceApplier.update(self)
+        MessageInputAppearanceApplier.update(inputContainer)
     }
 
     /// Mirrors the panel's remaining dots onto the more button. Reading
@@ -486,6 +604,23 @@ final class MessageInputViewImpl: UIView {
     /// button carry a dot before the panel has ever been opened.
     private func updateMoreButtonRedDotVisibility() {
         moreButtonRedDot.isHidden = !morePanel.hasVisibleRedDot
+    }
+
+    /// 订阅机器人回复状态：流式输出期间把发送/更多键换成停止键，对齐 Android bindChatbotState。
+    ///
+    /// 只有真有一条能打断的流式回复在跑时才切换（canInterrupt）。等待态不切换：那条路径上
+    /// 用户看到的是列表里的「正在输入」气泡，输入栏是好的，点了必须真能发出去。
+    private func bindChatbotState() {
+        guard let controller = chatbotController else { return }
+        chatbotStateCancellable = controller.$state
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateSendButtonVisibility()
+            }
+    }
+
+    @objc private func handleChatbotStopTapped() {
+        chatbotController?.sendInterrupt(completion: nil)
     }
 
     private func configureIconButton(_ button: UIButton, imageName: String) {
@@ -598,6 +733,8 @@ final class MessageInputViewImpl: UIView {
     private func sendText() {
         let text = messageTextView.extractSendText()
         guard !text.isEmpty else { return }
+        // 有可打断的流式回复在跑时拦住发送，对齐 Android canSend 门控
+        guard chatbotController?.canInterrupt != true else { return }
 
         var convertedMentions: [MentionInfo] = []
         for mention in mentionList {
@@ -641,6 +778,7 @@ final class MessageInputViewImpl: UIView {
     @objc private func handleMentionUserNotification(_ notification: Notification) {
         guard viewModel.isGroupChat, config.enableMention else { return }
         guard let userInfo = notification.userInfo,
+              userInfo["conversationID"] as? String == viewModel.conversationID,
               let userID = userInfo["userID"] as? String,
               let nickname = userInfo["nickname"] as? String else { return }
         appendMention(userID: userID, displayName: nickname)
@@ -785,6 +923,7 @@ final class MessageInputViewImpl: UIView {
 
     private func syncPlaceholderSuppression() {
         messageTextView.suppressPlaceholderForPanel = isEmojiPanelShown || isMorePanelShown
+        applyButtonAppearances()
     }
 
     private func syncBottomAreaHeight() {
@@ -825,14 +964,43 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func updateSendButtonVisibility() {
-        let hasText = !(messageTextView.extractSendText().isEmpty)
-        let showSend = hasText && !isVoiceInputMode
-        if showSend {
-            moreButton.isHidden = true
-            sendButton.isHidden = false
-        } else {
-            sendButton.isHidden = true
-            moreButton.isHidden = !config.isShowMore
+        // 可打断的流式回复在跑：只出停止键，对齐 Android MessageInputActionVisibilityPolicy
+        let showStop = chatbotController?.canInterrupt == true
+        let hasText = !messageTextView.extractSendText().isEmpty
+        let showSend = !showStop && config.isShowSendButton && !isVoiceInputMode
+            && (hasText || config.keepSendButtonVisible)
+        let showMore = !showStop && config.isShowMore && (config.keepSendButtonVisible || !showSend)
+        sendButton.isHidden = !showSend
+        sendButton.isEnabled = hasText
+        moreButton.isHidden = !showMore
+        chatbotStopButton.isHidden = !showStop
+        layoutActionButtons(showSend: showSend, showMore: showMore, showStop: showStop)
+        applyButtonAppearances()
+    }
+
+    private func layoutActionButtons(showSend: Bool, showMore: Bool, showStop: Bool) {
+        let sendSize = MessageInputAppearanceApplier.buttonSize(config.appearance?.sendButton, fallback: Self.inputRowButtonSize, supportsTitle: true)
+        let moreSize = MessageInputAppearanceApplier.buttonSize(config.appearance?.moreButton, fallback: Self.inputRowButtonSize)
+        let sendWidth = showSend ? sendSize.width : 0
+        let moreWidth = showMore ? moreSize.width : 0
+        let gap = showSend && showMore ? Self.inputRowHorizontalInset : 0
+        sendButton.snp.remakeConstraints { make in
+            make.trailing.equalTo(inputRow).offset(-Self.inputRowHorizontalInset)
+            make.centerY.equalTo(inputContainer)
+            make.width.equalTo(sendWidth)
+            make.height.equalTo(sendSize.height)
+        }
+        moreButton.snp.remakeConstraints { make in
+            make.trailing.equalTo(sendButton.snp.leading).offset(-gap)
+            make.centerY.equalTo(inputContainer)
+            let stopWidth = showStop ? Self.inputRowButtonSize : 0
+            make.width.equalTo(max(moreWidth, stopWidth))
+            make.height.equalTo(moreSize.height)
+        }
+        chatbotStopButton.snp.remakeConstraints { make in
+            make.trailing.equalTo(inputRow).offset(-Self.inputRowHorizontalInset)
+            make.centerY.equalTo(inputContainer)
+            make.width.height.equalTo(Self.inputRowButtonSize)
         }
     }
 
@@ -850,9 +1018,13 @@ final class MessageInputViewImpl: UIView {
         hideEmojiPanel(silent: true)
         hideMorePanel(silent: true)
         if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-            let screenHeight = UIScreen.main.bounds.height
-
-            currentKeyboardHeight = max(screenHeight - frame.origin.y, 0)
+            let bottomOnScreen: CGFloat
+            if let window = window {
+                bottomOnScreen = window.convert(convert(bounds, to: window), to: nil).maxY
+            } else {
+                bottomOnScreen = UIScreen.main.bounds.height
+            }
+            currentKeyboardHeight = max(bottomOnScreen - frame.origin.y, 0)
         }
         syncBottomAreaHeight()
         animateLayout()
@@ -927,44 +1099,58 @@ final class MessageInputViewImpl: UIView {
     }
 
     @objc private func handleAudioLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard let window = window else {
+            cancelVoiceRecording()
+            return
+        }
         switch gesture.state {
         case .began:
+            guard !isLongPressingAudio else { return }
             hideEmojiPanel()
             hideMorePanel()
             messageTextView.resignFirstResponder()
-            isLongPressingAudio = true
             postInputInteract()
-            mediaCoordinator.beginVoiceRecording()
+            isLongPressingAudio = mediaCoordinator.beginVoiceRecording(finger: gesture.location(in: window))
         case .changed:
             guard isLongPressingAudio else { return }
-            mediaCoordinator.updateVoiceRecording(finger: gesture.location(in: gesture.view?.window))
-        case .ended, .cancelled, .failed:
+            mediaCoordinator.updateVoiceRecording(finger: gesture.location(in: window))
+        case .ended:
             guard isLongPressingAudio else { return }
             isLongPressingAudio = false
-            mediaCoordinator.endVoiceRecording(finger: gesture.location(in: gesture.view?.window))
+            mediaCoordinator.endVoiceRecording(finger: gesture.location(in: window))
+        case .cancelled, .failed:
+            guard isLongPressingAudio else { return }
+            cancelVoiceRecording()
         default:
             break
         }
     }
 
     @objc private func handleTextInputLongPress(_ gesture: UILongPressGestureRecognizer) {
+        guard let window = window else {
+            cancelVoiceRecording()
+            return
+        }
         switch gesture.state {
         case .began:
-            guard canArmVoiceRecordingFromTextInput() else { return }
+            guard !isLongPressingAudio, canArmVoiceRecordingFromTextInput() else { return }
             hideEmojiPanel()
             hideMorePanel()
             messageTextView.resignFirstResponder()
-            isLongPressingAudio = true
             postInputInteract()
-            mediaCoordinator.beginVoiceRecording()
+            isLongPressingAudio = mediaCoordinator.beginVoiceRecording(finger: gesture.location(in: window))
         case .changed:
             guard isLongPressingAudio else { return }
-            mediaCoordinator.updateVoiceRecording(finger: gesture.location(in: gesture.view?.window))
-        case .ended, .cancelled:
+            mediaCoordinator.updateVoiceRecording(finger: gesture.location(in: window))
+        case .ended:
             isTextInputLongPressArmed = false
             guard isLongPressingAudio else { return }
             isLongPressingAudio = false
-            mediaCoordinator.endVoiceRecording(finger: gesture.location(in: gesture.view?.window))
+            mediaCoordinator.endVoiceRecording(finger: gesture.location(in: window))
+        case .cancelled, .failed:
+            isTextInputLongPressArmed = false
+            guard isLongPressingAudio else { return }
+            cancelVoiceRecording()
         default:
             break
         }
@@ -986,7 +1172,8 @@ final class MessageInputViewImpl: UIView {
     }
 
     @objc private func handleQuoteMessageNotification(_ notification: Notification) {
-        guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
+        guard notification.userInfo?["conversationID"] as? String == viewModel.conversationID,
+              let message = notification.userInfo?["message"] as? MessageInfo else { return }
         setQuoteMessage(message)
     }
 
@@ -1034,7 +1221,10 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
 
     func morePanelDidSelectAlbum() {
         hideMorePanel()
-        AlbumPickerMediaSendCoordinator.shared.showAlbumPicker(conversationID: viewModel.conversationID)
+        AlbumPickerMediaSendCoordinator.shared.showAlbumPicker(
+            conversationID: viewModel.conversationID,
+            enableReadReceipt: config.enableReadReceipt
+        )
     }
 
     func morePanelDidSelectCamera() {

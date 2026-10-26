@@ -71,12 +71,12 @@ final class VideoRecorderRecordButtonView: UIView {
 
     private func initUI() {
         progressView.lineCap = .butt
-        progressView.progressBgColor = VideoRecorderCommon.dynamicColor("record_btn_progress_bg_color", defaultColor: "#FFFFFF")
-        progressView.progressColor = VideoRecorderConfigInternal.sharedInstance().getThemeColor()
+        progressView.progressBgColor = .white
+        progressView.progressColor = VideoRecorderConfigInternal.themeColor
         progressView.width = Self.progressWidthNormal
         addSubview(progressView)
 
-        dotView.backgroundColor = VideoRecorderCommon.dynamicColor("record_btn_dot_color", defaultColor: "#FFFFFF")
+        dotView.backgroundColor = .white
         addSubview(dotView)
 
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(onTap(_:)))

@@ -18,7 +18,7 @@ final class ContactListViewImpl: RTCBaseView {
 
     private let onGroupClick: (GroupInfo) -> Void
 
-    private let config: ContactListConfigProtocol
+    private let config: ContactListConfig
 
     private let viewModel = ContactListViewModel()
 
@@ -43,7 +43,7 @@ final class ContactListViewImpl: RTCBaseView {
 
     init(onContactClick: @escaping (ContactInfo) -> Void,
          onGroupClick: @escaping (GroupInfo) -> Void,
-         config: ContactListConfigProtocol = ChatContactListConfig()) {
+         config: ContactListConfig = ContactListConfig()) {
         self.onContactClick = onContactClick
         self.onGroupClick = onGroupClick
         self.config = config

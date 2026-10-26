@@ -6,7 +6,7 @@ import Kingfisher
 import AtomicXCore
 
 final class MessageListViewImpl: RTCBaseView {
-    var onMultiSelectModeChange: ((Bool) -> Void)?
+    private let onMultiSelectModeChange: ((Bool) -> Void)?
 
     private static let loadMoreThreshold: CGFloat = 240
 
@@ -56,6 +56,8 @@ final class MessageListViewImpl: RTCBaseView {
 
     private static let jumpRecenterTolerance = CGFloat(SpacingScheme.smallSpacing)
 
+    private static let bottomContentPadding = CGFloat(SpacingScheme.bubbleSpacing)
+
     private let onUserClick: ((String) -> Void)?
 
     private let viewModel: MessageListViewModel
@@ -77,6 +79,16 @@ final class MessageListViewImpl: RTCBaseView {
     private var scrollToLatestAfterReload = false
 
     private var lastTableBoundsHeight: CGFloat = 0
+
+    private var lastKnownContentHeight: CGFloat = 0
+
+    private var isGluedToBottom = true
+
+    private var isProgrammaticPin = false
+
+    private var streamFollowSuppressedMsgID: String?
+
+    private var streamingGrowthObserver: NSObjectProtocol?
 
     private var isLoadingOlder = false {
         didSet { updateLoadingIndicators() }
@@ -124,13 +136,17 @@ final class MessageListViewImpl: RTCBaseView {
         return imageView
     }()
 
-    private lazy var tableView: UITableView = {
-        let table = UITableView(frame: .zero, style: .plain)
+    private lazy var tableView: FollowPinTableView = {
+        let table = FollowPinTableView(frame: .zero, style: .plain)
         table.separatorStyle = .none
         table.keyboardDismissMode = .onDrag
         table.rowHeight = UITableView.automaticDimension
         table.estimatedRowHeight = Self.estimatedRowHeight
+        table.contentInset.bottom = Self.bottomContentPadding
         table.allowsSelection = true
+        table.onContentLayout = { [weak self] in
+            self?.handleContentLayout()
+        }
         return table
     }()
 
@@ -175,14 +191,22 @@ final class MessageListViewImpl: RTCBaseView {
     // MARK: - Init
 
     init(conversationID: String,
-                config: (MessageListConfigProtocol & MessageActionConfigProtocol) = ChatMessageListConfig(),
-                locateMessage: MessageInfo? = nil,
-                onUserClick: ((String) -> Void)? = nil) {
+         config: ChatMessageListConfig = ChatMessageListConfig(),
+         locateMessage: MessageInfo? = nil,
+         chatbotController: ChatbotConversationController? = nil,
+         onUserClick: ((String) -> Void)? = nil,
+         onMultiSelectModeChange: ((Bool) -> Void)? = nil) {
+        var effectiveConfig: MessageListConfigProtocol & MessageActionConfigProtocol = config
+        if ChatbotConversationPolicy.isChatbotConversation(conversationID) {
+            effectiveConfig = ChatbotMessageListConfig(base: config)
+        }
         self.onUserClick = onUserClick
+        self.onMultiSelectModeChange = onMultiSelectModeChange
         self.viewModel = MessageListViewModel(
             conversationID: conversationID,
-            config: config,
-            locateMessage: locateMessage
+            config: effectiveConfig,
+            locateMessage: locateMessage,
+            chatbotController: chatbotController
         )
         super.init(frame: .zero)
     }
@@ -259,6 +283,14 @@ final class MessageListViewImpl: RTCBaseView {
         listenController.stop()
         tableView.dataSource = self
         tableView.delegate = self
+        lastKnownContentHeight = tableView.contentSize.height
+        isGluedToBottom = true
+        streamFollowSuppressedMsgID = nil
+        if streamingGrowthObserver == nil {
+            streamingGrowthObserver = NotificationCenter.default.addObserver(forName: .messageListStreamingContentDidGrow, object: nil, queue: .main) { [weak self] _ in
+                self?.handleStreamingContentDidGrow()
+            }
+        }
         tongueView.addTarget(self, action: #selector(handleTongueTap), for: .touchUpInside)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTableViewTap))
         tapGesture.cancelsTouchesInView = false
@@ -476,7 +508,7 @@ final class MessageListViewImpl: RTCBaseView {
             .dropFirst()
             .sink { [weak self] ids in
                 self?.updateVisibleCellsMultiSelectState()
-                self?.multiSelectBar.configure(selectedCount: ids.count)
+                self?.updateMultiSelectBar(selectedCount: ids.count)
             }
             .store(in: &cancellables)
 
@@ -637,11 +669,19 @@ final class MessageListViewImpl: RTCBaseView {
         multiSelectBar.onForwardMerge = { [weak self] in self?.handleMultiSelectForward(type: .merged) }
     }
 
+    private func updateMultiSelectBar(selectedCount: Int) {
+        multiSelectBar.configure(
+            selectedCount: selectedCount,
+            supportsForward: viewModel.config.isSupportForward,
+            supportsDelete: viewModel.config.isSupportDelete
+        )
+    }
+
     private func applyMultiSelectMode(_ isMultiSelect: Bool) {
         UIView.performWithoutAnimation {
             multiSelectBar.isHidden = !isMultiSelect
             if isMultiSelect {
-                multiSelectBar.configure(selectedCount: viewModel.selectedMessageIDs.count)
+                updateMultiSelectBar(selectedCount: viewModel.selectedMessageIDs.count)
             }
             updateVisibleCellsMultiSelectState()
             onMultiSelectModeChange?(isMultiSelect)
@@ -653,7 +693,7 @@ final class MessageListViewImpl: RTCBaseView {
 
     private func updateLayoutForMultiSelectMode(_ isMultiSelect: Bool) {
         UIView.performWithoutAnimation {
-            tableView.contentInset.bottom = isMultiSelect ? multiSelectBar.frame.height : 0
+            tableView.contentInset.bottom = isMultiSelect ? multiSelectBar.frame.height + Self.bottomContentPadding : Self.bottomContentPadding
             if isMultiSelect {
                 revealMultiSelectAnchorAboveBar()
             }
@@ -675,6 +715,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleSingleMessageDelete(_ message: MessageInfo) {
+        guard viewModel.config.isSupportDelete, messages.contains(where: { $0.msgID == message.msgID }) else { return }
         let alert = UIAlertController(
             title: LocalizedChatString("ConfirmDeleteMessage"),
             message: nil,
@@ -688,6 +729,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleMultiSelectDelete() {
+        guard viewModel.config.isSupportDelete else { return }
         let selected = viewModel.getSelectedMessages()
         guard !selected.isEmpty else { return }
         let alert = UIAlertController(
@@ -705,6 +747,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleMultiSelectForward(type: MessageForwardType) {
+        guard viewModel.config.isSupportForward else { return }
         let selected = viewModel.getSelectedMessages()
         guard !selected.isEmpty else { return }
         if selected.contains(where: { $0.status != .sendSuccess }) {
@@ -730,13 +773,19 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func applyMessageList(_ list: [MessageInfo]) {
+        let receivedPlaceholder = list.contains { $0.msgID.hasPrefix(ChatbotPlaceholderMessageFactory.messageIDPrefix) }
 
         let exclusionMatchers = viewModel.config.messageExclusionMatchers
         let list = list.filter { message in
+            if ChatbotMessageVisibilityPolicy.shouldHide(message) { return false }
             if exclusionMatchers.contains(where: { $0(message) }) { return false }
             guard message.messageType == .custom,
                   let callModel = CallMessageParser.parse(message) else { return true }
             return !callModel.isExcludeFromHistory
+        }
+        let keptPlaceholder = list.contains { $0.msgID.hasPrefix(ChatbotPlaceholderMessageFactory.messageIDPrefix) }
+        if receivedPlaceholder || keptPlaceholder {
+            NSLog("[ChatbotPlaceholderDiag] applyMessageList placeholder received=\(receivedPlaceholder) kept=\(keptPlaceholder) total=\(list.count)")
         }
         let oldMessages = messages
 
@@ -781,6 +830,7 @@ final class MessageListViewImpl: RTCBaseView {
         if scrollToLatestAfterReload {
             scrollToLatestAfterReload = false
             scrollToBottom(animated: false)
+            scheduleSettlePin()
         } else if hasPendingJump {
 
         } else if !userHasInteracted {
@@ -798,6 +848,7 @@ final class MessageListViewImpl: RTCBaseView {
             } else if !messages.isEmpty {
                 if tableView.bounds.height > 0 {
                     scrollToBottom(animated: false)
+                    scheduleSettlePin()
                     hasPerformedInitialScroll = true
                 } else {
                     pendingInitialScroll = true
@@ -809,10 +860,35 @@ final class MessageListViewImpl: RTCBaseView {
             }
         } else if prepended, let anchor = anchor {
             restore(anchor: anchor)
-        } else if latestMessageChanged, !isUserScrollSession, !isLoadingNewer {
+        } else if !isUserScrollSession, !isLoadingNewer {
             let isOwnLatestMessage = list.last?.isSentBySelf == true
-            if isOwnLatestMessage || wasLatestCompletelyVisible {
+            var resumeFollow = false
+            if latestMessageChanged, let newLatestMessage = list.last {
+                if let suppressedMsgID = streamFollowSuppressedMsgID, newLatestMessage.msgID != suppressedMsgID {
+                    resumeFollow = true
+                } else if isStreamingMessage(newLatestMessage) {
+                    resumeFollow = true
+                }
+            }
+            if resumeFollow {
+                streamFollowSuppressedMsgID = nil
+            }
+            if latestMessageChanged, isOwnLatestMessage || wasLatestCompletelyVisible || resumeFollow {
                 scrollToBottom(animated: true)
+                isGluedToBottom = true
+                scheduleSettlePin()
+            } else if !latestMessageChanged {
+                if let latestMessage = list.last, isStreamingMessage(latestMessage) {
+                    if streamFollowSuppressedMsgID == nil {
+                        scrollToBottom(animated: false)
+                        isGluedToBottom = true
+                        scheduleSettlePin()
+                    }
+                } else if wasLatestCompletelyVisible {
+                    scrollToBottom(animated: false)
+                    isGluedToBottom = true
+                    scheduleSettlePin()
+                }
             }
         }
         isLoadingOlder = false
@@ -874,6 +950,11 @@ final class MessageListViewImpl: RTCBaseView {
         return old.first?.msgID != new.first?.msgID
     }
 
+    private func isStreamingMessage(_ message: MessageInfo) -> Bool {
+        guard case .stream(let payload) = message.messagePayload else { return false }
+        return !payload.isStreamEnded
+    }
+
     private func topAnchor(using currentMessages: [MessageInfo]) -> (msgID: String, delta: CGFloat)? {
         guard let indexPath = tableView.indexPathsForVisibleRows?.first,
               indexPath.row < currentMessages.count else { return nil }
@@ -899,7 +980,52 @@ final class MessageListViewImpl: RTCBaseView {
     private func scrollToBottom(animated: Bool) {
         guard !messages.isEmpty else { return }
         let lastIndex = IndexPath(row: messages.count - 1, section: 0)
+        isProgrammaticPin = true
         tableView.scrollToRow(at: lastIndex, at: .bottom, animated: false)
+        // scrollToRow 依赖自动估算行高，长 Markdown 行在首次布局前高度未解析，
+        // 落点可能偏离真实底部；强制布局后按 contentSize 精确吸附到底。
+        tableView.layoutIfNeeded()
+        let minOffset = -tableView.adjustedContentInset.top
+        let maxOffset = max(minOffset, tableView.contentSize.height - tableView.bounds.height + tableView.adjustedContentInset.bottom)
+        tableView.setContentOffset(CGPoint(x: 0, y: maxOffset), animated: false)
+        isProgrammaticPin = false
+        // 语义上「滚到底」就是恢复跟随，避免 didScroll 用未解析的估算高度误判脱胶。
+        isGluedToBottom = true
+    }
+
+    private func handleContentLayout() {
+        let contentHeight = tableView.contentSize.height
+        let previousHeight = lastKnownContentHeight
+        lastKnownContentHeight = contentHeight
+        guard contentHeight > previousHeight, previousHeight > 0 else { return }
+        pinToBottomIfFollowing()
+    }
+
+    private func pinToBottomIfFollowing() {
+        guard hasPerformedInitialScroll, !messages.isEmpty else { return }
+        guard isGluedToBottom, streamFollowSuppressedMsgID == nil else { return }
+        guard !isUserScrollSession, !tableView.isDragging, !tableView.isDecelerating else { return }
+        tableView.layoutIfNeeded()
+        let minOffset = -tableView.adjustedContentInset.top
+        let maxOffset = max(minOffset, tableView.contentSize.height - tableView.bounds.height + tableView.adjustedContentInset.bottom)
+        guard abs(maxOffset - tableView.contentOffset.y) > Self.glueOffsetTolerance else { return }
+        isProgrammaticPin = true
+        tableView.setContentOffset(CGPoint(x: 0, y: maxOffset), animated: false)
+        isProgrammaticPin = false
+    }
+
+    private func scheduleSettlePin() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            pinToBottomIfFollowing()
+            DispatchQueue.main.async { [weak self] in
+                self?.pinToBottomIfFollowing()
+            }
+        }
+    }
+
+    private func handleStreamingContentDidGrow() {
+        scheduleSettlePin()
     }
 
     private func glueContentToBottomForBoundsChange() {
@@ -914,7 +1040,9 @@ final class MessageListViewImpl: RTCBaseView {
         let maxOffset = max(minOffset, tableView.contentSize.height - newHeight + tableView.adjustedContentInset.bottom)
         let glued = min(max(tableView.contentOffset.y - delta, minOffset), maxOffset)
         if abs(glued - tableView.contentOffset.y) > Self.glueOffsetTolerance {
+            isProgrammaticPin = true
             tableView.setContentOffset(CGPoint(x: 0, y: glued), animated: false)
+            isProgrammaticPin = false
         }
     }
 
@@ -1105,6 +1233,7 @@ final class MessageListViewImpl: RTCBaseView {
             for: latestMessage,
             bubbleFrameInWindow: bubbleFrameInWindow,
             config: viewModel.config,
+            conversationID: viewModel.conversationID,
             auxiliaryHiddenIDs: viewModel.hiddenAuxiliaryTextIDs
         )
     }
@@ -1161,7 +1290,6 @@ final class MessageListViewImpl: RTCBaseView {
         cursor.msgID = quoteInfo.msgID
         if viewModel.isGroupChat {
             cursor.sequence = quoteInfo.sequence
-            cursor.timestamp = quoteInfo.timestamp
         } else {
             cursor.timestamp = quoteInfo.timestamp
         }
@@ -1189,6 +1317,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func isMessageExcludedFromDisplay(_ message: MessageInfo) -> Bool {
+        if ChatbotMessageVisibilityPolicy.shouldHide(message) { return true }
         if viewModel.config.messageExclusionMatchers.contains(where: { $0(message) }) { return true }
         guard message.messageType == .custom,
               let callModel = CallMessageParser.parse(message) else { return false }
@@ -1285,6 +1414,8 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleBackToLatest() {
+        isGluedToBottom = true
+        streamFollowSuppressedMsgID = nil
         if viewModel.hasMoreNewerMessage {
             scrollToLatestAfterReload = true
             viewModel.reloadLatestMessages { [weak self] success in
@@ -1376,6 +1507,8 @@ final class MessageListViewImpl: RTCBaseView {
         userHasInteracted = true
         hasPerformedInitialScroll = true
         pendingInitialScroll = false
+        // 跳转是主动离开底部：立即脱胶，避免贴底跟随把用户拽回最新消息。
+        isGluedToBottom = false
         armPendingHighlight(msgID)
         isJumpScrolling = true
         let indexPath = IndexPath(row: index, section: 0)
@@ -1409,6 +1542,9 @@ final class MessageListViewImpl: RTCBaseView {
 
     private func finishJumpScrollIfNeeded(msgID: String) {
         isJumpScrolling = false
+        // 跳转落点可能就在底部附近（如跳到最新消息）：按真实落点恢复跟随状态。
+        let distanceFromBottom = tableView.contentSize.height - (tableView.contentOffset.y + tableView.bounds.height)
+        isGluedToBottom = distanceFromBottom <= Self.nearBottomThreshold
         guard let index = messages.firstIndex(where: { $0.msgID == msgID }), index < messages.count else {
             return
         }
@@ -1435,7 +1571,8 @@ final class MessageListViewImpl: RTCBaseView {
             object: nil,
             userInfo: [
                 "userID": message.from.userID,
-                "nickname": message.from.nickname ?? ""
+                "nickname": message.from.nickname ?? "",
+                "conversationID": viewModel.conversationID
             ]
         )
     }
@@ -1459,17 +1596,26 @@ final class MessageListViewImpl: RTCBaseView {
         ) { [weak self] _, _ in
             self?.handleForwardAuxiliaryText(text)
         }
+        var actions: [MessageActionMenuAction] = []
+        if viewModel.config.isSupportCopy { actions.append(copyAction) }
+        if viewModel.config.isSupportForward { actions.append(forwardAction) }
+        guard !actions.isEmpty else { return }
         MessageActionMenuController.shared.showAuxiliaryMenu(
-            actions: [copyAction, forwardAction],
+            actions: actions,
             message: message,
             anchorFrameInWindow: anchorFrame
         )
     }
 
     private func handleForwardAuxiliaryText(_ text: String) {
+        guard viewModel.config.isSupportForward else { return }
         let selector = ForwardTargetSelectorViewController { [weak self] conversationIDs in
             guard let self = self else { return }
-            for conversationID in conversationIDs {
+            let partition = ChatbotForwardTargetPolicy.partition(conversationIDs)
+            if !partition.rejectedChatbot.isEmpty {
+                WindowToastManager.shared.show(LocalizedChatString("ChatbotForwardNotSupported"), type: .warning)
+            }
+            for conversationID in partition.allowed {
                 let inputStore = MessageInputStore.create(conversationID: conversationID)
                 let payload = TextSendMessagePayload(text: text)
                 inputStore.sendMessage(payload: .text(payload), option: SendMessageOption(), completion: nil)
@@ -1496,6 +1642,13 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func performForward(messages: [MessageInfo], conversationIDs: [String], type: MessageForwardType = .separate) {
+        // 机器人会话不支持作为转发目标，对齐 Android filterForwardTargets
+        let partition = ChatbotForwardTargetPolicy.partition(conversationIDs)
+        if !partition.rejectedChatbot.isEmpty {
+            WindowToastManager.shared.show(LocalizedChatString("ChatbotForwardNotSupported"), type: .warning)
+        }
+        let conversationIDs = partition.allowed
+        guard !conversationIDs.isEmpty else { return }
         let enableReadReceipt = AppBuilderConfig.shared.enableReadReceipt
         let preparedMessages = messages.map { message -> MessageInfo in
             var copy = message
@@ -1545,7 +1698,7 @@ extension MessageListViewImpl: UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let message = messages[indexPath.row]
         let kind = MessageCellRegistry.shared.renderKind(for: message)
-        let timeString = viewModel.messageTimeString(at: indexPath.row)
+        let timeString = viewModel.messageTimeString(at: indexPath.row, in: messages)
 
         switch kind {
         case .systemTip, .revoked:
@@ -1616,6 +1769,9 @@ extension MessageListViewImpl: UITableViewDelegate {
         userHasInteracted = true
         isUserScrollSession = true
         pendingInitialScroll = false
+        if let lastMessage = messages.last, isStreamingMessage(lastMessage) {
+            streamFollowSuppressedMsgID = lastMessage.msgID
+        }
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -1628,6 +1784,14 @@ extension MessageListViewImpl: UITableViewDelegate {
             viewModel.loadOlderMessages()
         }
         let distanceFromBottom = scrollView.contentSize.height - (scrollView.contentOffset.y + scrollView.bounds.height)
+        // 跟随状态只响应用户滚动：reloadData 行高重估、程序滚动、contentSize 变化引发的
+        // 瞬态偏移不应打断贴底跟随，否则长消息渲染过程中会偶发停在半屏。
+        if !isProgrammaticPin, scrollView.isTracking || scrollView.isDecelerating {
+            isGluedToBottom = distanceFromBottom <= Self.nearBottomThreshold
+            if isGluedToBottom {
+                streamFollowSuppressedMsgID = nil
+            }
+        }
         if distanceFromBottom <= Self.loadMoreThreshold,
            viewModel.hasMoreNewerMessage, !isLoadingNewer, !suppressPagination {
             isLoadingNewer = true
@@ -1668,4 +1832,17 @@ extension MessageListViewImpl: UITableViewDelegate {
         pendingHighlightPlayed = true
         messageCell.playHighlightAnimation()
     }
+}
+
+private final class FollowPinTableView: UITableView {
+    var onContentLayout: (() -> Void)?
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        onContentLayout?()
+    }
+}
+
+extension Notification.Name {
+    static let messageListStreamingContentDidGrow = Notification.Name("messageListStreamingContentDidGrow")
 }

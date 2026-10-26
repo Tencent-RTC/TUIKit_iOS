@@ -20,6 +20,8 @@ enum MessageContentViewFactory {
             return MessageMergedContentView()
         case .call:
             return MessageCallContentView()
+        case .chatbot, .stream:
+            return MessageStreamingContentView()
         case .custom(let businessID):
             return MessageCellRegistry.shared.makeCustomContentView(for: businessID) ?? MessageFallbackContentView(kind: .unsupported)
         case .face, .unsupported:

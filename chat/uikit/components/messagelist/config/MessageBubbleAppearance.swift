@@ -1,71 +1,70 @@
 import Foundation
 import UIKit
 
-// MARK: - Message List Background
-
-public enum MessageListBackground {
-    case color(UIColor)
-    case gradient(colors: [UIColor], startPoint: CGPoint, endPoint: CGPoint)
-    case image(UIImage)
-}
-
-// MARK: - Message Bubble Background
-
-public enum MessageBubbleBackground {
-    case color(UIColor)
-    case gradient(colors: [UIColor], startPoint: CGPoint, endPoint: CGPoint)
-    case image(UIImage)
-}
-
-// MARK: - Message Bubble Corner Radius
-
-public struct MessageBubbleCornerRadius {
-    public var topLeft: CGFloat?
-    public var topRight: CGFloat?
-    public var bottomLeft: CGFloat?
-    public var bottomRight: CGFloat?
-
+extension MessageBubbleCornerRadius {
     public init(topLeft: CGFloat? = nil, topRight: CGFloat? = nil, bottomLeft: CGFloat? = nil, bottomRight: CGFloat? = nil) {
-        self.topLeft = topLeft
-        self.topRight = topRight
-        self.bottomLeft = bottomLeft
-        self.bottomRight = bottomRight
+        self.userTopLeft = topLeft
+        self.userTopRight = topRight
+        self.userBottomLeft = bottomLeft
+        self.userBottomRight = bottomRight
+    }
+
+    public var topLeft: CGFloat? {
+        get { userTopLeft }
+        set { userTopLeft = newValue }
+    }
+
+    public var topRight: CGFloat? {
+        get { userTopRight }
+        set { userTopRight = newValue }
+    }
+
+    public var bottomLeft: CGFloat? {
+        get { userBottomLeft }
+        set { userBottomLeft = newValue }
+    }
+
+    public var bottomRight: CGFloat? {
+        get { userBottomRight }
+        set { userBottomRight = newValue }
     }
 }
 
-// MARK: - Message Bubble Stroke
-
-public struct MessageBubbleStroke {
-    public var width: CGFloat
-    public var color: UIColor
-
+extension MessageBubbleStroke {
     public init(width: CGFloat, color: UIColor) {
-        self.width = width
-        self.color = color
+        self.userWidth = width
+        self.userColor = color
+    }
+
+    public var width: CGFloat {
+        get { userWidth ?? 0 }
+        set { userWidth = newValue }
+    }
+
+    public var color: UIColor {
+        get { userColor ?? .clear }
+        set { userColor = newValue }
     }
 }
 
-// MARK: - Message Bubble Size
-
-public struct MessageBubbleSize {
-    public var width: CGFloat?
-    public var height: CGFloat?
-
+extension MessageBubbleSize {
     public init(width: CGFloat? = nil, height: CGFloat? = nil) {
-        self.width = width
-        self.height = height
+        self.userWidth = width
+        self.userHeight = height
+    }
+
+    public var width: CGFloat? {
+        get { userWidth }
+        set { userWidth = newValue }
+    }
+
+    public var height: CGFloat? {
+        get { userHeight }
+        set { userHeight = newValue }
     }
 }
 
-// MARK: - Message Bubble Appearance
-
-public struct MessageBubbleAppearance {
-    public var background: MessageBubbleBackground?
-    public var cornerRadius: MessageBubbleCornerRadius?
-    public var stroke: MessageBubbleStroke?
-    public var contentInsets: UIEdgeInsets?
-    public var minimumSize: MessageBubbleSize?
-
+extension MessageBubbleAppearance {
     public init(
         background: MessageBubbleBackground? = nil,
         cornerRadius: MessageBubbleCornerRadius? = nil,
@@ -73,11 +72,36 @@ public struct MessageBubbleAppearance {
         contentInsets: UIEdgeInsets? = nil,
         minimumSize: MessageBubbleSize? = nil
     ) {
-        self.background = background
-        self.cornerRadius = cornerRadius
-        self.stroke = stroke
-        self.contentInsets = contentInsets
-        self.minimumSize = minimumSize
+        self.userBackground = background
+        self.userCornerRadius = cornerRadius
+        self.userStroke = stroke
+        self.userContentInsets = contentInsets
+        self.userMinimumSize = minimumSize
+    }
+
+    public var background: MessageBubbleBackground? {
+        get { userBackground }
+        set { userBackground = newValue }
+    }
+
+    public var cornerRadius: MessageBubbleCornerRadius? {
+        get { userCornerRadius }
+        set { userCornerRadius = newValue }
+    }
+
+    public var stroke: MessageBubbleStroke? {
+        get { userStroke }
+        set { userStroke = newValue }
+    }
+
+    public var contentInsets: UIEdgeInsets? {
+        get { userContentInsets }
+        set { userContentInsets = newValue }
+    }
+
+    public var minimumSize: MessageBubbleSize? {
+        get { userMinimumSize }
+        set { userMinimumSize = newValue }
     }
 
     public func merged(over base: MessageBubbleAppearance?) -> MessageBubbleAppearance {

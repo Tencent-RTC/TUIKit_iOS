@@ -3,254 +3,19 @@ import UIKit
 import SnapKit
 import AtomicXCore
 
-public typealias MessageMatcher = (MessageInfo) -> Bool
-
-public protocol MessageListConfigProtocol {
-    var alignment: MessageAlignment { get }
-    var isShowTimeMessage: Bool { get }
-    var isShowLeftAvatar: Bool { get }
-    var isShowLeftNickname: Bool { get }
-    var isShowRightAvatar: Bool { get }
-    var isShowRightNickname: Bool { get }
-    var isShowTimeInBubble: Bool { get }
-    var cellSpacing: CGFloat { get }
-    var isShowSystemMessage: Bool { get }
-    var isShowUnsupportMessage: Bool { get }
-    var horizontalPadding: CGFloat { get }
-    var avatarSpacing: CGFloat { get }
-    var isSupportReaction: Bool { get }
-    var isSupportQuote: Bool { get }
-    var enableTyping: Bool { get }
-    var messageExclusionMatchers: [MessageMatcher] { get }
-    var background: MessageListBackground? { get }
-    var defaultBubbleAppearance: MessageBubbleAppearance? { get }
-    var ownBubbleAppearance: MessageBubbleAppearance? { get }
-    var incomingBubbleAppearance: MessageBubbleAppearance? { get }
-    var leftBubbleAppearance: MessageBubbleAppearance? { get }
-    var rightBubbleAppearance: MessageBubbleAppearance? { get }
-}
-
-extension MessageListConfigProtocol {
-    public var isSupportQuote: Bool { true }
-    public var enableTyping: Bool { true }
-    public var messageExclusionMatchers: [MessageMatcher] { [] }
-    public var background: MessageListBackground? { nil }
-    public var defaultBubbleAppearance: MessageBubbleAppearance? { nil }
-    public var ownBubbleAppearance: MessageBubbleAppearance? { nil }
-    public var incomingBubbleAppearance: MessageBubbleAppearance? { nil }
-    public var leftBubbleAppearance: MessageBubbleAppearance? { nil }
-    public var rightBubbleAppearance: MessageBubbleAppearance? { nil }
-
-    public func resolvedBubbleAppearance(isSelf: Bool, isLeft: Bool) -> MessageBubbleAppearance? {
-        let slot: MessageBubbleAppearance?
-        switch alignment {
-        case .left:
-            slot = leftBubbleAppearance
-        case .right:
-            slot = rightBubbleAppearance
-        case .twoSided:
-            slot = isSelf ? ownBubbleAppearance : incomingBubbleAppearance
-        }
-        guard let slot = slot else { return defaultBubbleAppearance }
-        return slot.merged(over: defaultBubbleAppearance)
-    }
-}
-
-public protocol MessageActionConfigProtocol {
-    var isSupportCopy: Bool { get }
-    var isSupportDelete: Bool { get }
-    var isSupportRecall: Bool { get }
-    var isSupportForward: Bool { get }
-    var isSupportQuote: Bool { get }
-    var isSupportMultiSelect: Bool { get }
-    var isSupportConvertToText: Bool { get }
-    var isSupportTranslate: Bool { get }
-    var isSupportListenFromHere: Bool { get }
-    var actionCustomizer: MessageActionCustomizer? { get }
-}
-
-extension MessageActionConfigProtocol {
-    public var isSupportQuote: Bool { true }
-    public var actionCustomizer: MessageActionCustomizer? { nil }
-}
-
-extension ChatMessageListConfig: MessageListConfigProtocol, MessageActionConfigProtocol {
-    public var alignment: MessageAlignment {
-        return userAlignment ?? AppBuilderConfig.shared.messageAlignment
-    }
-
-    public var isShowTimeMessage: Bool {
-        return userIsShowTimeMessage ?? true
-    }
-
-    public var isShowLeftAvatar: Bool {
-        return userIsShowLeftAvatar ?? true
-    }
-
-    public var isShowLeftNickname: Bool {
-        return userIsShowLeftNickname ?? true
-    }
-
-    public var isShowRightAvatar: Bool {
-        return userIsShowRightAvatar ?? false
-    }
-
-    public var isShowRightNickname: Bool {
-        return userIsShowRightNickname ?? true
-    }
-
-    public var isShowTimeInBubble: Bool {
-        return userIsShowTimeInBubble ?? true
-    }
-
-    public var cellSpacing: CGFloat {
-        return userCellSpacing ?? Self.defaultCellSpacing
-    }
-
-    public var isShowSystemMessage: Bool {
-        return userIsShowSystemMessage ?? true
-    }
-
-    public var isShowUnsupportMessage: Bool {
-        return userIsShowUnsupportMessage ?? true
-    }
-
-    public var isSupportCopy: Bool {
-        if let userIsSupportCopy = userIsSupportCopy {
-            return userIsSupportCopy
-        } else {
-            let config = AppBuilderConfig.shared
-            return config.messageActionList.contains(.copy)
-        }
-    }
-
-    public var isSupportDelete: Bool {
-        if let userIsSupportDelete = userIsSupportDelete {
-            return userIsSupportDelete
-        } else {
-            let config = AppBuilderConfig.shared
-            return config.messageActionList.contains(.delete)
-        }
-    }
-
-    public var isSupportRecall: Bool {
-        if let userIsSupportRecall = userIsSupportRecall {
-            return userIsSupportRecall
-        } else {
-            let config = AppBuilderConfig.shared
-            return config.messageActionList.contains(.recall)
-        }
-    }
-
-    public var isSupportForward: Bool {
-        if let userIsSupportForward = userIsSupportForward {
-            return userIsSupportForward
-        } else {
-            return AppBuilderConfig.shared.messageActionList.contains(.forward)
-        }
-    }
-
-    public var isSupportQuote: Bool {
-        if let userIsSupportQuote = userIsSupportQuote {
-            return userIsSupportQuote
-        } else {
-            return AppBuilderConfig.shared.messageActionList.contains(.quote)
-        }
-    }
-
-    public var isSupportMultiSelect: Bool {
-        return userIsSupportMultiSelect ?? true
-    }
-
-    public var isSupportConvertToText: Bool {
-        return userIsSupportConvertToText ?? true
-    }
-
-    public var isSupportTranslate: Bool {
-        return userIsSupportTranslate ?? true
-    }
-
-    public var isSupportListenFromHere: Bool {
-        return userIsSupportListenFromHere ?? true
-    }
-
-    public var actionCustomizer: MessageActionCustomizer? {
-        return userActionCustomizer
-    }
-
-    public var horizontalPadding: CGFloat {
-        return userHorizontalPadding ?? Self.defaultHorizontalPadding
-    }
-
-    public var avatarSpacing: CGFloat {
-        return userAvatarSpacing ?? Self.defaultAvatarSpacing
-    }
-
-    public var isSupportReaction: Bool {
-        return userIsSupportReaction ?? true
-    }
-
-    public var enableTyping: Bool {
-        return userEnableTyping ?? true
-    }
-
-    public var background: MessageListBackground? {
-        return userBackground
-    }
-
-    public var defaultBubbleAppearance: MessageBubbleAppearance? {
-        return userDefaultBubbleAppearance
-    }
-
-    public var ownBubbleAppearance: MessageBubbleAppearance? {
-        return userOwnBubbleAppearance
-    }
-
-    public var incomingBubbleAppearance: MessageBubbleAppearance? {
-        return userIncomingBubbleAppearance
-    }
-
-    public var leftBubbleAppearance: MessageBubbleAppearance? {
-        return userLeftBubbleAppearance
-    }
-
-    public var rightBubbleAppearance: MessageBubbleAppearance? {
-        return userRightBubbleAppearance
-    }
-
-    public var messageExclusionMatchers: [MessageMatcher] {
-        return exclusionMatchers
-    }
-
-    public mutating func addMessageExclusion(_ matcher: @escaping MessageMatcher) {
-        exclusionMatchers.append(matcher)
-    }
-
-    public mutating func excludeMessagesByType(_ types: MessageType...) {
-        exclusionMatchers.append { message in
-            return types.contains(message.messageType)
-        }
-    }
-
-    public mutating func excludeCustomMessagesByBusinessID(_ businessID: String) {
-        exclusionMatchers.append { message in
-            guard case .custom(let payload) = message.messagePayload,
-                  let data = payload.customData.data(using: .utf8),
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
-            else {
-                return false
-            }
-            return json["businessID"] as? String == businessID
-        }
-    }
-
-    public mutating func clearMessageExclusions() {
-        exclusionMatchers.removeAll()
-    }
-}
-
 public final class MessageListView: UIView {
     static let blankAreaClickNotification = NSNotification.Name("MessageListBlankAreaClick")
+    private let impl: MessageListViewImpl
+
+    /// 添加或更新本地展示占位；相同会话和占位 ID 的更新保留原位置。
+    public static func addPlaceholder(conversationID: String, info: MessagePlaceholderInfo) {
+        MessageListPlaceholderStore.shared.upsert(conversationID: conversationID, info: info)
+    }
+
+    /// 删除本地展示占位，不撤回消息或取消发送任务。
+    public static func removePlaceholder(conversationID: String, placeholderID: String) {
+        MessageListPlaceholderStore.shared.remove(conversationID: conversationID, placeholderID: placeholderID)
+    }
 
     public static func registerCustomMessageCell(businessID: String,
                                                  summaryProvider: @escaping (CustomMessagePayload) -> String?,
@@ -267,22 +32,19 @@ public final class MessageListView: UIView {
         CustomMessageSummaryRegistry.shared.registerMatcher(matcher)
     }
 
-    var onMultiSelectModeChange: ((Bool) -> Void)? {
-        get { impl.onMultiSelectModeChange }
-        set { impl.onMultiSelectModeChange = newValue }
-    }
-
-    private let impl: MessageListViewImpl
-
     init(conversationID: String,
-         config: (MessageListConfigProtocol & MessageActionConfigProtocol) = ChatMessageListConfig(),
+         config: ChatMessageListConfig = ChatMessageListConfig(),
          locateMessage: MessageInfo? = nil,
-         onUserClick: ((String) -> Void)? = nil) {
+         chatbotController: ChatbotConversationController? = nil,
+         onUserClick: ((String) -> Void)? = nil,
+         onMultiSelectModeChange: ((Bool) -> Void)? = nil) {
         impl = MessageListViewImpl(
             conversationID: conversationID,
             config: config,
             locateMessage: locateMessage,
-            onUserClick: onUserClick
+            chatbotController: chatbotController,
+            onUserClick: onUserClick,
+            onMultiSelectModeChange: onMultiSelectModeChange
         )
         super.init(frame: .zero)
         addSubview(impl)
@@ -308,6 +70,33 @@ public final class MessageListView: UIView {
     }
 }
 
+public typealias MessageActionCustomizer = (CustomEditor<MessageActionMenuAction>) -> Void
+
+public struct MessageActionMenuAction: CustomItem {
+    public var ID: String = ""
+    public let iconName: String
+    public let systemIconFallback: String
+    public let label: String
+    public var isDangerous: Bool = false
+    public var isReactionEntry: Bool = false
+    public let handler: (MessageInfo, MessageActionStore) -> Void
+    public init(ID: String = "",
+                iconName: String,
+                systemIconFallback: String,
+                label: String,
+                isDangerous: Bool = false,
+                isReactionEntry: Bool = false,
+                handler: @escaping (MessageInfo, MessageActionStore) -> Void) {
+        self.ID = ID
+        self.iconName = iconName
+        self.systemIconFallback = systemIconFallback
+        self.label = label
+        self.isDangerous = isDangerous
+        self.isReactionEntry = isReactionEntry
+        self.handler = handler
+    }
+}
+
 public struct MessageContentContext {
     let config: MessageListConfigProtocol
     public let isLeft: Bool
@@ -324,6 +113,5 @@ public struct MessageContentContext {
 }
 
 public protocol MessageContentView: UIView {
-
     func bind(message: MessageInfo, context: MessageContentContext)
 }
