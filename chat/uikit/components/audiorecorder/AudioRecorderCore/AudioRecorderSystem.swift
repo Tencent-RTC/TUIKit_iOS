@@ -12,8 +12,6 @@ internal class AudioRecorderSystem: AudioRecorderInternalProtocol {
 
     private static let meterUpdateInterval: TimeInterval = 0.2
 
-    private static let toastDuration: TimeInterval = 5
-
     private var listener: AudioRecorderListener?
 
     private var recorder: AVAudioRecorder?
@@ -98,17 +96,6 @@ internal class AudioRecorderSystem: AudioRecorderInternalProtocol {
 
     func setListener(_ listener: AudioRecorderListener) {
         self.listener = listener
-    }
-
-    func enableAIDeNoise(_ enable : Bool) {
-        if (!enable) {
-            return;
-        }
-
-        logger.error("system audio record do not support ai de noise");
-        #if DEBUG
-          WindowToastManager.shared.show(LocalizedChatString("AudioAuthorizationPrompter"), type: .warning, duration: Self.toastDuration)
-        #endif
     }
 
     @objc private func onRecordTimer() {

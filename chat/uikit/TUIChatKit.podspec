@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
     s.frameworks       = 'UIKit', 'Foundation', 'AVFoundation', 'AVKit', 'SwiftUI', 'SafariServices'
 
     s.dependency 'Kingfisher'
-    s.dependency 'AtomicXCore', '>= 4.3.10', '< 5.0'
-    s.dependency 'Masonry'
+    s.dependency 'AtomicXCore', '>= 3.0.0', '< 5.0'
+    #s.dependency 'AtomicXCore'
     s.dependency 'SnapKit'
     s.dependency 'AlbumPicker', '~> 1.0.0'
 

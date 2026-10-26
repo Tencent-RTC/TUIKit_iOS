@@ -1,3 +1,4 @@
+import Foundation
 import AVFoundation
 import AVKit
 import Combine

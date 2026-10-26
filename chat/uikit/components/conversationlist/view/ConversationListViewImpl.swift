@@ -1,3 +1,4 @@
+import Foundation
 import AtomicXCore
 import Combine
 import SnapKit
@@ -160,7 +161,7 @@ final class ConversationListViewImpl: RTCBaseView {
         }
         if config.isSupportClearHistory {
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.clearHistory, title: LocalizedChatString("ConversationClearChatHistory")) { [weak self] _ in
-                self?.viewModel.clearHistory(conversation)
+                self?.confirmClearHistory(conversation)
             })
         }
         if config.isSupportDelete {
@@ -185,6 +186,20 @@ final class ConversationListViewImpl: RTCBaseView {
         alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
         alert.addAction(UIAlertAction(title: LocalizedChatString("Delete"), style: .destructive) { _ in
             action.action(conversation)
+        })
+        findViewController()?.present(alert, animated: true)
+    }
+
+    private func confirmClearHistory(_ conversation: ConversationInfo) {
+        let titleKey = conversation.type == .group ? "ClearGroupHistoryTips" : "ClearContactHistoryTips"
+        let alert = UIAlertController(
+            title: LocalizedChatString(titleKey),
+            message: nil,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Confirm"), style: .destructive) { [weak self] _ in
+            self?.viewModel.clearHistory(conversation)
         })
         findViewController()?.present(alert, animated: true)
     }

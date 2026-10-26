@@ -1,3 +1,4 @@
+import Foundation
 import AtomicXCore
 import Combine
 import SnapKit
@@ -149,6 +150,19 @@ final class GroupMemberListViewController: ChatSettingBaseViewController {
         }
     }
 
+    private func confirmRemoveMember(_ member: GroupMember) {
+        let alert = UIAlertController(
+            title: LocalizedChatString("RemoveMemberConfirmTips"),
+            message: nil,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
+        alert.addAction(UIAlertAction(title: LocalizedChatString("RemoveMember"), style: .destructive) { [weak self] _ in
+            self?.memberStore.deleteMember(userIDList: [member.userID], completion: nil)
+        })
+        present(alert, animated: true)
+    }
+
     private func presentMemberActionSheet(_ member: GroupMember) {
         let alert = UIAlertController(
             title: nil,
@@ -160,7 +174,7 @@ final class GroupMemberListViewController: ChatSettingBaseViewController {
         })
         if canRemoveMember(member) {
             alert.addAction(UIAlertAction(title: LocalizedChatString("RemoveMember"), style: .default) { [weak self] _ in
-                self?.memberStore.deleteMember(userIDList: [member.userID], completion: nil)
+                self?.confirmRemoveMember(member)
             })
         }
         if canSetAdmin(for: member) {

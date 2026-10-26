@@ -1,6 +1,11 @@
+import Foundation
 import AVKit
 import Combine
 import UIKit
+
+public extension Notification.Name {
+    static let chatVideoPlaybackDidStart = Notification.Name("ChatVideoPlaybackDidStart")
+}
 
 struct VideoData {
     let uri: String
@@ -37,12 +42,14 @@ class VideoPlayer: ObservableObject {
     @Published public var player: AVPlayer?
 
     func play(videoData: VideoData) {
+        NotificationCenter.default.post(name: .chatVideoPlaybackDidStart, object: nil)
         currentVideoData = videoData
         setupPlayer(with: videoData)
         isPresented = true
     }
 
     func playWithUIKit(videoData: VideoData, onPresented: (() -> Void)? = nil, onDismiss: (() -> Void)? = nil) {
+        NotificationCenter.default.post(name: .chatVideoPlaybackDidStart, object: nil)
         currentVideoData = videoData
 
         let videoURL: URL

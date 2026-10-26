@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 
 public final class ExpandedHitButton: UIButton {

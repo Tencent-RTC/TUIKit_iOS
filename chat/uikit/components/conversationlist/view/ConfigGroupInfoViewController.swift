@@ -1,3 +1,4 @@
+import Foundation
 import AtomicXCore
 import Kingfisher
 import SnapKit
