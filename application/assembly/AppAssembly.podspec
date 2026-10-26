@@ -45,7 +45,6 @@ Pod::Spec.new do |spec|
       '*.swift',
       'Extension/**/*.{swift,h,m}',
       'Modules/Interface/**/*.{swift,h,m}',
-      'Modules/Room/*.{swift,h,m}',
       'Modules/AtomicXCoreLogin.swift',
       *modules.map { |m| "Modules/#{m}/**/*.{swift,h,m}" },
     ]
