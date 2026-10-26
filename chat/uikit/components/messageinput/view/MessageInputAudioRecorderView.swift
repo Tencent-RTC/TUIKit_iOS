@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 
 enum AudioRecorderReleaseAction {
@@ -190,12 +191,14 @@ final class MessageInputAudioRecorderView: UIView {
         )
 
         statusLabel.numberOfLines = 0
-        statusLabel.frame = CGRect(x: statusHorizontalMargin, y: 0, width: width - 2 * statusHorizontalMargin, height: 0)
-        statusLabel.sizeToFit()
-        var statusFrame = statusLabel.frame
-        statusFrame.origin.x = (width - statusFrame.width) / 2
-        statusFrame.origin.y = height - statusBottomMargin - statusFrame.height
-        statusLabel.frame = statusFrame
+        let statusMaxWidth = width - 2 * statusHorizontalMargin
+        let statusSize = statusLabel.sizeThatFits(CGSize(width: statusMaxWidth, height: .greatestFiniteMagnitude))
+        statusLabel.frame = CGRect(
+            x: statusHorizontalMargin,
+            y: height - statusBottomMargin - statusSize.height,
+            width: statusMaxWidth,
+            height: statusSize.height
+        )
 
         bubbleView.frame = CGRect(
             x: bubbleHorizontalMargin,

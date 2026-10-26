@@ -26,13 +26,12 @@ internal class AudioRecorderImpl: AudioRecorder {
 
     private var currentTime:Int = 0
 
-    override public func startRecord(filepath: String? = nil, enableAIDeNoise: Bool = false,
+    override public func startRecord(filepath: String? = nil,
                                      minDurationMs: Int = AudioRecorderImpl.kMinDuration, maxDurationMs: Int = AudioRecorderImpl.kMaxDuration) {
-        logger.info("start record file path is \( filepath ?? "") enableAIDeNoise : \(enableAIDeNoise) minDuration: \(minDurationMs) maxDuration : \(maxDurationMs)")
+        logger.info("start record file path is \( filepath ?? "") minDuration: \(minDurationMs) maxDuration : \(maxDurationMs)")
 
         self.minDurationMs = minDurationMs
         self.maxDurationMs = maxDurationMs
-        self.enableAIDeNoise(enableAIDeNoise)
 
         startRequested = true
         checkMicPermission { [weak self] isGranted, _ in
@@ -85,7 +84,10 @@ internal class AudioRecorderImpl: AudioRecorder {
         if recorder == nil {
             recorder = AudioRecorderSystem()
         }
+        recorder?.setListener(makeRecorderListener())
+    }
 
+    private func makeRecorderListener() -> AudioRecorderListener {
         var listener = AudioRecorderListener()
         listener.onProgress = { [weak self] duration in
             self?.currentTime = duration
@@ -94,8 +96,23 @@ internal class AudioRecorderImpl: AudioRecorder {
         listener.onPower = { [weak self] power in
             self?.onPowerLevel?(power)
         }
-        listener.onComplete = onComplete
-        recorder?.setListener(listener)
+        listener.onComplete = { [weak self] retCode in
+            self?.onComplete(retCode)
+        }
+        listener.onUnavailable = { [weak self] in
+            self?.fallbackToSystemRecorder()
+        }
+        return listener
+    }
+
+    private func fallbackToSystemRecorder() {
+        guard !(recorder is AudioRecorderSystem) else { return }
+        logger.info("txugc audio recorder is unavailable, fallback to system recorder")
+        let systemRecorder = AudioRecorderSystem()
+        systemRecorder.setListener(makeRecorderListener())
+        recorder = systemRecorder
+        guard startRequested || isRecording, let recordedFilePath = recordedFilePath else { return }
+        systemRecorder.startRecord(recordedFilePath, minDurationMs, maxDurationMs)
     }
 
     func executeOnMainThread(_ closure: @escaping () -> Void) {
@@ -106,14 +123,6 @@ internal class AudioRecorderImpl: AudioRecorder {
                 closure()
             }
         }
-    }
-
-    private func enableAIDeNoise(_ enable: Bool){
-
-        logger.info("enable ai de noise. enbale:\(enable)")
-        let sdkAppId = NSNumber(value: LoginStore.shared.sdkAppID).stringValue
-        AuidoRecordSignatureChecker.shareInstance().setSignatureToSDK(sdkAppId)
-        recorder?.enableAIDeNoise(enable)
     }
 
     private func startRecordInternal(_ filepath: String? = nil){
@@ -182,6 +191,9 @@ internal class AudioRecorderImpl: AudioRecorder {
     }
 
     private func onComplete(_ retCode:AudioRecordResultCode) {
+        executeOnMainThread {
+            self.isRecording = false
+        }
         notifyCompleteOnMainThread(retCode);
     }
 

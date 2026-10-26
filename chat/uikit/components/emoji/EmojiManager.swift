@@ -1,3 +1,5 @@
+import Foundation
+import UIKit
 class EmojiData: NSObject {
     public var name: String?
     var localizableName: String?

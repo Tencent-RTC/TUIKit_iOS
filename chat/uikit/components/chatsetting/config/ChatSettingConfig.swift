@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 
 // MARK: - C2C Chat Setting Config

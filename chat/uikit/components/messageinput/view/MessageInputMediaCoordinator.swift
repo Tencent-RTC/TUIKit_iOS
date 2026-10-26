@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 import AVFoundation
 import AtomicXCore
@@ -48,7 +49,6 @@ final class MessageInputMediaCoordinator: NSObject {
     func showCamera(recordMode: RecordMode) {
         guard let presenter = findViewController() else { return }
 
-        fetchVideoRecorderSignature()
         VideoRecorderConfigInternal.sharedInstance().setCustomConfig("{\"record_mode\": \(recordMode.rawValue)}")
 
         let recorder = VideoRecorderController()

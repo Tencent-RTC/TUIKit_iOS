@@ -438,6 +438,7 @@
 "QuoteOriginalFiltered" = "原消息未展示";
 "ClearAllChatHistory" = "清空聊天记录";
 "ClearAllChatHistoryTips" = "确定清空聊天记录？";
+"ClearGroupHistoryTips" = "确认删除该群的聊天记录";
 "Discline" = "拒绝";
 "Copied" = "已复制";
 "ConfirmDeleteMessage" = "确定删除已选消息";
@@ -470,7 +471,6 @@
 "AddContactMyUserIDFormat" = "我的用户ID: %@";
 "AddUserNoDataTips" = "该用户不存在";
 "AddGroupNoDataTips" = "该群聊不存在";
-"VideoTranscoding" = "视频转码中...";
 "VideoDownloading" = "视频下载中...";
 "VideoSavedSuccess" = "视频保存成功";
 "VideoSavedFailed" = "视频保存失败";
@@ -796,6 +796,7 @@
 "Member" = "成员";
 "DeleteAndQuitConfirmTitle" = "删除并退出";
 "DeleteAndQuitConfirmMessage" = "确定要删除并退出该群吗？";
+"QuitGroupConfirmTips" = "确认退出该群聊";
 "DeleteAndQuit" = "删除并退出";
 "DismissGroupConfirmTitle" = "解散该群";
 "DismissGroupConfirmMessage" = "确定要解散该群吗？解散后群聊将被永久删除。";
@@ -810,6 +811,7 @@
 "GroupMemberDetail" = "成员信息";
 "SetAsAdmin" = "设为管理员";
 "CancelAdmin" = "撤销管理员";
+"RemoveMemberConfirmTips" = "确定移除该成员？";
 "RemoveMember" = "移除成员";
 "GroupOwnerLabel" = "群主";
 "AdminLabel" = "管理员";
@@ -847,7 +849,6 @@
 "QuickReplyProcessing" = "正在处理中";
 "AudioRecordTimeLimitReached" = "语音录制时长达到上限";
 "AudioRecorderLessThanMinTime" = "语音录制时长太短";
-"AudioAuthorizationPrompter" = "当前配置不能开启AI降噪.仅Debug版本有该提示";
 "ChooseMediaType" = "选择媒体类型";
 "SendMessage" = "发消息或按住说话...";
 "SendMessageTextOnly" = "发消息...";
@@ -1012,3 +1013,4 @@
 "SettingsShowCalls" = "显示通话记录";
 "DemoWelcomeMessage" = "欢迎体验 Chat Demo！你可以先发送一条消息，体验基础聊天能力。\n如果想添加好友，可以前往联系人页面点击首页加号。\n如果想体验音视频通话，可以点击下方加号按钮 -> 语音通话/视频通话。";
 "DemoCustomerServiceSummary" = "[智能客服]";
+"VideoTranscoding" = "视频压缩中...";

@@ -1,3 +1,5 @@
+import Foundation
+import UIKit
 class BundleHelper {
     static func atomicXBundle() -> Bundle {
         let bundlePath = getBundlePath(bundleName: "TUIChatKitBundle", classType: BundleHelper.self, frameworkName: "")
@@ -25,6 +27,16 @@ class BundleHelper {
     }
 
     static func getBundlePath(bundleName: String, classType: AnyClass, frameworkName: String) -> String {
+#if SWIFT_PACKAGE
+        if let spmPath = spmBundlePaths[bundleName] {
+            return spmPath
+        }
+        if let found = findBundleInModule(named: bundleName), !spmBundlePaths.keys.contains(bundleName) {
+            spmBundlePaths[bundleName] = found
+            return found
+        }
+        return ""
+#else
         var bundlePathCache: [String: String] = [:]
         let classTypeString = NSStringFromClass(classType)
         let bundlePathKey = "\(bundleName)_\(classTypeString)"
@@ -53,18 +65,39 @@ class BundleHelper {
             bundlePathCache[bundlePathKey] = finalPath
         }
         return bundlePath ?? ""
+#endif
     }
+
+#if SWIFT_PACKAGE
+    private static var spmBundlePaths: [String: String] = [:]
+
+    private static func findBundleInModule(named bundleName: String) -> String? {
+        let root = Bundle.module.bundleURL
+        guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: nil) else { return nil }
+        let target = "\(bundleName).bundle"
+        while let url = enumerator.nextObject() as? URL {
+            if url.lastPathComponent == target {
+                return url.path
+            }
+        }
+        return nil
+    }
+#endif
 }
 
 public class AtomicXChatResources {
     static let frameworkBundle = Bundle(for: AtomicXChatResources.self)
     static var resourceBundle: Bundle {
+#if SWIFT_PACKAGE
+        return Bundle.module
+#else
         if let bundlePath = frameworkBundle.path(forResource: "TUIChatKitBundle", ofType: "bundle"),
            let bundle = Bundle(path: bundlePath)
         {
             return bundle
         }
         return frameworkBundle
+#endif
     }
 
     private static let rtlMirroredImageNames: Set<String> = [

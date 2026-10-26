@@ -438,6 +438,7 @@
 "QuoteOriginalFiltered" = "الرسالة الأصلية غير معروضة";
 "ClearAllChatHistory" = "مسح سجل الدردشة";
 "ClearAllChatHistoryTips" = "هل أنت متأكد من مسح سجل الدردشة بالكامل؟";
+"ClearGroupHistoryTips" = "هل أنت متأكد من حذف سجل الدردشة لهذه المجموعة؟";
 "Discline" = "رفض";
 "Copied" = "تم النسخ";
 "ConfirmDeleteMessage" = "هل أنت متأكد من حذف الرسائل المحددة؟";
@@ -470,7 +471,6 @@
 "AddContactMyUserIDFormat" = "معرف المستخدم الخاص بي: %@";
 "AddUserNoDataTips" = "هذا المستخدم غير موجود";
 "AddGroupNoDataTips" = "هذه الدردشة الجماعية غير موجودة";
-"VideoTranscoding" = "جاري تحويل الفيديو...";
 "VideoDownloading" = "جاري تحميل الفيديو...";
 "VideoSavedSuccess" = "تم حفظ الفيديو بنجاح";
 "VideoSavedFailed" = "فشل حفظ الفيديو";
@@ -796,6 +796,7 @@
 "Member" = "عضو";
 "DeleteAndQuitConfirmTitle" = "حذف والخروج";
 "DeleteAndQuitConfirmMessage" = "هل أنت متأكد من حذف والخروج من هذه المجموعة؟";
+"QuitGroupConfirmTips" = "هل أنت متأكد من مغادرة هذه المجموعة؟";
 "DeleteAndQuit" = "حذف والخروج";
 "DismissGroupConfirmTitle" = "حل المجموعة";
 "DismissGroupConfirmMessage" = "هل أنت متأكد من حل المجموعة؟ سيتم حذف الدردشة الجماعية نهائيًا بعد الحل.";
@@ -810,6 +811,7 @@
 "GroupMemberDetail" = "معلومات العضو";
 "SetAsAdmin" = "تعيين كمشرف";
 "CancelAdmin" = "إزالة المشرف";
+"RemoveMemberConfirmTips" = "هل تريد إزالة هذا العضو؟";
 "RemoveMember" = "إزالة العضو";
 "GroupOwnerLabel" = "مالك المجموعة";
 "AdminLabel" = "مشرف";
@@ -847,7 +849,6 @@
 "QuickReplyProcessing" = "جاري المعالجة";
 "AudioRecordTimeLimitReached" = "تم الوصول إلى الحد الأقصى لمدة التسجيل الصوتي";
 "AudioRecorderLessThanMinTime" = "مدة التسجيل الصوتي قصيرة جدًا";
-"AudioAuthorizationPrompter" = "التكوين الحالي لا يمكن تمكين منظمة العفو الدولية للحد من الضوضاء . تصحيح الإصدارات ف";
 "ChooseMediaType" = "اختر نوع الوسائط";
 "SendMessage" = "رسالة أو اضغط...";
 "SendMessageTextOnly" = "أرسل رسالة...";
@@ -1011,3 +1012,4 @@
 "SettingsShowCalls" = "عرض سجل المكالمات";
 "DemoWelcomeMessage" = "مرحبًا بك في Chat Demo! يمكنك أولاً إرسال رسالة لتجربة الدردشة الأساسية.\nلإضافة أصدقاء، انتقل إلى صفحة جهات الاتصال واضغط على زر الإضافة في الصفحة الرئيسية.\nلتجربة مكالمات الصوت والفيديو، اضغط على زر الإضافة أدناه -> مكالمة صوتية/مكالمة فيديو.";
 "DemoCustomerServiceSummary" = "[خدمة العملاء الذكية]";
+"VideoTranscoding" = "جاري ضغط الفيديو...";

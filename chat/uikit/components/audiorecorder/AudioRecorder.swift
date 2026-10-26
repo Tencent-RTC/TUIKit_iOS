@@ -1,3 +1,4 @@
+import Foundation
 import AVFoundation
 import AVKit
 import UIKit
@@ -12,7 +13,7 @@ public class AudioRecorder: NSObject, ObservableObject {
     public var onRecordTime: ((_ timeMs: Int) -> Void)?
     public var onPowerLevel: ((_ powerLevel: Int) -> Void)?
 
-    public func startRecord(filepath: String? = nil, enableAIDeNoise: Bool = false, minDurationMs: Int = 1000, maxDurationMs: Int = 60000) {}
+    public func startRecord(filepath: String? = nil, minDurationMs: Int = 1000, maxDurationMs: Int = 60000) {}
 
     public func stopRecord() {}
 

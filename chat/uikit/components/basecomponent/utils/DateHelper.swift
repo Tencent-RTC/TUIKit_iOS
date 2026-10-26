@@ -1,3 +1,4 @@
+import Foundation
 
 class DateHelper {
     private static let sundayFirstWeekday = 1

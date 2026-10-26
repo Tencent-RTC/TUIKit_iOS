@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 import SnapKit
 import AtomicXCore
@@ -58,6 +59,8 @@ final class MessageInputViewImpl: UIView {
 
     private let moreButton = UIButton(type: .system)
 
+    private let moreButtonRedDot = UIView()
+
     private let sendButton = UIButton(type: .system)
 
     private let bottomContainer = UIView()
@@ -80,6 +83,9 @@ final class MessageInputViewImpl: UIView {
     private lazy var morePanel: MessageInputMorePanel = {
         let panel = MessageInputMorePanel(config: viewModel.config)
         panel.delegate = self
+        panel.onRedDotDismissed = { [weak self] in
+            self?.updateMoreButtonRedDotVisibility()
+        }
         return panel
     }()
 
@@ -149,6 +155,8 @@ final class MessageInputViewImpl: UIView {
 
     private static let inputRowButtonSize: CGFloat = 28
 
+    private static let redDotSize: CGFloat = 8
+
     private static let textViewHorizontalInset: CGFloat = CGFloat(SpacingScheme.smallSpacing)
 
     private static let textViewMaxLines: Int = 6
@@ -190,7 +198,6 @@ final class MessageInputViewImpl: UIView {
         activateConstraints()
         bindInteraction()
         setupViewStyle()
-        fetchVideoRecorderSignature()
     }
 
     required init?(coder: NSCoder) {
@@ -234,6 +241,7 @@ final class MessageInputViewImpl: UIView {
         }
         if config.isShowMore {
             inputRow.addSubview(moreButton)
+            moreButton.addSubview(moreButtonRedDot)
         }
         inputRow.addSubview(sendButton)
         addSubview(bottomContainer)
@@ -278,6 +286,10 @@ final class MessageInputViewImpl: UIView {
                 make.trailing.equalTo(rightAnchor).offset(rightInset)
                 make.centerY.equalTo(inputContainer)
                 make.width.height.equalTo(Self.inputRowButtonSize)
+            }
+            moreButtonRedDot.snp.makeConstraints { make in
+                make.top.trailing.equalToSuperview()
+                make.width.height.equalTo(Self.redDotSize)
             }
         }
         sendButton.snp.makeConstraints { make in
@@ -459,6 +471,21 @@ final class MessageInputViewImpl: UIView {
 
         configureVoiceLabel()
         sendButton.isHidden = true
+
+        moreButtonRedDot.backgroundColor = colors.textColorError
+        moreButtonRedDot.layer.cornerRadius = Self.redDotSize / 2
+        moreButtonRedDot.isUserInteractionEnabled = false
+        moreButtonRedDot.isHidden = true
+        if config.isShowMore {
+            updateMoreButtonRedDotVisibility()
+        }
+    }
+
+    /// Mirrors the panel's remaining dots onto the more button. Reading
+    /// `morePanel` here also builds its actions up front, which is what lets the
+    /// button carry a dot before the panel has ever been opened.
+    private func updateMoreButtonRedDotVisibility() {
+        moreButtonRedDot.isHidden = !morePanel.hasVisibleRedDot
     }
 
     private func configureIconButton(_ button: UIButton, imageName: String) {
@@ -653,13 +680,24 @@ final class MessageInputViewImpl: UIView {
             let attributed = EmojiManager.shared.createAttributedStringFromEmojiCodes(from: draft)
             self.messageTextView.setContent(attributed)
             self.updateSendButtonVisibility()
-            DispatchQueue.main.asyncAfter(deadline: .now() + Self.draftKeyboardFocusDelay) {
-                self.messageTextView.becomeFirstResponder()
-            }
+            self.focusKeyboardAfterTransition()
             DispatchQueue.main.asyncAfter(deadline: .now() + Self.draftLoadingResetDelay) {
                 self.isLoadingDraft = false
             }
         }
+    }
+
+    private func focusKeyboardAfterTransition() {
+        let focus = { [weak self] in
+            _ = self?.messageTextView.becomeFirstResponder()
+        }
+        guard let coordinator = findViewController()?.transitionCoordinator else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.draftKeyboardFocusDelay, execute: focus)
+            return
+        }
+        coordinator.animate(alongsideTransition: nil, completion: { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + Self.draftKeyboardFocusDelay, execute: focus)
+        })
     }
 
     private func showEmojiPanel() {
@@ -953,6 +991,9 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func setQuoteMessage(_ message: MessageInfo) {
+        if isVoiceInputMode {
+            switchToTextMode()
+        }
         currentQuotedMessage = message
         let senderName = message.from.nickname ?? message.from.userID
         let summary = MessageInputQuoteSummaryFormatter.format(message: message)
