@@ -3,7 +3,7 @@ import AtomicXCore
 import SnapKit
 import UIKit
 
-final class JoinGroupViewController: ChatSettingBaseViewController {
+final class JoinGroupViewController: CustomNavigationBarViewController {
     var onEnterGroupChat: ((GroupInfo) -> Void)?
 
     private let impl = JoinGroupViewControllerImpl()

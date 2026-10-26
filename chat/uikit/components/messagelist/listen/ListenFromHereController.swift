@@ -27,8 +27,8 @@ enum ListenPlanBuilder {
             switch message.messageType {
             case .text:
                 guard case .text(let payload) = message.messagePayload else { continue }
-                let content = TtsTextSanitizer.shared.sanitize(text: payload.text)
-                if content.isEmpty { continue }
+                let content = payload.text
+                guard TtsPlaybacker.hasSpeakableText(content) else { continue }
                 let speechText = sameAsPrevious
                     ? content
                     : String(format: LocalizedChatString("VoiceListenSaysFormat"), speaker) + content
@@ -50,7 +50,7 @@ enum ListenPlanBuilder {
                 ))
             case .merged:
                 guard case .merged(let payload) = message.messagePayload else { continue }
-                let title = TtsTextSanitizer.shared.sanitize(text: payload.title)
+                let title = payload.title
                 let name = sameAsPrevious ? "" : speaker
                 items.append(ListenItem(
                     speechText: String(format: LocalizedChatString("VoiceListenSentMergedFormat"), name, title)
@@ -92,7 +92,7 @@ final class ListenFromHereController {
 
     var onStateChange: ((ListenPlaybackState) -> Void)?
 
-    private let tts = TtsPlaybackHelper()
+    private let tts = TtsPlaybacker()
 
     private var audioPlayer: AVPlayer?
 
@@ -168,9 +168,10 @@ final class ListenFromHereController {
             return
         }
 
-        tts.speak(
+        tts.playText(
             text: item.speechText,
             voiceId: voiceId,
+            removeSymbols: true,
             onStart: { [weak self] in
                 self?.clearLoading(currentSession: currentSession)
             },

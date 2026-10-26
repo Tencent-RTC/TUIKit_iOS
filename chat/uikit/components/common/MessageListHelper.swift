@@ -160,6 +160,9 @@ class MessageListHelper {
 
                 return String(format: cmd == 1 ? LocalizedChatString("TUICommunityCreateTipsMessage") : LocalizedChatString("TUIGroupCreateTipsMessage"), sender)
             }
+            if let chatbotSummary = ChatbotMessageSummaryPolicy.getSummary(messageInfo) {
+                return chatbotSummary
+            }
             if case .custom(let payload) = messageInfo.messagePayload,
                let summary = CustomMessageSummaryRegistry.shared.summary(for: payload),
                !summary.isEmpty
@@ -167,6 +170,17 @@ class MessageListHelper {
                 return summary
             }
             return LocalizedChatString("MessageUnsupportedType")
+
+        case .stream:
+            // 会话列表和搜索结果都是单行，markdown 里的换行和缩进要压平
+            if case .stream(let payload) = messageInfo.messagePayload {
+                let flattened = payload.markdown
+                    .components(separatedBy: .whitespacesAndNewlines)
+                    .filter { !$0.isEmpty }
+                    .joined(separator: " ")
+                return flattened
+            }
+            return ""
 
         case .tips:
             if case .tips(let payload) = messageInfo.messagePayload {

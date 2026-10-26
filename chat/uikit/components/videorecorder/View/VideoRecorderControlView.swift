@@ -20,12 +20,6 @@ protocol VideoRecorderControlViewDelegate: AnyObject {
 }
 
 final class VideoRecorderControlView: UIView {
-    private static let mixedRecordMode = 0
-
-    private static let photoOnlyRecordMode = 1
-
-    private static let videoOnlyRecordMode = 2
-
     private static let btnStartRecordSize: CGFloat = 72
 
     private static let btnStartRecordGapBottom: CGFloat = 15
@@ -75,7 +69,7 @@ final class VideoRecorderControlView: UIView {
     var flashState = false {
         didSet {
             let imageName = flashState ? "flash_open" : "flash_close"
-            btnFlash?.setImage(VideoRecorderCommon.bundleImageByName(imageName), for: .normal)
+            btnFlash?.setImage(AtomicXChatResources.image(named: imageName), for: .normal)
             delegate?.recordControlViewOnFlashStateChange(flashState)
         }
     }
@@ -104,10 +98,13 @@ final class VideoRecorderControlView: UIView {
 
     private let lbTip = UILabel()
 
-    private let recordeMode: Int
+    private let recordMode: RecordMode
+    private let settings: VideoRecorderSettings
 
-    override init(frame: CGRect) {
-        recordeMode = VideoRecorderConfigInternal.sharedInstance().getRecordeMode()
+    init(frame: CGRect, settings: VideoRecorderSettings) {
+        self.settings = settings
+        self.recordMode = settings.recordMode
+        self.isUsingFrontCamera = settings.isDefaultFrontCamera
         super.init(frame: frame)
         initUI()
     }
@@ -165,13 +162,13 @@ final class VideoRecorderControlView: UIView {
     }
 
     private func recordTipText() -> String {
-        if recordeMode == Self.mixedRecordMode {
-            return VideoRecorderCommon.localizedStringForKey("record_mode_mix_tip")
+        if recordMode == .videoPhotoMix {
+            return LocalizedChatString("record_mode_mix_tip")
         }
-        if recordeMode == Self.photoOnlyRecordMode {
-            return VideoRecorderCommon.localizedStringForKey("record_mode_photo_tip")
+        if recordMode == .photoOnly {
+            return LocalizedChatString("record_mode_photo_tip")
         }
-        return VideoRecorderCommon.localizedStringForKey("record_mode_video_tip")
+        return LocalizedChatString("record_mode_video_tip")
     }
 
     private func initControlButtons() {
@@ -180,10 +177,10 @@ final class VideoRecorderControlView: UIView {
         btnRecord.dotSizePressed = Self.btnStartRecordDotSizePressed
         btnRecord.progressSizeNormal = Self.btnStartRecordProgressSizeNormal
         btnRecord.progressSizePressed = Self.btnStartRecordProgressSizePressed
-        btnRecord.isOnlySupportTakePhoto = recordeMode != Self.photoOnlyRecordMode
+        btnRecord.isOnlySupportTakePhoto = recordMode != .photoOnly
         btnRecord.delegate = self
-        setupCustomButton(btnExitRecord, image: VideoRecorderCommon.bundleImageByName("cross"), action: #selector(onBtnExitClick))
-        setupCustomButton(btnCameraSwitch, image: VideoRecorderCommon.bundleImageByName("camera_switch"),
+        setupCustomButton(btnExitRecord, image: AtomicXChatResources.image(named: "cross"), action: #selector(onBtnExitClick))
+        setupCustomButton(btnCameraSwitch, image: AtomicXChatResources.image(named: "camera_switch"),
                           action: #selector(onBtnCameraSwitchClick))
 
         btnRecord.snp.makeConstraints { make in
@@ -209,10 +206,10 @@ final class VideoRecorderControlView: UIView {
     }
 
     private func initTorchView() {
-        guard VideoRecorderConfigInternal.sharedInstance().isSupportRecordTorch() else { return }
+        guard settings.isSupportTorch else { return }
 
-        let button = newFunctionButton(image: VideoRecorderCommon.bundleImageByName("flash_close"),
-                                       title: VideoRecorderCommon.localizedStringForKey("flash"),
+        let button = newFunctionButton(image: AtomicXChatResources.image(named: "flash_close"),
+                                       title: LocalizedChatString("flash"),
                                        action: #selector(onBtnFlashClick))
         button.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-Self.functionBtnToRight)
@@ -223,11 +220,11 @@ final class VideoRecorderControlView: UIView {
     }
 
     private func initAspectView() {
-        guard VideoRecorderConfigInternal.sharedInstance().isSupportRecordAspect() else { return }
+        guard settings.isSupportAspect else { return }
         guard UGCReflectVideoRecordCore.create() != nil else { return }
 
-        let button = newFunctionButton(image: VideoRecorderCommon.bundleImageByName("record_aspect_9_16"),
-                                       title: VideoRecorderCommon.localizedStringForKey("aspect"),
+        let button = newFunctionButton(image: AtomicXChatResources.image(named: "record_aspect_9_16"),
+                                       title: LocalizedChatString("aspect"),
                                        action: #selector(onBtnAspectClick))
         makeFunctionButtonConstraints(button, below: lastFuncitonBtn)
         btnAspect = button
@@ -251,7 +248,7 @@ final class VideoRecorderControlView: UIView {
         button.setImage(image, for: .normal)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: Self.functionTitleFontSize),
-            .foregroundColor: VideoRecorderCommon.dynamicColor("record_func_btn_text_color", defaultColor: "#FFFFFF")
+            .foregroundColor: UIColor.white
         ]
         button.setAttributedTitle(NSAttributedString(string: title, attributes: attributes), for: .normal)
         button.addTarget(self, action: action, for: .touchUpInside)
@@ -300,10 +297,10 @@ final class VideoRecorderControlView: UIView {
     @objc private func onBtnAspectClick() {
         if aspectRatio == .ratio9x16 {
             aspectRatio = .ratio3x4
-            btnAspect?.setImage(VideoRecorderCommon.bundleImageByName("record_aspect_3_4"), for: .normal)
+            btnAspect?.setImage(AtomicXChatResources.image(named: "record_aspect_3_4"), for: .normal)
         } else {
             aspectRatio = .ratio9x16
-            btnAspect?.setImage(VideoRecorderCommon.bundleImageByName("record_aspect_9_16"), for: .normal)
+            btnAspect?.setImage(AtomicXChatResources.image(named: "record_aspect_9_16"), for: .normal)
         }
         delegate?.recordControlViewOnAspectChange()
     }
@@ -311,7 +308,7 @@ final class VideoRecorderControlView: UIView {
 
 extension VideoRecorderControlView: VideoRecorderRecordButtonDelegate {
     func onRecordButtonLongPressBegan(_ button: VideoRecorderRecordButtonView) {
-        if recordeMode != Self.photoOnlyRecordMode {
+        if recordMode != .photoOnly {
             delegate?.recordControlViewOnRecordStart()
             lbDuration.isHidden = !Self.showDurationLabel
         } else {
@@ -322,9 +319,9 @@ extension VideoRecorderControlView: VideoRecorderRecordButtonDelegate {
     }
 
     func onRecordButtonLongPressEnded(_ button: VideoRecorderRecordButtonView) {
-        if recordeMode != Self.photoOnlyRecordMode {
+        if recordMode != .photoOnly {
             delegate?.recordControlViewOnRecordFinish()
-        } else if recordeMode != Self.videoOnlyRecordMode {
+        } else if recordMode != .videoOnly {
             delegate?.recordControlViewPhoto()
         }
         lbDuration.isHidden = true
@@ -333,7 +330,7 @@ extension VideoRecorderControlView: VideoRecorderRecordButtonDelegate {
     }
 
     func onRecordButtonLongPressCancelled(_ button: VideoRecorderRecordButtonView) {
-        if recordeMode != Self.photoOnlyRecordMode {
+        if recordMode != .photoOnly {
             delegate?.recordControlViewOnRecordFinish()
         }
         lbDuration.isHidden = true
@@ -342,7 +339,7 @@ extension VideoRecorderControlView: VideoRecorderRecordButtonDelegate {
     }
 
     func onRecordButtonTap(_ button: VideoRecorderRecordButtonView) {
-        if recordeMode != Self.videoOnlyRecordMode {
+        if recordMode != .videoOnly {
             delegate?.recordControlViewPhoto()
         }
     }

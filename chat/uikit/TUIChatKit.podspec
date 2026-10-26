@@ -11,13 +11,14 @@ Pod::Spec.new do |s|
     s.ios.deployment_target = '14.0'
     s.swift_version    = '5.0'
     s.static_framework = true
-    s.frameworks       = 'UIKit', 'Foundation', 'AVFoundation', 'AVKit', 'SwiftUI', 'SafariServices'
+    s.frameworks       = 'UIKit', 'Foundation', 'AudioToolbox', 'AVFoundation', 'AVKit', 'SwiftUI', 'SafariServices'
 
     s.dependency 'Kingfisher'
+    s.dependency 'TXLiteAVSDK_VoiceAI_iOS', '13.6.0.255'
     s.dependency 'AtomicXCore', '>= 3.0.0', '< 5.0'
-    #s.dependency 'AtomicXCore'
     s.dependency 'SnapKit'
     s.dependency 'AlbumPicker', '~> 1.0.0'
+    s.dependency 'tui-cmark-gfm', '0.29.0.15'
 
     s.source_files     = '**/*.{swift,h,m}'
     s.resource_bundles = {

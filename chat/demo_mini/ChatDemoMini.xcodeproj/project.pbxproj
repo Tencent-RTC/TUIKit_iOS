@@ -213,6 +213,8 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要访问相机以拍照";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "需要访问麦克风以录制语音";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相册以保存照片和视频";
@@ -298,6 +300,8 @@
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "需要访问相机以拍照";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "需要访问麦克风以录制语音";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "需要访问相册以保存照片和视频";

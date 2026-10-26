@@ -20,6 +20,14 @@ public class LanguageHelper {
         ) {
             return bundle.localizedString(forKey: key, value: key, table: nil)
         }
+        if currentLanguage != "en", let bundle = BundleHelper.findLocalizableBundle(
+            bundleName: bundleName,
+            classType: classType,
+            language: "en",
+            frameworkName: frameworkName
+        ) {
+            return bundle.localizedString(forKey: key, value: key, table: nil)
+        }
         return key
     }
 

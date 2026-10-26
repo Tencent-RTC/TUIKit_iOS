@@ -10,7 +10,9 @@ final class MessageFallbackContentView: UIView, MessageContentView {
 
     private static let verticalInset = CGFloat(SpacingScheme.smallSpacing)
 
-    private static let maxBubbleWidth: CGFloat = UIScreen.main.bounds.width * 0.72
+    private var maxBubbleWidth: CGFloat = UIScreen.main.bounds.width * ChatMessageListConfig.defaultBubbleMaxWidthRatio
+
+    private var maxWidthConstraint: Constraint?
 
     private let kind: MessageContentKind
 
@@ -35,6 +37,8 @@ final class MessageFallbackContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
+        maxBubbleWidth = UIScreen.main.bounds.width * context.config.bubbleMaxWidthRatio
+        maxWidthConstraint?.update(offset: maxBubbleWidth)
         textLabel.text = displayText(for: message, context: context)
         applyBubbleStyle(isSelf: message.isSentBySelf)
     }
@@ -49,7 +53,7 @@ final class MessageFallbackContentView: UIView, MessageContentView {
     private func activateConstraints() {
         bubbleView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.width.lessThanOrEqualTo(Self.maxBubbleWidth)
+            maxWidthConstraint = make.width.lessThanOrEqualTo(maxBubbleWidth).constraint
         }
         textLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(Self.verticalInset)

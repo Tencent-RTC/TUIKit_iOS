@@ -21,6 +21,19 @@ final class MessageInputTextView: UIView {
 
     var isGroupChat: Bool = false
 
+    private var fieldAppearance: MessageInputFieldAppearance?
+
+    private var resolvedTextColor: UIColor {
+        fieldAppearance?.textColor ?? TUIChatKitTheme.colors.textColorPrimary
+    }
+
+    func applyAppearance(_ appearance: MessageInputFieldAppearance?) {
+        fieldAppearance = appearance
+        placeholderLabel.textColor = appearance?.hintColor ?? TUIChatKitTheme.colors.textColorTertiary
+        if let hint = appearance?.hintText { placeholderText = hint }
+        resetTextStyle()
+    }
+
     var placeholderText: String? {
         didSet { placeholderLabel.text = placeholderText }
     }
@@ -266,14 +279,14 @@ final class MessageInputTextView: UIView {
     }
 
     private func resetTextStyle() {
-        let colors = TUIChatKitTheme.colors
         let wholeRange = NSRange(location: 0, length: textView.textStorage.length)
         textView.textStorage.removeAttribute(.font, range: wholeRange)
         textView.textStorage.removeAttribute(.foregroundColor, range: wholeRange)
-        textView.textStorage.addAttribute(.foregroundColor, value: colors.textColorPrimary, range: wholeRange)
+        textView.textStorage.addAttribute(.foregroundColor, value: resolvedTextColor, range: wholeRange)
         textView.textStorage.addAttribute(.font, value: Self.normalFont, range: wholeRange)
         textView.textAlignment = .natural
-        textView.textColor = colors.textColorPrimary
+        textView.textColor = resolvedTextColor
+        textView.typingAttributes[.foregroundColor] = resolvedTextColor
     }
 }
 
@@ -335,7 +348,7 @@ extension MessageInputTextView: UITextViewDelegate {
             textView.textStorage.deleteCharacters(in: selectedRange)
         }
         let textChange = EmojiManager.shared.createAttributedStringWithTextAndStyle(
-            text: text, withFont: Self.normalFont, textColor: TUIChatKitTheme.colors.textColorPrimary
+            text: text, withFont: Self.normalFont, textColor: resolvedTextColor
         )
         textView.textStorage.insert(textChange, at: selectedRange.location)
         let cursorLocation = selectedRange.location + textChange.length

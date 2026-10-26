@@ -29,6 +29,8 @@ public struct TUIChatKitColorScheme {
 
     public var bgColorDialog: UIColor { dynamic(\.bgColorDialog) }
 
+    public var bgColorMask: UIColor { dynamic(\.bgColorMask) }
+
     public var textColorPrimary: UIColor { dynamic(\.textColorPrimary) }
 
     public var textColorSecondary: UIColor { dynamic(\.textColorSecondary) }

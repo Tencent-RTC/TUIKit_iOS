@@ -10,7 +10,9 @@ final class MessageTextContentView: UIView, MessageContentView {
 
     private static let lineSpacingMultiplier: CGFloat = 0.3
 
-    private static let maxBubbleWidth: CGFloat = UIScreen.main.bounds.width * 0.72
+    private var maxBubbleWidth: CGFloat = UIScreen.main.bounds.width * ChatMessageListConfig.defaultBubbleMaxWidthRatio
+
+    private var maxWidthConstraint: Constraint?
 
     private let textLabel = UILabel()
 
@@ -30,6 +32,8 @@ final class MessageTextContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
+        maxBubbleWidth = UIScreen.main.bounds.width * context.config.bubbleMaxWidthRatio
+        textLabel.preferredMaxLayoutWidth = maxBubbleWidth - Self.horizontalInset * 2
         let text = Self.currentText(from: message)
         applyText(text, isSelf: context.isSelf, isLeft: context.isLeft)
     }
@@ -45,7 +49,7 @@ final class MessageTextContentView: UIView, MessageContentView {
             make.top.bottom.equalToSuperview().inset(Self.verticalInset)
             make.leading.equalToSuperview().offset(Self.horizontalInset)
             make.trailing.lessThanOrEqualToSuperview().offset(-Self.horizontalInset)
-            make.width.lessThanOrEqualTo(Self.maxBubbleWidth - Self.horizontalInset * 2)
+            maxWidthConstraint = make.width.lessThanOrEqualTo(maxBubbleWidth - Self.horizontalInset * 2).constraint
         }
     }
 
@@ -53,7 +57,7 @@ final class MessageTextContentView: UIView, MessageContentView {
         textLabel.numberOfLines = 0
         textLabel.font = FontScheme.caption1Regular
         textLabel.textAlignment = .natural
-        textLabel.preferredMaxLayoutWidth = Self.maxBubbleWidth - Self.horizontalInset * 2
+        textLabel.preferredMaxLayoutWidth = maxBubbleWidth - Self.horizontalInset * 2
     }
 
     private static func currentText(from message: MessageInfo) -> String {
@@ -89,7 +93,7 @@ final class MessageTextContentView: UIView, MessageContentView {
     private func applyLabelPosition(isLeft: Bool) {
         textLabel.snp.remakeConstraints { make in
             make.top.bottom.equalToSuperview().inset(Self.verticalInset)
-            make.width.lessThanOrEqualTo(Self.maxBubbleWidth - Self.horizontalInset * 2)
+            maxWidthConstraint = make.width.lessThanOrEqualTo(maxBubbleWidth - Self.horizontalInset * 2).constraint
             if isLeft {
                 make.leading.equalToSuperview().offset(Self.horizontalInset)
                 make.trailing.lessThanOrEqualToSuperview().offset(-Self.horizontalInset)

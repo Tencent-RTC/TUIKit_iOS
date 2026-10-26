@@ -17,7 +17,7 @@ final class ConversationListViewImpl: RTCBaseView {
 
     private let onConversationClick: (ConversationInfo) -> Void
 
-    private let config: ConversationActionConfigProtocol
+    private let config: ConversationActionConfig
 
     private let viewModel: ConversationListViewModel
 
@@ -61,7 +61,7 @@ final class ConversationListViewImpl: RTCBaseView {
     }()
 
     init(onConversationClick: @escaping (ConversationInfo) -> Void,
-         config: ConversationActionConfigProtocol = ChatConversationActionConfig()) {
+         config: ConversationActionConfig = ConversationActionConfig()) {
         self.onConversationClick = onConversationClick
         self.config = config
         self.viewModel = ConversationListViewModel()

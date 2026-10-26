@@ -6,8 +6,15 @@ import Combine
 final class MessageAuxiliaryTextBubbleView: UIView {
     var onLongPress: (() -> Void)?
 
+    var bubbleMaxWidthRatio: CGFloat = ChatMessageListConfig.defaultBubbleMaxWidthRatio {
+        didSet {
+            maxWidthConstraint?.update(offset: maxBubbleWidth)
+            invalidateIntrinsicContentSize()
+        }
+    }
+
     override var intrinsicContentSize: CGSize {
-        let maxContentWidth = Self.maxBubbleWidth - 2 * Self.horizontalInset
+        let maxContentWidth = maxBubbleWidth - 2 * Self.horizontalInset
         if !contentLabel.isHidden {
             let contentSize = contentLabel.sizeThatFits(CGSize(width: maxContentWidth, height: .greatestFiniteMagnitude))
             var contentWidth = contentSize.width
@@ -18,7 +25,7 @@ final class MessageAuxiliaryTextBubbleView: UIView {
                 totalHeight += Self.footerTopSpacing + footerSize.height
             }
             return CGSize(
-                width: min(ceil(contentWidth) + 2 * Self.horizontalInset, Self.maxBubbleWidth),
+                width: min(ceil(contentWidth) + 2 * Self.horizontalInset, maxBubbleWidth),
                 height: ceil(totalHeight)
             )
         }
@@ -39,7 +46,11 @@ final class MessageAuxiliaryTextBubbleView: UIView {
 
     private static let contentLineHeightMultiple: CGFloat = 1.3
 
-    private static let maxBubbleWidth: CGFloat = UIScreen.main.bounds.width * 0.72
+    private var maxBubbleWidth: CGFloat {
+        return UIScreen.main.bounds.width * bubbleMaxWidthRatio
+    }
+
+    private var maxWidthConstraint: Constraint?
 
     private static let loadingIndicatorScale: CGFloat = 0.8
 
@@ -144,7 +155,7 @@ final class MessageAuxiliaryTextBubbleView: UIView {
 
     private func activateConstraints() {
         snp.makeConstraints { make in
-            make.width.lessThanOrEqualTo(Self.maxBubbleWidth)
+            maxWidthConstraint = make.width.lessThanOrEqualTo(maxBubbleWidth).constraint
         }
         loadingIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()

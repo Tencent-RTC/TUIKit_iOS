@@ -3,7 +3,7 @@ import AtomicXCore
 import SnapKit
 import UIKit
 
-final class AddFriendViewController: ChatSettingBaseViewController {
+final class AddFriendViewController: CustomNavigationBarViewController {
     private let impl = AddFriendViewControllerImpl()
 
     override func viewDidLoad() {

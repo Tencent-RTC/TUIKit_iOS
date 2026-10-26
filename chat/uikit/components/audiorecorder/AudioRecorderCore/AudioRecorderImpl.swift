@@ -149,9 +149,9 @@ internal class AudioRecorderImpl: AudioRecorder {
             return
         }
 
-        recorder.startRecord(recordedFilePath, minDurationMs, maxDurationMs)
         isRecording = true
         isCancelRecord = false
+        recorder.startRecord(recordedFilePath, minDurationMs, maxDurationMs)
     }
 
     private func createRecordedFilePath()->String {
@@ -193,8 +193,8 @@ internal class AudioRecorderImpl: AudioRecorder {
     private func onComplete(_ retCode:AudioRecordResultCode) {
         executeOnMainThread {
             self.isRecording = false
+            self.notifyCompleteOnMainThread(retCode)
         }
-        notifyCompleteOnMainThread(retCode);
     }
 
     private func removeRecordFile(_ path : String?) {

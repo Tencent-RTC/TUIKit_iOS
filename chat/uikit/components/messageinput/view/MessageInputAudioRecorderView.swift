@@ -25,6 +25,14 @@ struct AudioRecorderGestureTarget {
     }
 }
 
+enum AudioRecorderGesturePolicy {
+    static let cancelUpwardDistance: CGFloat = 50
+
+    static func textOnlyReleaseAction(initialFinger: CGPoint, finger: CGPoint) -> AudioRecorderReleaseAction {
+        initialFinger.y - finger.y >= cancelUpwardDistance ? .cancel : .transcribe
+    }
+}
+
 final class MessageInputAudioRecorderView: UIView {
     private let backgroundView = RecorderGradientBackgroundView()
 
@@ -37,6 +45,10 @@ final class MessageInputAudioRecorderView: UIView {
     private let bubbleView = RecorderBubbleView()
 
     private var isDismissed = false
+
+    private var realtimeActive = false
+
+    private var lastAction: AudioRecorderReleaseAction = .sendAudio
 
     private static let defaultMaxDurationMs: Int = 60000
 
@@ -51,6 +63,8 @@ final class MessageInputAudioRecorderView: UIView {
     private static let gradientLocations: [CGFloat] = [0, 0.42, 0.67, 1.0]
 
     private let maxDurationMs: Int
+    private let allowSendOriginalVoice: Bool
+    private let initialFinger: CGPoint
 
     private let actionSize: CGFloat = 80
 
@@ -66,16 +80,26 @@ final class MessageInputAudioRecorderView: UIView {
 
     private let statusHorizontalMargin: CGFloat = CGFloat(SpacingScheme.contentSpacing)
 
-    private let bubbleHorizontalMargin: CGFloat = CGFloat(SpacingScheme.smallSpacing)
+    private static let compactBubbleWidth: CGFloat = 200
 
-    private let bubbleBottomMargin: CGFloat = 43
+    private static let compactWaveformRowHeight: CGFloat = 20
 
-    private let bubbleHeight: CGFloat = 40
+    private static let compactArrowHeight: CGFloat = 8
 
-    init(frame: CGRect, maxDurationMs: Int = MessageInputAudioRecorderView.defaultMaxDurationMs) {
+    private let bubbleBottomMargin: CGFloat = 231
+
+    private let compactBubbleHeight: CGFloat = CGFloat(SpacingScheme.iconIconSpacing) * 2 + MessageInputAudioRecorderView.compactWaveformRowHeight + MessageInputAudioRecorderView.compactArrowHeight
+
+    private let expandedBubbleEdgeMargin: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
+
+    init(frame: CGRect, maxDurationMs: Int = MessageInputAudioRecorderView.defaultMaxDurationMs,
+         allowSendOriginalVoice: Bool = true, initialFinger: CGPoint = .zero) {
         self.maxDurationMs = maxDurationMs
+        self.allowSendOriginalVoice = allowSendOriginalVoice
+        self.initialFinger = initialFinger
         super.init(frame: frame)
         constructHierarchy()
+        bubbleView.setShowsArrow(true)
         setupStyle()
         setNeedsLayout()
         isHidden = true
@@ -93,6 +117,17 @@ final class MessageInputAudioRecorderView: UIView {
 
     func stopAnimating() {
         bubbleView.stopAnimating()
+    }
+
+    func setRealtimeRecognitionActive(_ value: Bool) {
+        guard realtimeActive != value else { return }
+        realtimeActive = value
+        bubbleView.setRecognizedText("")
+        syncBubbleExpanded()
+    }
+
+    func updateRecognizedText(_ text: String) {
+        bubbleView.setRecognizedText(text)
     }
 
     func show() {
@@ -115,6 +150,9 @@ final class MessageInputAudioRecorderView: UIView {
     }
 
     func releaseAction(for finger: CGPoint) -> AudioRecorderReleaseAction {
+        if !allowSendOriginalVoice {
+            return AudioRecorderGesturePolicy.textOnlyReleaseAction(initialFinger: initialFinger, finger: finger)
+        }
         let local = CGPoint(x: finger.x - frame.origin.x, y: finger.y - frame.origin.y)
         let cancelTarget = AudioRecorderGestureTarget(
             left: cancelButton.frame.origin.x,
@@ -139,6 +177,8 @@ final class MessageInputAudioRecorderView: UIView {
 
     func update(state: AudioRecorderRecordUiState, durationMs: Int?, powerLevel: Int, maxDurationMs: Int) {
         let action = action(for: state)
+        lastAction = action
+        syncBubbleExpanded()
         statusLabel.text = statusText(for: action, durationMs: durationMs, maxDurationMs: maxDurationMs)
 
         let colors = TUIChatKitTheme.colors
@@ -200,12 +240,45 @@ final class MessageInputAudioRecorderView: UIView {
             height: statusSize.height
         )
 
-        bubbleView.frame = CGRect(
-            x: bubbleHorizontalMargin,
-            y: height - bubbleBottomMargin - bubbleHeight,
-            width: width - 2 * bubbleHorizontalMargin,
-            height: bubbleHeight
-        )
+        if bubbleView.isExpanded {
+            let expandedWidth = width - 2 * expandedBubbleEdgeMargin
+            let expandedHeight = bubbleView.preferredHeight(containerWidth: expandedWidth)
+            bubbleView.frame = CGRect(
+                x: expandedBubbleEdgeMargin,
+                y: height - bubbleBottomMargin - expandedHeight,
+                width: expandedWidth,
+                height: expandedHeight
+            )
+            let arrowX = allowSendOriginalVoice
+                ? transcribeButton.frame.midX - bubbleView.frame.minX : expandedWidth / 2
+            bubbleView.setArrowCenterX(arrowX)
+        } else {
+            let compactWidth = min(MessageInputAudioRecorderView.compactBubbleWidth, width - 2 * expandedBubbleEdgeMargin)
+            let bubbleY = height - bubbleBottomMargin - compactBubbleHeight
+            let bubbleX: CGFloat
+            let arrowX: CGFloat
+            if allowSendOriginalVoice, lastAction == .cancel {
+                let minX = expandedBubbleEdgeMargin
+                let maxX = max(width - expandedBubbleEdgeMargin - compactWidth, minX)
+                bubbleX = min(max(cancelButton.frame.midX - compactWidth / 2, minX), maxX)
+                arrowX = cancelButton.frame.midX - bubbleX
+            } else {
+                bubbleX = max((width - compactWidth) / 2, expandedBubbleEdgeMargin)
+                arrowX = compactWidth / 2
+            }
+            bubbleView.frame = CGRect(
+                x: bubbleX,
+                y: bubbleY,
+                width: compactWidth,
+                height: compactBubbleHeight
+            )
+            bubbleView.setArrowCenterX(arrowX)
+        }
+    }
+
+    private func syncBubbleExpanded() {
+        bubbleView.setExpanded(realtimeActive && lastAction == .transcribe)
+        setNeedsLayout()
     }
 
     private func constructHierarchy() {
@@ -223,7 +296,9 @@ final class MessageInputAudioRecorderView: UIView {
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 0
         statusLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
-        statusLabel.text = LocalizedChatString("message_input_release_send_hint")
+        statusLabel.text = LocalizedChatString(allowSendOriginalVoice ? "message_input_release_send_hint" : "InputRecordSlideToCancel")
+        cancelButton.isHidden = !allowSendOriginalVoice
+        transcribeButton.isHidden = !allowSendOriginalVoice
 
         cancelButton.setTitle(LocalizedChatString("message_input_cancel"))
         transcribeButton.setTitle(LocalizedChatString("message_input_transcribe_to_text"))
@@ -244,13 +319,13 @@ final class MessageInputAudioRecorderView: UIView {
         if action == .cancel {
             return LocalizedChatString("message_input_release_cancel_hint")
         }
-        if action == .transcribe {
+        if allowSendOriginalVoice, action == .transcribe {
             return LocalizedChatString("message_input_release_transcribe_hint")
         }
         if let durationMs = durationMs, let countdown = remainingSecondsBeforeAutoStop(durationMs, maxDurationMs) {
             return String(format: LocalizedChatString("message_input_auto_stop_countdown"), countdown)
         }
-        return LocalizedChatString("message_input_release_send_hint")
+        return LocalizedChatString(allowSendOriginalVoice ? "message_input_release_send_hint" : "InputRecordSlideToCancel")
     }
 
     private func remainingSecondsBeforeAutoStop(_ durationMs: Int, _ maxDurationMs: Int) -> Int? {
@@ -359,6 +434,30 @@ final class RecorderBubbleView: UIView {
 
     private static let pseudoSmoothingFactor: CGFloat = 0.35
 
+    private static let expandedHorizontalPadding: CGFloat = CGFloat(SpacingScheme.bubbleSpacing)
+
+    private static let expandedVerticalPadding: CGFloat = CGFloat(SpacingScheme.iconIconSpacing)
+
+    private static let expandedWaveformWidth: CGFloat = 40
+
+    private static let expandedWaveformHeight: CGFloat = 20
+
+    static let expandedMaxTextHeight: CGFloat = 220
+
+    private static let expandedArrowHeight: CGFloat = 8
+
+    private static let expandedArrowHalfWidth: CGFloat = 8
+
+    private static let compactRowWaveformWidth: CGFloat = 96
+
+    private static let compactRowWaveformHeight: CGFloat = 20
+
+    private static let compactRowGap: CGFloat = CGFloat(SpacingScheme.smallSpacing)
+
+    private static let textLineSpacing: CGFloat = 4
+
+    private static let placeholderAlpha: CGFloat = 0.6
+
     private var bubbleColor: UIColor = .clear
 
     private var contentColor: UIColor = .white
@@ -376,6 +475,18 @@ final class RecorderBubbleView: UIView {
     private var pseudoTimer: CFTimeInterval = 0
 
     private var durationText: String = "--:--"
+
+    private var recognizedText = ""
+
+    private var expanded = false
+
+    private var showsArrow = false
+
+    private var arrowCenterX: CGFloat?
+
+    private let textScrollView = UIScrollView()
+
+    private let textLabel = UILabel()
 
     private let phases: [CGFloat]
 
@@ -400,6 +511,12 @@ final class RecorderBubbleView: UIView {
         durationFont = FontScheme.caption3Bold
         super.init(frame: frame)
         backgroundColor = .clear
+        textLabel.numberOfLines = 0
+        textScrollView.showsVerticalScrollIndicator = false
+        textScrollView.isHidden = true
+        textScrollView.addSubview(textLabel)
+        addSubview(textScrollView)
+        applyTextContent()
         startAnimating()
     }
 
@@ -425,19 +542,80 @@ final class RecorderBubbleView: UIView {
 
     override func draw(_ rect: CGRect) {
         guard let ctx = UIGraphicsGetCurrentContext() else { return }
+        drawBubbleBody(in: ctx, rect: rect)
+        if expanded {
+            drawWaveform(in: ctx, region: expandedWaveformRegion(rect: rect))
+        } else if showsArrow {
+            drawCompactRow(in: ctx, rect: rect)
+        } else {
+            drawWaveform(in: ctx, region: rect)
+            drawDuration(in: ctx, rect: rect)
+        }
+    }
 
-        let bubblePath = UIBezierPath(roundedRect: rect, cornerRadius: RecorderBubbleView.cornerRadius)
-        ctx.addPath(bubblePath.cgPath)
+    private func drawBubbleBody(in ctx: CGContext, rect: CGRect) {
+        let hasArrow = expanded || showsArrow
+        let bodyBottom = hasArrow ? rect.height - RecorderBubbleView.expandedArrowHeight : rect.height
+        let path = UIBezierPath()
+        let bodyRect = CGRect(x: 0, y: 0, width: rect.width, height: bodyBottom)
+        path.append(UIBezierPath(roundedRect: bodyRect, cornerRadius: RecorderBubbleView.cornerRadius))
+        if hasArrow {
+            let radius = RecorderBubbleView.cornerRadius
+            let halfWidth = RecorderBubbleView.expandedArrowHalfWidth
+            let fallback = rect.width / 2
+            let lowerBound: CGFloat = radius + halfWidth
+            let upperBound: CGFloat = max(rect.width - radius - halfWidth, lowerBound)
+            let rawCenterX: CGFloat = arrowCenterX ?? fallback
+            let centerX: CGFloat = min(max(rawCenterX, lowerBound), upperBound)
+            path.move(to: CGPoint(x: centerX - halfWidth, y: bodyBottom))
+            path.addLine(to: CGPoint(x: centerX, y: rect.height))
+            path.addLine(to: CGPoint(x: centerX + halfWidth, y: bodyBottom))
+            path.close()
+        }
+        ctx.addPath(path.cgPath)
         ctx.setFillColor(bubbleColor.cgColor)
         ctx.fillPath()
+    }
 
-        let centerY = rect.height / 2
-        let layout = waveformLayout(containerWidth: rect.width)
+    private func drawCompactRow(in ctx: CGContext, rect: CGRect) {
+        let contentHeight = rect.height - RecorderBubbleView.expandedArrowHeight
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: durationFont,
+            .foregroundColor: contentColor
+        ]
+        let textSize = (durationText as NSString).size(withAttributes: attributes)
+        let rowWidth = RecorderBubbleView.compactRowWaveformWidth + RecorderBubbleView.compactRowGap + textSize.width
+        let rowStartX = (rect.width - rowWidth) / 2
+        let isRTL = effectiveUserInterfaceLayoutDirection == .rightToLeft
+        let waveformX = isRTL
+            ? rowStartX + textSize.width + RecorderBubbleView.compactRowGap
+            : rowStartX
+        let durationX = isRTL
+            ? rowStartX
+            : rowStartX + RecorderBubbleView.compactRowWaveformWidth + RecorderBubbleView.compactRowGap
+        let waveformRegion = CGRect(
+            x: waveformX,
+            y: (contentHeight - RecorderBubbleView.compactRowWaveformHeight) / 2,
+            width: RecorderBubbleView.compactRowWaveformWidth,
+            height: RecorderBubbleView.compactRowWaveformHeight
+        )
+        drawWaveform(in: ctx, region: waveformRegion)
+        let textY = (contentHeight - textSize.height) / 2
+        (durationText as NSString).draw(at: CGPoint(x: durationX, y: textY), withAttributes: attributes)
+    }
+
+    private func drawWaveform(in ctx: CGContext, region: CGRect) {
+        let barCount = expanded || showsArrow
+            ? max(Int((region.width + RecorderBubbleView.barGap) / (RecorderBubbleView.barWidth + RecorderBubbleView.barGap)), 1)
+            : RecorderBubbleView.totalBars
+        let totalWidth = CGFloat(barCount) * RecorderBubbleView.barWidth + CGFloat(barCount - 1) * RecorderBubbleView.barGap
+        let startX = region.minX + (region.width - totalWidth) / 2
+        let centerY = region.midY
         let t = CACurrentMediaTime() - startTime
         let normalizedPower = CGFloat(min(max(powerLevel, 0), 100)) / 100
         let amplitude = isFlat ? 0 : RecorderBubbleView.amplitudeBase * (RecorderBubbleView.amplitudeBaseFactor + normalizedPower * RecorderBubbleView.amplitudePowerFactor)
 
-        for i in 0..<RecorderBubbleView.totalBars {
+        for i in 0 ..< barCount {
             let noise: CGFloat
             if pseudoSpeaking {
                 noise = pseudoCurrent[i]
@@ -445,7 +623,7 @@ final class RecorderBubbleView: UIView {
                 noise = abs(sin(t * Double(freqs[i]) + Double(phases[i])))
             }
             let barHeight = RecorderBubbleView.minBarHeight + amplitude * CGFloat(noise)
-            let x = layout.startX + CGFloat(i) * (RecorderBubbleView.barWidth + RecorderBubbleView.barGap)
+            let x = startX + CGFloat(i) * (RecorderBubbleView.barWidth + RecorderBubbleView.barGap)
             let barRect = CGRect(
                 x: x,
                 y: centerY - barHeight / 2,
@@ -457,7 +635,10 @@ final class RecorderBubbleView: UIView {
         }
         ctx.setFillColor(contentColor.cgColor)
         ctx.fillPath()
+    }
 
+    private func drawDuration(in ctx: CGContext, rect: CGRect) {
+        let centerY = rect.height / 2
         let attributes: [NSAttributedString.Key: Any] = [
             .font: durationFont,
             .foregroundColor: contentColor
@@ -481,8 +662,119 @@ final class RecorderBubbleView: UIView {
     func setContentColor(_ color: UIColor) {
         if contentColor != color {
             contentColor = color
+            applyTextContent()
             setNeedsDisplay()
         }
+    }
+
+    var isExpanded: Bool {
+        return expanded
+    }
+
+    func setRecognizedText(_ text: String) {
+        guard recognizedText != text else { return }
+        recognizedText = text
+        applyTextContent()
+        setNeedsLayout()
+        if expanded, !text.isEmpty {
+            DispatchQueue.main.async { [weak self] in
+                self?.scrollTextToBottom()
+            }
+        }
+        superview?.setNeedsLayout()
+    }
+
+    func setExpanded(_ value: Bool) {
+        guard expanded != value else { return }
+        expanded = value
+        textScrollView.isHidden = !value
+        setNeedsLayout()
+        setNeedsDisplay()
+    }
+
+    func setShowsArrow(_ value: Bool) {
+        guard showsArrow != value else { return }
+        showsArrow = value
+        setNeedsDisplay()
+    }
+
+    func setArrowCenterX(_ x: CGFloat) {
+        guard arrowCenterX != x else { return }
+        arrowCenterX = x
+        setNeedsDisplay()
+    }
+
+    func preferredHeight(containerWidth: CGFloat) -> CGFloat {
+        return RecorderBubbleView.expandedVerticalPadding
+            + expandedTextHeight(containerWidth: containerWidth)
+            + RecorderBubbleView.expandedWaveformHeight
+            + RecorderBubbleView.expandedVerticalPadding
+            + RecorderBubbleView.expandedArrowHeight
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard expanded else { return }
+        let contentWidth = bounds.width - RecorderBubbleView.expandedHorizontalPadding * 2
+        let visibleHeight = expandedTextHeight(containerWidth: bounds.width)
+        textScrollView.frame = CGRect(
+            x: RecorderBubbleView.expandedHorizontalPadding,
+            y: RecorderBubbleView.expandedVerticalPadding,
+            width: contentWidth,
+            height: visibleHeight
+        )
+        let fullHeight = expandedFullTextHeight(containerWidth: bounds.width)
+        textLabel.frame = CGRect(x: 0, y: 0, width: contentWidth, height: fullHeight)
+        textScrollView.contentSize = CGSize(width: contentWidth, height: fullHeight)
+    }
+
+    private func expandedWaveformRegion(rect: CGRect) -> CGRect {
+        let isRTL = effectiveUserInterfaceLayoutDirection == .rightToLeft
+        let textHeight = expandedTextHeight(containerWidth: rect.width)
+        let rowY = RecorderBubbleView.expandedVerticalPadding + textHeight
+        let x = isRTL
+            ? RecorderBubbleView.expandedHorizontalPadding
+            : rect.width - RecorderBubbleView.expandedHorizontalPadding - RecorderBubbleView.expandedWaveformWidth
+        return CGRect(
+            x: x,
+            y: rowY,
+            width: RecorderBubbleView.expandedWaveformWidth,
+            height: RecorderBubbleView.expandedWaveformHeight
+        )
+    }
+
+    private func expandedTextHeight(containerWidth: CGFloat) -> CGFloat {
+        return min(expandedFullTextHeight(containerWidth: containerWidth), RecorderBubbleView.expandedMaxTextHeight)
+    }
+
+    private func expandedFullTextHeight(containerWidth: CGFloat) -> CGFloat {
+        let contentWidth = containerWidth - RecorderBubbleView.expandedHorizontalPadding * 2
+        guard contentWidth > 0 else { return 0 }
+        return max(textLabel.attributedText?.boundingRect(
+            with: CGSize(width: contentWidth, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            context: nil
+        ).height ?? 0, FontScheme.caption1Regular.lineHeight)
+    }
+
+    private func applyTextContent() {
+        let waiting = recognizedText.isEmpty
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineSpacing = RecorderBubbleView.textLineSpacing
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: FontScheme.caption1Regular,
+            .foregroundColor: contentColor,
+            .paragraphStyle: paragraph
+        ]
+        let display = waiting ? LocalizedChatString("message_input_realtime_transcribing") : recognizedText
+        textLabel.attributedText = NSAttributedString(string: display, attributes: attributes)
+        textLabel.alpha = waiting ? RecorderBubbleView.placeholderAlpha : 1
+    }
+
+    private func scrollTextToBottom() {
+        let overflow = textScrollView.contentSize.height - textScrollView.bounds.height
+        guard overflow > 0 else { return }
+        textScrollView.contentOffset = CGPoint(x: 0, y: overflow)
     }
 
     func setPowerLevel(_ level: Int) {
@@ -528,13 +820,6 @@ final class RecorderBubbleView: UIView {
             }
             pseudoCurrent[index] += (pseudoTargets[index] - pseudoCurrent[index]) * RecorderBubbleView.pseudoSmoothingFactor
         }
-    }
-
-    private func waveformLayout(containerWidth: CGFloat) -> (startX: CGFloat, totalWidth: CGFloat) {
-        let totalWidth = CGFloat(RecorderBubbleView.totalBars) * RecorderBubbleView.barWidth
-            + CGFloat(RecorderBubbleView.totalBars - 1) * RecorderBubbleView.barGap
-        let startX = (containerWidth - totalWidth) / 2
-        return (startX, totalWidth)
     }
 
     private static func formatDuration(_ milliseconds: Int?) -> String {

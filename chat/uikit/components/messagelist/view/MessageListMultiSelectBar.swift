@@ -52,11 +52,11 @@ final class MessageListMultiSelectBar: UIView {
 
     // MARK: - Configure
 
-    func configure(selectedCount: Int) {
+    func configure(selectedCount: Int, supportsForward: Bool, supportsDelete: Bool) {
         let enabled = selectedCount > 0
-        separateForwardItem.setEnabledState(enabled)
-        mergeForwardItem.setEnabledState(enabled)
-        deleteItem.setEnabledState(enabled)
+        separateForwardItem.setEnabledState(enabled && supportsForward)
+        mergeForwardItem.setEnabledState(enabled && supportsForward)
+        deleteItem.setEnabledState(enabled && supportsDelete)
     }
 
     private func constructViewHierarchy() {

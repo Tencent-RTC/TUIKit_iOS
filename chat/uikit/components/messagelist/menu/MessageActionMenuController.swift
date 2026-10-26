@@ -97,10 +97,12 @@ final class MessageActionMenuController: NSObject {
     func show(for message: MessageInfo,
               bubbleFrameInWindow: CGRect,
               config: MessageListConfigProtocol & MessageActionConfigProtocol,
+              conversationID: String,
               auxiliaryHiddenIDs: Set<String> = []) {
         var actions = MessageActionMenuProvider.visibleActions(
             for: message,
             config: config,
+            conversationID: conversationID,
             auxiliaryHiddenIDs: auxiliaryHiddenIDs
         )
         guard !actions.isEmpty else { return }

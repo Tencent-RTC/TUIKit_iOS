@@ -30,7 +30,7 @@ DEMO_BUILD_DIR=${BUILD_DIR}/Build/Products
 WORKSPACE_NAME="ChatDemo"
 SCHEME_NAME="ChatDemo"
 APP_NAME="ChatDemo"
-CHATDEMO_PLIST_PATH=${SHELL_DIR}/ChatDemo/Info.plist
+CHATDEMO_PLIST_PATH=${SHELL_DIR}/ChatDemo/Configuration/Info.plist
 APPEX_PLIST_PATH=${SHELL_DIR}/pushservice/Info.plist
 
 # App 上架标准版本（CFBundleShortVersionString）与构建号（CFBundleVersion）
@@ -160,8 +160,8 @@ function patchPbxprojForAppStore() {
             sub(/= [^;]+;/, "= " appBuildNo ";")
         } else if (index($0, "MARKETING_VERSION = ") > 0) {
             sub(/= [^;]+;/, "= " appVersion ";")
-        } else if (index($0, "CODE_SIGN_ENTITLEMENTS = \"ChatDemo/ChatDemo-Release.entitlements\";") > 0) {
-            sub("ChatDemo/ChatDemo-Release.entitlements", "ChatDemo/ChatDemo-AppStore.entitlements")
+        } else if (index($0, "CODE_SIGN_ENTITLEMENTS = \"ChatDemo/Configuration/ChatDemo-Release.entitlements\";") > 0) {
+            sub("ChatDemo/Configuration/ChatDemo-Release.entitlements", "ChatDemo/Configuration/ChatDemo-AppStore.entitlements")
         } else if (index($0, "CODE_SIGN_ENTITLEMENTS = pushservice/pushserviceRelease.entitlements;") > 0) {
             sub("pushservice/pushserviceRelease.entitlements", "pushservice/pushserviceAppStore.entitlements")
         } else if (index($0, "PRODUCT_BUNDLE_IDENTIFIER = com.imchat.imchat.uikit.pushservice;") > 0) {

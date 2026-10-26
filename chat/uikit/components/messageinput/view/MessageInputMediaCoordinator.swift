@@ -20,8 +20,18 @@ final class MessageInputMediaCoordinator: NSObject {
 
     private var currentGestureState: AudioRecorderRecordUiState = .recording
 
+    private var realtimeRecognizer: RealtimeAsrRecognizer?
+    private var finishingRecognizer: RealtimeAsrRecognizer?
+    private var recordingID: UUID?
+    private var voiceGeneration = UUID()
+    private var isAutomaticallyTranscribing = false
+
+    private static let minimumRecordDurationMs = 1000
+
     private var recordMaxDurationMs: Int {
-        return viewModel.config.audioMaxRecordDurationMs
+        let duration = viewModel.config.audioMaxRecordDurationMs
+        guard duration > 0 else { return ChatMessageInputConfig.defaultAudioMaxRecordDurationMs }
+        return max(Self.minimumRecordDurationMs, Int(Int32(clamping: duration)))
     }
 
     private var lastReleaseAction: AudioRecorderReleaseAction = .sendAudio
@@ -29,8 +39,6 @@ final class MessageInputMediaCoordinator: NSObject {
     private static let fileSizeLimit: Int64 = 1_000_000_000
 
     private static let videoThumbnailCompressionQuality: CGFloat = 0.7
-
-    private static let imageSaveCompressionQuality: CGFloat = 0.8
 
     private static let toastDuration: TimeInterval = 3
 
@@ -49,27 +57,18 @@ final class MessageInputMediaCoordinator: NSObject {
     func showCamera(recordMode: RecordMode) {
         guard let presenter = findViewController() else { return }
 
-        VideoRecorderConfigInternal.sharedInstance().setCustomConfig("{\"record_mode\": \(recordMode.rawValue)}")
-
-        let recorder = VideoRecorderController()
-        recorder.recordFilePath = makeMediaPath(messageType: .video, withExtension: "mov")
+        let recorder = VideoRecorderController(
+            config: VideoRecorderConfig(recordMode: recordMode),
+            onVideoCaptured: { [weak self] videoPath, _, thumbnailPath in
+                guard let self, let videoPath else { return }
+                self.createThumbnailAndSendVideo(videoPath, thumbnailPath)
+            },
+            onPhotoCaptured: { [weak self] imagePath in
+                guard let imagePath else { return }
+                self?.viewModel.sendImageMessage(imagePath)
+            }
+        )
         recorder.modalPresentationStyle = .fullScreen
-        recorder.resultCallback = { [weak self, weak recorder] videoPath, image, _ in
-            recorder?.dismiss(animated: true)
-            guard let self = self else { return }
-            if let videoPath = videoPath {
-                self.createThumbnailAndSendVideo(videoPath, nil)
-                return
-            }
-            if let image = image, let imagePath = self.saveImage(image) {
-                self.viewModel.sendImageMessage(imagePath)
-            }
-        }
-        recorder.photoPreviewOverride = { controller, image in
-            VideoRecorderPhotoEditBridge.present(from: controller, image: image, onConfirm: { editedImage in
-                controller.resultCallback?(nil, editedImage, 0)
-            }, onCancel: {})
-        }
         presenter.present(recorder, animated: true)
     }
 
@@ -90,14 +89,25 @@ final class MessageInputMediaCoordinator: NSObject {
 
     // MARK: - Voice（语音，直接驱动命令式 AudioRecorder）
 
-    func beginVoiceRecording() {
-        guard voiceOverlay == nil,
+    @discardableResult
+    func beginVoiceRecording(finger: CGPoint) -> Bool {
+        guard recordingID == nil, voiceOverlay == nil, voiceTranscriptionOverlay == nil,
+              finishingRecognizer == nil, !isAutomaticallyTranscribing,
               let inputView = presentingView,
-              let window = inputView.window else { return }
+              let window = inputView.window else { return false }
 
+        let generation = UUID()
+        voiceGeneration = generation
+        recordingID = generation
+        currentRecordDuration = 0
+        currentRecordPower = 0
+        lastReleaseAction = viewModel.config.enableSendRecordedVoice ? .sendAudio : .transcribe
+        currentGestureState = viewModel.config.enableSendRecordedVoice ? .recording : .readyToTranscribe
         let overlay = MessageInputAudioRecorderView(
             frame: window.bounds,
-            maxDurationMs: recordMaxDurationMs
+            maxDurationMs: recordMaxDurationMs,
+            allowSendOriginalVoice: viewModel.config.enableSendRecordedVoice,
+            initialFinger: finger
         )
         overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         window.addSubview(overlay)
@@ -106,7 +116,7 @@ final class MessageInputMediaCoordinator: NSObject {
         let recorder = AudioRecorder.sharedRecorder
         recorder.onRecordTime = { [weak self] milliseconds in
             DispatchQueue.main.async {
-                guard let self = self else { return }
+                guard let self, self.recordingID == generation else { return }
                 self.currentRecordDuration = milliseconds
                 self.voiceOverlay?.update(
                     state: self.currentGestureState,
@@ -118,7 +128,7 @@ final class MessageInputMediaCoordinator: NSObject {
         }
         recorder.onPowerLevel = { [weak self] power in
             DispatchQueue.main.async {
-                guard let self = self else { return }
+                guard let self, self.recordingID == generation else { return }
                 self.currentRecordPower = power
                 self.voiceOverlay?.update(
                     state: self.currentGestureState,
@@ -129,15 +139,29 @@ final class MessageInputMediaCoordinator: NSObject {
             }
         }
         recorder.onRecordingComplete = { [weak self] resultCode, filePath, duration in
-            guard let self = self else { return }
-            self.dismissVoiceOverlay()
-            self.handleVoiceRecordingComplete(resultCode: resultCode, filePath: filePath, duration: duration)
+            DispatchQueue.main.async {
+                guard let self, self.recordingID == generation else { return }
+                self.recordingID = nil
+                if self.voiceOverlay != nil {
+                    self.lastReleaseAction = self.currentGestureState == .readyToCancel ? .cancel
+                        : self.currentGestureState == .readyToTranscribe || !self.viewModel.config.enableSendRecordedVoice
+                            ? .transcribe : .sendAudio
+                }
+                self.dismissVoiceOverlay()
+                self.handleVoiceRecordingComplete(resultCode: resultCode, filePath: filePath, duration: duration)
+            }
         }
         NotificationCenter.default.post(name: MessageInputView.voiceRecordStartNotification, object: nil)
-        recorder.startRecord()
+        guard recordingID == generation else { return false }
+        recorder.startRecord(maxDurationMs: recordMaxDurationMs)
+        guard recordingID == generation else { return false }
+        primeRealtimeRecognizer()
+        if currentGestureState == .readyToTranscribe {
+            realtimeRecognizer?.beginRecognize()
+        }
         overlay.show()
-        currentGestureState = .recording
-        overlay.update(state: .recording, durationMs: 0, powerLevel: 0, maxDurationMs: recordMaxDurationMs)
+        overlay.update(state: currentGestureState, durationMs: 0, powerLevel: 0, maxDurationMs: recordMaxDurationMs)
+        return true
     }
 
     func updateVoiceRecording(finger: CGPoint) {
@@ -148,6 +172,9 @@ final class MessageInputMediaCoordinator: NSObject {
             : (action == .transcribe ? .readyToTranscribe : .recording)
         guard state != currentGestureState else { return }
         currentGestureState = state
+        if state == .readyToTranscribe {
+            realtimeRecognizer?.beginRecognize()
+        }
         overlay.update(
             state: state,
             durationMs: currentRecordDuration,
@@ -166,10 +193,35 @@ final class MessageInputMediaCoordinator: NSObject {
         let recorder = AudioRecorder.sharedRecorder
         switch action {
         case .cancel:
-            recorder.cancelRecord()
-        case .sendAudio, .transcribe:
+            cancelVoiceRecording()
+        case .sendAudio:
+            cancelRealtimeRecognizer()
+            recorder.stopRecord()
+        case .transcribe:
             recorder.stopRecord()
         }
+    }
+
+    func cancelVoiceRecording() {
+        voiceGeneration = UUID()
+        let wasRecording = recordingID != nil
+        recordingID = nil
+        lastReleaseAction = .cancel
+        cancelRealtimeRecognizer()
+        finishingRecognizer?.cancel()
+        finishingRecognizer = nil
+        isAutomaticallyTranscribing = false
+        dismissVoiceOverlay()
+        voiceTranscriptionOverlay?.dismiss()
+        voiceTranscriptionOverlay = nil
+        stopSpeak()
+        if wasRecording {
+            AudioRecorder.sharedRecorder.cancelRecord()
+        }
+    }
+
+    deinit {
+        cancelVoiceRecording()
     }
 
     // MARK: - Helpers
@@ -207,30 +259,118 @@ final class MessageInputMediaCoordinator: NSObject {
                 LocalizedChatString("AudioRecordTimeLimitReached"), type: .warning, duration: Self.toastDuration
             )
         }
+        let recognizer = realtimeRecognizer
+        realtimeRecognizer = nil
         if lastReleaseAction == .transcribe {
             if resultCode.rawValue >= 0, !filePath.isEmpty {
-                showVoiceTranscriptionOverlay(filePath: filePath, duration: duration)
+                if !viewModel.config.enableSendRecordedVoice, !viewModel.config.enableRealtimeVoiceToText {
+                    recognizer?.cancel()
+                    transcribeAndSendText(filePath: filePath)
+                } else if let recognizer, recognizer.isRecognizing {
+                    openVoiceTranscriptionDraft(filePath: filePath, duration: duration, recognizer: recognizer)
+                } else {
+                    recognizer?.cancel()
+                    showVoiceTranscriptionOverlay(filePath: filePath, duration: duration, initialText: nil)
+                    runWholeFileTranscription(filePath: filePath)
+                }
+            } else {
+                recognizer?.cancel()
             }
             return
         }
-        if resultCode.rawValue >= 0, !filePath.isEmpty {
+        recognizer?.cancel()
+        if lastReleaseAction == .sendAudio, viewModel.config.enableSendRecordedVoice,
+           resultCode.rawValue >= 0, !filePath.isEmpty {
             viewModel.sendVoiceMessage(filePath, duration: duration)
         }
     }
 
-    private func showVoiceTranscriptionOverlay(filePath: String, duration: Int) {
+    private func openVoiceTranscriptionDraft(filePath: String, duration: Int, recognizer: RealtimeAsrRecognizer) {
+        let generation = voiceGeneration
+        finishingRecognizer = recognizer
+        let partial = recognizer.text
+        showVoiceTranscriptionOverlay(
+            filePath: filePath,
+            duration: duration,
+            initialText: partial.isEmpty ? nil : partial
+        )
+        recognizer.finish { [weak self] finalText in
+            DispatchQueue.main.async {
+                guard let self, self.voiceGeneration == generation else { return }
+                self.finishingRecognizer = nil
+                guard self.voiceTranscriptionOverlay != nil else { return }
+                if finalText.isEmpty {
+                    self.runWholeFileTranscription(filePath: filePath)
+                } else {
+                    self.voiceTranscriptionOverlay?.updateResult(finalText)
+                }
+            }
+        }
+    }
+
+    private func runWholeFileTranscription(filePath: String) {
+        let generation = voiceGeneration
+        viewModel.convertLocalAudioToText(filePath: filePath) { [weak self] text in
+            guard let self, self.voiceGeneration == generation else { return }
+            self.voiceTranscriptionOverlay?.updateResult(text)
+        }
+    }
+
+    private func transcribeAndSendText(filePath: String) {
+        let generation = voiceGeneration
+        isAutomaticallyTranscribing = true
+        viewModel.convertLocalAudioToText(filePath: filePath) { [weak self] text in
+            guard let self, self.voiceGeneration == generation, self.isAutomaticallyTranscribing else { return }
+            self.isAutomaticallyTranscribing = false
+            guard self.presentingView?.window != nil, let text else { return }
+            let message = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !message.isEmpty else {
+                WindowToastManager.shared.show(LocalizedChatString("ConvertToTextFailed"), type: .warning, duration: Self.toastDuration)
+                return
+            }
+            self.viewModel.sendTextMessage(message)
+        }
+    }
+
+    private func primeRealtimeRecognizer() {
+        realtimeRecognizer?.cancel()
+        realtimeRecognizer = nil
+        voiceOverlay?.setRealtimeRecognitionActive(false)
+        guard viewModel.config.enableRealtimeVoiceToText else { return }
+        let generation = voiceGeneration
+        let recognizer = RealtimeAsrRecognizer(
+            language: viewModel.config.realtimeVoiceToTextLanguage,
+            enableVoiceprintDenoise: viewModel.config.enableVoiceprintDenoise
+        ) { [weak self] text in
+            guard let self, self.voiceGeneration == generation, self.voiceOverlay != nil else { return }
+            self.voiceOverlay?.updateRecognizedText(text)
+        }
+        if recognizer.prime() {
+            realtimeRecognizer = recognizer
+            voiceOverlay?.setRealtimeRecognitionActive(true)
+        }
+    }
+
+    private func cancelRealtimeRecognizer() {
+        realtimeRecognizer?.cancel()
+        realtimeRecognizer = nil
+    }
+
+    private func showVoiceTranscriptionOverlay(filePath: String, duration: Int, initialText: String?) {
         guard let window = presentingView?.window else { return }
         let callbacks = VoiceTranscriptionCallbacks(
             onCancel: { [weak self] in
-                self?.voiceTranscriptionOverlay = nil
+                self?.cancelVoiceRecording()
             },
             onSendAudio: { [weak self] path, dur in
-                self?.voiceTranscriptionOverlay = nil
-                self?.viewModel.sendVoiceMessage(path, duration: dur)
+                guard let self, self.viewModel.config.enableSendRecordedVoice else { return }
+                self.cancelVoiceRecording()
+                self.viewModel.sendVoiceMessage(path, duration: dur)
             },
             onSendText: { [weak self] text in
-                self?.voiceTranscriptionOverlay = nil
-                self?.viewModel.sendTextMessage(text)
+                guard let self else { return }
+                self.cancelVoiceRecording()
+                self.viewModel.sendTextMessage(text)
             },
             onTranslate: { text, language, onSuccess, onFailure in
                 AiMediaProcessManager.translateSingleText(
@@ -250,14 +390,12 @@ final class MessageInputMediaCoordinator: NSObject {
             frame: window.bounds,
             audioPath: filePath,
             audioDurationSecond: duration,
-            text: nil,
-            callbacks: callbacks
+            text: initialText,
+            callbacks: callbacks,
+            allowSendOriginalVoice: viewModel.config.enableSendRecordedVoice
         )
         voiceTranscriptionOverlay = overlay
         overlay.show(in: window)
-        viewModel.convertLocalAudioToText(filePath: filePath) { [weak overlay] text in
-            overlay?.updateResult(text)
-        }
     }
 
     private func startSpeak(text: String,
@@ -269,8 +407,9 @@ final class MessageInputMediaCoordinator: NSObject {
                 guard let audioURL = URL(string: url) else { onError(); return }
                 URLSession.shared.downloadTask(with: audioURL) { localURL, _, error in
                     guard let localURL = localURL, error == nil else { onError(); return }
-                    self?.speechPlayer = SpeechPlayer()
-                    self?.speechPlayer?.play(
+                    guard let self = self, self.voiceTranscriptionOverlay != nil else { return }
+                    self.speechPlayer = SpeechPlayer()
+                    self.speechPlayer?.play(
                         url: localURL,
                         onStart: onStart,
                         onComplete: onComplete,
@@ -318,13 +457,6 @@ final class MessageInputMediaCoordinator: NSObject {
             return nil
         }
         return UIImage(cgImage: cgImage)
-    }
-
-    private func saveImage(_ image: UIImage) -> String? {
-        guard let imageData = image.jpegData(compressionQuality: Self.imageSaveCompressionQuality) else { return nil }
-        let path = makeMediaPath(messageType: .image, withExtension: "png")
-        try? imageData.write(to: URL(fileURLWithPath: path))
-        return path
     }
 
     private func makeMediaPath(messageType: MessageType, withExtension: String?) -> String {

@@ -17,7 +17,7 @@ final class AlbumPickerMediaSendCoordinator {
 
     private var isPickerVisible = false
 
-    func showAlbumPicker(conversationID: String) {
+    func showAlbumPicker(conversationID: String, enableReadReceipt: Bool) {
         if conversationID.isEmpty || isPickerVisible {
             return
         }
@@ -29,6 +29,7 @@ final class AlbumPickerMediaSendCoordinator {
 
         let session = AlbumPickerSendSession(
             conversationID: conversationID,
+            enableReadReceipt: enableReadReceipt,
             pickerController: pickerController,
             onPickerDismissed: { [weak self] in
                 self?.isPickerVisible = false
@@ -95,6 +96,7 @@ private final class AlbumPickerSendSession: NSObject, AlbumPickerDelegate {
     }
 
     private let conversationID: String
+    private let enableReadReceipt: Bool
 
     private let inputStore: MessageInputStore
 
@@ -103,8 +105,6 @@ private final class AlbumPickerSendSession: NSObject, AlbumPickerDelegate {
     private let onPickerDismissed: () -> Void
 
     private let onCompleted: (AlbumPickerSendSession) -> Void
-
-    private let placeholderStore = AlbumPickerPlaceholderStore.shared
 
     private var placeholderStates: [String: PlaceholderState] = [:]
 
@@ -117,10 +117,12 @@ private final class AlbumPickerSendSession: NSObject, AlbumPickerDelegate {
     private var isFinished = false
 
     init(conversationID: String,
+         enableReadReceipt: Bool,
          pickerController: UIViewController,
          onPickerDismissed: @escaping () -> Void,
          onCompleted: @escaping (AlbumPickerSendSession) -> Void) {
         self.conversationID = conversationID
+        self.enableReadReceipt = enableReadReceipt
         self.inputStore = MessageInputStore.create(conversationID: conversationID)
         self.pickerController = pickerController
         self.onPickerDismissed = onPickerDismissed
@@ -209,7 +211,7 @@ private final class AlbumPickerSendSession: NSObject, AlbumPickerDelegate {
     private func applyPlaceholder(for media: AlbumMedia) {
         let placeholderID = Self.makePlaceholderID(sessionID: sessionID, mediaID: media.id)
         guard let state = placeholderStates[placeholderID] else { return }
-        placeholderStore.upsert(
+        MessageListView.addPlaceholder(
             conversationID: conversationID,
             info: MessagePlaceholderInfo(
                 placeholderID: state.placeholderID,
@@ -252,7 +254,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
 
     private func makeSendOption() -> SendMessageOption {
         var option = SendMessageOption()
-        option.needReadReceipt = ChatMessageInputConfig().enableReadReceipt
+        option.needReadReceipt = enableReadReceipt
         return option
     }
 
@@ -293,7 +295,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
     private func removePlaceholder(for media: AlbumMedia) {
         let placeholderID = Self.makePlaceholderID(sessionID: sessionID, mediaID: media.id)
         guard let state = placeholderStates.removeValue(forKey: placeholderID) else { return }
-        placeholderStore.remove(conversationID: conversationID, placeholderID: state.placeholderID)
+        MessageListView.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
     }
 
     private func sendPendingTextIfNeeded() {
@@ -326,17 +328,16 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
         placeholderStates.removeAll()
 
         for state in states where state.mediaPath == nil {
-            placeholderStore.remove(conversationID: conversationID, placeholderID: state.placeholderID)
+            MessageListView.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
         }
         let sendingIDs = states.filter { $0.mediaPath != nil }.map { $0.placeholderID }
         if sendingIDs.isEmpty {
             return
         }
-        let store = placeholderStore
         let targetConversationID = conversationID
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.placeholderCleanupDelay) {
             for placeholderID in sendingIDs {
-                store.remove(conversationID: targetConversationID, placeholderID: placeholderID)
+                MessageListView.removePlaceholder(conversationID: targetConversationID, placeholderID: placeholderID)
             }
         }
     }

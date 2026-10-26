@@ -73,6 +73,11 @@ final class MessageInputMorePanel: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        MessageInputAppearanceApplier.update(self)
+    }
+
     private func setupActions() {
         var defaults: [MessageInputMenuAction] = [
             MessageInputMenuAction(
@@ -128,7 +133,8 @@ final class MessageInputMorePanel: UIView {
     }
 
     private func setupView() {
-        backgroundColor = TUIChatKitTheme.colors.bgColorOperate
+        MessageInputAppearanceApplier.apply(fill: config.appearance?.morePanel?.fill, to: self,
+            defaultColor: TUIChatKitTheme.colors.bgColorOperate)
         collectionView.backgroundColor = .clear
         collectionView.isScrollEnabled = false
         collectionView.dataSource = self
@@ -162,7 +168,9 @@ extension MessageInputMorePanel: UICollectionViewDataSource {
         cell.configure(
             icon: item.icon ?? AtomicXChatResources.image(named: item.iconName),
             title: item.title,
-            showRedDot: item.showRedDot && !dismissedRedDotIDs.contains(item.ID)
+            showRedDot: item.showRedDot && !dismissedRedDotIDs.contains(item.ID),
+            appearance: config.appearance?.morePanel,
+            index: indexPath.item
         )
         return cell
     }
@@ -193,7 +201,8 @@ extension MessageInputMorePanel: UICollectionViewDelegateFlowLayout {
     ) -> CGSize {
         let availableWidth = collectionView.bounds.width
         let itemWidth = floor(availableWidth / CGFloat(Self.columns))
-        let itemHeight = Self.iconSize + Self.titleTopSpacing + Self.titleAreaHeight + Self.itemVerticalSpacing
+        let size = MessageInputAppearanceApplier.dimension(config.appearance?.morePanel?.itemSize, fallback: Self.iconSize)
+        let itemHeight = size + Self.titleTopSpacing + Self.titleAreaHeight + Self.itemVerticalSpacing
         return CGSize(width: itemWidth, height: itemHeight)
     }
 }
@@ -220,10 +229,30 @@ private final class MorePanelCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(icon: UIImage?, title: String, showRedDot: Bool) {
+    func configure(icon: UIImage?, title: String, showRedDot: Bool, appearance: MessageInputMorePanelAppearance?, index: Int) {
+        let colors = TUIChatKitTheme.colors
         iconImageView.image = icon
+        iconImageView.tintColor = appearance?.itemIconTint ?? colors.textColorPrimary
         titleLabel.text = title
+        titleLabel.textColor = appearance?.itemTitleColor ?? colors.textColorSecondary
+        titleLabel.font = UIFont.systemFont(ofSize: MessageInputAppearanceApplier.dimension(
+            appearance?.itemTitleSize, fallback: FontScheme.caption3Regular.pointSize))
         redDotView.isHidden = !showRedDot
+        let size = MessageInputAppearanceApplier.dimension(appearance?.itemSize, fallback: MessageInputMorePanel.iconSize)
+        let iconSize = MessageInputAppearanceApplier.dimension(appearance?.itemIconSize, fallback: MessageInputMorePanel.iconGlyphSize)
+        iconTileView.snp.updateConstraints { make in make.width.height.equalTo(size) }
+        iconImageView.snp.updateConstraints { make in make.width.height.equalTo(min(iconSize, size)) }
+        iconTileView.layer.cornerRadius = MessageInputAppearanceApplier.cornerRadius(
+            appearance?.itemCornerRadius, fallback: MessageInputMorePanel.iconTileCornerRadius,
+            size: CGSize(width: size, height: size))
+        let fills = appearance?.itemFills ?? []
+        let fill = fills.isEmpty ? nil : fills[index % fills.count]
+        MessageInputAppearanceApplier.apply(fill: fill, to: iconTileView, defaultColor: colors.bgColorInput)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        MessageInputAppearanceApplier.update(iconTileView)
     }
 
     private func setupCell() {

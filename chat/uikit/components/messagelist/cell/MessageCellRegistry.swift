@@ -23,6 +23,12 @@ enum MessageContentKind: Equatable {
 
     case call
 
+    /// chatbotPlugin 自定义消息（AI 机器人回复，含流式分片与占位气泡）
+    case chatbot
+
+    /// TIMStreamElem 流式消息
+    case stream
+
     case custom(String)
 
     case unsupported
@@ -37,13 +43,15 @@ enum MessageContentKind: Equatable {
         case .face: return "MessageCell.face"
         case .merged: return "MessageCell.merged"
         case .call: return "MessageCell.call"
+        case .chatbot: return "MessageCell.chatbot"
+        case .stream: return "MessageCell.stream"
         case .custom(let businessID): return "MessageCell.custom.\(businessID)"
         case .unsupported: return "MessageCell.unsupported"
         }
     }
 
     static var allReuseIdentifiers: [String] {
-        let kinds: [MessageContentKind] = [.text, .image, .video, .audio, .file, .face, .merged, .call, .unsupported]
+        let kinds: [MessageContentKind] = [.text, .image, .video, .audio, .file, .face, .merged, .call, .chatbot, .stream, .unsupported]
         return kinds.map { $0.reuseIdentifier }
     }
 }
@@ -52,7 +60,7 @@ final class MessageCellRegistry {
     static let shared = MessageCellRegistry()
 
     var builtInReuseIdentifiers: [String] {
-        let contentKinds: [MessageContentKind] = [.text, .image, .video, .audio, .file, .face, .merged, .call, .unsupported]
+        let contentKinds: [MessageContentKind] = [.text, .image, .video, .audio, .file, .face, .merged, .call, .chatbot, .stream, .unsupported]
         return contentKinds.map { $0.reuseIdentifier } + [Self.systemTipReuseIdentifier, Self.revokedReuseIdentifier]
     }
 
@@ -93,7 +101,9 @@ final class MessageCellRegistry {
             return .bubble(.face)
         case .merged:
             return .bubble(.merged)
-        case .stream, .none:
+        case .stream:
+            return .bubble(.stream)
+        case .none:
             return .bubble(.unsupported)
         }
     }
@@ -180,6 +190,10 @@ final class MessageCellRegistry {
 
         if let callModel = CallMessageParser.parse(message) {
             return callModel.isGroup ? .systemTip : .bubble(.call)
+        }
+        // chatbotPlugin 协议消息（AI 机器人回复 / 占位气泡 / 控制信令）优先于 businessID 路由
+        if ChatbotMessageProtocol.parse(message) != nil {
+            return .bubble(.chatbot)
         }
         guard let businessID = businessID(from: payload) else {
             return .bubble(.unsupported)
