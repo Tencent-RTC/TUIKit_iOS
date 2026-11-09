@@ -1,4 +1,0 @@
-//
-//  GuideExtensions.swift
-//  main
-//
