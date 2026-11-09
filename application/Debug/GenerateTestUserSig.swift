@@ -1,13 +1,13 @@
 //
 //  GenerateTestUserSig.swift
-//  RTCube
+//  App-UIKit
 //
 //  Created by abyyxwang on 2021/5/7.
 //  Copyright © 2021 Tencent. All rights reserved.
 //
 
-import CommonCrypto
 import Foundation
+import CommonCrypto
 import zlib
 
 /**
@@ -64,13 +64,13 @@ let COPYRIGHTED_MUSIC_LICENSE_KEY = ""
 let COPYRIGHTED_MUSIC_LICENSE_URL = ""
 
 class GenerateTestUserSig {
-    class func genTestUserSig(identifier: String, sdkAppId: Int, secretKey: String) -> String {
+    class func genTestUserSig(identifier: String) -> String {
         let current = CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970
         let TLSTime = CLong(floor(current))
         var obj: [String: Any] = [
             "TLS.ver": "2.0",
             "TLS.identifier": identifier,
-            "TLS.sdkappid": sdkAppId,
+            "TLS.sdkappid": SDKAPPID,
             "TLS.expire": EXPIRETIME,
             "TLS.time": TLSTime,
         ]
@@ -87,7 +87,7 @@ class GenerateTestUserSig {
             }
         }
         print("string to sign: \(stringToSign)")
-        let sig = hmac(stringToSign, secretKey: secretKey)
+        let sig = hmac(stringToSign, secretKey: SECRETKEY)
         obj["TLS.sig"] = sig
         print("sig: \(String(describing: sig))")
         guard let jsonData = try? JSONSerialization.data(withJSONObject: obj, options: .sortedKeys) else { return "" }
