@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 import AtomicXCore
 import Combine
+import AtomicX
+import Foundation
 
 public enum TranscriberSettings {
     public static var config: TranscriberConfig = .default

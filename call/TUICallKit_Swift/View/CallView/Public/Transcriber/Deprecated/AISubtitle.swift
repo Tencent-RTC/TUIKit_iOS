@@ -8,6 +8,10 @@
 import RTCRoomEngine
 import SnapKit
 import AtomicXCore
+import AtomicX
+import Foundation
+import TUICore
+import UIKit
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

@@ -7,6 +7,9 @@
 
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
+import Foundation
+import TUICore
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

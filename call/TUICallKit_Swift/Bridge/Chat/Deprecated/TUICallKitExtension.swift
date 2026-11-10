@@ -8,6 +8,8 @@
 import Foundation
 import TUICore
 import AtomicXCore
+import AtomicX
+import UIKit
 
 class TUICallKitExtension: NSObject, TUIExtensionProtocol {
     static let instance = TUICallKitExtension()

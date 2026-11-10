@@ -15,6 +15,8 @@ import TXLiteAVSDK_Professional
 import TUICore
 import AtomicX
 import AtomicXCore
+import Foundation
+import SnapKit
 
 private let TUICore_TEBeautyExtension_GetBeautyPanel = "TUICore_TEBeautyExtension_GetBeautyPanel"
 private let TUICore_TEBeautyService = "TUICore_TEBeautyService"

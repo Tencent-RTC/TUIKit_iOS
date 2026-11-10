@@ -7,6 +7,7 @@
 
 import TUICore
 import UIKit
+import Foundation
 
 class Toast {
     static let shared = Toast()

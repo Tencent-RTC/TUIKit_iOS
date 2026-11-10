@@ -8,6 +8,8 @@
 import Foundation
 import TUICore
 import AtomicXCore
+import AtomicX
+import UIKit
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

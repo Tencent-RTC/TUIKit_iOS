@@ -7,6 +7,7 @@
 
 import Foundation
 import TUICore
+import UIKit
 
 class TUICallKitObjectFactory: NSObject, TUIObjectProtocol {
     

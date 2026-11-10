@@ -8,6 +8,9 @@
 import Foundation
 import AtomicXCore
 import SnapKit
+import AtomicX
+import SDWebImage
+import UIKit
 
 class WaitingParticipantsViewCell: UICollectionViewCell {
     // MARK: Init

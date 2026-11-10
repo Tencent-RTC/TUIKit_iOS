@@ -10,6 +10,7 @@ import TUICore
 import UIKit
 import AtomicXCore
 import ImSDK_Plus
+import AtomicX
 
 class TUICallKitService: NSObject, TUIServiceProtocol {
     static let instance = TUICallKitService()

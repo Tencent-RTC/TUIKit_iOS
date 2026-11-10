@@ -11,6 +11,8 @@ import ImSDK_Plus
 import TUICore
 import Combine
 import AtomicXCore
+import AtomicX
+import Foundation
 
 class JoinCallViewManager: NSObject, V2TIMGroupListener, JoinCallViewDelegate {
     

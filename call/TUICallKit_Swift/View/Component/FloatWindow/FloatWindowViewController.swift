@@ -9,6 +9,7 @@ import UIKit
 import AtomicXCore
 import AtomicX
 import SnapKit
+import Foundation
 
 class FloatWindowViewController: UIViewController {
     

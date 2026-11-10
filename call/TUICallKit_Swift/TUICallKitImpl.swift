@@ -18,12 +18,12 @@ import TXLiteAVSDK_TRTC
 import TXLiteAVSDK_Professional
 #endif
 
-// TODO: 移除 RTCRoomEngine 的依赖
 import RTCRoomEngine
 
 class TUICallKitImpl: TUICallKit {
     static let shared = TUICallKitImpl()
     private var cancellables = Set<AnyCancellable>()
+    private var lastSelfStatus: CallParticipantStatus = .none
     
     let globalState = GlobalState()
     let viewState = ViewState()
@@ -240,7 +240,9 @@ extension TUICallKitImpl {
             .receive(on: RunLoop.main)
             .sink { [weak self] newStatus in
                 guard let self = self else { return }
-                self.syncVoIPStatus()
+                let oldStatus = self.lastSelfStatus
+                self.lastSelfStatus = newStatus
+                self.syncVoIPStatus(from: oldStatus, to: newStatus)
                 self.handleCallParticipantStatusChanged(newStatus)
             }
             .store(in: &cancellables)
@@ -291,24 +293,23 @@ extension TUICallKitImpl {
         WindowManager.shared.notifyRoomStateEnded()
     }
     
-    private func syncVoIPStatus() {
-        let selfStatus = CallStore.shared.state.value.selfInfo.status
-        let isCalled = CallStore.shared.state.value.selfInfo.id != CallStore.shared.state.value.activeCall.inviterId
-        
-        if selfStatus == .waiting && isCalled {
-            voipDataSyncHandler.updateCallInfo(callerId: CallStore.shared.state.value.activeCall.inviterId, calleeList: CallStore.shared.state.value.activeCall.inviteeIds, groupId: CallStore.shared.state.value.activeCall.chatGroupId, mediaType: CallStore.shared.state.value.activeCall.mediaType)
+    private func syncVoIPStatus(from oldStatus: CallParticipantStatus, to newStatus: CallParticipantStatus) {
+        switch newStatus {
+        case .waiting where !isCaller():
+            let activeCall = CallStore.shared.state.value.activeCall
+            voipDataSyncHandler.updateCallInfo(callerId: activeCall.inviterId,
+                                               calleeList: activeCall.inviteeIds,
+                                               groupId: activeCall.chatGroupId,
+                                               mediaType: activeCall.mediaType)
             
-            return
-        }
-        
-        if selfStatus == .none {
-            voipDataSyncHandler.closeVoIP()
-            return
-        }
-        
-        if selfStatus == .accept {
+        case .accept:
             voipDataSyncHandler.callBegin()
-            return
+
+        case .none where oldStatus != .none:
+            voipDataSyncHandler.closeVoIP()
+
+        default:
+            break
         }
     }
     

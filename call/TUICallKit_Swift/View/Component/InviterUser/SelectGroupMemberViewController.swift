@@ -9,6 +9,7 @@ import Foundation
 import TUICore
 import AtomicX
 import AtomicXCore
+import UIKit
 
 class SelectGroupMemberViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     

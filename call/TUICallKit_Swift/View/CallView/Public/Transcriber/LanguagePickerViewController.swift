@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Foundation
 
 protocol LanguagePickerDelegate: AnyObject {
     func languagePickerDidSelect(value: String, isSourceLanguage: Bool)
