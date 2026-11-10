@@ -3,20 +3,20 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-protocol RoomToolBarTitleDisplaying: AnyObject {
+protocol MeetingToolBarTitleDisplaying: AnyObject {
     var showsTitle: Bool { get set }
 }
 
-protocol RoomToolBarPopupItem: RoomToolBarTitleDisplaying {
+protocol MeetingToolBarPopupItem: MeetingToolBarTitleDisplaying {
     var routerContext: RouterContext? { get set }
     var onRequestDismiss: (() -> Void)? { get set }
 }
 
-extension RoomScreenShareButton: RoomToolBarPopupItem {}
-extension RoomRecordingButton: RoomToolBarPopupItem {}
-extension RoomSettingsButton: RoomToolBarPopupItem {}
+extension RoomScreenShareButton: MeetingToolBarPopupItem {}
+extension RoomRecordingButton: MeetingToolBarPopupItem {}
+extension RoomSettingsButton: MeetingToolBarPopupItem {}
 
-final class RoomToolBar: UIView {
+final class MeetingToolBar: UIView {
 
     private static let maxButtonCount = 6
     private static let buttonSize: CGFloat = 44
@@ -169,14 +169,14 @@ final class RoomToolBar: UIView {
     }
 }
 
-private extension RoomToolBar {
+private extension MeetingToolBar {
 
     @objc func handleMoreTap() {
         moreTouchUp()
         guard morePopup == nil else { return }
         let items = makeOverflowItems()
         guard !items.isEmpty else { return }
-        items.compactMap { $0 as? RoomToolBarPopupItem }.forEach { item in
+        items.compactMap { $0 as? MeetingToolBarPopupItem }.forEach { item in
             item.routerContext = routerContext
             item.onRequestDismiss = { [weak self] in self?.dismissMorePopup() }
         }
@@ -224,7 +224,7 @@ private extension RoomToolBar {
         grid.axis = .vertical
         grid.alignment = .fill
         grid.spacing = Self.menuRowSpacing
-        items.forEach { ($0 as? RoomToolBarTitleDisplaying)?.showsTitle = true }
+        items.forEach { ($0 as? MeetingToolBarTitleDisplaying)?.showsTitle = true }
         var index = 0
         while index < items.count {
             let rowItems = Array(items[index..<min(index + Self.menuColumnCount, items.count)])

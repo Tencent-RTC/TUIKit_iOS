@@ -7,10 +7,8 @@ import AtomicXCore
 public final class RoomHomeView: UIView {
 
     public weak var routerContext: RouterContext?
-    public var onLoggedOut: (() -> Void)?
     private var cancellableSet = Set<AnyCancellable>()
 
-    private let backButton = UIButton(type: .custom)
     private let avatar = RoomAvatar()
     private let titleText = UILabel()
 
@@ -29,7 +27,7 @@ public final class RoomHomeView: UIView {
     private let agendaEmptyArt = UIImageView()
     private let agendaEmptyLabel = UILabel()
 
-    private var profilePopup: RoomHomeLogoutPopup?
+    private var profilePopup: RoomHomeProfilePopup?
 
     public init() {
         super.init(frame: .zero)
@@ -63,7 +61,6 @@ public final class RoomHomeView: UIView {
     }
 
     private func setupViews() {
-        addSubview(backButton)
         addSubview(avatar)
         addSubview(titleText)
 
@@ -91,14 +88,9 @@ public final class RoomHomeView: UIView {
     }
 
     private func setupConstraints() {
-        backButton.snp.makeConstraints {
-            $0.centerY.equalTo(avatar)
-            $0.leading.equalToSuperview().offset(8)
-            $0.size.equalTo(32)
-        }
         avatar.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(10)
-            $0.leading.equalTo(backButton.snp.trailing).offset(0)
+            $0.leading.equalToSuperview().offset(16)
             $0.size.equalTo(32)
         }
         titleText.snp.makeConstraints {
@@ -147,10 +139,6 @@ public final class RoomHomeView: UIView {
     }
 
     private func setupStyles() {
-        backButton.setImage(RoomKitResources.image(named: "roomkit_icon_back"), for: .normal)
-        backButton.imageView?.contentMode = .scaleAspectFit
-        backButton.addTarget(self, action: #selector(handleBackTap), for: .touchUpInside)
-
         titleText.font = .systemFont(ofSize: 17, weight: .semibold)
         titleText.numberOfLines = 1
         titleText.lineBreakMode = .byTruncatingTail
@@ -248,10 +236,6 @@ public final class RoomHomeView: UIView {
         sender.transform = .identity
     }
 
-    @objc private func handleBackTap() {
-        routerContext?.pop(animated: true)
-    }
-
     @objc private func handleQuickMeetingTap() {
         routerContext?.push(RoomQuickStartViewController(), animated: true)
     }
@@ -280,78 +264,19 @@ public final class RoomHomeView: UIView {
         )
     }
 
-    private var presenter: UIViewController? {
-        if let controller = routerContext as? UIViewController { return controller }
-        var responder: UIResponder? = next
-        while let current = responder {
-            if let controller = current as? UIViewController { return controller }
-            responder = current.next
-        }
-        return nil
-    }
-
     @objc private func handleAvatarTap() {
         guard profilePopup == nil else { return }
-        let popup = RoomHomeLogoutPopup()
+        let popup = RoomHomeProfilePopup()
         popup.onSettings = { [weak self] in
             self?.profilePopup?.dismiss()
             self?.profilePopup = nil
             self?.routerContext?.push(RoomSettingsViewController(), animated: true)
-        }
-        popup.onShareLogs = { [weak self] in
-            self?.profilePopup?.dismiss()
-            self?.profilePopup = nil
-            self?.presentLogShare()
-        }
-        popup.onLogout = { [weak self] in
-            self?.profilePopup?.dismiss()
-            self?.profilePopup = nil
-            self?.presentLogoutDialog()
         }
         popup.onDismiss = { [weak self] in
             self?.profilePopup = nil
         }
         profilePopup = popup
         popup.show(in: self)
-    }
-
-    private func presentLogShare() {
-        guard let presenter else { return }
-        let navigation = UINavigationController(rootViewController: LogShareViewController())
-        navigation.modalPresentationStyle = .pageSheet
-        if #available(iOS 15.0, *) {
-            navigation.sheetPresentationController?.detents = [.medium(), .large()]
-            navigation.sheetPresentationController?.prefersGrabberVisible = true
-        }
-        presenter.present(navigation, animated: true)
-    }
-
-    private func presentLogoutDialog() {
-        guard let presenter else { return }
-        var dialog: RoomDialog?
-        dialog = RoomDialog.Builder(in: presenter)
-            .title(NSLocalizedString("app.home.logout", comment: ""))
-            .message(NSLocalizedString("app.home.logout_confirm", comment: ""))
-            .secondaryAction(NSLocalizedString("app.common.cancel", comment: "")) {}
-            .primaryAction(NSLocalizedString("app.home.logout", comment: "")) { [weak self] in
-                dialog?.dismiss(animated: true)
-                self?.logout()
-            }
-            .show()
-    }
-
-    private func logout() {
-        LoginStore.shared.logout { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    RoomToast.show(NSLocalizedString("app.home.logged_out", comment: ""))
-                    self?.onLoggedOut?()
-                case .failure(let error):
-                    ErrorLocalized.showError(code: error.code, message: error.message)
-                }
-            }
-        }
     }
 
     private func applyTheme() {

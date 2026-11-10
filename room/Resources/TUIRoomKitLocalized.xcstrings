@@ -1,0 +1,3695 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "roomkit.chat.muted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已被禁言，暂时无法发送消息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been muted and cannot send messages"
+          }
+        }
+      }
+    },
+    "roomkit.chat.muted_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前会议已开启全员禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone is muted in this meeting"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制已结束"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording ended"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.ended_abnormal": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制异常结束"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording ended unexpectedly"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.notify_cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离开房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave Room"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.notify_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我知道了"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.notify_content": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@开启了云端录制，房间中的音视频画面、共享屏幕内容将会被录制。如果留在房间中，表示您同意录制。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ started cloud recording. Audio, video, and shared screen content in the room will be recorded. By staying in the room, you consent to being recorded."
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.notify_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "云端录制中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cloud recording in progress"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.record_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.recording_label": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.start_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启录制"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Recording"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.start_content": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，将录制房间中的音视频画面、共享屏幕内容到云端，并告知所有参会成员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once enabled, the room's audio/video and shared screen content will be recorded to the cloud, and all participants will be notified."
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.start_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是否开启云端录制？"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start cloud recording?"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.started_toast": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制已开始 · 云端保存"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording started and saved to the cloud"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.stop_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束录制"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop recording"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.stop_content": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束录制后，将停止录制房间中的音视频画面、共享屏幕内容到云端，并告知所有参会成员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Once stopped, audio/video and shared screen content will no longer be recorded. All participants will be notified."
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.stop_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束云端录制？"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop cloud recording?"
+          }
+        }
+      }
+    },
+    "roomkit.cloud_recording.stopped_toast": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制已停止"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recording stopped"
+          }
+        }
+      }
+    },
+    "roomkit.common.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "roomkit.common.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "roomkit.common.copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已复制"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied"
+          }
+        }
+      }
+    },
+    "roomkit.common.developing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "功能开发中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This feature is in development"
+          }
+        }
+      }
+    },
+    "roomkit.common.notification": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notification"
+          }
+        }
+      }
+    },
+    "roomkit.device.all_cam_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全员禁画中，无法打开摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video is disabled for everyone, so the camera cannot be turned on"
+          }
+        }
+      }
+    },
+    "roomkit.device.all_mic_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全员静音中，无法打开麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone is muted, so the microphone cannot be turned on"
+          }
+        }
+      }
+    },
+    "roomkit.device.audio_interrupted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音频采集设备不可用，可能被系统电话或其他应用占用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The audio capture device is unavailable. It may be in use by a phone call or another app"
+          }
+        }
+      }
+    },
+    "roomkit.device.camera_no_device": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未检测到摄像头设备"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No camera device detected"
+          }
+        }
+      }
+    },
+    "roomkit.device.camera_no_permission": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摄像头权限未开启，请在系统设置中允许访问摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is not granted. Please allow camera access in system settings"
+          }
+        }
+      }
+    },
+    "roomkit.device.camera_occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摄像头被其他应用占用，请关闭后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The camera is in use by another app. Please close it and try again"
+          }
+        }
+      }
+    },
+    "roomkit.device.camera_start_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摄像头打开失败，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to turn on the camera. Please try again later"
+          }
+        }
+      }
+    },
+    "roomkit.device.mic_no_device": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未检测到麦克风设备"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No microphone device detected"
+          }
+        }
+      }
+    },
+    "roomkit.device.mic_no_permission": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风权限未开启，请在系统设置中允许访问麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone access is not granted. Please allow microphone access in system settings"
+          }
+        }
+      }
+    },
+    "roomkit.device.mic_occupied": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风被其他应用占用，请关闭后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone is in use by another app. Please close it and try again"
+          }
+        }
+      }
+    },
+    "roomkit.device.mic_start_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风打开失败，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to turn on the microphone. Please try again later"
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.illegal_room_id": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议号格式不正确，请检查后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid meeting ID. Please check and try again."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.illegal_room_name": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议名称不合法，请修改后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid meeting name. Please change and try again."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.password_required": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该会议需要密码才能进入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A password is required to join this meeting"
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.room_exists": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房间已存在，请重新创建"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This room ID already exists. Please create another one."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.room_full": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议人数已满，暂时无法加入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The meeting is full. You cannot join now."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.room_not_found": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议不存在或已结束"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The meeting does not exist or has ended."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.sensitive_word": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内容包含敏感词，请修改后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contains sensitive words. Please change and try again."
+          }
+        }
+      }
+    },
+    "roomkit.entry.failure.wrong_password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码错误，请重新输入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect password. Please try again."
+          }
+        }
+      }
+    },
+    "roomkit.error.default": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作失败，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Operation failed. Please try again later."
+          }
+        }
+      }
+    },
+    "roomkit.error.invalid_parameter": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求参数错误，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid request. Please try again later."
+          }
+        }
+      }
+    },
+    "roomkit.error.not_logged_in": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未登录，请先登录"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not signed in. Please sign in first."
+          }
+        }
+      }
+    },
+    "roomkit.error.package": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "功能未开通"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feature not available."
+          }
+        }
+      }
+    },
+    "roomkit.error.server": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "服务器异常，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server error. Please try again later."
+          }
+        }
+      }
+    },
+    "roomkit.error.too_frequent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作频繁，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many requests. Please try again later."
+          }
+        }
+      }
+    },
+    "roomkit.home.login_signup": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录 / 注册"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log in / Sign up"
+          }
+        }
+      }
+    },
+    "roomkit.home.logout_failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退出登录失败：%@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to log out: %@"
+          }
+        }
+      }
+    },
+    "roomkit.invitation_link": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议链接"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting link"
+          }
+        }
+      }
+    },
+    "roomkit.join.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join"
+          }
+        }
+      }
+    },
+    "roomkit.join.password_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入6位数字密码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the 6-digit password"
+          }
+        }
+      }
+    },
+    "roomkit.join.password_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入会议密码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the meeting password"
+          }
+        }
+      }
+    },
+    "roomkit.join.wrong_password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码错误，请重新输入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect password. Please try again."
+          }
+        }
+      }
+    },
+    "roomkit.login.logged_in": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已登录"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logged in"
+          }
+        }
+      }
+    },
+    "roomkit.main.audio_route_earpiece": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "听筒"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earpiece"
+          }
+        }
+      }
+    },
+    "roomkit.main.audio_route_speaker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扬声器"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaker"
+          }
+        }
+      }
+    },
+    "roomkit.main.captions": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "字幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Captions"
+          }
+        }
+      }
+    },
+    "roomkit.main.ended": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已结束会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting ended"
+          }
+        }
+      }
+    },
+    "roomkit.main.entering": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在进入会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joining the meeting"
+          }
+        }
+      }
+    },
+    "roomkit.main.feature_coming": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "功能建设中，敬请期待"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coming soon"
+          }
+        }
+      }
+    },
+    "roomkit.main.leave_end": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End Meeting"
+          }
+        }
+      }
+    },
+    "roomkit.main.leave_self": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "离开会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave Meeting"
+          }
+        }
+      }
+    },
+    "roomkit.main.left": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已离开会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left the meeting"
+          }
+        }
+      }
+    },
+    "roomkit.main.record": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录制"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
+        }
+      }
+    },
+    "roomkit.main.room_ended_by_host": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主持人已结束会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The host has ended the meeting"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen share"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_alert_continue": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue sharing"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_alert_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享屏幕时可能会泄露短信验证码、密码等隐私信息，造成财产损失，请警惕各种诈骗行为。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharing your screen can expose verification codes, passwords, and other private information. Watch out for scams."
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_alert_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安全提醒"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Security reminder"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_live": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_owner_admin_only": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅主持人/管理员可共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the host or admins can share the screen"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_remote_sharing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他参会者正在共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Someone else is already sharing the screen"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_sharing_phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在共享手机屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharing your phone screen"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_sharing_phone_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已切换至应用外共享模式，手机上的所有画面将实时共享给参会者。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything on your phone is being shared with the other participants."
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_started": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开始共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing started"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "停止共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop sharing"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_stop_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop sharing"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_stop_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定结束共享？其他参会者将无法继续看到你的共享内容。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop sharing? Other participants will no longer see your screen."
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_stop_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop sharing"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_stopped": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已停止共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You stopped sharing"
+          }
+        }
+      }
+    },
+    "roomkit.network.disconnected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已断开"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disconnected"
+          }
+        }
+      }
+    },
+    "roomkit.network.fair": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一般"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair"
+          }
+        }
+      }
+    },
+    "roomkit.network.good": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "良好"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        }
+      }
+    },
+    "roomkit.network.latency": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "延迟"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latency"
+          }
+        }
+      }
+    },
+    "roomkit.network.packet_loss": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "丢包率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Packet loss"
+          }
+        }
+      }
+    },
+    "roomkit.network.weak": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "较弱"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weak"
+          }
+        }
+      }
+    },
+    "roomkit.participants.admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin"
+          }
+        }
+      }
+    },
+    "roomkit.participants.audio_allow": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求打开麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask to turn on microphone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.audio_disable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off microphone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off camera"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_off_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全体禁画"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable Videos"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_off_all_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启全体禁画"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video is stopped for everyone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_on_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除全体禁画"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Videos"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_on_all_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解除全体禁画"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop all video is turned off"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_open": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on camera"
+          }
+        }
+      }
+    },
+    "roomkit.participants.cam_stop_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭 %@ 的摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turned off %@'s camera"
+          }
+        }
+      }
+    },
+    "roomkit.participants.chat_mute": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute chat"
+          }
+        }
+      }
+    },
+    "roomkit.participants.chat_unmute": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute chat"
+          }
+        }
+      }
+    },
+    "roomkit.participants.clear_search": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空搜索"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear search"
+          }
+        }
+      }
+    },
+    "roomkit.participants.confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm"
+          }
+        }
+      }
+    },
+    "roomkit.participants.failure.admin_limit": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设为管理员失败，管理员人数已达上限"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to set as admin. The admin limit has been reached."
+          }
+        }
+      }
+    },
+    "roomkit.participants.joined": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已进入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In meeting"
+          }
+        }
+      }
+    },
+    "roomkit.participants.kick": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "踢出房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove from room"
+          }
+        }
+      }
+    },
+    "roomkit.participants.kick_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "踢出"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        }
+      }
+    },
+    "roomkit.participants.kick_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将 %@ 踢出房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Removed %@ from the room"
+          }
+        }
+      }
+    },
+    "roomkit.participants.kick_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定将 %@ 踢出房间？"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove %@ from the room?"
+          }
+        }
+      }
+    },
+    "roomkit.participants.me": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mic_close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off microphone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mic_open": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on microphone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全体静音"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute All"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_all_chat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全体禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute all chat"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_all_chat_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启全员禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chat is muted for everyone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_all_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已开启全体静音"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone is muted"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_chat_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已禁言 %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muted %@"
+          }
+        }
+      }
+    },
+    "roomkit.participants.mute_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭 %@ 的麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turned off %@'s microphone"
+          }
+        }
+      }
+    },
+    "roomkit.participants.owner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主持人"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host"
+          }
+        }
+      }
+    },
+    "roomkit.participants.panel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参会者"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants"
+          }
+        }
+      }
+    },
+    "roomkit.participants.panel_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参会者（%@）"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants (%@)"
+          }
+        }
+      }
+    },
+    "roomkit.participants.rename": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "修改名称"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename"
+          }
+        }
+      }
+    },
+    "roomkit.participants.rename_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他参会者将看到这个显示名称"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other participants will see this display name"
+          }
+        }
+      }
+    },
+    "roomkit.participants.rename_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称修改成功"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name updated"
+          }
+        }
+      }
+    },
+    "roomkit.participants.rename_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入用户名"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a user name"
+          }
+        }
+      }
+    },
+    "roomkit.participants.revoke_admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove admin"
+          }
+        }
+      }
+    },
+    "roomkit.participants.revoke_admin_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将%@的管理员身份撤回"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The administrator status of %@ has been withdrawn"
+          }
+        }
+      }
+    },
+    "roomkit.participants.search_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到相关成员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching participants"
+          }
+        }
+      }
+    },
+    "roomkit.participants.search_empty_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有与 \"%@\" 匹配的成员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No one matches \"%@\""
+          }
+        }
+      }
+    },
+    "roomkit.participants.search_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "roomkit.participants.set_admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设为管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Make admin"
+          }
+        }
+      }
+    },
+    "roomkit.participants.set_admin_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将 %@ 设为管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made %@ an admin"
+          }
+        }
+      }
+    },
+    "roomkit.participants.share_everyone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全体成员可共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All members can share screen"
+          }
+        }
+      }
+    },
+    "roomkit.participants.share_everyone_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许全体成员共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone can share the screen now"
+          }
+        }
+      }
+    },
+    "roomkit.participants.share_owner_only": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅主持人/管理员可共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only host/admins can share screen"
+          }
+        }
+      }
+    },
+    "roomkit.participants.share_owner_only_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已设为仅主持人/管理员可共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the host and admins can share the screen now"
+          }
+        }
+      }
+    },
+    "roomkit.participants.sharing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharing"
+          }
+        }
+      }
+    },
+    "roomkit.participants.transfer_owner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "转交主持人"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfer host"
+          }
+        }
+      }
+    },
+    "roomkit.participants.transfer_owner_confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "转交"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfer"
+          }
+        }
+      }
+    },
+    "roomkit.participants.transfer_owner_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已将主持人转交给 %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host role transferred to %@"
+          }
+        }
+      }
+    },
+    "roomkit.participants.transfer_owner_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确定将主持人转交给 %@？转交后你将变为普通成员。"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfer the host role to %@? You become a regular member afterwards."
+          }
+        }
+      }
+    },
+    "roomkit.participants.unmute_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除全体静音"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute All"
+          }
+        }
+      }
+    },
+    "roomkit.participants.unmute_all_chat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解除全体禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute all chat"
+          }
+        }
+      }
+    },
+    "roomkit.participants.unmute_all_chat_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解除全员禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute all chat is turned off"
+          }
+        }
+      }
+    },
+    "roomkit.participants.unmute_all_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解除全体静音"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mute all is turned off"
+          }
+        }
+      }
+    },
+    "roomkit.participants.unmute_chat_done": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已解除 %@ 的禁言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmuted %@"
+          }
+        }
+      }
+    },
+    "roomkit.participants.video_allow": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求打开摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ask to turn on camera"
+          }
+        }
+      }
+    },
+    "roomkit.participants.video_disable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn off camera"
+          }
+        }
+      }
+    },
+    "roomkit.room.more": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        }
+      }
+    },
+    "roomkit.room_common.colon": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "："
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ":"
+          }
+        }
+      }
+    },
+    "roomkit.room_info.invitation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制邀请信息"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy invitation"
+          }
+        }
+      }
+    },
+    "roomkit.room_info.invitation_password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码：%@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password: %@"
+          }
+        }
+      }
+    },
+    "roomkit.room_info.invitation_room_id": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议号：%@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room ID: %@"
+          }
+        }
+      }
+    },
+    "roomkit.room_info.password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        }
+      }
+    },
+    "roomkit.room_info.room_id": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "会议号"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meeting ID"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.admin_revoked": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的管理员身份被收回"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your administrator status has been revoked"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_cameras_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已关闭所有成员视频，摄像头已禁用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants' video off. Camera access disabled."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_cameras_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许成员开启视频"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants can now start video."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_messages_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已禁止成员文字聊天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chat disabled for participants."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_messages_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许成员文字聊天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chat enabled for participants."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_microphones_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已静音所有成员，麦克风已禁用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants muted. Mic access disabled."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_microphones_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许成员开启麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participants can now unmute themselves."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_screen_shares_disabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已禁止成员屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing disabled for participants."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.all_screen_shares_enabled": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已允许成员开启屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing enabled for participants."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.become_admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已成为管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have become administrator"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.become_owner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已成为主持人"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have become the host"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.camera": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.camera_closed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@已关闭您的摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your camera has been disabled by %@"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.camera_invitation_received": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@邀请您打开摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is inviting you to enable your camera"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.connection_timeout": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络连接超时，已退出会议"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection timed out. You have left the meeting."
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.default_kicked_out": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被移出房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been removed from the room"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.device_request_rejected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的%@请求已被拒绝"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your %@ request has been rejected"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.invalid_status_on_reconnect": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房间已解散或您在离线期间已被移出"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The room has been disbanded or you have been removed while offline"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.keep_mute": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持关闭"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Mute"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.keep_off": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保持关闭"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep Off"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.kicked_by_admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被主持人移出房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been removed from the room by the host"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.kicked_by_server": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被服务器移出房间"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been removed from the room by the server"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.message_muted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被禁止文字聊天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been disabled from text chatting"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.message_unmuted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您已被允许文字聊天"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have been allowed to text chat"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.microphone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.microphone_closed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@已关闭您的麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your microphone has been disabled by %@"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.microphone_invitation_received": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@邀请您开启麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is inviting you to unmute your microphone"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.open_camera": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Camera"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.open_microphone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启麦克风"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unmute"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.replaced_by_another_device": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "您的账号已在其他设备登录"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your account has been logged in on another device"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.room_limit_exceeded": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "房间人数已达上限，无法加入"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Room limit exceeded. Unable to join"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.screen_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen Share"
+          }
+        }
+      }
+    },
+    "roomkit.room_notifications.screen_share_closed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@已停止您的屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your screen sharing has been stopped by %@"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.admin": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理员"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Admin"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.flip_camera": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "翻转摄像头"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flip camera"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.me": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Me"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.mic_off_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风已关闭"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone is off"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.mic_on_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "麦克风已开启"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone is on"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.network_quality": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络质量"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network quality"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.next_page": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一页"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next page"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.owner": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "主持人"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.page_number": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%ld / %ld"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%ld / %ld"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.prev_page": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一页"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous page"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.sharing_by": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@正在屏幕共享中"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is sharing the screen"
+          }
+        }
+      }
+    },
+    "roomkit.room_view.sharing_screen": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在屏幕共享"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sharing screen"
+          }
+        }
+      }
+    },
+    "roomkit.schedule.show_password": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示/隐藏密码"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show or hide password"
+          }
+        }
+      }
+    },
+    "roomkit.screen_share.failure.failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕共享失败，请稍后重试"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing failed. Please try again later."
+          }
+        }
+      }
+    },
+    "roomkit.screen_share.failure.owner_admin_only": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前仅主持人/管理员可以共享屏幕"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the host or admins can share the screen."
+          }
+        }
+      }
+    },
+    "roomkit.screen_share.failure.source_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "获取屏幕共享内容失败，请检查屏幕录制权限"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to get screen content. Please check the screen recording permission"
+          }
+        }
+      }
+    },
+    "roomkit.screen_share.failure.unsupported": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "屏幕共享失败，当前版本暂不支持"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screen sharing failed. Not supported in this version."
+          }
+        }
+      }
+    },
+    "roomkit.settings.group_general": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通用"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        }
+      }
+    },
+    "roomkit.settings.group_video": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        }
+      }
+    },
+    "roomkit.settings.language": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语言"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        }
+      }
+    },
+    "roomkit.settings.language_en": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        }
+      }
+    },
+    "roomkit.settings.language_zh_hans": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简体中文"
+          }
+        }
+      }
+    },
+    "roomkit.settings.mirror": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面镜像"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mirror my video"
+          }
+        }
+      }
+    },
+    "roomkit.settings.mirror_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启后，你和其他人看到的画面都会镜像"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When on, both you and everyone else see a mirrored image"
+          }
+        }
+      }
+    },
+    "roomkit.settings.quality_1080p": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超清"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Super Definition"
+          }
+        }
+      }
+    },
+    "roomkit.settings.quality_360p": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "流畅"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Definition"
+          }
+        }
+      }
+    },
+    "roomkit.settings.quality_540p": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标清"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard Definition"
+          }
+        }
+      }
+    },
+    "roomkit.settings.quality_720p": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "高清"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Definition"
+          }
+        }
+      }
+    },
+    "roomkit.settings.resolution": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分辨率"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resolution"
+          }
+        }
+      }
+    },
+    "roomkit.settings.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
