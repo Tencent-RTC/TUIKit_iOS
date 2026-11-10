@@ -140,10 +140,6 @@ extension MainViewController {
     func gotoRoomView() {
         KeyMetrics.reportAtomicMetrics(1205)
         let roomHomeVC = RoomHomeViewController()
-        roomHomeVC.onLoggedOut = {
-            UserDefaults.standard.removeObject(forKey: "UserIdKey")
-            (UIApplication.shared.delegate as? AppDelegate)?.showLoginViewController()
-        }
         navigationController?.pushViewController(roomHomeVC, animated: true)
     }
 }

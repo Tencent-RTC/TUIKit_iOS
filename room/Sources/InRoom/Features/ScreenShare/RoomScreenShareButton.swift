@@ -3,7 +3,7 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-final class RoomScreenShareButton: UIControl, RoomToolBarTitleDisplaying {
+final class RoomScreenShareButton: UIControl, MeetingToolBarTitleDisplaying {
 
     var onRequestDismiss: (() -> Void)?
 

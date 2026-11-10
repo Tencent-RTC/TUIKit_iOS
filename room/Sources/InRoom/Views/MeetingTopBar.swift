@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-final class RoomTopBar: UIView {
+final class MeetingTopBar: UIView {
 
     weak var popoverHost: UIView? {
         didSet { leaveButton.popoverHost = popoverHost }
@@ -75,6 +75,6 @@ final class RoomTopBar: UIView {
     }
 }
 
-private extension RoomTopBar {
+private extension MeetingTopBar {
     static let roomInfoMaxWidth: CGFloat = 220
 }

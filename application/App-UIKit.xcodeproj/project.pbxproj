@@ -20,9 +20,9 @@
 		CA1100000000000000000007 /* TXLiteAVSDK_ReplayKitExt.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CA1100000000000000000008 /* TXLiteAVSDK_ReplayKitExt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		DB0C68BE30A1C2C9000A97B1 /* TUIRoomKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */; };
 		DB0C68BF30A1C2C9000A97B1 /* AtomicXCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */; };
+		DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */; };
 		E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2E3B658CE8834F1CE6A073FA /* Kingfisher */; };
 		F447D57510FFAE94B279F2A9 /* TXIMSDK_Plus_iOS_XCFramework in Frameworks */ = {isa = PBXBuildFile; productRef = D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */; };
-		DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */

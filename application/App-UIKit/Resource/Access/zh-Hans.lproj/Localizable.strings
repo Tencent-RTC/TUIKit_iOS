@@ -138,7 +138,6 @@
 "app.login.missing_config" = "请先填写 GenerateTestUserSig.swift 中的 SDKAPPID 和 SECRETKEY";
 "app.login.failed" = "登录失败：%ld %@";
 "app.ok" = "好";
-"app.logs.title" = "分享日志";
 "app.logs.empty" = "暂无可分享日志";
 "app.logs.read_failed" = "读取日志失败，请关闭后重试";
 "app.logs.single" = "单个文件";
@@ -153,7 +152,6 @@
 "app.home.agenda" = "日程";
 "app.home.agenda_empty" = "暂无近期会议";
 "app.home.coming_soon" = "敬请期待";
-"app.common.cancel" = "取消";
 "app.pre.mic_on" = "打开麦克风";
 "app.pre.speaker_on" = "开启扬声器";
 "app.pre.camera_on" = "开启视频";
@@ -167,9 +165,6 @@
 "app.login.user_id" = "UserID";
 "app.login.user_id_placeholder" = "请输入 UserID";
 "app.login.user_id_required" = "请输入 UserID";
-"app.home.logout" = "退出登录";
-"app.home.logout_confirm" = "确定退出当前账号吗？";
-"app.home.logged_out" = "已退出登录";
 "app.common.back" = "返回";
 "app.settings.title" = "设置";
 "app.quick_start.title_placeholder" = "%@的快速会议";

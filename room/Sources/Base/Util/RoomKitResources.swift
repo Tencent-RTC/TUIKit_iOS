@@ -57,7 +57,7 @@ public enum RoomKitResources {
     }
 
     public static func localizedString(_ key: String) -> String {
-        localizedBundle.localizedString(forKey: key, value: key, table: nil)
+        localizedBundle.localizedString(forKey: key, value: key, table: "TUIRoomKitLocalized")
     }
 
     public static func localizedFormat(_ key: String, _ replacements: String...) -> String {
