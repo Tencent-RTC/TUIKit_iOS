@@ -1,4 +1,6 @@
 
 application/Pods
 application/App-UIKit.xcworkspace/xcuserdata
+application/.spm-cache
+application/build
 *.sh

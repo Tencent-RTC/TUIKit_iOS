@@ -34,9 +34,9 @@ public final class MeetingView: UIView {
     private let connectConfig: RoomConnectConfig
     private let eventHandler: RoomEventHandler
 
-    private let topBar: RoomTopBar
+    private let topBar: MeetingTopBar
     private let roomView: RoomView
-    private let toolBar: RoomToolBar
+    private let toolBar: MeetingToolBar
 
     private let sharingPlaceholder: RoomScreenSharingPlaceholderView
     private let enteringView = RoomLoadingView()
@@ -45,9 +45,9 @@ public final class MeetingView: UIView {
         self.roomID = roomID
         self.behavior = behavior
         self.connectConfig = config
-        self.topBar = RoomTopBar(roomID: roomID)
+        self.topBar = MeetingTopBar(roomID: roomID)
         self.roomView = RoomView(roomID: roomID)
-        self.toolBar = RoomToolBar(roomID: roomID)
+        self.toolBar = MeetingToolBar(roomID: roomID)
         self.eventHandler = RoomEventHandler(roomID: roomID)
         self.sharingPlaceholder = RoomScreenSharingPlaceholderView(roomID: roomID)
         super.init(frame: .zero)

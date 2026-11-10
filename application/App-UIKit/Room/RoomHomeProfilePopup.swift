@@ -2,17 +2,13 @@ import TUIRoomKit
 import UIKit
 import SnapKit
 
-final class RoomHomeLogoutPopup: UIView {
+final class RoomHomeProfilePopup: UIView {
 
     var onSettings: (() -> Void)?
-    var onShareLogs: (() -> Void)?
-    var onLogout: (() -> Void)?
     var onDismiss: (() -> Void)?
 
     private let container = UIView()
     private let settingsButton = SheetActionButton()
-    private let shareLogsButton = SheetActionButton()
-    private let logoutButton = SheetActionButton()
 
     private weak var popup: RoomPopup?
 
@@ -40,8 +36,6 @@ final class RoomHomeLogoutPopup: UIView {
         backgroundColor = .clear
         addSubview(container)
         container.addSubview(settingsButton)
-        container.addSubview(shareLogsButton)
-        container.addSubview(logoutButton)
     }
 
     private func setupConstraints() {
@@ -49,16 +43,6 @@ final class RoomHomeLogoutPopup: UIView {
 
         settingsButton.snp.makeConstraints {
             $0.top.equalToSuperview()
-            $0.leading.trailing.equalToSuperview().inset(Self.EDGE_INSET)
-            $0.height.equalTo(Self.BUTTON_HEIGHT)
-        }
-        shareLogsButton.snp.makeConstraints {
-            $0.top.equalTo(settingsButton.snp.bottom).offset(Self.BUTTON_GAP)
-            $0.leading.trailing.equalToSuperview().inset(Self.EDGE_INSET)
-            $0.height.equalTo(Self.BUTTON_HEIGHT)
-        }
-        logoutButton.snp.makeConstraints {
-            $0.top.equalTo(shareLogsButton.snp.bottom).offset(Self.BUTTON_GAP)
             $0.leading.trailing.equalToSuperview().inset(Self.EDGE_INSET)
             $0.height.equalTo(Self.BUTTON_HEIGHT)
             $0.bottom.equalToSuperview().offset(-Self.BOTTOM_INSET)
@@ -72,20 +56,6 @@ final class RoomHomeLogoutPopup: UIView {
             textColor: UIColor.roomKitFgPrimary,
             background: UIColor.roomKitBgHover,
             pressedBackground: UIColor.roomKitBgPress
-        )
-        configure(
-            shareLogsButton,
-            title: .shareLogsTitle,
-            textColor: UIColor.roomKitFgPrimary,
-            background: UIColor.roomKitBgHover,
-            pressedBackground: UIColor.roomKitBgPress
-        )
-        configure(
-            logoutButton,
-            title: .homeLogout,
-            textColor: UIColor.roomKitDanger,
-            background: UIColor.roomKitDangerSoft,
-            pressedBackground: UIColor.roomKitDangerSoftStrong
         )
         applyTheme()
     }
@@ -107,30 +77,18 @@ final class RoomHomeLogoutPopup: UIView {
 
     private func setupBindings() {
         settingsButton.addTarget(self, action: #selector(handleSettingsTap), for: .touchUpInside)
-        shareLogsButton.addTarget(self, action: #selector(handleShareLogsTap), for: .touchUpInside)
-        logoutButton.addTarget(self, action: #selector(handleLogoutTap), for: .touchUpInside)
     }
 
     @objc private func handleSettingsTap() {
         onSettings?()
     }
 
-    @objc private func handleShareLogsTap() {
-        onShareLogs?()
-    }
-
-    @objc private func handleLogoutTap() {
-        onLogout?()
-    }
-
     private func applyTheme() {
         settingsButton.backgroundColor = settingsButton.normalBackgroundColor
-        shareLogsButton.backgroundColor = shareLogsButton.normalBackgroundColor
-        logoutButton.backgroundColor = logoutButton.normalBackgroundColor
     }
 }
 
-extension RoomHomeLogoutPopup {
+extension RoomHomeProfilePopup {
 
     func show(in host: UIView) {
         guard popup == nil else { return }
@@ -149,9 +107,8 @@ extension RoomHomeLogoutPopup {
     }
 }
 
-private extension RoomHomeLogoutPopup {
+private extension RoomHomeProfilePopup {
     static let EDGE_INSET: CGFloat = 16
-    static let BUTTON_GAP: CGFloat = 12
     static let BUTTON_HEIGHT: CGFloat = 44
     static let BUTTON_RADIUS: CGFloat = 12
     static let BUTTON_FONT_SIZE: CGFloat = 16
@@ -174,6 +131,4 @@ private final class SheetActionButton: UIButton {
 
 private extension String {
     static var settingsTitle: String { NSLocalizedString("app.settings.title", comment: "") }
-    static var homeLogout: String { NSLocalizedString("app.home.logout", comment: "") }
-    static var shareLogsTitle: String { NSLocalizedString("app.logs.title", comment: "") }
 }
