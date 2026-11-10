@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 import AtomicXCore
+import AtomicX
+import SDWebImage
 
 class JoinCallUserCell: UICollectionViewCell {
     

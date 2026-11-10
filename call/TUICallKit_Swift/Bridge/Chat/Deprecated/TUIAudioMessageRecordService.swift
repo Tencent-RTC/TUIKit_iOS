@@ -10,6 +10,7 @@ import AVFAudio
 import TUICore
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

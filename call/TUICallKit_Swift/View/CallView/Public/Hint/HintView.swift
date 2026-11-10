@@ -10,6 +10,8 @@ import AtomicX
 import Combine
 import RTCRoomEngine
 import SnapKit
+import Foundation
+import UIKit
 
 class HintView: UIView {
     /// UX-specified: hold the end-call hint text on screen so users have time to read it.

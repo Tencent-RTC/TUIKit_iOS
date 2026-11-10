@@ -12,6 +12,7 @@ import AtomicX
 import Combine
 import AtomicXCore
 import TUICore
+import UIKit
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

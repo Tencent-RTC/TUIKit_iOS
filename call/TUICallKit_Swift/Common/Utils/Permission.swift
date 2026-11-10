@@ -8,6 +8,10 @@
 import AVFoundation
 import AtomicXCore
 import RTCRoomEngine
+import AtomicX
+import Foundation
+import TUICore
+import UIKit
 
 enum AuthorizationDeniedType: Int {
     case audio

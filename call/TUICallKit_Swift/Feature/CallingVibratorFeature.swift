@@ -10,6 +10,7 @@ import RTCRoomEngine
 import AtomicX
 import Combine
 import AtomicXCore
+import Foundation
 
 class CallingVibratorFeature: NSObject {
     override init() {
