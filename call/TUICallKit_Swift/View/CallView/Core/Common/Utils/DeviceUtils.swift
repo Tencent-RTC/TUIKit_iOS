@@ -5,6 +5,8 @@
 //  Created by yukiwwwang on 2025/8/28.
 //
 
+import Darwin
+
 class DeviceUtils {
     static func isPad() -> Bool {
         var systemInfo = utsname()

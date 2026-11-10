@@ -8,6 +8,8 @@
 import UIKit
 import SnapKit
 import AtomicXCore
+import AtomicX
+import Foundation
 
 final class TranscriberSettingsViewController: UIViewController {
     

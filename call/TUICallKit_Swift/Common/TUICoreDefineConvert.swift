@@ -7,6 +7,7 @@
 
 import Foundation
 import TUICore
+import UIKit
 
 
 class TUICoreDefineConvert {
@@ -53,6 +54,11 @@ class TUICoreDefineConvert {
     }
     
     static func getTUICallKitThemePath() -> String {
+#if SWIFT_PACKAGE
+        return Bundle.module.bundleURL
+            .appendingPathComponent("TUICallKitTheme.bundle").path
+#else
         return getTUIGetBundlePath("TUICallKitTheme", "TUICallingService")
+#endif
     }
 }

@@ -9,6 +9,9 @@ import AVKit
 import AVRouting
 import AtomicXCore
 import Combine
+import AtomicX
+import Foundation
+import SnapKit
 
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC

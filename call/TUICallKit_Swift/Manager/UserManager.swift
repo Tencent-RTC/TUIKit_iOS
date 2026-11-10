@@ -7,6 +7,8 @@
 
 import TUICore
 import AtomicXCore
+import AtomicX
+import Foundation
 
 class UserManager: NSObject {
     static let shared = UserManager()

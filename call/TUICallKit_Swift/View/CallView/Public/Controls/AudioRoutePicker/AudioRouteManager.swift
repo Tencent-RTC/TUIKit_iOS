@@ -8,6 +8,9 @@
 import AVFAudio
 import RTCRoomEngine
 import AtomicXCore
+import AtomicX
+import Foundation
+import TUICore
 
 public class AudioRouteManager {
     static private var isEnableiOSAvroutePickerViewMode = false

@@ -20,10 +20,14 @@ enum CallKitBundle {
     private static let fallbackLanguage = "en"
     
     private static let resourceBundle: Bundle? = {
+#if SWIFT_PACKAGE
+        return Bundle.module
+#else
         return candidateBundleURLs()
             .compactMap { $0 }
             .compactMap { Bundle(url: $0) }
             .first
+#endif
     }()
     
     static func getTUICallKitBundle() -> Bundle? {

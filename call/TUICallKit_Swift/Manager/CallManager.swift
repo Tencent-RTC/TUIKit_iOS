@@ -2,6 +2,7 @@ import AtomicXCore
 import RTCRoomEngine
 import AVFoundation
 import TUICore
+import AtomicX
 
 class CallManager {
     static let shared = CallManager()

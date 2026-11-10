@@ -9,6 +9,7 @@
 import Foundation
 import TUICore
 import AtomicXCore
+import AtomicX
 
 extension NSObject {
     @objc class func swiftLoad() {
@@ -44,8 +45,12 @@ extension NSObject {
     }
     
     @objc func initSdkSuccess(_ notification: Notification) {
-        DispatchQueue.main.async {
-            TUICallKit.createInstance()
+        if Thread.isMainThread {
+            let _ = TUICallKit.createInstance()
+        } else {
+            DispatchQueue.main.async {
+                let _ = TUICallKit.createInstance()
+            }
         }
     }
 }
