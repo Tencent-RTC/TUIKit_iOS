@@ -27,8 +27,7 @@ let package = Package(
             exclude: ["README.md", "Package.swift"],
             resources: [
                 .process("Resources/TUIRoomKitIcons.xcassets"),
-                .process("Resources/en.lproj"),
-                .process("Resources/zh-Hans.lproj"),
+                .process("Resources/TUIRoomKitLocalized.xcstrings"),
             ],
             linkerSettings: [
                 .linkedFramework("ReplayKit")

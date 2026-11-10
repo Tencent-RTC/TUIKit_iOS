@@ -31,7 +31,7 @@ AppDelegate                     # Bugly、许可证初始化、账号事件与�
             └── PusherViewController         # PusherView 宿主与退出回调
 ```
 
-Live 的四个列表文件和两个薄宿主迁自 `../live/LiveKitAccess/LiveKitAccess/`；VideoLiveViewController 适配自其 WaterfallViewController。Call 接入层迁自 `../call/CallKitAccess/CallKitAccess/`，Room 接入层迁自 `../room/RoomKitAccess/RoomKitAccess/`。三者只复用接入层源码，不启动另一个 App，也不引入其 AppDelegate 或登录流程。首页 `gotoCallView` push `CallEntryViewController`；`gotoRoomView` push `RoomHomeViewController`，并把 `onLoggedOut` 接到 AppDelegate 的换根逻辑。
+Live 的四个列表文件和两个薄宿主迁自 `../live/LiveKitAccess/LiveKitAccess/`；VideoLiveViewController 适配自其 WaterfallViewController。Call 接入层迁自 `../call/CallKitAccess/CallKitAccess/`，Room 接入层迁自 `../room/RoomKitAccess/RoomKitAccess/`。三者只复用接入层源码，不启动另一个 App，也不引入其 AppDelegate 或登录流程。首页 `gotoCallView` push `CallEntryViewController`；`gotoRoomView` push `RoomHomeViewController`。
 
 ## 账号状态
 
