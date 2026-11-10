@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
     s.dependency 'AtomicXCore', '>= 3.0.0', '< 5.0'
     s.dependency 'SnapKit'
     s.dependency 'AlbumPicker', '~> 1.0.0'
-    s.dependency 'tui-cmark-gfm', '0.29.0.15'
+    s.dependency 'tui-cmark-gfm', '0.29.17'
 
     s.source_files     = '**/*.{swift,h,m}'
     s.resource_bundles = {
