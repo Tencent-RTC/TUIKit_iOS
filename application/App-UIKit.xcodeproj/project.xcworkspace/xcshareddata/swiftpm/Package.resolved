@@ -1,5 +1,5 @@
 {
-  "originHash" : "d80ca355cac1f62325d5c4d19827d295aaf73685776928d7d9993bb2280aa6d8",
+  "originHash" : "e1ead1fe0000eb543e89b249077da85772feedfc690c8e606b7d6dcdf5c8fe4c",
   "pins" : [
     {
       "identity" : "atomicxcore_swiftpm",
@@ -47,12 +47,39 @@
       }
     },
     {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage.git",
+      "state" : {
+        "revision" : "2de3a496eaf6df9a1312862adcfd54acd73c39c0",
+        "version" : "5.21.7"
+      }
+    },
+    {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SnapKit/SnapKit.git",
       "state" : {
         "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "tcgiftplayerkit_swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Tencent-RTC/TCGiftPlayerKit_SwiftPM.git",
+      "state" : {
+        "revision" : "8501268edf275861975a56caef6a6a6b66030a5e",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "tuicore_swiftpm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Tencent-RTC/TUICore_SwiftPM.git",
+      "state" : {
+        "revision" : "88f2b422962a3f165297fd306e1560156d4fdb19",
+        "version" : "9.0.7656"
       }
     }
   ],
