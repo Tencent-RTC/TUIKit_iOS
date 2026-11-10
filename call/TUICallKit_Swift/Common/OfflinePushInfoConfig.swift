@@ -7,6 +7,7 @@
 
 import Foundation
 import RTCRoomEngine
+import TUICore
 
 @objc
 public class OfflinePushInfoConfig: NSObject {

@@ -1,5 +1,6 @@
 import UIKit
 import AtomicX
+import Foundation
 
 class SmartCellularSwitchRecommendationView: UIView {
     

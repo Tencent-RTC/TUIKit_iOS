@@ -5,6 +5,8 @@
 //  Created by vincepzhang on 2024/11/22.
 //
 
+import TUICore
+
 #if canImport(TXLiteAVSDK_TRTC)
 import TXLiteAVSDK_TRTC
 #elseif canImport(TXLiteAVSDK_Professional)

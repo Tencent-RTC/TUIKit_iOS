@@ -6,6 +6,10 @@
 //
 
 // Version
+import AtomicX
+import TUICore
+import UIKit
+
 let TUICALL_VERSION = "4.0.0.0"
 
 // Default avatar

@@ -12,6 +12,7 @@ import AtomicXCore
 import Combine
 import RTCRoomEngine
 import SDWebImage
+import Foundation
 
 public enum Feature: String {
     case aiTranscriber = "aiTranscriber"
@@ -107,6 +108,7 @@ extension CallView {
         addSubview(callTranscriberView)
         addSubview(timerView)
         addSubview(hintView)
+
 
         callCoreView.callViewAdapter = self
     }

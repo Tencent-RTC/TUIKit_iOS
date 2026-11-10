@@ -6,6 +6,7 @@
 //
 
 import AtomicX
+import Foundation
 
 class ViewState: NSObject {
     let router: Observable<ViewRouter> = Observable(.none)

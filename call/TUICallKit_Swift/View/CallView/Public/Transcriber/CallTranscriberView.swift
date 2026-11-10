@@ -10,6 +10,7 @@ import AtomicX
 import SnapKit
 import AtomicXCore
 import Combine
+import Foundation
 
 final class CallTranscriberView: UIView {
     

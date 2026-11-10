@@ -8,6 +8,8 @@ import AtomicX
 import AtomicXCore
 import Combine
 import TUICore
+import Foundation
+import UIKit
 
 class WindowManager: NSObject {
     static let shared = WindowManager()
