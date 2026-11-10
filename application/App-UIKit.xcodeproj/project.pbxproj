@@ -20,9 +20,9 @@
 		CA1100000000000000000007 /* TXLiteAVSDK_ReplayKitExt.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CA1100000000000000000008 /* TXLiteAVSDK_ReplayKitExt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		DB0C68BE30A1C2C9000A97B1 /* TUIRoomKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */; };
 		DB0C68BF30A1C2C9000A97B1 /* AtomicXCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */; };
-
 		E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2E3B658CE8834F1CE6A073FA /* Kingfisher */; };
 		F447D57510FFAE94B279F2A9 /* TXIMSDK_Plus_iOS_XCFramework in Frameworks */ = {isa = PBXBuildFile; productRef = D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */; };
+		DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +131,7 @@
 				2A0E29E6AF501D77546C5605 /* SensorsAnalyticsSDK in Frameworks */,
 				AE97CB05626121B39A024F10 /* SnapKit in Frameworks */,
 				E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */,
+				DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +231,7 @@
 				2E3B658CE8834F1CE6A073FA /* Kingfisher */,
 				AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */,
 				BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */,
+				AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */,
 			);
 			productName = "App-UIKit";
 			productReference = B3C8DDA02E44C02400F7FE10 /* App-UIKit.app */;
@@ -274,6 +276,7 @@
 				3A1F00B1C2D3E4F500000004 /* XCRemoteSwiftPackageReference "sa-sdk-ios-spm" */,
 				3A1F00B1C2D3E4F500000005 /* XCRemoteSwiftPackageReference "AtomicXCore_SwiftPM" */,
 				DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */,
+				DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3C8DDA12E44C02400F7FE10 /* Products */;
@@ -667,6 +670,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../room;
 		};
+		DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../live;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -735,6 +742,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */;
 			productName = TUIRoomKit;
+		};
+		AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */;
+			productName = TUILiveKit;
 		};
 		BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */ = {
 			isa = XCSwiftPackageProductDependency;
