@@ -246,10 +246,12 @@ public final class RoomQuickStartView: UIView {
         generateUnusedRoomID { [weak self] roomID in
             guard let self else { return }
             let finalName = roomName.isEmpty ? roomID : roomName
+            var options = CreateRoomOptions()
+            options.roomName = finalName
             self.routerContext?.push(
                 MeetingViewController(
                     roomID: roomID,
-                    behavior: .create(roomName: finalName),
+                    behavior: .createAndJoinRoom(options: options),
                     config: RoomConnectConfig(
                         autoEnableMicrophone: isMicrophoneOn,
                         autoEnableCamera: isCameraOn,
