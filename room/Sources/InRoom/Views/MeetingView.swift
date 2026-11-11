@@ -3,7 +3,7 @@ import SnapKit
 import AtomicXCore
 
 public enum RoomBehavior {
-    case create(roomName: String)
+    case createAndJoinRoom(options: CreateRoomOptions)
     case join
 }
 
@@ -111,16 +111,14 @@ public final class MeetingView: UIView {
     private func enterRoom() {
         enteringView.setShown(true)
         switch behavior {
-        case .create(let roomName):
-            createRoom(named: roomName)
+        case .createAndJoinRoom(let options):
+            createRoom(options: options)
         case .join:
             joinRoom()
         }
     }
 
-    private func createRoom(named roomName: String) {
-        var options = CreateRoomOptions()
-        options.roomName = roomName
+    private func createRoom(options: CreateRoomOptions) {
         RoomStore.shared.createAndJoinRoom(roomID: roomID, roomType: .standard, options: options) { [weak self] result in
             guard let self else { return }
             handleEnterResult(result)
