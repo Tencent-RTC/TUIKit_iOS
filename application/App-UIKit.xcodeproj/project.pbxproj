@@ -21,6 +21,7 @@
 		DB0C68BE30A1C2C9000A97B1 /* TUIRoomKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */; };
 		DB0C68BF30A1C2C9000A97B1 /* AtomicXCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */; };
 		DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */; };
+		DB0C68C130A1C2C9000A97B1 /* TUICallKit_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B3 /* TUICallKit_Swift */; };
 		E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2E3B658CE8834F1CE6A073FA /* Kingfisher */; };
 		F447D57510FFAE94B279F2A9 /* TXIMSDK_Plus_iOS_XCFramework in Frameworks */ = {isa = PBXBuildFile; productRef = D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */; };
 /* End PBXBuildFile section */
@@ -132,6 +133,7 @@
 				AE97CB05626121B39A024F10 /* SnapKit in Frameworks */,
 				E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */,
 				DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */,
+				DB0C68C130A1C2C9000A97B1 /* TUICallKit_Swift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +234,7 @@
 				AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */,
 				BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */,
 				AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */,
+				AA1B2C3D4E5F60718293A0B3 /* TUICallKit_Swift */,
 			);
 			productName = "App-UIKit";
 			productReference = B3C8DDA02E44C02400F7FE10 /* App-UIKit.app */;
@@ -277,6 +280,7 @@
 				3A1F00B1C2D3E4F500000005 /* XCRemoteSwiftPackageReference "AtomicXCore_SwiftPM" */,
 				DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */,
 				DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */,
+				DB7CF49D30A1B05C00B5EB07 /* XCLocalSwiftPackageReference "../call" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B3C8DDA12E44C02400F7FE10 /* Products */;
@@ -674,6 +678,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../live;
 		};
+		DB7CF49D30A1B05C00B5EB07 /* XCLocalSwiftPackageReference "../call" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../call;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -747,6 +755,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */;
 			productName = TUILiveKit;
+		};
+		AA1B2C3D4E5F60718293A0B3 /* TUICallKit_Swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB7CF49D30A1B05C00B5EB07 /* XCLocalSwiftPackageReference "../call" */;
+			productName = TUICallKit_Swift;
 		};
 		BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */ = {
 			isa = XCSwiftPackageProductDependency;

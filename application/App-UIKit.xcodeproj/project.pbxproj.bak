@@ -1,0 +1,779 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1CFFB453EF81CD0B1D232969 /* TXLiteAVSDK_ReplayKit in Frameworks */ = {isa = PBXBuildFile; productRef = DD2A74F7F41286C955B48BEC /* TXLiteAVSDK_ReplayKit */; };
+		2A0E29E6AF501D77546C5605 /* SensorsAnalyticsSDK in Frameworks */ = {isa = PBXBuildFile; productRef = F9C31148201BBA240E1FECFD /* SensorsAnalyticsSDK */; };
+		584C59742F7133B300E56200 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 584C59732F7133B200E56200 /* ReplayKit.framework */; };
+		584C597B2F7133B300E56200 /* TUIKitReplay.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 584C59722F7133B200E56200 /* TUIKitReplay.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		584C59962F713E1B00E56200 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 584C59952F713E1B00E56200 /* Accelerate.framework */; };
+		584C59982F713E2300E56200 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 584C59972F713E2300E56200 /* VideoToolbox.framework */; };
+		584C599A2F713E3D00E56200 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 584C59992F713E2F00E56200 /* libc++.tbd */; };
+		AE97CB05626121B39A024F10 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A98FF5F2090043884EB0A2F1 /* SnapKit */; };
+		B15C6B017C37DEBDC9C04333 /* Professional_SwiftPM in Frameworks */ = {isa = PBXBuildFile; productRef = EB46E6F2C22E7E704B0D8817 /* Professional_SwiftPM */; };
+		B3C8DE052E44C1B600F7FE10 /* GenerateTestUserSig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3C8DE032E44C1B600F7FE10 /* GenerateTestUserSig.swift */; };
+		CA1100000000000000000007 /* TXLiteAVSDK_ReplayKitExt.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CA1100000000000000000008 /* TXLiteAVSDK_ReplayKitExt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		DB0C68BE30A1C2C9000A97B1 /* TUIRoomKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */; };
+		DB0C68BF30A1C2C9000A97B1 /* AtomicXCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */; };
+		DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */; };
+		E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2E3B658CE8834F1CE6A073FA /* Kingfisher */; };
+		F447D57510FFAE94B279F2A9 /* TXIMSDK_Plus_iOS_XCFramework in Frameworks */ = {isa = PBXBuildFile; productRef = D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		584C59792F7133B300E56200 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B3C8DD982E44C02400F7FE10 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 584C59712F7133B200E56200;
+			remoteInfo = TUIKitReplay;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		584C597C2F7133B300E56200 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				584C597B2F7133B300E56200 /* TUIKitReplay.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA1100000000000000000009 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CA1100000000000000000007 /* TXLiteAVSDK_ReplayKitExt.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		584C59722F7133B200E56200 /* TUIKitReplay.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TUIKitReplay.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		584C59732F7133B200E56200 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		584C59952F713E1B00E56200 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		584C59972F713E2300E56200 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		584C59992F713E2F00E56200 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		B3C8DDA02E44C02400F7FE10 /* App-UIKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "App-UIKit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B3C8DE032E44C1B600F7FE10 /* GenerateTestUserSig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateTestUserSig.swift; sourceTree = "<group>"; };
+		CA1100000000000000000008 /* TXLiteAVSDK_ReplayKitExt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TXLiteAVSDK_ReplayKitExt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		584C59802F7133B300E56200 /* Exceptions for "TUIKitReplay" folder in "TUIKitReplay" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 584C59712F7133B200E56200 /* TUIKitReplay */;
+		};
+		B3C8DDB22E44C02500F7FE10 /* Exceptions for "App-UIKit" folder in "App-UIKit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B3C8DD9F2E44C02400F7FE10 /* App-UIKit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		584C59752F7133B300E56200 /* TUIKitReplay */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				584C59802F7133B300E56200 /* Exceptions for "TUIKitReplay" folder in "TUIKitReplay" target */,
+			);
+			path = TUIKitReplay;
+			sourceTree = "<group>";
+		};
+		B3C8DDA22E44C02400F7FE10 /* App-UIKit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B3C8DDB22E44C02500F7FE10 /* Exceptions for "App-UIKit" folder in "App-UIKit" target */,
+			);
+			path = "App-UIKit";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		584C596F2F7133B200E56200 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				584C59982F713E2300E56200 /* VideoToolbox.framework in Frameworks */,
+				584C599A2F713E3D00E56200 /* libc++.tbd in Frameworks */,
+				584C59962F713E1B00E56200 /* Accelerate.framework in Frameworks */,
+				584C59742F7133B300E56200 /* ReplayKit.framework in Frameworks */,
+				1CFFB453EF81CD0B1D232969 /* TXLiteAVSDK_ReplayKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3C8DD9D2E44C02400F7FE10 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB0C68BF30A1C2C9000A97B1 /* AtomicXCore in Frameworks */,
+				DB0C68BE30A1C2C9000A97B1 /* TUIRoomKit in Frameworks */,
+				B15C6B017C37DEBDC9C04333 /* Professional_SwiftPM in Frameworks */,
+				F447D57510FFAE94B279F2A9 /* TXIMSDK_Plus_iOS_XCFramework in Frameworks */,
+				2A0E29E6AF501D77546C5605 /* SensorsAnalyticsSDK in Frameworks */,
+				AE97CB05626121B39A024F10 /* SnapKit in Frameworks */,
+				E3EF5F0EB2A73D1A34F6C7AC /* Kingfisher in Frameworks */,
+				DB0C68C030A1C2C9000A97B1 /* TUILiveKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6A09F16F3F56F9C484CC99B0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				584C59992F713E2F00E56200 /* libc++.tbd */,
+				584C59972F713E2300E56200 /* VideoToolbox.framework */,
+				584C59952F713E1B00E56200 /* Accelerate.framework */,
+				584C59732F7133B200E56200 /* ReplayKit.framework */,
+				CA1100000000000000000008 /* TXLiteAVSDK_ReplayKitExt.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B3C8DD972E44C02400F7FE10 = {
+			isa = PBXGroup;
+			children = (
+				B3C8DE042E44C1B600F7FE10 /* Debug */,
+				B3C8DDA22E44C02400F7FE10 /* App-UIKit */,
+				584C59752F7133B300E56200 /* TUIKitReplay */,
+				B3C8DDA12E44C02400F7FE10 /* Products */,
+				6A09F16F3F56F9C484CC99B0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		B3C8DDA12E44C02400F7FE10 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B3C8DDA02E44C02400F7FE10 /* App-UIKit.app */,
+				584C59722F7133B200E56200 /* TUIKitReplay.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B3C8DE042E44C1B600F7FE10 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				B3C8DE032E44C1B600F7FE10 /* GenerateTestUserSig.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		584C59712F7133B200E56200 /* TUIKitReplay */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 584C597F2F7133B300E56200 /* Build configuration list for PBXNativeTarget "TUIKitReplay" */;
+			buildPhases = (
+				584C596E2F7133B200E56200 /* Sources */,
+				584C596F2F7133B200E56200 /* Frameworks */,
+				584C59702F7133B200E56200 /* Resources */,
+				CA1100000000000000000009 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				584C59752F7133B300E56200 /* TUIKitReplay */,
+			);
+			name = TUIKitReplay;
+			packageProductDependencies = (
+				DD2A74F7F41286C955B48BEC /* TXLiteAVSDK_ReplayKit */,
+			);
+			productName = TUIKitReplay;
+			productReference = 584C59722F7133B200E56200 /* TUIKitReplay.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B3C8DD9F2E44C02400F7FE10 /* App-UIKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B3C8DDB32E44C02500F7FE10 /* Build configuration list for PBXNativeTarget "App-UIKit" */;
+			buildPhases = (
+				B3C8DD9C2E44C02400F7FE10 /* Sources */,
+				B3C8DD9D2E44C02400F7FE10 /* Frameworks */,
+				B3C8DD9E2E44C02400F7FE10 /* Resources */,
+				584C597C2F7133B300E56200 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				584C597A2F7133B300E56200 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B3C8DDA22E44C02400F7FE10 /* App-UIKit */,
+			);
+			name = "App-UIKit";
+			packageProductDependencies = (
+				EB46E6F2C22E7E704B0D8817 /* Professional_SwiftPM */,
+				D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */,
+				F9C31148201BBA240E1FECFD /* SensorsAnalyticsSDK */,
+				A98FF5F2090043884EB0A2F1 /* SnapKit */,
+				2E3B658CE8834F1CE6A073FA /* Kingfisher */,
+				AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */,
+				BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */,
+				AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */,
+			);
+			productName = "App-UIKit";
+			productReference = B3C8DDA02E44C02400F7FE10 /* App-UIKit.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B3C8DD982E44C02400F7FE10 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					584C59712F7133B200E56200 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					B3C8DD9F2E44C02400F7FE10 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+				};
+			};
+			buildConfigurationList = B3C8DD9B2E44C02400F7FE10 /* Build configuration list for PBXProject "App-UIKit" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				ar,
+				ja,
+				"zh-Hans",
+				"zh-Hant",
+			);
+			mainGroup = B3C8DD972E44C02400F7FE10;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				659C7E1557AE2DCE0DE99BD3 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				9906A2002A170FD969080BA6 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				3A1F00B1C2D3E4F500000002 /* XCRemoteSwiftPackageReference "Chat_SDK_SwiftPM" */,
+				3A1F00B1C2D3E4F500000003 /* XCRemoteSwiftPackageReference "Professional_SwiftPM" */,
+				3A1F00B1C2D3E4F500000004 /* XCRemoteSwiftPackageReference "sa-sdk-ios-spm" */,
+				3A1F00B1C2D3E4F500000005 /* XCRemoteSwiftPackageReference "AtomicXCore_SwiftPM" */,
+				DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */,
+				DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B3C8DDA12E44C02400F7FE10 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B3C8DD9F2E44C02400F7FE10 /* App-UIKit */,
+				584C59712F7133B200E56200 /* TUIKitReplay */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		584C59702F7133B200E56200 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3C8DD9E2E44C02400F7FE10 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		584C596E2F7133B200E56200 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3C8DD9C2E44C02400F7FE10 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3C8DE052E44C1B600F7FE10 /* GenerateTestUserSig.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		584C597A2F7133B300E56200 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 584C59712F7133B200E56200 /* TUIKitReplay */;
+			targetProxy = 584C59792F7133B300E56200 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		584C597D2F7133B300E56200 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TUIKitReplay/TUIKitReplay.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TUIKitReplay",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TUIKitReplay/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TUIKitReplay;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.liveadapter.demo.upload;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "All-In-One-App-Group-Upload";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		584C597E2F7133B300E56200 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TUIKitReplay/TUIKitReplayRelease.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/TUIKitReplay",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TUIKitReplay/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TUIKitReplay;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.liveadapter.demo.upload;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "All-In-One-App-Group-Upload";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B3C8DDB42E44C02500F7FE10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "App-UIKit/App-UIKitDebug.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "App-UIKit/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "App-UIKit需要访问你的相机权限，开启后录制的视频才会有画面";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App-UIKit需要访问您的麦克风权限，开启后录制的视频才会有声音";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "App-UIKit需要访问你的相册";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+					"-lz",
+					"-liconv",
+					"-lsqlite3",
+					"-lresolv",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.liveadapter.demo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "All-In-One-App-Group";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B3C8DDB52E44C02500F7FE10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "App-UIKit/App-UIKit.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = F8A3GH6Q4W;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "App-UIKit/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "App-UIKit需要访问你的相机权限，开启后录制的视频才会有画面";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "App-UIKit需要访问您的麦克风权限，开启后录制的视频才会有声音";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "App-UIKit需要访问你的相册";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+					"-lz",
+					"-liconv",
+					"-lsqlite3",
+					"-lresolv",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.liveadapter.demo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "All-In-One-App-Group";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		B3C8DDB62E44C02500F7FE10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B3C8DDB72E44C02500F7FE10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		584C597F2F7133B300E56200 /* Build configuration list for PBXNativeTarget "TUIKitReplay" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				584C597D2F7133B300E56200 /* Debug */,
+				584C597E2F7133B300E56200 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B3C8DD9B2E44C02400F7FE10 /* Build configuration list for PBXProject "App-UIKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B3C8DDB62E44C02500F7FE10 /* Debug */,
+				B3C8DDB72E44C02500F7FE10 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B3C8DDB32E44C02500F7FE10 /* Build configuration list for PBXNativeTarget "App-UIKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B3C8DDB42E44C02500F7FE10 /* Debug */,
+				B3C8DDB52E44C02500F7FE10 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../room;
+		};
+		DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../live;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3A1F00B1C2D3E4F500000002 /* XCRemoteSwiftPackageReference "Chat_SDK_SwiftPM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Tencent-RTC/Chat_SDK_SwiftPM.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.7652;
+			};
+		};
+		3A1F00B1C2D3E4F500000003 /* XCRemoteSwiftPackageReference "Professional_SwiftPM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Tencent-RTC/Professional_SwiftPM.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.5.21355;
+			};
+		};
+		3A1F00B1C2D3E4F500000004 /* XCRemoteSwiftPackageReference "sa-sdk-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sensorsdata/sa-sdk-ios-spm.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.8;
+			};
+		};
+		3A1F00B1C2D3E4F500000005 /* XCRemoteSwiftPackageReference "AtomicXCore_SwiftPM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.3.0;
+			};
+		};
+		659C7E1557AE2DCE0DE99BD3 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = 5.7.1;
+			};
+		};
+		9906A2002A170FD969080BA6 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = exactVersion;
+				version = 8.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2E3B658CE8834F1CE6A073FA /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9906A2002A170FD969080BA6 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+		A98FF5F2090043884EB0A2F1 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 659C7E1557AE2DCE0DE99BD3 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		AA1B2C3D4E5F60718293A0B1 /* TUIRoomKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB7CF49B30A1B05C00B5EB05 /* XCLocalSwiftPackageReference "../room" */;
+			productName = TUIRoomKit;
+		};
+		AA1B2C3D4E5F60718293A0B2 /* TUILiveKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DB7CF49C30A1B05C00B5EB06 /* XCLocalSwiftPackageReference "../live" */;
+			productName = TUILiveKit;
+		};
+		BB2C3D4E5F60718293A0B1C2 /* AtomicXCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1F00B1C2D3E4F500000005 /* XCRemoteSwiftPackageReference "AtomicXCore_SwiftPM" */;
+			productName = AtomicXCore;
+		};
+		D0D4445DD36E1E3A40AFB711 /* TXIMSDK_Plus_iOS_XCFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1F00B1C2D3E4F500000002 /* XCRemoteSwiftPackageReference "Chat_SDK_SwiftPM" */;
+			productName = TXIMSDK_Plus_iOS_XCFramework;
+		};
+		DD2A74F7F41286C955B48BEC /* TXLiteAVSDK_ReplayKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1F00B1C2D3E4F500000003 /* XCRemoteSwiftPackageReference "Professional_SwiftPM" */;
+			productName = TXLiteAVSDK_ReplayKit;
+		};
+		EB46E6F2C22E7E704B0D8817 /* Professional_SwiftPM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1F00B1C2D3E4F500000003 /* XCRemoteSwiftPackageReference "Professional_SwiftPM" */;
+			productName = Professional_SwiftPM;
+		};
+		F9C31148201BBA240E1FECFD /* SensorsAnalyticsSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1F00B1C2D3E4F500000004 /* XCRemoteSwiftPackageReference "sa-sdk-ios-spm" */;
+			productName = SensorsAnalyticsSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = B3C8DD982E44C02400F7FE10 /* Project object */;
+}

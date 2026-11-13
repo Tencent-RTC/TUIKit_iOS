@@ -55,7 +55,8 @@ class MainViewController: UIViewController {
                               gradientColors: mainMenuItemColors,
                               selectHandle: { [weak self] in
                                   guard let self = self else { return }
-                                  self.showComingSoonToast()
+                                  self.gotoCallView()
+                                  self.trackSensorData("call")
                               }),
             MainMenuItemModel(imageName: "main_live",
                               title: "live".localized,
@@ -131,6 +132,10 @@ extension MainViewController {
 
     func showComingSoonToast() {
         view.showAtomicToast(text: "comingSoonToast".localized)
+    }
+
+    func gotoCallView() {
+        navigationController?.pushViewController(CallEntryViewController(), animated: true)
     }
 
     func gotoLiveView() {

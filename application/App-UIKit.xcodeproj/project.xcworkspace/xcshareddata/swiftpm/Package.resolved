@@ -1,13 +1,13 @@
 {
-  "originHash" : "33da992e1ac43a7e5ca3cf7f09997de13f329f35728c3afa1a6f1db4557bd223",
+  "originHash" : "a5bd3f820767bb6bb3d3b6c4ce1e454a8ad8077f80da0ceddf1a10ec24259f50",
   "pins" : [
     {
       "identity" : "atomicxcore_swiftpm",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git",
       "state" : {
-        "revision" : "b6a300aa43573d35d1646eb48e4aa90c9cb9d3fc",
-        "version" : "5.3.0"
+        "revision" : "2863be177a5ff78d9015c9bb41601e9fb2f47988",
+        "version" : "5.3.2"
       }
     },
     {
