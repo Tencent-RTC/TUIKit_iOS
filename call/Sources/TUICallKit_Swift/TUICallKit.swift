@@ -14,6 +14,7 @@ public class TUICallKit: NSObject {
     public override init() {
         super.init()
         _ = CallLauncher.shared
+        ChatCallEventSubscriber.shared.ensureSubscribed()
     }
 
     public func setSelfInfo(nickname: String, avatar: String, completion: CompletionClosure?) {
