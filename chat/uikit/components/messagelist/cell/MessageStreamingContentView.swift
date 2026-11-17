@@ -40,8 +40,8 @@ final class MessageStreamingContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
-        maxBubbleWidth = UIScreen.main.bounds.width * context.config.bubbleMaxWidthRatio
-        streamingMaxCharactersPerSecond = context.config.streamingMaxCharactersPerSecond
+        maxBubbleWidth = UIScreen.main.bounds.width * context.config._bubbleMaxWidthRatio
+        streamingMaxCharactersPerSecond = context.config._streamingMaxCharactersPerSecond
         baseLayoutKey = "\(context.isLeft)|\(context.isMultiSelectMode)"
         if let data = ChatbotMessageProtocol.parse(message) {
             bind(

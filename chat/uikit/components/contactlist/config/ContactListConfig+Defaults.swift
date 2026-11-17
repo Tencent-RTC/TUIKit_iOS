@@ -1,45 +1,25 @@
 extension ContactListConfig {
-    public init(showNewContacts: Bool? = nil,
-                showGroupApplications: Bool? = nil,
-                showMyGroups: Bool? = nil,
-                showBlacklist: Bool? = nil,
-                showSearchBar: Bool? = nil,
-                itemCustomizer: ContactListItemCustomizer? = nil) {
-        self.userShowNewContacts = showNewContacts
-        self.userShowGroupApplications = showGroupApplications
-        self.userShowMyGroups = showMyGroups
-        self.userShowBlacklist = showBlacklist
-        self.userShowSearchBar = showSearchBar
-        self.userItemCustomizer = itemCustomizer
+    var _showNewContacts: Bool {
+        showNewContacts ?? true
     }
 
-    public var showNewContacts: Bool {
-        get { userShowNewContacts ?? true }
-        set { userShowNewContacts = newValue }
+    var _showGroupApplications: Bool {
+        showGroupApplications ?? true
     }
 
-    public var showGroupApplications: Bool {
-        get { userShowGroupApplications ?? true }
-        set { userShowGroupApplications = newValue }
+    var _showMyGroups: Bool {
+        showMyGroups ?? true
     }
 
-    public var showMyGroups: Bool {
-        get { userShowMyGroups ?? true }
-        set { userShowMyGroups = newValue }
+    var _showBlacklist: Bool {
+        showBlacklist ?? true
     }
 
-    public var showBlacklist: Bool {
-        get { userShowBlacklist ?? true }
-        set { userShowBlacklist = newValue }
+    var _showSearchBar: Bool {
+        showSearchBar ?? true
     }
 
-    public var showSearchBar: Bool {
-        get { userShowSearchBar ?? true }
-        set { userShowSearchBar = newValue }
-    }
-
-    public var itemCustomizer: ContactListItemCustomizer? {
-        get { userItemCustomizer }
-        set { userItemCustomizer = newValue }
+    var _itemCustomizer: ContactListItemCustomizer? {
+        itemCustomizer
     }
 }

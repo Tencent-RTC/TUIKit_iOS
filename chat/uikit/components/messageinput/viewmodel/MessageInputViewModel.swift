@@ -14,7 +14,7 @@ final class MessageInputViewModel {
 
     let conversationID: String
 
-    let config: MessageInputConfigProtocol
+    let config: ChatMessageInputConfig
 
     var onSendFailure: ((String) -> Void)?
 
@@ -39,7 +39,7 @@ final class MessageInputViewModel {
 
     // MARK: - Init
 
-    init(conversationID: String, config: MessageInputConfigProtocol = ChatMessageInputConfig()) {
+    init(conversationID: String, config: ChatMessageInputConfig = ChatMessageInputConfig()) {
         self.conversationID = conversationID
         self.config = config
         self.store = MessageInputStore.create(conversationID: conversationID)
@@ -224,7 +224,7 @@ final class MessageInputViewModel {
 
     private func createSendMessageOption(pushDescription: String) -> SendMessageOption {
         var option = SendMessageOption()
-        option.needReadReceipt = config.enableReadReceipt
+        option.needReadReceipt = config._enableReadReceipt
         option.offlinePushInfo = createOfflinePushInfo(pushDescription: pushDescription)
         return option
     }

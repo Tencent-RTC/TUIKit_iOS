@@ -27,6 +27,8 @@ final class MessageVideoContentView: UIView, MessageContentView {
 
     private var boundMessage: MessageInfo?
 
+    private var displayedSource: String?
+
     private var onMediaTap: ((MessageInfo) -> Void)?
 
     private let snapshotView = UIImageView()
@@ -159,20 +161,31 @@ final class MessageVideoContentView: UIView, MessageContentView {
     private func loadSnapshot(payload: VideoMessagePayload, message: MessageInfo) {
         if let path = payload.videoSnapshotPath,
            !path.isEmpty,
-           FileManager.default.fileExists(atPath: path),
-           let image = UIImage(contentsOfFile: path) {
-            snapshotView.kf.cancelDownloadTask()
-            snapshotView.image = image
-            snapshotView.backgroundColor = .clear
-            playIconView.isHidden = false
-            return
+           FileManager.default.fileExists(atPath: path) {
+            if displayedSource == path, snapshotView.image != nil {
+                snapshotView.backgroundColor = .clear
+                playIconView.isHidden = false
+                return
+            }
+            if let image = UIImage(contentsOfFile: path) {
+                snapshotView.kf.cancelDownloadTask()
+                snapshotView.image = image
+                displayedSource = path
+                snapshotView.backgroundColor = .clear
+                playIconView.isHidden = false
+                return
+            }
         }
         if let urlString = payload.videoSnapshotURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
-            snapshotView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
-            snapshotView.kf.setImage(with: url)
             playIconView.isHidden = false
+            if displayedSource == urlString, snapshotView.image != nil {
+                return
+            }
+            snapshotView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
+            displayedSource = urlString
+            snapshotView.kf.setImage(with: url)
             return
         }
         showPlaceholder()
@@ -182,6 +195,7 @@ final class MessageVideoContentView: UIView, MessageContentView {
     private func showPlaceholder() {
         snapshotView.kf.cancelDownloadTask()
         snapshotView.image = nil
+        displayedSource = nil
         snapshotView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
         playIconView.isHidden = false
     }

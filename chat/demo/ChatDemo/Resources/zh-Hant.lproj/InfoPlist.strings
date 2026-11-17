@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "為方便您將所拍攝的照片或視頻發送給朋友，以及進行視頻通話、快速會議，請允許我們訪問攝像頭進行拍攝照片和視頻。";
+"NSMicrophoneUsageDescription" = "為方便您發送語音消息、拍攝視頻以及音視頻通話、快速會議，請允許我們使用麥克風進行錄音。";
+"NSPhotoLibraryAddUsageDescription" = "為方便您保存照片和視頻到設備，請允許我們寫入照片和視頻到設備。";

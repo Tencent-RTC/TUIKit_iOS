@@ -35,6 +35,8 @@ final class MessageQuoteBubbleView: UIView {
 
     private let thumbnailView = UIImageView()
 
+    private var displayedThumbnailPath: String?
+
     private let videoOverlayLabel = UILabel()
 
     // MARK: - Init
@@ -71,6 +73,7 @@ final class MessageQuoteBubbleView: UIView {
             thumbnailContainer.isHidden = true
             thumbnailView.kf.cancelDownloadTask()
             thumbnailView.image = nil
+            displayedThumbnailPath = nil
             contentLabel.isHidden = false
             bindContentText(display)
         }
@@ -203,14 +206,19 @@ final class MessageQuoteBubbleView: UIView {
         thumbnailContainer.isHidden = false
         videoOverlayLabel.isHidden = !thumbnail.isVideo
 
+        if displayedThumbnailPath == thumbnail.path, thumbnailView.image != nil {
+            return
+        }
         if !thumbnail.path.hasPrefix("http"),
            FileManager.default.fileExists(atPath: thumbnail.path),
            let image = UIImage(contentsOfFile: thumbnail.path) {
             thumbnailView.kf.cancelDownloadTask()
             thumbnailView.image = image
+            displayedThumbnailPath = thumbnail.path
             return
         }
         if let url = URL(string: thumbnail.path) {
+            displayedThumbnailPath = thumbnail.path
             thumbnailView.kf.setImage(with: url)
         }
     }

@@ -166,6 +166,7 @@ final class JoinGroupDetailViewController: CustomNavigationBarViewController {
         inputCard.backgroundColor = colors.bgColorOperate
         wordingTextView.backgroundColor = .clear
         wordingTextView.font = FontScheme.caption1Regular
+        wordingTextView.textAlignment = LanguageHelper.isRTL ? .right : .left
         wordingTextView.textColor = colors.textColorPrimary
         wordingTextView.textContainer.lineFragmentPadding = 0
         wordingTextView.text = Self.defaultWording()

@@ -284,7 +284,7 @@ final class MessageInputTextView: UIView {
         textView.textStorage.removeAttribute(.foregroundColor, range: wholeRange)
         textView.textStorage.addAttribute(.foregroundColor, value: resolvedTextColor, range: wholeRange)
         textView.textStorage.addAttribute(.font, value: Self.normalFont, range: wholeRange)
-        textView.textAlignment = .natural
+        textView.textAlignment = LanguageHelper.isRTL ? .right : .left
         textView.textColor = resolvedTextColor
         textView.typingAttributes[.foregroundColor] = resolvedTextColor
     }

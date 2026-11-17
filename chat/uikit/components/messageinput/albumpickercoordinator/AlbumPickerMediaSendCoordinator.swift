@@ -7,22 +7,19 @@ import AtomicXCore
 final class AlbumPickerMediaSendCoordinator {
     static let shared = AlbumPickerMediaSendCoordinator()
 
-    private static let maxSelectionCount = 9
-
-    private static let maxVideoOutputSizeInMB = 100
-
-    private static let maxVideoDurationInSeconds = 600
-
     private var activeSessions: [String: AlbumPickerSendSession] = [:]
 
     private var isPickerVisible = false
 
-    func showAlbumPicker(conversationID: String, enableReadReceipt: Bool) {
+    func showAlbumPicker(conversationID: String,
+                         enableReadReceipt: Bool,
+                         config: ChatMessageInputConfig = ChatMessageInputConfig()) {
         if conversationID.isEmpty || isPickerVisible {
             return
         }
         guard let presenter = Self.topMostViewController() else { return }
         AlbumPickerCoreTheme.shared.currentPrimaryColor = TUIChatKitTheme.colors.buttonColorPrimaryDefault
+        AlbumPickerCoreLanguage.shared.current = .chatKitCurrent
 
         let pickerController = UIViewController()
         pickerController.modalPresentationStyle = .fullScreen
@@ -42,7 +39,7 @@ final class AlbumPickerMediaSendCoordinator {
 
         let albumView = AlbumPickerView()
         albumView.delegate = session
-        albumView.initialize(config: Self.makeConfig(), theme: Self.makeTheme())
+        albumView.initialize(config: Self.makeConfig(from: config), theme: Self.makeTheme())
         pickerController.view = albumView
 
         isPickerVisible = true
@@ -51,16 +48,32 @@ final class AlbumPickerMediaSendCoordinator {
 
     private init() {}
 
-    private static func makeConfig() -> AlbumPickerConfig {
+    private static func makeConfig(from inputConfig: ChatMessageInputConfig) -> AlbumPickerConfig {
         var config = AlbumPickerConfig(
-            maxSelectionCount: maxSelectionCount,
+            maxSelectionCount: inputConfig._albumMaxSelectionCount,
             style: .likeWeChat,
-            mediaFilter: .imageAndVideo,
-            compressQuality: .standard
+            mediaFilter: mediaFilter(from: inputConfig._albumMediaFilter),
+            language: .chatKitCurrent,
+            compressQuality: compressQuality(from: inputConfig._albumCompressQuality)
         )
-        config.maxOutputFileSizeInMB = maxVideoOutputSizeInMB
-        config.maxVideoDurationInSeconds = maxVideoDurationInSeconds
+        config.maxOutputFileSizeInMB = inputConfig._albumMaxVideoOutputSizeInMB
+        config.maxVideoDurationInSeconds = inputConfig._albumMaxVideoDurationInSeconds
         return config
+    }
+
+    private static func mediaFilter(from filter: MessageInputAlbumMediaFilter) -> AlbumPickerMediaFilter {
+        switch filter {
+        case .imageOnly: return .imageOnly
+        case .videoOnly: return .videoOnly
+        case .imageAndVideo: return .imageAndVideo
+        }
+    }
+
+    private static func compressQuality(from quality: MessageInputAlbumCompressQuality) -> AlbumPickerCompressQuality {
+        switch quality {
+        case .standard: return .standard
+        case .high: return .high
+        }
     }
 
     private static func makeTheme() -> AlbumPickerTheme {
@@ -211,7 +224,7 @@ private final class AlbumPickerSendSession: NSObject, AlbumPickerDelegate {
     private func applyPlaceholder(for media: AlbumMedia) {
         let placeholderID = Self.makePlaceholderID(sessionID: sessionID, mediaID: media.id)
         guard let state = placeholderStates[placeholderID] else { return }
-        MessageListView.addPlaceholder(
+        MessageListHelper.addPlaceholder(
             conversationID: conversationID,
             info: MessagePlaceholderInfo(
                 placeholderID: state.placeholderID,
@@ -295,7 +308,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
     private func removePlaceholder(for media: AlbumMedia) {
         let placeholderID = Self.makePlaceholderID(sessionID: sessionID, mediaID: media.id)
         guard let state = placeholderStates.removeValue(forKey: placeholderID) else { return }
-        MessageListView.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
+        MessageListHelper.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
     }
 
     private func sendPendingTextIfNeeded() {
@@ -328,7 +341,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
         placeholderStates.removeAll()
 
         for state in states where state.mediaPath == nil {
-            MessageListView.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
+            MessageListHelper.removePlaceholder(conversationID: conversationID, placeholderID: state.placeholderID)
         }
         let sendingIDs = states.filter { $0.mediaPath != nil }.map { $0.placeholderID }
         if sendingIDs.isEmpty {
@@ -337,7 +350,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
         let targetConversationID = conversationID
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.placeholderCleanupDelay) {
             for placeholderID in sendingIDs {
-                MessageListView.removePlaceholder(conversationID: targetConversationID, placeholderID: placeholderID)
+                MessageListHelper.removePlaceholder(conversationID: targetConversationID, placeholderID: placeholderID)
             }
         }
     }
@@ -363,4 +376,15 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
     private static let progressUpdateStep = 5
     private static let placeholderCleanupDelay: TimeInterval = 3
     private static let placeholderIDPrefix = "album_picker_processing_"
+}
+
+extension AlbumPickerCoreLanguage.Language {
+    static var chatKitCurrent: AlbumPickerCoreLanguage.Language {
+        let language = LanguageHelper.getCurrentLanguage()
+        if language.hasPrefix("ar") { return .ar }
+        if language.hasPrefix("zh-Hant") { return .zhHant }
+        if language.hasPrefix("zh") { return .zhHans }
+        if language.hasPrefix("en") { return .en }
+        return .system
+    }
 }

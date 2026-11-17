@@ -9,7 +9,7 @@ final class MessageInputViewImpl: UIView {
 
     var onAnimateSuperviewLayout: (() -> Void)?
 
-    var bottomSafeAreaInset: CGFloat = 0 {
+    private var bottomSafeAreaInset: CGFloat = 0 {
         didSet {
             guard bottomSafeAreaInset != oldValue else { return }
 
@@ -40,23 +40,13 @@ final class MessageInputViewImpl: UIView {
 
     private let typingController: TypingIndicatorController?
 
-    var typingPublisher: AnyPublisher<Bool, Never>? {
-        return typingController?.typingPublisher
-    }
+    private var typingCancellable: AnyCancellable?
 
-    func sendTypingStatus(hasContent: Bool) {
-        typingController?.sendTypingStatus(hasContent: hasContent)
-    }
+    private let config: ChatMessageInputConfig
 
-    func invalidateTypingIndicator() {
-        typingController?.invalidate()
-    }
+    private let onSendFailure: ((String) -> Void)?
 
-    private let config: MessageInputConfigProtocol
-
-    var onTypingContentChanged: ((Bool) -> Void)?
-
-    var onSendFailure: ((String) -> Void)?
+    private let onPeerTypingChanged: ((Bool) -> Void)?
 
     private let topDivider = UIView()
 
@@ -215,13 +205,17 @@ final class MessageInputViewImpl: UIView {
     // MARK: - Init
 
     init(conversationID: String,
-         config: MessageInputConfigProtocol = ChatMessageInputConfig(),
-         chatbotController: ChatbotConversationController? = nil) {
+         config: ChatMessageInputConfig = ChatMessageInputConfig(),
+         chatbotController: ChatbotConversationController? = nil,
+         onSendFailure: ((String) -> Void)? = nil,
+         onPeerTypingChanged: ((Bool) -> Void)? = nil) {
         let viewModel = MessageInputViewModel(conversationID: conversationID, config: config)
         self.viewModel = viewModel
         self.config = viewModel.config
         self.chatbotController = chatbotController
-        if config.enableTyping, conversationID.hasPrefix(Self.c2cConversationPrefix) {
+        self.onSendFailure = onSendFailure
+        self.onPeerTypingChanged = onPeerTypingChanged
+        if config._enableTyping, conversationID.hasPrefix(Self.c2cConversationPrefix) {
             let currentUserID = LoginStore.shared.state.value.loginUserInfo?.userID
             typingController = TypingIndicatorController(conversationID: conversationID, currentUserID: currentUserID)
         } else {
@@ -241,6 +235,7 @@ final class MessageInputViewImpl: UIView {
         bindInteraction()
         setupViewStyle()
         bindChatbotState()
+        bindPeerTyping()
     }
 
     required init?(coder: NSCoder) {
@@ -250,11 +245,27 @@ final class MessageInputViewImpl: UIView {
     // MARK: - Four-Step Lifecycle
 
     deinit {
+        typingController?.invalidate()
         createdMediaCoordinator?.cancelVoiceRecording()
         NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - Window Lifecycle (对齐声明式 onAppear/onDisappear 草稿逻辑)
+
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        guard bounds.height > 0 else { return }
+        bottomSafeAreaInset = safeAreaInsets.bottom
+    }
+
+    private func bindPeerTyping() {
+        guard let typingController, let onPeerTypingChanged else { return }
+        typingCancellable = typingController.typingPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { isTyping in
+                onPeerTypingChanged(isTyping)
+            }
+    }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
@@ -281,13 +292,13 @@ final class MessageInputViewImpl: UIView {
         addSubview(topDivider)
         addSubview(quotePreviewBar)
         addSubview(inputRow)
-        if config.isShowAudioRecorder {
+        if config._isShowAudioRecorder {
             inputRow.addSubview(audioButton)
         }
         inputRow.addSubview(inputContainer)
         inputContainer.addSubview(messageTextView)
         inputContainer.addSubview(voiceLabel)
-        if config.isShowEmoji {
+        if config._isShowEmoji {
             inputRow.addSubview(emojiButton)
         }
         inputRow.addSubview(moreButton)
@@ -318,11 +329,11 @@ final class MessageInputViewImpl: UIView {
 
         var leftAnchor = inputRow.snp.leading
         var leftInset: CGFloat = Self.inputRowHorizontalInset
-        if config.isShowAudioRecorder {
+        if config._isShowAudioRecorder {
             audioButton.snp.makeConstraints { make in
                 make.leading.equalTo(leftAnchor).offset(leftInset)
                 make.centerY.equalTo(inputContainer)
-                let size = MessageInputAppearanceApplier.buttonSize(config.appearance?.audioRecordButton, fallback: Self.inputRowButtonSize)
+                let size = MessageInputAppearanceApplier.buttonSize(config._appearance?.audioRecordButton, fallback: Self.inputRowButtonSize)
                 make.width.equalTo(size.width)
                 make.height.equalTo(size.height)
             }
@@ -334,15 +345,15 @@ final class MessageInputViewImpl: UIView {
             make.top.trailing.equalToSuperview()
             make.width.height.equalTo(Self.redDotSize)
         }
-        layoutActionButtons(showSend: false, showMore: config.isShowMore, showStop: false)
+        layoutActionButtons(showSend: false, showMore: config._isShowMore, showStop: false)
         var rightAnchor = moreButton.snp.leading
         var rightInset: CGFloat = -Self.inputRowHorizontalInset
 
-        if config.isShowEmoji {
+        if config._isShowEmoji {
             emojiButton.snp.makeConstraints { make in
                 make.trailing.equalTo(rightAnchor).offset(rightInset)
                 make.centerY.equalTo(inputContainer)
-                let size = MessageInputAppearanceApplier.buttonSize(config.appearance?.emojiButton, fallback: Self.inputRowButtonSize)
+                let size = MessageInputAppearanceApplier.buttonSize(config._appearance?.emojiButton, fallback: Self.inputRowButtonSize)
                 make.width.equalTo(size.width)
                 make.height.equalTo(size.height)
             }
@@ -359,7 +370,7 @@ final class MessageInputViewImpl: UIView {
         }
 
         messageTextView.snp.makeConstraints { make in
-            let padding = MessageInputAppearanceApplier.padding(config.appearance?.field?.horizontalPadding, fallback: Self.textViewHorizontalInset)
+            let padding = MessageInputAppearanceApplier.padding(config._appearance?.field?.horizontalPadding, fallback: Self.textViewHorizontalInset)
             make.leading.equalToSuperview().offset(padding)
             make.trailing.equalToSuperview().offset(-padding)
             make.top.bottom.equalToSuperview()
@@ -385,16 +396,16 @@ final class MessageInputViewImpl: UIView {
 
     private func bindInteraction() {
         messageTextView.isGroupChat = viewModel.isGroupChat
-        messageTextView.enableMention = config.enableMention
+        messageTextView.enableMention = config._enableMention
         messageTextView.maxLines = Self.textViewMaxLines
-        messageTextView.placeholderText = config.appearance?.field?.hintText
-            ?? LocalizedChatString(config.enableLongPressToTalk ? "SendMessage" : "SendMessageTextOnly")
-        messageTextView.applyAppearance(config.appearance?.field)
+        messageTextView.placeholderText = config._appearance?.field?.hintText
+            ?? LocalizedChatString(config._enableLongPressToTalk ? "SendMessage" : "SendMessageTextOnly")
+        messageTextView.applyAppearance(config._appearance?.field)
 
         messageTextView.onSend = { [weak self] in self?.sendText() }
         messageTextView.onHeightChanged = { [weak self] height in
             guard let self = self else { return }
-            let minimumHeight = MessageInputAppearanceApplier.dimension(self.config.appearance?.field?.minHeight, fallback: Self.defaultInputContainerHeight)
+            let minimumHeight = MessageInputAppearanceApplier.dimension(self.config._appearance?.field?.minHeight, fallback: Self.defaultInputContainerHeight)
             let resolvedHeight = max(height, minimumHeight)
             self.inputContainerHeightConstraint?.update(offset: resolvedHeight)
             self.currentInputContainerHeight = resolvedHeight
@@ -405,10 +416,10 @@ final class MessageInputViewImpl: UIView {
             self?.updateSendButtonVisibility()
         }
         messageTextView.onUserTextChanged = { [weak self] hasContent in
-            self?.onTypingContentChanged?(hasContent)
+            self?.typingController?.sendTypingStatus(hasContent: hasContent)
         }
         messageTextView.onAtTriggered = { [weak self] position in
-            guard let self = self, self.viewModel.isGroupChat, self.config.enableMention else { return }
+            guard let self = self, self.viewModel.isGroupChat, self.config._enableMention else { return }
             self.presentMentionPicker(atPosition: position)
         }
         messageTextView.mentionToDeleteAtPosition = { [weak self] position in
@@ -427,13 +438,13 @@ final class MessageInputViewImpl: UIView {
 
         let voiceLongPress = UILongPressGestureRecognizer(target: self, action: #selector(handleAudioLongPress(_:)))
         voiceLongPress.minimumPressDuration = Self.voiceLongPressMinimumDuration
-        voiceLongPress.isEnabled = config.enableLongPressToTalk
+        voiceLongPress.isEnabled = config._enableLongPressToTalk
         voiceLabel.addGestureRecognizer(voiceLongPress)
         voiceLabel.isUserInteractionEnabled = true
         let voiceTap = UITapGestureRecognizer(target: self, action: #selector(handleAudioTapped))
         voiceLabel.addGestureRecognizer(voiceTap)
 
-        textInputLongPress.isEnabled = config.enableLongPressToTalk
+        textInputLongPress.isEnabled = config._enableLongPressToTalk
         textInputLongPress.delegate = self
         messageTextView.addGestureRecognizer(textInputLongPress)
         textInputTap.require(toFail: textInputLongPress)
@@ -529,7 +540,7 @@ final class MessageInputViewImpl: UIView {
         moreButtonRedDot.layer.cornerRadius = Self.redDotSize / 2
         moreButtonRedDot.isUserInteractionEnabled = false
         moreButtonRedDot.isHidden = true
-        if config.isShowMore {
+        if config._isShowMore {
             updateMoreButtonRedDotVisibility()
         }
 
@@ -547,7 +558,7 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func applyInputAppearance() {
-        let appearance = config.appearance
+        let appearance = config._appearance
         let colors = TUIChatKitTheme.colors
         MessageInputAppearanceApplier.apply(fill: appearance?.fill, to: self, defaultColor: colors.bgColorOperate)
         inputRow.backgroundColor = .clear
@@ -569,7 +580,7 @@ final class MessageInputViewImpl: UIView {
 
     private func applyButtonAppearances() {
         let colors = TUIChatKitTheme.colors
-        let appearance = config.appearance
+        let appearance = config._appearance
         let buttons: [(MessageInputAppearanceButton, MessageInputButtonAppearance?, Bool, String)] = [
             (audioButton, appearance?.audioRecordButton, isVoiceInputMode, isVoiceInputMode ? "input_keyboard" : "input_audio"),
             (emojiButton, appearance?.emojiButton, isEmojiPanelShown, isEmojiPanelShown ? "input_keyboard" : "input_emoji"),
@@ -592,7 +603,7 @@ final class MessageInputViewImpl: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        if config.appearance?.field?.cornerRadius == MessageInputButtonAppearance.cornerRadiusPill {
+        if config._appearance?.field?.cornerRadius == MessageInputButtonAppearance.cornerRadiusPill {
             inputContainer.layer.cornerRadius = min(inputContainer.bounds.width, inputContainer.bounds.height) / 2
         }
         MessageInputAppearanceApplier.update(self)
@@ -776,7 +787,7 @@ final class MessageInputViewImpl: UIView {
     }
 
     @objc private func handleMentionUserNotification(_ notification: Notification) {
-        guard viewModel.isGroupChat, config.enableMention else { return }
+        guard viewModel.isGroupChat, config._enableMention else { return }
         guard let userInfo = notification.userInfo,
               userInfo["conversationID"] as? String == viewModel.conversationID,
               let userID = userInfo["userID"] as? String,
@@ -967,9 +978,9 @@ final class MessageInputViewImpl: UIView {
         // 可打断的流式回复在跑：只出停止键，对齐 Android MessageInputActionVisibilityPolicy
         let showStop = chatbotController?.canInterrupt == true
         let hasText = !messageTextView.extractSendText().isEmpty
-        let showSend = !showStop && config.isShowSendButton && !isVoiceInputMode
-            && (hasText || config.keepSendButtonVisible)
-        let showMore = !showStop && config.isShowMore && (config.keepSendButtonVisible || !showSend)
+        let showSend = !showStop && config._isShowSendButton && !isVoiceInputMode
+            && (hasText || config._keepSendButtonVisible)
+        let showMore = !showStop && config._isShowMore && (config._keepSendButtonVisible || !showSend)
         sendButton.isHidden = !showSend
         sendButton.isEnabled = hasText
         moreButton.isHidden = !showMore
@@ -979,8 +990,8 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func layoutActionButtons(showSend: Bool, showMore: Bool, showStop: Bool) {
-        let sendSize = MessageInputAppearanceApplier.buttonSize(config.appearance?.sendButton, fallback: Self.inputRowButtonSize, supportsTitle: true)
-        let moreSize = MessageInputAppearanceApplier.buttonSize(config.appearance?.moreButton, fallback: Self.inputRowButtonSize)
+        let sendSize = MessageInputAppearanceApplier.buttonSize(config._appearance?.sendButton, fallback: Self.inputRowButtonSize, supportsTitle: true)
+        let moreSize = MessageInputAppearanceApplier.buttonSize(config._appearance?.moreButton, fallback: Self.inputRowButtonSize)
         let sendWidth = showSend ? sendSize.width : 0
         let moreWidth = showMore ? moreSize.width : 0
         let gap = showSend && showMore ? Self.inputRowHorizontalInset : 0
@@ -1071,7 +1082,7 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func switchToVoiceMode() {
-        guard config.isShowAudioRecorder else { return }
+        guard config._isShowAudioRecorder else { return }
         isVoiceInputMode = true
         messageTextView.isHidden = true
         voiceLabel.isHidden = false
@@ -1164,7 +1175,7 @@ final class MessageInputViewImpl: UIView {
     }
 
     private func canArmVoiceRecordingFromTextInput() -> Bool {
-        return config.isShowAudioRecorder
+        return config._isShowAudioRecorder
             && !isVoiceInputMode
             && !isEmojiPanelShown
             && !isMorePanelShown
@@ -1223,7 +1234,8 @@ extension MessageInputViewImpl: MessageInputMorePanelDelegate {
         hideMorePanel()
         AlbumPickerMediaSendCoordinator.shared.showAlbumPicker(
             conversationID: viewModel.conversationID,
-            enableReadReceipt: config.enableReadReceipt
+            enableReadReceipt: config._enableReadReceipt,
+            config: config
         )
     }
 

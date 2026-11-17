@@ -19,6 +19,8 @@ final class MessageImageContentView: UIView, MessageContentView {
 
     private var boundMessage: MessageInfo?
 
+    private var displayedSource: String?
+
     private var onMediaTap: ((MessageInfo) -> Void)?
 
     private let imageView = UIImageView()
@@ -124,19 +126,30 @@ final class MessageImageContentView: UIView, MessageContentView {
     private func loadThumbnail(payload: ImageMessagePayload, message: MessageInfo) {
         if let path = payload.largeImagePath ?? payload.originalImagePath,
            !path.isEmpty,
-           FileManager.default.fileExists(atPath: path),
-           let image = UIImage(contentsOfFile: path) {
-            imageView.kf.cancelDownloadTask()
-            imageView.image = image
-            placeholderIcon.isHidden = true
-            imageView.backgroundColor = .clear
-            return
+           FileManager.default.fileExists(atPath: path) {
+            if displayedSource == path, imageView.image != nil {
+                placeholderIcon.isHidden = true
+                imageView.backgroundColor = .clear
+                return
+            }
+            if let image = UIImage(contentsOfFile: path) {
+                imageView.kf.cancelDownloadTask()
+                imageView.image = image
+                displayedSource = path
+                placeholderIcon.isHidden = true
+                imageView.backgroundColor = .clear
+                return
+            }
         }
         if let urlString = payload.largeImageURL ?? payload.originalImageURL ?? payload.thumbImageURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
             placeholderIcon.isHidden = true
+            if displayedSource == urlString, imageView.image != nil {
+                return
+            }
             imageView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
+            displayedSource = urlString
             imageView.kf.setImage(with: url)
             return
         }
@@ -147,6 +160,7 @@ final class MessageImageContentView: UIView, MessageContentView {
     private func showPlaceholder() {
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
+        displayedSource = nil
         imageView.backgroundColor = TUIChatKitTheme.colors.bgColorBubbleReciprocal
         placeholderIcon.isHidden = false
     }

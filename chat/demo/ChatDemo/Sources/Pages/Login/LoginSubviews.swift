@@ -1,3 +1,4 @@
+import AtomicXCore
 import TUIChatKit
 import SnapKit
 import UIKit
@@ -90,6 +91,7 @@ final class LocalLoginViewController: UIViewController {
         subtitleLabel.font = .systemFont(ofSize: 15)
         subtitleLabel.textColor = colors.textColorTertiary
         userIDField.placeholder = LocalizedChatString("EnterUserID")
+        userIDField.textAlignment = LanguageHelper.isRTL ? .right : .left
         userIDField.backgroundColor = colors.buttonColorSecondaryDefault
         userIDField.textColor = colors.textColorPrimary
         userIDField.layer.cornerRadius = Self.fieldCornerRadius

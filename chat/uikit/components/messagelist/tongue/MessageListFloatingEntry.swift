@@ -179,8 +179,7 @@ final class MessageListFloatingEntryStateController {
         if let target = mentionTarget, mentionTargetVisibility != .visible {
             return .mention(target: target)
         }
-        if isBeyondDisplayThreshold,
-           let newMessage = newMessages.first {
+        if let newMessage = newMessages.first {
             return .newMessages(count: newMessages.count, firstMessage: newMessage)
         }
         guard isBeyondDisplayThreshold else { return nil }

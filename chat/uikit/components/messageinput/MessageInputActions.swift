@@ -1,6 +1,6 @@
 import UIKit
 
-public enum MessageInputActionIDs {
+public enum MessageInputDefaultActionIDs {
     public static let album = "messageInput.album"
     public static let takePhoto = "messageInput.takePhoto"
     public static let recordVideo = "messageInput.recordVideo"
@@ -8,8 +8,6 @@ public enum MessageInputActionIDs {
     public static let videoCall = "messageInput.videoCall"
     public static let audioCall = "messageInput.audioCall"
 }
-
-public typealias MessageInputActionCustomizer = (CustomEditor<MessageInputMenuAction>) -> Void
 
 public struct MessageInputMenuAction: CustomItem {
     public var ID: String

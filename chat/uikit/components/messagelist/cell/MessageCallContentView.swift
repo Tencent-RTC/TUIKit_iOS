@@ -58,7 +58,7 @@ final class MessageCallContentView: UIView, MessageContentView {
             : TUIChatKitTheme.colors.textColorPrimary
 
         textLabel.text = callModel.displayString(
-            senderShowName: MessageListHelper.senderShowName(of: message)
+            senderShowName: MessageDisplayHelper.senderShowName(of: message)
         )
         textLabel.textColor = contentColor
 

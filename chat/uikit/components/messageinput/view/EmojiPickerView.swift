@@ -200,6 +200,7 @@ final class EmojiPickerView: UIView {
     }
 
     private func bindInteraction() {
+        LanguageHelper.applyLayoutDirection(to: collectionView)
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(EmojiGridCell.self, forCellWithReuseIdentifier: EmojiGridCell.reuseID)
@@ -230,6 +231,7 @@ final class EmojiPickerView: UIView {
 
         let deleteImage = UIImage(systemName: "delete.left")?
             .withConfiguration(UIImage.SymbolConfiguration(pointSize: Self.deleteIconPointSize, weight: .medium))
+            .imageFlippedForRightToLeftLayoutDirection()
         deleteButton.setImage(deleteImage, for: .normal)
         deleteButton.tintColor = colors.textColorPrimary
         deleteButton.backgroundColor = colors.buttonColorSecondaryDefault
@@ -502,6 +504,7 @@ private final class EmojiSectionHeaderView: UICollectionReusableView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        LanguageHelper.applyLayoutDirection(to: self)
         titleLabel.font = FontScheme.caption2Regular
         titleLabel.textColor = TUIChatKitTheme.colors.textColorSecondary
         addSubview(titleLabel)

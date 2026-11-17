@@ -935,6 +935,13 @@
 "AboutDisclaimer" = "Disclaimer";
 "AboutPersonalInformationCollectionList" = "Personal Information Collected";
 "About3PartySharingList" = "Information Shared with Third Parties";
+"AboutCloseAccount" = "Cancel Account";
+"AboutCloseAccountDescribe" = "After canceling this account, you will be unable to use it, and related data will be permanently deleted. Current account:%@";
+"AboutCloseAccountAlterMsg" = "Are you sure you want to cancel this account?";
+"AboutCloseAccountAlterAction" = "Confirm";
+"AboutCloseAccountNoToken" = "Cancellation failed. No token or mobile number associated with the current account is detected. Please log in with your mobile number.";
+"AboutCloseAccountSuccessful" = "Account cancelled successfully";
+"AboutCloseAccountFailedWithError" = "Failed to cancel the account\nerrorCode: %ld, errorMsg: %@";
 "AboutDisclaimerText" = "Tencent Cloud Chat APP (\"this product\") is a test product provided by Tencent Cloud, and Tencent Cloud enjoys the copyright and ownership of this product. This product is only used for functional experience and must not be used for any commercial purposes. In order to comply with the regulatory requirements of relevant departments, any pornography, abusive, violent, and politically related content is strictly prohibited during use.";
 
 "ConfigGroupNameLabel" = "Group";

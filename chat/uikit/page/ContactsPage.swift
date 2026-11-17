@@ -9,7 +9,11 @@ public final class ContactsPage: UIViewController {
         onContactClick: ((ContactInfo) -> Void)? = nil,
         onGroupClick: ((GroupInfo) -> Void)? = nil
     ) {
-        implementation = ContactsPageImpl(config: config ?? ContactListConfig(), onContactClick: onContactClick, onGroupClick: onGroupClick)
+        implementation = ContactsPageImpl(
+            config: config ?? ContactListConfig(),
+            onContactClick: onContactClick,
+            onGroupClick: onGroupClick)
+
         super.init(nibName: nil, bundle: nil)
         implementation.owner = self
     }

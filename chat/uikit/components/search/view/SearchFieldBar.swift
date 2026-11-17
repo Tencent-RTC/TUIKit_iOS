@@ -123,6 +123,7 @@ final class SearchFieldBar: UIView {
 
         textField.font = FontScheme.caption2Regular
         textField.textColor = colors.textColorPrimary
+        textField.textAlignment = LanguageHelper.isRTL ? .right : .left
         textField.tintColor = colors.textColorLink
         textField.returnKeyType = .search
         textField.attributedPlaceholder = NSAttributedString(

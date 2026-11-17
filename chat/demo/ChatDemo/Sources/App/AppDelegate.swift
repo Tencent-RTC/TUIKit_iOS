@@ -1,7 +1,6 @@
 import AtomicXCore
 import TUIChatKit
 import Combine
-import TUICallKit_Swift
 import UIKit
 
 @main
@@ -10,13 +9,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private static let welcomeMessageDelay: TimeInterval = 1
 
+
     private var cancellables = Set<AnyCancellable>()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         setupAppConfiguration()
         CustomLinkMessageManager.register()
         CustomerServiceManager.registerSummary()
-        ChatCallEventSubscriber.shared.ensureSubscribed()
         setupLoginObserver()
 
         return true
@@ -25,6 +24,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
+
+
+
+
+
+
+
+
+
+
+
 
     private func setupLoginObserver() {
         LoginStore.shared.state
@@ -45,6 +55,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             inputStore.sendMessage(payload: .text(payload), option: nil, completion: nil)
         }
     }
+
+
 
     private func setupAppConfiguration() {
         if let configPath = Bundle.main.path(forResource: "appConfig", ofType: "json") {

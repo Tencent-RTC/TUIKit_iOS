@@ -199,7 +199,7 @@ extension SearchMessageDetailViewController: UITableViewDataSource {
         let message = messages[indexPath.row]
         let colors = TUIChatKitTheme.colors
         let senderName = ChatUtil.getMessageSenderName(message)
-        let abstract = MessageListHelper.getMessageAbstract(message, showMergedTitle: true)
+        let abstract = MessageDisplayHelper.getMessageAbstract(message, showMergedTitle: true)
         let title = SearchHighlightBuilder.attributedText(
             text: senderName,
             keyword: "",

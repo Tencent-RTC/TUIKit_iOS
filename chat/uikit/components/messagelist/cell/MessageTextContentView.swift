@@ -32,7 +32,7 @@ final class MessageTextContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
-        maxBubbleWidth = UIScreen.main.bounds.width * context.config.bubbleMaxWidthRatio
+        maxBubbleWidth = UIScreen.main.bounds.width * context.config._bubbleMaxWidthRatio
         textLabel.preferredMaxLayoutWidth = maxBubbleWidth - Self.horizontalInset * 2
         let text = Self.currentText(from: message)
         applyText(text, isSelf: context.isSelf, isLeft: context.isLeft)

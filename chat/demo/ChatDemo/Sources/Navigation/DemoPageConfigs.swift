@@ -6,12 +6,12 @@ internal enum DemoPageConfigs {
 
     internal static func makeConversationsConfig() -> ConversationActionConfig {
         var config = ConversationActionConfig()
-        config.userIsSupportDelete = nil
-        config.userIsSupportMute = nil
-        config.userIsSupportPin = nil
-        config.userIsSupportMarkUnread = nil
-        config.userIsSupportClearHistory = nil
-        config.userActionCustomizer = nil
+        config.isSupportDelete = nil
+        config.isSupportMute = nil
+        config.isSupportPin = nil
+        config.isSupportMarkUnread = nil
+        config.isSupportClearHistory = nil
+        config.actionCustomizer = nil
         return config
     }
 
@@ -28,35 +28,35 @@ internal enum DemoPageConfigs {
 
     internal static func makeMessageListConfig() -> ChatMessageListConfig {
         var config = ChatMessageListConfig()
-        config.userIsShowLeftAvatar = nil
-        config.userIsShowRightAvatar = nil
-        config.userIsShowLeftNickname = nil
-        config.userIsShowRightNickname = nil
-        config.userIsSupportTranslate = nil
-        config.userIsSupportConvertToText = nil
-        config.userStreamingMaxCharactersPerSecond = nil
-        config.userActionCustomizer = nil
-        config.userEnableChatbotReplyPlaceholder = false
+        config.isShowLeftAvatar = nil
+        config.isShowRightAvatar = nil
+        config.isShowLeftNickname = nil
+        config.isShowRightNickname = nil
+        config.isSupportTranslate = nil
+        config.isSupportConvertToText = nil
+        config.streamingMaxCharactersPerSecond = nil
+        config.actionCustomizer = nil
+        config.enableChatbotReplyPlaceholder = false
         return config
     }
 
     internal static func makeMessageInputConfig(conversationID: String) -> ChatMessageInputConfig {
         let sdkAppID = LoginStore.shared.sdkAppID
         var config = ChatMessageInputConfig()
-        config.userEnableReadReceipt = nil
-        config.userEnableRealtimeVoiceToText = nil
-        config.userRealtimeVoiceToTextLanguage = nil
-        config.userEnableVoiceprintDenoise = nil
-        config.userIsShowAudioCall = nil
-        config.userIsShowVideoCall = nil
+        config.enableReadReceipt = nil
+        config.enableRealtimeVoiceToText = nil
+        config.realtimeVoiceToTextLanguage = nil
+        config.enableVoiceprintDenoise = nil
+        config.isShowAudioCall = nil
+        config.isShowVideoCall = nil
         config.enableSendRecordedVoice = true
-        let enableReadReceipt = config.enableReadReceipt
+        let enableReadReceipt = config.enableReadReceipt ?? AppBuilderConfig.shared.enableReadReceipt
         config.actionCustomizer = { editor in
             editor.add(CustomLinkMessageManager.makeMenuAction(conversationID: conversationID, enableReadReceipt: enableReadReceipt))
-            editor.replace(MessageInputActionIDs.videoCall) { action in
+            editor.replace(MessageInputDefaultActionIDs.videoCall) { action in
                 DemoCallMenuBadge.addUnreadBadgeIfNeeded(to: action, sdkAppID: sdkAppID)
             }
-            editor.replace(MessageInputActionIDs.audioCall) { action in
+            editor.replace(MessageInputDefaultActionIDs.audioCall) { action in
                 DemoCallMenuBadge.addUnreadBadgeIfNeeded(to: action, sdkAppID: sdkAppID)
             }
         }

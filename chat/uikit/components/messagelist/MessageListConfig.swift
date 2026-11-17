@@ -3,54 +3,54 @@ import AtomicXCore
 
 public struct ChatMessageListConfig {
     // 布局：对齐、消息间距、列表边距、头像间距与气泡宽度。
-    public var userAlignment: MessageAlignment? = nil
-    public var userCellSpacing: CGFloat? = nil
-    public var userHorizontalPadding: CGFloat? = nil
-    public var userAvatarSpacing: CGFloat? = nil
-    public var userBubbleMaxWidthRatio: CGFloat? = nil
+    public var alignment: MessageAlignment? = nil
+    public var cellSpacing: CGFloat? = nil
+    public var horizontalPadding: CGFloat? = nil
+    public var avatarSpacing: CGFloat? = nil
+    public var bubbleMaxWidthRatio: CGFloat? = nil
 
     // 身份展示：左右两侧的头像与昵称。
-    public var userIsShowLeftAvatar: Bool? = nil
-    public var userIsShowLeftNickname: Bool? = nil
-    public var userIsShowRightAvatar: Bool? = nil
-    public var userIsShowRightNickname: Bool? = nil
+    public var isShowLeftAvatar: Bool? = nil
+    public var isShowLeftNickname: Bool? = nil
+    public var isShowRightAvatar: Bool? = nil
+    public var isShowRightNickname: Bool? = nil
 
     // 消息展示与过滤：时间、系统消息、未支持消息及排除规则。
-    public var userIsShowTimeMessage: Bool? = nil
-    public var userIsShowTimeInBubble: Bool? = nil
-    public var userIsShowSystemMessage: Bool? = nil
-    public var userIsShowUnsupportMessage: Bool? = nil
-    public var userMessageExclusionMatchers: [MessageMatcher]? = nil
+    public var isShowTimeMessage: Bool? = nil
+    public var isShowTimeInBubble: Bool? = nil
+    public var isShowSystemMessage: Bool? = nil
+    public var isShowUnsupportMessage: Bool? = nil
+    public var messageExclusionMatchers: [MessageMatcher]? = nil
 
     // 外观：列表背景、默认气泡及各方向气泡样式。
-    public var userBackground: MessageListBackground? = nil
-    public var userDefaultBubbleAppearance: MessageBubbleAppearance? = nil
-    public var userOwnBubbleAppearance: MessageBubbleAppearance? = nil
-    public var userIncomingBubbleAppearance: MessageBubbleAppearance? = nil
-    public var userLeftBubbleAppearance: MessageBubbleAppearance? = nil
-    public var userRightBubbleAppearance: MessageBubbleAppearance? = nil
+    public var background: MessageListBackground? = nil
+    public var defaultBubbleAppearance: MessageBubbleAppearance? = nil
+    public var ownBubbleAppearance: MessageBubbleAppearance? = nil
+    public var incomingBubbleAppearance: MessageBubbleAppearance? = nil
+    public var leftBubbleAppearance: MessageBubbleAppearance? = nil
+    public var rightBubbleAppearance: MessageBubbleAppearance? = nil
 
     // 消息交互：复制、删除、撤回、转发、引用、多选与表情回应。
-    public var userIsSupportCopy: Bool? = nil
-    public var userIsSupportDelete: Bool? = nil
-    public var userIsSupportRecall: Bool? = nil
-    public var userIsSupportForward: Bool? = nil
-    public var userIsSupportQuote: Bool? = nil
-    public var userIsSupportMultiSelect: Bool? = nil
-    public var userIsSupportReaction: Bool? = nil
+    public var isSupportCopy: Bool? = nil
+    public var isSupportDelete: Bool? = nil
+    public var isSupportRecall: Bool? = nil
+    public var isSupportForward: Bool? = nil
+    public var isSupportQuote: Bool? = nil
+    public var isSupportMultiSelect: Bool? = nil
+    public var isSupportReaction: Bool? = nil
 
     // 内容处理：语音转文字、翻译与连续播放语音。
-    public var userIsSupportConvertToText: Bool? = nil
-    public var userIsSupportTranslate: Bool? = nil
-    public var userIsSupportListenFromHere: Bool? = nil
+    public var isSupportConvertToText: Bool? = nil
+    public var isSupportTranslate: Bool? = nil
+    public var isSupportListenFromHere: Bool? = nil
 
     // 扩展：自定义消息操作菜单。
-    public var userActionCustomizer: MessageActionCustomizer? = nil
+    public var actionCustomizer: MessageActionCustomizer? = nil
 
     // 回复状态与流式渲染：正在输入、助手回复占位及每秒出字上限。
-    public var userEnableTyping: Bool? = nil
-    public var userEnableChatbotReplyPlaceholder: Bool? = nil
-    public var userStreamingMaxCharactersPerSecond: Double? = nil
+    public var enableTyping: Bool? = nil
+    public var enableChatbotReplyPlaceholder: Bool? = nil
+    public var streamingMaxCharactersPerSecond: Double? = nil
 }
 
 public enum MessageListBackground {

@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		161326BF2F693A6F00EBFF2E /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */; };
+
+
+
+
 		16CF01AA000000000000AA03 /* ChatFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000AA02 /* ChatFlowCoordinator.swift */; };
 		16CF01AA000000000000AA05 /* CustomerServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000AA04 /* CustomerServiceManager.swift */; };
 		16CF01AA000000000000BB03 /* VoiceMessageSettingPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */; };
@@ -18,9 +22,13 @@
 		16CF01AA000000000000DD01 /* HomeTabBarController+Tabs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000DD02 /* HomeTabBarController+Tabs.swift */; };
 		16CF01AA000000000000DD03 /* HomeTabBarController+UnreadBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000DD04 /* HomeTabBarController+UnreadBadges.swift */; };
 		16CF01AA000000000000DD05 /* HomeTabBarController+Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000DD06 /* HomeTabBarController+Appearance.swift */; };
+
 		16CF01AA000000000000DD09 /* HiddenBarNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16CF01AA000000000000DD0A /* HiddenBarNavigationController.swift */; };
+
 		4AE6172335A14D917199DD62 /* Pods_ChatDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */; };
+
 		A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DB2E6EC0050075F614 /* SettingsPage.swift */; };
+
 		A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424DE2E6EC0050075F614 /* AppDelegate.swift */; };
 		A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424D92E6EC0050075F614 /* HomePage.swift */; };
 		A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */; };
@@ -28,40 +36,33 @@
 		A32424F12E6EC0050075F614 /* appConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = A32424DD2E6EC0050075F614 /* appConfig.json */; };
 		A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A32424DF2E6EC0050075F614 /* Assets.xcassets */; };
 		A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A32424F42E6EC0050075F614 /* RootViewController.swift */; };
+
 		AB00000000000000000000AC /* LoginSubviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AD /* LoginSubviews.swift */; };
-		AB00000000000000000000AE /* telephone_area_code.json in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000AF /* telephone_area_code.json */; };
-		AB00000000000000000000B1 /* verification.html in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000B2 /* verification.html */; };
+
+
+		AB00000000000000000003D1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000003D2 /* InfoPlist.strings */; };
+		AB00000000000000000003D7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000003D8 /* PrivacyInfo.xcprivacy */; };
 		AB00000000000000000000C1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000C2 /* SceneDelegate.swift */; };
 		AB00000000000000000000D1 /* DemoAIAssistantAgentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB00000000000000000000D2 /* DemoAIAssistantAgentLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		161326E02F6A7E7600EBFF2E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E6F3900DD7B5D309DE65B878 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 161326DA2F6A7E7600EBFF2E;
-		};
+
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		161326E32F6A7E7600EBFF2E /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0CB983487A575C830063379D /* Pods-TUIKitDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TUIKitDemo.debug.xcconfig"; path = "Target Support Files/Pods-TUIKitDemo/Pods-TUIKitDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+
+
 		161326D12F697B0000EBFF2E /* ChatDemo-Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Debug.entitlements"; sourceTree = "<group>"; };
 		161326D22F697B0100EBFF2E /* ChatDemo-Release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-Release.entitlements"; sourceTree = "<group>"; };
+
+
 		16CF01AA000000000000AA02 /* ChatFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFlowCoordinator.swift; sourceTree = "<group>"; };
 		16CF01AA000000000000AA04 /* CustomerServiceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerServiceManager.swift; sourceTree = "<group>"; };
 		16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceMessageSettingPages.swift; sourceTree = "<group>"; };
@@ -72,22 +73,37 @@
 		16CF01AA000000000000DD02 /* HomeTabBarController+Tabs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeTabBarController+Tabs.swift"; sourceTree = "<group>"; };
 		16CF01AA000000000000DD04 /* HomeTabBarController+UnreadBadges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeTabBarController+UnreadBadges.swift"; sourceTree = "<group>"; };
 		16CF01AA000000000000DD06 /* HomeTabBarController+Appearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeTabBarController+Appearance.swift"; sourceTree = "<group>"; };
+
 		16CF01AA000000000000DD0A /* HiddenBarNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenBarNavigationController.swift; sourceTree = "<group>"; };
-		16E6A6AB2FDAE2A40032F383 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+
+
+
+
+
+
+
 		8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatDemo.debug.xcconfig"; path = "Target Support Files/Pods-ChatDemo/Pods-ChatDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		A30527642E6EC1B700276146 /* ChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A32424D92E6EC0050075F614 /* HomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePage.swift; sourceTree = "<group>"; };
 		A32424DA2E6EC0050075F614 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		A32424DB2E6EC0050075F614 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
+
 		A32424DD2E6EC0050075F614 /* appConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = appConfig.json; sourceTree = "<group>"; };
 		A32424DE2E6EC0050075F614 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A32424DF2E6EC0050075F614 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A32424E12E6EC0050075F614 /* GenerateTestUserSig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateTestUserSig.swift; sourceTree = "<group>"; };
 		A32424E22E6EC0050075F614 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A32424F42E6EC0050075F614 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+
+
 		AB00000000000000000000AD /* LoginSubviews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginSubviews.swift; sourceTree = "<group>"; };
-		AB00000000000000000000AF /* telephone_area_code.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = telephone_area_code.json; sourceTree = "<group>"; };
-		AB00000000000000000000B2 /* verification.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = verification.html; sourceTree = "<group>"; };
+
+
+		AB00000000000000000003D3 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh-Hans; path = zh-Hans.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AB00000000000000000003D4 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh-Hant; path = zh-Hant.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AB00000000000000000003D5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AB00000000000000000003D6 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		AB00000000000000000003D8 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AB00000000000000000000C2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		AB00000000000000000000D2 /* DemoAIAssistantAgentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoAIAssistantAgentLoader.swift; sourceTree = "<group>"; };
 		AB00000000000000000000E8 /* ChatDemo-AppStore.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ChatDemo-AppStore.entitlements"; sourceTree = "<group>"; };
@@ -99,13 +115,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		161326D82F6A7E7600EBFF2E /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+
 		736B3438CD4CFAA7939F606F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -122,6 +132,7 @@
 			isa = PBXGroup;
 			children = (
 				A32424E62E6EC0050075F614 /* ChatDemo */,
+
 				93794F2383C516BE71859D82 /* Products */,
 				1065E008367E941D8A0243A4 /* Pods */,
 				65D6509523A1AF803D6EEA96 /* Frameworks */,
@@ -137,15 +148,20 @@
 				E89B2374B3E641FC68E9F381 /* Pods-TUIKitDemo.release.xcconfig */,
 				8D7295459315C15E4DEB5CB1 /* Pods-ChatDemo.debug.xcconfig */,
 				ADA16EB7C9F14EC0FDEC6E5F /* Pods-ChatDemo.release.xcconfig */,
+
+
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
+
 		65D6509523A1AF803D6EEA96 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+
 				161326BE2F693A6F00EBFF2E /* CoreTelephony.framework */,
 				F2341E1490CCF32C4F01AF72 /* Pods_ChatDemo.framework */,
+
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -154,6 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				A30527642E6EC1B700276146 /* ChatDemo.app */,
+
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -195,8 +212,10 @@
 			isa = PBXGroup;
 			children = (
 				A32424DF2E6EC0050075F614 /* Assets.xcassets */,
-				AB00000000000000000000AF /* telephone_area_code.json */,
-				AB00000000000000000000B2 /* verification.html */,
+
+
+				AB00000000000000000003D2 /* InfoPlist.strings */,
+				AB00000000000000000003D8 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -232,6 +251,7 @@
 				16CF01AA000000000000CC06 /* ChatSecurityWarningView.swift */,
 				16CF01AA000000000000CC08 /* CustomLinkMessage.swift */,
 				16CF01AA000000000000AA04 /* CustomerServiceManager.swift */,
+
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -255,6 +275,7 @@
 		AB00000000000000000000E7 /* Support */ = {
 			isa = PBXGroup;
 			children = (
+
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -266,6 +287,7 @@
 				16CF01AA000000000000DD02 /* HomeTabBarController+Tabs.swift */,
 				16CF01AA000000000000DD04 /* HomeTabBarController+UnreadBadges.swift */,
 				16CF01AA000000000000DD06 /* HomeTabBarController+Appearance.swift */,
+
 				16CF01AA000000000000DD0A /* HiddenBarNavigationController.swift */,
 			);
 			path = Home;
@@ -275,6 +297,7 @@
 			isa = PBXGroup;
 			children = (
 				A32424DA2E6EC0050075F614 /* LoginPage.swift */,
+
 				AB00000000000000000000AD /* LoginSubviews.swift */,
 			);
 			path = Login;
@@ -284,6 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				A32424DB2E6EC0050075F614 /* SettingsPage.swift */,
+
 				16CF01AA000000000000BB02 /* VoiceMessageSettingPages.swift */,
 			);
 			path = Settings;
@@ -292,6 +316,7 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+
 		F46C707D758A05C4A3BEE0B2 /* ChatDemo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3543F57F37ECC8690B63763D /* Build configuration list for PBXNativeTarget "ChatDemo" */;
@@ -302,12 +327,12 @@
 				1658FB48197F6F185AF1F61E /* [CP] Embed Pods Frameworks */,
 				147293C1E5D25EB6974D2BC5 /* [CP] Copy Pods Resources */,
 				CEAD06132DA9128900E92F24 /* Resources */,
-				161326E32F6A7E7600EBFF2E /* Embed Foundation Extensions */,
+
 			);
 			buildRules = (
 			);
 			dependencies = (
-				161326E12F6A7E7600EBFF2E /* PBXTargetDependency */,
+
 			);
 			name = ChatDemo;
 			productName = ChatApp;
@@ -331,6 +356,9 @@
 			knownRegions = (
 				Base,
 				en,
+				"zh-Hans",
+				"zh-Hant",
+				ar,
 			);
 			mainGroup = 06152C22A88379FD87B6CFAF;
 			productRefGroup = 93794F2383C516BE71859D82 /* Products */;
@@ -338,26 +366,23 @@
 			projectRoot = "";
 			targets = (
 				F46C707D758A05C4A3BEE0B2 /* ChatDemo */,
+
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		161326D92F6A7E7600EBFF2E /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+
 		CEAD06132DA9128900E92F24 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A32424F12E6EC0050075F614 /* appConfig.json in Resources */,
 				A32424F32E6EC0050075F614 /* Assets.xcassets in Resources */,
-				AB00000000000000000000AE /* telephone_area_code.json in Resources */,
-				AB00000000000000000000B1 /* verification.html in Resources */,
+
+
+				AB00000000000000000003D1 /* InfoPlist.strings in Resources */,
+				AB00000000000000000003D7 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,27 +423,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ChatDemo/Pods-ChatDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6893CE2877E40A11C8D75201 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
+
 		773003C6B8FC2D60E9E15AF7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -441,42 +446,27 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CCB5747094C2136B67B8146C /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			showEnvVarsInLog = 0;
-		};
+
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		161326D72F6A7E7600EBFF2E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+
 		960AC3DB982879A761D2CE93 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A32424E72E6EC0050075F614 /* SettingsPage.swift in Sources */,
+
 				16CF01AA000000000000BB03 /* VoiceMessageSettingPages.swift in Sources */,
+
+
 				A32424EB2E6EC0050075F614 /* AppDelegate.swift in Sources */,
 				A32424F52E6EC0050075F614 /* RootViewController.swift in Sources */,
 				A32424EC2E6EC0050075F614 /* HomePage.swift in Sources */,
 				16CF01AA000000000000DD01 /* HomeTabBarController+Tabs.swift in Sources */,
 				16CF01AA000000000000DD03 /* HomeTabBarController+UnreadBadges.swift in Sources */,
 				16CF01AA000000000000DD05 /* HomeTabBarController+Appearance.swift in Sources */,
+
 				16CF01AA000000000000DD09 /* HiddenBarNavigationController.swift in Sources */,
 				AB00000000000000000000D1 /* DemoAIAssistantAgentLoader.swift in Sources */,
 				16CF01AA000000000000AA03 /* ChatFlowCoordinator.swift in Sources */,
@@ -487,6 +477,7 @@
 				16CF01AA000000000000AA05 /* CustomerServiceManager.swift in Sources */,
 				A32424EE2E6EC0050075F614 /* GenerateTestUserSig.swift in Sources */,
 				A32424EF2E6EC0050075F614 /* LoginPage.swift in Sources */,
+
 				AB00000000000000000000AC /* LoginSubviews.swift in Sources */,
 				AB00000000000000000000C1 /* SceneDelegate.swift in Sources */,
 			);
@@ -495,11 +486,22 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		161326E12F6A7E7600EBFF2E /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			targetProxy = 161326E02F6A7E7600EBFF2E /* PBXContainerItemProxy */;
-		};
+
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		AB00000000000000000003D2 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AB00000000000000000003D3 /* zh-Hans */,
+				AB00000000000000000003D4 /* zh-Hant */,
+				AB00000000000000000003D5 /* en */,
+				AB00000000000000000003D6 /* ar */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		125C9F740FAC230133E7F6D4 /* Release */ = {
@@ -509,10 +511,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ChatDemo/Configuration/ChatDemo-Release.entitlements";
 				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "";
 				INFOPLIST_FILE = ChatDemo/Configuration/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -522,7 +524,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.imchat.imchat.uikit;
 				PRODUCT_NAME = ChatDemo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -531,83 +533,8 @@
 			};
 			name = Release;
 		};
-		161326E42F6A7E7600EBFF2E /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		161326E52F6A7E7600EBFF2E /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
+
+
 		240EC12F542C9CCC37C0E58F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -678,10 +605,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "ChatDemo/Configuration/ChatDemo-Debug.entitlements";
 				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 5GHU44CJHG;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "";
 				INFOPLIST_FILE = ChatDemo/Configuration/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -691,7 +618,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tencent.tuikit.demo.xa.uikit;
 				PRODUCT_NAME = ChatDemo;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = Wildcard_20260824;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -768,6 +695,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+
 		3543F57F37ECC8690B63763D /* Build configuration list for PBXNativeTarget "ChatDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

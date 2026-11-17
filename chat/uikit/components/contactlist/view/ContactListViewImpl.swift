@@ -64,14 +64,14 @@ final class ContactListViewImpl: RTCBaseView {
             make.top.leading.trailing.equalToSuperview()
         }
         listView.snp.makeConstraints { make in
-            if config.showSearchBar {
+            if config._showSearchBar {
                 make.top.equalTo(searchBar.snp.bottom)
             } else {
                 make.top.equalToSuperview()
             }
             make.leading.trailing.bottom.equalToSuperview()
         }
-        searchBar.isHidden = !config.showSearchBar
+        searchBar.isHidden = !config._showSearchBar
     }
 
     public override func bindInteraction() {
@@ -94,7 +94,7 @@ final class ContactListViewImpl: RTCBaseView {
 
     private func buildHeaderItems() -> [ContactCustomItem] {
         var defaults: [ContactCustomItem] = []
-        if config.showNewContacts {
+        if config._showNewContacts {
             defaults.append(ContactCustomItem(
                 ID: ContactListItemIDs.newContacts,
                 title: LocalizedChatString("ContactsNewFriends"),
@@ -103,7 +103,7 @@ final class ContactListViewImpl: RTCBaseView {
                 onClick: { [weak self] in self?.presentFriendApplications() }
             ))
         }
-        if config.showGroupApplications {
+        if config._showGroupApplications {
             defaults.append(ContactCustomItem(
                 ID: ContactListItemIDs.groupApplications,
                 title: LocalizedChatString("ContactsGroupApplications"),
@@ -112,7 +112,7 @@ final class ContactListViewImpl: RTCBaseView {
                 onClick: { [weak self] in self?.presentGroupApplications() }
             ))
         }
-        if config.showMyGroups {
+        if config._showMyGroups {
             defaults.append(ContactCustomItem(
                 ID: ContactListItemIDs.myGroups,
                 title: LocalizedChatString("ContactsGroupChats"),
@@ -120,7 +120,7 @@ final class ContactListViewImpl: RTCBaseView {
                 onClick: { [weak self] in self?.presentGroupList() }
             ))
         }
-        if config.showBlacklist {
+        if config._showBlacklist {
             defaults.append(ContactCustomItem(
                 ID: ContactListItemIDs.blacklist,
                 title: LocalizedChatString("ContactsBlackList"),
@@ -128,7 +128,7 @@ final class ContactListViewImpl: RTCBaseView {
                 onClick: { [weak self] in self?.presentBlackList() }
             ))
         }
-        guard let customizer = config.itemCustomizer else { return defaults }
+        guard let customizer = config._itemCustomizer else { return defaults }
         let editor = CustomEditor(items: defaults)
         customizer(editor)
         return editor.build()

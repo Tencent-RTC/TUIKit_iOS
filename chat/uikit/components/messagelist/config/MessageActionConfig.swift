@@ -1,53 +1,43 @@
 import Foundation
 
 extension ChatMessageListConfig {
-    public var isSupportCopy: Bool {
-        get { userIsSupportCopy ?? AppBuilderConfig.shared.messageActionList.contains(.copy) }
-        set { userIsSupportCopy = newValue }
+    var _isSupportCopy: Bool {
+        isSupportCopy ?? AppBuilderConfig.shared.messageActionList.contains(.copy)
     }
 
-    public var isSupportDelete: Bool {
-        get { userIsSupportDelete ?? AppBuilderConfig.shared.messageActionList.contains(.delete) }
-        set { userIsSupportDelete = newValue }
+    var _isSupportDelete: Bool {
+        isSupportDelete ?? AppBuilderConfig.shared.messageActionList.contains(.delete)
     }
 
-    public var isSupportRecall: Bool {
-        get { userIsSupportRecall ?? AppBuilderConfig.shared.messageActionList.contains(.recall) }
-        set { userIsSupportRecall = newValue }
+    var _isSupportRecall: Bool {
+        isSupportRecall ?? AppBuilderConfig.shared.messageActionList.contains(.recall)
     }
 
-    public var isSupportForward: Bool {
-        get { userIsSupportForward ?? AppBuilderConfig.shared.messageActionList.contains(.forward) }
-        set { userIsSupportForward = newValue }
+    var _isSupportForward: Bool {
+        isSupportForward ?? AppBuilderConfig.shared.messageActionList.contains(.forward)
     }
 
-    public var isSupportQuote: Bool {
-        get { userIsSupportQuote ?? AppBuilderConfig.shared.messageActionList.contains(.quote) }
-        set { userIsSupportQuote = newValue }
+    var _isSupportQuote: Bool {
+        isSupportQuote ?? AppBuilderConfig.shared.messageActionList.contains(.quote)
     }
 
-    public var isSupportMultiSelect: Bool {
-        get { userIsSupportMultiSelect ?? true }
-        set { userIsSupportMultiSelect = newValue }
+    var _isSupportMultiSelect: Bool {
+        isSupportMultiSelect ?? true
     }
 
-    public var isSupportConvertToText: Bool {
-        get { userIsSupportConvertToText ?? true }
-        set { userIsSupportConvertToText = newValue }
+    var _isSupportConvertToText: Bool {
+        isSupportConvertToText ?? true
     }
 
-    public var isSupportTranslate: Bool {
-        get { userIsSupportTranslate ?? true }
-        set { userIsSupportTranslate = newValue }
+    var _isSupportTranslate: Bool {
+        isSupportTranslate ?? true
     }
 
-    public var isSupportListenFromHere: Bool {
-        get { userIsSupportListenFromHere ?? true }
-        set { userIsSupportListenFromHere = newValue }
+    var _isSupportListenFromHere: Bool {
+        isSupportListenFromHere ?? true
     }
 
-    public var actionCustomizer: MessageActionCustomizer? {
-        get { userActionCustomizer }
-        set { userActionCustomizer = newValue }
+    var _actionCustomizer: MessageActionCustomizer? {
+        actionCustomizer
     }
 }
