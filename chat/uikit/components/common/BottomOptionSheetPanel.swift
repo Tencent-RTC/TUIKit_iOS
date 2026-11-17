@@ -1,7 +1,17 @@
-import SnapKit
 import UIKit
+import SnapKit
 
-final class AIAgentPickerSheet: UIViewController {
+public final class BottomOptionSheetPanel: UIViewController {
+    public struct Option {
+        public let title: String
+        public let isDangerous: Bool
+
+        public init(title: String, isDangerous: Bool = false) {
+            self.title = title
+            self.isDangerous = isDangerous
+        }
+    }
+
     private static let panelCornerRadius: CGFloat = 16
 
     private static let rowHeight: CGFloat = 56
@@ -20,7 +30,9 @@ final class AIAgentPickerSheet: UIViewController {
 
     private static let animationDuration: TimeInterval = 0.25
 
-    private let agentNames: [String]
+    private static let maxPanelRatio: CGFloat = 0.75
+
+    private let options: [Option]
 
     private let onSelect: (Int) -> Void
 
@@ -30,29 +42,36 @@ final class AIAgentPickerSheet: UIViewController {
 
     private let optionsGroupView = UIView()
 
+    private let optionsScrollView = UIScrollView()
+
     private let optionsContentView = UIView()
 
     private let cancelButton = UIButton(type: .custom)
 
-    init(agentNames: [String], onSelect: @escaping (Int) -> Void) {
-        self.agentNames = agentNames
+    public init(options: [Option], onSelect: @escaping (Int) -> Void) {
+        self.options = options
         self.onSelect = onSelect
         super.init(nibName: nil, bundle: nil)
     }
 
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         activateConstraints()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        applyMaxHeightLimit()
+    }
+
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        playPresentAnimation()
+        playPresentAnimationIfNeeded()
     }
 
     private func setupViews() {
@@ -65,6 +84,9 @@ final class AIAgentPickerSheet: UIViewController {
         optionsGroupView.backgroundColor = colors.bgColorOperate
         optionsGroupView.layer.cornerRadius = Self.panelCornerRadius
         optionsGroupView.clipsToBounds = true
+        optionsScrollView.showsVerticalScrollIndicator = true
+        optionsScrollView.alwaysBounceVertical = false
+        optionsScrollView.contentInsetAdjustmentBehavior = .never
 
         cancelButton.backgroundColor = colors.bgColorOperate
         cancelButton.layer.cornerRadius = Self.panelCornerRadius
@@ -77,7 +99,8 @@ final class AIAgentPickerSheet: UIViewController {
         view.addSubview(dimView)
         view.addSubview(contentView)
         contentView.addSubview(optionsGroupView)
-        optionsGroupView.addSubview(optionsContentView)
+        optionsGroupView.addSubview(optionsScrollView)
+        optionsScrollView.addSubview(optionsContentView)
         contentView.addSubview(cancelButton)
         buildOptionRows()
     }
@@ -85,11 +108,11 @@ final class AIAgentPickerSheet: UIViewController {
     private func buildOptionRows() {
         let colors = TUIChatKitTheme.colors
         var previousRow: UIView?
-        for (index, name) in agentNames.enumerated() {
+        for (index, option) in options.enumerated() {
             let row = UIButton(type: .custom)
             row.tag = index
-            row.setTitle(name, for: .normal)
-            row.setTitleColor(colors.textColorLink, for: .normal)
+            row.setTitle(option.title, for: .normal)
+            row.setTitleColor(option.isDangerous ? colors.textColorError : colors.textColorLink, for: .normal)
             row.titleLabel?.font = .systemFont(ofSize: Self.titleFontSize)
             row.addTarget(self, action: #selector(handleOptionTapped(_:)), for: .touchUpInside)
             optionsContentView.addSubview(row)
@@ -127,24 +150,49 @@ final class AIAgentPickerSheet: UIViewController {
         }
         contentView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(Self.horizontalMargin)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-Self.bottomMargin)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-Self.bottomMargin)
+            make.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.top)
         }
         optionsGroupView.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
         }
-        optionsContentView.snp.makeConstraints { make in
+        optionsScrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        optionsContentView.snp.makeConstraints { make in
+            make.edges.equalTo(optionsScrollView.contentLayoutGuide)
+            make.width.equalTo(optionsScrollView.frameLayoutGuide)
         }
         cancelButton.snp.makeConstraints { make in
             make.top.equalTo(optionsGroupView.snp.bottom).offset(Self.groupSpacing)
-            make.leading.trailing.equalToSuperview()
+            make.leading.trailing.bottom.equalToSuperview()
             make.height.equalTo(Self.rowHeight)
-            make.bottom.equalToSuperview()
         }
     }
 
-    private func playPresentAnimation() {
-        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
+    private func applyMaxHeightLimit() {
+        let availableHeight = view.bounds.height
+            - view.safeAreaInsets.top
+            - view.safeAreaInsets.bottom
+            - Self.bottomMargin
+        let cancelAreaHeight = Self.rowHeight + Self.groupSpacing
+        let maxOptionsHeight = min(
+            view.bounds.height * Self.maxPanelRatio,
+            availableHeight - cancelAreaHeight
+        )
+        guard maxOptionsHeight > 0 else { return }
+        let contentHeight = CGFloat(options.count) * Self.rowHeight
+        optionsGroupView.snp.remakeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.height.equalTo(contentHeight).priority(.high)
+            make.height.lessThanOrEqualTo(maxOptionsHeight)
+        }
+    }
+
+    private func playPresentAnimationIfNeeded() {
+        guard dimView.alpha == 0 else { return }
+        view.layoutIfNeeded()
+        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height + Self.bottomMargin)
         UIView.animate(withDuration: Self.animationDuration) {
             self.dimView.alpha = 1
             self.contentView.transform = .identity
@@ -153,12 +201,27 @@ final class AIAgentPickerSheet: UIViewController {
 
     @objc private func handleOptionTapped(_ sender: UIButton) {
         let index = sender.tag
-        dismiss(animated: false) { [onSelect] in
-            onSelect(index)
+        guard index >= 0, index < options.count else { return }
+        dismissPanel { [weak self] in
+            self?.onSelect(index)
         }
     }
 
     @objc private func handleDismiss() {
-        dismiss(animated: false)
+        dismissPanel(completion: nil)
+    }
+
+    private func dismissPanel(completion: (() -> Void)?) {
+        UIView.animate(withDuration: Self.animationDuration) {
+            self.dimView.alpha = 0
+            self.contentView.transform = CGAffineTransform(
+                translationX: 0,
+                y: self.contentView.bounds.height + Self.bottomMargin
+            )
+        } completion: { _ in
+            self.dismiss(animated: false) {
+                completion?()
+            }
+        }
     }
 }

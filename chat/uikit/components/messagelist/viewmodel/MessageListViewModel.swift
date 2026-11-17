@@ -25,7 +25,7 @@ final class MessageListViewModel {
 
     let conversationID: String
 
-    let config: MessageListConfigProtocol & MessageActionConfigProtocol
+    let config: ChatMessageListConfig
 
     let locateMessage: MessageInfo?
 
@@ -108,7 +108,7 @@ final class MessageListViewModel {
     // MARK: - Init
 
     init(conversationID: String,
-         config: MessageListConfigProtocol & MessageActionConfigProtocol = ChatMessageListConfig(),
+         config: ChatMessageListConfig = ChatMessageListConfig(),
          locateMessage: MessageInfo? = nil,
          chatbotController: ChatbotConversationController? = nil,
          conversationStore: ConversationListStore = ConversationListStore.create()) {
@@ -287,8 +287,8 @@ final class MessageListViewModel {
 
     func makeMergedForwardInfo(messages: [MessageInfo]) -> MergedForwardInfo {
         var info = MergedForwardInfo()
-        info.title = MessageListHelper.generateMergedTitle(messages: messages, conversationID: conversationID)
-        info.abstractList = MessageListHelper.generateAbstractList(messages: messages)
+        info.title = MessageDisplayHelper.generateMergedTitle(messages: messages, conversationID: conversationID)
+        info.abstractList = MessageDisplayHelper.generateAbstractList(messages: messages)
         info.compatibleText = "Merged messages"
         return info
     }
@@ -526,7 +526,7 @@ final class MessageListViewModel {
 
         // 等待机器人回复期间，在列表最新端补一条「AI 正在输入」气泡。
         // 这条消息只存在于展示列表：不进本地库、不参与登录同步。
-        let chatbotPlaceholderTimestamp = config.enableChatbotReplyPlaceholder
+        let chatbotPlaceholderTimestamp = config._enableChatbotReplyPlaceholder
             ? chatbotController?.placeholderTimestampSeconds(baseMessages) : nil
         chatbotPlaceholderDeferred = chatbotPlaceholderTimestamp != nil && isLastInboundMessageRevealing(baseMessages)
         if let controller = chatbotController,

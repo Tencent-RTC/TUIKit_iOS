@@ -22,40 +22,41 @@ enum MessageActionMenuProvider {
 
     static func visibleActions(
         for message: MessageInfo,
-        config: MessageListConfigProtocol & MessageActionConfigProtocol,
+        config: ChatMessageListConfig,
         conversationID: String,
-        auxiliaryHiddenIDs: Set<String> = []
+        auxiliaryHiddenIDs: Set<String> = [],
+        source: AnyObject? = nil
     ) -> [MessageActionMenuAction] {
         var actions: [MessageActionMenuAction] = []
 
-        if config.isSupportCopy, canCopy(message) {
+        if config._isSupportCopy, canCopy(message) {
             actions.append(copyAction())
         }
-        if config.isSupportForward, canForward(message) {
-            actions.append(forwardAction())
+        if config._isSupportForward, canForward(message) {
+            actions.append(forwardAction(source: source))
         }
         if canQuote(message, config: config) {
             actions.append(quoteAction(conversationID: conversationID))
         }
-        if config.isSupportMultiSelect {
-            actions.append(multiSelectAction())
+        if config._isSupportMultiSelect {
+            actions.append(multiSelectAction(source: source))
         }
-        if config.isSupportDelete {
-            actions.append(deleteAction())
+        if config._isSupportDelete {
+            actions.append(deleteAction(source: source))
         }
-        if config.isSupportRecall, canRecall(message) {
+        if config._isSupportRecall, canRecall(message) {
             actions.append(recallAction())
         }
-        if config.isSupportConvertToText, canConvertToText(message, auxiliaryHiddenIDs: auxiliaryHiddenIDs) {
-            actions.append(convertToTextAction())
+        if config._isSupportConvertToText, canConvertToText(message, auxiliaryHiddenIDs: auxiliaryHiddenIDs) {
+            actions.append(convertToTextAction(source: source))
         }
-        if config.isSupportTranslate, canTranslate(message, auxiliaryHiddenIDs: auxiliaryHiddenIDs) {
-            actions.append(translateAction())
+        if config._isSupportTranslate, canTranslate(message, auxiliaryHiddenIDs: auxiliaryHiddenIDs) {
+            actions.append(translateAction(source: source))
         }
-        if config.isSupportListenFromHere {
-            actions.append(listenFromHereAction())
+        if config._isSupportListenFromHere {
+            actions.append(listenFromHereAction(source: source))
         }
-        if let customizer = config.actionCustomizer {
+        if let customizer = config._actionCustomizer {
             let editor = CustomEditor(items: actions)
             customizer(editor)
             return editor.build()
@@ -70,9 +71,9 @@ enum MessageActionMenuProvider {
     }
 
     private static func canQuote(_ message: MessageInfo,
-                                 config: MessageListConfigProtocol) -> Bool {
+                                 config: ChatMessageListConfig) -> Bool {
 
-        return config.isSupportQuote && message.status == .sendSuccess
+        return config._isSupportQuote && message.status == .sendSuccess
     }
 
     private static func canForward(_ message: MessageInfo) -> Bool {
@@ -142,7 +143,7 @@ enum MessageActionMenuProvider {
         }
     }
 
-    private static func forwardAction() -> MessageActionMenuAction {
+    private static func forwardAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.forward,
             iconName: "message_forward",
@@ -151,13 +152,13 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("showForwardTargetSelector"),
-                object: nil,
+                object: source,
                 userInfo: ["messages": [message]]
             )
         }
     }
 
-    private static func convertToTextAction() -> MessageActionMenuAction {
+    private static func convertToTextAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.convertToText,
             iconName: "message_convert",
@@ -166,13 +167,13 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("convertVoiceToText"),
-                object: nil,
+                object: source,
                 userInfo: ["message": message]
             )
         }
     }
 
-    private static func translateAction() -> MessageActionMenuAction {
+    private static func translateAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.translate,
             iconName: "message_translate",
@@ -181,7 +182,7 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("translateTextMessage"),
-                object: nil,
+                object: source,
                 userInfo: ["message": message]
             )
         }
@@ -198,7 +199,7 @@ enum MessageActionMenuProvider {
         }
     }
 
-    private static func multiSelectAction() -> MessageActionMenuAction {
+    private static func multiSelectAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.multiSelect,
             iconName: "message_multiselect",
@@ -207,13 +208,13 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("enterMultiSelectMode"),
-                object: nil,
+                object: source,
                 userInfo: ["initialMessage": message]
             )
         }
     }
 
-    private static func listenFromHereAction() -> MessageActionMenuAction {
+    private static func listenFromHereAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.listenFromHere,
             iconName: "message_listen_from_here",
@@ -222,13 +223,13 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("listenFromHereNotification"),
-                object: nil,
+                object: source,
                 userInfo: ["message": message]
             )
         }
     }
 
-    private static func deleteAction() -> MessageActionMenuAction {
+    private static func deleteAction(source: AnyObject?) -> MessageActionMenuAction {
         MessageActionMenuAction(
             ID: MessageActionIDs.delete,
             iconName: "message_delete",
@@ -238,7 +239,7 @@ enum MessageActionMenuProvider {
         ) { message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("deleteMessageNotification"),
-                object: nil,
+                object: source,
                 userInfo: ["message": message]
             )
         }

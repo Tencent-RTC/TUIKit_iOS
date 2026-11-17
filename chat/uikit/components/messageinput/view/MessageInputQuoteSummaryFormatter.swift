@@ -19,7 +19,7 @@ enum MessageInputQuoteSummaryFormatter {
         case .file(let filePayload):
             return filePayload.fileName ?? LocalizedChatString("MessageTypeFile")
         case .merged:
-            return LocalizedChatString("MessageTypeMerged")
+            return LocalizedChatString("MessageTypeMergedHistory")
         case .face(let facePayload):
             return facePayload.faceData ?? LocalizedChatString("MessageTypeCustom")
         case .custom(let payload):

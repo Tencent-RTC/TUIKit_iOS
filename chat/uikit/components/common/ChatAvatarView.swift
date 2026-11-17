@@ -41,6 +41,8 @@ public enum ChatAvatarSize {
 public final class ChatAvatarView: UIView {
     private let imageView = UIImageView()
 
+    private var displayedAvatarURL: String?
+
     private let textLabel = UILabel()
 
     // MARK: - Init
@@ -79,8 +81,11 @@ public final class ChatAvatarView: UIView {
     // MARK: - Configure
 
     public func configure(avatarURL: String?, fallbackName: String) {
-        imageView.kf.cancelDownloadTask()
         let urlString = avatarURL ?? ""
+        if !urlString.isEmpty, urlString == displayedAvatarURL, !imageView.isHidden, imageView.image != nil {
+            return
+        }
+        imageView.kf.cancelDownloadTask()
         if urlString.isEmpty {
             showTextAvatar(name: fallbackName)
         } else {
@@ -91,6 +96,7 @@ public final class ChatAvatarView: UIView {
     func reset() {
         imageView.kf.cancelDownloadTask()
         imageView.image = nil
+        displayedAvatarURL = nil
         imageView.isHidden = true
         textLabel.text = nil
         textLabel.isHidden = false
@@ -101,6 +107,7 @@ public final class ChatAvatarView: UIView {
     private func showTextAvatar(name: String) {
         imageView.isHidden = true
         imageView.image = nil
+        displayedAvatarURL = nil
         textLabel.isHidden = false
         textLabel.text = name.first.map { String($0).uppercased() } ?? ""
     }
@@ -108,6 +115,7 @@ public final class ChatAvatarView: UIView {
     private func loadImageAvatar(urlString: String, fallbackName: String) {
         textLabel.isHidden = true
         imageView.isHidden = false
+        displayedAvatarURL = urlString
         imageView.kf.setImage(with: URL(string: urlString)) { [weak self] result in
             guard let self else { return }
             if case .failure = result {

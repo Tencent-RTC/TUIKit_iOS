@@ -124,6 +124,7 @@ final internal class ContactSearchBarView: UIView {
 
         textField.font = FontScheme.caption2Regular
         textField.textColor = colors.textColorPrimary
+        textField.textAlignment = LanguageHelper.isRTL ? .right : .left
         applyPlaceholder()
         textField.clearButtonMode = .never
         textField.returnKeyType = .search

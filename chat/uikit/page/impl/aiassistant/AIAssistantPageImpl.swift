@@ -115,10 +115,11 @@ internal final class AIAssistantPageImpl: PageImplementation {
             make.centerY.equalTo(headerView.snp.bottom).offset(-Self.headerHeight / 2)
             make.leading.greaterThanOrEqualToSuperview().offset(Self.headerHorizontalInset)
             make.trailing.lessThanOrEqualTo(callButton.snp.leading).offset(-Self.headerHorizontalInset)
+            make.height.equalTo(Self.headerHeight)
         }
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview()
-            make.centerY.equalToSuperview()
+            make.top.bottom.equalToSuperview()
             make.width.lessThanOrEqualTo(Self.titleMaxWidth)
         }
         dropdownImageView.snp.makeConstraints { make in
@@ -307,7 +308,7 @@ internal final class AIAssistantPageImpl: PageImplementation {
 
     private func showAgentPicker() {
         guard agents.count > 1 else { return }
-        let sheet = AIAgentPickerSheet(agentNames: agents.map { $0.displayName }) { [weak self] index in
+        let sheet = BottomOptionSheetPanel(options: agents.map { BottomOptionSheetPanel.Option(title: $0.displayName) }) { [weak self] index in
             guard let self = self, self.agents.indices.contains(index) else { return }
             self.bindAgent(self.agents[index])
         }

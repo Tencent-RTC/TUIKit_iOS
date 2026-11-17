@@ -2,6 +2,9 @@ import UIKit
 
 extension ChatMessageInputConfig {
     static let defaultAudioMaxRecordDurationMs = 60_000
+    static let defaultAlbumMaxSelectionCount = 9
+    static let defaultAlbumMaxVideoDurationInSeconds = 600
+    static let defaultAlbumMaxVideoOutputSizeInMB = 100
 
     public init(
         isShowAudioRecorder: Bool? = nil,
@@ -18,126 +21,137 @@ extension ChatMessageInputConfig {
         audioMaxRecordDurationMs: Int? = nil,
         enableRealtimeVoiceToText: Bool? = nil,
         realtimeVoiceToTextLanguage: String? = nil,
-        actionCustomizer: MessageInputActionCustomizer? = nil,
+        actionCustomizer: ((CustomEditor<MessageInputMenuAction>) -> Void)? = nil,
         enableSendRecordedVoice: Bool? = nil,
         keepSendButtonVisible: Bool? = nil,
         appearance: MessageInputAppearance? = nil,
-        enableVoiceprintDenoise: Bool? = nil
+        enableVoiceprintDenoise: Bool? = nil,
+        albumMaxSelectionCount: Int? = nil,
+        albumMediaFilter: MessageInputAlbumMediaFilter? = nil,
+        albumCompressQuality: MessageInputAlbumCompressQuality? = nil,
+        albumMaxVideoDurationInSeconds: Int? = nil,
+        albumMaxVideoOutputSizeInMB: Int? = nil
     ) {
-        self.userIsShowAudioRecorder = isShowAudioRecorder
-        self.userIsShowPhotoTaker = isShowPhotoTaker
-        self.userIsShowMore = isShowMore
-        self.userIsShowSendButton = isShowSendButton
-        self.userIsShowEmoji = isShowEmoji
-        self.userEnableReadReceipt = enableReadReceipt
-        self.userEnableMention = enableMention
-        self.userEnableLongPressToTalk = enableLongPressToTalk
-        self.userIsShowVideoCall = isShowVideoCall
-        self.userIsShowAudioCall = isShowAudioCall
-        self.userEnableTyping = enableTyping
-        self.userAudioMaxRecordDurationMs = audioMaxRecordDurationMs
-        self.userEnableRealtimeVoiceToText = enableRealtimeVoiceToText
-        self.userRealtimeVoiceToTextLanguage = realtimeVoiceToTextLanguage
-        self.userActionCustomizer = actionCustomizer
-        self.userEnableSendRecordedVoice = enableSendRecordedVoice
-        self.userKeepSendButtonVisible = keepSendButtonVisible
-        self.userAppearance = appearance
-        self.userEnableVoiceprintDenoise = enableVoiceprintDenoise
+        self.isShowAudioRecorder = isShowAudioRecorder
+        self.isShowPhotoTaker = isShowPhotoTaker
+        self.isShowMore = isShowMore
+        self.isShowSendButton = isShowSendButton
+        self.isShowEmoji = isShowEmoji
+        self.enableReadReceipt = enableReadReceipt
+        self.enableMention = enableMention
+        self.enableLongPressToTalk = enableLongPressToTalk
+        self.isShowVideoCall = isShowVideoCall
+        self.isShowAudioCall = isShowAudioCall
+        self.enableTyping = enableTyping
+        self.audioMaxRecordDurationMs = audioMaxRecordDurationMs
+        self.enableRealtimeVoiceToText = enableRealtimeVoiceToText
+        self.realtimeVoiceToTextLanguage = realtimeVoiceToTextLanguage
+        self.actionCustomizer = actionCustomizer
+        self.enableSendRecordedVoice = enableSendRecordedVoice
+        self.keepSendButtonVisible = keepSendButtonVisible
+        self.appearance = appearance
+        self.enableVoiceprintDenoise = enableVoiceprintDenoise
+        self.albumMaxSelectionCount = albumMaxSelectionCount
+        self.albumMediaFilter = albumMediaFilter
+        self.albumCompressQuality = albumCompressQuality
+        self.albumMaxVideoDurationInSeconds = albumMaxVideoDurationInSeconds
+        self.albumMaxVideoOutputSizeInMB = albumMaxVideoOutputSizeInMB
     }
 
-    public var isShowAudioRecorder: Bool {
-        get { userIsShowAudioRecorder ?? true }
-        set { userIsShowAudioRecorder = newValue }
+    var _isShowAudioRecorder: Bool {
+        isShowAudioRecorder ?? true
     }
 
-    public var isShowPhotoTaker: Bool {
-        get { userIsShowPhotoTaker ?? true }
-        set { userIsShowPhotoTaker = newValue }
+    var _isShowPhotoTaker: Bool {
+        isShowPhotoTaker ?? true
     }
 
-    public var isShowMore: Bool {
-        get { userIsShowMore ?? true }
-        set { userIsShowMore = newValue }
+    var _isShowMore: Bool {
+        isShowMore ?? true
     }
 
-    public var isShowSendButton: Bool {
-        get { userIsShowSendButton ?? !AppBuilderConfig.shared.hideSendButton }
-        set { userIsShowSendButton = newValue }
+    var _isShowSendButton: Bool {
+        isShowSendButton ?? !AppBuilderConfig.shared.hideSendButton
     }
 
-    public var isShowEmoji: Bool {
-        get { userIsShowEmoji ?? true }
-        set { userIsShowEmoji = newValue }
+    var _isShowEmoji: Bool {
+        isShowEmoji ?? true
     }
 
-    public var enableReadReceipt: Bool {
-        get { userEnableReadReceipt ?? AppBuilderConfig.shared.enableReadReceipt }
-        set { userEnableReadReceipt = newValue }
+    var _enableReadReceipt: Bool {
+        enableReadReceipt ?? AppBuilderConfig.shared.enableReadReceipt
     }
 
-    public var enableMention: Bool {
-        get { userEnableMention ?? true }
-        set { userEnableMention = newValue }
+    var _enableMention: Bool {
+        enableMention ?? true
     }
 
-    public var enableLongPressToTalk: Bool {
-        get { userEnableLongPressToTalk ?? true }
-        set { userEnableLongPressToTalk = newValue }
+    var _enableLongPressToTalk: Bool {
+        enableLongPressToTalk ?? true
     }
 
-    public var isShowVideoCall: Bool {
-        get { userIsShowVideoCall ?? true }
-        set { userIsShowVideoCall = newValue }
+    var _isShowVideoCall: Bool {
+        isShowVideoCall ?? true
     }
 
-    public var isShowAudioCall: Bool {
-        get { userIsShowAudioCall ?? true }
-        set { userIsShowAudioCall = newValue }
+    var _isShowAudioCall: Bool {
+        isShowAudioCall ?? true
     }
 
-    public var enableTyping: Bool {
-        get { userEnableTyping ?? true }
-        set { userEnableTyping = newValue }
+    var _enableTyping: Bool {
+        enableTyping ?? true
     }
 
-    public var audioMaxRecordDurationMs: Int {
-        get { userAudioMaxRecordDurationMs ?? Self.defaultAudioMaxRecordDurationMs }
-        set { userAudioMaxRecordDurationMs = newValue }
+    var _audioMaxRecordDurationMs: Int {
+        audioMaxRecordDurationMs ?? Self.defaultAudioMaxRecordDurationMs
     }
 
-    public var enableRealtimeVoiceToText: Bool {
-        get { userEnableRealtimeVoiceToText ?? true }
-        set { userEnableRealtimeVoiceToText = newValue }
+    var _enableRealtimeVoiceToText: Bool {
+        enableRealtimeVoiceToText ?? true
     }
 
-    public var enableVoiceprintDenoise: Bool {
-        get { userEnableVoiceprintDenoise ?? false }
-        set { userEnableVoiceprintDenoise = newValue }
+    var _enableVoiceprintDenoise: Bool {
+        enableVoiceprintDenoise ?? false
     }
 
-    public var realtimeVoiceToTextLanguage: String {
-        get { userRealtimeVoiceToTextLanguage ?? Locale.current.languageCode ?? "zh" }
-        set { userRealtimeVoiceToTextLanguage = newValue }
+    var _realtimeVoiceToTextLanguage: String {
+        realtimeVoiceToTextLanguage ?? Locale.current.languageCode ?? "zh"
     }
 
     /// 允许发送原录音，默认 true。false 时按住转文字、上滑取消；非实时识别在松手后转换并自动发送。
-    public var enableSendRecordedVoice: Bool {
-        get { userEnableSendRecordedVoice ?? true }
-        set { userEnableSendRecordedVoice = newValue }
+    var _enableSendRecordedVoice: Bool {
+        enableSendRecordedVoice ?? true
     }
 
-    public var keepSendButtonVisible: Bool {
-        get { userKeepSendButtonVisible ?? false }
-        set { userKeepSendButtonVisible = newValue }
+    var _keepSendButtonVisible: Bool {
+        keepSendButtonVisible ?? false
     }
 
-    public var appearance: MessageInputAppearance? {
-        get { userAppearance }
-        set { userAppearance = newValue }
+    var _appearance: MessageInputAppearance? {
+        appearance
     }
 
-    public var actionCustomizer: MessageInputActionCustomizer? {
-        get { userActionCustomizer }
-        set { userActionCustomizer = newValue }
+    var _actionCustomizer: ((CustomEditor<MessageInputMenuAction>) -> Void)? {
+        actionCustomizer
+    }
+
+    var _albumMaxSelectionCount: Int {
+        max(albumMaxSelectionCount ?? Self.defaultAlbumMaxSelectionCount, 1)
+    }
+
+    var _albumMediaFilter: MessageInputAlbumMediaFilter {
+        albumMediaFilter ?? .imageAndVideo
+    }
+
+    var _albumCompressQuality: MessageInputAlbumCompressQuality {
+        albumCompressQuality ?? .standard
+    }
+
+    var _albumMaxVideoDurationInSeconds: Int {
+        max(albumMaxVideoDurationInSeconds ?? Self.defaultAlbumMaxVideoDurationInSeconds, 1)
+    }
+
+    var _albumMaxVideoOutputSizeInMB: Int {
+        max(albumMaxVideoOutputSizeInMB ?? Self.defaultAlbumMaxVideoOutputSizeInMB, 1)
     }
 }

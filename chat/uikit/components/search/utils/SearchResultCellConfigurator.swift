@@ -61,7 +61,7 @@ enum SearchResultCellConfigurator {
             )
         } else {
             let abstract = item.messageList.first.map {
-                MessageListHelper.getMessageAbstract($0, showMergedTitle: true)
+                MessageDisplayHelper.getMessageAbstract($0, showMergedTitle: true)
             } ?? ""
             if abstract.contains("[TUIEmoji_") {
                 subtitle = SearchHighlightBuilder.attributedTextWithEmoji(

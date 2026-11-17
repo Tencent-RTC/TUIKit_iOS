@@ -34,15 +34,15 @@
 "Make_a_call" = "إجراء مكالمة";
 "Done" = "تم";
 "All" = "الجميع";
-"Agreed" = "\u200Fموافق عليه\u200F";
-"Disclined" = "\u200Fمرفوض\u200F";
-"Agree" = "\u200Fموافق\u200F";
+"Agreed" = "\U200Fموافق عليه\U200F";
+"Disclined" = "\U200Fمرفوض\U200F";
+"Agree" = "\U200Fموافق\U200F";
 "Have_been_sent" = "تم الإرسال";
 "OK" = "موافق";
 "None" = "لا شيء";
 "Alia" = "ملاحظة";
 "Group" = "مجموعة";
-"Accept" = "\u200Fموافق\u200F";
+"Accept" = "\U200Fموافق\U200F";
 "Decline" = "رفض";
 "send_success" = "تم الإرسال بنجاح";
 "add_success" = "تمت الإضافة بنجاح";
@@ -78,7 +78,7 @@
 "GroupJoin" = "إضافة مجموعة";
 "GroupRequestJoinGroupFormat" = "%@ يطلب الانضمام إلى المحادثة الجماعية";
 "GroupDeleteFriend" = "حذف جهة الاتصال";
-"GroupAddFirend" = "\u200Fإضافة جهة اتصال\u200F";
+"GroupAddFirend" = "\U200Fإضافة جهة اتصال\U200F";
 "GroupAddMembers" = "إضافة أعضاء إلى المجموعة";
 "GroupRemoveMembers" = "إزالة العضو";
 "GroupMember" = "أعضاء المجموعة";
@@ -90,7 +90,7 @@
 "ProfileDeleteFirend" = "حذف الصديق";
 "ProfileEditAlia" = "تعديل ملاحظة جهة الاتصال";
 "ProfileContactInfo" = "معلومات جهة الاتصال";
-"ProfileUserID" = "\u200Fمعرف المستخدم\u200F";
+"ProfileUserID" = "\U200Fمعرف المستخدم\U200F";
 "ProfileSignaturePrefix" = "التوقيع: ";
 "ClearContactHistoryTips" = "تأكيد حذف سجل الدردشة مع جهة الاتصال هذه";
 "DeleteFriendConfirmTips" = "تأكيد حذف هذا الصديق";
@@ -106,7 +106,7 @@
 "CallSwitchToAudio" = "التبديل إلى مكالمة صوتية";
 "CallSwitchToAudioAccept" = "تأكيد التحويل من الفيديو إلى الصوت";
 "CallRejectCaller" = "رفض المستخدم المكالمة";
-"CallRejectCallee" = "\u200Fمرفوض\u200F";
+"CallRejectCallee" = "\U200Fمرفوض\U200F";
 "CallCancelCaller" = "تم الإلغاء";
 "CallCancelCallee" = "ألغى المتصل المكالمة";
 "CallTimeoutCaller" = "لم يتم الرد على المكالمة";
@@ -138,7 +138,7 @@
 "ProfilePhoto" = "الصورة الرمزية";
 "ProfileName" = "الاسم المستعار";
 "ProfileAccount" = "الحساب";
-"ProfileSignature" = "\u200Fالتوقيع\u200F";
+"ProfileSignature" = "\U200Fالتوقيع\U200F";
 "ProfileGender" = "النوع";
 "ProfileEditName" = "تعديل الاسم المستعار";
 "ProfileEditNameDesc" = "الصينية فقط والحروف والأرقام والشرطات السفلية";
@@ -240,7 +240,7 @@
 "GroupTransferOwner" = "نقل الملكية";
 "GroupTransferOwnerSuccess" = "تم نقل ملكية المجموعة بنجاح";
 "GroupTransferOwnerConfirmTips" = "تأكيد نقل ملكية المجموعة";
-"GroupApplicant" = "\u200Fطلبات المجموعة\u200F";
+"GroupApplicant" = "\U200Fطلبات المجموعة\U200F";
 "GroupDismssTipsFormat" = "تم حل مجموعة %@";
 "GroupRecycledTipsFormat" = "تم إعادة تدوير مجموعة %@";
 "GroupKickOffTipsFormat" = "تم طردك من مجموعة %@";
@@ -309,7 +309,7 @@
 "MessageReadPartUnread" = "غير مقروء";
 "MessageReadPartDisable" = "بدون حالة";
 "MessageReadAllRead" = "تمت القراءة من الجميع";
-"MessageReactionUserSuffix" = "\u200Fو%1$d آخرين\u200F";
+"MessageReactionUserSuffix" = "\U200Fو%1$d آخرين\U200F";
 "MessageReadC2CRead" = "مقروء";
 "MessageReadC2CUnRead" = "غير مقروء";
 "MessageReadC2CUnReadDetail" = "لم يتم القراءة بعد";
@@ -553,7 +553,7 @@
 "ChooseBackgroundSuccess" = "تم التعيين بنجاح!";
 "ChooseBackgroundFailed" = "فشل التعيين!";
 "ContactNoNewApplicationRequest" = "لا توجد طلبات صداقة جديدة حاليًا";
-"ContactNoGroupChats" = "\u200Fلا توجد مجموعات\u200F";
+"ContactNoGroupChats" = "\U200Fلا توجد مجموعات\U200F";
 "ContactNoBlacklistUsers" = "لا يوجد مستخدمون في القائمة السوداء";
 "SearchBlacklistUserNotFound" = "لم يتم العثور على مستخدمين ذوي صلة في القائمة السوداء";
 "SearchGroupNotFound" = "لم يتم العثور على مجموعات ذات صلة";
@@ -575,16 +575,16 @@
 "CreatGroupID" = "معرف المجموعة (اختياري)";
 "CreatGroupNamed_Placeholder" = "أدخل اسم المجموعة";
 "CreatGroupID_Placeholder" = "أدخل معرف المجموعة";
-"CreatGroupAvatar" = "\u200Fصورة رمزية للمجموعة\u200F";
+"CreatGroupAvatar" = "\U200Fصورة رمزية للمجموعة\U200F";
 "CreatGroupType" = "نوع المجموعة";
-"CreatGroupType_Work" = "\u200Fمجموعة عمل الأصدقاء (Work)\u200F";
+"CreatGroupType_Work" = "\U200Fمجموعة عمل الأصدقاء (Work)\U200F";
 "CreatGroupType_Public" = "مجموعة تواصل مع غرباء (Public)";
 "CreatGroupType_Meeting" = "مجموعة اجتماع مؤقتة (Meeting)";
-"CreatGroupType_Community" = "\u200Fمجتمع (Community)\u200F";
-"CreatGroupType_Work_Desc" = "\u200Fمجموعة عمل الأصدقاء (Work): تشبه محادثات WeChat العادية، بعد الإنشاء، يمكن للأصدقاء الموجودين في المجموعة دعوة أصدقائهم للانضمام دون الحاجة إلى موافقة المضافين أو الموافقة من قبل مالك المجموعة.\u200F";
-"CreatGroupType_Public_Desc" = "\u200Fمجموعة تواصل الغرباء (Public): تشبه مجموعات QQ، بعد الإنشاء، يمكن لمالك المجموعة تعيين مشرفين للمجموعة، عندما يبحث المستخدمون عن معرف المجموعة ويطلبون الانضمام، يجب عليهم الحصول على موافقة من مالك المجموعة أو المشرفين قبل الانضمام إلى المجموعة.\u200F";
-"CreatGroupType_Meeting_Desc" = "\u200Fمجموعة اجتماعات مؤقتة (Meeting): بعد الإنشاء، يمكن للمستخدمين الانضمام والخروج من المجموعة بحرية، ويمكنهم عرض الرسائل قبل الانضمام إلى المجموعة.\u200F";
-"CreatGroupType_Community_Desc" = "\u200Fالمجتمع (Community): بعد الإنشاء يمكن الدخول والخروج بحرية، يدعم حتى 100000 شخص، يدعم تخزين الرسائل السابقة، بعد البحث عن معرف المجموعة وإرسال طلب الانضمام، يمكن الانضمام إلى المجموعة دون حاجة لموافقة المشرف.\u200F";
+"CreatGroupType_Community" = "\U200Fمجتمع (Community)\U200F";
+"CreatGroupType_Work_Desc" = "\U200Fمجموعة عمل الأصدقاء (Work): تشبه محادثات WeChat العادية، بعد الإنشاء، يمكن للأصدقاء الموجودين في المجموعة دعوة أصدقائهم للانضمام دون الحاجة إلى موافقة المضافين أو الموافقة من قبل مالك المجموعة.\U200F";
+"CreatGroupType_Public_Desc" = "\U200Fمجموعة تواصل الغرباء (Public): تشبه مجموعات QQ، بعد الإنشاء، يمكن لمالك المجموعة تعيين مشرفين للمجموعة، عندما يبحث المستخدمون عن معرف المجموعة ويطلبون الانضمام، يجب عليهم الحصول على موافقة من مالك المجموعة أو المشرفين قبل الانضمام إلى المجموعة.\U200F";
+"CreatGroupType_Meeting_Desc" = "\U200Fمجموعة اجتماعات مؤقتة (Meeting): بعد الإنشاء، يمكن للمستخدمين الانضمام والخروج من المجموعة بحرية، ويمكنهم عرض الرسائل قبل الانضمام إلى المجموعة.\U200F";
+"CreatGroupType_Community_Desc" = "\U200Fالمجتمع (Community): بعد الإنشاء يمكن الدخول والخروج بحرية، يدعم حتى 100000 شخص، يدعم تخزين الرسائل السابقة، بعد البحث عن معرف المجموعة وإرسال طلب الانضمام، يمكن الانضمام إلى المجموعة دون حاجة لموافقة المشرف.\U200F";
 "CreatGroupType_See_Doc" = "انظر الوثائق المنتج";
 "CreatGroupType_Desc_Highlight" = "وثائق المنتج";
 "CreatGroupType_See_Doc_Simple" = "عرض وثائق المنتج";
@@ -610,7 +610,7 @@
 "MembersRoleAdmin" = "مشرف";
 "MembersRoleSuper" = "مالك المجموعة";
 "CreateCancel" = "إلغاء";
-"CreateNext" = "\u200Fالخطوة التالية\u200F";
+"CreateNext" = "\U200Fالخطوة التالية\U200F";
 "CreateFinish" = "إنشاء";
 "CreateMemebers" = "الأعضاء المحددين في المجموعة";
 "DateToday" = "اليوم";
@@ -924,6 +924,13 @@
 "AboutDisclaimer" = "إخلاء المسؤولية";
 "AboutPersonalInformationCollectionList" = "قائمة المعلومات الشخصية المجمّعة";
 "About3PartySharingList" = "قائمة المعلومات المشتركة مع أطراف ثالثة";
+"AboutCloseAccount" = "إلغاء الحساب";
+"AboutCloseAccountDescribe" = "بعد إلغاء هذا الحساب، لن تتمكن من استخدامه، وسيتم حذف البيانات ذات الصلة بشكل دائم. الحساب الحالي: %@";
+"AboutCloseAccountAlterMsg" = "هل أنت متأكد أنك تريد إلغاء هذا الحساب؟";
+"AboutCloseAccountAlterAction" = "تأكيد";
+"AboutCloseAccountNoToken" = "فشل إلغاء الحساب. لم يتم اكتشاف رمز أو رقم هاتف محمول مرتبط بالحساب الحالي. يرجى تسجيل الدخول باستخدام رقم هاتفك.";
+"AboutCloseAccountSuccessful" = "تم إلغاء الحساب بنجاح";
+"AboutCloseAccountFailedWithError" = "فشل إلغاء الحساب\nerrorCode: %ld, errorMsg: %@";
 "AboutDisclaimerText" = "تطبيق Tencent Cloud Chat (\"هذا المنتج\") هو منتج تجريبي مقدّم من Tencent Cloud، وتملك Tencent Cloud حقوق النشر والملكية لهذا المنتج. يُستخدم هذا المنتج فقط لتجربة الوظائف ولا يجوز استخدامه لأي أغراض تجارية. وامتثالاً للمتطلبات التنظيمية للجهات المعنية، يُمنع منعاً باتاً نشر أي محتوى إباحي أو مسيء أو عنيف أو سياسي مخالف للقانون أثناء الاستخدام.";
 
 "ConfigGroupNameLabel" = "اسم المجموعة";
@@ -931,7 +938,7 @@
 "ConfigGroupIDOptionalHint" = "معرف المجموعة (اختياري)";
 "ConfigSelectGroupTypeTitle" = "اختر نوع المجموعة";
 "ConfigGroupNameSuffix" = "و%zd آخرين";"ConfigGroupNameSeparator" = "، ";
-"message_input_send" = "\u200Fإرسال\u200F";
+"message_input_send" = "\U200Fإرسال\U200F";
 "message_input_send_original_voice" = "إرسال الصوت";
 "message_input_voice_transcription_empty" = "لم يتم التعرف على أي نص";
 "voice_message_read_aloud" = "قراءة بصوت عالٍ";

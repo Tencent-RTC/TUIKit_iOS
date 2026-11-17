@@ -29,7 +29,7 @@ final class MessageInputMorePanel: UIView {
         }
     }
 
-    private let config: MessageInputConfigProtocol
+    private let config: ChatMessageInputConfig
 
     fileprivate static let columns = 4
 
@@ -57,7 +57,7 @@ final class MessageInputMorePanel: UIView {
 
     private var dismissedRedDotIDs: Set<String> = []
 
-    init(config: MessageInputConfigProtocol) {
+    init(config: ChatMessageInputConfig) {
         self.config = config
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -81,49 +81,49 @@ final class MessageInputMorePanel: UIView {
     private func setupActions() {
         var defaults: [MessageInputMenuAction] = [
             MessageInputMenuAction(
-                ID: MessageInputActionIDs.album,
+                ID: MessageInputDefaultActionIDs.album,
                 title: LocalizedChatString("MorePhoto"),
                 iconName: "more_picture",
                 onClick: { [weak self] in self?.delegate?.morePanelDidSelectAlbum() }
             )
         ]
-        if config.isShowPhotoTaker {
+        if config._isShowPhotoTaker {
             defaults.append(MessageInputMenuAction(
-                ID: MessageInputActionIDs.takePhoto,
+                ID: MessageInputDefaultActionIDs.takePhoto,
                 title: LocalizedChatString("MoreCamera"),
                 iconName: "more_camera",
                 onClick: { [weak self] in self?.delegate?.morePanelDidSelectCamera() }
             ))
             defaults.append(MessageInputMenuAction(
-                ID: MessageInputActionIDs.recordVideo,
+                ID: MessageInputDefaultActionIDs.recordVideo,
                 title: LocalizedChatString("MoreVideo"),
                 iconName: "more_video",
                 onClick: { [weak self] in self?.delegate?.morePanelDidSelectVideo() }
             ))
         }
         defaults.append(MessageInputMenuAction(
-            ID: MessageInputActionIDs.file,
+            ID: MessageInputDefaultActionIDs.file,
             title: LocalizedChatString("MoreFile"),
             iconName: "more_file",
             onClick: { [weak self] in self?.delegate?.morePanelDidSelectFile() }
         ))
-        if config.isShowVideoCall {
+        if config._isShowVideoCall {
             defaults.append(MessageInputMenuAction(
-                ID: MessageInputActionIDs.videoCall,
+                ID: MessageInputDefaultActionIDs.videoCall,
                 title: LocalizedChatString("MoreVideoCall"),
                 iconName: "more_video_call",
                 onClick: { [weak self] in self?.delegate?.morePanelDidSelectVideoCall() }
             ))
         }
-        if config.isShowAudioCall {
+        if config._isShowAudioCall {
             defaults.append(MessageInputMenuAction(
-                ID: MessageInputActionIDs.audioCall,
+                ID: MessageInputDefaultActionIDs.audioCall,
                 title: LocalizedChatString("MoreVoiceCall"),
                 iconName: "more_voice_call",
                 onClick: { [weak self] in self?.delegate?.morePanelDidSelectAudioCall() }
             ))
         }
-        if let customizer = config.actionCustomizer {
+        if let customizer = config._actionCustomizer {
             let editor = CustomEditor(items: defaults)
             customizer(editor)
             actions = editor.build()
@@ -133,9 +133,10 @@ final class MessageInputMorePanel: UIView {
     }
 
     private func setupView() {
-        MessageInputAppearanceApplier.apply(fill: config.appearance?.morePanel?.fill, to: self,
+        MessageInputAppearanceApplier.apply(fill: config._appearance?.morePanel?.fill, to: self,
             defaultColor: TUIChatKitTheme.colors.bgColorOperate)
         collectionView.backgroundColor = .clear
+        LanguageHelper.applyLayoutDirection(to: collectionView)
         collectionView.isScrollEnabled = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -169,7 +170,7 @@ extension MessageInputMorePanel: UICollectionViewDataSource {
             icon: item.icon ?? AtomicXChatResources.image(named: item.iconName),
             title: item.title,
             showRedDot: item.showRedDot && !dismissedRedDotIDs.contains(item.ID),
-            appearance: config.appearance?.morePanel,
+            appearance: config._appearance?.morePanel,
             index: indexPath.item
         )
         return cell
@@ -201,7 +202,7 @@ extension MessageInputMorePanel: UICollectionViewDelegateFlowLayout {
     ) -> CGSize {
         let availableWidth = collectionView.bounds.width
         let itemWidth = floor(availableWidth / CGFloat(Self.columns))
-        let size = MessageInputAppearanceApplier.dimension(config.appearance?.morePanel?.itemSize, fallback: Self.iconSize)
+        let size = MessageInputAppearanceApplier.dimension(config._appearance?.morePanel?.itemSize, fallback: Self.iconSize)
         let itemHeight = size + Self.titleTopSpacing + Self.titleAreaHeight + Self.itemVerticalSpacing
         return CGSize(width: itemWidth, height: itemHeight)
     }
@@ -222,6 +223,7 @@ private final class MorePanelCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        LanguageHelper.applyLayoutDirection(to: self)
         setupCell()
     }
 

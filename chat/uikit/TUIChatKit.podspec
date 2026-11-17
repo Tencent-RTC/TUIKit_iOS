@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'TUIChatKit'
-    s.version          = '9.1.7824'
+    s.version          = '9.1.7825'
     s.summary          = 'AtomicX Chat Component'
     s.description      = 'Chat streaming component for AtomicX'
     s.homepage         = 'https://cloud.tencent.com/document/product/269'
@@ -15,12 +15,13 @@ Pod::Spec.new do |s|
 
     s.dependency 'Kingfisher'
     s.dependency 'TXLiteAVSDK_VoiceAI_iOS', '13.6.0.255'
-    s.dependency 'AtomicXCore', '>= 3.0.0', '< 5.0'
+    s.dependency 'AtomicXCore'
     s.dependency 'SnapKit'
     s.dependency 'AlbumPicker', '~> 1.0.0'
     s.dependency 'tui-cmark-gfm', '0.29.17'
 
     s.source_files     = '**/*.{swift,h,m}'
+    s.exclude_files    = 'Package.swift'
     s.resource_bundles = {
         'TUIChatKitBundle' => [
             'resources/strings/**/*.{bundle,xcstrings}',

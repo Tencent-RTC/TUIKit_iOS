@@ -22,7 +22,7 @@ enum ListenPlanBuilder {
             let speakerKey = message.isSentBySelf ? "self" : "user:\(message.from.userID)"
             let speaker = message.isSentBySelf
                 ? LocalizedChatString("VoiceListenSelfSpeaker")
-                : MessageListHelper.senderShowName(of: message)
+                : MessageDisplayHelper.senderShowName(of: message)
             let sameAsPrevious = lastSpeakerKey == speakerKey
             switch message.messageType {
             case .text:

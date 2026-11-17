@@ -64,6 +64,12 @@ final class MessageListViewImpl: RTCBaseView {
 
     private var messages: [MessageInfo] = []
 
+    private var messageFingerprints: [String: String] = [:]
+
+    private var isApplyingRowUpdates = false
+
+    private var pendingMessageList: [MessageInfo]?
+
     private var cancellables = Set<AnyCancellable>()
 
     private var hasPerformedInitialScroll = false
@@ -144,6 +150,7 @@ final class MessageListViewImpl: RTCBaseView {
         table.estimatedRowHeight = Self.estimatedRowHeight
         table.contentInset.bottom = Self.bottomContentPadding
         table.allowsSelection = true
+        table.scrollsToTop = false
         table.onContentLayout = { [weak self] in
             self?.handleContentLayout()
         }
@@ -196,9 +203,9 @@ final class MessageListViewImpl: RTCBaseView {
          chatbotController: ChatbotConversationController? = nil,
          onUserClick: ((String) -> Void)? = nil,
          onMultiSelectModeChange: ((Bool) -> Void)? = nil) {
-        var effectiveConfig: MessageListConfigProtocol & MessageActionConfigProtocol = config
+        var effectiveConfig = config
         if ChatbotConversationPolicy.isChatbotConversation(conversationID) {
-            effectiveConfig = ChatbotMessageListConfig(base: config)
+            effectiveConfig = config.applyingChatbotRestrictions()
         }
         self.onUserClick = onUserClick
         self.onMultiSelectModeChange = onMultiSelectModeChange
@@ -426,7 +433,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func applyOpaqueListBackground() {
-        if let configuredBackground = viewModel.config.background {
+        if let configuredBackground = viewModel.config._background {
             applyConfiguredListBackground(configuredBackground)
             return
         }
@@ -512,7 +519,7 @@ final class MessageListViewImpl: RTCBaseView {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("enterMultiSelectMode"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("enterMultiSelectMode"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 let initialMessage = notification.userInfo?["initialMessage"] as? MessageInfo
@@ -520,14 +527,14 @@ final class MessageListViewImpl: RTCBaseView {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("showForwardTargetSelector"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("showForwardTargetSelector"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 self?.handleShowForwardTargetSelector(from: notification)
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("listenFromHereNotification"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("listenFromHereNotification"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 self?.handleListenFromHere(from: notification)
@@ -556,7 +563,7 @@ final class MessageListViewImpl: RTCBaseView {
             }
         }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("deleteMessageNotification"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("deleteMessageNotification"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
@@ -564,7 +571,7 @@ final class MessageListViewImpl: RTCBaseView {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("convertVoiceToText"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("convertVoiceToText"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
@@ -572,7 +579,7 @@ final class MessageListViewImpl: RTCBaseView {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("translateTextMessage"))
+        NotificationCenter.default.publisher(for: NSNotification.Name("translateTextMessage"), object: self)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] notification in
                 guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
@@ -672,8 +679,8 @@ final class MessageListViewImpl: RTCBaseView {
     private func updateMultiSelectBar(selectedCount: Int) {
         multiSelectBar.configure(
             selectedCount: selectedCount,
-            supportsForward: viewModel.config.isSupportForward,
-            supportsDelete: viewModel.config.isSupportDelete
+            supportsForward: viewModel.config._isSupportForward,
+            supportsDelete: viewModel.config._isSupportDelete
         )
     }
 
@@ -715,7 +722,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleSingleMessageDelete(_ message: MessageInfo) {
-        guard viewModel.config.isSupportDelete, messages.contains(where: { $0.msgID == message.msgID }) else { return }
+        guard viewModel.config._isSupportDelete, messages.contains(where: { $0.msgID == message.msgID }) else { return }
         let alert = UIAlertController(
             title: LocalizedChatString("ConfirmDeleteMessage"),
             message: nil,
@@ -729,7 +736,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleMultiSelectDelete() {
-        guard viewModel.config.isSupportDelete else { return }
+        guard viewModel.config._isSupportDelete else { return }
         let selected = viewModel.getSelectedMessages()
         guard !selected.isEmpty else { return }
         let alert = UIAlertController(
@@ -747,7 +754,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleMultiSelectForward(type: MessageForwardType) {
-        guard viewModel.config.isSupportForward else { return }
+        guard viewModel.config._isSupportForward else { return }
         let selected = viewModel.getSelectedMessages()
         guard !selected.isEmpty else { return }
         if selected.contains(where: { $0.status != .sendSuccess }) {
@@ -773,9 +780,21 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func applyMessageList(_ list: [MessageInfo]) {
+        if isApplyingRowUpdates {
+            let shouldSchedule = pendingMessageList == nil
+            pendingMessageList = list
+            if shouldSchedule {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self, let pending = self.pendingMessageList else { return }
+                    self.pendingMessageList = nil
+                    self.applyMessageList(pending)
+                }
+            }
+            return
+        }
         let receivedPlaceholder = list.contains { $0.msgID.hasPrefix(ChatbotPlaceholderMessageFactory.messageIDPrefix) }
 
-        let exclusionMatchers = viewModel.config.messageExclusionMatchers
+        let exclusionMatchers = viewModel.config._messageExclusionMatchers
         let list = list.filter { message in
             if ChatbotMessageVisibilityPolicy.shouldHide(message) { return false }
             if exclusionMatchers.contains(where: { $0(message) }) { return false }
@@ -823,9 +842,10 @@ final class MessageListViewImpl: RTCBaseView {
         }
         deferredPrependMessages = nil
 
-        messages = list
-        tableView.reloadData()
+        isApplyingRowUpdates = true
+        applyRowUpdates(from: oldMessages, to: list, allowIncremental: !prepended)
         tableView.layoutIfNeeded()
+        isApplyingRowUpdates = false
 
         if scrollToLatestAfterReload {
             scrollToLatestAfterReload = false
@@ -948,6 +968,132 @@ final class MessageListViewImpl: RTCBaseView {
     private func isPrepend(old: [MessageInfo], new: [MessageInfo]) -> Bool {
         guard !old.isEmpty, new.count > old.count else { return false }
         return old.first?.msgID != new.first?.msgID
+    }
+
+    private struct RowUpdatePlan {
+        var deletes: [IndexPath] = []
+        var inserts: [IndexPath] = []
+        var reloads: [IndexPath] = []
+        var reconfigures: [(cell: UITableViewCell, newRow: Int)] = []
+
+        var isEmpty: Bool {
+            deletes.isEmpty && inserts.isEmpty && reloads.isEmpty && reconfigures.isEmpty
+        }
+    }
+
+    private func applyRowUpdates(from oldMessages: [MessageInfo], to newMessages: [MessageInfo], allowIncremental: Bool) {
+        let newFingerprints = Dictionary(
+            newMessages.map { ($0.msgID, String(reflecting: $0)) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        let oldFingerprints = messageFingerprints
+        messageFingerprints = newFingerprints
+        guard allowIncremental,
+              tableView.window != nil,
+              !tableView.hasUncommittedUpdates,
+              let plan = makeRowUpdatePlan(
+                old: oldMessages,
+                new: newMessages,
+                oldFingerprints: oldFingerprints,
+                newFingerprints: newFingerprints
+              ) else {
+            messages = newMessages
+            tableView.reloadData()
+            return
+        }
+        guard !plan.isEmpty else {
+            messages = newMessages
+            return
+        }
+        UIView.performWithoutAnimation {
+            if plan.deletes.isEmpty, plan.inserts.isEmpty, plan.reloads.isEmpty {
+                messages = newMessages
+            } else {
+                tableView.performBatchUpdates {
+                    messages = newMessages
+                    tableView.deleteRows(at: plan.deletes, with: .none)
+                    tableView.insertRows(at: plan.inserts, with: .none)
+                    tableView.reloadRows(at: plan.reloads, with: .none)
+                }
+            }
+            guard !plan.reconfigures.isEmpty else { return }
+            var staleRows: [IndexPath] = []
+            for item in plan.reconfigures {
+                if tableView.indexPath(for: item.cell)?.row == item.newRow {
+                    configureDisplayedCell(item.cell, at: item.newRow)
+                } else {
+                    staleRows.append(IndexPath(row: item.newRow, section: 0))
+                }
+            }
+            tableView.performBatchUpdates {
+                tableView.reloadRows(at: staleRows, with: .none)
+            }
+        }
+    }
+
+    private func makeRowUpdatePlan(old: [MessageInfo],
+                                   new: [MessageInfo],
+                                   oldFingerprints: [String: String],
+                                   newFingerprints: [String: String]) -> RowUpdatePlan? {
+        guard !old.isEmpty, !new.isEmpty, messages.count == old.count,
+              tableView.numberOfRows(inSection: 0) == old.count else { return nil }
+        let oldIDs = old.map(\.msgID)
+        let newIDs = new.map(\.msgID)
+        let oldIDSet = Set(oldIDs)
+        let newIDSet = Set(newIDs)
+        guard oldIDSet.count == oldIDs.count, newIDSet.count == newIDs.count else { return nil }
+        guard oldIDs.filter(newIDSet.contains) == newIDs.filter(oldIDSet.contains) else { return nil }
+
+        var plan = RowUpdatePlan()
+        var oldIndexByID: [String: Int] = [:]
+        for (index, msgID) in oldIDs.enumerated() {
+            oldIndexByID[msgID] = index
+            if !newIDSet.contains(msgID) {
+                plan.deletes.append(IndexPath(row: index, section: 0))
+            }
+        }
+        for (newIndex, message) in new.enumerated() {
+            guard let oldIndex = oldIndexByID[message.msgID] else {
+                plan.inserts.append(IndexPath(row: newIndex, section: 0))
+                continue
+            }
+            let contentChanged = oldFingerprints[message.msgID] != newFingerprints[message.msgID]
+            let timeChanged = viewModel.messageTimeString(at: oldIndex, in: old)
+                != viewModel.messageTimeString(at: newIndex, in: new)
+            guard contentChanged || timeChanged else { continue }
+            let oldIndexPath = IndexPath(row: oldIndex, section: 0)
+            if reuseIdentifier(for: old[oldIndex]) == reuseIdentifier(for: message),
+               let cell = tableView.cellForRow(at: oldIndexPath) {
+                plan.reconfigures.append((cell, newIndex))
+            } else {
+                plan.reloads.append(oldIndexPath)
+            }
+        }
+        guard old.count - plan.deletes.count + plan.inserts.count == new.count else { return nil }
+        return plan
+    }
+
+    private func reuseIdentifier(for message: MessageInfo) -> String {
+        let kind = MessageCellRegistry.shared.renderKind(for: message)
+        return MessageCellRegistry.shared.reuseIdentifier(for: kind)
+    }
+
+    private func configureDisplayedCell(_ cell: UITableViewCell, at row: Int) {
+        guard row < messages.count else { return }
+        let message = messages[row]
+        let kind = MessageCellRegistry.shared.renderKind(for: message)
+        let timeString = viewModel.messageTimeString(at: row, in: messages)
+        switch kind {
+        case .systemTip, .revoked:
+            guard let cell = cell as? MessageCenteredTextCell else { return }
+            configureCenteredTextCell(cell, message: message, kind: kind, timeString: timeString)
+        case .bubble(let contentKind):
+            guard let cell = cell as? MessageBaseCell else { return }
+            configureBubbleCell(cell, message: message, contentKind: contentKind, timeString: timeString)
+        case .custom(let businessID):
+            guard let cell = cell as? MessageBaseCell else { return }
+            configureBubbleCell(cell, message: message, contentKind: .custom(businessID), timeString: timeString)
+        }
     }
 
     private func isStreamingMessage(_ message: MessageInfo) -> Bool {
@@ -1169,7 +1315,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func isLeft(for message: MessageInfo) -> Bool {
-        switch viewModel.config.alignment {
+        switch viewModel.config._alignment {
         case .left: return true
         case .right: return false
         case .twoSided: return !message.isSentBySelf
@@ -1234,7 +1380,8 @@ final class MessageListViewImpl: RTCBaseView {
             bubbleFrameInWindow: bubbleFrameInWindow,
             config: viewModel.config,
             conversationID: viewModel.conversationID,
-            auxiliaryHiddenIDs: viewModel.hiddenAuxiliaryTextIDs
+            auxiliaryHiddenIDs: viewModel.hiddenAuxiliaryTextIDs,
+            source: self
         )
     }
 
@@ -1318,7 +1465,7 @@ final class MessageListViewImpl: RTCBaseView {
 
     private func isMessageExcludedFromDisplay(_ message: MessageInfo) -> Bool {
         if ChatbotMessageVisibilityPolicy.shouldHide(message) { return true }
-        if viewModel.config.messageExclusionMatchers.contains(where: { $0(message) }) { return true }
+        if viewModel.config._messageExclusionMatchers.contains(where: { $0(message) }) { return true }
         guard message.messageType == .custom,
               let callModel = CallMessageParser.parse(message) else { return false }
         return callModel.isExcludeFromHistory
@@ -1597,8 +1744,8 @@ final class MessageListViewImpl: RTCBaseView {
             self?.handleForwardAuxiliaryText(text)
         }
         var actions: [MessageActionMenuAction] = []
-        if viewModel.config.isSupportCopy { actions.append(copyAction) }
-        if viewModel.config.isSupportForward { actions.append(forwardAction) }
+        if viewModel.config._isSupportCopy { actions.append(copyAction) }
+        if viewModel.config._isSupportForward { actions.append(forwardAction) }
         guard !actions.isEmpty else { return }
         MessageActionMenuController.shared.showAuxiliaryMenu(
             actions: actions,
@@ -1608,7 +1755,7 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func handleForwardAuxiliaryText(_ text: String) {
-        guard viewModel.config.isSupportForward else { return }
+        guard viewModel.config._isSupportForward else { return }
         let selector = ForwardTargetSelectorViewController { [weak self] conversationIDs in
             guard let self = self else { return }
             let partition = ChatbotForwardTargetPolicy.partition(conversationIDs)
@@ -1718,9 +1865,16 @@ extension MessageListViewImpl: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? MessageCenteredTextCell else {
             return UITableViewCell()
         }
-        let text = MessageCellRegistry.shared.centeredText(for: message, kind: kind, config: viewModel.config)
-        cell.configure(text: text, timeString: timeString, showTime: viewModel.config.isShowTimeMessage)
+        configureCenteredTextCell(cell, message: message, kind: kind, timeString: timeString)
         return cell
+    }
+
+    private func configureCenteredTextCell(_ cell: MessageCenteredTextCell,
+                                           message: MessageInfo,
+                                           kind: MessageRenderKind,
+                                           timeString: String?) {
+        let text = MessageCellRegistry.shared.centeredText(for: message, kind: kind, config: viewModel.config)
+        cell.configure(text: text, timeString: timeString, showTime: viewModel.config._isShowTimeMessage)
     }
 
     private func bubbleCell(for message: MessageInfo,
@@ -1730,6 +1884,14 @@ extension MessageListViewImpl: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: contentKind.reuseIdentifier, for: indexPath) as? MessageBaseCell else {
             return UITableViewCell()
         }
+        configureBubbleCell(cell, message: message, contentKind: contentKind, timeString: timeString)
+        return cell
+    }
+
+    private func configureBubbleCell(_ cell: MessageBaseCell,
+                                     message: MessageInfo,
+                                     contentKind: MessageContentKind,
+                                     timeString: String?) {
         cell.configure(
             message: message,
             contentKind: contentKind,
@@ -1751,7 +1913,6 @@ extension MessageListViewImpl: UITableViewDataSource {
             self?.handleAuxiliaryTextLongPress(message: msg, text: text, anchorFrame: anchorFrame)
         }
         cell.onReadReceiptTap = { [weak self] tapped in self?.presentReadReceiptDetail(message: tapped) }
-        return cell
     }
 }
 

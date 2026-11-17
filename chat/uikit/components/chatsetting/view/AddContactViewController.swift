@@ -394,6 +394,7 @@ final class AddContactViewController: CustomNavigationBarViewController {
             make.height.greaterThanOrEqualTo(Self.inputCardMinHeight - Self.inputCardPadding * 2)
         }
         wordingTextView.font = FontScheme.caption1Regular
+        wordingTextView.textAlignment = LanguageHelper.isRTL ? .right : .left
         wordingTextView.textColor = TUIChatKitTheme.colors.textColorPrimary
         wordingTextView.backgroundColor = .clear
         wordingTextView.textContainer.lineFragmentPadding = 0

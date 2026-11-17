@@ -21,6 +21,15 @@ final class DemoLanguageManager {
         ["ar", "he", "fa", "ur"].contains(currentLanguage)
     }
 
+    var semanticContentAttribute: UISemanticContentAttribute {
+        isRTL ? .forceRightToLeft : .forceLeftToRight
+    }
+
+    func applyLayoutDirection(to window: UIWindow?) {
+        UIView.appearance().semanticContentAttribute = semanticContentAttribute
+        window?.semanticContentAttribute = semanticContentAttribute
+    }
+
     func setLanguage(_ code: String) {
         guard code != currentLanguage else { return }
         currentLanguage = code
@@ -119,9 +128,8 @@ final class RootViewController: UIViewController {
     }
 
     private func applyLayoutDirection() {
-        let attribute: UISemanticContentAttribute = DemoLanguageManager.shared.isRTL ? .forceRightToLeft : .forceLeftToRight
-        view.window?.semanticContentAttribute = attribute
-        view.semanticContentAttribute = attribute
+        DemoLanguageManager.shared.applyLayoutDirection(to: view.window)
+        view.semanticContentAttribute = DemoLanguageManager.shared.semanticContentAttribute
     }
 
     private func switchRoot(for status: LoginStatus) {

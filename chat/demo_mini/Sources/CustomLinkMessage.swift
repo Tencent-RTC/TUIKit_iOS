@@ -31,7 +31,7 @@ struct CustomLinkMessage {
 
 enum CustomLinkMessageRegistrar {
     static func register() {
-        MessageListView.registerCustomMessageCell(
+        MessageListHelper.registerCustomMessageCell(
             businessID: CustomLinkMessage.businessID,
             summaryProvider: { payload in
                 CustomLinkMessage.from(customData: payload.customData)?.text

@@ -47,7 +47,7 @@ enum CustomerServiceManager {
     static func registerSummary() {
         guard !summaryRegistered else { return }
         summaryRegistered = true
-        MessageListView.registerCustomMessageSummary(matcher: { payload in
+        MessageListHelper.registerCustomMessageSummary(matcher: { payload in
             guard let data = payload.customData.data(using: .utf8),
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   json[customerServicePluginKey] != nil else { return nil }

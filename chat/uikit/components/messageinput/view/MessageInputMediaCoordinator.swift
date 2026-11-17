@@ -29,7 +29,7 @@ final class MessageInputMediaCoordinator: NSObject {
     private static let minimumRecordDurationMs = 1000
 
     private var recordMaxDurationMs: Int {
-        let duration = viewModel.config.audioMaxRecordDurationMs
+        let duration = viewModel.config._audioMaxRecordDurationMs
         guard duration > 0 else { return ChatMessageInputConfig.defaultAudioMaxRecordDurationMs }
         return max(Self.minimumRecordDurationMs, Int(Int32(clamping: duration)))
     }
@@ -101,12 +101,12 @@ final class MessageInputMediaCoordinator: NSObject {
         recordingID = generation
         currentRecordDuration = 0
         currentRecordPower = 0
-        lastReleaseAction = viewModel.config.enableSendRecordedVoice ? .sendAudio : .transcribe
-        currentGestureState = viewModel.config.enableSendRecordedVoice ? .recording : .readyToTranscribe
+        lastReleaseAction = viewModel.config._enableSendRecordedVoice ? .sendAudio : .transcribe
+        currentGestureState = viewModel.config._enableSendRecordedVoice ? .recording : .readyToTranscribe
         let overlay = MessageInputAudioRecorderView(
             frame: window.bounds,
             maxDurationMs: recordMaxDurationMs,
-            allowSendOriginalVoice: viewModel.config.enableSendRecordedVoice,
+            allowSendOriginalVoice: viewModel.config._enableSendRecordedVoice,
             initialFinger: finger
         )
         overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -144,7 +144,7 @@ final class MessageInputMediaCoordinator: NSObject {
                 self.recordingID = nil
                 if self.voiceOverlay != nil {
                     self.lastReleaseAction = self.currentGestureState == .readyToCancel ? .cancel
-                        : self.currentGestureState == .readyToTranscribe || !self.viewModel.config.enableSendRecordedVoice
+                        : self.currentGestureState == .readyToTranscribe || !self.viewModel.config._enableSendRecordedVoice
                             ? .transcribe : .sendAudio
                 }
                 self.dismissVoiceOverlay()
@@ -263,7 +263,7 @@ final class MessageInputMediaCoordinator: NSObject {
         realtimeRecognizer = nil
         if lastReleaseAction == .transcribe {
             if resultCode.rawValue >= 0, !filePath.isEmpty {
-                if !viewModel.config.enableSendRecordedVoice, !viewModel.config.enableRealtimeVoiceToText {
+                if !viewModel.config._enableSendRecordedVoice, !viewModel.config._enableRealtimeVoiceToText {
                     recognizer?.cancel()
                     transcribeAndSendText(filePath: filePath)
                 } else if let recognizer, recognizer.isRecognizing {
@@ -279,7 +279,7 @@ final class MessageInputMediaCoordinator: NSObject {
             return
         }
         recognizer?.cancel()
-        if lastReleaseAction == .sendAudio, viewModel.config.enableSendRecordedVoice,
+        if lastReleaseAction == .sendAudio, viewModel.config._enableSendRecordedVoice,
            resultCode.rawValue >= 0, !filePath.isEmpty {
             viewModel.sendVoiceMessage(filePath, duration: duration)
         }
@@ -336,11 +336,11 @@ final class MessageInputMediaCoordinator: NSObject {
         realtimeRecognizer?.cancel()
         realtimeRecognizer = nil
         voiceOverlay?.setRealtimeRecognitionActive(false)
-        guard viewModel.config.enableRealtimeVoiceToText else { return }
+        guard viewModel.config._enableRealtimeVoiceToText else { return }
         let generation = voiceGeneration
         let recognizer = RealtimeAsrRecognizer(
-            language: viewModel.config.realtimeVoiceToTextLanguage,
-            enableVoiceprintDenoise: viewModel.config.enableVoiceprintDenoise
+            language: viewModel.config._realtimeVoiceToTextLanguage,
+            enableVoiceprintDenoise: viewModel.config._enableVoiceprintDenoise
         ) { [weak self] text in
             guard let self, self.voiceGeneration == generation, self.voiceOverlay != nil else { return }
             self.voiceOverlay?.updateRecognizedText(text)
@@ -363,7 +363,7 @@ final class MessageInputMediaCoordinator: NSObject {
                 self?.cancelVoiceRecording()
             },
             onSendAudio: { [weak self] path, dur in
-                guard let self, self.viewModel.config.enableSendRecordedVoice else { return }
+                guard let self, self.viewModel.config._enableSendRecordedVoice else { return }
                 self.cancelVoiceRecording()
                 self.viewModel.sendVoiceMessage(path, duration: dur)
             },
@@ -392,7 +392,7 @@ final class MessageInputMediaCoordinator: NSObject {
             audioDurationSecond: duration,
             text: initialText,
             callbacks: callbacks,
-            allowSendOriginalVoice: viewModel.config.enableSendRecordedVoice
+            allowSendOriginalVoice: viewModel.config._enableSendRecordedVoice
         )
         voiceTranscriptionOverlay = overlay
         overlay.show(in: window)

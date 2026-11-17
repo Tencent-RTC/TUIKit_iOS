@@ -203,7 +203,7 @@ final class VideoRecorderPreviewView: UIView {
     private func addPanGesture() {
         if edgePanGesture == nil {
             let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleEdgePanGesture(_:)))
-            gesture.edges = .left
+            gesture.edges = LanguageHelper.isRTL ? .right : .left
             addGestureRecognizer(gesture)
             edgePanGesture = gesture
         }
@@ -216,16 +216,17 @@ final class VideoRecorderPreviewView: UIView {
 
     @objc private func handleEdgePanGesture(_ gesture: UIScreenEdgePanGestureRecognizer) {
         let translation = gesture.translation(in: self)
+        let direction: CGFloat = LanguageHelper.isRTL ? -1 : 1
         switch gesture.state {
         case .changed:
             let progress = min(1.0, max(0.0, abs(translation.x / bounds.width)))
-            transform = CGAffineTransform(translationX: progress * bounds.width, y: 0)
+            transform = CGAffineTransform(translationX: direction * progress * bounds.width, y: 0)
         case .ended, .cancelled:
-            let velocity = gesture.velocity(in: self).x
+            let velocity = gesture.velocity(in: self).x * direction
             let progress = abs(translation.x / bounds.width)
             if progress > Self.quitProgressThreshold || velocity > Self.quitVelocityThreshold {
                 UIView.animate(withDuration: Self.quitAnimationDuration, animations: {
-                    self.transform = CGAffineTransform(translationX: self.bounds.width, y: 0)
+                    self.transform = CGAffineTransform(translationX: direction * self.bounds.width, y: 0)
                 }, completion: { _ in
                     self.quit(false)
                 })

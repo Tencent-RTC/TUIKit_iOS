@@ -8,6 +8,34 @@ internal final class ChatFlowCoordinator {
     internal init() {}
 
     internal func pushChat(_ conversation: ConversationInfo, locateMessage: MessageInfo? = nil, animated: Bool = true) {
+        guard conversation.type == .c2c else {
+            showChat(conversation, locateMessage: locateMessage, animated: animated)
+            return
+        }
+        guard let userID = c2cUserID(conversation.conversationID) else { return }
+        if canChatWithoutFriendship(userID) {
+            showChat(conversation, locateMessage: locateMessage, animated: animated)
+            return
+        }
+        guard let source = navigationController?.topViewController else { return }
+        UserProfileRouter.openChat(userID: userID, from: source, animated: animated) { [weak self] contact in
+            guard ChatUtil.getC2CConversationID(contact.userID) == conversation.conversationID else { return }
+            self?.showChat(conversation, locateMessage: locateMessage, animated: animated)
+        }
+    }
+
+    private func canChatWithoutFriendship(_ userID: String) -> Bool {
+        return userID.hasPrefix("@RBT") || userID == "administrator"
+    }
+
+    private func c2cUserID(_ conversationID: String) -> String? {
+        let prefix = "c2c_"
+        guard conversationID.hasPrefix(prefix) else { return nil }
+        let userID = String(conversationID.dropFirst(prefix.count))
+        return userID.isEmpty ? nil : userID
+    }
+
+    private func showChat(_ conversation: ConversationInfo, locateMessage: MessageInfo? = nil, animated: Bool = true) {
         let page = makeChatPage(conversation: conversation, locateMessage: locateMessage)
         pushPage(page, animated: animated)
     }
@@ -23,7 +51,7 @@ internal final class ChatFlowCoordinator {
                 self?.navigationController?.popViewController(animated: true)
             },
             onUserClick: { [weak self] userID in
-                self?.pushContactSettings(userID: userID, parentConversationID: conversation.conversationID)
+                self?.openUserProfile(userID: userID, parentConversationID: conversation.conversationID)
             },
             onMoreClick: { [weak self] in
                 self?.openConversationSettings(for: conversation)
@@ -42,25 +70,11 @@ internal final class ChatFlowCoordinator {
     }
 
     private func openConversationSettings(for conversation: ConversationInfo) {
-        if conversation.type == .c2c, let userID = ChatUtil.getUserID(conversation.conversationID) {
-            pushContactSettings(userID: userID, parentConversationID: conversation.conversationID)
+        if conversation.type == .c2c, let userID = c2cUserID(conversation.conversationID) {
+            openUserProfile(userID: userID, parentConversationID: conversation.conversationID)
         } else if conversation.type == .group, let groupID = ChatUtil.getGroupID(conversation.conversationID) {
             pushGroupSettings(groupID: groupID, parentConversationID: conversation.conversationID)
         }
-    }
-
-    private func pushContactSettings(userID: String, parentConversationID: String?) {
-        let page = C2CChatSettingViewController(
-            userID: userID,
-            config: DemoPageConfigs.makeContactSettingsConfig(),
-            onSendMessageClick: { [weak self] in
-                self?.openContactChat(userID: userID, parentConversationID: parentConversationID)
-            },
-            onContactDelete: { [weak self] in
-                self?.navigationController?.popToRootViewController(animated: true)
-            }
-        )
-        pushPage(page)
     }
 
     private func pushGroupSettings(groupID: String, parentConversationID: String?) {
@@ -74,41 +88,34 @@ internal final class ChatFlowCoordinator {
                 self?.navigationController?.popToRootViewController(animated: true)
             },
             onGroupMemberClick: { [weak self] userID in
-                self?.openMemberProfile(userID: userID, parentConversationID: parentConversationID)
+                self?.openUserProfile(userID: userID, parentConversationID: parentConversationID)
             }
         )
         pushPage(page)
     }
 
     private func openContactChat(userID: String, parentConversationID: String?) {
+        if canChatWithoutFriendship(userID) {
+            showContactChat(userID: userID, contact: nil, parentConversationID: parentConversationID)
+            return
+        }
+        guard let source = navigationController?.topViewController else { return }
+        UserProfileRouter.openChat(userID: userID, from: source) { [weak self] contact in
+            self?.showContactChat(userID: userID, contact: contact, parentConversationID: parentConversationID)
+        }
+    }
+
+    private func showContactChat(userID: String, contact: ContactInfo?, parentConversationID: String?) {
         let conversationID = ChatUtil.getC2CConversationID(userID)
         if parentConversationID == conversationID {
             navigationController?.popViewController(animated: true)
             return
         }
-        ContactStore.shared.getContactInfo(
-            userIDList: [userID],
-            completion: ContactChatLookupHandler(
-                onSuccess: { [weak self] contacts in
-                    DispatchQueue.main.async {
-                        self?.pushContactChat(userID: userID, contact: contacts.first)
-                    }
-                },
-                onFailure: { [weak self] _, _ in
-                    DispatchQueue.main.async {
-                        self?.pushContactChat(userID: userID, contact: nil)
-                    }
-                }
-            )
-        )
-    }
-
-    private func pushContactChat(userID: String, contact: ContactInfo?) {
-        var conversation = ConversationInfo(conversationID: ChatUtil.getC2CConversationID(userID))
+        var conversation = ConversationInfo(conversationID: conversationID)
         conversation.type = .c2c
         conversation.title = contactDisplayName(contact) ?? userID
         conversation.avatarURL = contact?.avatarURL
-        pushChat(conversation)
+        showChat(conversation)
     }
 
     private func contactDisplayName(_ contact: ContactInfo?) -> String? {
@@ -118,7 +125,7 @@ internal final class ChatFlowCoordinator {
         return nil
     }
 
-    private func openMemberProfile(userID: String, parentConversationID: String?) {
+    private func openUserProfile(userID: String, parentConversationID: String?) {
         guard let source = navigationController?.topViewController else { return }
         UserProfileRouter.open(
             userID: userID,
@@ -135,23 +142,5 @@ internal final class ChatFlowCoordinator {
     private func pushPage(_ page: UIViewController, animated: Bool = true) {
         page.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(page, animated: animated)
-    }
-}
-
-private final class ContactChatLookupHandler: GetContactInfoCompletionHandler {
-    private let onSuccessBlock: ([ContactInfo]) -> Void
-    private let onFailureBlock: (Int, String) -> Void
-
-    init(onSuccess: @escaping ([ContactInfo]) -> Void, onFailure: @escaping (Int, String) -> Void) {
-        onSuccessBlock = onSuccess
-        onFailureBlock = onFailure
-    }
-
-    func onSuccess(contactInfoList: [ContactInfo]) {
-        onSuccessBlock(contactInfoList)
-    }
-
-    func onFailure(code: Int, desc: String) {
-        onFailureBlock(code, desc)
     }
 }

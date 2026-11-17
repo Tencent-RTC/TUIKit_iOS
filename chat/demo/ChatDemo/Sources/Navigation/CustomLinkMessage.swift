@@ -28,7 +28,7 @@ internal enum CustomLinkMessageManager {
     private static let exampleLink = "https://cloud.tencent.com/document/product/269/3794"
 
     internal static func register() {
-        MessageListView.registerCustomMessageCell(
+        MessageListHelper.registerCustomMessageCell(
             businessID: CustomLinkMessage.businessID,
             summaryProvider: { payload in
                 CustomLinkMessage.decode(customData: payload.customData)?.text

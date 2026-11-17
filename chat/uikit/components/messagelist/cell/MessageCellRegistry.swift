@@ -132,12 +132,12 @@ final class MessageCellRegistry {
 
     // MARK: - Centered Text (系统提示 / 撤回 居中灰字文案)
 
-    func centeredText(for message: MessageInfo, kind: MessageRenderKind, config: MessageListConfigProtocol) -> String {
+    func centeredText(for message: MessageInfo, kind: MessageRenderKind, config: ChatMessageListConfig) -> String {
         switch kind {
         case .revoked:
-            return MessageListHelper.getMessageAbstract(message)
+            return MessageDisplayHelper.getMessageAbstract(message)
         case .systemTip:
-            guard config.isShowSystemMessage else { return "" }
+            guard config._isShowSystemMessage else { return "" }
             return systemTipText(for: message)
         default:
             return ""
@@ -151,10 +151,10 @@ final class MessageCellRegistry {
     private func systemTipText(for message: MessageInfo) -> String {
         switch message.messagePayload {
         case .tips(let payload):
-            return MessageListHelper.getGroupTipsDisplayString(payload.groupTips)
+            return MessageDisplayHelper.getGroupTipsDisplayString(payload.groupTips)
         case .custom(let payload):
             if let callModel = CallMessageParser.parse(message) {
-                return callModel.displayString(senderShowName: MessageListHelper.senderShowName(of: message))
+                return callModel.displayString(senderShowName: MessageDisplayHelper.senderShowName(of: message))
             }
             return customSystemText(from: payload, message: message)
         default:
@@ -174,7 +174,7 @@ final class MessageCellRegistry {
             if message.isSentBySelf {
                 return localContent
             }
-            let opUser = MessageListHelper.senderShowName(of: message)
+            let opUser = MessageDisplayHelper.senderShowName(of: message)
             let content = customInfo["content"] as? String ?? ""
             return content.isEmpty ? "\(opUser) \(localContent)" : "\(opUser) \(content)"
         }

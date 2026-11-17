@@ -2,33 +2,50 @@ import UIKit
 
 public struct ChatMessageInputConfig {
     // 输入入口：录音、拍照、更多面板与表情按钮。
-    public var userIsShowAudioRecorder: Bool? = nil
-    public var userIsShowPhotoTaker: Bool? = nil
-    public var userIsShowMore: Bool? = nil
-    public var userIsShowEmoji: Bool? = nil
+    public var isShowAudioRecorder: Bool? = nil
+    public var isShowPhotoTaker: Bool? = nil
+    public var isShowMore: Bool? = nil
+    public var isShowEmoji: Bool? = nil
 
     // 消息发送与状态：发送按钮、已读回执、提及与正在输入。
-    public var userIsShowSendButton: Bool? = nil
-    public var userKeepSendButtonVisible: Bool? = nil
-    public var userEnableReadReceipt: Bool? = nil
-    public var userEnableMention: Bool? = nil
-    public var userEnableTyping: Bool? = nil
+    public var isShowSendButton: Bool? = nil
+    public var keepSendButtonVisible: Bool? = nil
+    public var enableReadReceipt: Bool? = nil
+    public var enableMention: Bool? = nil
+    public var enableTyping: Bool? = nil
 
     // 语音输入：长按录音、录音时长、实时识别、识别语言与原录音发送。
-    public var userEnableLongPressToTalk: Bool? = nil
-    public var userAudioMaxRecordDurationMs: Int? = nil
-    public var userEnableRealtimeVoiceToText: Bool? = nil
-    public var userRealtimeVoiceToTextLanguage: String? = nil
-    public var userEnableSendRecordedVoice: Bool? = nil
-    public var userEnableVoiceprintDenoise: Bool? = nil
+    public var enableLongPressToTalk: Bool? = nil
+    public var audioMaxRecordDurationMs: Int? = nil
+    public var enableRealtimeVoiceToText: Bool? = nil
+    public var realtimeVoiceToTextLanguage: String? = nil
+    public var enableSendRecordedVoice: Bool? = nil
+    public var enableVoiceprintDenoise: Bool? = nil
 
     // 通话入口：视频通话与音频通话。
-    public var userIsShowVideoCall: Bool? = nil
-    public var userIsShowAudioCall: Bool? = nil
+    public var isShowVideoCall: Bool? = nil
+    public var isShowAudioCall: Bool? = nil
 
     // 外观与扩展：输入框样式及更多面板动作定制。
-    public var userAppearance: MessageInputAppearance? = nil
-    public var userActionCustomizer: MessageInputActionCustomizer? = nil
+    public var appearance: MessageInputAppearance? = nil
+    public var actionCustomizer: ((CustomEditor<MessageInputMenuAction>) -> Void)? = nil
+
+    public var albumMaxSelectionCount: Int? = nil
+    public var albumMediaFilter: MessageInputAlbumMediaFilter? = nil
+    public var albumCompressQuality: MessageInputAlbumCompressQuality? = nil
+    public var albumMaxVideoDurationInSeconds: Int? = nil
+    public var albumMaxVideoOutputSizeInMB: Int? = nil
+}
+
+public enum MessageInputAlbumMediaFilter {
+    case imageOnly
+    case videoOnly
+    case imageAndVideo
+}
+
+public enum MessageInputAlbumCompressQuality {
+    case standard
+    case high
 }
 
 public enum MessageInputGradientDirection {

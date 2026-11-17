@@ -96,17 +96,19 @@ final class MessageActionMenuController: NSObject {
 
     func show(for message: MessageInfo,
               bubbleFrameInWindow: CGRect,
-              config: MessageListConfigProtocol & MessageActionConfigProtocol,
+              config: ChatMessageListConfig,
               conversationID: String,
-              auxiliaryHiddenIDs: Set<String> = []) {
+              auxiliaryHiddenIDs: Set<String> = [],
+              source: AnyObject? = nil) {
         var actions = MessageActionMenuProvider.visibleActions(
             for: message,
             config: config,
             conversationID: conversationID,
-            auxiliaryHiddenIDs: auxiliaryHiddenIDs
+            auxiliaryHiddenIDs: auxiliaryHiddenIDs,
+            source: source
         )
         guard !actions.isEmpty else { return }
-        let showReactionEntry = config.isSupportReaction
+        let showReactionEntry = config._isSupportReaction
             && message.status == .sendSuccess
             && !EmojiManager.shared.getPickerEmojis().isEmpty
         if showReactionEntry {
@@ -141,8 +143,12 @@ final class MessageActionMenuController: NSObject {
         guard let window = Self.keyWindow(), !actions.isEmpty else { return }
         dismiss()
 
-        let overlay = UIView(frame: window.bounds)
+        let overlay = MessageActionMenuOverlayView(frame: window.bounds)
         overlay.backgroundColor = UIColor.black.withAlphaComponent(Metric.overlayAlpha)
+        overlay.onPassThroughTouch = { [weak self, weak overlay] in
+            guard let self, let overlay, self.overlayView === overlay else { return }
+            self.dismiss()
+        }
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleOverlayTap))
         tap.delegate = self
         overlay.addGestureRecognizer(tap)
@@ -452,6 +458,48 @@ extension MessageActionMenuController: UIGestureRecognizerDelegate {
         guard let menu = menuBubbleView else { return true }
         let point = touch.location(in: menu)
         return !menu.bounds.contains(point)
+    }
+}
+
+private final class MessageActionMenuOverlayView: UIView {
+    var onPassThroughTouch: (() -> Void)?
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hitView = super.hitTest(point, with: event)
+        guard hitView === self,
+              event?.type == .touches,
+              let window,
+              underlyingView(at: convert(point, to: window), in: window, with: event)?.isInsideMessageInputView == true
+        else {
+            return hitView
+        }
+        DispatchQueue.main.async { [weak self] in
+            self?.onPassThroughTouch?()
+        }
+        return nil
+    }
+
+    private func underlyingView(at point: CGPoint, in window: UIWindow, with event: UIEvent?) -> UIView? {
+        guard let index = window.subviews.firstIndex(where: { $0 === self }) else { return nil }
+        for subview in window.subviews[..<index].reversed() {
+            if let view = subview.hitTest(subview.convert(point, from: window), with: event) {
+                return view
+            }
+        }
+        return nil
+    }
+}
+
+private extension UIView {
+    var isInsideMessageInputView: Bool {
+        var current: UIView? = self
+        while let view = current {
+            if view is MessageInputView {
+                return true
+            }
+            current = view.superview
+        }
+        return false
     }
 }
 

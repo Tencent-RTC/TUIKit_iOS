@@ -158,15 +158,16 @@ internal final class ConversationsPageImpl: PageImplementation {
     }
 
     private func openChatRemovingIntermediatePages(_ info: NavigationInfo) {
+        if let navigationController {
+            let stack = navigationController.viewControllers.filter {
+                !($0 is CreateC2CConversationViewController)
+                    && !($0 is CreateGroupConversationViewController)
+            }
+            if stack.count != navigationController.viewControllers.count {
+                navigationController.setViewControllers(stack, animated: false)
+            }
+        }
         onConversationClick?(info)
-        guard let navigationController = navigationController else { return }
-        let stack = navigationController.viewControllers.filter {
-            !($0 is CreateC2CConversationViewController)
-                && !($0 is CreateGroupConversationViewController)
-        }
-        if stack.count != navigationController.viewControllers.count {
-            navigationController.setViewControllers(stack, animated: false)
-        }
     }
 
     private func makeConversation(fromUser user: AZOrderedListItem) -> ConversationInfo {

@@ -5,7 +5,7 @@ target 'ChatDemo' do
   
   pod 'AtomicXCore', '>= 4.3.10', '< 5.0'
   pod 'TUIChatKit', :path => '../uikit/TUIChatKit.podspec'
-  pod 'TUICallKit_Swift', :path => '../../call/TUICallKit_Swift.podspec'
+  pod 'TUICallKit_Swift'
   pod 'TencentCloudAIDeskCustomer'
 end
 

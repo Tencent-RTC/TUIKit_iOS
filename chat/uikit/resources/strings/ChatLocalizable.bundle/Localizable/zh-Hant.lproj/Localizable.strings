@@ -935,6 +935,13 @@
 "AboutDisclaimer" = "免責聲明";
 "AboutPersonalInformationCollectionList" = "個人信息收集清單";
 "About3PartySharingList" = "第三方信息共享清單";
+"AboutCloseAccount" = "註銷賬戶";
+"AboutCloseAccountDescribe" = "註銷後，您將無法使用當前帳號，相關數據也將刪除無法找回。當前帳號ID:%@";
+"AboutCloseAccountAlterMsg" = "確認註銷帳號嗎?";
+"AboutCloseAccountAlterAction" = "註銷";
+"AboutCloseAccountNoToken" = "註銷失敗,當前帳號未查到token或手機號，請使用手機號登錄";
+"AboutCloseAccountSuccessful" = "註銷成功";
+"AboutCloseAccountFailedWithError" = "註銷失敗\nerrorCode: %ld, errorMsg: %@";
 "AboutDisclaimerText" = "騰訊雲IM APP（「本產品」）是由騰訊雲提供的一款測試產品，騰訊雲享有本產品的著作權和所有權。本產品僅用於功能體驗，不得用於任何商業用途。為配合相關部門監管要求，嚴禁在使用中有任何色情、辱罵、暴恐、涉政等違法內容傳播。";
 
 "ConfigGroupNameLabel" = "群名稱";
