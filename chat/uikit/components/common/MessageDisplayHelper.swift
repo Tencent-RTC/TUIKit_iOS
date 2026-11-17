@@ -1,7 +1,7 @@
 import AtomicXCore
 import Foundation
 
-class MessageListHelper {
+class MessageDisplayHelper {
     private static let mergedAbstractMaxCount = 4
 
     static func getGroupTipsDisplayString(_ groupTips: [GroupTipsInfo]?) -> String {

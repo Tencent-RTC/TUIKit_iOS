@@ -18,7 +18,9 @@ public final class ConversationsPage: UIViewController {
         config: ConversationActionConfig? = nil,
         onConversationClick: ((NavigationInfo) -> Void)? = nil
     ) {
-        implementation = ConversationsPageImpl(config: config ?? ConversationActionConfig(), onConversationClick: onConversationClick)
+        implementation = ConversationsPageImpl(
+            config: config ?? ConversationActionConfig(),
+            onConversationClick: onConversationClick)
         super.init(nibName: nil, bundle: nil)
         implementation.owner = self
     }

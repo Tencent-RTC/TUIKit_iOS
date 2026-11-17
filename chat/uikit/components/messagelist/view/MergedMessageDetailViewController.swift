@@ -6,7 +6,7 @@ import AtomicXCore
 final class MergedMessageDetailViewController: UIViewController, SystemNavigationBarPage {
     private let mergedMessage: MessageInfo
 
-    private let config: MessageListConfigProtocol
+    private let config: ChatMessageListConfig
 
     private let messageListStore: MessageListStore
 
@@ -65,7 +65,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
 
     // MARK: - Init
 
-    init(mergedMessage: MessageInfo, conversationID: String, config: MessageListConfigProtocol = ChatMessageListConfig(alignment: LanguageHelper.isRTL ? .right : .left)) {
+    init(mergedMessage: MessageInfo, conversationID: String, config: ChatMessageListConfig = ChatMessageListConfig(alignment: LanguageHelper.isRTL ? .right : .left)) {
         self.mergedMessage = mergedMessage
         self.conversationID = conversationID
         self.config = config
@@ -231,7 +231,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
     }
 
     private func isLeft(for message: MessageInfo) -> Bool {
-        switch config.alignment {
+        switch config._alignment {
         case .left: return true
         case .right: return false
         case .twoSided: return !message.isSentBySelf
@@ -437,7 +437,7 @@ extension MergedMessageDetailViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         let text = MessageCellRegistry.shared.centeredText(for: message, kind: kind, config: config)
-        cell.configure(text: text, timeString: timeString, showTime: config.isShowTimeMessage)
+        cell.configure(text: text, timeString: timeString, showTime: config._isShowTimeMessage)
         return cell
     }
 

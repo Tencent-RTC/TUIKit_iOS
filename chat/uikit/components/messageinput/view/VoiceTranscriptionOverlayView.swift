@@ -315,8 +315,8 @@ final class VoiceTranscriptionOverlayView: UIView {
         editTextView.font = FontScheme.caption1Regular
         editTextView.textColor = colors.textColorButton
         editTextView.tintColor = colors.textColorButton
-        editTextView.textAlignment = .left
-        editTextView.semanticContentAttribute = .forceLeftToRight
+        editTextView.textAlignment = LanguageHelper.isRTL ? .right : .left
+        LanguageHelper.applyLayoutDirection(to: editTextView)
         editTextView.textContainerInset = Self.editTextContentInsets
         editTextView.textContainer.lineFragmentPadding = 0
         editTextView.isScrollEnabled = true

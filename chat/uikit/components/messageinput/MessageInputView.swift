@@ -1,6 +1,5 @@
 import Foundation
 import AtomicXCore
-import Combine
 import SnapKit
 import UIKit
 
@@ -11,25 +10,6 @@ final class MessageInputView: UIView {
 
     static let typingMessageBusinessID = "user_typing_status"
 
-    var bottomSafeAreaInset: CGFloat {
-        get { impl.bottomSafeAreaInset }
-        set { impl.bottomSafeAreaInset = newValue }
-    }
-
-    var onTypingContentChanged: ((Bool) -> Void)? {
-        get { impl.onTypingContentChanged }
-        set { impl.onTypingContentChanged = newValue }
-    }
-
-    var onSendFailure: ((String) -> Void)? {
-        get { impl.onSendFailure }
-        set { impl.onSendFailure = newValue }
-    }
-
-    var typingPublisher: AnyPublisher<Bool, Never>? {
-        return impl.typingPublisher
-    }
-
     private let impl: MessageInputViewImpl
 
     override var intrinsicContentSize: CGSize {
@@ -37,37 +17,50 @@ final class MessageInputView: UIView {
     }
 
     init(conversationID: String,
-         config: MessageInputConfigProtocol = ChatMessageInputConfig(),
-         chatbotController: ChatbotConversationController? = nil) {
-        impl = MessageInputViewImpl(conversationID: conversationID, config: config, chatbotController: chatbotController)
+         config: ChatMessageInputConfig = ChatMessageInputConfig(),
+         chatbotController: ChatbotConversationController? = nil,
+         onSendFailure: ((String) -> Void)? = nil,
+         onPeerTypingChanged: ((Bool) -> Void)? = nil)
+    {
+        impl = MessageInputViewImpl(
+            conversationID: conversationID,
+            config: config,
+            chatbotController: chatbotController,
+            onSendFailure: onSendFailure,
+            onPeerTypingChanged: onPeerTypingChanged
+        )
         super.init(frame: .zero)
-        setContentHuggingPriority(.required, for: .vertical)
-        setContentCompressionResistancePriority(.required, for: .vertical)
-        addSubview(impl)
-        impl.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        impl.onIntrinsicContentSizeInvalidated = { [weak self] in
-            self?.invalidateIntrinsicContentSize()
-        }
-        impl.onAnimateSuperviewLayout = { [weak self] in
-            self?.superview?.layoutIfNeeded()
-        }
+        constructViewHierarchy()
+        activateConstraints()
+        bindInteraction()
     }
 
-    func sendTypingStatus(hasContent: Bool) {
-        impl.sendTypingStatus(hasContent: hasContent)
-    }
-
-    func invalidateTypingIndicator() {
-        impl.invalidateTypingIndicator()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     func cancelVoiceRecording() {
         impl.cancelVoiceRecording()
     }
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func constructViewHierarchy() {
+        addSubview(impl)
+    }
+
+    private func activateConstraints() {
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.required, for: .vertical)
+        impl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    private func bindInteraction() {
+        impl.onIntrinsicContentSizeInvalidated = { [weak self] in
+            self?.invalidateIntrinsicContentSize()
+        }
+        impl.onAnimateSuperviewLayout = { [weak self] in
+            self?.superview?.layoutIfNeeded()
+        }
     }
 }

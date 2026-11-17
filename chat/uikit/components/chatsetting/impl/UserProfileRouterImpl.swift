@@ -3,7 +3,18 @@ import UIKit
 
 enum UserProfileRouterImpl {
 
-    private static var pendingRouteKeys = Set<String>()
+    private static var pendingRoutes: [ObjectIdentifier: UUID] = [:]
+
+    static func openChat(
+        userID: String,
+        from source: UIViewController,
+        animated: Bool = true,
+        onOpenChat: @escaping (ContactInfo) -> Void
+    ) {
+        route(userID: userID, from: source, animated: animated) { _, contact in
+            onOpenChat(contact)
+        }
+    }
 
     static func open(
         userID: String,
@@ -11,7 +22,7 @@ enum UserProfileRouterImpl {
         onSendMessageClick: (() -> Void)? = nil,
         onContactDelete: (() -> Void)? = nil
     ) {
-        if isFriendInMemory(userID: userID) {
+        route(userID: userID, from: source) { source, _ in
             push(
                 from: source,
                 destination: makeC2CPage(
@@ -20,97 +31,59 @@ enum UserProfileRouterImpl {
                     onContactDelete: onContactDelete
                 )
             )
+        }
+    }
+
+    private static func route(
+        userID: String,
+        from source: UIViewController,
+        animated: Bool = true,
+        onFriend: @escaping (UIViewController, ContactInfo) -> Void
+    ) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak source] in
+                guard let source else { return }
+                route(userID: userID, from: source, animated: animated, onFriend: onFriend)
+            }
             return
         }
-        let routeKey = "\(ObjectIdentifier(source)):\(userID)"
-        guard !pendingRouteKeys.contains(routeKey) else { return }
-        pendingRouteKeys.insert(routeKey)
-        ContactStore.shared.loadFriends { result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    pendingRouteKeys.remove(routeKey)
-                    routeByLoadedFriendList(
-                        userID: userID,
+        guard !userID.isEmpty else { return }
+        let routeKey = ObjectIdentifier(source)
+        let token = UUID()
+        pendingRoutes[routeKey] = token
+        let navigationController = source.navigationController
+        let hasNavigationController = navigationController != nil
+        let finish: (ContactInfo?) -> Void = { [weak source, weak navigationController] contact in
+            DispatchQueue.main.async {
+                guard pendingRoutes[routeKey] == token else { return }
+                pendingRoutes.removeValue(forKey: routeKey)
+                guard let source else { return }
+                if hasNavigationController {
+                    guard let navigationController,
+                          source.navigationController === navigationController,
+                          navigationController.topViewController === source else { return }
+                } else {
+                    guard source.navigationController == nil else { return }
+                }
+                if let contact, contact.isFriend {
+                    onFriend(source, contact)
+                } else {
+                    push(
                         from: source,
-                        onSendMessageClick: onSendMessageClick,
-                        onContactDelete: onContactDelete
+                        destination: AddContactViewController(userID: userID, contactInfo: contact),
+                        animated: animated
                     )
                 }
-            case .failure:
-                fallbackToContactInfo(
-                    userID: userID,
-                    from: source,
-                    routeKey: routeKey,
-                    onSendMessageClick: onSendMessageClick,
-                    onContactDelete: onContactDelete
-                )
             }
         }
-    }
-
-    // MARK: - Private
-
-    private static func isFriendInMemory(userID: String) -> Bool {
-        return ContactStore.shared.state.value.friendList.contains(where: { $0.userID == userID })
-    }
-
-    private static func routeByLoadedFriendList(
-        userID: String,
-        from source: UIViewController,
-        onSendMessageClick: (() -> Void)?,
-        onContactDelete: (() -> Void)?
-    ) {
-        if isFriendInMemory(userID: userID) {
-            push(
-                from: source,
-                destination: makeC2CPage(
-                    userID: userID,
-                    onSendMessageClick: onSendMessageClick,
-                    onContactDelete: onContactDelete
-                )
-            )
-        } else {
-            push(from: source, destination: AddContactViewController(userID: userID))
-        }
-    }
-
-    private static func fallbackToContactInfo(
-        userID: String,
-        from source: UIViewController,
-        routeKey: String,
-        onSendMessageClick: (() -> Void)?,
-        onContactDelete: (() -> Void)?
-    ) {
         ContactStore.shared.getContactInfo(
             userIDList: [userID],
             completion: UserProfileRouteContactInfoHandler(
-                onSuccess: { contactInfoList in
-                    DispatchQueue.main.async {
-                        pendingRouteKeys.remove(routeKey)
-                        let contactInfo = contactInfoList.first
-                        if contactInfo?.isFriend == true {
-                            push(
-                                from: source,
-                                destination: makeC2CPage(
-                                    userID: userID,
-                                    onSendMessageClick: onSendMessageClick,
-                                    onContactDelete: onContactDelete
-                                )
-                            )
-                        } else {
-                            push(
-                                from: source,
-                                destination: AddContactViewController(userID: userID, contactInfo: contactInfo)
-                            )
-                        }
-                    }
+                onSuccess: { contacts in
+                    finish(contacts.first(where: { $0.userID == userID }))
                 },
                 onFailure: { _, _ in
-                    DispatchQueue.main.async {
-                        pendingRouteKeys.remove(routeKey)
-                        push(from: source, destination: AddContactViewController(userID: userID))
-                    }
+                    finish(nil)
                 }
             )
         )
@@ -128,12 +101,12 @@ enum UserProfileRouterImpl {
         )
     }
 
-    private static func push(from source: UIViewController, destination: UIViewController) {
+    private static func push(from source: UIViewController, destination: UIViewController, animated: Bool = true) {
         destination.hidesBottomBarWhenPushed = true
         if let navigationController = source.navigationController {
-            navigationController.pushViewController(destination, animated: true)
+            navigationController.pushViewController(destination, animated: animated)
         } else {
-            source.present(destination, animated: true)
+            source.present(destination, animated: animated)
         }
     }
 }

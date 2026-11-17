@@ -216,6 +216,8 @@ public final class TextInputDialogViewController: UIViewController {
         let inputFont = FontScheme.caption1Regular
         textView.font = inputFont
         textField.font = inputFont
+        textView.textAlignment = LanguageHelper.isRTL ? .right : .left
+        textField.textAlignment = LanguageHelper.isRTL ? .right : .left
         textView.textColor = TUIChatKitTheme.colors.textColorPrimary
         textField.textColor = TUIChatKitTheme.colors.textColorPrimary
         textView.backgroundColor = TUIChatKitTheme.colors.bgColorDialog

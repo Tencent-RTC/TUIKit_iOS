@@ -103,14 +103,13 @@ internal final class ChatPageImpl: PageImplementation {
 
     private var latestUnreadTotal: Int64 = 0
 
-    private let messageInputConfig: MessageInputConfigProtocol
+    private let messageInputConfig: ChatMessageInputConfig
 
     private let messageListConfig: ChatMessageListConfig
 
     /// 机器人（@RBT#）会话的回复状态控制器，非机器人会话为 nil。
     private var chatbotController: ChatbotConversationController?
 
-    private var typingCancellable: AnyCancellable?
 
     private lazy var messageListView: MessageListView = {
         let view = MessageListView(
@@ -138,11 +137,14 @@ internal final class ChatPageImpl: PageImplementation {
         let view = MessageInputView(
             conversationID: conversation.id,
             config: messageInputConfig,
-            chatbotController: chatbotController
+            chatbotController: chatbotController,
+            onSendFailure: { [weak self] reason in
+                self?.showSendFailure(reason)
+            },
+            onPeerTypingChanged: messageListConfig._enableTyping ? { [weak self] isTyping in
+                self?.updateTitleForPeerTyping(isTyping)
+            } : nil
         )
-        view.onSendFailure = { [weak self] reason in
-            self?.showSendFailure(reason)
-        }
         createdMessageInputView = view
         return view
     }()
@@ -175,13 +177,13 @@ internal final class ChatPageImpl: PageImplementation {
         self.showsNavigationBar = showsNavigationBar
         var listConfig = messageListConfig
         listConfig.excludeCustomMessagesByBusinessID(MessageInputView.typingMessageBusinessID)
-        var effectiveInputConfig: MessageInputConfigProtocol = messageInputConfig
+        var effectiveInputConfig = messageInputConfig
         // 机器人会话：创建回复状态控制器，并套用机器人专用的输入配置，
         // 对齐 Android ChatPageView.setup 的 setupWithChatbot 路径
         if ChatbotConversationPolicy.isChatbotConversation(conversation.id) {
             NSLog("[ChatbotPlaceholderDiag] ChatPage wiring chatbotController, conversation=\(conversation.id)")
             chatbotController = ChatbotConversationControllers.acquire(conversation.id)
-            effectiveInputConfig = ChatbotMessageInputConfig(base: effectiveInputConfig)
+            effectiveInputConfig = effectiveInputConfig.applyingChatbotRestrictions()
         }
         self.messageListConfig = listConfig
         self.messageInputConfig = effectiveInputConfig
@@ -195,8 +197,6 @@ internal final class ChatPageImpl: PageImplementation {
     deinit {
         unreadCancellable?.cancel()
         sendFailureHideWorkItem?.cancel()
-        typingCancellable?.cancel()
-        createdMessageInputView?.invalidateTypingIndicator()
         if let controller = chatbotController {
             ChatbotConversationControllers.release(conversation.id, controller: controller)
         }
@@ -214,10 +214,6 @@ internal final class ChatPageImpl: PageImplementation {
         bindUnreadBadge()
         bindChatBackground()
         updateTopBannerLayout()
-    }
-
-    internal func viewDidLayoutSubviews() {
-        messageInputView.bottomSafeAreaInset = view.safeAreaInsets.bottom
     }
 
     internal func viewWillAppear(_ animated: Bool) {
@@ -345,7 +341,6 @@ internal final class ChatPageImpl: PageImplementation {
         backButton.addTarget(self, action: #selector(handleBackTapped), for: .touchUpInside)
         cancelMultiSelectButton.addTarget(self, action: #selector(handleCancelMultiSelectTapped), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(handleMoreTapped), for: .touchUpInside)
-        bindTypingIndicator()
     }
 
     private func updateTopBannerLayout() {
@@ -378,22 +373,12 @@ internal final class ChatPageImpl: PageImplementation {
         }
     }
 
-    private func bindTypingIndicator() {
-        guard let typingPublisher = messageInputView.typingPublisher else { return }
-        messageInputView.onTypingContentChanged = { [weak self] hasContent in
-            self?.messageInputView.sendTypingStatus(hasContent: hasContent)
+    private func updateTitleForPeerTyping(_ isTyping: Bool) {
+        if isTyping {
+            titleLabel.text = LocalizedChatString("Typing")
+        } else {
+            titleLabel.text = conversation.title ?? conversation.conversationID
         }
-        guard messageListConfig.enableTyping else { return }
-        typingCancellable = typingPublisher
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isTyping in
-                guard let self = self else { return }
-                if isTyping {
-                    self.titleLabel.text = LocalizedChatString("Typing")
-                } else {
-                    self.titleLabel.text = self.conversation.title ?? self.conversation.conversationID
-                }
-            }
     }
 
     private func bindChatBackground() {

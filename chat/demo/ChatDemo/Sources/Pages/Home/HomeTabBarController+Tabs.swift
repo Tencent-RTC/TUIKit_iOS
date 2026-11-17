@@ -1,6 +1,8 @@
 import AtomicXCore
 import TUIChatKit
-import TUICallKit_Swift
+#if !BUILDAPPSTORE
+import TUICore
+#endif
 import UIKit
 
 extension HomeTabBarController {
@@ -23,9 +25,11 @@ extension HomeTabBarController {
             tabs.append(makeAssistantTab())
         }
         tabs.append(makeConversationsTab())
-        if Self.isCallsTabVisible {
-            tabs.append(makeCallsTab())
+        #if !BUILDAPPSTORE
+        if Self.isCallsTabVisible, let callsTab = makeCallsTab() {
+            tabs.append(callsTab)
         }
+        #endif
         tabs.append(contentsOf: [makeContactsTab(), makeSettingsTab()])
         viewControllers = tabs
     }
@@ -41,8 +45,20 @@ extension HomeTabBarController {
         return page
     }
 
-    private func makeCallsTab() -> UIViewController {
-        let page = RecentCallsViewController(recordCallsUIStyle: .minimalist)
+    #if !BUILDAPPSTORE
+    internal static func makeRecentCallsPage() -> UIViewController? {
+        let param: [AnyHashable: Any] = [
+            TUICore_TUICallingObjectFactory_RecordCallsVC_UIStyle: TUICore_TUICallingObjectFactory_RecordCallsVC_UIStyle_Minimalist
+        ]
+        return TUICore.createObject(
+            TUICore_TUICallingObjectFactory,
+            key: TUICore_TUICallingObjectFactory_RecordCallsVC,
+            param: param
+        ) as? UIViewController
+    }
+
+    private func makeCallsTab() -> UIViewController? {
+        guard let page = Self.makeRecentCallsPage() else { return nil }
         page.tabBarItem = UITabBarItem(
             title: LocalizedChatString("TabCalls"),
             image: UIImage(named: "tab_calls"),
@@ -50,6 +66,7 @@ extension HomeTabBarController {
         )
         return page
     }
+    #endif
 
     private func makeConversationsTab() -> UIViewController {
         let coordinator = ChatFlowCoordinator()

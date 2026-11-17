@@ -40,11 +40,6 @@ public final class ChatPage: UIViewController {
         implementation.viewDidLoad()
     }
 
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        implementation.viewDidLayoutSubviews()
-    }
-
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         implementation.viewWillAppear(animated)

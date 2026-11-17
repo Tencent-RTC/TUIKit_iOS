@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'TUIChatKit'
-    s.version          = '9.1.7824'
+    s.version          = '9.1.7825'
     s.summary          = 'AtomicX Chat Component'
     s.description      = 'Chat streaming component for AtomicX'
     s.homepage         = 'https://cloud.tencent.com/document/product/269'
@@ -21,6 +21,7 @@ Pod::Spec.new do |s|
     s.dependency 'tui-cmark-gfm', '0.29.17'
 
     s.source_files     = '**/*.{swift,h,m}'
+    s.exclude_files    = 'Package.swift'
     s.resource_bundles = {
         'TUIChatKitBundle' => [
             'resources/strings/**/*.{bundle,xcstrings}',

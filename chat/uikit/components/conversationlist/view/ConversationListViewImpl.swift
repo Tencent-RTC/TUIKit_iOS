@@ -134,7 +134,7 @@ final class ConversationListViewImpl: RTCBaseView {
 
     private func buildActions(for conversation: ConversationInfo) -> [ConversationCustomAction] {
         var defaultActions: [ConversationCustomAction] = []
-        if config.isSupportMarkUnread {
+        if config._isSupportMarkUnread {
             let isUnread = viewModel.isUnread(conversation)
             let title = isUnread ? LocalizedChatString("MarkAsRead") : LocalizedChatString("MarkAsUnRead")
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.markUnread, title: title) { [weak self] _ in
@@ -145,31 +145,31 @@ final class ConversationListViewImpl: RTCBaseView {
                 }
             })
         }
-        if config.isSupportMute {
+        if config._isSupportMute {
             let willMute = conversation.receiveOption == .receive
             let title = willMute ? LocalizedChatString("ConversationMute") : LocalizedChatString("ConversationUnmute")
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.mute, title: title) { [weak self] _ in
                 self?.viewModel.muteConversation(conversation, mute: willMute)
             })
         }
-        if config.isSupportPin {
+        if config._isSupportPin {
             let pinned = conversation.isPinned
             let title = pinned ? LocalizedChatString("UnPin") : LocalizedChatString("Pin")
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.pin, title: title) { [weak self] _ in
                 self?.viewModel.pinConversation(conversation, pin: !pinned)
             })
         }
-        if config.isSupportClearHistory {
+        if config._isSupportClearHistory {
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.clearHistory, title: LocalizedChatString("ConversationClearChatHistory")) { [weak self] _ in
                 self?.confirmClearHistory(conversation)
             })
         }
-        if config.isSupportDelete {
+        if config._isSupportDelete {
             defaultActions.append(ConversationCustomAction(ID: ConversationActionIDs.delete, title: LocalizedChatString("Delete"), dangerous: true) { [weak self] _ in
                 self?.viewModel.deleteConversation(conversation)
             })
         }
-        if let customizer = config.actionCustomizer {
+        if let customizer = config._actionCustomizer {
             let editor = CustomEditor(items: defaultActions)
             customizer(editor)
             return editor.build()
@@ -205,19 +205,13 @@ final class ConversationListViewImpl: RTCBaseView {
     }
 
     private func showMoreActionSheet(actions: [ConversationCustomAction], conversation: ConversationInfo) {
-        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        for action in actions {
-            let style: UIAlertAction.Style = action.dangerous ? .destructive : .default
-            alert.addAction(UIAlertAction(title: action.title, style: style) { _ in
-                action.action(conversation)
-            })
+        let options = actions.map { BottomOptionSheetPanel.Option(title: $0.title, isDangerous: $0.dangerous) }
+        let panel = BottomOptionSheetPanel(options: options) { index in
+            guard actions.indices.contains(index) else { return }
+            actions[index].action(conversation)
         }
-        alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
-        if traitCollection.userInterfaceIdiom == .pad, let popover = alert.popoverPresentationController {
-            popover.sourceView = self
-            popover.sourceRect = bounds
-        }
-        findViewController()?.present(alert, animated: true)
+        panel.modalPresentationStyle = .overFullScreen
+        findViewController()?.present(panel, animated: false)
     }
 
     private func findViewController() -> UIViewController? {

@@ -555,6 +555,7 @@ final class VoiceCloneViewController: UIViewController {
         authTipLabel.numberOfLines = 0
         nameField.placeholder = LocalizedChatString("VoiceCloneNameHint")
         nameField.font = .systemFont(ofSize: 16)
+        nameField.textAlignment = LanguageHelper.isRTL ? .right : .left
         nameField.textColor = colors.textColorPrimary
         nameField.backgroundColor = colors.bgColorInput
         nameField.layer.cornerRadius = 8

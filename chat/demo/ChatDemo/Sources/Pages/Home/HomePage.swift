@@ -4,7 +4,6 @@ import Combine
 import UIKit
 
 internal final class HomeTabBarController: UITabBarController {
-    private static let showCallsTabKey = "show_calls_tab"
     internal static let tabIconSize: CGFloat = 24
 
 //    #if ENABLE_AI_ASSISTANT
@@ -15,9 +14,20 @@ internal final class HomeTabBarController: UITabBarController {
 
     internal static let isAITabVisible = true
 
+    #if !BUILDAPPSTORE
+    private static let showCallsTabKey = "show_calls_tab"
+
+    internal static let isCallsTabAvailable: Bool = makeRecentCallsPage() != nil
+    #endif
+
     internal static var isCallsTabVisible: Bool {
+        #if BUILDAPPSTORE
+        return false
+        #else
+        guard isCallsTabAvailable else { return false }
         guard UserDefaults.standard.object(forKey: showCallsTabKey) != nil else { return true }
         return UserDefaults.standard.bool(forKey: showCallsTabKey)
+        #endif
     }
 
     private static var aiTabOffset: Int {
@@ -94,13 +104,14 @@ internal final class HomeTabBarController: UITabBarController {
         updateUnreadBadgePositions()
     }
 
+
+    #if !BUILDAPPSTORE
     internal func setCallsTabVisible(_ visible: Bool) {
         let previous = Self.isCallsTabVisible
         UserDefaults.standard.set(visible, forKey: Self.showCallsTabKey)
-        guard visible != previous else { return }
+        guard Self.isCallsTabVisible != previous else { return }
         let selectedWasSettings = selectedIndex == (viewControllers?.count ?? 1) - 1
         rebuildTabs()
-        // tab 数量变化后按钮位置会变，重新走一次真实图标定位
         messageUnreadBadge.hasAnchoredPosition = false
         contactsUnreadBadge.hasAnchoredPosition = false
         updateTabBarAppearance()
@@ -110,6 +121,7 @@ internal final class HomeTabBarController: UITabBarController {
             selectedIndex = min(selectedIndex, (viewControllers?.count ?? 1) - 1)
         }
     }
+    #endif
 
     private func rebuildTabsAfterFirstAppearanceIfNeeded() {
         guard !hasRebuiltTabsAfterFirstAppearance else { return }

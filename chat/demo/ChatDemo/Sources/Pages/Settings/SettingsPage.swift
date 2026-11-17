@@ -54,9 +54,11 @@ final class SettingsViewController: UIViewController {
 
     private let readReceiptSwitch = UISwitch()
 
-    private let readReceiptDescLabel = UILabel()
-
+    #if !BUILDAPPSTORE
     private let callsTabSwitch = UISwitch()
+    #endif
+
+    private let readReceiptDescLabel = UILabel()
 
     private let logoutButton = UIButton(type: .custom)
 
@@ -115,11 +117,15 @@ final class SettingsViewController: UIViewController {
         groupTwo.addArrangedSubview(makeRowDivider())
         groupTwo.addArrangedSubview(makeReadReceiptRow())
         groupTwo.addArrangedSubview(makeRowDivider())
-        groupTwo.addArrangedSubview(makeCallsTabRow())
-        groupTwo.addArrangedSubview(makeRowDivider())
         groupTwo.addArrangedSubview(makeEntryRow(title: LocalizedChatString("TranslateMessage"), valueLabel: translateValueLabel, action: #selector(handleTranslateTapped)))
         groupTwo.addArrangedSubview(makeRowDivider())
         groupTwo.addArrangedSubview(makeEntryRow(title: LocalizedChatString("VoiceMessageSettings"), valueLabel: nil, action: #selector(handleVoiceTapped)))
+        #if !BUILDAPPSTORE
+        if HomeTabBarController.isCallsTabAvailable {
+            groupTwo.addArrangedSubview(makeRowDivider())
+            groupTwo.addArrangedSubview(makeCallsTabRow())
+        }
+        #endif
         contentStack.addArrangedSubview(groupTwo)
         contentStack.addArrangedSubview(makeGroupSpacer())
         let groupThree = UIStackView()
@@ -170,7 +176,9 @@ final class SettingsViewController: UIViewController {
     private func bindInteraction() {
         profileRow.addTarget(self, action: #selector(handleProfileTapped), for: .touchUpInside)
         readReceiptSwitch.addTarget(self, action: #selector(handleReadReceiptChanged), for: .valueChanged)
+        #if !BUILDAPPSTORE
         callsTabSwitch.addTarget(self, action: #selector(handleCallsTabChanged), for: .valueChanged)
+        #endif
         logoutButton.addTarget(self, action: #selector(handleLogoutTapped), for: .touchUpInside)
     }
 
@@ -350,6 +358,7 @@ final class SettingsViewController: UIViewController {
         return container
     }
 
+    #if !BUILDAPPSTORE
     private func makeCallsTabRow() -> UIView {
         let colors = TUIChatKitTheme.colors
         let container = UIView()
@@ -374,6 +383,7 @@ final class SettingsViewController: UIViewController {
         }
         return container
     }
+    #endif
 
     private func makeGroupSpacer() -> UIView {
         let spacer = UIView()
@@ -549,9 +559,11 @@ final class SettingsViewController: UIViewController {
         refreshReadReceiptDesc()
     }
 
+    #if !BUILDAPPSTORE
     @objc private func handleCallsTabChanged() {
         (tabBarController as? HomeTabBarController)?.setCallsTabVisible(callsTabSwitch.isOn)
     }
+    #endif
 
     @objc private func handleLogoutTapped() {
         DemoLoginManager.shared.logout { _ in }
@@ -565,7 +577,7 @@ final class SettingsViewController: UIViewController {
     }
 
     private func presentActionSheet(options: [(String, () -> Void)], completion: (() -> Void)? = nil) {
-        let panel = BottomOptionSheetPanel(optionTitles: options.map { $0.0 }) { selectedIndex in
+        let panel = BottomOptionSheetPanel(options: options.map { BottomOptionSheetPanel.Option(title: $0.0) }) { selectedIndex in
             options[selectedIndex].1()
             completion?()
         }
@@ -660,6 +672,15 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
     private func setupViewStyle() {
         view.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         title = LocalizedChatString("ProfileDetails")
+        navigationItem.leftBarButtonItem = BackBarButtonFactory.makeBackBarButtonItem(
+            target: self,
+            action: #selector(handleBackTapped),
+            tintColor: TUIChatKitTheme.colors.textColorPrimary
+        )
+    }
+
+    @objc private func handleBackTapped() {
+        navigationController?.popViewController(animated: true)
     }
 
     private func bindInteraction() {
@@ -694,7 +715,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
             make.width.height.equalTo(ChatAvatarSize.xxl.size)
         }
         displayNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(avatarButton.snp.bottom).offset(Self.horizontalPadding)
+            make.top.equalTo(avatarButton.snp.bottom).offset(8)
             make.leading.trailing.equalToSuperview().inset(Self.horizontalPadding)
             make.bottom.equalToSuperview()
         }
@@ -808,10 +829,22 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
 
     @objc private func handleAvatarTapped() {
         let imageUrlList = (1 ... 26).map { "https://im.sdk.qcloud.com/download/tuikit-resource/avatar/avatar_\($0).png" }
-        let picker = AvatarPickerPanel(imageUrlList: imageUrlList) { selectedImageUrl in
-            guard let userID = LoginStore.shared.state.value.loginUserInfo?.userID else { return }
-            let user = UserProfile(userID: userID, nickname: nil, avatarURL: selectedImageUrl)
-            LoginStore.shared.setSelfInfo(userProfile: user, completion: nil)
+        let picker = AvatarPickerPanel(imageUrlList: imageUrlList) { [weak self] selectedImageUrl in
+            guard let self = self,
+                  var user = LoginStore.shared.state.value.loginUserInfo else { return }
+            user.avatarURL = selectedImageUrl
+            self.avatarButton.isEnabled = false
+            LoginStore.shared.setSelfInfo(userProfile: user) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.avatarButton.isEnabled = true
+                    switch result {
+                    case .success:
+                        self?.refreshValues()
+                    case .failure(let error):
+                        WindowToastManager.shared.error("\(error.code): \(error.message)")
+                    }
+                }
+            }
         }
         picker.modalPresentationStyle = .overFullScreen
         present(picker, animated: false)
@@ -848,7 +881,7 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
             (LocalizedChatString("Female"), { self.updateGender(.female) }),
             (LocalizedChatString("GenderSecret"), { self.updateGender(.unknown) })
         ]
-        let panel = BottomOptionSheetPanel(optionTitles: options.map { $0.0 }) { selectedIndex in
+        let panel = BottomOptionSheetPanel(options: options.map { BottomOptionSheetPanel.Option(title: $0.0) }) { selectedIndex in
             options[selectedIndex].1()
         }
         panel.modalPresentationStyle = .overFullScreen
@@ -1036,6 +1069,12 @@ private final class AvatarPickerPanel: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
 
+        let dimControl = UIControl()
+        dimControl.addTarget(self, action: #selector(handleClose), for: .touchUpInside)
+        view.addSubview(dimControl)
+        dimControl.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         view.addSubview(panelView)
         panelView.addSubview(titleLabel)
         panelView.addSubview(closeButton)
@@ -1058,8 +1097,6 @@ private final class AvatarPickerPanel: UIViewController {
         }
 
         closeButton.addTarget(self, action: #selector(handleClose), for: .touchUpInside)
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleClose))
-        view.addGestureRecognizer(tap)
     }
 
     @objc private func handleClose() {
@@ -1081,8 +1118,12 @@ extension AvatarPickerPanel: UICollectionViewDataSource, UICollectionViewDelegat
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        onSelect(imageUrlList[indexPath.item])
-        dismiss(animated: false)
+        collectionView.isUserInteractionEnabled = false
+        let selectedImageUrl = imageUrlList[indexPath.item]
+        let onSelect = self.onSelect
+        dismiss(animated: false) {
+            onSelect(selectedImageUrl)
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -1329,6 +1370,7 @@ final class AboutViewController: UIViewController {
         guard let url = URL(string: Self.icpBeianURL) else { return }
         UIApplication.shared.open(url)
     }
+
 
     @objc private func handleDisclaimerTapped() {
         let alert = UIAlertController(
@@ -1719,222 +1761,5 @@ final class PrimaryColorPickerViewController: UIViewController {
     @objc private func handleConfirmTapped() {
         onColorSelected(currentColor().demoHexString)
         dismiss(animated: true)
-    }
-}
-
-// MARK: - Bottom Option Sheet
-
-private final class BottomOptionSheetPanel: UIViewController {
-    private static let panelCornerRadius: CGFloat = 16
-
-    private static let rowHeight: CGFloat = 56
-
-    private static let horizontalMargin: CGFloat = 8
-
-    private static let groupSpacing: CGFloat = 8
-
-    private static let bottomMargin: CGFloat = 8
-
-    private static let separatorHeight: CGFloat = 0.5
-
-    private static let titleFontSize: CGFloat = 16
-
-    private static let dimAlpha: CGFloat = 0.4
-
-    private static let animationDuration: TimeInterval = 0.25
-
-    private static let maxPanelRatio: CGFloat = 0.75
-
-    private let optionTitles: [String]
-
-    private let onSelect: (Int) -> Void
-
-    private let dimView = UIControl()
-
-    private let contentView = UIView()
-
-    private let optionsGroupView = UIView()
-
-    private let optionsScrollView = UIScrollView()
-
-    private let optionsContentView = UIView()
-
-    private let cancelButton = UIButton(type: .custom)
-
-    init(optionTitles: [String], onSelect: @escaping (Int) -> Void) {
-        self.optionTitles = optionTitles
-        self.onSelect = onSelect
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupViews()
-        activateConstraints()
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        applyMaxHeightLimit()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        playPresentAnimationIfNeeded()
-    }
-
-    private func setupViews() {
-        let colors = TUIChatKitTheme.colors
-        view.backgroundColor = .clear
-        dimView.backgroundColor = UIColor.black.withAlphaComponent(Self.dimAlpha)
-        dimView.alpha = 0
-        dimView.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-
-        optionsGroupView.backgroundColor = colors.bgColorOperate
-        optionsGroupView.layer.cornerRadius = Self.panelCornerRadius
-        optionsGroupView.clipsToBounds = true
-        optionsScrollView.showsVerticalScrollIndicator = true
-        optionsScrollView.alwaysBounceVertical = false
-        optionsScrollView.contentInsetAdjustmentBehavior = .never
-
-        cancelButton.backgroundColor = colors.bgColorOperate
-        cancelButton.layer.cornerRadius = Self.panelCornerRadius
-        cancelButton.clipsToBounds = true
-        cancelButton.setTitle(LocalizedChatString("Cancel"), for: .normal)
-        cancelButton.setTitleColor(colors.textColorLink, for: .normal)
-        cancelButton.titleLabel?.font = .systemFont(ofSize: Self.titleFontSize, weight: .semibold)
-        cancelButton.addTarget(self, action: #selector(handleDismiss), for: .touchUpInside)
-
-        view.addSubview(dimView)
-        view.addSubview(contentView)
-        contentView.addSubview(optionsGroupView)
-        optionsGroupView.addSubview(optionsScrollView)
-        optionsScrollView.addSubview(optionsContentView)
-        contentView.addSubview(cancelButton)
-        buildOptionRows()
-    }
-
-    private func buildOptionRows() {
-        let colors = TUIChatKitTheme.colors
-        var previousRow: UIView?
-        for (index, title) in optionTitles.enumerated() {
-            let row = UIButton(type: .custom)
-            row.tag = index
-            row.setTitle(title, for: .normal)
-            row.setTitleColor(colors.textColorLink, for: .normal)
-            row.titleLabel?.font = .systemFont(ofSize: Self.titleFontSize)
-            row.addTarget(self, action: #selector(handleOptionTapped(_:)), for: .touchUpInside)
-            optionsContentView.addSubview(row)
-            row.snp.makeConstraints { make in
-                make.leading.trailing.equalToSuperview()
-                make.height.equalTo(Self.rowHeight)
-                if let previousRow = previousRow {
-                    make.top.equalTo(previousRow.snp.bottom)
-                } else {
-                    make.top.equalToSuperview()
-                }
-            }
-            if index > 0 {
-                let separator = UIView()
-                separator.backgroundColor = colors.strokeColorPrimary
-                optionsContentView.addSubview(separator)
-                separator.snp.makeConstraints { make in
-                    make.leading.trailing.equalToSuperview()
-                    make.top.equalTo(row.snp.top)
-                    make.height.equalTo(Self.separatorHeight)
-                }
-            }
-            previousRow = row
-        }
-        if let lastRow = previousRow {
-            optionsContentView.snp.makeConstraints { make in
-                make.bottom.equalTo(lastRow.snp.bottom)
-            }
-        }
-    }
-
-    private func activateConstraints() {
-        dimView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        contentView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(Self.horizontalMargin)
-            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-Self.bottomMargin)
-            make.top.greaterThanOrEqualTo(view.safeAreaLayoutGuide.snp.top)
-        }
-        optionsGroupView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-        }
-        optionsScrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        optionsContentView.snp.makeConstraints { make in
-            make.edges.equalTo(optionsScrollView.contentLayoutGuide)
-            make.width.equalTo(optionsScrollView.frameLayoutGuide)
-        }
-        cancelButton.snp.makeConstraints { make in
-            make.top.equalTo(optionsGroupView.snp.bottom).offset(Self.groupSpacing)
-            make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(Self.rowHeight)
-        }
-    }
-
-    private func applyMaxHeightLimit() {
-        let availableHeight = view.bounds.height
-            - view.safeAreaInsets.top
-            - view.safeAreaInsets.bottom
-            - Self.bottomMargin
-        let cancelAreaHeight = Self.rowHeight + Self.groupSpacing
-        let maxOptionsHeight = min(
-            view.bounds.height * Self.maxPanelRatio,
-            availableHeight - cancelAreaHeight
-        )
-        guard maxOptionsHeight > 0 else { return }
-        let contentHeight = CGFloat(optionTitles.count) * Self.rowHeight
-        optionsGroupView.snp.remakeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-            make.height.equalTo(contentHeight).priority(.high)
-            make.height.lessThanOrEqualTo(maxOptionsHeight)
-        }
-    }
-
-    private func playPresentAnimationIfNeeded() {
-        guard dimView.alpha == 0 else { return }
-        view.layoutIfNeeded()
-        contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height + Self.bottomMargin)
-        UIView.animate(withDuration: Self.animationDuration) {
-            self.dimView.alpha = 1
-            self.contentView.transform = .identity
-        }
-    }
-
-    @objc private func handleOptionTapped(_ sender: UIButton) {
-        let index = sender.tag
-        guard index >= 0, index < optionTitles.count else { return }
-        dismissPanel { [weak self] in
-            self?.onSelect(index)
-        }
-    }
-
-    @objc private func handleDismiss() {
-        dismissPanel(completion: nil)
-    }
-
-    private func dismissPanel(completion: (() -> Void)?) {
-        UIView.animate(withDuration: Self.animationDuration) {
-            self.dimView.alpha = 0
-            self.contentView.transform = CGAffineTransform(
-                translationX: 0,
-                y: self.contentView.bounds.height + Self.bottomMargin
-            )
-        } completion: { _ in
-            self.dismiss(animated: false) {
-                completion?()
-            }
-        }
     }
 }

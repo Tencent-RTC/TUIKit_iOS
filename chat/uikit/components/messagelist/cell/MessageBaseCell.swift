@@ -73,7 +73,7 @@ final class MessageBaseCell: UITableViewCell {
     private static let quoteTopSpacing = CGFloat(SpacingScheme.iconTextSpacing)
 
     private var bubbleMaxWidth: CGFloat {
-        let ratio = lastContext?.config.bubbleMaxWidthRatio ?? ChatMessageListConfig.defaultBubbleMaxWidthRatio
+        let ratio = lastContext?.config._bubbleMaxWidthRatio ?? ChatMessageListConfig.defaultBubbleMaxWidthRatio
         return UIScreen.main.bounds.width * ratio
     }
 
@@ -177,13 +177,13 @@ final class MessageBaseCell: UITableViewCell {
                    auxiliaryTextState: AuxiliaryTextDisplayState = .hidden) {
         self.message = message
         self.lastContext = context
-        auxiliaryTextBubbleView.bubbleMaxWidthRatio = context.config.bubbleMaxWidthRatio
+        auxiliaryTextBubbleView.bubbleMaxWidthRatio = context.config._bubbleMaxWidthRatio
         installContentViewIfNeeded(kind: contentKind)
         contentView0?.bind(message: message, context: context)
         applyReadReceipt(message: message, context: context)
-        applyQuote(message: message, isSupportQuote: context.config.isSupportQuote, isLeft: context.isLeft)
+        applyQuote(message: message, isSupportQuote: context.config._isSupportQuote, isLeft: context.isLeft)
 
-        applyTime(timeString, show: context.config.isShowTimeMessage)
+        applyTime(timeString, show: context.config._isShowTimeMessage)
         applyDetailTime(context.detailTimeText)
         applyAvatar(message: message, isLeft: context.isLeft, show: shouldShowAvatar(context: context))
         applyNickname(message: message, context: context)
@@ -370,7 +370,7 @@ final class MessageBaseCell: UITableViewCell {
     }
 
     private func applyReaction(message: MessageInfo, context: MessageContentContext) {
-        let supportReaction = context.config.isSupportReaction
+        let supportReaction = context.config._isSupportReaction
         if supportReaction, !message.reactionList.isEmpty {
             reactionBar.isHidden = false
             let maxRowWidth = bubbleMaxWidth - 2 * reactionBarLayoutInsets().horizontal
@@ -472,7 +472,7 @@ final class MessageBaseCell: UITableViewCell {
     }
 
     private func shouldShowAvatar(context: MessageContentContext) -> Bool {
-        return context.isLeft ? context.config.isShowLeftAvatar : context.config.isShowRightAvatar
+        return context.isLeft ? context.config._isShowLeftAvatar : context.config._isShowRightAvatar
     }
 
     private func applyTime(_ timeString: String?, show: Bool) {
@@ -501,9 +501,9 @@ final class MessageBaseCell: UITableViewCell {
 
     private func applyNickname(message: MessageInfo, context: MessageContentContext) {
         let policyShowsNickname = context.isSelf
-            ? context.config.alignment != .twoSided
+            ? context.config._alignment != .twoSided
             : context.isGroupChat
-        let configShowsNickname = context.isLeft ? context.config.isShowLeftNickname : context.config.isShowRightNickname
+        let configShowsNickname = context.isLeft ? context.config._isShowLeftNickname : context.config._isShowRightNickname
         if policyShowsNickname && configShowsNickname {
             nicknameLabel.text = Self.senderDisplayName(of: message.from)
             nicknameLabel.isHidden = false
@@ -699,9 +699,9 @@ final class MessageBaseCell: UITableViewCell {
                               multiSelect: Bool) {
         applyBubbleBackground(context: context)
         applyBubbleMinimumSize(activeBubbleAppearance?.minimumSize)
-        let hp = context.config.horizontalPadding
-        let avatarSpacing = context.config.avatarSpacing
-        let cellSpacing = context.config.cellSpacing
+        let hp = context.config._horizontalPadding
+        let avatarSpacing = context.config._avatarSpacing
+        let cellSpacing = context.config._cellSpacing
         let timeShown = !timeLabel.isHidden
         let statusReserve: CGFloat = showStatus ? (Self.statusIconSize + Self.statusSlotGap) : 0
 

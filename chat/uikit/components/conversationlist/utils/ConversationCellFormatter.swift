@@ -80,7 +80,7 @@ enum ConversationCellFormatter {
     }
 
     private static func finalSubtitleText(for conversation: ConversationInfo, countUnit: String) -> String {
-        let subtitle = MessageListHelper.getMessageAbstract(conversation.lastMessage)
+        let subtitle = MessageDisplayHelper.getMessageAbstract(conversation.lastMessage)
         if conversation.receiveOption != .receive, conversation.unreadCount > 0 {
             return "[\(conversation.unreadCount)\(countUnit)] \(subtitle)"
         }

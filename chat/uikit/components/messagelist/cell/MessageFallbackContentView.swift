@@ -37,7 +37,7 @@ final class MessageFallbackContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
-        maxBubbleWidth = UIScreen.main.bounds.width * context.config.bubbleMaxWidthRatio
+        maxBubbleWidth = UIScreen.main.bounds.width * context.config._bubbleMaxWidthRatio
         maxWidthConstraint?.update(offset: maxBubbleWidth)
         textLabel.text = displayText(for: message, context: context)
         applyBubbleStyle(isSelf: message.isSentBySelf)
@@ -74,13 +74,13 @@ final class MessageFallbackContentView: UIView, MessageContentView {
         }
 
         if kind == .unsupported {
-            return context.config.isShowUnsupportMessage ? LocalizedChatString("MessageUnsupportedType") : ""
+            return context.config._isShowUnsupportMessage ? LocalizedChatString("MessageUnsupportedType") : ""
         }
-        let abstract = MessageListHelper.getMessageAbstract(message)
+        let abstract = MessageDisplayHelper.getMessageAbstract(message)
         if !abstract.isEmpty {
             return abstract
         }
-        return context.config.isShowUnsupportMessage ? LocalizedChatString("MessageUnsupportedType") : ""
+        return context.config._isShowUnsupportMessage ? LocalizedChatString("MessageUnsupportedType") : ""
     }
 
     private func applyBubbleStyle(isSelf: Bool) {

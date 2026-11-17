@@ -53,6 +53,15 @@ final class DemoLoginManager {
             }
         })
     }
+
+
+
+    private init() {
+        if LoginStore.shared.state.value.loginStatus == .logined,
+           let userInfo = LoginStore.shared.state.value.loginUserInfo {
+            currentUserID = userInfo.userID
+        }
+    }
 }
 
 private enum LoginPersist {
@@ -67,7 +76,10 @@ final class AutoLoginViewController: UIViewController {
     static var hasSavedCredentials: Bool {
         let type = UserDefaults.standard.string(forKey: LoginPersist.loginType) ?? ""
         let userID = UserDefaults.standard.string(forKey: LoginPersist.loginUser) ?? ""
-        return type == LoginPersist.loginTypeLocal && !userID.isEmpty
+        if type == LoginPersist.loginTypeLocal {
+            return !userID.isEmpty
+        }
+        return false
     }
 
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
@@ -108,6 +120,8 @@ final class AutoLoginViewController: UIViewController {
     private func handleFailure() {
         UserDefaults.standard.set("", forKey: LoginPersist.loginUser)
         UserDefaults.standard.set("", forKey: LoginPersist.loginType)
-        NotificationCenter.default.post(name: Self.didFailNotification, object: nil)
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: Self.didFailNotification, object: nil)
+        }
     }
 }

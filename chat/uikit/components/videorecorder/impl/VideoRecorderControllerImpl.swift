@@ -198,7 +198,7 @@ final class VideoRecorderControllerImpl: PageImplementation {
 
     private func addEdgePanGesture() {
         let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleEdgePanGesture(_:)))
-        gesture.edges = .left
+        gesture.edges = LanguageHelper.isRTL ? .right : .left
         view.addGestureRecognizer(gesture)
         edgePanGesture = gesture
     }
@@ -207,9 +207,10 @@ final class VideoRecorderControllerImpl: PageImplementation {
         guard gesture.state == .ended || gesture.state == .cancelled else { return }
         let translation = gesture.translation(in: view)
         let velocity = gesture.velocity(in: view)
+        let horizontalVelocity = velocity.x * (LanguageHelper.isRTL ? -1 : 1)
         let xProgress = abs(translation.x / view.bounds.width)
         let yProgress = abs(translation.y / view.bounds.height)
-        if xProgress > Self.edgePanProgressThreshold || velocity.x > Self.edgePanVelocityThreshold
+        if xProgress > Self.edgePanProgressThreshold || horizontalVelocity > Self.edgePanVelocityThreshold
             || yProgress > Self.edgePanProgressThreshold || velocity.y > Self.edgePanVelocityThreshold {
             completeCapture(videoPath: nil, image: nil, durationMs: 0)
         }
