@@ -2,14 +2,14 @@ import UIKit
 import SnapKit
 
 final class LiveBottomToolbarView: UIView {
-    var onPK: (() -> Void)?
+    var onCoHost: (() -> Void)?
     var onCoGuest: (() -> Void)?
     var onMore: (() -> Void)?
     var onFlipCamera: (() -> Void)?
     var onShowBackgroundMusic: (() -> Void)?
 
-    private let pkAction = LivingActionControl(
-        title: LiveKitResources.localizedString("tuilivekit.pusher.living.pk"), assetName: "livekit_living_pk",
+    private let coHostAction = LivingActionControl(
+        title: LiveKitResources.localizedString("tuilivekit.pusher.cohost.title"), assetName: "livekit_living_cohost",
         iconSize: CGSize(width: 46, height: 38), iconTop: -6)
     private let coGuestAction = LivingActionControl(
         title: LiveKitResources.localizedString("tuilivekit.pusher.living.coguest"),
@@ -35,20 +35,20 @@ final class LiveBottomToolbarView: UIView {
     private func configureUI() {
         backgroundColor = LiveTheme.Color.controlBase
 
-        [pkAction, coGuestAction, flipAction, musicAction, moreAction].forEach { addSubview($0) }
-        pkAction.addTarget(self, action: #selector(showPK), for: .touchUpInside)
+        [coHostAction, coGuestAction, flipAction, musicAction, moreAction].forEach { addSubview($0) }
+        coHostAction.addTarget(self, action: #selector(showCoHost), for: .touchUpInside)
         coGuestAction.addTarget(self, action: #selector(showCoGuest), for: .touchUpInside)
         flipAction.addTarget(self, action: #selector(flipCamera), for: .touchUpInside)
         musicAction.addTarget(self, action: #selector(showBackgroundMusic), for: .touchUpInside)
         moreAction.addTarget(self, action: #selector(showMore), for: .touchUpInside)
 
-        pkAction.snp.makeConstraints { make in
+        coHostAction.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12 + LiveCommentRowStyle.horizontalInset)
             make.top.equalToSuperview().offset(16)
         }
         coGuestAction.snp.makeConstraints { make in
-            make.leading.equalTo(pkAction.snp.trailing).offset(14)
-            make.top.equalTo(pkAction)
+            make.leading.equalTo(coHostAction.snp.trailing).offset(14)
+            make.top.equalTo(coHostAction)
         }
         flipAction.snp.makeConstraints { make in
             make.trailing.equalTo(musicAction.snp.leading).offset(-12)
@@ -69,7 +69,7 @@ final class LiveBottomToolbarView: UIView {
 
     func setCoGuestUnread(_ hasUnread: Bool) { coGuestAction.setUnread(hasUnread) }
 
-    @objc private func showPK() { onPK?() }
+    @objc private func showCoHost() { onCoHost?() }
 
     @objc private func showCoGuest() { onCoGuest?() }
 

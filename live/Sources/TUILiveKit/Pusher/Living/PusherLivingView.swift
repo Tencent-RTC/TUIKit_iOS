@@ -28,6 +28,7 @@ final class PusherLivingView: UIView {
             coGuestAudienceManageView.actionHandler = coGuestActionHandler
         }
     }
+    weak var coHostStore: PusherCoHostStore?
     var onCoGuestStageTap: ((CGPoint) -> Bool)?
     var coGuestSmallWindowRegions: (() -> [CGRect])?
     var coGuestGridRegions: (() -> [CGRect])?
@@ -61,6 +62,11 @@ final class PusherLivingView: UIView {
     private let endConfirmationView = PusherEndConfirmationView()
     private let coGuestSettingsView = PusherCoGuestSettingsView()
     private let coGuestAudienceManageView = PusherCoGuestAudienceManageView()
+    private let coHostCandidateListView = PusherCoHostCandidateListView()
+    private let coHostActionsView = PusherCoHostActionsView()
+    private let coHostIncomingInviteView = PusherCoHostIncomingInviteView()
+    private let coHostDurationScrim = LivingScrimView(direction: .horizontalCenter)
+    private let coHostDurationLabel = UILabel()
     private let liveStatusView: PusherLiveStatusView
 
     // MARK: - Presentation State
@@ -82,6 +88,9 @@ final class PusherLivingView: UIView {
     private var messageListNormalHeightConstraint: Constraint?
     private var messageListComposerBottomConstraint: Constraint?
     private var messageListComposerHeightConstraint: Constraint?
+    private var coHostState = PusherCoHostStore.State()
+    private var coHostNextPanel: (() -> Void)?
+    private var incomingPresentationID: UUID?
     private var coGuestState = PusherCoGuestStore.State()
     private var audienceState = PusherAudienceStore.State()
     private var renderedAudienceState: PusherAudienceStore.State?
@@ -113,6 +122,7 @@ final class PusherLivingView: UIView {
         super.layoutSubviews()
         updateInteractionLayout()
         updateCommentWidth()
+        updateCoHostDurationLayout()
     }
 
 }
@@ -120,7 +130,10 @@ final class PusherLivingView: UIView {
 // MARK: - Stage Rendering
 
 extension PusherLivingView {
-    func updateHost(name: String, avatarURL: String) { headerView.bindHost(name: name, avatarURL: avatarURL) }
+    func updateHost(name: String, avatarURL: String) {
+        headerView.bindHost(name: name, avatarURL: avatarURL)
+        coHostCandidateListView.bindHostAvatar(avatarURL)
+    }
 
     func updateSettings(_ settings: PusherSettingsState) { settingsView.bind(settings) }
 
@@ -131,6 +144,8 @@ extension PusherLivingView {
 
     func updateElapsedSeconds(_ seconds: Int) {
         headerView.bindElapsedSeconds(seconds)
+        updateCoHostDuration()
+        coHostIncomingInviteView.updateCountdown()
         liveStatusView.updateElapsedSeconds(seconds)
     }
 
@@ -321,6 +336,140 @@ extension PusherLivingView {
     }
 }
 
+// MARK: - Host Connection
+
+extension PusherLivingView {
+    func updateCoHost(_ state: PusherCoHostStore.State) {
+        let changedConnection = state.isConnected != coHostState.isConnected
+        coHostState = state
+        coHostCandidateListView.bind(state)
+        coHostActionsView.bind(state)
+        coHostIncomingInviteView.bind(state)
+        updateCoHostDuration()
+        if changedConnection {
+            dismissCoHost()
+            updateCommentWidth()
+            setNeedsLayout()
+        }
+        showPendingCoHostInvitation()
+    }
+
+    func dismissCoHost() {
+        coHostNextPanel = nil
+        incomingPresentationID = nil
+        coHostCandidateListView.dismiss()
+        coHostActionsView.dismiss()
+        coHostIncomingInviteView.dismiss()
+    }
+
+    func showPendingCoHostInvitation() {
+        guard coHostState.applicant != nil else {
+            incomingPresentationID = nil
+            coHostIncomingInviteView.dismiss()
+            return
+        }
+        guard coHostStore != nil, window != nil, !isHidden, UIApplication.shared.applicationState == .active,
+            let deadline = coHostState.applicantDeadline, deadline > Date(), !coHostIncomingInviteView.isPresented,
+            incomingPresentationID == nil
+        else { return }
+        coHostNextPanel = nil
+        let otherPanels = subviews.compactMap { $0 as? BottomSheetView }.filter {
+            $0 !== coHostIncomingInviteView && !$0.isHidden
+        }
+        guard !otherPanels.isEmpty else {
+            coHostIncomingInviteView.show()
+            return
+        }
+        let presentationID = UUID()
+        incomingPresentationID = presentationID
+        var remaining = otherPanels.count
+        for panel in otherPanels {
+            panel.dismissWithCompletion { [weak self] completed in
+                guard let self, self.incomingPresentationID == presentationID else { return }
+                guard completed else {
+                    self.incomingPresentationID = nil
+                    DispatchQueue.main.async { [weak self] in self?.showPendingCoHostInvitation() }
+                    return
+                }
+                remaining -= 1
+                guard remaining == 0 else { return }
+                self.incomingPresentationID = nil
+                self.showPendingCoHostInvitation()
+            }
+        }
+    }
+
+    private func showCoHost() {
+        guard coHostStore != nil else { return }
+        if coHostState.applicant != nil {
+            showPendingCoHostInvitation()
+            return
+        }
+        if coHostState.isConnected {
+            coHostActionsView.show()
+        } else {
+            coHostCandidateListView.show(isAdding: false)
+            coHostStore?.refresh()
+        }
+    }
+
+    private func bindCoHostActions() {
+        coHostIncomingInviteView.onAccept = { [weak self] in self?.coHostStore?.acceptInvitation() }
+        coHostIncomingInviteView.onReject = { [weak self] in self?.coHostStore?.rejectInvitation() }
+        coHostCandidateListView.onInvite = { [weak self] in self?.coHostStore?.invite(liveID: $0) }
+        coHostCandidateListView.onCancel = { [weak self] in self?.coHostStore?.cancelInvitation(liveID: $0) }
+        coHostCandidateListView.onRefresh = { [weak self] in self?.coHostStore?.refresh() }
+        coHostCandidateListView.onLoadMore = { [weak self] in self?.coHostStore?.loadMore() }
+        coHostCandidateListView.onBack = { [weak self] in
+            guard let self else { return }
+            self.coHostNextPanel = { [weak self] in self?.showCoHost() }
+            self.coHostCandidateListView.dismiss()
+        }
+        coHostActionsView.onInviteMore = { [weak self] in
+            guard let self else { return }
+            self.coHostNextPanel = { [weak self] in
+                self?.coHostCandidateListView.show(isAdding: true)
+                self?.coHostStore?.refresh()
+            }
+            self.coHostActionsView.dismiss()
+        }
+        coHostActionsView.onEnd = { [weak self] in self?.coHostStore?.exitConnection() }
+        coHostCandidateListView.onDidDismiss = { [weak self] in self?.showNextCoHostPanel() }
+        coHostActionsView.onDidDismiss = { [weak self] in self?.showNextCoHostPanel() }
+    }
+
+    private func showNextCoHostPanel() {
+        let next = coHostNextPanel
+        coHostNextPanel = nil
+        guard window != nil, !isHidden else { return }
+        next?()
+    }
+
+    private func updateCoHostDuration() {
+        guard coHostState.isConnected, let start = coHostState.connectionStartedAt else {
+            coHostDurationScrim.isHidden = true
+            return
+        }
+        let seconds = max(0, Int(Date().timeIntervalSince(start)))
+        let duration = String(format: "%02d:%02d", seconds / 60, seconds % 60)
+        coHostDurationLabel.text = LiveKitResources.localizedFormat("tuilivekit.pusher.cohost.duration", duration)
+        updateCoHostDurationLayout()
+    }
+
+    private func updateCoHostDurationLayout() {
+        guard coHostState.isConnected, coHostState.connectionStartedAt != nil,
+            let stageTop = (coGuestGridRegions?() ?? []).filter({ !$0.isEmpty && $0.intersects(bounds) }).map(\.minY)
+                .min(), stageTop >= 22
+        else {
+            coHostDurationScrim.isHidden = true
+            return
+        }
+        // Keep the timer immediately above the SDK seats, including multi-host layouts.
+        coHostDurationScrim.frame = CGRect(x: 0, y: stageTop - 22, width: bounds.width, height: 22)
+        coHostDurationScrim.isHidden = false
+    }
+}
+
 // MARK: - UI Assembly
 
 private extension PusherLivingView {
@@ -338,6 +487,16 @@ private extension PusherLivingView {
         stageTap.delegate = self
         addGestureRecognizer(stageTap)
 
+        coHostDurationLabel.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+        coHostDurationLabel.textColor = UIColor(red: 246 / 255, green: 250 / 255, blue: 1, alpha: 1)
+        coHostDurationLabel.textAlignment = .center
+        coHostDurationScrim.isHidden = true
+        insertSubview(coHostDurationScrim, aboveSubview: topScrim)
+        coHostDurationScrim.addSubview(coHostDurationLabel)
+        addSubview(coHostCandidateListView)
+        addSubview(coHostActionsView)
+        addSubview(coHostIncomingInviteView)
+        bindCoHostActions()
         bindActions()
         configureLayout()
     }
@@ -363,9 +522,7 @@ private extension PusherLivingView {
         audienceManageView.onRemoveFromRoom = { [weak self] in self?.audienceStore.removeFromRoom(userID: $0) }
         endConfirmationView.onConfirmEnd = { [weak self] in self?.onEnd?() }
         bottomToolbar.onMore = { [weak self] in self?.settingsView.show() }
-        bottomToolbar.onPK = {
-            LiveToast.show(LiveKitResources.localizedString("tuilivekit.pusher.living.pk_developing"))
-        }
+        bottomToolbar.onCoHost = { [weak self] in self?.showCoHost() }
         bottomToolbar.onCoGuest = { [weak self] in
             self?.coGuestSettingsView.show()
             self?.coGuestActionHandler?.markApplicantsSeen()
@@ -409,6 +566,10 @@ private extension PusherLivingView {
         bottomToolbar.snp.makeConstraints { make in
             make.leading.trailing.bottom.equalToSuperview()
             make.top.equalTo(safeAreaLayoutGuide.snp.bottom).offset(-68)
+        }
+        coHostDurationLabel.snp.makeConstraints { make in make.edges.equalToSuperview() }
+        [coHostCandidateListView, coHostActionsView, coHostIncomingInviteView].forEach {
+            $0.snp.makeConstraints { make in make.edges.equalToSuperview() }
         }
         messageListView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
@@ -543,7 +704,8 @@ private extension PusherLivingView {
 
 private extension PusherLivingView {
     private var usesGridCommentLayout: Bool {
-        coGuestState.layout == .gridLayout || (coGuestState.layout == .dynamicLayout && !coGuestState.connected.isEmpty)
+        coHostState.isConnected || coGuestState.layout == .gridLayout
+            || (coGuestState.layout == .dynamicLayout && !coGuestState.connected.isEmpty)
     }
 
     private var interactionTopBoundary: CGFloat? {
@@ -604,7 +766,7 @@ private extension PusherLivingView {
         let defaultWidth = min(bounds.width * BarrageStreamView.defaultWidthRatio, bounds.width - 24)
         let width: CGFloat
         switch coGuestState.layout {
-        case .floatLayout, .columnLayout:
+        case .floatLayout where !coHostState.isConnected, .columnLayout where !coHostState.isConnected:
             // Use the whole viewport so scrolling does not repeatedly change line widths.
             let commentFrame = messageListView.frame
             let rightEdge = (coGuestSmallWindowRegions?() ?? []).filter {
@@ -683,7 +845,7 @@ extension PusherLivingView: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         var view = touch.view
         while let current = view, current !== self {
-            if current is UIControl { return false }
+            if current is UIControl || current is BottomSheetView { return false }
             view = current.superview
         }
         return true
@@ -695,32 +857,4 @@ extension PusherLivingView: UIGestureRecognizerDelegate {
             && coGuestSettingsView.isHidden && liveStatusView.isHidden && coGuestAudienceManageView.isHidden
     }
 
-}
-
-private final class LivingScrimView: UIView {
-    enum Direction {
-        case top
-        case bottom
-    }
-
-    private let gradient = CAGradientLayer()
-
-    init(direction: Direction) {
-        super.init(frame: .zero)
-        isUserInteractionEnabled = false
-        gradient.colors =
-            direction == .top
-            ? [UIColor.black.withAlphaComponent(0.5).cgColor, UIColor.clear.cgColor]
-            : [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.58).cgColor]
-        gradient.startPoint = CGPoint(x: 0.5, y: 0)
-        gradient.endPoint = CGPoint(x: 0.5, y: 1)
-        layer.addSublayer(gradient)
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gradient.frame = bounds
-    }
 }

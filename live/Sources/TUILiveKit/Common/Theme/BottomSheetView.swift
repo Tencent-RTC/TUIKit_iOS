@@ -26,6 +26,12 @@ class BottomSheetView: UIView {
     private let titleLabel = LiveText(.sheetTitle, alignment: .center)
     private var sheetHeightConstraint: Constraint?
     private var appliedSheetHeight: CGFloat = 0
+    private enum Presentation { case hidden, presenting, shown, dismissing }
+    private var presentation: Presentation = .hidden
+    private var animationID = UUID()
+    private var dismissalCompletions: [(Bool) -> Void] = []
+
+    var isPresented: Bool { presentation == .presenting || presentation == .shown }
 
     // MARK: - Subclass overrides
 
@@ -102,6 +108,15 @@ class BottomSheetView: UIView {
     }
 
     func present() {
+        guard !isPresented else { return }
+        let cancelledCompletions = dismissalCompletions
+        dismissalCompletions.removeAll()
+        animationID = UUID()
+        let id = animationID
+        presentation = .presenting
+        layer.removeAllAnimations()
+        contentView.layer.removeAllAnimations()
+        dimmingControl.layer.removeAllAnimations()
         BottomSheetView.presentedPanels.add(self)
         let height = sheetHeight
         appliedSheetHeight = height
@@ -111,28 +126,54 @@ class BottomSheetView: UIView {
         // Resolve the sheet's outer size before laying out its constrained content.
         superview?.layoutIfNeeded()
         isHidden = false
+        superview?.bringSubviewToFront(self)
         layoutIfNeeded()
         dimmingControl.alpha = 0
         contentView.transform = CGAffineTransform(translationX: 0, y: contentView.bounds.height)
         UIView.animate(withDuration: Animation.presentDuration, delay: 0, options: Animation.present) {
             self.dimmingControl.alpha = 1
             self.contentView.transform = .identity
+        } completion: { [weak self] finished in
+            guard let self, self.animationID == id else { return }
+            if !finished {
+                self.dimmingControl.alpha = 1
+                self.contentView.transform = .identity
+            }
+            self.presentation = .shown
         }
+        cancelledCompletions.forEach { $0(false) }
     }
 
     @objc func dismiss() {
-        guard !isHidden else { return }
+        guard isPresented else { return }
+        presentation = .dismissing
+        animationID = UUID()
+        let id = animationID
         BottomSheetView.presentedPanels.remove(self)
         sheetWillDismiss()
         UIView.animate(withDuration: Animation.dismissDuration, delay: 0, options: Animation.dismiss) {
             self.dimmingControl.alpha = 0
             self.contentView.transform = CGAffineTransform(translationX: 0, y: self.contentView.bounds.height)
-        } completion: { [weak self] _ in
-            guard let self else { return }
+        } completion: { [weak self] finished in
+            guard let self, self.animationID == id else { return }
+            if !finished { self.dimmingControl.alpha = 0 }
             self.contentView.transform = .identity
             self.isHidden = true
+            self.presentation = .hidden
+            let completions = self.dismissalCompletions
+            self.dismissalCompletions.removeAll()
             self.sheetDidDismiss()
+            completions.forEach { $0(true) }
         }
+    }
+
+    func dismissWithCompletion(_ completion: @escaping (Bool) -> Void) {
+        guard presentation != .hidden else {
+            completion(true)
+            return
+        }
+        dismissalCompletions.append(completion)
+        dismiss()
     }
 
     /// Applies the current `sheetHeight`. Use when the sheet switches pages
@@ -165,3 +206,8 @@ private enum SheetTitleStyle {
     static let topInset: CGFloat = 30
     static let height: CGFloat = 18
 }
+
+/// Unified spacing between a sheet's bottom-most component and the sheet's
+/// bottom edge (above the safe area). Every bottom sheet pins its last visible
+/// control to `contentView.safeAreaLayoutGuide` with this inset.
+enum SheetBottomStyle { static let inset: CGFloat = 44 }

@@ -1,6 +1,7 @@
 import AtomicXCore
 import AVFoundation
 import Combine
+import TXLiteAVSDK_Professional
 import UIKit
 
 public final class VoiceLoungeView: UIView {
@@ -10,6 +11,23 @@ public final class VoiceLoungeView: UIView {
     }
 
     public var onClose: (() -> Void)?
+    public var onSwitchLive: ((LiveInfo) -> Void)?
+
+    public var prepareAccessoryView: UIView? {
+        get { isCreating ? prepareView.accessoryView : nil }
+        set {
+            guard isCreating, stage == .prepare, !didReleaseSession else { return }
+            prepareView.accessoryView = newValue
+        }
+    }
+
+    public var prepareTitle: String {
+        get { isCreating ? prepareView.title : "" }
+        set {
+            guard isCreating, stage == .prepare, !didReleaseSession else { return }
+            prepareView.title = newValue
+        }
+    }
 
     private let liveID: String
     private let role: VoiceLoungeRole
@@ -27,17 +45,30 @@ public final class VoiceLoungeView: UIView {
     private var seatStore: LiveSeatStore?
     private let liveClock = VoiceLoungeLiveClock()
     private var sessionCancellables = Set<AnyCancellable>()
+    private var accountCancellables = Set<AnyCancellable>()
+    private var lifecycleCancellables = Set<AnyCancellable>()
+    private let screenAwakeOwner = UUID()
+    private var pushSessionID: UUID?
+    private var isPusherAttached = false
+    private var didReleaseSession = false
+    private var hasConnected = false
+    private lazy var player = AtomicPlayer()
+    private var isPlaying = false
 
     private var hostUserID = ""
     private var hostName = ""
     private var hostAvatarURL = ""
 
     private enum Stage { case prepare, living, summary }
-    private var stage: Stage = .prepare
+    private var stage: Stage = .prepare { didSet { updateScreenAwake() } }
     private lazy var prepareView = VoiceLoungePrepareView()
     private lazy var endPanel = VoiceLoungeEndPanel()
     private lazy var summaryView = VoiceLoungeSummaryView()
     private lazy var alertView = VoiceLoungeAlertView()
+    private lazy var transcriberPanel = VoiceLoungeAITranscriberPanel()
+    private lazy var audienceEndView = VoiceLoungeAudienceEndView()
+    private var isFetchingNextLive = false
+    private var latestLiveInfo = LiveInfo()
     private var pusherConfig: PusherInfo?
     private var hasConfiguredSeatMode = false
     private var endSummary: PusherEvent.PusherSummary?
@@ -47,7 +78,7 @@ public final class VoiceLoungeView: UIView {
     private var isPaused = false
     private var wasMutedBeforePause = false
 
-    private var isLiving = false
+    private var isLiving = false { didSet { updateScreenAwake() } }
     private var hasJoinedLive = false
     private var sessionToken = 0
 
@@ -79,12 +110,22 @@ public final class VoiceLoungeView: UIView {
         setupStyles()
         setupBindings()
         configureMode()
+        if isCreating { subscribeAccountEvents() }
+        subscribeAppLifecycle()
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if isCreating, window == nil { releasePushSession() }
+        updateScreenAwake()
+    }
+
     private var stackedViews: [UIView] {
-        isCreating ? [prepareView, livingView, summaryView, endPanel, pauseView, alertView] : [livingView, pauseView]
+        isCreating
+            ? [prepareView, livingView, summaryView, endPanel, pauseView, alertView, transcriberPanel]
+            : [livingView, pauseView, audienceEndView, alertView, transcriberPanel]
     }
 
     private func setupViews() {
@@ -113,6 +154,13 @@ public final class VoiceLoungeView: UIView {
 
     private func setupBindings() {
         coGuest.onToast = { LiveToast.show($0) }
+        coGuest.onMicrophoneDenied = { [weak self] in self?.showMicrophonePermissionAlert() }
+        livingActions.confirm = { [weak self] title, message, confirmTitle, action in
+            guard let self else { return }
+            self.alertView.show(
+                title: title, message: message, confirmTitle: confirmTitle, skin: self.roomSettings.skin,
+                onConfirm: action)
+        }
         if isCreating { bindCreateSession() } else { bindJoinSession() }
     }
 
@@ -124,13 +172,39 @@ public final class VoiceLoungeView: UIView {
         if isCreating { loadHostUserInfo() } else { joinLiving() }
     }
 
-    deinit { if role == .host { AtomicPusher.shared.release() } }
+    deinit {
+        if isPusherAttached { AtomicPusher.shared.release() }
+        if isPlaying { player.stopPlay() }
+        if hasJoinedLive { LiveListStore.shared.leaveLive(completion: nil) }
+        Task { @MainActor [screenAwakeOwner] in LiveScreenAwake.setEnabled(screenAwakeOwner, false) }
+    }
 }
-
-// MARK: - Shared
 
 private extension VoiceLoungeView {
     var selfUserID: String { LoginStore.shared.state.value.loginUserInfo?.userID ?? "" }
+
+    func updateScreenAwake() {
+        let inRoom = isCreating ? stage == .living : isLiving
+        let awake =
+            window != nil && !didReleaseSession && inRoom && UIApplication.shared.applicationState != .background
+        LiveScreenAwake.setEnabled(screenAwakeOwner, awake)
+    }
+
+    func subscribeAppLifecycle() {
+        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification).sink { [weak self] _ in
+            self?.updateScreenAwake()
+        }.store(in: &lifecycleCancellables)
+        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).sink { [weak self] _ in
+            self?.updateScreenAwake()
+        }.store(in: &lifecycleCancellables)
+    }
+
+    func showMicrophonePermissionAlert() {
+        alertView.show(
+            title: .micPermissionTitle, message: .micPermissionMessage, confirmTitle: .micPermissionSettings,
+            skin: roomSettings.skin
+        ) { VoiceLoungeMicrophonePermission.openSystemSettings() }
+    }
 
     func exitForEmptyLiveID() {
         LiveKitLog.error("[VoiceLounge] liveID is empty, role=\(isCreating ? "host" : "audience")")
@@ -158,11 +232,9 @@ private extension VoiceLoungeView {
     }
 }
 
-// MARK: - Create: Prepare → Living → Summary, pushing audio
-
 private extension VoiceLoungeView {
     func bindCreateSession() {
-        prepareView.onExit = { [weak self] in self?.onClose?() }
+        prepareView.onExit = { [weak self] in self?.closeHost() }
         prepareView.onStart = { [weak self] input in self?.enterLiving(with: input) }
         livingView.onClose = { [weak self] in
             guard let self else { return }
@@ -170,7 +242,7 @@ private extension VoiceLoungeView {
             self.endPanel.show(viewerCount: Int(min(online, UInt(Int.max))))
         }
         endPanel.onConfirmEnd = { [weak self] in self?.confirmEndLive() }
-        summaryView.onExit = { [weak self] in self?.closeSummary() }
+        summaryView.onExit = { [weak self] in self?.closeHost() }
         bindLivingActions()
         giftRankStore.onPublish = { [weak self] in self?.syncRoomMetaToAudience() }
         pauseView.onResume = { [weak self] in self?.resumeLive() }
@@ -189,6 +261,7 @@ private extension VoiceLoungeView {
     func syncHostMicOff() { seatUIStore.isHostMicOff = isMuted || isPaused }
 
     func enterLiving(with input: VoiceLoungeConfig) {
+        guard stage == .prepare, !didReleaseSession, window != nil else { return }
         stage = .living
         liveClock.start()
         endSummary = nil
@@ -207,13 +280,16 @@ private extension VoiceLoungeView {
     }
 
     func confirmEndLive() {
-        guard !isEndingLive else { return }
+        guard stage == .living, !didReleaseSession, !isEndingLive, isPusherAttached else { return }
         isEndingLive = true
         AtomicPusher.shared.stopPush()
     }
 
     func enterSummary() {
+        guard stage == .living, !didReleaseSession else { return }
         stage = .summary
+        pushSessionID = nil
+        sessionCancellables.removeAll()
         var summary = VoiceLoungeSummaryData()
         summary.startTime = liveClock.startDate
         summary.endTime = Date()
@@ -227,26 +303,27 @@ private extension VoiceLoungeView {
             summary.likes = Int(LikeStore.create(liveID: liveID).state.value.totalLikeCount)
         }
         summaryView.bind(summary)
+        liveClock.stop()
 
         summaryView.isHidden = false
         livingView.isHidden = true
     }
 
-    func closeSummary() {
-        stage = .prepare
-        summaryView.isHidden = true
-        livingView.isHidden = true
-        prepareView.isHidden = false
-        liveClock.stop()
+    func closeHost() {
+        guard !didReleaseSession else { return }
         releasePushSession()
         onClose?()
     }
 
     func startPush(with liveName: String) {
+        pushSessionID = UUID()
+        hasConnected = false
         subscribePusher()
         AtomicPusher.shared.setView(livingView.coreView)
+        isPusherAttached = true
         let config = PusherInfo(
-            liveID: liveID, liveName: liveName, isPublicVisible: true, metaData: roomSettings.config.metaData)
+            liveID: liveID, liveName: liveName, coverURL: roomSettings.config.coverURL, isPublicVisible: true,
+            metaData: roomSettings.config.metaData)
         pusherConfig = config
         AtomicPusher.shared.startPush(config: config)
         seatStore = LiveSeatStore.create(liveID: liveID)
@@ -256,59 +333,72 @@ private extension VoiceLoungeView {
     }
 
     func openHostMicrophone() {
+        guard let sessionID = pushSessionID else { return }
         let open: () -> Void = { [weak self] in
-            guard let self, self.stage == .living else { return }
+            guard let self, self.stage == .living, !self.didReleaseSession, self.pushSessionID == sessionID,
+                self.window != nil
+            else { return }
             if DeviceStore.shared.state.value.microphoneStatus == .on {
                 if !self.isMuted { self.seatStore?.unmuteMicrophone(completion: nil) }
                 return
             }
             DeviceStore.shared.openLocalMicrophone { [weak self] result in
                 Task { @MainActor in
-                    guard let self else { return }
+                    guard let self, !self.didReleaseSession, self.pushSessionID == sessionID, self.stage == .living
+                    else { return }
                     if case .success = result, self.isMuted || self.isPaused { self.seatStore?.muteMicrophone() }
                 }
             }
         }
-        switch AVCaptureDevice.authorizationStatus(for: .audio) {
-        case .authorized: open()
-        case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .audio) { granted in
-                guard granted else { return }
-                Task { @MainActor in open() }
-            }
-        default: break
-        }
+        VoiceLoungeMicrophonePermission.request(
+            onGranted: open,
+            onDenied: { [weak self] in
+                guard let self, self.stage == .living, !self.didReleaseSession, self.pushSessionID == sessionID,
+                    self.window != nil
+                else { return }
+                self.showMicrophonePermissionAlert()
+            })
     }
 
     func syncRoomMetaToAudience() {
-        guard var config = pusherConfig else { return }
+        guard stage == .living, !didReleaseSession, var config = pusherConfig else { return }
         config.metaData = roomSettings.config.metaData.merging(giftRankStore.publishedMetaData()) { _, rank in rank }
             .merging([VoiceLoungeConfig.pausedMetaKey: isPaused ? "1" : "0"]) { _, paused in paused }
         pusherConfig = config
-        AtomicPusher.shared.updateConfig(config: config, modifyFlag: .metaData)
+        AtomicPusher.shared.setMetaData(config.metaData)
     }
 
     func subscribePusher() {
         sessionCancellables.removeAll()
+        guard let sessionID = pushSessionID else { return }
 
         AtomicPusher.shared.state.subscribe().receive(on: DispatchQueue.main).sink { [weak self] state in
-            self?.applyPusherState(state)
+            guard let self, !self.didReleaseSession, self.pushSessionID == sessionID, self.stage == .living,
+                state.pusherInfo.liveID == self.liveID
+            else { return }
+            self.applyPusherState(state)
         }.store(in: &sessionCancellables)
 
         AtomicPusher.shared.pusherEvent.receive(on: DispatchQueue.main).sink { [weak self] event in
-            self?.handlePusherEvent(event)
+            guard let self, !self.didReleaseSession, self.pushSessionID == sessionID, self.window != nil else { return }
+            self.handlePusherEvent(event)
         }.store(in: &sessionCancellables)
     }
 
     func applyPusherState(_ state: PusherState) {
         totalViewerCount = max(0, state.totalViewerCount)
         if state.networkState == .CONNECTED, !hasConfiguredSeatMode, let seatStore {
+            hasConnected = true
             hasConfiguredSeatMode = true
+            applyHifiAudioConfig()
             coGuest.activate(liveID: liveID, role: role)
             seatUIStore.enableStaleCleanup()
             activateInteractions(hostUserID: selfUserID)
-            seatStore.setSeatMode(mode: .apply) { result in
+            let sessionID = pushSessionID
+            seatStore.setSeatMode(mode: .apply) { [weak self] result in
                 Task { @MainActor in
+                    guard let self, !self.didReleaseSession, self.pushSessionID == sessionID, self.stage == .living
+                    else { return }
                     if case .failure(let error) = result { LiveToast.show(LiveKitErrorText.message(error)) }
                 }
             }
@@ -317,7 +407,14 @@ private extension VoiceLoungeView {
 
     func handlePusherEvent(_ event: PusherEvent) {
         switch event {
-        case .pusherError: break
+        case let .pusherError(code, message):
+            guard code != .OK else { return }
+            LiveKitLog.error("[VoiceLounge] push failed liveID=\(liveID) code=\(code.rawValue) message=\(message)")
+            if code == .ERROR_START_PUSH_REQUEST_FAILED, !hasConnected, !isEndingLive {
+                returnToPrepareAfterStartFailure()
+            }
+            let key = code == .ERROR_START_PUSH_REQUEST_FAILED ? "start_failed" : "operation_failed"
+            LiveToast.show(LiveKitResources.localizedString("tuilivekit.pusher.error.\(key)"))
         case .liveEnded(_, let summary):
             endSummary = summary
             enterSummary()
@@ -329,17 +426,56 @@ private extension VoiceLoungeView {
     }
 
     func releasePushSession() {
+        guard !didReleaseSession else { return }
+        didReleaseSession = true
+        updateScreenAwake()
+        let hadSession = pushSessionID != nil
+        pushSessionID = nil
         sessionCancellables.removeAll()
+        accountCancellables.removeAll()
+        prepareView.deactivate()
+        liveClock.stop()
         coGuest.deactivate()
         deactivateInteractions()
-        DeviceStore.shared.closeLocalMicrophone()
         hasConfiguredSeatMode = false
         pusherConfig = nil
         seatStore = nil
         seatUIStore.deactivate()
         isPaused = false
         pauseView.setPaused(false)
+        livingView.removeFromSuperview()
+        guard isPusherAttached else { return }
+        isPusherAttached = false
+        DeviceStore.shared.closeLocalMicrophone()
+        if hadSession, stage == .living, !isEndingLive { AtomicPusher.shared.stopPush() }
         AtomicPusher.shared.release()
+    }
+
+    func returnToPrepareAfterStartFailure() {
+        pushSessionID = nil
+        sessionCancellables.removeAll()
+        coGuest.deactivate()
+        deactivateInteractions()
+        seatUIStore.deactivate()
+        seatStore = nil
+        pusherConfig = nil
+        hasConfiguredSeatMode = false
+        liveClock.stop()
+        stage = .prepare
+        livingView.isHidden = true
+        summaryView.isHidden = true
+        prepareView.isHidden = false
+    }
+
+    func subscribeAccountEvents() {
+        LoginStore.shared.loginEventPublisher.receive(on: DispatchQueue.main).sink { [weak self] event in
+            guard let self, !self.didReleaseSession, self.window != nil, case .kickedOffline = event else { return }
+            if self.stage == .living {
+                self.confirmEndLive()
+            } else if self.stage == .prepare {
+                DispatchQueue.main.async { [weak self] in self?.closeHost() }
+            }
+        }.store(in: &accountCancellables)
     }
 
     func bindLivingActions() {
@@ -350,10 +486,39 @@ private extension VoiceLoungeView {
             if layout == .duo { self?.confirmSwitchToDuo(layout) } else { self?.applyLivingLayout(layout) }
         }
         livingActions.changeTopic = { [weak self] topic in self?.commitTopic(topic) }
+        livingActions.updateTranscriber = { [weak self] state in self?.applyTranscriberState(state) }
+        livingActions.showTranscriberPanel = { [weak self] in self?.presentTranscriberPanel() }
+    }
+
+    func applyTranscriberState(_ state: VoiceLoungeAITranscriberPanel.State) {
+        let current = roomSettings.config
+        var next = current
+        next.isTranscriberEnabled = state.isEnabled
+        next.transcriberShowOriginal = state.showOriginal
+        next.transcriberScale = state.scale
+        next.transcriberLanguage = state.language
+        if next != current {
+            let enabledChanged = next.isTranscriberEnabled != current.isTranscriberEnabled
+            roomSettings.config = next
+            if enabledChanged { syncRoomMetaToAudience() }
+        }
+        if state.saveAsDefault {
+            VoiceLoungeTranscriberDefaults.current = VoiceLoungeTranscriberDefaults(
+                isEnabled: state.isEnabled, showOriginal: state.showOriginal, scale: state.scale,
+                language: state.language)
+        }
+    }
+
+    func presentTranscriberPanel() {
+        let state = VoiceLoungeAITranscriberPanel.State(
+            isEnabled: roomSettings.isTranscriberEnabled, showOriginal: roomSettings.transcriberShowOriginal,
+            scale: roomSettings.transcriberScale, language: roomSettings.transcriberLanguage, saveAsDefault: false)
+        transcriberPanel.onStateChanged = { [weak self] s in self?.applyTranscriberState(s) }
+        transcriberPanel.show(initial: state, skin: roomSettings.skin)
     }
 
     func pauseLive() {
-        guard !isPaused else { return }
+        guard stage == .living, !didReleaseSession, !isEndingLive, !isPaused else { return }
         isPaused = true
         liveClock.pause()
         pauseView.setPaused(true)
@@ -368,7 +533,7 @@ private extension VoiceLoungeView {
     }
 
     func resumeLive() {
-        guard isPaused else { return }
+        guard stage == .living, !didReleaseSession, !isEndingLive, isPaused else { return }
         liveClock.resume()
         isPaused = false
         pauseView.setPaused(false)
@@ -382,6 +547,7 @@ private extension VoiceLoungeView {
     }
 
     func handleLivingToggleMute() {
+        guard stage == .living, !didReleaseSession, !isEndingLive else { return }
         isMuted.toggle()
         if let seatStore {
             if isMuted { seatStore.muteMicrophone() } else { seatStore.unmuteMicrophone(completion: nil) }
@@ -422,12 +588,13 @@ private extension VoiceLoungeView {
     }
 }
 
-// MARK: - Join: enter an existing room, pulling audio
-
 private extension VoiceLoungeView {
     func bindJoinSession() {
+        livingActions.showTranscriberPanel = { [weak self] in self?.presentTranscriberPanel() }
         livingView.onClose = { [weak self] in self?.leaveRoom() }
         pauseView.onResume = { [weak self] in self?.leaveRoom() }
+        audienceEndView.onBack = { [weak self] in self?.onClose?() }
+        audienceEndView.onSwipeUp = { [weak self] in self?.switchToNextLive() }
         coGuest.onHostPauseChanged = { [weak self] paused in self?.applyHostPause(paused) }
         coGuest.onMicOpenRequested = { [weak self] in
             guard let self, self.coGuest.guestStatus == .onSeat else { return }
@@ -435,7 +602,6 @@ private extension VoiceLoungeView {
             let info = self.seatUIStore.seatList.first { $0.userInfo.userID == selfID }?.userInfo
             guard info?.allowOpenMicrophone != false, info?.microphoneStatus != .on else { return }
             self.seatStore?.unmuteMicrophone(completion: nil)
-            LiveToast.show(.microphoneUnlocked)
         }
     }
 
@@ -445,6 +611,7 @@ private extension VoiceLoungeView {
 
         var config = VoiceLoungeConfig()
         config.roomName = .loadingName
+        config.isTranscriberEnabled = true
         roomSettings.config = config
         syncHostInfo()
 
@@ -463,12 +630,18 @@ private extension VoiceLoungeView {
         livingView.coreView.setLiveID(liveID)
         sessionToken += 1
         let token = sessionToken
+        if !isPlaying {
+            isPlaying = true
+            player.setView(livingView.coreView)
+            player.startPlay(url: "livekit://liveid=\(liveID)")
+        }
         LiveListStore.shared.joinLive(liveID: liveID) { [weak self] result in
             Task { @MainActor in
                 guard let self, token == self.sessionToken else { return }
                 switch result {
                 case .success(let info):
                     self.hasJoinedLive = true
+                    self.applyHifiAudioConfig()
                     self.activateInteractions(hostUserID: info.liveOwner.userID)
                     self.coGuest.activate(liveID: self.liveID, role: self.role)
                     self.seatUIStore.activateAudienceList()
@@ -509,11 +682,8 @@ private extension VoiceLoungeView {
 
         seatStore?.liveSeatEventPublisher.receive(on: DispatchQueue.main).sink { [weak self] event in
             switch event {
-            case .onLocalMicrophoneClosedByAdmin:
-                LiveToast.show(.microphoneLocked)
-                self?.seatStore?.muteMicrophone()
+            case .onLocalMicrophoneClosedByAdmin: self?.seatStore?.muteMicrophone()
             case .onLocalMicrophoneOpenedByAdmin:
-                LiveToast.show(.microphoneUnlocked)
                 guard let self, self.coGuest.guestStatus == .onSeat else { return }
                 self.seatStore?.unmuteMicrophone(completion: nil)
             default: break
@@ -522,11 +692,70 @@ private extension VoiceLoungeView {
 
         LiveListStore.shared.liveListEventPublisher.receive(on: DispatchQueue.main).sink { [weak self] event in
             guard let self else { return }
-            if case .onLiveEnded(let endedID, _, _) = event, endedID == self.liveID { self.leaveRoom() }
+            if case .onLiveEnded(let endedID, _, _) = event, endedID == self.liveID { self.showAudienceEnd() }
+        }.store(in: &sessionCancellables)
+
+        player.playerEvent.receive(on: DispatchQueue.main).sink { [weak self] event in
+            guard let self else { return }
+            switch event {
+            case .liveEnded: self.showAudienceEnd()
+            case let .kickedOut(reason, _):
+                let key: String
+                switch reason {
+                case .BY_ADMIN: key = "removed"
+                case .BY_LOGGED_ON_OTHER_DEVICE: key = "other_device"
+                case .BY_SERVER: key = "server"
+                case .FOR_NETWORK_DISCONNECTED: key = "network"
+                case .FOR_LIVE_CHANNEL_EXPIRED: key = "expired"
+                @unknown default: key = "removed"
+                }
+                let message = LiveKitResources.localizedString("tuilivekit.player.interruption." + key)
+                self.showAudienceEnd(reason: message)
+                LiveToast.show(message)
+            default: break
+            }
         }.store(in: &sessionCancellables)
     }
 
+    func showAudienceEnd(reason: String? = nil) {
+        guard isLiving else { return }
+        isLiving = false
+        liveClock.stop()
+        BottomSheetView.dismissAll()
+        endEditing(true)
+        releasePlaySession()
+        audienceEndView.show(liveInfo: latestLiveInfo, reason: reason)
+    }
+
+    func switchToNextLive() {
+        guard !isFetchingNextLive else { return }
+        isFetchingNextLive = true
+        let currentID = liveID
+        let selfID = selfUserID
+        LiveListStore.shared.fetchLiveList(cursor: "", count: 20) { [weak self] result in
+            Task { @MainActor in
+                guard let self else { return }
+                self.isFetchingNextLive = false
+                switch result {
+                case .success:
+                    let next = LiveListStore.shared.state.value.liveList.first {
+                        !$0.liveID.isEmpty && $0.liveID != currentID && $0.liveOwner.userID != selfID
+                    }
+                    if let next, let onSwitchLive = self.onSwitchLive {
+                        onSwitchLive(next)
+                    } else {
+                        LiveToast.show(.noMoreLive)
+                    }
+                case .failure(let error):
+                    LiveKitLog.error("[VoiceLounge] fetchLiveList failed code=\(error.code) message=\(error.message)")
+                    LiveToast.show(LiveKitErrorText.message(error))
+                }
+            }
+        }
+    }
+
     func applyLiveInfo(_ info: LiveInfo) {
+        if !info.liveOwner.userID.isEmpty { latestLiveInfo = info }
         hostName = info.liveOwner.userName
         hostAvatarURL = info.liveOwner.avatarURL
         if !info.liveOwner.userID.isEmpty, info.liveOwner.userID != hostUserID {
@@ -537,7 +766,7 @@ private extension VoiceLoungeView {
 
         var config = roomSettings.config
         config.roomName = info.liveName.isEmpty ? liveID : info.liveName
-        if VoiceLoungeConfig.hasMeta(in: info.metaData) { config.applyMeta(info.metaData) }
+        if VoiceLoungeConfig.hasMeta(in: info.metaData) { config.applyMeta(info.metaData, includeTranscriber: false) }
         roomSettings.config = config
         if let paused = info.metaData[VoiceLoungeConfig.pausedMetaKey] { applyHostPause(paused == "1") }
     }
@@ -560,7 +789,7 @@ private extension VoiceLoungeView {
                 }
                 if let paused = metaData[VoiceLoungeConfig.pausedMetaKey] { self.applyHostPause(paused == "1") }
                 guard VoiceLoungeConfig.hasMeta(in: metaData) else { return }
-                self.roomSettings.config.applyMeta(metaData)
+                self.roomSettings.config.applyMeta(metaData, includeTranscriber: false)
             }
         }
     }
@@ -580,12 +809,30 @@ private extension VoiceLoungeView {
         deactivateInteractions()
         sessionCancellables.removeAll()
         pauseView.setPaused(false)
+        if isPlaying {
+            player.stopPlay()
+            isPlaying = false
+        }
         if hasJoinedLive {
             LiveListStore.shared.leaveLive(completion: nil)
             hasJoinedLive = false
         }
         seatStore = nil
         seatUIStore.deactivate()
+    }
+}
+
+private extension VoiceLoungeView {
+    static let hifiAudioQualityJSON = "{\"api\":\"setAudioQualityEx\",\"params\":{\"audioScene\":18}}"
+    static let hifiPrivateConfigJSON =
+        "{\"api\":\"setPrivateConfig\",\"params\":{\"configs\":["
+        + "{\"key\":\"Liteav.Audio.common.agc.version\",\"default\":\"0\",\"value\":\"6\"},"
+        + "{\"key\":\"Liteav.Audio.common.ai.ec.model.type\",\"default\":\"0\",\"value\":\"6\"}" + "]}}"
+
+    func applyHifiAudioConfig() {
+        let cloud = TRTCCloud.sharedInstance()
+        cloud.callExperimentalAPI(Self.hifiAudioQualityJSON)
+        cloud.callExperimentalAPI(Self.hifiPrivateConfigJSON)
     }
 }
 
@@ -602,11 +849,15 @@ private extension String {
     static var duoConfirmTitle: String {
         LiveKitResources.localizedString("tuilivekit.voiceroom.layout.duo_confirm_title")
     }
+    static var noMoreLive: String { LiveKitResources.localizedString("tuilivekit.voiceroom.end.no_more_live") }
     static var loadingName: String { LiveKitResources.localizedString("tuilivekit.voiceroom.room.loading_name") }
-    static var microphoneLocked: String {
-        LiveKitResources.localizedString("tuilivekit.player.coguest.microphone_locked")
+    static var micPermissionTitle: String {
+        LiveKitResources.localizedString("tuilivekit.voiceroom.mic_permission.title")
     }
-    static var microphoneUnlocked: String {
-        LiveKitResources.localizedString("tuilivekit.player.coguest.microphone_unlocked")
+    static var micPermissionMessage: String {
+        LiveKitResources.localizedString("tuilivekit.voiceroom.mic_permission.message")
+    }
+    static var micPermissionSettings: String {
+        LiveKitResources.localizedString("tuilivekit.voiceroom.mic_permission.settings")
     }
 }

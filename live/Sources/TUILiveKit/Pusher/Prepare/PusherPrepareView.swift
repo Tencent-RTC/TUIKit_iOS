@@ -15,12 +15,29 @@ final class PusherPrepareView: UIView {
         didSet { moreSettingsView.actionHandler = settingsActionHandler }
     }
 
+    var accessoryView: UIView? {
+        didSet {
+            guard oldValue !== accessoryView else { return }
+            oldValue?.removeFromSuperview()
+            guard let accessoryView else { return }
+            editingContentView.addSubview(accessoryView)
+            accessoryView.snp.makeConstraints { make in
+                make.leading.trailing.equalTo(safeAreaLayoutGuide).inset(60)
+                make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(4)
+                make.height.equalTo(48)
+            }
+        }
+    }
+
+    var title: String { liveInfoEditorView.title }
+    var isCountingDown: Bool { countdownTimer != nil }
+
     // MARK: - Child Views
 
     private let editingContentView = UIView()
     private let shadingView = PusherPrepareGradientOverlayView()
     private let liveInfoEditorView = PusherLiveInfoEditorView()
-    private let exitButton = UIButton(type: .system)
+    private let exitButton = UIButton(type: .custom)
     private let settingsActionsStack = UIStackView()
     private let startButton = GradientButton(type: .custom)
     private let coverPickerView = PusherCoverPickerView()
@@ -95,9 +112,9 @@ private extension PusherPrepareView {
     }
 
     private func configureControls() {
-        exitButton.setTitle("×", for: .normal)
-        exitButton.setTitleColor(.white, for: .normal)
-        exitButton.titleLabel?.font = PusherPrepareViewTypography.exitButtonFont
+        exitButton.setImage(LiveKitResources.image(named: LivePrepareHeaderStyle.closeImageName), for: .normal)
+        exitButton.imageView?.contentMode = .scaleAspectFit
+        exitButton.accessibilityLabel = LiveKitResources.localizedString("tuilivekit.common.close")
         exitButton.backgroundColor = .clear
         exitButton.addTarget(self, action: #selector(exit), for: .touchUpInside)
 
@@ -156,9 +173,9 @@ private extension PusherPrepareView {
             make.bottom.lessThanOrEqualTo(settingsActionsStack.snp.top).offset(-40)
         }
         exitButton.snp.makeConstraints { make in
-            make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(8)
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(4)
-            make.size.equalTo(44)
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(LivePrepareHeaderStyle.closeButtonLeading)
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(LivePrepareHeaderStyle.closeButtonTop)
+            make.size.equalTo(LivePrepareHeaderStyle.closeButtonSize)
         }
         settingsActionsStack.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -292,6 +309,5 @@ private final class GradientButton: UIButton {
 
 // Styles owned by this component or feature. Values preserve the existing design.
 private enum PusherPrepareViewTypography {
-    static let exitButtonFont: UIFont = UIFont.systemFont(ofSize: 30, weight: .light)
     static let startButtonFont: UIFont = UIFont.systemFont(ofSize: 16, weight: .semibold)
 }

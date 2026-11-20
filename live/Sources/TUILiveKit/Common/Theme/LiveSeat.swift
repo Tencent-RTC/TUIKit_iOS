@@ -332,3 +332,43 @@ private enum LiveSeatOverlayStyle {
 }
 
 private enum LiveSeatOverlayTypography { static let nameFont: UIFont = UIFont.systemFont(ofSize: 10) }
+
+final class LivingScrimView: UIView {
+    enum Direction {
+        case top
+        case bottom
+        case horizontalCenter
+    }
+
+    private let gradient = CAGradientLayer()
+
+    init(direction: Direction) {
+        super.init(frame: .zero)
+        isUserInteractionEnabled = false
+        switch direction {
+        case .top, .bottom:
+            gradient.colors =
+                direction == .top
+                ? [UIColor.black.withAlphaComponent(0.5).cgColor, UIColor.clear.cgColor]
+                : [UIColor.clear.cgColor, UIColor.black.withAlphaComponent(0.58).cgColor]
+            gradient.startPoint = CGPoint(x: 0.5, y: 0)
+            gradient.endPoint = CGPoint(x: 0.5, y: 1)
+        case .horizontalCenter:
+            gradient.colors = [
+                UIColor.black.withAlphaComponent(0).cgColor, UIColor.black.withAlphaComponent(0.52).cgColor,
+                UIColor.black.withAlphaComponent(0).cgColor,
+            ]
+            gradient.locations = [0, 0.5, 1]
+            gradient.startPoint = CGPoint(x: 0, y: 0.5)
+            gradient.endPoint = CGPoint(x: 1, y: 0.5)
+        }
+        layer.addSublayer(gradient)
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradient.frame = bounds
+    }
+}

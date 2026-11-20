@@ -28,21 +28,24 @@ final class GiftAnimationView: UIView {
         addSubview(canvas)
         NSLayoutConstraint.activate([
             canvas.leadingAnchor.constraint(equalTo: leadingAnchor),
-            canvas.trailingAnchor.constraint(equalTo: trailingAnchor),
-            canvas.topAnchor.constraint(equalTo: topAnchor),
+            canvas.trailingAnchor.constraint(equalTo: trailingAnchor), canvas.topAnchor.constraint(equalTo: topAnchor),
             canvas.bottomAnchor.constraint(equalTo: bottomAnchor),
         ])
     }
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func enqueue(resourceURL: String) {
-        queue.append(Effect(resourceURL: resourceURL))
+        LiveKitLog.info("Gift effect enqueued url=\(resourceURL)")
+        queue.append(Effect(resourceURL: Self.normalizedURL(resourceURL)))
         playNextIfNeeded()
         prepareNextIfNeeded()
+    }
+
+    private static func normalizedURL(_ resourceURL: String) -> String {
+        let trimmed = resourceURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.hasPrefix("/"), URL(string: trimmed) == nil else { return trimmed }
+        return trimmed.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? trimmed
     }
 
     func reset() {
@@ -57,11 +60,7 @@ final class GiftAnimationView: UIView {
         currentEffect = effect
         isHidden = false
         scheduleTimeout(for: effect)
-        if effect.result != nil {
-            consumePreparation(effect)
-        } else {
-            prepare(effect)
-        }
+        if effect.result != nil { consumePreparation(effect) } else { prepare(effect) }
     }
 
     private func prepareNextIfNeeded() {
@@ -90,15 +89,14 @@ final class GiftAnimationView: UIView {
                     self.hasStartedPlayback = true
                     self.scheduleTimeout(for: effect)
                     self.prepareNextIfNeeded()
-                case .finished:
-                    self.finishCurrentEffect()
+                case .finished: self.finishCurrentEffect()
                 case .failed(let error):
-                    LiveKitLog.error("Gift playback failed: \(error.localizedDescription)")
+                    LiveKitLog.error("Gift playback failed url=\(effect.resourceURL): \(error.localizedDescription)")
                     self.finishCurrentEffect()
                 }
             }
         case .failure(let error):
-            LiveKitLog.error("Gift preparation failed: \(error.localizedDescription)")
+            LiveKitLog.error("Gift preparation failed url=\(effect.resourceURL): \(error.localizedDescription)")
             finishCurrentEffect()
         }
     }

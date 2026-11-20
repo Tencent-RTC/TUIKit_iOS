@@ -15,6 +15,28 @@ struct PusherPresentationState: Equatable {
 public final class PusherView: UIView {
     public var onExit: (() -> Void)?
 
+    /// Optional host content in the preparation header, beside the existing close button.
+    /// The 48-point-high slot follows the preparation controls' visibility and sits below their overlays.
+    public var prepareAccessoryView: UIView? {
+        get { prepareView.accessoryView }
+        set {
+            guard phase == .prepare, !didReleaseSession else { return }
+            prepareView.accessoryView = newValue
+        }
+    }
+
+    /// The editable preparation title. End editing before reading to commit input-method composition.
+    /// Assignments use the existing title limit and are ignored after preparation or during its countdown.
+    public var prepareTitle: String {
+        get { phase == .prepare ? prepareView.title : liveTitle }
+        set {
+            guard phase == .prepare, !didReleaseSession, !prepareView.isCountingDown else { return }
+            prepareView.endEditing(true)
+            prepareView.bind(title: newValue, coverURL: coverURL)
+            liveTitle = prepareView.title
+        }
+    }
+
     private enum Phase {
         case prepare
         case living
@@ -24,6 +46,7 @@ public final class PusherView: UIView {
     private let liveID: String
     private let seatStore: LiveSeatStore
     private let coGuestStore: PusherCoGuestStore
+    private let coHostStore: PusherCoHostStore
     private let coGuestBackgroundView = UIImageView()
     private let videoView: PusherVideoView
     private let prepareView = PusherPrepareView()
@@ -31,6 +54,7 @@ public final class PusherView: UIView {
     private let livingView: PusherLivingView
     private let summaryView: PusherSummaryView
     private var connectedGuestCount = 0
+    private var isCoHostConnected = false
     private var coGuestLayout: CoGuestLayoutTemplate = .dynamicLayout
     private var phase: Phase = .prepare
     private var liveTitle = LiveKitResources.localizedString("tuilivekit.pusher.default_title")
@@ -70,6 +94,7 @@ public final class PusherView: UIView {
         let seatStore = LiveSeatStore.create(liveID: liveID)
         self.seatStore = seatStore
         coGuestStore = PusherCoGuestStore(liveID: liveID, seatStore: seatStore)
+        coHostStore = PusherCoHostStore(liveID: liveID)
         videoView = PusherVideoView(liveID: liveID)
         livingView = PusherLivingView(liveID: liveID)
         summaryView = PusherSummaryView()
@@ -211,6 +236,18 @@ private extension PusherView {
     }
 
     private func bindState() {
+        coHostStore.onToast = { [weak self] message in
+            guard let self, self.phase == .living, !self.isEndingLive, !self.didReleaseSession else { return }
+            LiveToast.show(message)
+        }
+        coHostStore.onStateChanged = { [weak self] state in
+            guard let self else { return }
+            self.livingView.updateCoHost(state)
+            if self.isCoHostConnected != state.isConnected {
+                self.isCoHostConnected = state.isConnected
+                self.updateCoGuestPresentation()
+            }
+        }
         coGuestStore.onToast = { [weak self] message in
             guard let self, self.phase == .living, !self.isEndingLive, !self.didReleaseSession else { return }
             LiveToast.show(message)
@@ -300,9 +337,11 @@ private extension PusherView {
 
     private func updateCoGuestPresentation() {
         let isLiving = phase == .living
-        let isStageActive = isLiving && (connectedGuestCount > 0 || coGuestLayout != .floatLayout)
+        let isStageActive =
+            isLiving && (coHostStore.state.isConnected || connectedGuestCount > 0 || coGuestLayout != .floatLayout)
         videoView.updateCoGuestVideoState(
-            isLiving: isLiving, layout: coGuestLayout, connectedGuestCount: connectedGuestCount)
+            isLiving: isLiving, layout: coGuestLayout, connectedGuestCount: connectedGuestCount,
+            isCoHostConnected: coHostStore.state.isConnected)
         coGuestBackgroundView.isHidden = !isStageActive
         livingView.setCoGuestStageActive(isStageActive)
     }
@@ -591,6 +630,8 @@ private extension PusherView {
                 }
             }
             coGuestStore.didConnect()
+            livingView.coHostStore = coHostStore
+            coHostStore.activate()
             livingView.refreshAudience()
         }
         let statistics = state.statistics
@@ -686,6 +727,9 @@ private extension PusherView {
         interruptionMessage = nil
         livingView.resetAfterStartFailure()
         coGuestStore.deactivate()
+        livingView.coHostStore = nil
+        coHostStore.deactivate()
+        livingView.dismissCoHost()
         prepareView.deactivate()
         render()
         // This only opens devices if a user pause/background transition stopped
@@ -759,6 +803,9 @@ private extension PusherView {
     private func endLive() {
         guard phase == .living, !isEndingLive, !didReleaseSession else { return }
         isEndingLive = true
+        livingView.coHostStore = nil
+        coHostStore.deactivate()
+        livingView.dismissCoHost()
         beautyPanel.dismiss()
         endingOverlay.isHidden = false
         bringSubviewToFront(endingOverlay)
@@ -773,6 +820,9 @@ private extension PusherView {
         livingView.deactivateComments(resetState: false)
         livingView.deactivateMusic()
         coGuestStore.deactivate()
+        livingView.coHostStore = nil
+        coHostStore.deactivate()
+        livingView.dismissCoHost()
         finishPause()
         elapsedTimer?.invalidate()
         elapsedTimer = nil
@@ -808,6 +858,9 @@ private extension PusherView {
         livingView.deactivateComments(resetState: true)
         livingView.deactivateMusic()
         coGuestStore.deactivate()
+        livingView.coHostStore = nil
+        coHostStore.deactivate()
+        livingView.dismissCoHost()
         cancellables.removeAll()
         // Detach SDK-backed children now so Summary exit cannot unbind a newer session.
         livingView.removeFromSuperview()
@@ -919,6 +972,7 @@ private extension PusherView {
         NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).sink { [weak self] _ in
             self?.updateIdleTimer()
             self?.startPreviewIfNeeded()
+            self?.livingView.showPendingCoHostInvitation()
         }.store(in: &cancellables)
     }
 

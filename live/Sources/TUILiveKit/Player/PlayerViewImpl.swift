@@ -290,7 +290,12 @@ import UIKit
             guard let self, self.isJoinedChannel else { return [] }
             return self.videoView.visibleSeatRegions(in: self.overlayView)
         }
-        videoView.onGeometryChanged = { [weak self] in self?.overlayView.setNeedsLayout() }
+        videoView.onGeometryChanged = { [weak self] in
+            guard let self else { return }
+            self.videoView.refreshConnectionPresentation()
+            self.overlayView.setCoHostConnected(self.videoView.isCoHostConnected)
+            self.overlayView.setNeedsLayout()
+        }
         overlayView.onToast = { [weak self] message in
             guard let self, self.isJoinedChannel else { return }
             self.showToast(message)

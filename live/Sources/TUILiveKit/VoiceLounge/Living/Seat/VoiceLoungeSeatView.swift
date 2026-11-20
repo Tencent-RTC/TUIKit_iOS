@@ -11,7 +11,10 @@ final class VoiceLoungeSeatView: UIControl {
     static let defaultNameGap: CGFloat = 2
     private static let nameHeight: CGFloat = 17
 
+    var avatarAnchor: ConstraintItem { avatarContainer.snp.center }
+
     private let ringView = UIView()
+    private let waveRings = [CAShapeLayer(), CAShapeLayer()]
     private let avatarContainer = UIView()
     private let avatarImageView = UIImageView()
     private let initialLabel = LiveText.voiceLounge(.body, tone: .primary, alignment: .center)
@@ -27,15 +30,23 @@ final class VoiceLoungeSeatView: UIControl {
     private let emptyTitle: String
     private let showsName: Bool
     private let nameGap: CGFloat
+    private let isCompact: Bool
+    private let showsWave: Bool
     private var index = 0
     private var appliedAvatarURL: String?
     private var failedAvatarURL: String?
+    private var wasFaded = false
 
-    init(avatarSize: CGFloat, emptyTitle: String, showsName: Bool = true, nameGap: CGFloat = defaultNameGap) {
+    init(
+        avatarSize: CGFloat, emptyTitle: String, showsName: Bool = true, nameGap: CGFloat = defaultNameGap,
+        isCompact: Bool = false, showsWave: Bool = true
+    ) {
         self.avatarSize = avatarSize
         self.emptyTitle = emptyTitle
         self.showsName = showsName
         self.nameGap = nameGap
+        self.isCompact = isCompact
+        self.showsWave = showsWave
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -93,15 +104,17 @@ final class VoiceLoungeSeatView: UIControl {
         pillLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalTo(showsName ? nameLabel.snp.centerY : ringView.snp.bottom)
-            make.height.equalTo(18)
+            make.height.equalTo(pillHeight)
+            make.width.lessThanOrEqualToSuperview()
         }
     }
 
     private func setupStyles() {
-        ringView.layer.borderColor = VoiceLoungeSeatStyle.speakingRing.cgColor
-        ringView.layer.borderWidth = 2
         ringView.isUserInteractionEnabled = false
-        ringView.isHidden = true
+        waveRings.forEach { ring in
+            VoiceLoungeSeatStyle.styleWaveRing(ring)
+            ringView.layer.addSublayer(ring)
+        }
         emptyRing.isUserInteractionEnabled = false
         emptyRing.backgroundColor = VoiceLoungeSeatStyle.emptyFill
         dashLayer.fillColor = UIColor.clear.cgColor
@@ -140,13 +153,18 @@ final class VoiceLoungeSeatView: UIControl {
         adminBadge.layer.borderColor = UIColor.black.withAlphaComponent(0.25).cgColor
         adminBadge.isUserInteractionEnabled = false
         adminBadge.isHidden = true
-        pillLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        pillLabel.font = .systemFont(ofSize: isCompact ? 10 : 13, weight: .medium)
+        pillLabel.insets = isCompact ? UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5) : pillLabel.insets
+        pillLabel.adjustsFontSizeToFitWidth = true
+        pillLabel.minimumScaleFactor = 0.8
         pillLabel.textAlignment = .center
-        pillLabel.layer.cornerRadius = 9
+        pillLabel.layer.cornerRadius = pillHeight / 2
         pillLabel.layer.masksToBounds = true
         pillLabel.isUserInteractionEnabled = false
         pillLabel.isHidden = true
     }
+
+    private var pillHeight: CGFloat { isCompact ? 16 : 18 }
 
     private func setupBindings() { addTarget(self, action: #selector(handleTap), for: .touchUpInside) }
 
@@ -154,7 +172,17 @@ final class VoiceLoungeSeatView: UIControl {
         super.layoutSubviews()
         avatarContainer.layer.cornerRadius = avatarSize / 2
         emptyRing.layer.cornerRadius = avatarSize / 2
-        ringView.layer.cornerRadius = (avatarSize + 8) / 2
+        let ringSide = avatarSize + VoiceLoungeSeatStyle.waveRingOffset * 2
+        let ringFrame = CGRect(
+            x: (ringView.bounds.width - ringSide) / 2, y: (ringView.bounds.height - ringSide) / 2, width: ringSide,
+            height: ringSide)
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        waveRings.forEach { ring in
+            ring.frame = ringFrame
+            ring.path = UIBezierPath(ovalIn: ring.bounds).cgPath
+        }
+        CATransaction.commit()
         dashLayer.frame = emptyRing.bounds
         dashLayer.path = UIBezierPath(ovalIn: emptyRing.bounds.insetBy(dx: 0.5, dy: 0.5)).cgPath
         let box = emptyRing.bounds
@@ -182,7 +210,8 @@ final class VoiceLoungeSeatView: UIControl {
         let locked = seat.state == .locked
 
         avatarContainer.isHidden = !occupied
-        avatarContainer.alpha = faded ? 0.5 : 1
+        applyFadeAlpha(faded: faded, shouldAnimate: wasFaded && !faded && occupied)
+        wasFaded = faded
         emptyRing.isHidden = occupied
         avatarImageView.isHidden = !occupied
         initialLabel.isHidden = !occupied || (!seat.avatarURL.isEmpty && failedAvatarURL != seat.avatarURL)
@@ -234,9 +263,22 @@ final class VoiceLoungeSeatView: UIControl {
         }
 
         let onSeat = seat.state == .occupied
-        updateRing(onSeat && !seat.isMuted && seat.isSpeaking ? .speaking : .idle)
+        updateRing(showsWave && onSeat && !seat.isMuted && seat.isSpeaking ? .speaking : .idle)
     }
-    
+    private func applyFadeAlpha(faded: Bool, shouldAnimate: Bool) {
+        let target: CGFloat = faded ? 0.5 : 1
+        avatarContainer.layer.removeAnimation(forKey: "fadeAlpha")
+        if shouldAnimate {
+            let fade = CABasicAnimation(keyPath: "opacity")
+            fade.fromValue = 0.5
+            fade.toValue = 1
+            fade.duration = 0.28
+            fade.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            avatarContainer.layer.add(fade, forKey: "fadeAlpha")
+        }
+        avatarContainer.alpha = target
+    }
+
     private func setName(_ name: String, muted: Bool) {
         guard muted, let icon = Self.muteIcon, let font = nameLabel.font else {
             nameLabel.text = name
@@ -263,20 +305,10 @@ final class VoiceLoungeSeatView: UIControl {
     private func updateRing(_ state: RingState) {
         guard state != ringState else { return }
         ringState = state
-        ringView.layer.removeAnimation(forKey: "pulse")
-        ringView.layer.opacity = 1
-        switch state {
-        case .idle: ringView.isHidden = true
-        case .speaking:
-            ringView.isHidden = false
-            ringView.layer.borderColor = VoiceLoungeSeatStyle.speakingRing.cgColor
-            let pulse = CABasicAnimation(keyPath: "opacity")
-            pulse.fromValue = 1
-            pulse.toValue = 0.25
-            pulse.duration = 0.7
-            pulse.autoreverses = true
-            pulse.repeatCount = .infinity
-            ringView.layer.add(pulse, forKey: "pulse")
+        if state == .speaking {
+            VoiceLoungeSeatStyle.startWave(on: waveRings)
+        } else {
+            VoiceLoungeSeatStyle.stopWave(on: waveRings)
         }
     }
 
@@ -301,18 +333,74 @@ enum VoiceLoungeSeatStyle {
     static let seatBackground = VoiceLoungeColor.overlaySoft
     static let emptyStroke = UIColor.white.withAlphaComponent(0.4)
     static let emptyFill = UIColor.white.withAlphaComponent(0.04)
-    static let speakingRing = LiveTheme.Color.brandCyan
+    static let waveRing = UIColor.white.withAlphaComponent(0.8)
+
+    static let waveRingWidth: CGFloat = 2
+    static let waveRingOffset: CGFloat = 2
+    static let waveMaximumScale: CGFloat = 1.38
+    static let waveDuration: CFTimeInterval = 1.4
+    static let waveStaticOpacity: CGFloat = 0.58
+    static let waveAnimationKey = "VoiceLoungeSpeakingWave"
     static let focusAvatar: CGFloat = 64
     static let guestAvatar: CGFloat = 52
     static let adminBadge = UIColor(red: 0.27, green: 0.55, blue: 1.0, alpha: 0.95)
     static let pillNormal = UIColor(red: 0.42, green: 0.40, blue: 0.75, alpha: 0.45)
     static let pillHighlighted = UIColor(red: 0.45, green: 0.42, blue: 0.88, alpha: 0.9)
+
+    static func styleWaveRing(_ ring: CAShapeLayer) {
+        ring.fillColor = UIColor.clear.cgColor
+        ring.strokeColor = waveRing.cgColor
+        ring.lineWidth = waveRingWidth
+        ring.opacity = 0
+    }
+
+    static func startWave(on rings: [CAShapeLayer]) {
+        rings.forEach { ring in
+            ring.removeAnimation(forKey: waveAnimationKey)
+            ring.opacity = 0
+        }
+        if UIAccessibility.isReduceMotionEnabled {
+            rings.first?.opacity = Float(waveStaticOpacity)
+            return
+        }
+        rings.enumerated().forEach { index, ring in
+            let offset = waveDuration / Double(rings.count) * Double(index)
+            ring.add(waveAnimation(timeOffset: offset), forKey: waveAnimationKey)
+        }
+    }
+
+    static func stopWave(on rings: [CAShapeLayer]) {
+        rings.forEach { ring in
+            ring.removeAnimation(forKey: waveAnimationKey)
+            ring.opacity = 0
+        }
+    }
+
+    private static func waveAnimation(timeOffset: CFTimeInterval) -> CAAnimation {
+        let opacity = CAKeyframeAnimation(keyPath: "opacity")
+        opacity.values = [0, 0.62, 0.22, 0]
+        opacity.keyTimes = [0, 0.14, 0.7, 1]
+        let scale = CABasicAnimation(keyPath: "transform.scale")
+        scale.fromValue = 1
+        scale.toValue = waveMaximumScale
+        let group = CAAnimationGroup()
+        group.animations = [opacity, scale]
+        group.duration = waveDuration
+        group.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 0.5, 0.4, 1)
+        group.repeatCount = .infinity
+        group.timeOffset = timeOffset
+        return group
+    }
 }
 
 private final class SeatPillLabel: UILabel {
     var insets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
 
     override func drawText(in rect: CGRect) { super.drawText(in: rect.inset(by: insets)) }
+
+    override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
+        super.textRect(forBounds: bounds.inset(by: insets), limitedToNumberOfLines: numberOfLines)
+    }
 
     override var intrinsicContentSize: CGSize {
         let size = super.intrinsicContentSize

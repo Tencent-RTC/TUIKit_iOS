@@ -22,18 +22,18 @@ enum LiveKitLog {
     }
 
     private static func log(_ level: Level, message: String, file: String, line: Int) {
+        #if DEBUG
+            NSLog("[TUILiveKit][%d] %@:%d %@", level.rawValue, file, line, message)
+        #endif
         let payload: [String: Any] = [
             "api": "TuikitLog",
             "params": [
-                "level": level.rawValue,
-                "message": message,
-                "module": "TUILiveKit",
-                "file": file,
-                "line": line
-            ]
+                "level": level.rawValue, "message": message, "module": "TUILiveKit", "file": file, "line": line,
+            ],
         ]
         guard let data = try? JSONSerialization.data(withJSONObject: payload),
-              let json = String(data: data, encoding: .utf8) else { return }
+            let json = String(data: data, encoding: .utf8)
+        else { return }
         TRTCCloud.sharedInstance().callExperimentalAPI(json)
     }
 }
