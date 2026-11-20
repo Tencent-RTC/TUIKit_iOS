@@ -17,7 +17,7 @@ final class VoiceLoungeThemeSelectPanel: BottomSheetView {
     private var selectedID = VoiceLoungeBackground.defaultID
     private var selectedSkinID = VoiceLoungeSkin.defaultID
 
-    override var sheetHeight: CGFloat { ThemePanelStyle.sheetHeight }
+    override var sheetHeight: CGFloat { ThemePanelStyle.contentHeight + SheetBottomStyle.inset + safeAreaInsets.bottom }
 
     override init(frame: CGRect) {
         let layout = UICollectionViewFlowLayout()
@@ -257,13 +257,14 @@ private enum ThemePanelStyle {
     static let selectionBoxCorner: CGFloat = 14
     static let skinRowHeight: CGFloat = 48 + 6 + 15
 
-    static let previewHeight: CGFloat = 147
-    static let cardSize = CGSize(width: 68, height: 147 + 6 + 15)
+    static let previewWidth: CGFloat = 81
+    static let previewHeight: CGFloat = previewWidth * 16 / 9
+    static let cardSize = CGSize(width: previewWidth, height: previewHeight + 6 + 15)
     static let cardSpacing: CGFloat = 10
 
     static let selectionBorder = VoiceLoungeColor.prepareMid
 
-    static let sheetHeight: CGFloat = skinLabelTop + 14 + 8 + skinRowHeight + 16 + 14 + 10 + cardSize.height + 28
+    static let contentHeight: CGFloat = skinLabelTop + 14 + 8 + skinRowHeight + 16 + 14 + 10 + cardSize.height
 }
 
 private extension String {

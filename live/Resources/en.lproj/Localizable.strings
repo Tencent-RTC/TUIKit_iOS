@@ -283,6 +283,7 @@
 "tuilivekit.pusher.music.happy" = "Upbeat";
 "tuilivekit.pusher.music.sad" = "Melancholy";
 "tuilivekit.pusher.music.wonder_world" = "Wonder World";
+"tuilivekit.pusher.music.rain" = "Rain";
 
 "tuilivekit.pusher.coguest.manage_user" = "Manage · %@";
 "tuilivekit.pusher.coguest.mute_user" = "Mute";
@@ -354,6 +355,10 @@
 "tuilivekit.voiceroom.prepare.room_name_byte_limit" = "Room name can contain up to %d bytes";
 "tuilivekit.voiceroom.prepare.topic_placeholder" = "Choose a live topic";
 "tuilivekit.voiceroom.prepare.topic_picked" = "Let's chat about \u201c%@\u201d";
+"tuilivekit.voiceroom.prepare.change_cover" = "Change cover";
+"tuilivekit.voiceroom.prepare.room_name_edit" = "Edit room name";
+"tuilivekit.voiceroom.prepare.seat_label" = "Seat %ld";
+
 "tuilivekit.voiceroom.topic.title" = "Topic";
 "tuilivekit.voiceroom.topic.placeholder" = "What to chat about today?";
 "tuilivekit.voiceroom.topic.footer" = "We'll recommend like-minded viewers based on the topic";
@@ -361,7 +366,8 @@
 "tuilivekit.voiceroom.topic.over_limit" = "Character limit exceeded";
 "tuilivekit.voiceroom.topic.over_limit_hint" = "Topics can be up to %d characters. Please shorten it.";
 "tuilivekit.voiceroom.topic.cleared" = "The host cleared the topic";
-"tuilivekit.voiceroom.topic.changed" = "The host set the topic to \u201c%@\u201d";
+"tuilivekit.voiceroom.topic.changed" = "The host updated the topic to: %@";
+"tuilivekit.voiceroom.topic.default" = "Follow and like us, hop on mic to chat~";
 "tuilivekit.voiceroom.topic.preset.tea.tag" = "Break room";
 "tuilivekit.voiceroom.topic.preset.tea.text" = "Break room gossip";
 "tuilivekit.voiceroom.topic.preset.icebreak.tag" = "Icebreaker";
@@ -399,10 +405,49 @@
 
 /* VoiceRoom Caption Settings */
 "tuilivekit.voiceroom.caption.title" = "Live Caption";
-"tuilivekit.voiceroom.caption.subtitle" = "AI transcribes host and guest speech in real time";
+"tuilivekit.voiceroom.caption.subtitle" = "Transcribe the call in real time and show it below the stage";
+"tuilivekit.voiceroom.caption.hint_tap" = "Tap to configure";
+"tuilivekit.voiceroom.caption.show_source" = "Show Source";
+"tuilivekit.voiceroom.caption.show_source_subtitle" = "Show the original language text beneath the translation";
+"tuilivekit.voiceroom.caption.font_scale" = "Caption Size";
+"tuilivekit.voiceroom.caption.font_small" = "Small";
+"tuilivekit.voiceroom.caption.font_standard" = "Standard";
+"tuilivekit.voiceroom.caption.font_large" = "Large";
+"tuilivekit.voiceroom.caption.target_language" = "Target Language";
+"tuilivekit.voiceroom.caption.default_hint" = "Set as default and use this configuration next time";
+"tuilivekit.voiceroom.caption.host_only_toast" = "Only the host can change this";
+"tuilivekit.voiceroom.caption.lang_chinese" = "Chinese";
+"tuilivekit.voiceroom.caption.lang_english" = "English";
+"tuilivekit.voiceroom.caption.lang_japanese" = "Japanese";
+"tuilivekit.voiceroom.caption.lang_korean" = "Korean";
+"tuilivekit.voiceroom.caption.lang_spanish" = "Spanish";
+"tuilivekit.voiceroom.caption.lang_french" = "French";
+"tuilivekit.voiceroom.caption.lang_german" = "German";
+"tuilivekit.voiceroom.caption.lang_russian" = "Russian";
 
 /* VoiceRoom Audio Effects */
 "tuilivekit.voiceroom.audio.title" = "Audio Effects";
+"tuilivekit.voiceroom.audio.voice_volume" = "Voice Volume";
+"tuilivekit.voiceroom.audio.voice_custom" = "Custom";
+"tuilivekit.voiceroom.audio.pitch" = "Pitch";
+"tuilivekit.voiceroom.audio.formant" = "Formant";
+"tuilivekit.voiceroom.audio.pad_low" = "Deep";
+"tuilivekit.voiceroom.audio.pad_high" = "Sharp";
+"tuilivekit.voiceroom.audio.pad_bright" = "Bright";
+"tuilivekit.voiceroom.audio.pad_thick" = "Thick";
+"tuilivekit.voiceroom.audio.formant_hint" = "Horizontal: pitch · Vertical: formant (timbre)";
+
+/* VoiceRoom Background Music */
+"tuilivekit.voiceroom.bgm.track_count" = "%ld songs";
+"tuilivekit.voiceroom.bgm.play" = "Play";
+"tuilivekit.voiceroom.bgm.pause" = "Pause";
+"tuilivekit.voiceroom.bgm.prev" = "Previous";
+"tuilivekit.voiceroom.bgm.next" = "Next";
+"tuilivekit.voiceroom.bgm.volume" = "Volume";
+"tuilivekit.voiceroom.bgm.mode_order" = "Order";
+"tuilivekit.voiceroom.bgm.mode_single" = "Repeat";
+"tuilivekit.voiceroom.bgm.mode_shuffle" = "Shuffle";
+"tuilivekit.voiceroom.bgm.mode_tip" = "Play mode: %@";
 
 /* VoiceRoom Living More */
 "tuilivekit.voiceroom.living.pause" = "Pause";
@@ -412,8 +457,7 @@
 "tuilivekit.voiceroom.living.resume" = "Resume";
 "tuilivekit.voiceroom.living.paused_audience" = "The host will be right back";
 "tuilivekit.voiceroom.living.leave_room" = "Leave Room";
-"tuilivekit.voiceroom.living.section_basic" = "Basic";
-"tuilivekit.voiceroom.living.section_interact" = "Interact";
+"tuilivekit.voiceroom.living.layout_setting" = "Layout";
 "tuilivekit.voiceroom.living.bgm" = "BGM";
 "tuilivekit.voiceroom.living.comment" = "Comment";
 
@@ -460,6 +504,7 @@
 "tuilivekit.voiceroom.comic.accept" = "Accept";
 "tuilivekit.voiceroom.comic.invite" = "Invite";
 "tuilivekit.voiceroom.comic.cancel_invite" = "Cancel";
+"tuilivekit.voiceroom.comic.reject_apply" = "Decline request";
 "tuilivekit.voiceroom.comic.invite_empty" = "No viewers to invite";
 "tuilivekit.voiceroom.comic.invited" = "Invitation sent";
 "tuilivekit.voiceroom.comic.invite_accepted" = "%@ accepted the invitation";
@@ -481,6 +526,7 @@
 "tuilivekit.voiceroom.rank.empty" = "No gifts yet";
 "tuilivekit.common.gift.to_user" = "To %@";
 "tuilivekit.voiceroom.seat.sheet_title" = "Seat";
+"tuilivekit.voiceroom.seat.user_panel_subtitle" = "Seat %d · On mic";
 "tuilivekit.voiceroom.seat.lock_toggle" = "Lock Seat";
 "tuilivekit.voiceroom.seat.invitable" = "Invitable Viewers (%@)";
 "tuilivekit.voiceroom.seat.locked_hint" = "Seat is locked. Unlock it to invite viewers";
@@ -490,6 +536,14 @@
 "tuilivekit.voiceroom.seat.pill_start" = "Start Chat";
 "tuilivekit.voiceroom.comic.retract_title" = "Withdraw mic request?";
 "tuilivekit.voiceroom.comic.retract" = "Withdraw";
+"tuilivekit.voiceroom.comic.applying_title" = "Start voice co-host?";
+"tuilivekit.voiceroom.comic.applying_cancel" = "Cancel";
+"tuilivekit.voiceroom.comic.leave_title" = "Leave voice co-host?";
+"tuilivekit.voiceroom.comic.leave_confirm" = "Confirm";
+"tuilivekit.voiceroom.comic.seat_full" = "Full";
+"tuilivekit.voiceroom.seat.empty_seat" = "Empty seat";
+"tuilivekit.voiceroom.seat.locked_seat" = "Locked";
+"tuilivekit.voiceroom.seat.seat_meta" = "Seat %ld · %@";
 "tuilivekit.voiceroom.comic.retracted" = "Mic request withdrawn";
 "tuilivekit.voiceroom.comic.voice_apply" = "Voice Co-host";
 "tuilivekit.voiceroom.comic.cancel_apply" = "Cancel Request";
@@ -515,6 +569,7 @@
 /* VoiceRoom Summary */
 "tuilivekit.voiceroom.summary.title" = "Live Summary";
 "tuilivekit.voiceroom.summary.ended" = "Live Ended";
+"tuilivekit.voiceroom.end.no_more_live" = "No more live streams";
 "tuilivekit.voiceroom.summary.duration" = "Live Duration";
 "tuilivekit.voiceroom.summary.section" = "Session Data";
 "tuilivekit.voiceroom.summary.note" = "Data based on this demo session";
@@ -536,4 +591,51 @@
 "tuilivekit.voiceroom.notice.topic" = "🏷️ Topic: %@";
 "tuilivekit.voiceroom.notice.entered" = "joined the room";
 "tuilivekit.voiceroom.comic.invite_bar_title" = "The host invited you to the mic";
+"tuilivekit.voiceroom.seat.status_on_mic" = "On mic";
+"tuilivekit.voiceroom.seat.status_pending" = "Pending";
+"tuilivekit.voiceroom.seat.badge_muted" = "Muted";
+"tuilivekit.voiceroom.seat.badge_admin" = "Admin";
+"tuilivekit.voiceroom.cohost.set" = "Set as lead guest";
+"tuilivekit.voiceroom.cohost.revoke" = "Remove as lead guest";
+"tuilivekit.voiceroom.cohost.set_done" = "Set as lead guest";
+"tuilivekit.voiceroom.cohost.revoked" = "Removed as lead guest";
+"tuilivekit.voiceroom.cohost.no_free_seat" = "All guest seats are taken. Free a seat first.";
+"tuilivekit.voiceroom.cohost.replace_title" = "Replace the lead guest?";
+"tuilivekit.voiceroom.cohost.replace_message" = "%@ is the current lead guest and will be moved to a regular seat.";
+"tuilivekit.voiceroom.cohost.replace_confirm" = "Replace";
+"tuilivekit.voiceroom.mic_permission.title" = "Microphone access needed";
+"tuilivekit.voiceroom.mic_permission.message" = "Others in the room can only hear you after you allow microphone access in Settings > Privacy & Security > Microphone.";
+"tuilivekit.voiceroom.mic_permission.settings" = "Open Settings";
 "tuilivekit.voiceroom.room.gift_stat" = "%@ gifts this live";
+
+// Host connection
+"tuilivekit.pusher.cohost.title" = "Connect";
+"tuilivekit.pusher.cohost.invite_title" = "Invite hosts";
+"tuilivekit.pusher.cohost.empty" = "No hosts available";
+"tuilivekit.pusher.cohost.retry" = "Could not load. Tap to retry";
+"tuilivekit.pusher.cohost.load_more" = "Load more";
+"tuilivekit.pusher.cohost.recommended" = "Recommended hosts";
+"tuilivekit.pusher.cohost.mutual" = "Mutual follows";
+"tuilivekit.pusher.cohost.following" = "Following";
+"tuilivekit.pusher.cohost.connected" = "Connected";
+"tuilivekit.pusher.cohost.cancel_invitation" = "Cancel invite";
+"tuilivekit.pusher.cohost.invite" = "Invite";
+"tuilivekit.pusher.cohost.connected_with" = "Connected with %1$@";
+"tuilivekit.pusher.cohost.connected_count" = "%1$d hosts connected";
+"tuilivekit.pusher.cohost.end" = "End connection";
+"tuilivekit.pusher.cohost.invite_more" = "Find more hosts";
+"tuilivekit.pusher.cohost.duration" = "Connected %@";
+"tuilivekit.pusher.cohost.request_timeout" = "Connection invitation timed out";
+"tuilivekit.pusher.cohost.request_rejected" = "Connection invitation declined";
+"tuilivekit.pusher.cohost.follow_query_failed" = "Could not load follow status. Pull to refresh to retry.";
+"tuilivekit.pusher.cohost.interaction_title" = "Host interaction";
+"tuilivekit.pusher.cohost.incoming_mutual" = "Connection invitation from a mutual follow";
+"tuilivekit.pusher.cohost.incoming" = "Host connection invitation";
+"tuilivekit.pusher.cohost.reject_countdown" = "Decline (%1$ds)";
+"tuilivekit.pusher.cohost.accept" = "Accept";
+"tuilivekit.pusher.cohost.random_title" = "Random connection";
+"tuilivekit.pusher.cohost.random_subtitle" = "Find a host to connect with";
+"tuilivekit.pusher.cohost.random_button" = "Connect with a random host";
+"tuilivekit.pusher.cohost.random_developing" = "Random connection is under development";
+
+"tuilivekit.player.cohost.connected" = "Connected";

@@ -19,6 +19,26 @@ import UIKit
         set { coGuestView.onUiStateChanged = newValue }
     }
 
+    private let coHostStatusScrim = LivingScrimView(direction: .horizontalCenter)
+    private let coHostStatusLabel = UILabel()
+    private var isCoHostConnected = false
+
+    func setCoHostConnected(_ connected: Bool) {
+        guard isCoHostConnected != connected else { return }
+        isCoHostConnected = connected
+        updateCoHostStatus()
+    }
+
+    private func updateCoHostStatus() {
+        guard isCoHostConnected else {
+            coHostStatusScrim.isHidden = true
+            return
+        }
+        let stageTop = (videoSeatRegions?() ?? []).filter { !$0.isEmpty && $0.intersects(bounds) }.map(\.minY).min()
+        coHostStatusScrim.isHidden = !isJoinedChannel || isCleanScreen || stageTop == nil || (stageTop ?? 0) < 22
+        if let stageTop { coHostStatusScrim.frame = CGRect(x: 0, y: stageTop - 22, width: bounds.width, height: 22) }
+    }
+
     private let movableContentView = UIView()
     private let audienceView = AudienceView()
     private let audienceWelcomeView = AudienceWelcomeView()
@@ -73,11 +93,15 @@ import UIKit
     override func layoutSubviews() {
         super.layoutSubviews()
         updateInteractionLayout()
+        updateCoHostStatus()
     }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
-        guard let window else { return }
+        guard let window else {
+            setCoHostConnected(false)
+            return
+        }
         [giftSendPanel, audienceListView].forEach { panel in
             guard panel.superview !== window else { return }
             panel.removeFromSuperview()
@@ -161,6 +185,7 @@ import UIKit
     }
 
     func deactivateRoomFeatures() {
+        setCoHostConnected(false)
         guard activatedRoomLiveID != nil else { return }
         commentStore.deactivate()
         giftBarrageStore.deactivate()
@@ -202,6 +227,14 @@ import UIKit
         addSubview(movableContentView)
         [hostInfoView, messageListView, audienceWelcomeView, bottomBarContainer, likeAnimationView].forEach(
             movableContentView.addSubview)
+        coHostStatusScrim.isHidden = true
+        coHostStatusLabel.text = LiveKitResources.localizedString("tuilivekit.player.cohost.connected")
+        coHostStatusLabel.font = .monospacedDigitSystemFont(ofSize: 12, weight: .medium)
+        coHostStatusLabel.textColor = UIColor(red: 246 / 255, green: 250 / 255, blue: 1, alpha: 1)
+        coHostStatusLabel.textAlignment = .center
+        movableContentView.addSubview(coHostStatusScrim)
+        coHostStatusScrim.addSubview(coHostStatusLabel)
+        coHostStatusLabel.snp.makeConstraints { $0.edges.equalToSuperview() }
         addSubview(audienceView)
         addSubview(cleanScreenButton)
 

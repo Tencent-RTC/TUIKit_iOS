@@ -20,16 +20,16 @@ import UIKit
 
     var changes: AnyPublisher<Void, Never> { changeSubject.eraseToAnyPublisher() }
     var cancelApplicationPrompts: AnyPublisher<Void, Never> { cancelApplicationSubject.eraseToAnyPublisher() }
+    var leavePrompts: AnyPublisher<Void, Never> { leaveSubject.eraseToAnyPublisher() }
 
     private let changeSubject = PassthroughSubject<Void, Never>()
     private let cancelApplicationSubject = PassthroughSubject<Void, Never>()
+    private let leaveSubject = PassthroughSubject<Void, Never>()
 
     private var speakingUsers: [String: Int] = [:]
     private var localMicVolume = 0
-    private var audienceList: [LiveUserInfo] = []
     private var adminUserIDs: Set<String> = []
     private var showsAudienceFadedSeat = true
-    private var formerSeatUserIDs: Set<String> = []
     private var isStaleCleanupEnabled = false
     private var hasCleanedStaleSeats = false
     private var hasCleanedStaleAdmins = false
@@ -39,6 +39,7 @@ import UIKit
     private var sessionCancellables = Set<AnyCancellable>()
     private var audienceCancellables = Set<AnyCancellable>()
     private var bindingCancellables = Set<AnyCancellable>()
+    private var audienceVolumeToken: SubscriptionToken?
 
     init(
         liveID: String, role: VoiceLoungeRole, coGuest: VoiceLoungeCoGuestStore, muteCache: VoiceLoungeMuteCache,
@@ -51,8 +52,10 @@ import UIKit
         self.settings = settings
         settings.changes.sink { [weak self] in self?.refresh(force: true) }.store(in: &bindingCancellables)
         coGuest.changes.sink { [weak self] in self?.handleCoGuestChange() }.store(in: &bindingCancellables)
+        coGuest.fadedSeatReleases.sink { [weak self] in self?.hideAudienceFadedSeat() }.store(in: &bindingCancellables)
         muteCache.changes.sink { [weak self] in self?.refresh() }.store(in: &bindingCancellables)
     }
+
 }
 
 extension VoiceLoungeSeatStore {
@@ -68,6 +71,30 @@ extension VoiceLoungeSeatStore {
                 self?.localMicVolume = volume
                 self?.refresh()
             }.store(in: &sessionCancellables)
+        subscribeAudienceVolume()
+    }
+
+    private func subscribeAudienceVolume() {
+        guard role == .audience, audienceVolumeToken == nil else { return }
+        let liveID = self.liveID
+        audienceVolumeToken = EngineBridge.subscribe(event: "CoreViewModule.stateChanged") { [weak self] id, json in
+            guard id == liveID, let data = json.data(using: .utf8),
+                let dict = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+                dict["property"] as? String == "speaking_users", let raw = dict["speaking_users"] as? [String: Any]
+            else { return }
+            var map: [String: Int] = [:]
+            for (userID, value) in raw { if let intValue = (value as? NSNumber)?.intValue { map[userID] = intValue } }
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.speakingUsers = map
+                self.refresh()
+            }
+        }
+    }
+
+    private func unsubscribeAudienceVolume() {
+        if let token = audienceVolumeToken { EngineBridge.unsubscribe(token) }
+        audienceVolumeToken = nil
     }
 
     func activateAudienceList() {
@@ -76,12 +103,16 @@ extension VoiceLoungeSeatStore {
         audienceStore = store
         store.state.subscribe().receive(on: DispatchQueue.main).sink { [weak self] state in
             guard let self else { return }
-            self.audienceList = state.audienceList
             self.adminUserIDs = Set(state.adminList.map(\.userID).filter { !$0.isEmpty })
-            self.forgetFormerSeatUsersWhoLeft()
             self.cleanStaleAdminsIfNeeded()
             self.refresh()
         }.store(in: &audienceCancellables)
+        if role == .host {
+            store.liveAudienceEventPublisher.receive(on: DispatchQueue.main).sink { [weak self] event in
+                guard case .onAudienceLeft(let user) = event else { return }
+                self?.coGuest.forgetUser(userID: user.userID)
+            }.store(in: &audienceCancellables)
+        }
         store.fetchAudienceList(completion: nil)
     }
 
@@ -95,16 +126,15 @@ extension VoiceLoungeSeatStore {
     func deactivate() {
         sessionCancellables.removeAll()
         audienceCancellables.removeAll()
+        unsubscribeAudienceVolume()
         seatStore = nil
         audienceStore = nil
         seatList = []
         speakingUsers = [:]
         localMicVolume = 0
-        audienceList = []
         adminUserIDs = []
         showsAudienceFadedSeat = true
         audienceFadedSeatIndex = nil
-        formerSeatUserIDs = []
         isStaleCleanupEnabled = false
         hasCleanedStaleSeats = false
         hasCleanedStaleAdmins = false
@@ -119,6 +149,26 @@ extension VoiceLoungeSeatStore {
     }
 
     func promptCancelApplication() { cancelApplicationSubject.send() }
+
+    func promptLeave() { leaveSubject.send() }
+
+    var hasNoFreeGuestSeat: Bool { !seats.contains { $0.role != .host && ($0.state == .empty || $0.state == .faded) } }
+
+    var isSelfMicOff: Bool { selfSeatUser.map { muteCache.isMicOff($0) } ?? true }
+
+    @discardableResult func toggleSelfMicrophone() -> Bool {
+        guard let user = selfSeatUser else { return true }
+        if user.microphoneStatus == .on {
+            seatStore?.muteMicrophone()
+            return true
+        }
+        guard user.allowOpenMicrophone else { return false }
+        seatStore?.unmuteMicrophone { result in
+            guard case .failure(let error) = result else { return }
+            LiveKitLog.error("[VoiceLounge] unmute self failed: code=\(error.code), message=\(error.message)")
+        }
+        return true
+    }
 }
 
 private extension VoiceLoungeSeatStore {
@@ -126,26 +176,20 @@ private extension VoiceLoungeSeatStore {
 
     var selfUserID: String { LoginStore.shared.state.value.loginUserInfo?.userID ?? "" }
 
+    var selfSeatUser: SeatUserInfo? {
+        let selfID = selfUserID
+        guard !selfID.isEmpty else { return nil }
+        return seatList.first { $0.userInfo.userID == selfID }?.userInfo
+    }
+
     func applySeatState(seatList: [SeatInfo], speakingUsers: [String: Int]) {
         self.seatList = seatList
         self.speakingUsers = speakingUsers
         if role == .host {
             muteCache.reconcile(with: seatList)
             cleanStaleSeatsIfNeeded()
-            if hasCleanedStaleSeats {
-                let selfID = selfUserID
-                seatList.map(\.userInfo.userID).filter { !$0.isEmpty && $0 != selfID }.forEach {
-                    formerSeatUserIDs.insert($0)
-                }
-            }
         }
         refresh()
-    }
-
-    func forgetFormerSeatUsersWhoLeft() {
-        guard role == .host, !formerSeatUserIDs.isEmpty else { return }
-        let present = Set(audienceList.map(\.userID)).union(seatList.map(\.userInfo.userID))
-        formerSeatUserIDs.formIntersection(present)
     }
 
     func handleCoGuestChange() {
@@ -153,6 +197,13 @@ private extension VoiceLoungeSeatStore {
             showsAudienceFadedSeat = false
             audienceFadedSeatIndex = nil
         }
+        refresh()
+    }
+
+    func hideAudienceFadedSeat() {
+        guard role == .audience, coGuest.guestStatus == .idle else { return }
+        showsAudienceFadedSeat = false
+        audienceFadedSeatIndex = nil
         refresh()
     }
 
@@ -254,12 +305,8 @@ private extension VoiceLoungeSeatStore {
         case .host:
             let applicants = coGuest.applicants.filter { !onSeatIDs.contains($0.userID) && $0.userID != selfID }
             let applicantIDs = Set(applicants.map(\.userID))
-            var seen = Set<String>()
-            let viewers = audienceList.filter {
-                !$0.userID.isEmpty && $0.userID != selfID && !onSeatIDs.contains($0.userID)
-                    && !applicantIDs.contains($0.userID) && !coGuest.seatingHoldUserIDs.contains($0.userID)
-                    && (!formerSeatUserIDs.contains($0.userID) || coGuest.inviteeIDs.contains($0.userID))
-                    && seen.insert($0.userID).inserted
+            let invitees = coGuest.invitees.filter {
+                !onSeatIDs.contains($0.userID) && $0.userID != selfID && !applicantIDs.contains($0.userID)
             }
             var slots = result.indices.filter { result[$0].state == .empty && result[$0].role != .host }
             func place(_ user: LiveUserInfo, at slot: Int, isApplicant: Bool) {
@@ -267,26 +314,22 @@ private extension VoiceLoungeSeatStore {
                 result[slot].userID = user.userID
                 result[slot].name = user.userName.isEmpty ? user.userID : user.userName
                 result[slot].avatarURL = user.avatarURL
-                if isApplicant {
-                    result[slot].pillText = .pillStart
-                    result[slot].isPillHighlighted = true
-                } else if coGuest.inviteeIDs.contains(user.userID) {
-                    result[slot].pillText = .pillInvitePending
-                    result[slot].isPillHighlighted = false
-                }
+                result[slot].pillText = isApplicant ? .pillStart : .pillInvitePending
+                result[slot].isPillHighlighted = isApplicant
             }
-            var unplaced: [LiveUserInfo] = []
-            for user in applicants {
-                if let seatIndex = coGuest.applicantSeatIndex[user.userID],
-                    let position = slots.firstIndex(where: { result[$0].index == seatIndex })
-                {
-                    place(user, at: slots.remove(at: position), isApplicant: true)
+            let requests =
+                applicants.map { ($0, true, coGuest.applicantSeatIndex[$0.userID]) }
+                + invitees.map { ($0, false, coGuest.inviteeSeatIndex[$0.userID]) }
+            var unplaced: [(LiveUserInfo, Bool)] = []
+            for (user, isApplicant, seatIndex) in requests {
+                if let seatIndex, let position = slots.firstIndex(where: { result[$0].index == seatIndex }) {
+                    place(user, at: slots.remove(at: position), isApplicant: isApplicant)
                 } else {
-                    unplaced.append(user)
+                    unplaced.append((user, isApplicant))
                 }
             }
             var iterator = slots.makeIterator()
-            for (user, isApplicant) in unplaced.map({ ($0, true) }) + viewers.map({ ($0, false) }) {
+            for (user, isApplicant) in unplaced {
                 guard let slot = iterator.next() else { break }
                 place(user, at: slot, isApplicant: isApplicant)
             }

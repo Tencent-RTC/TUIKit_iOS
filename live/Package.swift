@@ -7,13 +7,13 @@ let package = Package(
     platforms: [.iOS(.v15)],
     products: [.library(name: "TUILiveKit", targets: ["TUILiveKit"])],
     dependencies: [
-        .package(url: "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git", from: "5.3.0"),
+        .package(url: "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git", from: "5.3.3"),
         .package(url: "https://github.com/Tencent-RTC/TUICore_SwiftPM.git", from: "9.0.7652"),
         .package(url: "https://github.com/Tencent-RTC/Chat_SDK_SwiftPM.git", from: "9.1.7824"),
         .package(url: "https://github.com/Tencent-RTC/Professional_SwiftPM.git", from: "13.5.21355"),
         .package(url: "https://github.com/Tencent-RTC/TCGiftPlayerKit_SwiftPM.git", from: "1.0.0"),
-        .package(url: "https://github.com/SnapKit/SnapKit.git", exact: "5.7.1"),
-        .package(url: "https://github.com/onevcat/Kingfisher.git", exact: "8.14.0"),
+        .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1"),
+        .package(url: "https://github.com/onevcat/Kingfisher.git", "7.12.0"..<"9.0.0"),
     ],
     targets: [
         .target(name: "TUILiveKit", dependencies: [

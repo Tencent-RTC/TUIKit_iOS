@@ -11,6 +11,19 @@ struct VoiceLoungeSkin: Equatable {
 
     var swatchColors: [UIColor] { [deep, mid, light] }
     var swatchLocations: [NSNumber] { [0, 0.55, 1] }
+
+    var textSoft: UIColor { mid.blendedWithWhite(0.75) }
+
+    var textStrong: UIColor { mid.blendedWithWhite(0.4) }
+}
+
+private extension UIColor {
+    func blendedWithWhite(_ ratio: CGFloat) -> UIColor {
+        var (red, green, blue, alpha): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        let keep = 1 - ratio
+        return UIColor(red: red * keep + ratio, green: green * keep + ratio, blue: blue * keep + ratio, alpha: 1)
+    }
 }
 
 extension VoiceLoungeSkin {
@@ -95,8 +108,10 @@ enum VoiceLoungeColor {
     static let overlayMarked = UIColor.white.withAlphaComponent(0.14)
 
     static let card = UIColor.black.withAlphaComponent(0.28)
-
-    // MARK: - Shared Colors
+    static let transcriberCard = UIColor.white.withAlphaComponent(0.12)
+    static let transcriberNameGradient: [UIColor] = [
+        UIColor(red: 1.0, green: 0.5, blue: 0.62, alpha: 1), UIColor(red: 0.7, green: 0.62, blue: 1.0, alpha: 1),
+    ]
 
     static let rose = UIColor(red: 1.0, green: 0.325, blue: 0.439, alpha: 1)
     static let statHighlight = UIColor(red: 0.557, green: 0.812, blue: 1, alpha: 1)

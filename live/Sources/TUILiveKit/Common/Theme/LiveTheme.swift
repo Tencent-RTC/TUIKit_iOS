@@ -104,6 +104,14 @@ enum LiveHeaderStyle {
     static let avatarRadius: CGFloat = 16
 }
 
+/// Shared preparation close control, exported from Ardot 5074:2790.
+enum LivePrepareHeaderStyle {
+    static let closeImageName = "livekit_prepare_close"
+    static let closeButtonSize: CGFloat = 44
+    static let closeButtonLeading: CGFloat = 8
+    static let closeButtonTop: CGFloat = 4
+}
+
 enum LiveAudienceRowStyle {
     static let giftValueFont: UIFont = UIFont.systemFont(ofSize: 12, weight: .bold)
     static let separator: UIColor = UIColor.white.withAlphaComponent(0.08)

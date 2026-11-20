@@ -43,7 +43,6 @@ final class VoiceLoungePrepareMorePanel: BottomSheetView {
     }
 
     private func setupStyles() {
-        sheetTitle = .moreTitle
         grid.axis = .horizontal
         grid.distribution = .fillEqually
         grid.alignment = .top
@@ -114,6 +113,14 @@ private enum PrepareToolIcon {
         case .transcriber: return nil
         }
     }
+
+    var drawSize: CGFloat {
+        switch self {
+        case .layout: return 22
+        case .audio: return 18
+        case .transcriber: return 23
+        }
+    }
 }
 
 private final class PrepareToolIconView: UIView {
@@ -132,7 +139,7 @@ private final class PrepareToolIconView: UIView {
             addSubview(imageView)
             imageView.snp.makeConstraints { make in
                 make.center.equalToSuperview()
-                make.size.equalToSuperview().multipliedBy(0.62)
+                make.size.equalTo(icon.drawSize)
             }
             return
         }
@@ -149,20 +156,13 @@ private final class PrepareToolIconView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         guard icon.assetName == nil else { return }
-        shapeLayer.frame = bounds
-        let scale = min(bounds.width, bounds.height) / 24
+        let side = icon.drawSize
+        shapeLayer.frame = CGRect(
+            x: (bounds.width - side) / 2, y: (bounds.height - side) / 2, width: side, height: side)
+        let scale = side / 24
         let path = UIBezierPath()
         switch icon {
-        case .transcriber:
-            path.append(UIBezierPath(roundedRect: CGRect(x: 3.4, y: 4.4, width: 13.2, height: 11.2), cornerRadius: 2.4))
-            path.move(to: CGPoint(x: 6.6, y: 8))
-            path.addLine(to: CGPoint(x: 13.6, y: 8))
-            path.move(to: CGPoint(x: 6.6, y: 10.8))
-            path.addLine(to: CGPoint(x: 11.2, y: 10.8))
-            path.append(UIBezierPath(ovalIn: CGRect(x: 13.4, y: 12.4, width: 7.2, height: 7.2)))
-            path.move(to: CGPoint(x: 17, y: 14.4))
-            path.addLine(to: CGPoint(x: 17, y: 16))
-            path.addLine(to: CGPoint(x: 18.2, y: 17))
+        case .transcriber: path.append(VoiceLoungeTranscriberGlyph.path())
         case .layout, .audio: break
         }
         path.apply(CGAffineTransform(scaleX: scale, y: scale))
@@ -172,14 +172,21 @@ private final class PrepareToolIconView: UIView {
 
 private enum PrepareToolStyle {
     static let gridInset: CGFloat = 20
-    static let gridTop: CGFloat = 64
+    static let gridTop: CGFloat = 28
     static let iconSize: CGFloat = 56
     static let iconBackground = VoiceLoungeColor.prepareIconBackground
     static let iconBorder = VoiceLoungeColor.prepareIconBorder
     static let iconStroke = UIColor.white.withAlphaComponent(0.92)
-    static let sheetHeight: CGFloat = 64 + 56 + 8 + 18 + 28
+    static let sheetHeight: CGFloat = gridTop + 56 + 8 + 18 + 28
 }
 
-private extension String {
-    static var moreTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.prepare.more_title") }
+enum VoiceLoungeTranscriberGlyph {
+    static func path() -> UIBezierPath {
+        let path = UIBezierPath(roundedRect: CGRect(x: 3.5, y: 5.5, width: 17, height: 13), cornerRadius: 3.2)
+        path.move(to: CGPoint(x: 7.5, y: 10.2))
+        path.addLine(to: CGPoint(x: 16.5, y: 10.2))
+        path.move(to: CGPoint(x: 7.5, y: 13.8))
+        path.addLine(to: CGPoint(x: 12.5, y: 13.8))
+        return path
+    }
 }

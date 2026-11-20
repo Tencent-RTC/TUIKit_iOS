@@ -6,11 +6,37 @@ final class VoiceLoungePrepareView: UIView {
     var onExit: (() -> Void)?
     var onStart: ((VoiceLoungeConfig) -> Void)?
 
+    var accessoryView: UIView? {
+        didSet {
+            guard oldValue !== accessoryView else { return }
+            oldValue?.removeFromSuperview()
+            infoEditorTopConstraint?.update(
+                offset: accessoryView == nil ? PrepareStyle.headerTop : PrepareStyle.accessoryHeaderTop)
+            guard let accessoryView else { return }
+            insertSubview(accessoryView, belowSubview: themePanel)
+            accessoryView.snp.makeConstraints { make in
+                make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(4)
+                make.leading.trailing.equalTo(safeAreaLayoutGuide).inset(60)
+                make.height.equalTo(48)
+            }
+        }
+    }
+
+    var title: String {
+        get { infoEditorView.roomName }
+        set {
+            infoEditorView.setRoomName(newValue)
+            input.roomName = infoEditorView.roomName
+        }
+    }
+
     private let backgroundView = VoiceLoungeBackgroundView()
     private let backgroundDimView = UIView()
-    private let exitButton = UIControl()
-    private let exitIconView = UIImageView()
+    private let exitButton = UIButton(type: .custom)
     private let infoEditorView = VoiceLoungeInfoEditorView()
+    private var infoEditorTopConstraint: Constraint?
+    private let heroView = VoiceLoungeHostHeroView()
+    private let seatPreviewView = VoiceLoungeSeatPreviewView()
     private let actionsStack = UIStackView()
     private let backgroundAction = PrepareToolButton(
         title: .actionBackground, assetName: "livekit_voiceprepare_background")
@@ -22,6 +48,7 @@ final class VoiceLoungePrepareView: UIView {
     private let transcriberPanel = VoiceLoungeAITranscriberPanel()
     private let audioEffectsPanel = VoiceLoungeAudioEffectPanel()
     private let topicPanel = VoiceLoungeTopicPanel()
+    private let coverPickerView = PusherCoverPickerView()
     private var captureVolume: Int = 100
 
     private var input = VoiceLoungeConfig()
@@ -39,9 +66,12 @@ final class VoiceLoungePrepareView: UIView {
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    override var isHidden: Bool { didSet { heroView.setActive(!isHidden) } }
+
     func bind(_ input: VoiceLoungeConfig) {
         self.input = input
         applyDefaultLayout()
+        applyPersistedTranscriberDefaults()
         render()
     }
 
@@ -54,14 +84,23 @@ final class VoiceLoungePrepareView: UIView {
         render()
     }
 
+    private func applyPersistedTranscriberDefaults() {
+        guard let defaults = VoiceLoungeTranscriberDefaults.current else { return }
+        input.isTranscriberEnabled = defaults.isEnabled
+        input.transcriberShowOriginal = defaults.showOriginal
+        input.transcriberScale = defaults.scale
+        input.transcriberLanguage = defaults.language
+    }
+
     func deactivate() { infoEditorView.endRoomNameEditing() }
 
     private func setupViews() {
         addSubview(backgroundView)
         addSubview(backgroundDimView)
-        exitButton.addSubview(exitIconView)
-        addSubview(exitButton)
+        addSubview(seatPreviewView)
+        addSubview(heroView)
         addSubview(infoEditorView)
+        addSubview(exitButton)
         [backgroundAction, moreAction].forEach(actionsStack.addArrangedSubview)
         addSubview(actionsStack)
         addSubview(startButton)
@@ -71,25 +110,24 @@ final class VoiceLoungePrepareView: UIView {
         addSubview(transcriberPanel)
         addSubview(audioEffectsPanel)
         addSubview(topicPanel)
+        addSubview(coverPickerView)
     }
 
     private func setupConstraints() {
         backgroundView.snp.makeConstraints { make in make.edges.equalToSuperview() }
         backgroundDimView.snp.makeConstraints { make in make.edges.equalToSuperview() }
         exitButton.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(9)
-            make.size.equalTo(34)
-        }
-        exitIconView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(21)
+            make.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(LivePrepareHeaderStyle.closeButtonLeading)
+            make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(LivePrepareHeaderStyle.closeButtonTop)
+            make.size.equalTo(LivePrepareHeaderStyle.closeButtonSize)
         }
         infoEditorView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(exitButton.snp.bottom).offset(42)
-            make.bottom.lessThanOrEqualTo(actionsStack.snp.top).offset(-24)
+            make.leading.trailing.equalToSuperview().inset(24)
+            infoEditorTopConstraint =
+                make.top.equalTo(safeAreaLayoutGuide.snp.top).offset(PrepareStyle.headerTop).constraint
         }
+        applyHeroConstraints(for: input.seatLayout)
+        applySeatPreviewConstraints(for: input.seatLayout)
         actionsStack.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.leading.greaterThanOrEqualToSuperview().offset(20)
@@ -107,15 +145,16 @@ final class VoiceLoungePrepareView: UIView {
         transcriberPanel.snp.makeConstraints { make in make.edges.equalToSuperview() }
         audioEffectsPanel.snp.makeConstraints { make in make.edges.equalToSuperview() }
         topicPanel.snp.makeConstraints { make in make.edges.equalToSuperview() }
+        coverPickerView.snp.makeConstraints { make in make.edges.equalToSuperview() }
     }
 
     private func setupStyles() {
         backgroundDimView.backgroundColor = PrepareStyle.backgroundDim
         backgroundDimView.isUserInteractionEnabled = false
 
-        exitIconView.image = LiveKitResources.image(named: "livekit_voiceprepare_close")
-        exitIconView.contentMode = .scaleAspectFit
-        exitIconView.isUserInteractionEnabled = false
+        exitButton.setImage(LiveKitResources.image(named: LivePrepareHeaderStyle.closeImageName), for: .normal)
+        exitButton.imageView?.contentMode = .scaleAspectFit
+        exitButton.backgroundColor = .clear
         exitButton.accessibilityLabel = .close
 
         actionsStack.axis = .horizontal
@@ -130,6 +169,17 @@ final class VoiceLoungePrepareView: UIView {
         startButton.addTarget(self, action: #selector(start), for: .touchUpInside)
 
         infoEditorView.onRoomNameChanged = { [weak self] name in self?.input.roomName = name }
+        infoEditorView.onChangeCover = { [weak self] in
+            guard let self else { return }
+            infoEditorView.endRoomNameEditing()
+            coverPickerView.bind(selectedURL: input.coverURL)
+            coverPickerView.present()
+        }
+        coverPickerView.onSelect = { [weak self] coverURL in
+            guard let self else { return }
+            input.coverURL = coverURL
+            render()
+        }
         infoEditorView.onSelectTopic = { [weak self] in
             guard let self else { return }
             infoEditorView.endRoomNameEditing()
@@ -154,37 +204,64 @@ final class VoiceLoungePrepareView: UIView {
         morePanel.onTranscriber = { [weak self] in self?.presentTranscriberPanel() }
         morePanel.onAudio = { [weak self] in self?.presentAudioPanel() }
 
-        layoutPanel.onConfirm = { [weak self] layout, setAsDefault in
+        layoutPanel.onConfirm = { [weak self] layout in
             guard let self else { return }
             input.seatLayout = layout
-            saveDefaultLayout(setAsDefault ? layout : nil)
             render()
         }
-        transcriberPanel.onToggle = { [weak self] isOn in
+        transcriberPanel.onStateChanged = { [weak self] state in
             guard let self else { return }
-            input.isTranscriberEnabled = isOn
+            self.input.isTranscriberEnabled = state.isEnabled
+            self.input.transcriberShowOriginal = state.showOriginal
+            self.input.transcriberScale = state.scale
+            self.input.transcriberLanguage = state.language
+            if state.saveAsDefault {
+                VoiceLoungeTranscriberDefaults.current = VoiceLoungeTranscriberDefaults(
+                    isEnabled: state.isEnabled, showOriginal: state.showOriginal, scale: state.scale,
+                    language: state.language)
+            }
         }
         audioEffectsPanel.onSetCaptureVolume = { [weak self] volume in self?.captureVolume = volume }
     }
 
-    var defaultLayoutKey: String? {
-        guard let userID = LoginStore.shared.state.value.loginUserInfo?.userID, !userID.isEmpty else { return nil }
-        return "TUILiveKit.voiceLounge.defaultLayout.v1.\(LoginStore.shared.sdkAppID).\(userID).voice"
-    }
-
     private func applyDefaultLayout() {
-        guard let key = defaultLayoutKey, let raw = UserDefaults.standard.string(forKey: key),
-            let saved = VoiceLoungeSeatLayout(rawValue: raw)
-        else { return }
+        guard let saved = VoiceLoungeSeatLayout.savedDefault else { return }
         input.seatLayout = saved
     }
 
-    private func saveDefaultLayout(_ layout: VoiceLoungeSeatLayout?) {
-        guard let key = defaultLayoutKey else { return }
-        if let layout {
-            UserDefaults.standard.set(layout.rawValue, forKey: key)
-        } else {
-            UserDefaults.standard.removeObject(forKey: key)
+    private func applyHeroConstraints(for layout: VoiceLoungeSeatLayout) {
+        heroView.snp.remakeConstraints { make in
+            make.leading.trailing.equalToSuperview()
+            if layout == .oneV8x {
+                make.centerY.equalTo(seatPreviewView)
+                make.top.greaterThanOrEqualTo(infoEditorView.snp.bottom).offset(PrepareStyle.heroMinimumGap)
+            } else {
+                make.top.equalTo(infoEditorView.snp.top).offset(PrepareStyle.heroOffset).priority(.high)
+                make.top.greaterThanOrEqualTo(infoEditorView.snp.bottom).offset(PrepareStyle.heroMinimumGap)
+            }
+        }
+    }
+
+    private func applySeatPreviewConstraints(for layout: VoiceLoungeSeatLayout) {
+        seatPreviewView.snp.remakeConstraints { make in
+            switch layout {
+            case .oneV8x:
+                make.leading.greaterThanOrEqualTo(heroView.snp.centerX).offset(32)
+                make.trailing.equalToSuperview().inset(24)
+                make.top.equalTo(infoEditorView.snp.bottom).offset(PrepareStyle.seatPreviewMinimumGap)
+                make.bottom.lessThanOrEqualTo(actionsStack.snp.top).offset(-PrepareStyle.seatPreviewMinimumGap)
+                    .priority(999)
+            case .duo:
+                make.centerX.equalToSuperview()
+                make.top.equalTo(heroView.snp.bottom).offset(PrepareStyle.seatPreviewGap)
+                make.size.equalTo(0)
+            default:
+                make.centerX.equalToSuperview()
+                make.top.equalTo(heroView.snp.bottom).offset(PrepareStyle.seatPreviewGap).priority(.medium)
+                make.top.greaterThanOrEqualTo(heroView.snp.bottom).offset(PrepareStyle.seatPreviewMinimumGap)
+                make.bottom.lessThanOrEqualTo(actionsStack.snp.top).offset(-PrepareStyle.seatPreviewMinimumGap)
+                    .priority(999)
+            }
         }
     }
 
@@ -192,7 +269,13 @@ final class VoiceLoungePrepareView: UIView {
         layoutPanel.show(selected: input.seatLayout, setAsDefault: true, skin: input.skin)
     }
 
-    private func presentTranscriberPanel() { transcriberPanel.show(isOn: input.isTranscriberEnabled, skin: input.skin) }
+    private func presentTranscriberPanel() {
+        let hasDefaults = VoiceLoungeTranscriberDefaults.current != nil
+        let state = VoiceLoungeAITranscriberPanel.State(
+            isEnabled: input.isTranscriberEnabled, showOriginal: input.transcriberShowOriginal,
+            scale: input.transcriberScale, language: input.transcriberLanguage, saveAsDefault: hasDefaults)
+        transcriberPanel.show(initial: state, skin: input.skin)
+    }
 
     private func presentAudioPanel() { audioEffectsPanel.show(captureVolume: captureVolume) }
 
@@ -200,7 +283,14 @@ final class VoiceLoungePrepareView: UIView {
         backgroundView.show(input.background)
         startButton.applySkin(input.skin)
         startButton.setTitle(.startVoice)
-        infoEditorView.bind(input, hostName: hostName, avatarURL: hostAvatarURL)
+        infoEditorView.bind(input, hostName: hostName)
+        heroView.bind(hostName: hostName, avatarURL: hostAvatarURL, skin: input.skin)
+        heroView.applyLayout(input.seatLayout)
+        seatPreviewView.isHidden = input.seatLayout == .duo
+        seatPreviewView.applyLayout(input.seatLayout)
+        applyHeroConstraints(for: input.seatLayout)
+        applySeatPreviewConstraints(for: input.seatLayout)
+        audioEffectsPanel.applySkin(input.skin)
     }
 }
 
@@ -229,59 +319,41 @@ extension VoiceLoungePrepareView {
 }
 
 private final class PrepareToolButton: UIControl {
-    private let iconBackground = UIView()
     private let iconView = UIImageView()
     private let titleLabel = LiveText.voiceLounge(.control, tone: .secondary, alignment: .center, emphasized: true)
 
-    override var isSelected: Bool { didSet { updateSelection() } }
-
-    var selectedBorderColor: UIColor = VoiceLoungeColor.prepareMid { didSet { updateSelection() } }
+    override var isHighlighted: Bool { didSet { alpha = isHighlighted ? 0.6 : 1 } }
 
     init(title: String, assetName: String) {
         super.init(frame: .zero)
-        iconBackground.backgroundColor = VoiceLoungeColor.prepareIconBackground
-        iconBackground.layer.cornerRadius = 24
-        iconBackground.layer.borderWidth = 1
-        iconBackground.layer.borderColor = VoiceLoungeColor.prepareIconBorder.cgColor
-        iconBackground.isUserInteractionEnabled = false
-        addSubview(iconBackground)
-
-        iconView.image = LiveKitResources.image(named: assetName)
+        iconView.image = LiveKitResources.image(named: assetName)?.withRenderingMode(.alwaysTemplate)
+        iconView.tintColor = PrepareStyle.actionIconTint
         iconView.contentMode = .scaleAspectFit
-        iconBackground.addSubview(iconView)
+        iconView.isUserInteractionEnabled = false
+        addSubview(iconView)
 
         titleLabel.text = title
         titleLabel.numberOfLines = 1
-        titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.75
+        titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.isUserInteractionEnabled = false
         addSubview(titleLabel)
 
-        snp.makeConstraints { $0.width.equalTo(48) }
-        iconBackground.snp.makeConstraints { make in
-            make.top.centerX.equalToSuperview()
-            make.size.equalTo(48)
+        snp.makeConstraints { make in
+            make.width.greaterThanOrEqualTo(PrepareStyle.actionIconBox)
+            make.width.lessThanOrEqualTo(PrepareStyle.actionLabelMaxWidth)
         }
         iconView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(22)
+            make.top.equalToSuperview().offset((PrepareStyle.actionIconBox - PrepareStyle.actionIconSize) / 2)
+            make.centerX.equalToSuperview()
+            make.size.equalTo(PrepareStyle.actionIconSize)
         }
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(iconBackground.snp.bottom).offset(7)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(15)
-            make.bottom.equalToSuperview()
+            make.top.equalToSuperview().offset(PrepareStyle.actionIconBox + 7)
+            make.leading.trailing.bottom.equalToSuperview()
         }
-        updateSelection()
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    private func updateSelection() {
-        iconBackground.layer.borderColor =
-            (isSelected ? selectedBorderColor : VoiceLoungeColor.prepareIconBorder).cgColor
-        titleLabel.tone = isSelected ? .primary : .secondary
-    }
 }
 
 private final class StartLiveButton: UIControl {
@@ -358,6 +430,16 @@ private final class StartLiveButton: UIControl {
 
 private enum PrepareStyle {
     static let actionSpacing: CGFloat = 30
+    static let actionIconBox: CGFloat = 30
+    static let actionIconSize: CGFloat = 26
+    static let actionLabelMaxWidth: CGFloat = 72
+    static let actionIconTint = UIColor.white.withAlphaComponent(0.92)
+    static let headerTop: CGFloat = 49
+    static let accessoryHeaderTop: CGFloat = 85
+    static let heroOffset: CGFloat = 210
+    static let heroMinimumGap: CGFloat = 36
+    static let seatPreviewGap: CGFloat = 20
+    static let seatPreviewMinimumGap: CGFloat = 16
     static let backgroundDim = UIColor(red: 0.051, green: 0.055, blue: 0.078, alpha: 0.42)
 }
 

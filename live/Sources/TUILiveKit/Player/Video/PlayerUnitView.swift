@@ -4,6 +4,18 @@ import UIKit
 final class PlayerUnitView: LiveSeat {
     var onGeometryChanged: (() -> Void)?
     var representedLiveID: String { liveInfo?.liveID ?? "" }
+    var isRemoteHost: Bool {
+        !currentUnitInfo.userID.isEmpty && !currentUnitInfo.liveID.isEmpty
+            && currentUnitInfo.liveID != representedLiveID
+    }
+    private var isCoHostConnected = false
+
+    func setCoHostConnected(_ connected: Bool) {
+        guard isCoHostConnected != connected else { return }
+        isCoHostConnected = connected
+        apply()
+    }
+
     private var liveInfo: LiveInfo?
     private var currentUnitInfo: UnitInfo
     private var currentStatus: PlayerStatus
@@ -57,6 +69,6 @@ final class PlayerUnitView: LiveSeat {
         updateVisibility(
             isEmpty: info.userID.isEmpty,
             showsNoVideo: info.cameraStatus != .on || info.userSuspendStatus == .inBackground,
-            showsOverlay: !isOwner && roomActive)
+            showsOverlay: (!isOwner || isCoHostConnected) && roomActive)
     }
 }

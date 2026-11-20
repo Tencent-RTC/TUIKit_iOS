@@ -1,3 +1,4 @@
+import AtomicXCore
 import Combine
 import Foundation
 
@@ -14,6 +15,9 @@ import Foundation
     var seatLayout: VoiceLoungeSeatLayout { config.seatLayout }
     var topic: String { config.topic }
     var isTranscriberEnabled: Bool { config.isTranscriberEnabled }
+    var transcriberShowOriginal: Bool { config.transcriberShowOriginal }
+    var transcriberScale: VoiceLoungeTranscriberScale { config.transcriberScale }
+    var transcriberLanguage: TranslationLanguage { config.transcriberLanguage }
     var skin: VoiceLoungeSkin { config.skin }
     var background: VoiceLoungeBackground { config.background }
 
@@ -32,16 +36,70 @@ import Foundation
 
 struct VoiceLoungeConfig: Equatable {
     var roomName = ""
-    var topic = ""
+    var coverURL = LiveKitResources.defaultCoverURL
+    var topic = VoiceLoungeConfig.defaultTopic
     var seatLayout: VoiceLoungeSeatLayout = .oneV8
     var skin = VoiceLoungeSkin.defaultSkin
     var background = VoiceLoungeBackground.defaultBackground
     var isTranscriberEnabled = false
+    var transcriberShowOriginal = false
+    var transcriberScale: VoiceLoungeTranscriberScale = .standard
+    var transcriberLanguage: TranslationLanguage = .english
+
+    static var defaultTopic: String { LiveKitResources.localizedString("tuilivekit.voiceroom.topic.default") }
 
     static func defaultRoomName(hostName: String) -> String {
         let trimmed = hostName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return .roomNameFallback }
         return .roomNameVoice(trimmed)
+    }
+}
+
+enum VoiceLoungeTranscriberScale: String, CaseIterable, Equatable {
+    case small
+    case standard
+    case large
+
+    var fontSize: CGFloat {
+        switch self {
+        case .small: return 11
+        case .standard: return 13
+        case .large: return 18
+        }
+    }
+}
+
+struct VoiceLoungeTranscriberDefaults: Equatable {
+    var isEnabled: Bool
+    var showOriginal: Bool
+    var scale: VoiceLoungeTranscriberScale
+    var language: TranslationLanguage
+
+    static var current: VoiceLoungeTranscriberDefaults? {
+        get {
+            guard let key = defaultsKey else { return nil }
+            let d = UserDefaults.standard
+            guard d.object(forKey: "\(key).enabled") != nil else { return nil }
+            let scaleRaw = d.string(forKey: "\(key).scale") ?? VoiceLoungeTranscriberScale.standard.rawValue
+            let langRaw = d.string(forKey: "\(key).lang") ?? TranslationLanguage.english.rawValue
+            return VoiceLoungeTranscriberDefaults(
+                isEnabled: d.bool(forKey: "\(key).enabled"), showOriginal: d.bool(forKey: "\(key).original"),
+                scale: VoiceLoungeTranscriberScale(rawValue: scaleRaw) ?? .standard,
+                language: TranslationLanguage(rawValue: langRaw) ?? .english, )
+        }
+        set {
+            guard let key = defaultsKey, let v = newValue else { return }
+            let d = UserDefaults.standard
+            d.set(v.isEnabled, forKey: "\(key).enabled")
+            d.set(v.showOriginal, forKey: "\(key).original")
+            d.set(v.scale.rawValue, forKey: "\(key).scale")
+            d.set(v.language.rawValue, forKey: "\(key).lang")
+        }
+    }
+
+    private static var defaultsKey: String? {
+        guard let userID = LoginStore.shared.state.value.loginUserInfo?.userID, !userID.isEmpty else { return nil }
+        return "TUILiveKit.voiceLounge.transcriber.v1.\(LoginStore.shared.sdkAppID).\(userID)"
     }
 }
 
@@ -66,13 +124,14 @@ extension VoiceLoungeConfig {
         ]
     }
 
-    mutating func applyMeta(_ metaData: [String: String]) {
+    mutating func applyMeta(_ metaData: [String: String], includeTranscriber: Bool = true) {
         let defaults = VoiceLoungeConfig()
         seatLayout = metaData[MetaKey.layout].flatMap(VoiceLoungeSeatLayout.init(rawValue:)) ?? defaults.seatLayout
         background = metaData[MetaKey.background].flatMap(VoiceLoungeBackground.background(id:)) ?? defaults.background
         skin = metaData[MetaKey.skin].flatMap(VoiceLoungeSkin.skin(id:)) ?? defaults.skin
         topic = metaData[MetaKey.topic] ?? defaults.topic
-        isTranscriberEnabled = metaData[MetaKey.transcriber] == "1"
+        guard includeTranscriber else { return }
+        isTranscriberEnabled = metaData[MetaKey.transcriber].map { $0 == "1" } ?? defaults.isTranscriberEnabled
     }
 }
 
@@ -101,4 +160,24 @@ enum VoiceLoungeSeatLayout: String, Equatable, CaseIterable {
     }
 
     var displayName: String { LiveKitResources.localizedString(labelKey) }
+
+    static var savedDefault: VoiceLoungeSeatLayout? {
+        get {
+            guard let key = defaultKey, let raw = UserDefaults.standard.string(forKey: key) else { return nil }
+            return VoiceLoungeSeatLayout(rawValue: raw)
+        }
+        set {
+            guard let key = defaultKey else { return }
+            if let newValue {
+                UserDefaults.standard.set(newValue.rawValue, forKey: key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+    }
+
+    private static var defaultKey: String? {
+        guard let userID = LoginStore.shared.state.value.loginUserInfo?.userID, !userID.isEmpty else { return nil }
+        return "TUILiveKit.voiceLounge.defaultLayout.v1.\(LoginStore.shared.sdkAppID).\(userID).voice"
+    }
 }

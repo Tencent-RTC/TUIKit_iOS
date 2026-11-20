@@ -8,34 +8,24 @@ final class VoiceLoungeLivingMorePanel: BottomSheetView {
     private let livingActions: VoiceLoungeLivingActions
     private lazy var layoutPanel: VoiceLoungeSeatLayoutPanel = {
         let panel = VoiceLoungeSeatLayoutPanel()
-        panel.onConfirm = { [weak self] layout, _ in self?.livingActions.changeLayout(layout) }
+        panel.onConfirm = { [weak self] layout in self?.livingActions.changeLayout(layout) }
         return panel
     }()
 
-    private let pauseItem = BigButton(iconKind: .pause, titleKey: "tuilivekit.voiceroom.living.pause")
+    private let pauseItem = MoreItemButton(iconName: "livekit_living_setting_pause", title: .pauseLive)
+    private let layoutItem = MoreItemButton(iconName: "livekit_living_more", title: .layoutSetting)
+    private let transcriberItem = MoreItemButton(image: MoreGlyph.transcriberImage(), title: .transcriber)
+    private let commentItem = MoreItemButton(iconName: "livekit_living_setting_comment", title: .comment)
+    private let itemsRow = UIStackView()
 
-    private let basicTitle = LiveText.voiceLounge(.metadata, tone: .tertiary, emphasized: true)
-    private let layoutItem = SmallButton(iconKind: .layout, titleKey: "tuilivekit.voiceroom.prepare.more_layout")
-
-    private let interactTitle = LiveText.voiceLounge(.metadata, tone: .tertiary, emphasized: true)
-    private let commentItem = SmallButton(iconKind: .comment, titleKey: "tuilivekit.voiceroom.living.comment")
-
-    private let topRow: UIStackView
-    private let basicRow: UIStackView
-    private let interactRow: UIStackView
-
-    override var sheetHeight: CGFloat { 372 + safeAreaInsets.bottom }
+    override var sheetHeight: CGFloat { MoreStyle.contentHeight + safeAreaInsets.bottom }
 
     init(settings: VoiceLoungeSettings, livingActions: VoiceLoungeLivingActions) {
         self.settings = settings
         self.livingActions = livingActions
-        topRow = Self.makeFourColumnRow(items: [pauseItem])
-        basicRow = Self.makeFourColumnRow(items: [layoutItem])
-        interactRow = Self.makeFourColumnRow(items: [commentItem])
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
-        setupStyles()
         setupBindings()
     }
 
@@ -43,194 +33,160 @@ final class VoiceLoungeLivingMorePanel: BottomSheetView {
         fatalError("init(frame:) is unavailable; use init(settings:livingActions:)")
     }
 
-    func show() { present() }
+    func show() {
+        transcriberItem.applyTranscriberState(isOn: settings.isTranscriberEnabled)
+        present()
+    }
 
     private func setupViews() {
-        contentView.addSubview(topRow)
-        contentView.addSubview(basicTitle)
-        contentView.addSubview(basicRow)
-        contentView.addSubview(interactTitle)
-        contentView.addSubview(interactRow)
+        sheetTitle = nil
+        let cells: [UIView] = [pauseItem, layoutItem, transcriberItem, commentItem]
+        cells.forEach(itemsRow.addArrangedSubview)
+        itemsRow.axis = .horizontal
+        itemsRow.distribution = .fillEqually
+        itemsRow.alignment = .top
+        contentView.addSubview(itemsRow)
     }
 
     private func setupConstraints() {
-        let hInset: CGFloat = 24
-        topRow.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(hInset)
-            make.top.equalToSuperview().offset(26)
+        itemsRow.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(MoreStyle.horizontalInset)
+            make.top.equalToSuperview().offset(MoreStyle.topInset)
         }
-        basicTitle.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(hInset)
-            make.top.equalTo(topRow.snp.bottom).offset(24)
-        }
-        basicRow.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(hInset)
-            make.top.equalTo(basicTitle.snp.bottom).offset(14)
-        }
-        interactTitle.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(hInset)
-            make.top.equalTo(basicRow.snp.bottom).offset(24)
-        }
-        interactRow.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(hInset)
-            make.top.equalTo(interactTitle.snp.bottom).offset(14)
-            make.bottom.lessThanOrEqualToSuperview().inset(24)
-        }
-    }
-
-    private func setupStyles() {
-        sheetTitle = nil
-        basicTitle.text = .sectionBasic
-        interactTitle.text = .sectionInteract
     }
 
     private func setupBindings() {
-        pauseItem.onTap = { [weak self] in
-            self?.dismiss()
-            self?.livingActions.pauseLive()
-        }
-        layoutItem.onTap = { [weak self] in
-            self?.dismiss()
-            self?.showLayoutPicker()
-        }
-        commentItem.onTap = { [weak self] in
-            self?.dismiss()
-            self?.onComment?()
-        }
+        pauseItem.addTarget(self, action: #selector(pauseLive), for: .touchUpInside)
+        layoutItem.addTarget(self, action: #selector(showLayoutPicker), for: .touchUpInside)
+        transcriberItem.addTarget(self, action: #selector(toggleTranscriber), for: .touchUpInside)
+        commentItem.addTarget(self, action: #selector(comment), for: .touchUpInside)
     }
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
         guard let window else {
-            [layoutPanel].forEach { $0.removeFromSuperview() }
+            layoutPanel.removeFromSuperview()
             return
         }
-        [layoutPanel].forEach { panel in
-            guard panel.superview !== window else { return }
-            panel.removeFromSuperview()
-            window.addSubview(panel)
-            panel.snp.remakeConstraints { make in make.edges.equalToSuperview() }
+        if layoutPanel.superview !== window {
+            layoutPanel.removeFromSuperview()
+            window.addSubview(layoutPanel)
+            layoutPanel.snp.remakeConstraints { make in make.edges.equalToSuperview() }
         }
-    }
-
-    private func showLayoutPicker() {
-        layoutPanel.show(selected: settings.seatLayout, setAsDefault: false, skin: settings.skin)
-    }
-
-    private static func makeFourColumnRow(items: [UIView]) -> UIStackView {
-        var cells = items
-        while cells.count < 4 { cells.append(UIView()) }
-        let row = UIStackView(arrangedSubviews: cells)
-        row.axis = .horizontal
-        row.distribution = .fillEqually
-        row.alignment = .top
-        return row
     }
 }
 
-private final class BigButton: UIControl {
-    var onTap: (() -> Void)?
+extension VoiceLoungeLivingMorePanel {
+    @objc private func pauseLive() {
+        dismiss()
+        livingActions.pauseLive()
+    }
 
+    @objc private func showLayoutPicker() {
+        dismiss()
+        layoutPanel.show(selected: settings.seatLayout, setAsDefault: true, skin: settings.skin)
+    }
+
+    @objc private func toggleTranscriber() {
+        let nextEnabled = !settings.isTranscriberEnabled
+        let state = VoiceLoungeAITranscriberPanel.State(
+            isEnabled: nextEnabled, showOriginal: settings.transcriberShowOriginal, scale: settings.transcriberScale,
+            language: settings.transcriberLanguage, saveAsDefault: false)
+        livingActions.updateTranscriber(state)
+        transcriberItem.applyTranscriberState(isOn: settings.isTranscriberEnabled)
+    }
+
+    @objc private func comment() {
+        dismiss()
+        onComment?()
+    }
+}
+
+private final class MoreItemButton: UIControl {
     private let iconBackground = UIView()
     private let iconView = UIImageView()
-    private let titleLabel = LiveText.voiceLounge(.caption, tone: .primary, alignment: .center)
+    private let titleLabel = LiveText.voiceLounge(.control, tone: .secondary, alignment: .center)
+    private var originalImage: UIImage?
 
-    init(iconKind: IconKind, titleKey: String) {
+    override var isHighlighted: Bool { didSet { alpha = isHighlighted ? 0.65 : 1 } }
+
+    convenience init(iconName: String, title: String) {
+        self.init(image: LiveKitResources.image(named: iconName), title: title)
+    }
+
+    init(image: UIImage?, title: String) {
         super.init(frame: .zero)
+        originalImage = image
         iconBackground.backgroundColor = VoiceLoungeColor.overlaySoft
-        iconBackground.layer.cornerRadius = 26
+        iconBackground.layer.cornerRadius = MoreStyle.iconPlate / 2
         iconBackground.isUserInteractionEnabled = false
         addSubview(iconBackground)
 
-        iconView.image = iconKind.image
+        iconView.image = image
         iconView.contentMode = .scaleAspectFit
         iconView.isUserInteractionEnabled = false
         iconBackground.addSubview(iconView)
 
-        titleLabel.text = LiveKitResources.localizedString(titleKey)
+        titleLabel.text = title
+        titleLabel.numberOfLines = 1
+        titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.isUserInteractionEnabled = false
         addSubview(titleLabel)
+        accessibilityLabel = title
 
         iconBackground.snp.makeConstraints { make in
-            make.top.centerX.equalToSuperview()
-            make.size.equalTo(52)
+            make.top.equalToSuperview().offset(4)
+            make.centerX.equalToSuperview()
+            make.size.equalTo(MoreStyle.iconPlate)
         }
         iconView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.size.equalTo(26)
+            make.size.equalTo(MoreStyle.iconSize)
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(iconBackground.snp.bottom).offset(8)
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(4)
+            make.bottom.equalToSuperview().inset(4)
         }
-        addTarget(self, action: #selector(tap), for: .touchUpInside)
     }
 
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
-
-    @objc private func tap() { onTap?() }
-}
-
-private final class SmallButton: UIControl {
-    var onTap: (() -> Void)?
-
-    private let iconBackground = UIView()
-    private let iconView = UIImageView()
-    private let titleLabel = LiveText.voiceLounge(.caption, tone: .primary, alignment: .center)
-
-    init(iconKind: IconKind, titleKey: String) {
-        super.init(frame: .zero)
-        iconBackground.backgroundColor = VoiceLoungeColor.overlaySoft
-        iconBackground.layer.cornerRadius = 22
-        iconBackground.isUserInteractionEnabled = false
-        addSubview(iconBackground)
-
-        iconView.image = iconKind.image
-        iconView.contentMode = .scaleAspectFit
-        iconView.isUserInteractionEnabled = false
-        iconBackground.addSubview(iconView)
-
-        titleLabel.text = LiveKitResources.localizedString(titleKey)
-        titleLabel.isUserInteractionEnabled = false
-        addSubview(titleLabel)
-
-        iconBackground.snp.makeConstraints { make in
-            make.top.centerX.equalToSuperview()
-            make.size.equalTo(44)
-        }
-        iconView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(22)
-        }
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(iconBackground.snp.bottom).offset(7)
-            make.leading.trailing.bottom.equalToSuperview()
-        }
-        addTarget(self, action: #selector(tap), for: .touchUpInside)
+    func applyTranscriberState(isOn: Bool) {
+        iconBackground.backgroundColor = isOn ? .white : VoiceLoungeColor.overlaySoft
+        iconView.image = MoreGlyph.transcriberImage(strokeColor: isOn ? .black : .white)
     }
 
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
-
-    @objc private func tap() { onTap?() }
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-private enum IconKind {
-    case pause, layout, comment
+private enum MoreStyle {
+    static let horizontalInset: CGFloat = 20
+    static let topInset: CGFloat = 30
+    static let iconPlate: CGFloat = 50
+    static let iconSize: CGFloat = 26
+    static let contentHeight: CGFloat = 124
+}
 
-    var image: UIImage? {
-        let name: String
-        switch self {
-        case .pause: name = "livekit_living_setting_pause"
-        case .layout: name = "livekit_living_more"
-        case .comment: name = "livekit_living_setting_comment"
+private enum MoreGlyph {
+    static func transcriberImage(strokeColor: UIColor = .white) -> UIImage {
+        let size = CGSize(width: MoreStyle.iconSize, height: MoreStyle.iconSize)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        let image = renderer.image { ctx in
+            let scale = size.width / 24
+            ctx.cgContext.scaleBy(x: scale, y: scale)
+            strokeColor.setStroke()
+            let path = VoiceLoungeTranscriberGlyph.path()
+            path.lineWidth = 1.8
+            path.lineCapStyle = .round
+            path.lineJoinStyle = .round
+            path.stroke()
         }
-        return LiveKitResources.image(named: name)
+        return image
     }
 }
 
 private extension String {
-    static var sectionBasic: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.section_basic") }
-    static var sectionInteract: String {
-        LiveKitResources.localizedString("tuilivekit.voiceroom.living.section_interact")
-    }
+    static var pauseLive: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.pause") }
+    static var layoutSetting: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.layout_setting") }
+    static var transcriber: String { LiveKitResources.localizedString("tuilivekit.voiceroom.caption.title") }
+    static var comment: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.comment") }
 }
