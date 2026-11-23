@@ -16,9 +16,13 @@ final class PusherVideoView: UIView {
         coreView.snp.makeConstraints { make in make.edges.equalToSuperview() }
     }
 
-    func updateCoGuestVideoState(isLiving: Bool, layout: CoGuestLayoutTemplate, connectedGuestCount: Int) {
-        unitAdapter.update(isLiving: isLiving, layout: layout, connectedGuestCount: connectedGuestCount)
-        let isCoGuestStageVisible = isLiving && (connectedGuestCount > 0 || layout != .floatLayout)
+    func updateCoGuestVideoState(
+        isLiving: Bool, layout: CoGuestLayoutTemplate, connectedGuestCount: Int, isCoHostConnected: Bool = false
+    ) {
+        unitAdapter.update(
+            isLiving: isLiving, layout: layout, connectedGuestCount: connectedGuestCount,
+            isCoHostConnected: isCoHostConnected)
+        let isCoGuestStageVisible = isLiving && (isCoHostConnected || connectedGuestCount > 0 || layout != .floatLayout)
         backgroundColor = isCoGuestStageVisible ? .clear : PusherVideoStyle.idleBackground
     }
 
@@ -56,6 +60,7 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
     private var showsEmptySeats = false
     private var showsHostOverlay = false
     private var localCameraStatus: DeviceStatus?
+    private var isCoHostConnected = false
 
     func updateLocalCameraStatus(_ status: DeviceStatus) {
         guard localCameraStatus != status else { return }
@@ -65,13 +70,15 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
         managedViews.compactMap(\.view).forEach(updatePresentation)
     }
 
-    func update(isLiving: Bool, layout: CoGuestLayoutTemplate, connectedGuestCount: Int) {
+    func update(isLiving: Bool, layout: CoGuestLayoutTemplate, connectedGuestCount: Int, isCoHostConnected: Bool) {
         self.isLiving = isLiving
         self.connectedGuestCount = connectedGuestCount
-        showsEmptySeats = layout.pusherShowsEmptySeats
-        showsHostOverlay = layout == .gridLayout || (layout == .dynamicLayout && connectedGuestCount > 0)
-        usesSmallWindows = layout == .floatLayout || layout == .columnLayout
-        usesGrid = layout == .gridLayout || (layout == .dynamicLayout && connectedGuestCount > 0)
+        self.isCoHostConnected = isCoHostConnected
+        showsEmptySeats = !isCoHostConnected && layout.pusherShowsEmptySeats
+        showsHostOverlay =
+            isCoHostConnected || layout == .gridLayout || (layout == .dynamicLayout && connectedGuestCount > 0)
+        usesSmallWindows = !isCoHostConnected && (layout == .floatLayout || layout == .columnLayout)
+        usesGrid = isCoHostConnected || layout == .gridLayout || (layout == .dynamicLayout && connectedGuestCount > 0)
         managedViews.removeAll { $0.view == nil }
         managedViews.forEach { if let view = $0.view { updatePresentation(view) } }
         notifyGeometryChanged()
@@ -105,7 +112,7 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
     }
 
     func guestUserID(at point: CGPoint, in sourceView: UIView) -> String? {
-        guard isLiving, connectedGuestCount > 0 else { return nil }
+        guard isLiving, !isCoHostConnected, connectedGuestCount > 0 else { return nil }
         return managedViews.reversed().compactMap(\.view).first { view in
             view.isGuest && isVisible(view, in: sourceView)
                 && view.bounds.contains(view.convert(point, from: sourceView))
@@ -141,8 +148,9 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
 
     private func updatePresentation(_ view: PusherUnitView) {
         view.setPresentation(
-            isLiving: isLiving, showsEmptySeats: showsEmptySeats, hasGuests: connectedGuestCount > 0,
-            showsHostOverlay: showsHostOverlay, localCameraStatus: localCameraStatus)
+            isLiving: isLiving, showsEmptySeats: showsEmptySeats,
+            hasGuests: isCoHostConnected || connectedGuestCount > 0, showsHostOverlay: showsHostOverlay,
+            localCameraStatus: localCameraStatus)
     }
 
     private func notifyGeometryChanged() {

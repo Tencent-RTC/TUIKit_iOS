@@ -4,260 +4,36 @@ import Kingfisher
 import SnapKit
 import UIKit
 
-final class VoiceLoungeCoGuestPanel: BottomSheetView {
-    private enum Mode: Equatable {
-        case idle
-        case applying
-        case onSeat(isMicOn: Bool)
-    }
-
-    private let liveID: String
-    private let coGuest: VoiceLoungeCoGuestStore
-
-    private let avatarRing = UIView()
-    private let avatarView = UIImageView()
-    private let nameLabel = LiveText.voiceLounge(.action, tone: .primary, alignment: .center)
-    private let buttonRow = UIStackView()
-    private let primaryButton = MicActionButton()
-    private let secondaryButton = MicActionButton()
-    private var mode: Mode = .idle
-    private var preferredSeatIndex = -1
-    private var selfSeatUser: SeatUserInfo?
-    private var skin = VoiceLoungeSkin.defaultSkin
-    private var cancellables = Set<AnyCancellable>()
-
-    override var sheetHeight: CGFloat { 300 }
-
-    init(liveID: String, coGuest: VoiceLoungeCoGuestStore) {
-        self.liveID = liveID
-        self.coGuest = coGuest
-        super.init(frame: .zero)
-        setupViews()
-        setupConstraints()
-        setupStyles()
-        setupBindings()
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    func show(preferredSeatIndex: Int?, skin: VoiceLoungeSkin) {
-        self.preferredSeatIndex = preferredSeatIndex ?? -1
-        self.skin = skin
-        avatarRing.layer.borderColor = skin.mid.withAlphaComponent(0.55).cgColor
-        present()
-    }
-
-    private func setupViews() {
-        contentView.addSubview(avatarRing)
-        avatarRing.addSubview(avatarView)
-        contentView.addSubview(nameLabel)
-        buttonRow.addArrangedSubview(primaryButton)
-        buttonRow.addArrangedSubview(secondaryButton)
-        contentView.addSubview(buttonRow)
-    }
-
-    private func setupConstraints() {
-        avatarRing.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(36)
-            make.size.equalTo(84)
-        }
-        avatarView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.size.equalTo(76)
-        }
-        nameLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.top.equalTo(avatarRing.snp.bottom).offset(14)
-            make.leading.greaterThanOrEqualToSuperview().offset(20)
-        }
-        buttonRow.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(20)
-            make.top.equalTo(nameLabel.snp.bottom).offset(32)
-            make.height.equalTo(56)
-        }
-    }
-
-    private func setupStyles() {
-        avatarRing.layer.borderWidth = 2
-        avatarRing.layer.cornerRadius = 42
-        avatarRing.backgroundColor = UIColor(red: 0.16, green: 0.13, blue: 0.24, alpha: 1)
-        avatarView.contentMode = .scaleAspectFill
-        avatarView.clipsToBounds = true
-        avatarView.layer.cornerRadius = 38
-        nameLabel.font = .systemFont(ofSize: 19, weight: .semibold)
-        buttonRow.axis = .horizontal
-        buttonRow.spacing = 20
-        buttonRow.distribution = .fillEqually
-    }
-
-    private func setupBindings() {
-        primaryButton.addTarget(self, action: #selector(tapPrimary), for: .touchUpInside)
-        secondaryButton.addTarget(self, action: #selector(tapSecondary), for: .touchUpInside)
-    }
-
-    override func sheetWillPresent() {
-        let profile = LoginStore.shared.state.value.loginUserInfo
-        let selfID = profile?.userID ?? ""
-        let nickname = profile?.nickname ?? ""
-        nameLabel.text = nickname.isEmpty ? selfID : nickname
-        avatarView.kf.setImage(
-            with: URL(string: profile?.avatarURL ?? ""),
-            placeholder: LiveKitResources.image(named: "livekit_livelist_default_avatar"))
-
-        cancellables.removeAll()
-        selfSeatUser = nil
-        LiveSeatStore.create(liveID: liveID).state.subscribe().receive(on: DispatchQueue.main).sink {
-            [weak self] state in
-            self?.selfSeatUser = state.seatList.first { $0.userInfo.userID == selfID }?.userInfo
-            self?.render()
-        }.store(in: &cancellables)
-        coGuest.changes.sink { [weak self] in self?.render() }.store(in: &cancellables)
-        render()
-    }
-
-    override func sheetDidDismiss() { cancellables.removeAll() }
-
-    private var currentMode: Mode {
-        switch coGuest.guestStatus {
-        case .idle: return .idle
-        case .applying: return .applying
-        case .onSeat: return .onSeat(isMicOn: selfSeatUser?.microphoneStatus == .on)
-        }
-    }
-
-    private func render() {
-        mode = currentMode
-        switch mode {
-        case .idle:
-            primaryButton.apply(title: .voiceApply, style: .filled(skin))
-            secondaryButton.isHidden = true
-        case .applying:
-            primaryButton.apply(title: .cancelApply, style: .outlined)
-            secondaryButton.isHidden = true
-        case .onSeat(let isMicOn):
-            primaryButton.apply(title: isMicOn ? .mute : .unmute, style: .outlined)
-            secondaryButton.apply(title: .leaveSeat, style: .outlined)
-            secondaryButton.isHidden = false
-        }
-    }
-
-    private func toggleMute(_ user: SeatUserInfo?) {
-        let store = LiveSeatStore.create(liveID: liveID)
-        if user?.microphoneStatus == .on {
-            store.muteMicrophone()
-        } else if user?.allowOpenMicrophone == false {
-            LiveToast.show(.microphoneLocked)
-        } else {
-            store.unmuteMicrophone(completion: nil)
-        }
-    }
-}
-
-extension VoiceLoungeCoGuestPanel {
-    @objc private func tapPrimary() {
-        let action: () -> Void
-        switch mode {
-        case .idle:
-            let seatIndex = preferredSeatIndex
-            action = { [coGuest] in coGuest.apply(seatIndex: seatIndex) }
-        case .applying: action = { [coGuest] in coGuest.cancelApplication() }
-        case .onSeat:
-            let user = selfSeatUser
-            action = { [weak self] in self?.toggleMute(user) }
-        }
-        dismiss()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { action() }
-    }
-
-    @objc private func tapSecondary() {
-        dismiss()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) { [coGuest] in coGuest.leaveSeat() }
-    }
-}
-
-private final class MicActionButton: UIControl {
-    enum Style {
-        case filled(VoiceLoungeSkin)
-        case outlined
-    }
-
-    private let gradientView = GradientView()
-    private let titleLabel = UILabel()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        layer.cornerRadius = 16
-        gradientView.isUserInteractionEnabled = false
-        gradientView.layer.cornerRadius = 16
-        gradientView.clipsToBounds = true
-        addSubview(gradientView)
-        titleLabel.font = .systemFont(ofSize: 18, weight: .semibold)
-        titleLabel.textColor = .white
-        titleLabel.textAlignment = .center
-        addSubview(titleLabel)
-        gradientView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        titleLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.leading.greaterThanOrEqualToSuperview().offset(8)
-        }
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    func apply(title: String, style: Style) {
-        titleLabel.text = title
-        switch style {
-        case .filled(let skin):
-            gradientView.isHidden = false
-            gradientView.colors = [skin.deep, skin.light]
-            layer.borderWidth = 0
-            layer.shadowColor = skin.mid.cgColor
-            layer.shadowOpacity = 0.55
-            layer.shadowRadius = 14
-            layer.shadowOffset = CGSize(width: 0, height: 4)
-        case .outlined:
-            gradientView.isHidden = true
-            layer.borderWidth = 1.5
-            layer.borderColor = UIColor.white.withAlphaComponent(0.28).cgColor
-            layer.shadowOpacity = 0
-        }
-    }
-
-    override var isHighlighted: Bool { didSet { alpha = isHighlighted ? 0.7 : 1 } }
-}
-
-private final class GradientView: UIView {
-    override class var layerClass: AnyClass { CAGradientLayer.self }
-
-    var colors: [UIColor] = [] { didSet { (layer as? CAGradientLayer)?.colors = colors.map(\.cgColor) } }
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        let gradient = layer as? CAGradientLayer
-        gradient?.startPoint = CGPoint(x: 0, y: 0.5)
-        gradient?.endPoint = CGPoint(x: 1, y: 0.5)
-    }
-
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
-
 final class VoiceLoungeCoGuestManagePanel: BottomSheetView {
     private enum Section: Int, CaseIterable { case connected, applicants }
 
-    private let liveID: String
-    private let coGuest: VoiceLoungeCoGuestStore
+    private let store: VoiceLoungeSeatStore
     private let tableView = UITableView(frame: .zero, style: .plain)
     private var connected: [SeatUserInfo] = []
     private var applicants: [LiveUserInfo] = []
+    private var isSeatFull = false
     private var skin = VoiceLoungeSkin.defaultSkin
     private var cancellables = Set<AnyCancellable>()
 
-    override var sheetHeight: CGFloat { 520 }
+    private var liveID: String { store.liveID }
+    private var coGuest: VoiceLoungeCoGuestStore { store.coGuest }
 
-    init(liveID: String, coGuest: VoiceLoungeCoGuestStore) {
-        self.liveID = liveID
-        self.coGuest = coGuest
+    private static let tableTop: CGFloat = 66
+    private static let tableBottomInset: CGFloat = 12
+    private static let maxContentHeight: CGFloat = 560
+
+    override var sheetHeight: CGFloat {
+        let content = Section.allCases.reduce(CGFloat(0)) { total, section in
+            let header = MicSectionHeader.height + (section == .connected ? 0 : MicSectionHeader.cardSpacing)
+            let rowHeight = isEmpty(section) ? MicEmptyCell.height : MicUserCell.height
+            return total + header + rowHeight * CGFloat(rowCount(section))
+        }
+        let height = Self.tableTop + 4 + content + Self.tableBottomInset
+        return min(height, Self.maxContentHeight) + (window?.safeAreaInsets.bottom ?? 0)
+    }
+
+    init(store: VoiceLoungeSeatStore) {
+        self.store = store
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -269,12 +45,14 @@ final class VoiceLoungeCoGuestManagePanel: BottomSheetView {
 
     func show(skin: VoiceLoungeSkin) {
         self.skin = skin
+        reloadData()
         present()
     }
 
     override func sheetWillPresent() {
         cancellables.removeAll()
         coGuest.changes.sink { [weak self] in self?.render() }.store(in: &cancellables)
+        store.changes.sink { [weak self] in self?.render() }.store(in: &cancellables)
         render()
     }
 
@@ -285,7 +63,7 @@ final class VoiceLoungeCoGuestManagePanel: BottomSheetView {
     private func setupConstraints() {
         tableView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
-            make.top.equalToSuperview().offset(66)
+            make.top.equalToSuperview().offset(Self.tableTop)
             make.bottom.equalTo(contentView.safeAreaLayoutGuide.snp.bottom)
         }
     }
@@ -296,7 +74,7 @@ final class VoiceLoungeCoGuestManagePanel: BottomSheetView {
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         tableView.alwaysBounceVertical = true
-        tableView.contentInset = UIEdgeInsets(top: 4, left: 0, bottom: 16, right: 0)
+        tableView.contentInset = UIEdgeInsets(top: 4, left: 0, bottom: Self.tableBottomInset, right: 0)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(MicUserCell.self, forCellReuseIdentifier: MicUserCell.reuseIdentifier)
@@ -310,18 +88,21 @@ final class VoiceLoungeCoGuestManagePanel: BottomSheetView {
     private func hangUp(userID: String) {
         LiveSeatStore.create(liveID: liveID).kickUserOutOfSeat(userID: userID) { result in
             Task { @MainActor in
-                switch result {
-                case .success: LiveToast.show(.kicked)
-                case .failure(let error): LiveToast.show(VoiceLoungeErrorText.coGuest(error))
-                }
+                if case .failure(let error) = result { LiveToast.show(VoiceLoungeErrorText.coGuest(error)) }
             }
         }
     }
 
-    private func render() {
+    private func reloadData() {
         connected = coGuest.connectedUsers
         applicants = coGuest.applicants
+        isSeatFull = store.hasNoFreeGuestSeat
+    }
+
+    private func render() {
+        reloadData()
         tableView.reloadData()
+        updateSheetHeight(animated: true)
     }
 
     private func isEmpty(_ section: Section) -> Bool {
@@ -343,7 +124,8 @@ extension VoiceLoungeCoGuestManagePanel: UITableViewDataSource, UITableViewDeleg
     func numberOfSections(in tableView: UITableView) -> Int { Section.allCases.count }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        Section(rawValue: section).map(rowCount) ?? 0
+        guard let section = Section(rawValue: section) else { return 0 }
+        return rowCount(section)
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -389,10 +171,13 @@ extension VoiceLoungeCoGuestManagePanel: UITableViewDataSource, UITableViewDeleg
         case .applicants:
             let user = applicants[indexPath.row]
             let userID = user.userID
+            let button: MicUserCell.ButtonSpec =
+                isSeatFull
+                ? .init(title: .full, showsMic: false, style: .disabled)
+                : .init(title: .connect, showsMic: true, style: .tinted)
             cell.bind(
-                name: user.userName.isEmpty ? userID : user.userName, avatarURL: user.avatarURL,
-                button: .init(title: .connect, showsMic: true, style: .tinted),
-                isEnabled: !coGuest.pendingUserIDs.contains(userID), isLast: isLast, skin: skin)
+                name: user.userName.isEmpty ? userID : user.userName, avatarURL: user.avatarURL, button: button,
+                isEnabled: !isSeatFull && !coGuest.pendingUserIDs.contains(userID), isLast: isLast, skin: skin)
             cell.onTap = { [weak self] in self?.coGuest.accept(userID: userID) }
         }
         return cell
@@ -485,7 +270,7 @@ private final class MicEmptyCell: UITableViewCell {
 
 private final class MicUserCell: UITableViewCell {
     struct ButtonSpec {
-        enum Style { case tinted, destructive }
+        enum Style { case tinted, destructive, disabled }
         let title: String
         let showsMic: Bool
         let style: Style
@@ -578,23 +363,19 @@ private final class MicUserCell: UITableViewCell {
         case .destructive:
             button.backgroundColor = MicCardStyle.hangUp.withAlphaComponent(0.55)
             button.layer.borderColor = MicCardStyle.hangUp.withAlphaComponent(0.8).cgColor
+        case .disabled:
+            button.backgroundColor = UIColor.white.withAlphaComponent(0.06)
+            button.layer.borderColor = UIColor.white.withAlphaComponent(0.06).cgColor
         }
         micView.isHidden = !spec.showsMic
         titleLabel.text = spec.title
+        titleLabel.textColor = spec.style == .disabled ? UIColor.white.withAlphaComponent(0.4) : .white
         button.isEnabled = isEnabled
-        button.alpha = isEnabled ? 1 : 0.5
+        button.alpha = isEnabled || spec.style == .disabled ? 1 : 0.5
     }
 }
 
 private extension String {
-    static var voiceApply: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.voice_apply") }
-    static var cancelApply: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.cancel_apply") }
-    static var mute: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.mute") }
-    static var unmute: String { LiveKitResources.localizedString("tuilivekit.voiceroom.living.unmute") }
-    static var leaveSeat: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.leave_comic") }
-    static var microphoneLocked: String {
-        LiveKitResources.localizedString("tuilivekit.player.coguest.microphone_locked")
-    }
     static func appliedTitle(_ args: CVarArg...) -> String {
         LiveKitResources.localizedFormat("tuilivekit.voiceroom.comic.applied_title", args)
     }
@@ -603,8 +384,8 @@ private extension String {
         LiveKitResources.localizedString("tuilivekit.voiceroom.comic.applicants_empty")
     }
     static var connect: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.connect") }
+    static var full: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.seat_full") }
     static var connectedTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.connected_title") }
     static var hangUp: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.hang_up") }
-    static var kicked: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.kicked") }
     static var settingsTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.settings_title") }
 }

@@ -173,6 +173,7 @@ private final class TopicRow: UIControl {
     let topicText: String
     var onTap: (() -> Void)?
 
+    private let tagBackground = UIView()
     private let tagLabel = UILabel()
     private let textLabel = UILabel()
     private let checkIcon = UIImageView()
@@ -185,15 +186,17 @@ private final class TopicRow: UIControl {
         layer.borderWidth = 1
         layer.borderColor = UIColor.clear.cgColor
 
+        tagBackground.backgroundColor = VoiceLoungeColor.overlayMarked
+        tagBackground.layer.cornerRadius = 9
+        tagBackground.isUserInteractionEnabled = false
+        addSubview(tagBackground)
+
         tagLabel.text = topic.tag
         tagLabel.font = .systemFont(ofSize: 13, weight: .medium)
         tagLabel.textColor = .white
         tagLabel.textAlignment = .center
-        tagLabel.backgroundColor = VoiceLoungeColor.overlayMarked
-        tagLabel.layer.cornerRadius = 9
-        tagLabel.layer.masksToBounds = true
         tagLabel.isUserInteractionEnabled = false
-        addSubview(tagLabel)
+        tagBackground.addSubview(tagLabel)
 
         textLabel.text = topic.text
         textLabel.font = .systemFont(ofSize: 15)
@@ -209,11 +212,15 @@ private final class TopicRow: UIControl {
         addSubview(checkIcon)
 
         snp.makeConstraints { $0.height.equalTo(56) }
-        tagLabel.snp.makeConstraints { make in
+        tagBackground.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(12)
             make.centerY.equalToSuperview()
-            make.height.equalTo(22)
-            make.width.greaterThanOrEqualTo(44)
+            make.height.equalTo(24)
+            make.width.greaterThanOrEqualTo(52)
+        }
+        tagLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(8)
         }
         tagLabel.setContentHuggingPriority(.required, for: .horizontal)
         tagLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -223,7 +230,7 @@ private final class TopicRow: UIControl {
             make.size.equalTo(18)
         }
         textLabel.snp.makeConstraints { make in
-            make.leading.equalTo(tagLabel.snp.trailing).offset(10)
+            make.leading.equalTo(tagBackground.snp.trailing).offset(10)
             make.trailing.lessThanOrEqualTo(checkIcon.snp.leading).offset(-10)
             make.centerY.equalToSuperview()
         }

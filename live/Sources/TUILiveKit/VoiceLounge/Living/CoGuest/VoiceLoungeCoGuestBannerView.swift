@@ -7,9 +7,8 @@ final class VoiceLoungeCoGuestBannerView: UIView {
     enum Kind {
         case invitation
         case requesting
+        case leaving
     }
-
-    private static let autoHideDelay: TimeInterval = 6
 
     private let kind: Kind
     private let store: VoiceLoungeSeatStore
@@ -18,10 +17,18 @@ final class VoiceLoungeCoGuestBannerView: UIView {
     private let titleLabel = LiveText.voiceLounge(.body, tone: .primary)
     private let actionButton = UIButton(type: .custom)
     private let closeButton = UIButton(type: .custom)
-    private var autoHideWork: DispatchWorkItem?
     private var animationToken = 0
 
+    private let barView = UIView()
+
     private var coGuest: VoiceLoungeCoGuestStore { store.coGuest }
+    private var hasCloseButton: Bool { kind != .requesting }
+
+    private enum Metrics {
+        static let barHeight: CGFloat = 56
+        static let closeSize: CGFloat = 36
+        static let closeGap: CGFloat = 8
+    }
 
     init(kind: Kind, store: VoiceLoungeSeatStore) {
         self.kind = kind
@@ -36,53 +43,71 @@ final class VoiceLoungeCoGuestBannerView: UIView {
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     private func setupViews() {
-        addSubview(iconView)
-        addSubview(titleLabel)
-        addSubview(actionButton)
+        addSubview(barView)
+        barView.addSubview(iconView)
+        barView.addSubview(titleLabel)
+        barView.addSubview(actionButton)
         addSubview(closeButton)
     }
 
     private func setupConstraints() {
-        snp.makeConstraints { $0.height.equalTo(56) }
+        snp.makeConstraints { $0.height.equalTo(Metrics.barHeight) }
+        barView.snp.makeConstraints { make in
+            make.leading.top.bottom.equalToSuperview()
+            make.trailing.equalToSuperview().inset(Metrics.closeSize + Metrics.closeGap)
+        }
         iconView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(18)
             make.centerY.equalToSuperview()
-            make.size.equalTo(kind == .invitation ? 22 : 20)
+            make.size.equalTo(kind == .requesting ? 20 : 22)
         }
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(iconView.snp.trailing).offset(12)
             make.centerY.equalToSuperview()
             make.trailing.lessThanOrEqualTo(actionButton.snp.leading).offset(-10)
         }
-        closeButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(12)
-            make.centerY.equalToSuperview()
-            make.size.equalTo(32)
-        }
         actionButton.snp.makeConstraints { make in
-            make.trailing.equalTo(closeButton.snp.leading).offset(-12)
+            make.trailing.equalToSuperview().inset(8)
             make.centerY.equalToSuperview()
-            make.size.equalTo(CGSize(width: 84, height: 40))
+            make.size.equalTo(hasCloseButton ? CGSize(width: 84, height: 40) : CGSize(width: 68, height: 36))
+        }
+        closeButton.snp.makeConstraints { make in
+            make.trailing.centerY.equalToSuperview()
+            make.size.equalTo(Metrics.closeSize)
         }
     }
 
     private func setupStyles() {
         isHidden = true
-        backgroundColor = VoiceLoungeColor.floatingBar
-        layer.cornerRadius = 22
-        let iconName = kind == .invitation ? "livekit_coguest_invitation" : "livekit_coguest_mic"
-        iconView.image = LiveKitResources.image(named: iconName)?.withRenderingMode(.alwaysTemplate)
+        backgroundColor = .clear
+        barView.backgroundColor = VoiceLoungeColor.floatingBar
+        barView.layer.cornerRadius = 22
+        iconView.image = LiveKitResources.image(named: "livekit_coguest_invitation")?.withRenderingMode(.alwaysTemplate)
         iconView.contentMode = .scaleAspectFit
-        titleLabel.text = kind == .invitation ? .inviteBarTitle : .retractTitle
-        actionButton.setTitle(kind == .invitation ? .connect : .retract, for: .normal)
+        switch kind {
+        case .invitation:
+            titleLabel.text = .inviteBarTitle
+            actionButton.setTitle(.connect, for: .normal)
+        case .requesting:
+            titleLabel.text = .applyingTitle
+            actionButton.setTitle(.cancel, for: .normal)
+        case .leaving:
+            titleLabel.text = .leaveTitle
+            actionButton.setTitle(.leaveConfirm, for: .normal)
+        }
+        actionButton.layer.cornerRadius = hasCloseButton ? 20 : 18
         actionButton.setTitleColor(.white, for: .normal)
         actionButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        actionButton.layer.cornerRadius = 20
+        closeButton.isHidden = !hasCloseButton
         closeButton.setImage(
             LiveKitResources.image(named: "livekit_living_close")?.withRenderingMode(.alwaysTemplate), for: .normal)
         closeButton.tintColor = VoiceLoungeColor.floatingBarIcon
-        closeButton.backgroundColor = VoiceLoungeColor.overlayBase
-        closeButton.layer.cornerRadius = 16
+        closeButton.backgroundColor = VoiceLoungeColor.floatingBar
+        closeButton.layer.cornerRadius = Metrics.closeSize / 2
+    }
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        barView.frame.contains(point) || (!closeButton.isHidden && closeButton.frame.contains(point))
     }
 
     private func setupBindings() {
@@ -91,13 +116,19 @@ final class VoiceLoungeCoGuestBannerView: UIView {
         switch kind {
         case .invitation:
             coGuest.invitationEvents.sink { [weak self] event in self?.handle(event) }.store(in: &cancellables)
-        case .requesting:
-            store.cancelApplicationPrompts.sink { [weak self] in self?.show() }.store(in: &cancellables)
+        case .requesting: store.cancelApplicationPrompts.sink { [weak self] in self?.show() }.store(in: &cancellables)
+        case .leaving: store.leavePrompts.sink { [weak self] in self?.show() }.store(in: &cancellables)
         }
-        coGuest.changes.sink { [weak self] in
-            guard let self, self.shouldHide(for: self.coGuest.guestStatus) else { return }
-            self.hide()
-        }.store(in: &cancellables)
+        coGuest.changes.sink { [weak self] in self?.syncWithStatus() }.store(in: &cancellables)
+    }
+
+    private func syncWithStatus() {
+        let status = coGuest.guestStatus
+        if kind == .requesting, status == .applying {
+            if isHidden { show() }
+            return
+        }
+        if shouldHide(for: status) { hide() }
     }
 
     private func tapAction() {
@@ -105,6 +136,7 @@ final class VoiceLoungeCoGuestBannerView: UIView {
         switch kind {
         case .invitation: coGuest.acceptInvitation()
         case .requesting: coGuest.cancelApplication()
+        case .leaving: coGuest.leaveSeat()
         }
     }
 
@@ -117,6 +149,7 @@ final class VoiceLoungeCoGuestBannerView: UIView {
         switch kind {
         case .invitation: return status == .onSeat
         case .requesting: return status != .applying
+        case .leaving: return status != .onSeat
         }
     }
 
@@ -126,7 +159,6 @@ final class VoiceLoungeCoGuestBannerView: UIView {
         case .cancelled:
             guard !isHidden else { return }
             hide()
-            LiveToast.show(.inviteCancelled)
         }
     }
 
@@ -134,21 +166,15 @@ final class VoiceLoungeCoGuestBannerView: UIView {
         let skin = store.skin
         actionButton.backgroundColor = skin.mid
         iconView.tintColor = skin.light
+        closeButton.tintColor = skin.light
         animationToken += 1
         layer.removeAllAnimations()
         isHidden = false
         alpha = 0
         UIView.animate(withDuration: 0.2) { self.alpha = 1 }
-        guard kind == .requesting else { return }
-        autoHideWork?.cancel()
-        let work = DispatchWorkItem { [weak self] in self?.hide() }
-        autoHideWork = work
-        DispatchQueue.main.asyncAfter(deadline: .now() + Self.autoHideDelay, execute: work)
     }
 
     private func hide() {
-        autoHideWork?.cancel()
-        autoHideWork = nil
         guard !isHidden else { return }
         animationToken += 1
         let token = animationToken
@@ -166,9 +192,8 @@ private extension String {
         LiveKitResources.localizedString("tuilivekit.voiceroom.comic.invite_bar_title")
     }
     static var connect: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.connect") }
-    static var inviteCancelled: String {
-        LiveKitResources.localizedString("tuilivekit.voiceroom.comic.invite_cancelled")
-    }
-    static var retract: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.retract") }
-    static var retractTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.retract_title") }
+    static var cancel: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.applying_cancel") }
+    static var applyingTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.applying_title") }
+    static var leaveTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.leave_title") }
+    static var leaveConfirm: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.leave_confirm") }
 }

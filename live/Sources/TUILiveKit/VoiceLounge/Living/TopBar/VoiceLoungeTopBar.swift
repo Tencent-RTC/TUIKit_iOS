@@ -15,6 +15,7 @@ final class VoiceLoungeTopBar: UIView {
     private let clock: VoiceLoungeLiveClock
     private lazy var giftRankPanel = VoiceLoungeGiftRankPanel(store: giftRankStore)
     private lazy var statusPanel = VoiceLoungeStatusPanel(liveID: liveID, clock: clock)
+    private let audienceListPanel = AudienceListPanel()
     private var settingsSubscription: AnyCancellable?
     private var countCancellables = Set<AnyCancellable>()
     private var likeCount = 0
@@ -37,18 +38,20 @@ final class VoiceLoungeTopBar: UIView {
     private let giftRankPill = PillButton(title: .giftRank)
     private let plazaPill = PillButton(title: .plaza, showsChevron: true)
     private let spacer = UIView()
-    private lazy var line2Stack = UIStackView([statLabel, hifiBadge], axis: .horizontal, spacing: 6, alignment: .center)
+    private lazy var line2Stack = UIStackView(
+        [statLabel, hifiBadge], axis: .horizontal, spacing: 6, alignment: .center)
     private lazy var textStack = UIStackView(
         [roomNameLabel, line2Stack], axis: .vertical, spacing: 2, alignment: .leading, interactive: false)
     private lazy var cardStack = UIStackView(
         [hostAvatarView, textStack, followButton], axis: .horizontal, spacing: 7, alignment: .center)
-    private lazy var subBar = UIStackView([giftRankPill, spacer, plazaPill], axis: .horizontal, spacing: 10, alignment: .center)
+    private lazy var subBar = UIStackView(
+        [giftRankPill, spacer, plazaPill], axis: .horizontal, spacing: 10, alignment: .center)
 
     private var skin = VoiceLoungeSkin.defaultSkin
 
     init(
-        role: VoiceLoungeRole, liveID: String, settings: VoiceLoungeSettings,
-        giftRankStore: VoiceLoungeGiftRankStore, clock: VoiceLoungeLiveClock
+        role: VoiceLoungeRole, liveID: String, settings: VoiceLoungeSettings, giftRankStore: VoiceLoungeGiftRankStore,
+        clock: VoiceLoungeLiveClock
     ) {
         self.role = role
         self.liveID = liveID
@@ -139,6 +142,7 @@ final class VoiceLoungeTopBar: UIView {
         followButton.addTarget(self, action: #selector(tapFollow), for: .touchUpInside)
         giftRankPill.onTap = { [weak self] in self?.showGiftRank() }
         plazaPill.onTap = { [weak self] in self?.showLiveStatus() }
+        audiencePresence.onAudience = { [weak self] in self?.audienceListPanel.show() }
         settingsSubscription = settings.changes.sink { [weak self] in self?.renderRoom() }
         giftRankSubscription = giftRankStore.changes.sink { [weak self] in self?.renderCounts() }
     }
@@ -157,13 +161,16 @@ final class VoiceLoungeTopBar: UIView {
         }
     }
 
-    private var panels: [BottomSheetView] { role == .host ? [giftRankPanel, statusPanel] : [giftRankPanel] }
+    private var panels: [BottomSheetView] {
+        (role == .host ? [giftRankPanel, statusPanel] : [giftRankPanel]) + [audienceListPanel]
+    }
 
     func activate() {
         guard countCancellables.isEmpty else { return }
         var liveInfo = LiveInfo()
         liveInfo.liveID = liveID
         audiencePresence.bind(liveInfo)
+        audienceListPanel.activate(liveID: liveID)
         LikeStore.create(liveID: liveID).state.subscribe().map { Int($0.totalLikeCount) }.removeDuplicates().receive(
             on: DispatchQueue.main
         ).sink { [weak self] count in
@@ -175,6 +182,8 @@ final class VoiceLoungeTopBar: UIView {
     func deactivate() {
         countCancellables.removeAll()
         audiencePresence.unbind()
+        audienceListPanel.dismiss()
+        audienceListPanel.deactivate()
         likeCount = 0
         renderCounts()
     }
@@ -466,8 +475,8 @@ private extension UILabel {
 
 private extension UIStackView {
     convenience init(
-        _ views: [UIView], axis: NSLayoutConstraint.Axis, spacing: CGFloat,
-        alignment: UIStackView.Alignment = .fill, interactive: Bool = true
+        _ views: [UIView], axis: NSLayoutConstraint.Axis, spacing: CGFloat, alignment: UIStackView.Alignment = .fill,
+        interactive: Bool = true
     ) {
         self.init(arrangedSubviews: views)
         self.axis = axis

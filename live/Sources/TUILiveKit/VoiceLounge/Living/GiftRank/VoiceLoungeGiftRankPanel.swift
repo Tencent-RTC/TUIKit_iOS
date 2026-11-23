@@ -11,7 +11,7 @@ final class VoiceLoungeGiftRankPanel: BottomSheetView {
     private let podium = PodiumView()
     private let emptyLabel = LiveText.voiceLounge(.body, tone: .tertiary, alignment: .center)
 
-    override var sheetHeight: CGFloat { 640 }
+    override var sheetHeight: CGFloat { 560 }
 
     init(store: VoiceLoungeGiftRankStore) {
         self.store = store
@@ -43,7 +43,7 @@ final class VoiceLoungeGiftRankPanel: BottomSheetView {
             make.top.equalToSuperview().offset(120)
         }
         tableView.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
+            make.top.equalToSuperview().offset(60)
             make.leading.trailing.bottom.equalToSuperview()
         }
     }

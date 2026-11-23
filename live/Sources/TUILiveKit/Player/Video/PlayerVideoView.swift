@@ -6,6 +6,7 @@ import UIKit
 final class PlayerVideoView: UIView {
     let coreView = AtomicLiveView(viewType: AtomicLiveViewType.playView)
     private let backgroundView = UIImageView()
+    private let connectionBackgroundView = UIImageView()
     private var liveInfo = LiveInfo()
     private let unitAdapter = LiveVideoViewAdapter()
 
@@ -15,6 +16,12 @@ final class PlayerVideoView: UIView {
         backgroundView.clipsToBounds = true
         addSubview(backgroundView)
         backgroundView.snp.makeConstraints { make in make.edges.equalToSuperview() }
+        connectionBackgroundView.image = LiveKitResources.image(named: "livekit_pusher_coguest_background")
+        connectionBackgroundView.contentMode = .scaleToFill
+        connectionBackgroundView.isHidden = true
+        addSubview(connectionBackgroundView)
+        connectionBackgroundView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        coreView.backgroundColor = .clear
         coreView.setViewChangeAdapter(unitAdapter)
         addSubview(coreView)
         coreView.snp.makeConstraints { make in make.edges.equalToSuperview() }
@@ -25,6 +32,13 @@ final class PlayerVideoView: UIView {
     var onGeometryChanged: (() -> Void)? {
         get { unitAdapter.onGeometryChanged }
         set { unitAdapter.onGeometryChanged = newValue }
+    }
+
+    var isCoHostConnected: Bool { unitAdapter.isCoHostConnected }
+
+    func refreshConnectionPresentation() {
+        connectionBackgroundView.isHidden = !isCoHostConnected
+        unitAdapter.refreshConnectionPresentation()
     }
 
     func visibleSeatRegions(in view: UIView) -> [CGRect] { unitAdapter.visibleSeatRegions(in: view) }
@@ -65,6 +79,15 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
     private var currentStatus: PlayerStatus = .idle
     private let activeUnits = NSHashTable<PlayerUnitView>.weakObjects()
 
+    var isCoHostConnected: Bool {
+        activeUnits.allObjects.contains { $0.isRemoteHost && $0.window != nil && !$0.isHidden }
+    }
+
+    func refreshConnectionPresentation() {
+        let connected = isCoHostConnected
+        activeUnits.allObjects.forEach { $0.setCoHostConnected(connected) }
+    }
+
     func setStatus(_ status: PlayerStatus) {
         guard currentStatus != status else { return }
         currentStatus = status
@@ -73,16 +96,15 @@ private final class LiveVideoViewAdapter: AtomicLiveViewChangeAdapter {
     }
 
     func onCreateUnitView(unitInfo: UnitInfo?) -> UIView? {
-        guard let unitInfo, unitInfo.liveID.isEmpty || unitInfo.liveID == liveInfo.liveID else { return nil }
+        // AtomicLiveView filters by the owning room. A connected host's unit carries its source room ID.
+        guard let unitInfo else { return nil }
         let view = PlayerUnitView(unitInfo: unitInfo, liveInfo: liveInfo, playerStatus: currentStatus)
         track(view)
         return view
     }
 
     func onUpdateUnitView(unitInfo: UnitInfo?, view: UIView?) {
-        guard let view = view as? PlayerUnitView, unitInfo != nil || view.representedLiveID == liveInfo.liveID,
-            unitInfo == nil || unitInfo?.liveID.isEmpty == true || unitInfo?.liveID == liveInfo.liveID
-        else { return }
+        guard let view = view as? PlayerUnitView, view.representedLiveID == liveInfo.liveID else { return }
         view.setUnitInfo(unitInfo ?? UnitInfo(), liveInfo: liveInfo)
         view.setPlayerStatus(currentStatus)
         track(view)

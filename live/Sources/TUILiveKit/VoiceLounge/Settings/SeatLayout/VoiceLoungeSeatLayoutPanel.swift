@@ -2,9 +2,8 @@ import SnapKit
 import UIKit
 
 final class VoiceLoungeSeatLayoutPanel: BottomSheetView {
-    var onConfirm: ((_ layout: VoiceLoungeSeatLayout, _ setAsDefault: Bool) -> Void)?
+    var onConfirm: ((VoiceLoungeSeatLayout) -> Void)?
 
-    private let confirmButton = UIButton(type: .system)
     private let cardRow = UIStackView()
     private let defaultCheckbox = CheckboxRow()
 
@@ -13,7 +12,7 @@ final class VoiceLoungeSeatLayoutPanel: BottomSheetView {
     private var selected: VoiceLoungeSeatLayout = .oneV8
     private var skin = VoiceLoungeSkin.defaultSkin
 
-    override var sheetHeight: CGFloat { 278 }
+    override var sheetHeight: CGFloat { 300 }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -31,47 +30,39 @@ final class VoiceLoungeSeatLayoutPanel: BottomSheetView {
         defaultCheckbox.apply(skin: skin)
         rebuildCards()
         syncSelection()
-        confirmButton.setTitleColor(Self.lighten(skin.mid), for: .normal)
         present()
     }
 
     private func setupViews() {
-        contentView.addSubview(confirmButton)
         contentView.addSubview(cardRow)
         contentView.addSubview(defaultCheckbox)
     }
 
     private func setupConstraints() {
-        confirmButton.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(20)
-            make.top.equalToSuperview().offset(26)
-            make.height.equalTo(28)
-        }
         cardRow.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(confirmButton.snp.bottom).offset(14)
+            make.top.equalToSuperview().offset(64)
             make.height.equalTo(128)
         }
         defaultCheckbox.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(18)
-            make.top.equalTo(cardRow.snp.bottom).offset(14)
+            make.centerX.equalToSuperview()
+            make.top.greaterThanOrEqualTo(cardRow.snp.bottom).offset(14)
+            make.leading.greaterThanOrEqualToSuperview().inset(18)
             make.trailing.lessThanOrEqualToSuperview().inset(18)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide.snp.bottom).inset(SheetBottomStyle.inset)
             make.height.equalTo(20)
         }
     }
 
     private func setupStyles() {
         sheetTitle = .title
-        confirmButton.setTitle(.confirm, for: .normal)
-        confirmButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        confirmButton.setTitleColor(LiveTheme.Color.brandCyan, for: .normal)
         cardRow.axis = .horizontal
         cardRow.distribution = .fillEqually
         cardRow.spacing = 10
         defaultCheckbox.setTitle(.defaultHint)
     }
 
-    private func setupBindings() { confirmButton.addTarget(self, action: #selector(tapConfirm), for: .touchUpInside) }
+    private func setupBindings() { defaultCheckbox.onChange = { [weak self] _ in self?.saveDefault() } }
 
     private func rebuildCards() {
         cardRow.arrangedSubviews.forEach {
@@ -91,23 +82,14 @@ final class VoiceLoungeSeatLayoutPanel: BottomSheetView {
         guard selected != layout else { return }
         selected = layout
         syncSelection()
+        saveDefault()
+        onConfirm?(layout)
     }
+
+    private func saveDefault() { VoiceLoungeSeatLayout.savedDefault = defaultCheckbox.isOn ? selected : nil }
 
     private func syncSelection() {
         cards.forEach { layout, card in card.apply(isSelected: layout == selected, skin: skin) }
-    }
-
-    private static func lighten(_ color: UIColor) -> UIColor {
-        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
-        guard color.getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return color }
-        return UIColor(hue: h, saturation: max(0, s - 0.3), brightness: min(1, b + 0.3), alpha: 1)
-    }
-}
-
-extension VoiceLoungeSeatLayoutPanel {
-    @objc private func tapConfirm() {
-        onConfirm?(selected, defaultCheckbox.isOn)
-        dismiss()
     }
 }
 
@@ -232,6 +214,7 @@ private final class LayoutPreviewView: UIView {
 }
 
 private final class CheckboxRow: UIControl {
+    var onChange: ((Bool) -> Void)?
     var isOn = true { didSet { applyColors() } }
 
     private let box = UIView()
@@ -291,11 +274,13 @@ private final class CheckboxRow: UIControl {
         check.isHidden = !isOn
     }
 
-    @objc private func toggle() { isOn.toggle() }
+    @objc private func toggle() {
+        isOn.toggle()
+        onChange?(isOn)
+    }
 }
 
 private extension String {
-    static var confirm: String { LiveKitResources.localizedString("tuilivekit.voiceroom.layout.confirm") }
     static var defaultHint: String { LiveKitResources.localizedString("tuilivekit.voiceroom.layout.default_hint") }
     static var title: String { LiveKitResources.localizedString("tuilivekit.voiceroom.layout.title") }
 }

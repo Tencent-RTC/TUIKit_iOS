@@ -4,10 +4,12 @@ import UIKit
 final class VoiceLoungeAudioEffectPanel: BottomSheetView {
     var onSetCaptureVolume: ((Int) -> Void)?
 
-    private let audioEffectView = AudioEffectView()
-    private var currentCaptureVolume: Int = 100
+    private let audioEffectView = VoiceLoungeAudioEffectView()
 
-    override var sheetHeight: CGFloat { 466 }
+    override var sheetHeight: CGFloat {
+        let screenHeight = window?.bounds.height ?? UIScreen.main.bounds.height
+        return min(max(screenHeight * 0.62, 420), screenHeight - safeAreaInsets.top - 40)
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,28 +20,29 @@ final class VoiceLoungeAudioEffectPanel: BottomSheetView {
     }
 
     func show(captureVolume: Int) {
-        currentCaptureVolume = captureVolume
         audioEffectView.bindCaptureVolume(captureVolume)
         present()
     }
+
+    func applySkin(_ skin: VoiceLoungeSkin) { audioEffectView.applySkin(skin) }
 
     private func setupViews() { contentView.addSubview(audioEffectView) }
 
     private func setupConstraints() {
         audioEffectView.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalToSuperview().offset(60)
-            make.height.equalTo(372)
+            make.leading.trailing.equalToSuperview()
+            make.top.equalToSuperview().offset(58)
+            make.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 
-    private func setupStyles() { sheetTitle = .title }
+    private func setupStyles() {
+        sheetTitle = .title
+        audioEffectView.applySkin(.defaultSkin)
+    }
 
     private func setupBindings() {
-        audioEffectView.onSetCaptureVolume = { [weak self] volume in
-            self?.currentCaptureVolume = volume
-            self?.onSetCaptureVolume?(volume)
-        }
+        audioEffectView.onSetCaptureVolume = { [weak self] volume in self?.onSetCaptureVolume?(volume) }
     }
 
     override func sheetWillPresent() { audioEffectView.setActive(true) }

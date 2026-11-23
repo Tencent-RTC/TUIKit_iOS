@@ -37,7 +37,8 @@ import Foundation
     func showOpeningTopic() {
         guard isActive, !isOpeningTopicShown else { return }
         isOpeningTopicShown = true
-        if !openingTopic.isEmpty { append(.topicNotice(openingTopic)) }
+        guard !openingTopic.isEmpty else { return }
+        append(openingTopic == VoiceLoungeConfig.defaultTopic ? openingTopic : .topicNotice(openingTopic))
     }
 
     func deactivate() {

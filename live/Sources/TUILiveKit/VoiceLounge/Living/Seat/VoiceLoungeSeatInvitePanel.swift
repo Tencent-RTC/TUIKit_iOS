@@ -8,7 +8,14 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
     private let liveID: String
     private let coGuest: VoiceLoungeCoGuestStore
 
-    private let lockLabel = LiveText.voiceLounge(.body, tone: .primary)
+    private let profileCard = UIView()
+    private let profileIconBackground = UIView()
+    private let profileMicIcon = UIImageView()
+    private let profileLockIcon = SeatLockIconView()
+    private let profileTitle = LiveText.voiceLounge(.action, tone: .primary)
+    private let profileMeta = LiveText.voiceLounge(.caption, tone: .tertiary)
+    private let lockCard = UIView()
+    private let lockLabel = LiveText.voiceLounge(.body, tone: .secondary)
     private let lockSwitch = UISwitch()
     private let card = UIView()
     private let cardTitle = LiveText.voiceLounge(.action, tone: .primary)
@@ -21,10 +28,16 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
     private var seatList: [SeatInfo] = []
     private var rows: [LiveUserInfo] = []
     private var pendingLock: Bool?
+    private var tappedLocked = false
     private var skin = VoiceLoungeSkin.defaultSkin
     private var cancellables = Set<AnyCancellable>()
 
-    override var sheetHeight: CGFloat { 460 }
+    override var sheetHeight: CGFloat {
+        guard isLocked else { return InviteStyle.unlockedHeight }
+        let bottomInset = window?.safeAreaInsets.bottom ?? 0
+        return InviteStyle.contentTop + InviteStyle.profileHeight + InviteStyle.cardGap + InviteStyle.lockHeight
+            + InviteStyle.lockedBottomPadding + bottomInset
+    }
 
     init(liveID: String, coGuest: VoiceLoungeCoGuestStore) {
         self.liveID = liveID
@@ -39,8 +52,15 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     private func setupViews() {
-        contentView.addSubview(lockLabel)
-        contentView.addSubview(lockSwitch)
+        contentView.addSubview(profileCard)
+        profileCard.addSubview(profileIconBackground)
+        profileIconBackground.addSubview(profileMicIcon)
+        profileIconBackground.addSubview(profileLockIcon)
+        profileCard.addSubview(profileTitle)
+        profileCard.addSubview(profileMeta)
+        contentView.addSubview(lockCard)
+        lockCard.addSubview(lockLabel)
+        lockCard.addSubview(lockSwitch)
         contentView.addSubview(card)
         card.addSubview(cardTitle)
         card.addSubview(divider)
@@ -49,17 +69,50 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
     }
 
     private func setupConstraints() {
+        profileCard.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(InviteStyle.horizontalInset)
+            make.top.equalToSuperview().offset(InviteStyle.contentTop)
+            make.height.equalTo(InviteStyle.profileHeight)
+        }
+        profileIconBackground.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(InviteStyle.profileIconSize)
+        }
+        profileMicIcon.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(26)
+        }
+        profileLockIcon.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(26)
+        }
+        profileTitle.snp.makeConstraints { make in
+            make.leading.equalTo(profileIconBackground.snp.trailing).offset(16)
+            make.trailing.lessThanOrEqualToSuperview().inset(16)
+            make.bottom.equalTo(profileCard.snp.centerY).offset(-2)
+        }
+        profileMeta.snp.makeConstraints { make in
+            make.leading.equalTo(profileTitle)
+            make.trailing.lessThanOrEqualToSuperview().inset(16)
+            make.top.equalTo(profileCard.snp.centerY).offset(4)
+        }
+        lockCard.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(profileCard)
+            make.top.equalTo(profileCard.snp.bottom).offset(InviteStyle.cardGap)
+            make.height.equalTo(InviteStyle.lockHeight)
+        }
         lockLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.top.equalToSuperview().offset(66)
+            make.leading.equalToSuperview().offset(16)
+            make.centerY.equalToSuperview()
         }
         lockSwitch.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().inset(20)
-            make.centerY.equalTo(lockLabel)
+            make.trailing.equalToSuperview().inset(16)
+            make.centerY.equalToSuperview()
         }
         card.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(lockLabel.snp.bottom).offset(24)
+            make.leading.trailing.equalTo(profileCard)
+            make.top.equalTo(lockCard.snp.bottom).offset(InviteStyle.cardGap)
             make.bottom.equalTo(contentView.safeAreaLayoutGuide.snp.bottom).offset(-12)
         }
         cardTitle.snp.makeConstraints { make in
@@ -84,10 +137,20 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
     private func setupStyles() {
         sheetTitle = .sheetTitle
         lockLabel.text = .lockToggle
-        card.backgroundColor = UIColor.black.withAlphaComponent(0.25)
-        card.layer.cornerRadius = 16
-        card.layer.borderWidth = 1
-        card.layer.borderColor = VoiceLoungeColor.overlayHair.cgColor
+        [profileCard, lockCard, card].forEach { view in
+            view.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+            view.layer.cornerRadius = 16
+            view.layer.borderWidth = 1
+            view.layer.borderColor = VoiceLoungeColor.overlayHair.cgColor
+        }
+        profileIconBackground.backgroundColor = VoiceLoungeColor.overlaySoft
+        profileIconBackground.layer.cornerRadius = InviteStyle.profileIconSize / 2
+        profileMicIcon.image = LiveKitResources.image(named: "livekit_coguest_seat_mic")?.withRenderingMode(
+            .alwaysTemplate)
+        profileMicIcon.tintColor = InviteStyle.profileIconTint
+        profileMicIcon.contentMode = .scaleAspectFit
+        profileLockIcon.strokeColor = InviteStyle.profileIconTint
+        profileTitle.font = .systemFont(ofSize: VoiceLoungeFont.size(17), weight: .semibold)
         divider.backgroundColor = VoiceLoungeColor.overlaySoft
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
@@ -101,11 +164,14 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
 
     private func setupBindings() { lockSwitch.addTarget(self, action: #selector(lockChanged), for: .valueChanged) }
 
-    func show(seatIndex: Int, skin: VoiceLoungeSkin) {
+    func show(seatIndex: Int, isLocked: Bool, skin: VoiceLoungeSkin) {
         self.seatIndex = seatIndex
         self.skin = skin
+        tappedLocked = isLocked
         pendingLock = nil
         lockSwitch.onTintColor = skin.mid
+        renderProfile(locked: isLocked)
+        card.isHidden = isLocked
         present()
     }
 
@@ -149,7 +215,7 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
         render()
     }
 
-    private var sdkLocked: Bool { seatList.first { $0.index == seatIndex }?.isLocked ?? false }
+    private var sdkLocked: Bool { seatList.first { $0.index == seatIndex }?.isLocked ?? tappedLocked }
 
     private var isLocked: Bool { pendingLock ?? sdkLocked }
 
@@ -185,30 +251,39 @@ final class VoiceLoungeSeatInvitePanel: BottomSheetView {
 
     private func render() {
         let audience = candidates
-        lockSwitch.setOn(isLocked, animated: false)
+        let locked = isLocked
+        lockSwitch.setOn(locked, animated: false)
         lockSwitch.isEnabled = pendingLock == nil
+        renderProfile(locked: locked)
         cardTitle.text = .invitable("\(audience.count)")
-        if isLocked {
-            rows = []
-            emptyLabel.text = .lockedHint
-            emptyLabel.isHidden = false
-            tableView.isHidden = true
-        } else {
-            rows = audience
-            tableView.isHidden = false
-            emptyLabel.text = .inviteEmpty
-            emptyLabel.isHidden = !audience.isEmpty
-        }
+        card.isHidden = locked
+        rows = locked ? [] : audience
+        emptyLabel.text = .inviteEmpty
+        emptyLabel.isHidden = locked || !audience.isEmpty
         tableView.reloadData()
+        updateSheetHeight(animated: true)
+    }
+
+    private func renderProfile(locked: Bool) {
+        let status: String = locked ? .lockedSeat : .emptySeat
+        profileMicIcon.isHidden = locked
+        profileLockIcon.isHidden = !locked
+        profileTitle.text = status
+        profileMeta.text = .seatMeta(seatIndex, status)
     }
 
     private func toggleInvite(_ user: LiveUserInfo) {
-        if coGuest.inviteeIDs.contains(user.userID) {
+        if isApplicant(user.userID) {
+            coGuest.accept(userID: user.userID)
+            dismiss()
+        } else if coGuest.inviteeIDs.contains(user.userID) {
             coGuest.cancelInvitation(userID: user.userID)
         } else {
             coGuest.invite(userID: user.userID, seatIndex: seatIndex)
         }
     }
+
+    private func isApplicant(_ userID: String) -> Bool { coGuest.applicants.contains { $0.userID == userID } }
 }
 
 extension VoiceLoungeSeatInvitePanel { @objc private func lockChanged() { toggleLock(lockSwitch.isOn) } }
@@ -221,7 +296,7 @@ extension VoiceLoungeSeatInvitePanel: UITableViewDataSource {
         guard let cell = cell as? InviteCell, indexPath.row < rows.count else { return cell }
         let user = rows[indexPath.row]
         cell.bind(
-            user: user, isInvited: coGuest.inviteeIDs.contains(user.userID),
+            user: user, isApplicant: isApplicant(user.userID), isInvited: coGuest.inviteeIDs.contains(user.userID),
             isPending: coGuest.pendingUserIDs.contains(user.userID), skin: skin)
         cell.onTap = { [weak self] in self?.toggleInvite(user) }
         return cell
@@ -277,16 +352,17 @@ private final class InviteCell: UITableViewCell {
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func bind(user: LiveUserInfo, isInvited: Bool, isPending: Bool, skin: VoiceLoungeSkin) {
+    func bind(user: LiveUserInfo, isApplicant: Bool, isInvited: Bool, isPending: Bool, skin: VoiceLoungeSkin) {
         avatarView.kf.cancelDownloadTask()
         avatarView.kf.setImage(
             with: URL(string: user.avatarURL),
             placeholder: LiveKitResources.image(named: "livekit_livelist_default_avatar"))
         nameLabel.text = user.userName.isEmpty ? user.userID : user.userName
-        button.setTitle(isInvited ? .cancelInvite : .invite, for: .normal)
-        button.setTitleColor(UIColor.white.withAlphaComponent(isInvited ? 0.7 : 0.9), for: .normal)
-        button.backgroundColor = isInvited ? VoiceLoungeColor.overlaySoft : skin.mid.withAlphaComponent(0.35)
-        button.layer.borderColor = (isInvited ? UIColor.white.withAlphaComponent(0.15) : skin.mid).cgColor
+        let muted = isInvited && !isApplicant
+        button.setTitle(isApplicant ? .connect : (isInvited ? .cancelInvite : .invite), for: .normal)
+        button.setTitleColor(UIColor.white.withAlphaComponent(muted ? 0.7 : 0.9), for: .normal)
+        button.backgroundColor = muted ? VoiceLoungeColor.overlaySoft : skin.mid.withAlphaComponent(0.35)
+        button.layer.borderColor = (muted ? UIColor.white.withAlphaComponent(0.15) : skin.mid).cgColor
         button.isEnabled = !isPending
         button.alpha = isPending ? 0.5 : 1
     }
@@ -298,8 +374,66 @@ private extension String {
     }
     static var cancelInvite: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.cancel_invite") }
     static var invite: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.invite") }
+    static var connect: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.connect") }
     static var inviteEmpty: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.invite_empty") }
     static var lockToggle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.seat.lock_toggle") }
-    static var lockedHint: String { LiveKitResources.localizedString("tuilivekit.voiceroom.seat.locked_hint") }
     static var sheetTitle: String { LiveKitResources.localizedString("tuilivekit.voiceroom.seat.sheet_title") }
+    static var emptySeat: String { LiveKitResources.localizedString("tuilivekit.voiceroom.seat.empty_seat") }
+    static var lockedSeat: String { LiveKitResources.localizedString("tuilivekit.voiceroom.seat.locked_seat") }
+    static func seatMeta(_ index: Int, _ status: String) -> String {
+        LiveKitResources.localizedFormat("tuilivekit.voiceroom.seat.seat_meta", index, status)
+    }
+}
+
+private enum InviteStyle {
+    static let horizontalInset: CGFloat = 16
+    static let contentTop: CGFloat = 66
+    static let profileHeight: CGFloat = 88
+    static let profileIconSize: CGFloat = 52
+    static let profileIconTint = UIColor.white.withAlphaComponent(0.8)
+    static let cardGap: CGFloat = 12
+    static let lockHeight: CGFloat = 56
+    static let lockedBottomPadding: CGFloat = 28
+    static let unlockedHeight: CGFloat = 520
+}
+
+private final class SeatLockIconView: UIView {
+    var strokeColor: UIColor = .white { didSet { shapeLayer.strokeColor = strokeColor.cgColor } }
+
+    private let shapeLayer = CAShapeLayer()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+        setupStyles()
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    private func setupViews() { layer.addSublayer(shapeLayer) }
+
+    private func setupStyles() {
+        isUserInteractionEnabled = false
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = strokeColor.cgColor
+        shapeLayer.lineWidth = 1.8
+        shapeLayer.lineCap = .round
+        shapeLayer.lineJoin = .round
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let scale = bounds.width / 24
+        let path = UIBezierPath(roundedRect: CGRect(x: 6, y: 11, width: 12, height: 9), cornerRadius: 2)
+        let shackle = UIBezierPath()
+        shackle.move(to: CGPoint(x: 8.5, y: 11))
+        shackle.addLine(to: CGPoint(x: 8.5, y: 8))
+        shackle.addArc(withCenter: CGPoint(x: 12, y: 8), radius: 3.5, startAngle: .pi, endAngle: 0, clockwise: true)
+        shackle.addLine(to: CGPoint(x: 15.5, y: 11))
+        path.append(shackle)
+        path.apply(CGAffineTransform(scaleX: scale, y: scale))
+        shapeLayer.frame = bounds
+        shapeLayer.lineWidth = 1.8 * scale
+        shapeLayer.path = path.cgPath
+    }
 }

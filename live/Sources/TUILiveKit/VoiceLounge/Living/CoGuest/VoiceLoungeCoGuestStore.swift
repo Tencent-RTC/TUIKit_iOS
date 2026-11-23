@@ -2,6 +2,7 @@ import AVFoundation
 import AtomicXCore
 import Combine
 import Foundation
+import UIKit
 
 @MainActor final class VoiceLoungeCoGuestStore {
     enum GuestStatus: Equatable {
@@ -23,6 +24,9 @@ import Foundation
     var changes: AnyPublisher<Void, Never> { changeSubject.eraseToAnyPublisher() }
     private let changeSubject = PassthroughSubject<Void, Never>()
 
+    var fadedSeatReleases: AnyPublisher<Void, Never> { fadedSeatReleaseSubject.eraseToAnyPublisher() }
+    private let fadedSeatReleaseSubject = PassthroughSubject<Void, Never>()
+
     private(set) var guestStatus: GuestStatus = .idle {
         didSet {
             guard guestStatus != oldValue else { return }
@@ -31,16 +35,11 @@ import Foundation
     }
     private(set) var applicants: [LiveUserInfo] = []
     private(set) var pendingUserIDs: Set<String> = []
+    private(set) var invitees: [LiveUserInfo] = []
     private(set) var inviteeIDs: Set<String> = []
     private(set) var applicantSeatIndex: [String: Int] = [:]
+    private(set) var inviteeSeatIndex: [String: Int] = [:]
     private(set) var connectedUsers: [SeatUserInfo] = []
-    private var recentlyCancelled: [String: TimeInterval] = [:]
-    private var seatingHoldUntil: [String: TimeInterval] = [:]
-
-    var seatingHoldUserIDs: Set<String> {
-        let now = ProcessInfo.processInfo.systemUptime
-        return Set(seatingHoldUntil.filter { $0.value > now }.keys)
-    }
 
     private var store: CoGuestStore?
     private var barrageStore: BarrageStore?
@@ -50,16 +49,24 @@ import Foundation
 
     var onMicOpenRequested: (() -> Void)?
     var onHostPauseChanged: ((Bool) -> Void)?
+    var onMicrophoneDenied: (() -> Void)?
     private var liveID = ""
     private var role: VoiceLoungeRole = .audience
     private var cancellables = Set<AnyCancellable>()
     private let applyTimeout: TimeInterval = 60
     private let inviteTimeout: TimeInterval = 30
     private var pendingInviterID: String?
+    private var pendingInviter: LiveUserInfo?
 
     private var selfUserID: String { LoginStore.shared.state.value.loginUserInfo?.userID ?? "" }
 
-    // MARK: - Lifecycle
+    private var pendingInviteDeadline: TimeInterval = 0
+
+    var hasPendingInvitation: Bool {
+        role == .audience && guestStatus != .onSeat && pendingInviterID != nil
+            && ProcessInfo.processInfo.systemUptime < pendingInviteDeadline
+    }
+
     func activate(liveID: String, role: VoiceLoungeRole) {
         guard !liveID.isEmpty else { return }
         if self.liveID == liveID, store != nil { return }
@@ -105,28 +112,33 @@ import Foundation
         liveID = ""
         applicants = []
         pendingUserIDs = []
+        invitees = []
         inviteeIDs = []
         applicantSeatIndex = [:]
+        inviteeSeatIndex = [:]
         connectedUsers = []
-        recentlyCancelled = [:]
-        seatingHoldUntil = [:]
         pendingInviterID = nil
+        pendingInviter = nil
         guestStatus = .idle
         changeSubject.send()
     }
 
-    // MARK: - Audience
-    func apply(seatIndex: Int, quiet: Bool = false) {
+    @discardableResult func promptPendingInvitation() -> Bool {
+        guard hasPendingInvitation, let pendingInviter else { return false }
+        invitationSubject.send(.received(pendingInviter))
+        return true
+    }
+
+    func apply(seatIndex: Int) {
         guard role == .audience, guestStatus == .idle, let store else { return }
+        if promptPendingInvitation() { return }
         guestStatus = .applying
         store.applyForSeat(seatIndex: seatIndex, timeout: applyTimeout, extraInfo: "{\"mediaType\":\"audio\"}") {
             [weak self] result in
             Task { @MainActor in
                 guard let self else { return }
                 switch result {
-                case .success:
-                    if !quiet { self.onToast?(.applied) }
-                    self.announceSeatIntent(seatIndex)
+                case .success: self.announceSeatIntent(seatIndex)
                 case .failure(let error):
                     LiveKitLog.error(
                         "[VoiceLoungeCoGuest] applyForSeat failed: code=\(error.code), message=\(error.message)")
@@ -143,7 +155,7 @@ import Foundation
             Task { @MainActor in
                 guard let self, self.guestStatus == .applying else { return }
                 self.guestStatus = .idle
-                self.apply(seatIndex: seatIndex, quiet: true)
+                self.apply(seatIndex: seatIndex)
             }
         }
     }
@@ -157,7 +169,7 @@ import Foundation
         guard role == .audience, guestStatus == .applying, let store else { return }
         store.cancelApplication(completion: nil)
         guestStatus = .idle
-        onToast?(.retracted)
+        fadedSeatReleaseSubject.send()
     }
 
     func leaveSeat() {
@@ -169,12 +181,11 @@ import Foundation
         }
         DeviceStore.shared.closeLocalMicrophone()
         guestStatus = .idle
-        onToast?(.left)
     }
 
     func acceptInvitation() {
         guard role == .audience, let store, let inviterID = pendingInviterID else { return }
-        pendingInviterID = nil
+        clearPendingInvitation()
         if guestStatus == .applying {
             store.cancelApplication(completion: nil)
             guestStatus = .idle
@@ -185,8 +196,7 @@ import Foundation
                 switch result {
                 case .success:
                     self.guestStatus = .onSeat
-                    self.onToast?(.joinedByInvite)
-                    Self.openMicrophone()
+                    self.openMicrophone()
                 case .failure(let error): self.onToast?(VoiceLoungeErrorText.coGuest(error))
                 }
             }
@@ -195,14 +205,20 @@ import Foundation
 
     func rejectInvitation() {
         guard role == .audience, let store, let inviterID = pendingInviterID else { return }
-        pendingInviterID = nil
+        clearPendingInvitation()
         store.rejectInvitation(inviterID: inviterID, completion: nil)
+        if guestStatus == .idle { fadedSeatReleaseSubject.send() }
     }
 
-    // MARK: - Host
+    private func clearPendingInvitation() {
+        pendingInviterID = nil
+        pendingInviter = nil
+    }
 
     func invite(userID: String, seatIndex: Int) {
-        perform(userID: userID, successMessage: .invited) { [inviteTimeout] store, completion in
+        guard role == .host, !userID.isEmpty, !pendingUserIDs.contains(userID) else { return }
+        if seatIndex >= 0 { inviteeSeatIndex[userID] = seatIndex } else { inviteeSeatIndex[userID] = nil }
+        perform(userID: userID) { [inviteTimeout] store, completion in
             store.inviteToSeat(
                 userID: userID, seatIndex: seatIndex, timeout: inviteTimeout, extraInfo: nil, completion: completion)
         }
@@ -214,19 +230,20 @@ import Foundation
     }
 
     func accept(userID: String) {
-        holdSeating(for: userID)
         perform(userID: userID) { store, completion in store.acceptApplication(userID: userID, completion: completion) }
     }
 
-    private static let seatingHoldDuration: TimeInterval = 10
-
-    private func holdSeating(for userID: String) {
-        seatingHoldUntil[userID] = ProcessInfo.processInfo.systemUptime + Self.seatingHoldDuration
+    func reject(userID: String) {
+        perform(userID: userID) { store, completion in store.rejectApplication(userID: userID, completion: completion) }
     }
 
-    private func perform(
-        userID: String, successMessage: String? = nil, action: (CoGuestStore, @escaping CompletionClosure) -> Void
-    ) {
+    func forgetUser(userID: String) {
+        guard role == .host, !userID.isEmpty else { return }
+        applicantSeatIndex[userID] = nil
+        inviteeSeatIndex[userID] = nil
+    }
+
+    private func perform(userID: String, action: (CoGuestStore, @escaping CompletionClosure) -> Void) {
         guard role == .host, let store, !userID.isEmpty, !pendingUserIDs.contains(userID) else { return }
         pendingUserIDs.insert(userID)
         notifyApplicants()
@@ -235,16 +252,11 @@ import Foundation
             Task { @MainActor in
                 guard let self, self.liveID == liveID else { return }
                 self.pendingUserIDs.remove(userID)
-                switch result {
-                case .success: if let successMessage { self.onToast?(successMessage) }
-                case .failure(let error): self.onToast?(VoiceLoungeErrorText.coGuest(error))
-                }
+                if case .failure(let error) = result { self.onToast?(VoiceLoungeErrorText.coGuest(error)) }
                 self.notifyApplicants()
             }
         }
     }
-
-    // MARK: - State / Events
 
     private func apply(_ state: CoGuestState) {
         let selfID = selfUserID
@@ -254,11 +266,14 @@ import Foundation
             applicants = state.applicants.filter {
                 !$0.userID.isEmpty && $0.userID != selfID && seen.insert($0.userID).inserted
             }
-            inviteeIDs = Set(state.invitees.map(\.userID).filter { !$0.isEmpty })
+            var inviteeSeen = Set<String>()
+            invitees = state.invitees.filter {
+                !$0.userID.isEmpty && $0.userID != selfID && inviteeSeen.insert($0.userID).inserted
+            }
+            inviteeIDs = Set(invitees.map(\.userID))
+            inviteeSeatIndex = inviteeSeatIndex.filter { inviteeIDs.contains($0.key) }
             pendingUserIDs.formIntersection(Set(applicants.map(\.userID)).union(inviteeIDs))
             connectedUsers = state.connected.filter { !$0.userID.isEmpty && $0.userID != selfID }
-            let connectedIDs = Set(connectedUsers.map(\.userID))
-            seatingHoldUntil = seatingHoldUntil.filter { !connectedIDs.contains($0.key) }
             notifyApplicants()
         case .audience:
             guard !selfID.isEmpty else { return }
@@ -274,11 +289,11 @@ import Foundation
         case .onGuestApplicationResponded(let isAccept, _):
             if isAccept {
                 guestStatus = .onSeat
-                onToast?(.accepted)
-                Self.openMicrophone()
+                openMicrophone()
             } else {
                 guestStatus = .idle
                 onToast?(.rejected)
+                fadedSeatReleaseSubject.send()
             }
         case .onGuestApplicationNoResponse(let reason):
             onToast?(reason == .alreadySeated ? .alreadySeated : .applyTimeout)
@@ -286,13 +301,14 @@ import Foundation
         case .onKickedOffSeat:
             DeviceStore.shared.closeLocalMicrophone()
             guestStatus = .idle
-            onToast?(.kickedOff)
         case .onHostInvitationReceived(let hostUser):
             guard guestStatus != .onSeat else { return }
             pendingInviterID = hostUser.userID
+            pendingInviter = hostUser
+            pendingInviteDeadline = ProcessInfo.processInfo.systemUptime + inviteTimeout
             invitationSubject.send(.received(hostUser))
         case .onHostInvitationCancelled:
-            pendingInviterID = nil
+            clearPendingInvitation()
             invitationSubject.send(.cancelled)
         @unknown default: break
         }
@@ -300,19 +316,8 @@ import Foundation
 
     private func handleHostEvent(_ event: HostEvent) {
         switch event {
-        case .onGuestApplicationReceived(let user):
-            if let cancelledAt = recentlyCancelled[user.userID], ProcessInfo.processInfo.systemUptime - cancelledAt < 5
-            {
-                recentlyCancelled[user.userID] = nil
-                return
-            }
-            onToast?(.newApplicant(Self.displayName(user)))
-        case .onGuestApplicationCancelled(let user):
-            recentlyCancelled[user.userID] = ProcessInfo.processInfo.systemUptime
         case .onHostInvitationResponded(let isAccept, let user):
-            if isAccept { holdSeating(for: user.userID) }
-            let name = Self.displayName(user)
-            onToast?(isAccept ? .inviteAccepted(name) : .inviteRejected(name))
+            if !isAccept { onToast?(.inviteRejected(Self.displayName(user))) }
         case .onHostInvitationNoResponse(let user, _): onToast?(.inviteTimeout(Self.displayName(user)))
         default: break
         }
@@ -369,17 +374,28 @@ import Foundation
         user.userName.isEmpty ? user.userID : user.userName
     }
 
-    private static func openMicrophone() {
-        let open = { DeviceStore.shared.openLocalMicrophone(completion: nil) }
+    private func openMicrophone() {
+        VoiceLoungeMicrophonePermission.request(
+            onGranted: { DeviceStore.shared.openLocalMicrophone(completion: nil) },
+            onDenied: { [weak self] in self?.onMicrophoneDenied?() })
+    }
+}
+
+@MainActor enum VoiceLoungeMicrophonePermission {
+    static func request(onGranted: @escaping @MainActor () -> Void, onDenied: @escaping @MainActor () -> Void) {
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
-        case .authorized: open()
+        case .authorized: onGranted()
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .audio) { granted in
-                guard granted else { return }
-                Task { @MainActor in open() }
+                Task { @MainActor in granted ? onGranted() : onDenied() }
             }
-        default: break
+        default: onDenied()
         }
+    }
+
+    static func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 }
 
@@ -388,28 +404,13 @@ private extension String {
         LiveKitResources.localizedString("tuilivekit.player.coguest.error.already_seated")
     }
     static var applyTimeout: String { LiveKitResources.localizedString("tuilivekit.player.coguest.error.timeout") }
-    static func inviteAccepted(_ args: CVarArg...) -> String {
-        LiveKitResources.localizedFormat("tuilivekit.voiceroom.comic.invite_accepted", args)
-    }
     static func inviteRejected(_ args: CVarArg...) -> String {
         LiveKitResources.localizedFormat("tuilivekit.voiceroom.comic.invite_rejected", args)
     }
-    static var accepted: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.accepted") }
-    static var applied: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.applied") }
     static func inviteTimeout(_ args: CVarArg...) -> String {
         LiveKitResources.localizedFormat("tuilivekit.voiceroom.comic.invite_timeout", args)
     }
-    static var invited: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.invited") }
-    static var joinedByInvite: String {
-        LiveKitResources.localizedString("tuilivekit.voiceroom.comic.joined_by_invite")
-    }
-    static var kickedOff: String { LiveKitResources.localizedString("tuilivekit.player.coguest.error.kicked_off") }
-    static var left: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.left") }
-    static func newApplicant(_ args: CVarArg...) -> String {
-        LiveKitResources.localizedFormat("tuilivekit.voiceroom.comic.new_applicant", args)
-    }
     static var rejected: String { LiveKitResources.localizedString("tuilivekit.player.coguest.error.rejected") }
-    static var retracted: String { LiveKitResources.localizedString("tuilivekit.voiceroom.comic.retracted") }
 }
 
 enum VoiceLoungeErrorText {
