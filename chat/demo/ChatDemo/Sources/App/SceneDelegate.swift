@@ -1,3 +1,4 @@
+import TUIChatKit
 import UIKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -7,6 +8,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         let window = UIWindow(windowScene: windowScene)
         DemoLanguageManager.shared.applyLayoutDirection(to: window)
+        ThemeState.shared.applyTheme(to: window)
         window.rootViewController = RootViewController()
         window.makeKeyAndVisible()
         self.window = window

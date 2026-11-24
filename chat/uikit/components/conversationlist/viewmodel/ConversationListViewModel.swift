@@ -11,6 +11,8 @@ final class ConversationListViewModel {
 
     private var cancellables = Set<AnyCancellable>()
 
+    private var isLoadingMore = false
+
     // MARK: - Init
 
     init(store: ConversationListStore = ConversationListStore.create()) {
@@ -29,6 +31,16 @@ final class ConversationListViewModel {
         }
     }
 
+    func loadMoreIfNeeded() {
+        guard initialLoadFinished, !isLoadingMore, store.state.value.hasMoreConversations else { return }
+        isLoadingMore = true
+        store.loadMoreConversations { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.isLoadingMore = false
+            }
+        }
+    }
+
     func deleteConversation(_ conversation: ConversationInfo) {
         store.deleteConversation(conversationID: conversation.conversationID, completion: nil)
     }
@@ -38,17 +50,15 @@ final class ConversationListViewModel {
     }
 
     func clearHistory(_ conversation: ConversationInfo) {
-        store.clearConversationMessages(conversationID: conversation.conversationID, completion: nil)
+        ConversationUnreadClearer.clearMessages(
+            store: store,
+            conversationID: conversation.conversationID,
+            hasUnreadMark: conversation.conversationMarkList.contains(.unread)
+        )
     }
 
     func clearUnreadCount(_ conversation: ConversationInfo) {
-        store.clearConversationUnreadCount(conversationID: conversation.conversationID, completion: nil)
-        store.markConversation(
-            conversationIDList: [conversation.conversationID],
-            markType: .unread,
-            enable: false,
-            completion: nil
-        )
+        ConversationUnreadClearer.clearConversationsUnread(store: store, conversations: [conversation])
     }
 
     func markAsRead(_ conversation: ConversationInfo) {

@@ -220,5 +220,5 @@ extension ChatMessageListConfig {
     public mutating func clearMessageExclusions() {
         messageExclusionMatchers = nil
     }
-
+    
 }

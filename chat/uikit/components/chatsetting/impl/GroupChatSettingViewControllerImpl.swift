@@ -882,7 +882,7 @@ final class GroupChatSettingViewControllerImpl: ChatSettingPageImplementation {
         )
         alert.addAction(UIAlertAction(title: LocalizedChatString("Clear"), style: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            self.conversationStore.clearConversationMessages(conversationID: self.conversationID, completion: nil)
+            ConversationUnreadClearer.clearMessages(store: self.conversationStore, conversationID: self.conversationID)
         })
         alert.addAction(UIAlertAction(title: LocalizedChatString("Cancel"), style: .cancel))
         present(alert, animated: true)

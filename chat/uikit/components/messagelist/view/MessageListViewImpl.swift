@@ -123,6 +123,7 @@ final class MessageListViewImpl: RTCBaseView {
     private static let unreadClearDebounceInterval: TimeInterval = 0.3
 
     private var isHostVisible = false
+    private let audioPlaybackScope = ChatAudioPlaybackScope()
 
     private var isAppActive = true
 
@@ -223,6 +224,10 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     deinit {
+        if let streamingGrowthObserver {
+            NotificationCenter.default.removeObserver(streamingGrowthObserver)
+        }
+        debounceUnreadClearWorkItem?.cancel()
         joinCallBannerController.release()
     }
 
@@ -332,6 +337,7 @@ final class MessageListViewImpl: RTCBaseView {
 
     func hostVisibilityDidChange(_ isVisible: Bool) {
         isHostVisible = isVisible
+        audioPlaybackScope.setVisible(isVisible)
         refreshResumedAndShown()
     }
 
@@ -519,27 +525,18 @@ final class MessageListViewImpl: RTCBaseView {
             }
             .store(in: &cancellables)
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("enterMultiSelectMode"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                let initialMessage = notification.userInfo?["initialMessage"] as? MessageInfo
-                self?.viewModel.enterMultiSelectMode(initialMessageID: initialMessage?.msgID)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("enterMultiSelectMode")) { view, notification in
+            let initialMessage = notification.userInfo?["initialMessage"] as? MessageInfo
+            view.viewModel.enterMultiSelectMode(initialMessageID: initialMessage?.msgID)
+        }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("showForwardTargetSelector"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                self?.handleShowForwardTargetSelector(from: notification)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("showForwardTargetSelector")) { view, notification in
+            view.handleShowForwardTargetSelector(from: notification)
+        }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("listenFromHereNotification"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                self?.handleListenFromHere(from: notification)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("listenFromHereNotification")) { view, notification in
+            view.handleListenFromHere(from: notification)
+        }
 
         NotificationCenter.default.publisher(for: MessageInputView.voiceRecordStartNotification)
             .receive(on: DispatchQueue.main)
@@ -563,38 +560,26 @@ final class MessageListViewImpl: RTCBaseView {
             }
         }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("deleteMessageNotification"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
-                self?.handleSingleMessageDelete(message)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("deleteMessageNotification")) { view, notification in
+            guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
+            view.handleSingleMessageDelete(message)
+        }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("convertVoiceToText"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
-                self?.viewModel.convertVoiceToText(message)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("convertVoiceToText")) { view, notification in
+            guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
+            view.viewModel.convertVoiceToText(message)
+        }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("translateTextMessage"), object: self)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
-                self?.viewModel.translateTextMessage(message)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("translateTextMessage")) { view, notification in
+            guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
+            view.viewModel.translateTextMessage(message)
+        }
 
-        NotificationCenter.default.publisher(for: NSNotification.Name("messageReactionToggle"))
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] notification in
-                guard let message = notification.userInfo?["message"] as? MessageInfo,
-                      let reactionID = notification.userInfo?["reactionID"] as? String else { return }
-                self?.viewModel.toggleReaction(message: message, reactionID: reactionID)
-            }
-            .store(in: &cancellables)
+        observeActionNotification(NSNotification.Name("messageReactionToggle")) { view, notification in
+            guard let message = notification.userInfo?["message"] as? MessageInfo,
+                  let reactionID = notification.userInfo?["reactionID"] as? String else { return }
+            view.viewModel.toggleReaction(message: message, reactionID: reactionID)
+        }
 
         viewModel.$processingAuxiliaryTextIDs
             .receive(on: DispatchQueue.main)
@@ -635,6 +620,19 @@ final class MessageListViewImpl: RTCBaseView {
                 guard let self = self else { return }
                 self.isAppActive = true
                 self.refreshResumedAndShown()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func observeActionNotification(
+        _ name: Notification.Name,
+        handler: @escaping (MessageListViewImpl, Notification) -> Void
+    ) {
+        NotificationCenter.default.publisher(for: name)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] notification in
+                guard let self, (notification.object as AnyObject?) === self else { return }
+                handler(self, notification)
             }
             .store(in: &cancellables)
     }
@@ -780,6 +778,10 @@ final class MessageListViewImpl: RTCBaseView {
     }
 
     private func applyMessageList(_ list: [MessageInfo]) {
+        if listenController.state.isActive {
+            let eligibleMessages = messagesForListening(from: list)
+            listenController.updateValidMessageIDs(Set(eligibleMessages.map(\.msgID)))
+        }
         if isApplyingRowUpdates {
             let shouldSchedule = pendingMessageList == nil
             pendingMessageList = list
@@ -794,14 +796,7 @@ final class MessageListViewImpl: RTCBaseView {
         }
         let receivedPlaceholder = list.contains { $0.msgID.hasPrefix(ChatbotPlaceholderMessageFactory.messageIDPrefix) }
 
-        let exclusionMatchers = viewModel.config._messageExclusionMatchers
-        let list = list.filter { message in
-            if ChatbotMessageVisibilityPolicy.shouldHide(message) { return false }
-            if exclusionMatchers.contains(where: { $0(message) }) { return false }
-            guard message.messageType == .custom,
-                  let callModel = CallMessageParser.parse(message) else { return true }
-            return !callModel.isExcludeFromHistory
-        }
+        let list = list.filter { shouldDisplayMessage($0) }
         let keptPlaceholder = list.contains { $0.msgID.hasPrefix(ChatbotPlaceholderMessageFactory.messageIDPrefix) }
         if receivedPlaceholder || keptPlaceholder {
             NSLog("[ChatbotPlaceholderDiag] applyMessageList placeholder received=\(receivedPlaceholder) kept=\(keptPlaceholder) total=\(list.count)")
@@ -1236,11 +1231,26 @@ final class MessageListViewImpl: RTCBaseView {
         var changed: Set<String> = []
         for (o, n) in zip(old, new) {
             guard o.msgID == n.msgID, o.status == n.status else { return nil }
+            guard !mediaPayloadChanged(o, n) else { return nil }
             if o.uploadMediaProgress != n.uploadMediaProgress || o.downloadMediaProgress != n.downloadMediaProgress {
                 changed.insert(n.msgID)
             }
         }
         return changed.isEmpty ? nil : changed
+    }
+
+    private func mediaPayloadChanged(_ old: MessageInfo, _ new: MessageInfo) -> Bool {
+        guard isMediaPayload(old.messagePayload) || isMediaPayload(new.messagePayload) else { return false }
+        return String(describing: old.messagePayload) != String(describing: new.messagePayload)
+    }
+
+    private func isMediaPayload(_ payload: MessagePayload?) -> Bool {
+        switch payload {
+        case .image?, .video?, .audio?, .file?:
+            return true
+        default:
+            return false
+        }
     }
 
     private func updateVisibleCellsMediaProgress(msgIDs: Set<String>) {
@@ -1258,6 +1268,7 @@ final class MessageListViewImpl: RTCBaseView {
         var changed: Set<String> = []
         for (o, n) in zip(old, new) {
             guard o.msgID == n.msgID else { return nil }
+            guard !mediaPayloadChanged(o, n) else { return nil }
             if !reactionListsEqual(o.reactionList, n.reactionList) {
                 changed.insert(n.msgID)
             }
@@ -1334,7 +1345,8 @@ final class MessageListViewImpl: RTCBaseView {
             onMergedMessageTap: { [weak self] tapped in
                 guard tapped.status != .violation else { return }
                 self?.openMergedDetail(tapped)
-            }
+            },
+            audioPlaybackScope: audioPlaybackScope
         )
     }
 
@@ -1771,12 +1783,32 @@ final class MessageListViewImpl: RTCBaseView {
         findViewController()?.navigationController?.pushViewController(selector, animated: true)
     }
 
-    private func handleListenFromHere(from notification: Notification) {
-        guard let message = notification.userInfo?["message"] as? MessageInfo,
-              let startIndex = messages.firstIndex(where: { $0.msgID == message.msgID }) else { return }
+    private func shouldDisplayMessage(_ message: MessageInfo) -> Bool {
+        if ChatbotMessageVisibilityPolicy.shouldHide(message) { return false }
+        if viewModel.config._messageExclusionMatchers.contains(where: { $0(message) }) { return false }
+        guard message.messageType == .custom,
+              let callModel = CallMessageParser.parse(message) else { return true }
+        return !callModel.isExcludeFromHistory
+    }
 
-        let range = Array(messages[startIndex...])
-        let plan = ListenPlanBuilder.build(messages: range)
+    private func messagesForListening(from displayedMessages: [MessageInfo]) -> [MessageInfo] {
+        let latestMessages = Dictionary(
+            viewModel.messageListStore.state.value.messageList.map { ($0.msgID, $0) },
+            uniquingKeysWith: { _, latest in latest }
+        )
+        return displayedMessages.compactMap { displayedMessage in
+            guard let latestMessage = latestMessages[displayedMessage.msgID],
+                  shouldDisplayMessage(displayedMessage), shouldDisplayMessage(latestMessage),
+                  ListenPlanBuilder.isEligible(displayedMessage), ListenPlanBuilder.isEligible(latestMessage) else { return nil }
+            return latestMessage
+        }
+    }
+
+    private func handleListenFromHere(from notification: Notification) {
+        guard let message = notification.userInfo?["message"] as? MessageInfo else { return }
+        let eligibleMessages = messagesForListening(from: messages)
+        guard let startIndex = eligibleMessages.firstIndex(where: { $0.msgID == message.msgID }) else { return }
+        let plan = ListenPlanBuilder.build(messages: Array(eligibleMessages[startIndex...]))
         listenController.start(plan: plan)
     }
 

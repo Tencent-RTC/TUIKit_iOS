@@ -508,7 +508,7 @@ final class C2CChatSettingViewControllerImpl: ChatSettingPageImplementation {
     }
 
     private func clearHistory() {
-        conversationStore.clearConversationMessages(conversationID: conversationID) { result in
+        ConversationUnreadClearer.clearMessages(store: conversationStore, conversationID: conversationID) { result in
             if case .success = result {
                 DispatchQueue.main.async {
                     WindowToastManager.shared.show(LocalizedChatString("ClearAllChatHistory"), type: .success, duration: Self.toastDuration)

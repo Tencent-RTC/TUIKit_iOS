@@ -5,6 +5,46 @@
 	};
 	objectVersion = 77;
 	objects = {
+		1EF8F4C4A229462CAD677304 = {
+			isa = "PBXVariantGroup";
+			children = (
+				"EA1CA438A73C4402AD5EE85E",
+				"11005691E8C366B840C360D3",
+			);
+			name = "Localizable.strings";
+			sourceTree = "<group>";
+		};
+
+		8C5277F4011646FC2D4D0A84 = {
+			isa = "PBXBuildFile";
+			fileRef = "1EF8F4C4A229462CAD677304";
+		};
+
+		EA1CA438A73C4402AD5EE85E = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "text.plist.strings";
+			name = "en";
+			path = "en.lproj/Localizable.strings";
+			sourceTree = "<group>";
+		};
+
+		11005691E8C366B840C360D3 = {
+			isa = "PBXFileReference";
+			lastKnownFileType = "text.plist.strings";
+			name = "zh-Hans";
+			path = "zh-Hans.lproj/Localizable.strings";
+			sourceTree = "<group>";
+		};
+
+		B0B47BEF74D661C9A7908CF6 = {
+			isa = "PBXResourcesBuildPhase";
+			buildActionMask = "2147483647";
+			files = (
+				"8C5277F4011646FC2D4D0A84",
+			);
+			runOnlyForDeploymentPostprocessing = "0";
+		};
+
 
 /* Begin PBXBuildFile section */
 		6298ABB418F6BD781160144B /* CustomLinkMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FF265C1BDC6A40DB05DDFD /* CustomLinkMessage.swift */; };
@@ -58,6 +98,7 @@
 				49EB06282CBEB1E3767A042B /* AppDelegate.swift */,
 				74FF265C1BDC6A40DB05DDFD /* CustomLinkMessage.swift */,
 				D48B8C0C6E8A68F93FAD048F /* GenerateTestUserSig.swift */,
+				"1EF8F4C4A229462CAD677304",
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -92,6 +133,7 @@
 				1377FFC00F3F4CDF7CA5EC13 /* Frameworks */,
 				A7FE44E6B40C3C25C4D5B752 /* [CP] Embed Pods Frameworks */,
 				10FF5EFF2408C4D43E61B81F /* [CP] Copy Pods Resources */,
+				"B0B47BEF74D661C9A7908CF6",
 			);
 			buildRules = (
 			);
@@ -117,6 +159,7 @@
 			knownRegions = (
 				Base,
 				en,
+				"zh-Hans",
 			);
 			mainGroup = B1AC43551FC638A24134F16D;
 			minimizedProjectReferenceProxies = 1;

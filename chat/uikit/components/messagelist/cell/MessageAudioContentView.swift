@@ -32,6 +32,8 @@ final class MessageAudioContentView: UIView, MessageContentView {
     private var isSelf = false
 
     private weak var messageListStore: MessageListStore?
+    private weak var audioPlaybackScope: ChatAudioPlaybackScope?
+    private var bindingGeneration = 0
 
     private var playingCancellable: AnyCancellable?
 
@@ -69,9 +71,13 @@ final class MessageAudioContentView: UIView, MessageContentView {
     // MARK: - MessageContentView
 
     func bind(message: MessageInfo, context: MessageContentContext) {
+        if self.message?.msgID != message.msgID || audioPlaybackScope !== context.audioPlaybackScope {
+            bindingGeneration += 1
+        }
         self.message = message
         self.isSelf = context.isSelf
         self.messageListStore = context.messageListStore
+        self.audioPlaybackScope = context.audioPlaybackScope
 
         let duration = Self.audioDuration(from: message)
         durationLabel.text = Self.formatDuration(duration)
@@ -154,8 +160,8 @@ final class MessageAudioContentView: UIView, MessageContentView {
 
     private func updatePlaybackVisualState() {
         guard let message = message else { return }
-        let isCurrent = currentPlayingMsgID == message.msgID
-        let isPlaying = isCurrent && ChatAudioPlaybackCoordinator.shared.isPlaying(msgID: message.msgID)
+        let isPlaying = ChatAudioPlaybackCoordinator.shared.isPlaying(msgID: message.msgID, scope: audioPlaybackScope)
+        let isCurrent = isPlaying
         if isPlaying {
             voiceIconView.startAnimating()
         } else {
@@ -167,44 +173,50 @@ final class MessageAudioContentView: UIView, MessageContentView {
     }
 
     @objc private func handleTap() {
-        guard let message = message else { return }
-        guard case .audio(let payload) = message.messagePayload else { return }
+        guard let message = message, window != nil,
+              message.status != .revoked, message.status != .deleted, message.status != .violation,
+              case .audio(let payload) = message.messagePayload,
+              let request = ChatAudioPlaybackCoordinator.shared.beginRequest(scope: audioPlaybackScope) else { return }
 
         if let path = payload.audioPath,
            !path.isEmpty,
            FileManager.default.fileExists(atPath: path) {
-            ChatAudioPlaybackCoordinator.shared.toggle(msgID: message.msgID, url: URL(fileURLWithPath: path))
+            ChatAudioPlaybackCoordinator.shared.toggle(msgID: message.msgID, url: URL(fileURLWithPath: path), scope: audioPlaybackScope)
             return
         }
         if let urlString = payload.audioURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
-            ChatAudioPlaybackCoordinator.shared.toggle(msgID: message.msgID, url: url)
+            ChatAudioPlaybackCoordinator.shared.toggle(msgID: message.msgID, url: url, scope: audioPlaybackScope)
             return
         }
-        downloadThenPlay(message: message)
+        downloadThenPlay(message: message, request: request)
     }
 
-    private func downloadThenPlay(message: MessageInfo) {
+    private func downloadThenPlay(message: MessageInfo, request: ChatAudioPlaybackCoordinator.PlaybackRequest) {
+        let generation = bindingGeneration
         MessageActionStore.create(message: message).downloadMedia(quality: nil) { [weak self] result in
             guard case .success = result else { return }
             DispatchQueue.main.async {
-                self?.playAfterDownload(msgID: message.msgID)
+                guard let self, self.bindingGeneration == generation, self.message?.msgID == message.msgID,
+                      self.window != nil, ChatAudioPlaybackCoordinator.shared.isCurrent(request) else { return }
+                self.playAfterDownload(msgID: message.msgID)
             }
         }
     }
 
     private func playAfterDownload(msgID: String) {
         let latest = messageListStore?.state.value.messageList.first { $0.msgID == msgID }
-        guard case .audio(let payload)? = latest?.messagePayload else { return }
+        guard let latest, latest.status != .revoked, latest.status != .deleted, latest.status != .violation,
+              case .audio(let payload) = latest.messagePayload else { return }
         if let path = payload.audioPath,
            !path.isEmpty,
            FileManager.default.fileExists(atPath: path) {
-            ChatAudioPlaybackCoordinator.shared.toggle(msgID: msgID, url: URL(fileURLWithPath: path))
+            ChatAudioPlaybackCoordinator.shared.toggle(msgID: msgID, url: URL(fileURLWithPath: path), scope: audioPlaybackScope)
         } else if let urlString = payload.audioURL,
                   !urlString.isEmpty,
                   let url = URL(string: urlString) {
-            ChatAudioPlaybackCoordinator.shared.toggle(msgID: msgID, url: url)
+            ChatAudioPlaybackCoordinator.shared.toggle(msgID: msgID, url: url, scope: audioPlaybackScope)
         }
     }
 

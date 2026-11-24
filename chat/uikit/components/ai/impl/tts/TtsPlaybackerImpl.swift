@@ -18,6 +18,15 @@ final class TtsPlaybackerImpl {
     private var session = 0
     private var pendingOnComplete: (() -> Void)?
 
+    private struct TextPlaybackRequest {
+        let chunks: [String]
+        let voiceId: String
+        let language: String
+        let onStart: (() -> Void)?
+        let onComplete: (() -> Void)?
+        let onError: ((String) -> Void)?
+    }
+
     init() {}
 
     static func hasSpeakableText(_ text: String) -> Bool {
@@ -47,25 +56,47 @@ final class TtsPlaybackerImpl {
             }
             return
         }
+        let request = TextPlaybackRequest(
+            chunks: TtsTextProcessor.shared.speechChunks(text: speechText),
+            voiceId: voiceId, language: language,
+            onStart: onStart, onComplete: onComplete, onError: onError
+        )
+        playChunk(request, index: 0, currentSession: currentSession)
+    }
+
+    private func playChunk(_ request: TextPlaybackRequest, index: Int, currentSession: Int) {
+        guard currentSession == session else { return }
+        guard request.chunks.indices.contains(index) else {
+            pendingOnComplete = nil
+            request.onComplete?()
+            return
+        }
         AiMediaProcessManager.convertTextToVoice(
-            text: speechText,
-            voiceId: voiceId,
-            language: language,
+            text: request.chunks[index],
+            voiceId: request.voiceId,
+            language: request.language,
             onSuccess: { [weak self] audioUrl in
                 guard let self, let owner = self.owner, currentSession == self.session else { return }
                 defer { withExtendedLifetime(owner) {} }
                 guard let url = URL(string: audioUrl) else {
                     self.pendingOnComplete = nil
-                    onError?("invalid tts audio url")
+                    request.onError?("invalid tts audio url")
                     return
                 }
-                self.startPlayback(currentSession: currentSession, url: url, onStart: onStart, onComplete: onComplete, onError: onError)
+                self.startPlayback(
+                    currentSession: currentSession, url: url,
+                    onStart: index == 0 ? request.onStart : nil,
+                    onComplete: { [weak self] in
+                        self?.playChunk(request, index: index + 1, currentSession: currentSession)
+                    },
+                    onError: request.onError
+                )
             },
             onFailure: { [weak self] _, desc in
                 guard let self, let owner = self.owner, currentSession == self.session else { return }
                 defer { withExtendedLifetime(owner) {} }
                 self.pendingOnComplete = nil
-                onError?(desc)
+                request.onError?(desc)
             }
         )
     }
@@ -117,9 +148,9 @@ final class TtsPlaybackerImpl {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            guard let self, let owner = self.owner, currentSession == self.session else { return }
+            guard let self, let owner = self.owner, currentSession == self.session,
+                  self.playerItem === item else { return }
             defer { withExtendedLifetime(owner) {} }
-            self.pendingOnComplete = nil
             self.teardownPlayer()
             onComplete?()
         }
@@ -128,7 +159,8 @@ final class TtsPlaybackerImpl {
             object: item,
             queue: .main
         ) { [weak self] notification in
-            guard let self, let owner = self.owner, currentSession == self.session else { return }
+            guard let self, let owner = self.owner, currentSession == self.session,
+                  self.playerItem === item else { return }
             defer { withExtendedLifetime(owner) {} }
             self.pendingOnComplete = nil
             self.teardownPlayer()

@@ -58,15 +58,22 @@ public class ThemeState: ObservableObject {
     }
 
     public var colors: SemanticColorScheme {
-        if let cached = cachedColorScheme, let cachedConfig = cachedThemeConfig, cachedConfig == currentTheme {
+        if let cached = cachedColorScheme, cachedThemeConfig == currentTheme,
+           cachedInterfaceStyle == systemInterfaceStyle {
             return cached
         }
 
         let newColorScheme = calculateColorScheme()
         cachedColorScheme = newColorScheme
         cachedThemeConfig = currentTheme
-
+        cachedInterfaceStyle = systemInterfaceStyle
         return newColorScheme
+    }
+
+    internal func colors(resolvingWith traits: UITraitCollection) -> SemanticColorScheme {
+        guard currentMode == .system, traits.userInterfaceStyle != .unspecified else { return colors }
+        if traits.userInterfaceStyle == systemInterfaceStyle { return colors }
+        return calculateColorScheme(interfaceStyle: traits.userInterfaceStyle)
     }
 
     var fonts: SemanticFontScheme {
@@ -100,11 +107,14 @@ public class ThemeState: ObservableObject {
 
     private static let ThemeKey = "BaseComponentThemeKey"
 
-    @Published private var systemInterfaceStyle: UIUserInterfaceStyle = .unspecified
+    private var systemInterfaceStyle: UIUserInterfaceStyle = .unspecified
 
     private var cachedColorScheme: SemanticColorScheme?
 
     private var cachedThemeConfig: ThemeConfig?
+    private var cachedInterfaceStyle: UIUserInterfaceStyle?
+    private var systemThemeObservers: [NSObjectProtocol] = []
+    private let observedScenes = NSHashTable<UIWindowScene>.weakObjects()
 
     init() {
         loadTheme()
@@ -113,10 +123,15 @@ public class ThemeState: ObservableObject {
     }
 
     public func setThemeMode(_ mode: ThemeMode) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.setThemeMode(mode) }
+            return
+        }
+        updateSystemInterfaceStyle(publishChange: false)
         clearCache()
         currentTheme = ThemeConfig(mode: mode, primaryColor: currentTheme.primaryColor)
-        saveTheme()
         applyInterfaceStyleOverride()
+        saveTheme()
     }
 
     public func setPrimaryColor(_ hex: String) {
@@ -132,23 +147,49 @@ public class ThemeState: ObservableObject {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        systemThemeObservers.forEach { NotificationCenter.default.removeObserver($0) }
+    }
+
+    public func applyTheme(to window: UIWindow) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self, weak window] in
+                guard let window else { return }
+                self?.applyTheme(to: window)
+            }
+            return
+        }
+        refreshSystemAppearance()
+        window.overrideUserInterfaceStyle = interfaceStyleOverride
+    }
+
+    public func refreshSystemAppearance() {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.refreshSystemAppearance() }
+            return
+        }
+        observeSceneAppearanceChanges()
+        updateSystemInterfaceStyle()
+    }
+
+    private var interfaceStyleOverride: UIUserInterfaceStyle {
+        switch currentMode {
+        case .light: return .light
+        case .dark: return .dark
+        case .system: return .unspecified
+        }
     }
 
     private func applyInterfaceStyleOverride() {
         #if os(iOS) || os(tvOS)
-        let style: UIUserInterfaceStyle
-        switch currentTheme.mode {
-        case .light: style = .light
-        case .dark: style = .dark
-        case .system: style = .unspecified
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { [weak self] in self?.applyInterfaceStyleOverride() }
+            return
         }
-        DispatchQueue.main.async {
-            for scene in UIApplication.shared.connectedScenes {
-                guard let windowScene = scene as? UIWindowScene else { continue }
-                for window in windowScene.windows {
-                    window.overrideUserInterfaceStyle = style
-                }
+        let style = interfaceStyleOverride
+        for scene in UIApplication.shared.connectedScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = style
             }
         }
         #endif
@@ -156,45 +197,44 @@ public class ThemeState: ObservableObject {
 
     private func setupSystemThemeObserver() {
         #if os(iOS) || os(tvOS)
-        updateSystemInterfaceStyle()
-
-        NotificationCenter.default.addObserver(
-            forName: UIApplication.didBecomeActiveNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.updateSystemInterfaceStyle()
-        }
-
-        NotificationCenter.default.addObserver(
-            forName: Notification.Name("UITraitCollectionDidChangeNotification"),
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            self?.updateSystemInterfaceStyle()
+        refreshSystemAppearance()
+        for name in [UIApplication.didBecomeActiveNotification, UIScene.didActivateNotification] {
+            let observer = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                self?.refreshSystemAppearance()
+                self?.applyInterfaceStyleOverride()
+            }
+            systemThemeObservers.append(observer)
         }
         #endif
     }
 
-    private func updateSystemInterfaceStyle() {
-        #if os(iOS) || os(tvOS)
-        let newStyle: UIUserInterfaceStyle
-
-        if #available(iOS 13.0, *) {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let window = windowScene.windows.first
-            {
-                newStyle = window.traitCollection.userInterfaceStyle
-            } else {
-                newStyle = UIScreen.main.traitCollection.userInterfaceStyle
+    private func observeSceneAppearanceChanges() {
+        guard #available(iOS 17.0, tvOS 17.0, *) else { return }
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            for scene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
+                guard !self.observedScenes.contains(scene) else { continue }
+                self.observedScenes.add(scene)
+                scene.registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (_: UIWindowScene, _: UITraitCollection) in
+                    self?.updateSystemInterfaceStyle()
+                }
             }
-        } else {
-            newStyle = .unspecified
+            self.updateSystemInterfaceStyle()
         }
+    }
 
-        if systemInterfaceStyle != newStyle {
-            systemInterfaceStyle = newStyle
-            clearCache()
+    private func updateSystemInterfaceStyle(publishChange: Bool = true) {
+        #if os(iOS) || os(tvOS)
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive && $0.windows.contains(where: \.isKeyWindow) }
+            ?? scenes.first { $0.activationState == .foregroundActive }
+            ?? scenes.first
+        let newStyle = scene?.traitCollection.userInterfaceStyle ?? UIScreen.main.traitCollection.userInterfaceStyle
+        guard newStyle != .unspecified, systemInterfaceStyle != newStyle else { return }
+        systemInterfaceStyle = newStyle
+        clearCache()
+        if publishChange, currentMode == .system {
+            currentTheme = ThemeConfig(mode: currentMode, primaryColor: currentPrimaryColor)
         }
         #endif
     }
@@ -203,12 +243,13 @@ public class ThemeState: ObservableObject {
         return isDarkMode ? DarkSemanticScheme : LightSemanticScheme
     }
 
-    private func calculateColorScheme() -> SemanticColorScheme {
+    private func calculateColorScheme(interfaceStyle: UIUserInterfaceStyle? = nil) -> SemanticColorScheme {
         let effectiveMode: ThemeMode
 
         switch currentTheme.mode {
         case .system:
-            effectiveMode = isDarkMode ? .dark : .light
+            let usesDarkMode = interfaceStyle.map { $0 == .dark } ?? isDarkMode
+            effectiveMode = usesDarkMode ? .dark : .light
         case .light, .dark:
             effectiveMode = currentTheme.mode
         }

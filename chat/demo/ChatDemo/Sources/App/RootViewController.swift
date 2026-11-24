@@ -63,6 +63,13 @@ final class RootViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         applyLayoutDirection()
+        ThemeState.shared.refreshSystemAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        guard traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) else { return }
+        ThemeState.shared.refreshSystemAppearance()
     }
 
     private func bindLoginStatus() {

@@ -42,6 +42,8 @@ final class ReactionEmojiPickerViewController: UIViewController {
 
     private let message: MessageInfo
 
+    private weak var source: AnyObject?
+
     private let backdropView = UIView()
 
     private let sheetView = UIView()
@@ -56,15 +58,18 @@ final class ReactionEmojiPickerViewController: UIViewController {
 
     private var hasAnimatedIn = false
 
-    static func present(message: MessageInfo) {
+    private var isDismissing = false
+
+    static func present(message: MessageInfo, source: AnyObject? = nil) {
         guard let presenter = topViewController() else { return }
-        let controller = ReactionEmojiPickerViewController(message: message)
+        let controller = ReactionEmojiPickerViewController(message: message, source: source)
         controller.modalPresentationStyle = .overFullScreen
         presenter.present(controller, animated: false)
     }
 
-    private init(message: MessageInfo) {
+    private init(message: MessageInfo, source: AnyObject?) {
         self.message = message
+        self.source = source
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -87,10 +92,10 @@ final class ReactionEmojiPickerViewController: UIViewController {
 
     private func buildSections() {
         let allEmojis = EmojiManager.shared.getPickerEmojis()
-        let emojiByName = Dictionary(uniqueKeysWithValues: allEmojis.compactMap { emoji -> (String, EmojiData)? in
+        let emojiByName = Dictionary(allEmojis.compactMap { emoji -> (String, EmojiData)? in
             guard let name = emoji.name else { return nil }
             return (name, emoji)
-        })
+        }, uniquingKeysWith: { first, _ in first })
         let recentNames = EmojiManager.shared.getRecentEmojis(groupID: EmojiManager.shared.reactionGroupID())
         let recentEmojis = recentNames.compactMap { emojiByName[$0] }
         if !recentEmojis.isEmpty {
@@ -213,14 +218,19 @@ final class ReactionEmojiPickerViewController: UIViewController {
     }
 
     @objc private func handleBackdropTap() {
+        guard !isDismissing else { return }
+        isDismissing = true
         animateOut { [weak self] in self?.dismiss(animated: false) }
     }
 
     @objc private func handleHandleTap() {
+        guard !isDismissing else { return }
+        isDismissing = true
         animateOut { [weak self] in self?.dismiss(animated: false) }
     }
 
     @objc private func handleDragPan(_ gesture: UIPanGestureRecognizer) {
+        guard !isDismissing else { return }
         let translation = gesture.translation(in: view)
         switch gesture.state {
         case .changed:
@@ -229,6 +239,7 @@ final class ReactionEmojiPickerViewController: UIViewController {
         case .ended, .cancelled:
             let dismissed = translation.y >= sheetHeight * Self.dismissDragThresholdRatio
             if dismissed {
+                isDismissing = true
                 animateOut { [weak self] in self?.dismiss(animated: false) }
             } else {
                 UIView.animate(withDuration: Self.dragAnimationDuration) {
@@ -241,14 +252,15 @@ final class ReactionEmojiPickerViewController: UIViewController {
     }
 
     private func handleEmojiSelected(_ emoji: EmojiData) {
-        guard let name = emoji.name else { return }
+        guard !isDismissing, let name = emoji.name else { return }
+        isDismissing = true
         let hasReacted = message.reactionList.contains { $0.reactionID == name && $0.reactedByMyself }
         if !hasReacted {
             EmojiManager.shared.addRecentEmoji(emoji, groupID: EmojiManager.shared.reactionGroupID())
         }
         NotificationCenter.default.post(
             name: NSNotification.Name("messageReactionToggle"),
-            object: nil,
+            object: source,
             userInfo: ["message": message, "reactionID": name]
         )
         animateOut { [weak self] in self?.dismiss(animated: false) }

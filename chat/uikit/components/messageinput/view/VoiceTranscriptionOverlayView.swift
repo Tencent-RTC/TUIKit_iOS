@@ -108,6 +108,8 @@ final class VoiceTranscriptionOverlayView: UIView {
 
     private let editTextView = VerticalCenterTextView()
 
+    private let emptyHintLabel = UILabel()
+
     private let loadingDotsView = LoadingDotsView()
 
     private let waveformView = RecorderBubbleView()
@@ -148,6 +150,8 @@ final class VoiceTranscriptionOverlayView: UIView {
     private var state: TranscriptionState
 
     private var originalText: String = ""
+
+    private var lastProgrammaticText: String?
 
     private var translatedText: String?
 
@@ -232,6 +236,9 @@ final class VoiceTranscriptionOverlayView: UIView {
     }
 
     func updateResult(_ resultText: String?) {
+        if hasUserEditedText {
+            return
+        }
         if let resultText = resultText, !resultText.isEmpty {
             state = .text
             if originalText.isEmpty {
@@ -300,6 +307,7 @@ final class VoiceTranscriptionOverlayView: UIView {
 
         bubbleView.addSubview(editTextView)
         bubbleView.addSubview(loadingDotsView)
+        bubbleView.addSubview(emptyHintLabel)
 
         chipRow.axis = .horizontal
         chipRow.spacing = CGFloat(SpacingScheme.iconIconSpacing)
@@ -321,6 +329,17 @@ final class VoiceTranscriptionOverlayView: UIView {
         editTextView.textContainer.lineFragmentPadding = 0
         editTextView.isScrollEnabled = true
         editTextView.returnKeyType = .done
+        editTextView.delegate = self
+
+        emptyHintLabel.font = FontScheme.caption1Regular
+        emptyHintLabel.textColor = colors.textColorButton.withAlphaComponent(0.7)
+        emptyHintLabel.textAlignment = LanguageHelper.isRTL ? .right : .left
+        LanguageHelper.applyLayoutDirection(to: emptyHintLabel)
+        emptyHintLabel.numberOfLines = 1
+        emptyHintLabel.lineBreakMode = .byTruncatingTail
+        emptyHintLabel.text = LocalizedChatString("message_input_voice_transcription_empty")
+        emptyHintLabel.isHidden = true
+        emptyHintLabel.isUserInteractionEnabled = false
 
         let closeIcon = Self.vectorIcon(.close)
         let transcribeIcon = Self.vectorIcon(.transcribe)
@@ -401,15 +420,15 @@ final class VoiceTranscriptionOverlayView: UIView {
     private func applyTheme() {
         let colors = TUIChatKitTheme.colors
         applyBackgroundGradient()
-        bubbleView.bubbleColor = state == .empty ? colors.buttonColorHangupDefault : colors.buttonColorPrimaryDefault
+        bubbleView.bubbleColor = (state == .empty && !hasEditedText) ? colors.buttonColorHangupDefault : colors.buttonColorPrimaryDefault
         let arrowCenterX = sendTextButton.frame.midX - bubbleView.frame.minX
         bubbleView.arrowCenterX = arrowCenterX
         loadingDotsView.dotColor = colors.textColorButton
         editTextView.textColor = colors.textColorButton
         editTextView.tintColor = colors.textColorButton
+        emptyHintLabel.textColor = colors.textColorButton.withAlphaComponent(0.7)
         cancelButton.backgroundColor = colors.buttonColorSecondaryDefault
         sendAudioButton.backgroundColor = colors.buttonColorSecondaryDefault
-        sendTextButton.backgroundColor = state == .text ? colors.buttonColorPrimaryDefault : colors.buttonColorPrimaryDisabled
         cancelButton.setTitleColor(colors.textColorPrimary, for: .normal)
         sendAudioButton.setTitleColor(colors.textColorPrimary, for: .normal)
         sendTextButton.setTitleColor(colors.textColorButton, for: .normal)
@@ -417,7 +436,27 @@ final class VoiceTranscriptionOverlayView: UIView {
         sendAudioLabel.textColor = colors.textColorTertiary
         waveformView.setBubbleColor(colors.bgColorInput)
         waveformView.setContentColor(colors.textColorPrimary)
-        sendTextButton.isEnabled = state == .text
+        updateSendButtonState()
+    }
+
+    private var hasEditedText: Bool {
+        return !(editTextView.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var hasUserEditedText: Bool {
+        guard let applied = lastProgrammaticText else { return false }
+        return (editTextView.text ?? "") != applied
+    }
+
+    private func refreshEmptyHint() {
+        emptyHintLabel.isHidden = !(state == .empty && !hasEditedText)
+    }
+
+    private func updateSendButtonState() {
+        let colors = TUIChatKitTheme.colors
+        let enabled = hasEditedText
+        sendTextButton.isEnabled = enabled
+        sendTextButton.backgroundColor = enabled ? colors.buttonColorPrimaryDefault : colors.buttonColorPrimaryDisabled
     }
 
     private func bindBubbleText(_ resultText: String?) {
@@ -429,7 +468,7 @@ final class VoiceTranscriptionOverlayView: UIView {
             let display: String
             switch state {
             case .empty:
-                display = LocalizedChatString("message_input_voice_transcription_empty")
+                display = ""
             case .text:
                 display = resultText ?? originalText
             default:
@@ -438,9 +477,11 @@ final class VoiceTranscriptionOverlayView: UIView {
             loadingDotsView.isHidden = true
             editTextView.isHidden = false
             editTextView.text = display
-            editTextView.isEditable = state == .text
+            editTextView.isEditable = true
+            lastProgrammaticText = display
         }
-        sendTextButton.isEnabled = state == .text
+        refreshEmptyHint()
+        updateSendButtonState()
     }
 
     private func updateBubbleHeightForState(_ resultText: String?) {
@@ -554,7 +595,6 @@ final class VoiceTranscriptionOverlayView: UIView {
         let lang = VoiceTranscriptionLanguageStore.selected
         if lang.isEmpty {
             presentLanguageSelector { [weak self] picked in
-                VoiceTranscriptionLanguageStore.selected = picked
                 self?.translateWith(picked)
             }
         } else {
@@ -565,7 +605,6 @@ final class VoiceTranscriptionOverlayView: UIView {
     private func handleSwitchLanguage() {
         if isTranslating { return }
         presentLanguageSelector { [weak self] picked in
-            VoiceTranscriptionLanguageStore.selected = picked
             self?.translateWith(picked)
         }
     }
@@ -621,12 +660,13 @@ final class VoiceTranscriptionOverlayView: UIView {
         callbacks.onTranslate(originalText, languageCode, { [weak self] translated in
             guard let self = self, !self.isDismissed else { return }
             self.isTranslating = false
-            if translated.isEmpty {
+            if translated.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 self.translationFailed = true
                 self.renderChipRow()
                 WindowToastManager.shared.error(LocalizedChatString("voice_message_translate_failed"))
                 return
             }
+            VoiceTranscriptionLanguageStore.selected = languageCode
             self.translationFailed = false
             self.translatedText = translated
             self.setBubbleText(translated)
@@ -643,7 +683,9 @@ final class VoiceTranscriptionOverlayView: UIView {
     private func setBubbleText(_ value: String) {
         updateBubbleHeightForState(value)
         editTextView.text = value
-        sendTextButton.isEnabled = state == .text && !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        lastProgrammaticText = value
+        refreshEmptyHint()
+        updateSendButtonState()
     }
 
     private func presentLanguageSelector(onPicked: @escaping (String) -> Void) {
@@ -788,6 +830,7 @@ final class VoiceTranscriptionOverlayView: UIView {
         let bodyHeight = bubbleHeight - bubbleTriangleHeight
         editTextView.scrollIndicatorInsets = .zero
         editTextView.frame = CGRect(x: 0, y: 0, width: bubbleView.bounds.width, height: bodyHeight)
+        emptyHintLabel.frame = editTextView.frame.insetBy(dx: Self.editTextContentInsets.left, dy: 0)
         loadingDotsView.frame = CGRect(x: Self.loadingDotsLeadingInset, y: (bodyHeight - Self.loadingDotsHeight) / 2, width: Self.loadingDotsWidth, height: Self.loadingDotsHeight)
     }
 
@@ -850,6 +893,14 @@ final class VoiceTranscriptionOverlayView: UIView {
             labelTop: labelTop,
             waveformTop: waveformTop
         )
+    }
+}
+
+extension VoiceTranscriptionOverlayView: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        refreshEmptyHint()
+        updateSendButtonState()
+        applyTheme()
     }
 }
 
@@ -1101,7 +1152,7 @@ enum VoiceTranscriptionLanguageStore {
 
     static let options: [Option] = [
         Option(code: "zh", nativeName: "简体中文"),
-        Option(code: "zh-TW", nativeName: "繁體中文"),
+        Option(code: "zh-TR", nativeName: "繁體中文"),
         Option(code: "en", nativeName: "English"),
         Option(code: "ja", nativeName: "日本語"),
         Option(code: "ko", nativeName: "한국어"),
@@ -1120,7 +1171,10 @@ enum VoiceTranscriptionLanguageStore {
     ]
 
     static var selected: String {
-        get { VoiceMessageConfig.shared.getRecordTranslateTargetLanguage() }
+        get {
+            let value = VoiceMessageConfig.shared.getRecordTranslateTargetLanguage()
+            return value == "zh-TW" ? "zh-TR" : value
+        }
         set { VoiceMessageConfig.shared.setRecordTranslateTargetLanguage(newValue) }
     }
 }

@@ -21,7 +21,12 @@ final class StreamTextPacer {
         weak var listener: StreamTextPacerListener?
     }
 
-    private var states: [String: State] = [:]
+    private struct StateKey: Hashable {
+        let msgID: String
+        let listenerID: ObjectIdentifier
+    }
+
+    private var states: [StateKey: State] = [:]
     private var timer: Timer?
 
     private init() {}
@@ -33,12 +38,18 @@ final class StreamTextPacer {
                         limiter: StreamRevealLimiter? = nil,
                         maxCharactersPerSecond: Double = 0,
                         listener: StreamTextPacerListener?) -> Int {
-        guard !msgID.isEmpty, rendered.length > 0 else {
-            return rendered.length
+        guard !msgID.isEmpty, let listener else {
+            return Self.limitedLength(rendered.length, limiter: limiter)
+        }
+        let key = StateKey(msgID: msgID, listenerID: ObjectIdentifier(listener))
+        guard rendered.length > 0 else {
+            states.removeValue(forKey: key)
+            stopTimerIfIdle()
+            return 0
         }
         let speed = maxCharactersPerSecond.isFinite && maxCharactersPerSecond > 0
             ? maxCharactersPerSecond : 0
-        if let state = states[msgID] {
+        if let state = states[key], state.listener === listener {
             if state.maxCharactersPerSecond != speed {
                 state.maxCharactersPerSecond = speed
                 state.speedBudget = 0
@@ -63,23 +74,28 @@ final class StreamTextPacer {
         state.isStreaming = isStreaming
         state.limiter = limiter
         state.listener = listener
-        states[msgID] = state
+        states[key] = state
         startTimerIfNeeded()
         return 0
     }
 
     func isRevealing(msgID: String) -> Bool {
-        guard let state = states[msgID] else { return false }
-        return !isFinished(state)
+        states.contains { key, state in
+            key.msgID == msgID && state.listener != nil && !isFinished(state)
+        }
     }
 
     func detach(msgID: String, listener: StreamTextPacerListener) {
-        guard let state = states[msgID], state.listener === listener else { return }
-        state.listener = nil
+        let key = StateKey(msgID: msgID, listenerID: ObjectIdentifier(listener))
+        guard let state = states[key], state.listener === listener else { return }
+        states.removeValue(forKey: key)
+        stopTimerIfIdle()
     }
 
     func discard(msgID: String) {
-        states.removeValue(forKey: msgID)
+        for key in Array(states.keys) where key.msgID == msgID {
+            states.removeValue(forKey: key)
+        }
         stopTimerIfIdle()
     }
 
@@ -99,21 +115,22 @@ final class StreamTextPacer {
     }
 
     private func tick() {
-        var finishedMsgIDs: [String] = []
-        for (msgID, state) in states {
+        var finishedStates: [(StateKey, State)] = []
+        for (key, state) in states {
+            guard states[key] === state else { continue }
             if state.listener == nil {
-                finishedMsgIDs.append(msgID)
+                finishedStates.append((key, state))
                 continue
             }
             if !isFinished(state) {
-                advance(state, msgID: msgID)
+                advance(state, msgID: key.msgID)
             }
             if isFinished(state) {
-                finishedMsgIDs.append(msgID)
+                finishedStates.append((key, state))
             }
         }
-        for msgID in finishedMsgIDs {
-            states.removeValue(forKey: msgID)
+        for (key, state) in finishedStates where states[key] === state {
+            states.removeValue(forKey: key)
         }
         stopTimerIfIdle()
     }

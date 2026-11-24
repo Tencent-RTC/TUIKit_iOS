@@ -310,6 +310,9 @@
 "MessageReadPartDisable" = "بدون حالة";
 "MessageReadAllRead" = "تمت القراءة من الجميع";
 "MessageReactionUserSuffix" = "\U200Fو%1$d آخرين\U200F";
+"MessageReactionFailed" = "تعذّر إضافة التفاعل";
+"MessageReactionCountLimit" = "بلغت التفاعلات على هذه الرسالة الحد الأقصى";
+"MessageReactionUserCountLimit" = "بلغ عدد المستخدمين لهذا التفاعل الحد الأقصى";
 "MessageReadC2CRead" = "مقروء";
 "MessageReadC2CUnRead" = "غير مقروء";
 "MessageReadC2CUnReadDetail" = "لم يتم القراءة بعد";

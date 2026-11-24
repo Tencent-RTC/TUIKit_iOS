@@ -149,7 +149,7 @@ enum MessageActionMenuProvider {
             iconName: "message_forward",
             systemIconFallback: "arrowshape.turn.up.right",
             label: LocalizedChatString("Forward")
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("showForwardTargetSelector"),
                 object: source,
@@ -164,7 +164,7 @@ enum MessageActionMenuProvider {
             iconName: "message_convert",
             systemIconFallback: "text.bubble",
             label: LocalizedChatString("ConvertToText")
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("convertVoiceToText"),
                 object: source,
@@ -179,7 +179,7 @@ enum MessageActionMenuProvider {
             iconName: "message_translate",
             systemIconFallback: "character.bubble",
             label: LocalizedChatString("Translate")
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("translateTextMessage"),
                 object: source,
@@ -205,7 +205,7 @@ enum MessageActionMenuProvider {
             iconName: "message_multiselect",
             systemIconFallback: "checkmark.circle",
             label: LocalizedChatString("MultiSelect")
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("enterMultiSelectMode"),
                 object: source,
@@ -220,7 +220,7 @@ enum MessageActionMenuProvider {
             iconName: "message_listen_from_here",
             systemIconFallback: "speaker.wave.2",
             label: LocalizedChatString("VoiceListenFromHere")
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("listenFromHereNotification"),
                 object: source,
@@ -236,7 +236,7 @@ enum MessageActionMenuProvider {
             systemIconFallback: "trash",
             label: LocalizedChatString("Delete"),
             isDangerous: true
-        ) { message, _ in
+        ) { [weak source] message, _ in
             NotificationCenter.default.post(
                 name: NSNotification.Name("deleteMessageNotification"),
                 object: source,

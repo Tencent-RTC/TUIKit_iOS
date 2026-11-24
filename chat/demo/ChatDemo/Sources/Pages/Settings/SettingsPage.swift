@@ -254,26 +254,31 @@ final class SettingsViewController: UIViewController {
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 16)
         titleLabel.textColor = colors.textColorSecondary
+        titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         let arrowImageView = UIImageView(image: AtomicXChatResources.image(named: "contact_info_arrow_right")?.withRenderingMode(.alwaysTemplate))
         arrowImageView.tintColor = colors.textColorTertiary
         arrowImageView.contentMode = .scaleAspectFit
         arrowImageView.setContentHuggingPriority(.required, for: .horizontal)
+        arrowImageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         row.addSubview(titleLabel)
         row.addSubview(arrowImageView)
         if let valueLabel = valueLabel {
             valueLabel.font = .systemFont(ofSize: 16)
             valueLabel.textColor = colors.textColorPrimary
             valueLabel.lineBreakMode = .byTruncatingTail
-            valueLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+            valueLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
             row.addSubview(valueLabel)
             valueLabel.snp.makeConstraints { make in
+                make.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(Self.horizontalPadding)
                 make.trailing.equalTo(arrowImageView.snp.leading).offset(-Self.arrowSpacing)
                 make.centerY.equalToSuperview()
             }
         }
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(Self.horizontalPadding)
+            make.trailing.lessThanOrEqualTo(arrowImageView.snp.leading).offset(-Self.arrowSpacing)
+            make.width.greaterThanOrEqualTo(0)
             make.centerY.equalToSuperview()
             make.top.equalToSuperview().offset(Self.rowVerticalPadding)
             make.bottom.equalToSuperview().offset(-Self.rowVerticalPadding)
@@ -595,9 +600,9 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
 
     private static let dividerHeight: CGFloat = 0.5
 
-    private static let headerTopMargin: CGFloat = 16
+    private static let headerTopMargin: CGFloat = 8
 
-    private static let entryTopMargin: CGFloat = 36
+    private static let entryTopMargin: CGFloat = 44
 
     private static let entryRowMinHeight: CGFloat = 48
 
@@ -643,13 +648,14 @@ final class ProfileDetailViewController: UIViewController, SystemNavigationBarPa
         let entryContainer = UIStackView()
         entryContainer.axis = .vertical
         entryContainer.spacing = 0
+        entryContainer.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileAccount"), valueLabel: accountValueLabel, showArrow: false, action: nil))
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileNickname"), valueLabel: nicknameValueLabel, showArrow: true, action: #selector(handleNicknameTapped)))
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileStatus"), valueLabel: signatureValueLabel, showArrow: true, action: #selector(handleSignatureTapped)))
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileGender"), valueLabel: genderValueLabel, showArrow: true, action: #selector(handleGenderTapped)))
         entryContainer.addArrangedSubview(makeInfoRow(title: LocalizedChatString("ProfileBirthday"), valueLabel: birthdayValueLabel, showArrow: true, action: #selector(handleBirthdayTapped), showDivider: false))
         let entryWrapper = UIView()
-        entryWrapper.backgroundColor = TUIChatKitTheme.colors.bgColorOperate
+        entryWrapper.backgroundColor = TUIChatKitTheme.colors.bgColorTopBar
         entryWrapper.addSubview(entryContainer)
         entryContainer.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()

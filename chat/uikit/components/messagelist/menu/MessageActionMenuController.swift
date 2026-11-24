@@ -119,7 +119,8 @@ final class MessageActionMenuController: NSObject {
             message: message,
             anchorFrameInWindow: bubbleFrameInWindow,
             hasReactionEntry: showReactionEntry,
-            style: .message
+            style: .message,
+            source: source
         )
     }
 
@@ -131,7 +132,8 @@ final class MessageActionMenuController: NSObject {
             message: message,
             anchorFrameInWindow: anchorFrameInWindow,
             hasReactionEntry: false,
-            style: .auxiliary
+            style: .auxiliary,
+            source: nil
         )
     }
 
@@ -139,7 +141,8 @@ final class MessageActionMenuController: NSObject {
                              message: MessageInfo,
                              anchorFrameInWindow: CGRect,
                              hasReactionEntry: Bool,
-                             style: MenuStyle) {
+                             style: MenuStyle,
+                             source: AnyObject?) {
         guard let window = Self.keyWindow(), !actions.isEmpty else { return }
         dismiss()
 
@@ -159,7 +162,8 @@ final class MessageActionMenuController: NSObject {
             actions: actions,
             message: message,
             hasReactionEntry: hasReactionEntry,
-            style: style
+            style: style,
+            source: source
         )
         overlay.addSubview(menuView)
         menuBubbleView = menuView
@@ -196,7 +200,8 @@ final class MessageActionMenuController: NSObject {
     private func buildMenuView(actions: [MessageActionMenuAction],
                                message: MessageInfo,
                                hasReactionEntry: Bool,
-                               style: MenuStyle) -> MessageActionMenuBubbleView {
+                               style: MenuStyle,
+                               source: AnyObject?) -> MessageActionMenuBubbleView {
         let bubble = MessageActionMenuBubbleView()
         let menuContent = buildMenuContent(
             actions: actions,
@@ -219,11 +224,11 @@ final class MessageActionMenuController: NSObject {
             let panel = ReactionEmojiPanelView(message: message)
             panel.isHidden = true
             panel.onCollapse = { [weak self] in self?.toggleEmojiPanel() }
-            panel.onMore = { [weak self] in
+            panel.onMore = { [weak self, weak source] in
                 self?.dismiss()
-                ReactionEmojiPickerViewController.present(message: message)
+                ReactionEmojiPickerViewController.present(message: message, source: source)
             }
-            panel.onToggleEmoji = { [weak self] emoji in
+            panel.onToggleEmoji = { [weak self, weak source] emoji in
                 guard let self = self, let name = emoji.name else { return }
                 self.dismiss()
                 let hasReacted = message.reactionList.contains { $0.reactionID == name && $0.reactedByMyself }
@@ -232,7 +237,7 @@ final class MessageActionMenuController: NSObject {
                 }
                 NotificationCenter.default.post(
                     name: NSNotification.Name("messageReactionToggle"),
-                    object: nil,
+                    object: source,
                     userInfo: ["message": message, "reactionID": name]
                 )
             }

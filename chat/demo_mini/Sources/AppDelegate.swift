@@ -31,7 +31,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    private var hasValidConfiguration: Bool {
+        GenerateTestUserSig.sdkAppID > 0
+            && !GenerateTestUserSig.secretKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func requireConfiguration() -> Bool {
+        guard hasValidConfiguration else {
+            guard navigationController.presentedViewController == nil else { return false }
+            let alert = UIAlertController(
+                title: NSLocalizedString("ConfigurationRequired", comment: ""),
+                message: NSLocalizedString("ConfigurationGuide", comment: ""),
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
+            navigationController.present(alert, animated: true)
+            return false
+        }
+        return true
+    }
+
     private func login() {
+        guard hasValidConfiguration else { return }
         LoginStore.shared.login(sdkAppID: GenerateTestUserSig.sdkAppID, userID: Self.userID, userSig: Self.userSig) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
@@ -46,17 +67,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func showHome() {
         let homePage = HomeViewController(entries: [
-            (NSLocalizedString("ShowConversationList", comment: ""), { [weak self] in self?.showConversationList() }),
-            (NSLocalizedString("ShowC2CChat", comment: ""), { [weak self] in self?.showC2CChat() }),
-            (NSLocalizedString("ShowGroupChat", comment: ""), { [weak self] in self?.showGroupChat() }),
-            (NSLocalizedString("ShowContacts", comment: ""), { [weak self] in self?.showContacts() }),
-            (NSLocalizedString("StartVideoCall", comment: ""), { [weak self] in self?.startVideoCall() }),
+            ("ShowConversationList", { [weak self] in self?.showConversationList() }),
+            ("ShowC2CChat", { [weak self] in self?.showC2CChat() }),
+            ("ShowGroupChat", { [weak self] in self?.showGroupChat() }),
+            ("ShowContacts", { [weak self] in self?.showContacts() }),
+            ("StartVideoCall", { [weak self] in self?.startVideoCall() }),
         ])
         navigationController.viewControllers = [homePage]
         window?.rootViewController = navigationController
     }
 
     private func showConversationList() {
+        guard requireConfiguration() else { return }
         let conversationsPage = ConversationsPage(onConversationClick: { [weak self] info in
             self?.showChat(info.conversation)
         })
@@ -64,14 +86,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func showC2CChat() {
-        showChat(Self.makeC2CConversation(userID: Self.c2cChatUserID, title: "与 \(Self.c2cChatUserID) 聊天"))
+        guard requireConfiguration() else { return }
+        showChat(Self.makeC2CConversation(userID: Self.c2cChatUserID, title: String(format: NSLocalizedString("C2CChatTitle", comment: ""), Self.c2cChatUserID)))
     }
 
     private func showGroupChat() {
-        showChat(Self.makeGroupConversation(groupID: Self.chatGroupID, title: "测试群：\(Self.chatGroupID)"))
+        guard requireConfiguration() else { return }
+        showChat(Self.makeGroupConversation(groupID: Self.chatGroupID, title: String(format: NSLocalizedString("GroupChatTitle", comment: ""), Self.chatGroupID)))
     }
 
     private func showContacts() {
+        guard requireConfiguration() else { return }
         let contactsPage = ContactsPage(
             onContactClick: { [weak self] item in
                 self?.showChat(Self.makeC2CConversation(userID: item.userID,
@@ -143,14 +168,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func startVideoCall() {
+        guard requireConfiguration() else { return }
         TUICallKit.createInstance().calls(userIdList: [Self.c2cChatUserID], mediaType: .video, params: nil, completion: nil)
     }
 }
 
 private final class HomeViewController: UIViewController {
-    private let entries: [(title: String, handler: () -> Void)]
+    private let entries: [(key: String, handler: () -> Void)]
 
-    init(entries: [(title: String, handler: () -> Void)]) {
+    init(entries: [(key: String, handler: () -> Void)]) {
         self.entries = entries
         super.init(nibName: nil, bundle: nil)
     }
@@ -163,7 +189,9 @@ private final class HomeViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         let buttons = entries.map { entry in
-            UIButton(type: .system, primaryAction: UIAction(title: entry.title) { _ in entry.handler() })
+            let button = UIButton(type: .system, primaryAction: UIAction(title: NSLocalizedString(entry.key, comment: "")) { _ in entry.handler() })
+            button.accessibilityIdentifier = entry.key
+            return button
         }
         let stackView = UIStackView(arrangedSubviews: buttons)
         stackView.axis = .vertical

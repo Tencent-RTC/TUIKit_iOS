@@ -261,7 +261,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
         case .video:
             sendVideoMessage(path, snapshotPath: reusableSnapshotPath ?? "", media: media)
         case .image:
-            inputStore.sendMessage(payload: .image(makeImagePayload(imagePath: path)), option: makeSendOption(), completion: nil)
+            inputStore.sendMessage(payload: .image(makeImagePayload(imagePath: path)), option: makeSendOption(), completion: MessageInputViewModel.toastSendFailure)
         }
     }
 
@@ -295,7 +295,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
             snapshotWidth: snapshotWidth,
             snapshotHeight: snapshotHeight
         )
-        inputStore.sendMessage(payload: .video(payload), option: makeSendOption(), completion: nil)
+        inputStore.sendMessage(payload: .video(payload), option: makeSendOption(), completion: MessageInputViewModel.toastSendFailure)
     }
 
     private func markSendFailed(_ media: AlbumMedia) {
@@ -314,7 +314,7 @@ private func sendOnce(_ media: AlbumMedia, _ send: @escaping () -> Void) {
     private func sendPendingTextIfNeeded() {
         if let text = pendingText, !text.isEmpty, !didSendPendingText {
             didSendPendingText = true
-            inputStore.sendMessage(payload: .text(TextSendMessagePayload(text: text)), option: makeSendOption(), completion: nil)
+            inputStore.sendMessage(payload: .text(TextSendMessagePayload(text: text)), option: makeSendOption(), completion: MessageInputViewModel.toastSendFailure)
         }
     }
 

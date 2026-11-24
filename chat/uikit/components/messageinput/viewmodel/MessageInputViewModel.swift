@@ -16,7 +16,7 @@ final class MessageInputViewModel {
 
     let config: ChatMessageInputConfig
 
-    var onSendFailure: ((String) -> Void)?
+    var onSendFailure: ((String) -> Bool)?
 
     /// 文本消息发送成功回调。机器人会话用它驱动「等待回复」状态机，对齐 Android 的
     /// setTextSendCallbacks(onSent)：钩子挂在 ViewModel 的发送漏斗里，按钮、键盘、
@@ -58,12 +58,11 @@ final class MessageInputViewModel {
         if let quoted = quotedMessage {
             option.quotedMessage = quoted
         }
-        store.sendMessage(payload: .text(TextSendMessagePayload(text: text)), option: option) { [weak self] result in
-            self?.handleSendResult(result)
-            if case .success = result {
-                self?.notifyTextMessageSent()
-            }
-        }
+        store.sendMessage(
+            payload: .text(TextSendMessagePayload(text: text)),
+            option: option,
+            completion: makeSendCompletion { [weak self] in self?.notifyTextMessageSent() }
+        )
     }
 
     func sendImageMessage(_ imagePath: String) {
@@ -74,10 +73,9 @@ final class MessageInputViewModel {
         }
         store.sendMessage(
             payload: .image(payload),
-            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeImage"))
-        ) { [weak self] result in
-            self?.handleSendResult(result)
-        }
+            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeImage")),
+            completion: makeSendCompletion()
+        )
     }
 
     func sendVideoMessage(_ videoPath: String, snapshotPath: String) {
@@ -98,20 +96,18 @@ final class MessageInputViewModel {
         )
         store.sendMessage(
             payload: .video(payload),
-            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeVideo"))
-        ) { [weak self] result in
-            self?.handleSendResult(result)
-        }
+            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeVideo")),
+            completion: makeSendCompletion()
+        )
     }
 
     func sendFileMessage(_ filePath: String, fileName: String, fileSize: Int) {
         let payload = FileSendMessagePayload(filePath: filePath, fileName: fileName, fileSize: fileSize)
         store.sendMessage(
             payload: .file(payload),
-            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeFile"))
-        ) { [weak self] result in
-            self?.handleSendResult(result)
-        }
+            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeFile")),
+            completion: makeSendCompletion()
+        )
     }
 
     func sendFaceMessage(groupIndex: Int, faceData: String, quotedMessage: MessageInfo? = nil) {
@@ -120,19 +116,16 @@ final class MessageInputViewModel {
         if let quoted = quotedMessage {
             option.quotedMessage = quoted
         }
-        store.sendMessage(payload: .face(payload), option: option) { [weak self] result in
-            self?.handleSendResult(result)
-        }
+        store.sendMessage(payload: .face(payload), option: option, completion: makeSendCompletion())
     }
 
     func sendVoiceMessage(_ voicePath: String, duration: Int) {
         let payload = AudioSendMessagePayload(audioFilePath: voicePath, duration: duration)
         store.sendMessage(
             payload: .audio(payload),
-            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeVoice"))
-        ) { [weak self] result in
-            self?.handleSendResult(result)
-        }
+            option: createSendMessageOption(pushDescription: LocalizedChatString("MessageTypeVoice")),
+            completion: makeSendCompletion()
+        )
     }
 
     func convertLocalAudioToText(filePath: String, onCompleted: @escaping (String?) -> Void) {
@@ -187,6 +180,24 @@ final class MessageInputViewModel {
         )
     }
 
+    private func makeSendCompletion(onSuccess: (() -> Void)? = nil) -> CompletionClosure {
+        return { [weak self] result in
+            guard let self else {
+                Self.toastSendFailure(result)
+                return
+            }
+            self.handleSendResult(result)
+            if case .success = result {
+                onSuccess?()
+            }
+        }
+    }
+
+    static func toastSendFailure(_ result: Result<Void, ErrorInfo>) {
+        guard case .failure(let error) = result else { return }
+        WindowToastManager.shared.error(failureReason(from: error))
+    }
+
     private func handleSendResult(_ result: Result<Void, ErrorInfo>) {
         switch result {
         case .success:
@@ -209,12 +220,14 @@ final class MessageInputViewModel {
     }
 
     private func notifySendFailure(_ reason: String) {
+        let deliver = { [weak self] in
+            if self?.onSendFailure?(reason) == true { return }
+            WindowToastManager.shared.error(reason)
+        }
         if Thread.isMainThread {
-            onSendFailure?(reason)
+            deliver()
         } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.onSendFailure?(reason)
-            }
+            DispatchQueue.main.async(execute: deliver)
         }
     }
 

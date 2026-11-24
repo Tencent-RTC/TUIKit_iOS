@@ -17,6 +17,10 @@ enum ConversationSendStatusIndicator {
 
 enum ConversationCellFormatter {
 
+    private static let callIconWidth: CGFloat = 12
+
+    private static let callIconSpacing: CGFloat = 4
+
     // MARK: - Time
 
     static func timeText(for conversation: ConversationInfo) -> String? {
@@ -60,9 +64,13 @@ enum ConversationCellFormatter {
             return result
         }
 
-        let finalText = finalSubtitleText(for: conversation, countUnit: countUnit)
+        let abstract = MessageDisplayHelper.getMessageAbstract(conversation.lastMessage)
         result.append(makeAttr(atTag, error, font))
-        result.append(emojiRenderedAttr(finalText, color: secondary, font: font))
+        appendUnreadPrefixIfNeeded(to: result, conversation: conversation, countUnit: countUnit, color: secondary, font: font)
+        if !abstract.isEmpty, let mediaType = callMediaType(of: conversation.lastMessage) {
+            result.append(callIconAttr(mediaType, color: secondary, font: font))
+        }
+        result.append(emojiRenderedAttr(abstract, color: secondary, font: font))
         return result
     }
 
@@ -79,12 +87,63 @@ enum ConversationCellFormatter {
         result.append(makeAttr("[\(conversation.unreadCount)\(countUnit)] ", color, font))
     }
 
-    private static func finalSubtitleText(for conversation: ConversationInfo, countUnit: String) -> String {
-        let subtitle = MessageDisplayHelper.getMessageAbstract(conversation.lastMessage)
-        if conversation.receiveOption != .receive, conversation.unreadCount > 0 {
-            return "[\(conversation.unreadCount)\(countUnit)] \(subtitle)"
+    private static func callMediaType(of message: MessageInfo?) -> CallStreamMediaType? {
+        guard let message = message,
+              message.messageType == .custom,
+              message.status != .revoked,
+              message.status != .violation,
+              let model = CallMessageParser.parse(message),
+              model.streamMediaType != .unknown else {
+            return nil
         }
-        return subtitle
+        return model.streamMediaType
+    }
+
+    private static func callIconAttr(_ mediaType: CallStreamMediaType, color: UIColor, font: UIFont) -> NSAttributedString {
+        guard let source = callIconImage(for: mediaType), source.size.width > 0 else {
+            return NSAttributedString()
+        }
+        let width = callIconWidth
+        let height = width * source.size.height / source.size.width
+        let attachment = NSTextAttachment()
+        attachment.image = source.withTintColor(color, renderingMode: .alwaysOriginal)
+        let center = (font.ascender + font.descender) / 2
+        attachment.bounds = CGRect(x: 0, y: center - height / 2, width: width, height: height)
+        let result = NSMutableAttributedString(attachment: attachment)
+        result.append(callIconSpacerAttr())
+        return result
+    }
+
+    private static func callIconImage(for mediaType: CallStreamMediaType) -> UIImage? {
+        let name = mediaType == .voice ? "message_call_audio" : "message_call_video"
+        guard let source = AtomicXChatResources.image(named: name) else {
+            return nil
+        }
+        guard mediaType == .video else {
+            return source
+        }
+        return horizontallyFlippedImage(source)
+    }
+
+    private static func horizontallyFlippedImage(_ image: UIImage) -> UIImage {
+        guard let cgImage = image.cgImage else {
+            return image.withHorizontallyFlippedOrientation()
+        }
+        let rawImage = UIImage(cgImage: cgImage, scale: image.scale, orientation: .up)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        format.opaque = false
+        return UIGraphicsImageRenderer(size: rawImage.size, format: format).image { context in
+            context.cgContext.translateBy(x: rawImage.size.width, y: 0)
+            context.cgContext.scaleBy(x: -1, y: 1)
+            rawImage.draw(in: CGRect(origin: .zero, size: rawImage.size))
+        }
+    }
+
+    private static func callIconSpacerAttr() -> NSAttributedString {
+        let spacer = NSTextAttachment()
+        spacer.bounds = CGRect(x: 0, y: 0, width: callIconSpacing, height: 0)
+        return NSAttributedString(attachment: spacer)
     }
 
     private static func emojiRenderedAttr(_ text: String, color: UIColor, font: UIFont) -> NSAttributedString {
