@@ -9,16 +9,30 @@ struct ListenPlaybackState {
 }
 
 struct ListenItem {
+    let messageID: String
     let speechText: String
     let audioPath: String?
 }
 
 enum ListenPlanBuilder {
+    static func isEligible(_ message: MessageInfo) -> Bool {
+        guard !message.msgID.isEmpty, message.status != .revoked,
+              message.status != .deleted, message.status != .violation else { return false }
+        switch (message.messageType, message.messagePayload) {
+        case (.text, .text(let payload)):
+            return TtsPlaybacker.hasSpeakableText(payload.text)
+        case (.image, .image), (.video, .video), (.file, .file), (.merged, .merged), (.audio, .audio):
+            return true
+        default:
+            return false
+        }
+    }
 
     static func build(messages: [MessageInfo]) -> [ListenItem] {
         var items: [ListenItem] = []
         var lastSpeakerKey: String?
         for message in messages {
+            guard isEligible(message) else { continue }
             let speakerKey = message.isSentBySelf ? "self" : "user:\(message.from.userID)"
             let speaker = message.isSentBySelf
                 ? LocalizedChatString("VoiceListenSelfSpeaker")
@@ -32,19 +46,22 @@ enum ListenPlanBuilder {
                 let speechText = sameAsPrevious
                     ? content
                     : String(format: LocalizedChatString("VoiceListenSaysFormat"), speaker) + content
-                items.append(ListenItem(speechText: speechText, audioPath: nil))
+                items.append(ListenItem(messageID: message.msgID, speechText: speechText, audioPath: nil))
             case .image:
                 items.append(ListenItem(
+                    messageID: message.msgID,
                     speechText: mediaSpeech(formatKey: "VoiceListenSentImageFormat", speaker: speaker, omitName: sameAsPrevious),
                     audioPath: nil
                 ))
             case .video:
                 items.append(ListenItem(
+                    messageID: message.msgID,
                     speechText: mediaSpeech(formatKey: "VoiceListenSentVideoFormat", speaker: speaker, omitName: sameAsPrevious),
                     audioPath: nil
                 ))
             case .file:
                 items.append(ListenItem(
+                    messageID: message.msgID,
                     speechText: mediaSpeech(formatKey: "VoiceListenSentFileFormat", speaker: speaker, omitName: sameAsPrevious),
                     audioPath: nil
                 ))
@@ -53,6 +70,7 @@ enum ListenPlanBuilder {
                 let title = payload.title
                 let name = sameAsPrevious ? "" : speaker
                 items.append(ListenItem(
+                    messageID: message.msgID,
                     speechText: String(format: LocalizedChatString("VoiceListenSentMergedFormat"), name, title)
                         .trimmingCharacters(in: .whitespaces),
                     audioPath: nil
@@ -69,7 +87,7 @@ enum ListenPlanBuilder {
                 let speechText = sameAsPrevious
                     ? ""
                     : String(format: LocalizedChatString("VoiceListenSaysFormat"), speaker)
-                items.append(ListenItem(speechText: speechText, audioPath: path))
+                items.append(ListenItem(messageID: message.msgID, speechText: speechText, audioPath: path))
             default:
                 continue
             }
@@ -140,6 +158,22 @@ final class ListenFromHereController {
         playCurrent(showLoading: true, currentSession: currentSession)
     }
 
+    func updateValidMessageIDs(_ messageIDs: Set<String>) {
+        guard active, queue.indices.contains(index) else { return }
+        let currentMessageID = queue[index].messageID
+        let remaining = queue[index...].filter { messageIDs.contains($0.messageID) }
+        queue = Array(queue.prefix(index)) + remaining
+        guard !messageIDs.contains(currentMessageID) else { return }
+        session += 1
+        teardownAudioPlayer()
+        tts.stop(notifyCompletion: false)
+        if queue.indices.contains(index) {
+            playCurrent(showLoading: true, currentSession: session)
+        } else {
+            stop()
+        }
+    }
+
     func stop() {
         let wasActive = active || state.isActive
         active = false
@@ -147,7 +181,7 @@ final class ListenFromHereController {
         index = -1
         queue = []
         teardownAudioPlayer()
-        tts.stop()
+        tts.stop(notifyCompletion: false)
         if wasActive {
             state = ListenPlaybackState()
         }
@@ -155,7 +189,8 @@ final class ListenFromHereController {
 
     private func playCurrent(showLoading: Bool, currentSession: Int) {
         guard active, currentSession == session, index >= 0, index < queue.count else { return }
-        let item = queue[index]
+        let currentIndex = index
+        let item = queue[currentIndex]
         state.currentText = item.speechText
         state.isLoading = showLoading
 
@@ -173,10 +208,12 @@ final class ListenFromHereController {
             voiceId: voiceId,
             removeSymbols: true,
             onStart: { [weak self] in
-                self?.clearLoading(currentSession: currentSession)
+                guard let self, self.index == currentIndex else { return }
+                self.clearLoading(currentSession: currentSession)
             },
             onComplete: { [weak self] in
-                guard let self, self.active, currentSession == self.session else { return }
+                guard let self, self.active, currentSession == self.session,
+                      self.index == currentIndex else { return }
                 if let audioPath = item.audioPath, !audioPath.isEmpty {
                     self.playAudio(audioPath: audioPath, currentSession: currentSession)
                 } else {
@@ -184,7 +221,8 @@ final class ListenFromHereController {
                 }
             },
             onError: { [weak self] _ in
-                guard let self, self.active, currentSession == self.session else { return }
+                guard let self, self.active, currentSession == self.session,
+                      self.index == currentIndex else { return }
                 self.advance(currentSession: currentSession)
             }
         )
@@ -213,7 +251,8 @@ final class ListenFromHereController {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            guard let self, self.active, currentSession == self.session else { return }
+            guard let self, self.active, currentSession == self.session,
+                  self.audioPlayerItem === item else { return }
             self.advance(currentSession: currentSession)
         }
         audioFailedObserver = NotificationCenter.default.addObserver(
@@ -221,7 +260,8 @@ final class ListenFromHereController {
             object: item,
             queue: .main
         ) { [weak self] _ in
-            guard let self, self.active, currentSession == self.session else { return }
+            guard let self, self.active, currentSession == self.session,
+                  self.audioPlayerItem === item else { return }
             self.advance(currentSession: currentSession)
         }
 
@@ -233,6 +273,7 @@ final class ListenFromHereController {
 
     private func advance(currentSession: Int) {
         guard active, currentSession == session else { return }
+        teardownAudioPlayer()
         index += 1
         if index >= queue.count {
             stop()

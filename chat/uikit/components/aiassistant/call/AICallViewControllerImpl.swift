@@ -339,7 +339,7 @@ internal final class AICallViewControllerImpl: NSObject {
     private func renderState(_ state: AICallState) {
         currentState = state
         let showMuted = isMuted && (state == .listening || state == .idle)
-        orbView.setState(showMuted ? .listening : state)
+        orbView.setState(isMuted ? .listening : state)
         let key: String
         if showMuted {
             key = "DemoAICallMuted"

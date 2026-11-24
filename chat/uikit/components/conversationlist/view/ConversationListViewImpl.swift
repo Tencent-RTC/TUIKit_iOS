@@ -15,6 +15,8 @@ enum ConversationActionIDs {
 final class ConversationListViewImpl: RTCBaseView {
     private static let rowHeight: CGFloat = 72
 
+    private static let loadMoreThreshold = 3
+
     private let onConversationClick: (ConversationInfo) -> Void
 
     private let config: ConversationActionConfig
@@ -253,6 +255,12 @@ extension ConversationListViewImpl: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let conversation = conversations[indexPath.row]
         onConversationClick(conversation)
+    }
+
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row >= conversations.count - Self.loadMoreThreshold {
+            viewModel.loadMoreIfNeeded()
+        }
     }
 
     public func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

@@ -310,6 +310,9 @@
 "MessageReadPartDisable" = "人无状态";
 "MessageReadAllRead" = "全部已读";
 "MessageReactionUserSuffix" = "等%1$d人";
+"MessageReactionFailed" = "添加表情回应失败";
+"MessageReactionCountLimit" = "该消息的表情回应数量已达上限";
+"MessageReactionUserCountLimit" = "该表情的回应人数已达上限";
 "MessageReadC2CRead" = "已读";
 "MessageReadC2CUnRead" = "未读";
 "MessageReadC2CUnReadDetail" = "尚未阅读";

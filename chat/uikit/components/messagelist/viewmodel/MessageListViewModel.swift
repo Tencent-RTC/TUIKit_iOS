@@ -23,6 +23,10 @@ final class MessageListViewModel {
 
     private static let syncRepairHoldTimeoutSeconds: TimeInterval = 5
 
+    private static let reactionCountLimitCode = 23005
+
+    private static let reactionUserCountLimitCode = 23006
+
     let conversationID: String
 
     let config: ChatMessageListConfig
@@ -247,10 +251,14 @@ final class MessageListViewModel {
         let actionStore = MessageActionStore.create(message: current)
         let completion: (Result<Void, ErrorInfo>) -> Void = { [weak self] result in
             guard let self = self else { return }
-            if case .failure = result {
+            if case .failure(let error) = result {
                 DispatchQueue.main.async {
-                    guard let idx = self.messageList.firstIndex(where: { $0.msgID == message.msgID }) else { return }
-                    self.messageList[idx].reactionList = snapshot
+                    if let idx = self.messageList.firstIndex(where: { $0.msgID == message.msgID }) {
+                        self.messageList[idx].reactionList = snapshot
+                    }
+                    if isAdd {
+                        WindowToastManager.shared.warning(Self.addReactionFailureText(code: Int(error.code)))
+                    }
                 }
             }
         }
@@ -617,6 +625,17 @@ final class MessageListViewModel {
 
     private func visiblePlaceholderSignatures() -> [String] {
         return visiblePlaceholders().map { placeholderSignature($0) }
+    }
+
+    private static func addReactionFailureText(code: Int) -> String {
+        switch code {
+        case reactionCountLimitCode:
+            return LocalizedChatString("MessageReactionCountLimit")
+        case reactionUserCountLimitCode:
+            return LocalizedChatString("MessageReactionUserCountLimit")
+        default:
+            return LocalizedChatString("MessageReactionFailed")
+        }
     }
 
     private func makeOptimisticReactionList(from list: [MessageReaction], reactionID: String, add: Bool) -> [MessageReaction] {

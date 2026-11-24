@@ -60,11 +60,15 @@ class VideoPlayer: ObservableObject {
         }
 
         let player = AVPlayer(url: videoURL)
+        Self.activatePlaybackAudioSession()
         let playerVC = AVPlayerViewController()
         playerVC.player = player
 
         let containerVC = VideoPlayerContainerViewController(playerViewController: playerVC)
-        containerVC.onDismiss = onDismiss
+        containerVC.onDismiss = {
+            Self.deactivatePlaybackAudioSession()
+            onDismiss?()
+        }
         containerVC.modalPresentationStyle = .fullScreen
         containerVC.modalTransitionStyle = .crossDissolve
 
@@ -86,9 +90,24 @@ class VideoPlayer: ObservableObject {
         player = nil
         currentVideoData = nil
         isPresented = false
+        Self.deactivatePlaybackAudioSession()
     }
 
     private init() {}
+
+    private static func activatePlaybackAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback, mode: .moviePlayback)
+            try session.setActive(true)
+        } catch {
+            print("VideoPlayer: AVAudioSession setup failed: \(error.localizedDescription)")
+        }
+    }
+
+    private static func deactivatePlaybackAudioSession() {
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    }
 
     private func setupPlayer(with videoData: VideoData) {
         let videoURL: URL
@@ -103,6 +122,7 @@ class VideoPlayer: ObservableObject {
         let newPlayer = AVPlayer(playerItem: playerItem)
 
         newPlayer.automaticallyWaitsToMinimizeStalling = false
+        Self.activatePlaybackAudioSession()
 
         NotificationCenter.default.addObserver(
             forName: .AVPlayerItemDidPlayToEndTime,

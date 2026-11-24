@@ -29,7 +29,7 @@ public final class MessageListView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
 
     func hostVisibilityDidChange(_ isVisible: Bool) {
         impl.hostVisibilityDidChange(isVisible)
@@ -82,6 +82,7 @@ public struct MessageContentContext {
     public weak var messageListStore: MessageListStore?
     public var onMediaTap: ((MessageInfo) -> Void)? = nil
     public var onMergedMessageTap: ((MessageInfo) -> Void)? = nil
+    internal weak var audioPlaybackScope: ChatAudioPlaybackScope? = nil
 }
 
 public protocol MessageContentView: UIView {

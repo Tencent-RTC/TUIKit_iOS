@@ -19,7 +19,7 @@ final class MessageInputView: UIView {
     init(conversationID: String,
          config: ChatMessageInputConfig = ChatMessageInputConfig(),
          chatbotController: ChatbotConversationController? = nil,
-         onSendFailure: ((String) -> Void)? = nil,
+         onSendFailure: ((String) -> Bool)? = nil,
          onPeerTypingChanged: ((Bool) -> Void)? = nil)
     {
         impl = MessageInputViewImpl(

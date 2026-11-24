@@ -74,6 +74,33 @@ final class TtsTextProcessor {
         return result.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private static let maximumSpeechUTF8Bytes = 255
+    private static let speechBoundaries = CharacterSet.whitespacesAndNewlines
+        .union(CharacterSet(charactersIn: "。！？；.!?;"))
+
+    func speechChunks(text: String) -> [String] {
+        guard text.utf8.count > Self.maximumSpeechUTF8Bytes else { return text.isEmpty ? [] : [text] }
+        let scalars = Array(text.unicodeScalars)
+        var chunks: [String] = []
+        var start = 0
+        while start < scalars.count {
+            var end = start
+            var byteCount = 0
+            var boundary: Int?
+            while end < scalars.count {
+                let nextByteCount = String(scalars[end]).utf8.count
+                guard byteCount + nextByteCount <= Self.maximumSpeechUTF8Bytes else { break }
+                byteCount += nextByteCount
+                end += 1
+                if Self.speechBoundaries.contains(scalars[end - 1]) { boundary = end }
+            }
+            let chunkEnd = end == scalars.count ? end : boundary ?? end
+            chunks.append(String(String.UnicodeScalarView(scalars[start..<chunkEnd])))
+            start = chunkEnd
+        }
+        return chunks
+    }
+
     // MARK: - Universal emoji pattern
 
     init() {

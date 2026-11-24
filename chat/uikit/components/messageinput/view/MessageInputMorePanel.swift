@@ -33,6 +33,10 @@ final class MessageInputMorePanel: UIView {
 
     fileprivate static let columns = 4
 
+    fileprivate static let rowsPerPage = 2
+
+    fileprivate static var pageSize: Int { columns * rowsPerPage }
+
     fileprivate static let iconSize: CGFloat = 56
 
     fileprivate static let iconTileCornerRadius: CGFloat = CGFloat(RadiusScheme.alertRadius)
@@ -51,6 +55,8 @@ final class MessageInputMorePanel: UIView {
 
     private let collectionView: UICollectionView
 
+    private let pageControl = UIPageControl()
+
     private var collectionBottomConstraint: Constraint?
 
     private var actions: [MessageInputMenuAction] = []
@@ -59,10 +65,10 @@ final class MessageInputMorePanel: UIView {
 
     init(config: ChatMessageInputConfig) {
         self.config = config
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = Self.itemVerticalSpacing * 2
+        let layout = MorePanelPagedGridLayout(columns: Self.columns, rows: Self.rowsPerPage)
+        layout.rowSpacing = Self.itemVerticalSpacing * 2
+        let size = MessageInputAppearanceApplier.dimension(config._appearance?.morePanel?.itemSize, fallback: Self.iconSize)
+        layout.itemHeight = size + Self.titleTopSpacing + Self.titleAreaHeight + Self.itemVerticalSpacing
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         super.init(frame: .zero)
         setupActions()
@@ -76,6 +82,7 @@ final class MessageInputMorePanel: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         MessageInputAppearanceApplier.update(self)
+        updateCurrentPage()
     }
 
     private func setupActions() {
@@ -137,7 +144,8 @@ final class MessageInputMorePanel: UIView {
             defaultColor: TUIChatKitTheme.colors.bgColorOperate)
         collectionView.backgroundColor = .clear
         LanguageHelper.applyLayoutDirection(to: collectionView)
-        collectionView.isScrollEnabled = false
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(MorePanelCell.self, forCellWithReuseIdentifier: MorePanelCell.reuseID)
@@ -147,6 +155,31 @@ final class MessageInputMorePanel: UIView {
             collectionBottomConstraint = make.bottom.equalToSuperview()
                 .inset(Self.panelPadding).constraint
         }
+        let colors = TUIChatKitTheme.colors
+        pageControl.isUserInteractionEnabled = false
+        pageControl.hidesForSinglePage = true
+        pageControl.pageIndicatorTintColor = colors.textColorDisable
+        pageControl.currentPageIndicatorTintColor = colors.textColorPrimary
+        pageControl.numberOfPages = pageCount
+        pageControl.currentPage = 0
+        addSubview(pageControl)
+        pageControl.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(Self.panelPadding)
+        }
+    }
+
+    private var pageCount: Int {
+        return max(1, (actions.count + Self.pageSize - 1) / Self.pageSize)
+    }
+
+    fileprivate func updateCurrentPage() {
+        let width = collectionView.bounds.width
+        guard width > 0 else { return }
+        let rawPage = Int((collectionView.contentOffset.x + width / 2) / width)
+        let page = collectionView.effectiveUserInterfaceLayoutDirection == .rightToLeft ? pageCount - 1 - rawPage : rawPage
+        pageControl.currentPage = min(max(page, 0), pageCount - 1)
     }
 }
 
@@ -189,22 +222,83 @@ extension MessageInputMorePanel: UICollectionViewDelegate {
         }
         action.onClick()
     }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        updateCurrentPage()
+    }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
+private final class MorePanelPagedGridLayout: UICollectionViewLayout {
+    var itemHeight: CGFloat = 0
 
-extension MessageInputMorePanel: UICollectionViewDelegateFlowLayout {
+    var rowSpacing: CGFloat = 0
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        layout collectionViewLayout: UICollectionViewLayout,
-        sizeForItemAt indexPath: IndexPath
-    ) -> CGSize {
-        let availableWidth = collectionView.bounds.width
-        let itemWidth = floor(availableWidth / CGFloat(Self.columns))
-        let size = MessageInputAppearanceApplier.dimension(config._appearance?.morePanel?.itemSize, fallback: Self.iconSize)
-        let itemHeight = size + Self.titleTopSpacing + Self.titleAreaHeight + Self.itemVerticalSpacing
-        return CGSize(width: itemWidth, height: itemHeight)
+    private let columns: Int
+
+    private let rows: Int
+
+    private var cachedAttributes: [UICollectionViewLayoutAttributes] = []
+
+    private var contentWidth: CGFloat = 0
+
+    init(columns: Int, rows: Int) {
+        self.columns = columns
+        self.rows = rows
+        super.init()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var flipsHorizontallyInOppositeLayoutDirection: Bool {
+        return true
+    }
+
+    override var collectionViewContentSize: CGSize {
+        return CGSize(width: contentWidth, height: collectionView?.bounds.height ?? 0)
+    }
+
+    override func prepare() {
+        super.prepare()
+        cachedAttributes = []
+        contentWidth = 0
+        guard let collectionView, collectionView.numberOfSections > 0 else { return }
+        let pageWidth = collectionView.bounds.width
+        let count = collectionView.numberOfItems(inSection: 0)
+        guard pageWidth > 0, count > 0 else { return }
+        let pageSize = columns * rows
+        let pageCount = (count + pageSize - 1) / pageSize
+        contentWidth = pageWidth * CGFloat(pageCount)
+        let itemWidth = floor(pageWidth / CGFloat(columns))
+        let columnGap = columns > 1 ? max(pageWidth - itemWidth * CGFloat(columns), 0) / CGFloat(columns - 1) : 0
+        for index in 0..<count {
+            let page = index / pageSize
+            let slot = index % pageSize
+            let column = slot % columns
+            let row = slot / columns
+            let attributes = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: index, section: 0))
+            attributes.frame = CGRect(
+                x: CGFloat(page) * pageWidth + CGFloat(column) * (itemWidth + columnGap),
+                y: CGFloat(row) * (itemHeight + rowSpacing),
+                width: itemWidth,
+                height: itemHeight
+            )
+            cachedAttributes.append(attributes)
+        }
+    }
+
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        return cachedAttributes.filter { $0.frame.intersects(rect) }
+    }
+
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard cachedAttributes.indices.contains(indexPath.item) else { return nil }
+        return cachedAttributes[indexPath.item]
+    }
+
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        return newBounds.size != collectionView?.bounds.size
     }
 }
 

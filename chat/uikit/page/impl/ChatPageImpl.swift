@@ -139,7 +139,7 @@ internal final class ChatPageImpl: PageImplementation {
             config: messageInputConfig,
             chatbotController: chatbotController,
             onSendFailure: { [weak self] reason in
-                self?.showSendFailure(reason)
+                self?.showSendFailure(reason) ?? false
             },
             onPeerTypingChanged: messageListConfig._enableTyping ? { [weak self] isTyping in
                 self?.updateTitleForPeerTyping(isTyping)
@@ -465,8 +465,9 @@ internal final class ChatPageImpl: PageImplementation {
         messageInputView.backgroundColor = colors.bgColorOperate
     }
 
-    private func showSendFailure(_ reason: String) {
-        guard !reason.isEmpty else { return }
+    private func showSendFailure(_ reason: String) -> Bool {
+        guard !reason.isEmpty else { return true }
+        guard isViewLoaded, view.window != nil else { return false }
         sendFailureHideWorkItem?.cancel()
         sendFailureLabel.text = reason
         sendFailureBar.isHidden = false
@@ -482,6 +483,7 @@ internal final class ChatPageImpl: PageImplementation {
             deadline: .now() + Self.failureBarDisplayDuration,
             execute: hideWorkItem
         )
+        return true
     }
 
     private func hideSendFailure() {

@@ -3,3 +3,8 @@
 "ShowGroupChat" = "Start Group Chat";
 "ShowContacts" = "Contacts";
 "StartVideoCall" = "Start Video Call";
+"ConfigurationRequired" = "Configuration Required";
+"ConfigurationGuide" = "Set a valid SDKAppID and SecretKey in Sources/GenerateTestUserSig.swift, then rebuild and run the demo.";
+"OK" = "OK";
+"C2CChatTitle" = "Chat with %@";
+"GroupChatTitle" = "Test group: %@";

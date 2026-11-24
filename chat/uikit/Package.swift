@@ -5,8 +5,8 @@ let package = Package(
     name: "TUIChatKit", defaultLocalization: "en", platforms: [.iOS(.v15)],
     products: [.library(name: "TUIChatKit", targets: ["TUIChatKit"])],
     dependencies: [
-        .package(url: "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git", from: "5.2.0"),
-        .package(url: "https://github.com/Tencent-RTC/Chat_SDK_SwiftPM.git", from: "9.1.7824"),
+        .package(url: "https://github.com/Tencent-RTC/AtomicXCore_SwiftPM.git", "3.0.0"..<"5.0.0"),
+        .package(url: "https://github.com/Tencent-RTC/Chat_SDK_SwiftPM.git", from: "9.1.7834"),
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.7.1"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", exact: "7.12.0"),
     ],
@@ -39,8 +39,8 @@ let package = Package(
         .binaryTarget(
             name: "tui_cmark_gfm",
             url:
-                "https://im.sdk.cloud.tencent.cn/download/tuichatkit/tui-cmark-gfm/0.29.0.15/tui_cmark_gfm.xcframework.zip",
-            checksum: "7593e23aea0e0d14f2d1d705477ae0d471e5eb4c65782e4641d933d01d164338"),
+                "https://im.sdk.cloud.tencent.cn/download/tuichatkit/tui-cmark-gfm/0.29.17/tui_cmark_gfm.xcframework.zip",
+            checksum: "152a813b99b7ac8923444ecfd282490835f99ae938318f3512f3624252f9ff85"),
         .binaryTarget(
             name: "TXLiteAVSDK_VoiceAI_iOS", url: "https://dl.gmertc.com/voiceai/13.6.0/VoiceAI_iOS_sdk_13.6.0.255.zip",
             checksum: "4d1d0c49b3b1213d50bbb8ed3840802bce5f391f7e3a0d99135f9560fcc18dff"),

@@ -310,6 +310,9 @@
 "MessageReadPartDisable" = "disable read";
 "MessageReadAllRead" = "Read by All";
 "MessageReactionUserSuffix" = "and %1$d others";
+"MessageReactionFailed" = "Failed to add reaction";
+"MessageReactionCountLimit" = "This message has reached the reaction limit";
+"MessageReactionUserCountLimit" = "This reaction has reached the user limit";
 "MessageReadC2CRead" = "Read";
 "MessageReadC2CUnRead" = "Unread";
 "MessageReadC2CUnReadDetail" = "Unread";

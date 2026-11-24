@@ -44,7 +44,7 @@ final class MessageInputViewImpl: UIView {
 
     private let config: ChatMessageInputConfig
 
-    private let onSendFailure: ((String) -> Void)?
+    private let onSendFailure: ((String) -> Bool)?
 
     private let onPeerTypingChanged: ((Bool) -> Void)?
 
@@ -122,6 +122,8 @@ final class MessageInputViewImpl: UIView {
     private var quotePreviewBarHeightConstraint: Constraint?
 
     private var currentInputContainerHeight: CGFloat = MessageInputViewImpl.defaultInputContainerHeight
+
+    private var currentTextInputContainerHeight: CGFloat = MessageInputViewImpl.defaultInputContainerHeight
 
     private var currentEmojiPanelHeight: CGFloat = 0
 
@@ -207,7 +209,7 @@ final class MessageInputViewImpl: UIView {
     init(conversationID: String,
          config: ChatMessageInputConfig = ChatMessageInputConfig(),
          chatbotController: ChatbotConversationController? = nil,
-         onSendFailure: ((String) -> Void)? = nil,
+         onSendFailure: ((String) -> Bool)? = nil,
          onPeerTypingChanged: ((Bool) -> Void)? = nil) {
         let viewModel = MessageInputViewModel(conversationID: conversationID, config: config)
         self.viewModel = viewModel
@@ -223,7 +225,7 @@ final class MessageInputViewImpl: UIView {
         }
         super.init(frame: .zero)
         viewModel.onSendFailure = { [weak self] reason in
-            self?.onSendFailure?(reason)
+            self?.onSendFailure?(reason) ?? false
         }
         if let chatbotController {
             viewModel.onTextMessageSent = { [weak chatbotController] in
@@ -405,11 +407,8 @@ final class MessageInputViewImpl: UIView {
         messageTextView.onSend = { [weak self] in self?.sendText() }
         messageTextView.onHeightChanged = { [weak self] height in
             guard let self = self else { return }
-            let minimumHeight = MessageInputAppearanceApplier.dimension(self.config._appearance?.field?.minHeight, fallback: Self.defaultInputContainerHeight)
-            let resolvedHeight = max(height, minimumHeight)
-            self.inputContainerHeightConstraint?.update(offset: resolvedHeight)
-            self.currentInputContainerHeight = resolvedHeight
-            self.invalidateIntrinsicContentSize()
+            self.currentTextInputContainerHeight = height
+            self.syncInputContainerHeight()
         }
         messageTextView.onContentChanged = { [weak self] _ in
             self?.handleContentChanged()
@@ -572,10 +571,16 @@ final class MessageInputViewImpl: UIView {
         )
         MessageInputAppearanceApplier.apply(fill: appearance?.field?.fill, to: inputContainer, defaultColor: colors.bgColorInput)
         voiceLabel.textColor = appearance?.field?.textColor ?? colors.textColorPrimary
-        if let height = appearance?.field?.minHeight, height.isFinite, height > currentInputContainerHeight {
-            currentInputContainerHeight = height
-            inputContainerHeightConstraint?.update(offset: height)
-        }
+        syncInputContainerHeight()
+    }
+
+    private func syncInputContainerHeight() {
+        let minimumHeight = MessageInputAppearanceApplier.dimension(config._appearance?.field?.minHeight, fallback: Self.defaultInputContainerHeight)
+        let height = isVoiceInputMode ? minimumHeight : max(currentTextInputContainerHeight, minimumHeight)
+        guard currentInputContainerHeight != height else { return }
+        currentInputContainerHeight = height
+        inputContainerHeightConstraint?.update(offset: height)
+        invalidateIntrinsicContentSize()
     }
 
     private func applyButtonAppearances() {
@@ -1094,6 +1099,8 @@ final class MessageInputViewImpl: UIView {
         hideEmojiPanel()
         hideMorePanel()
         updateSendButtonVisibility()
+        syncInputContainerHeight()
+        animateLayout()
         postInputInteract()
     }
 
@@ -1106,6 +1113,9 @@ final class MessageInputViewImpl: UIView {
             for: .normal
         )
         updateSendButtonVisibility()
+        syncInputContainerHeight()
+        messageTextView.setNeedsLayout()
+        animateLayout()
         postInputInteract()
     }
 

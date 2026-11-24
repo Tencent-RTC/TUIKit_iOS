@@ -39,6 +39,10 @@ final class ConversationCell: UITableViewCell {
 
     private static let menuHighlightAlpha: CGFloat = 0.08
 
+    private static let menuHighlightDarkSurfaceAlpha: CGFloat = 0.13
+
+    private static let darkSurfaceLuminanceThreshold: CGFloat = 0.5
+
     private static let statusSubtitleSpacing: CGFloat = CGFloat(SpacingScheme.iconTextSpacing)
 
     private let avatarContainer = UIView()
@@ -87,7 +91,24 @@ final class ConversationCell: UITableViewCell {
     // MARK: - Configure
 
     func setMenuHighlighted(_ highlighted: Bool) {
+        if highlighted {
+            menuHighlightOverlay.backgroundColor = menuHighlightColor()
+        }
         menuHighlightOverlay.isHidden = !highlighted
+    }
+
+    private func menuHighlightColor() -> UIColor {
+        let surface = backgroundColor ?? TUIChatKitTheme.colors.bgColorOperate
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        surface.resolvedColor(with: traitCollection).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        let luminance = 0.299 * red + 0.587 * green + 0.114 * blue
+        if luminance < Self.darkSurfaceLuminanceThreshold {
+            return UIColor.white.withAlphaComponent(Self.menuHighlightDarkSurfaceAlpha)
+        }
+        return UIColor.black.withAlphaComponent(Self.menuHighlightAlpha)
     }
 
     func setSeparatorHidden(_ hidden: Bool) {
@@ -240,7 +261,7 @@ final class ConversationCell: UITableViewCell {
         statusImageView.tintColor = colors.textColorError
         statusImageView.contentMode = .scaleAspectFit
 
-        sendingIndicator.color = colors.textColorAntiSecondary
+        sendingIndicator.color = colors.textColorSecondary
         sendingIndicator.hidesWhenStopped = true
         sendingIndicator.transform = CGAffineTransform(scaleX: Self.sendingIndicatorScale, y: Self.sendingIndicatorScale)
 

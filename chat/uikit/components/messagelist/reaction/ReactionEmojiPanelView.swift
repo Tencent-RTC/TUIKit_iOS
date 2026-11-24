@@ -208,10 +208,10 @@ final class ReactionEmojiPanelView: UIView {
     private func quickEmojiList() -> [EmojiData] {
         let allEmojis = EmojiManager.shared.getPickerEmojis()
         guard !allEmojis.isEmpty else { return [] }
-        let emojiByName = Dictionary(uniqueKeysWithValues: allEmojis.compactMap { emoji -> (String, EmojiData)? in
+        let emojiByName = Dictionary(allEmojis.compactMap { emoji -> (String, EmojiData)? in
             guard let name = emoji.name else { return nil }
             return (name, emoji)
-        })
+        }, uniquingKeysWith: { first, _ in first })
         var orderedNames: [String] = []
         orderedNames += message.reactionList.filter { $0.reactedByMyself }.map { $0.reactionID }
         let recentGroupID = EmojiManager.shared.reactionGroupID()

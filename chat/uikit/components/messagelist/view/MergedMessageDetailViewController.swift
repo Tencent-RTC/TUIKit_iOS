@@ -21,6 +21,7 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
     private var pendingHighlightIndex: Int?
 
     private var mediaObservers: [NSObjectProtocol] = []
+    private let audioPlaybackScope = ChatAudioPlaybackScope()
 
     private static let mediaDownloadNotificationName = Notification.Name(rawValue: "messageMediaDownload")
 
@@ -90,6 +91,16 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
         bindInteraction()
         observeMediaDownloadNotifications()
         loadMergedMessages()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        audioPlaybackScope.setVisible(true)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        audioPlaybackScope.setVisible(false)
     }
 
     deinit {
@@ -251,7 +262,8 @@ final class MergedMessageDetailViewController: UIViewController, SystemNavigatio
             onMergedMessageTap: { [weak self] tapped in
                 guard tapped.status != .violation else { return }
                 self?.openInnerMergedDetail(tapped)
-            }
+            },
+            audioPlaybackScope: audioPlaybackScope
         )
     }
 

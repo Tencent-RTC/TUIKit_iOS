@@ -13,7 +13,7 @@ public final class ContactsPage: UIViewController {
             config: config ?? ContactListConfig(),
             onContactClick: onContactClick,
             onGroupClick: onGroupClick)
-
+        
         super.init(nibName: nil, bundle: nil)
         implementation.owner = self
     }

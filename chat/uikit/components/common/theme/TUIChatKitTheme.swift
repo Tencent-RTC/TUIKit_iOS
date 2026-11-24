@@ -92,8 +92,8 @@ public struct TUIChatKitColorScheme {
     public init() {}
 
     private func dynamic(_ keyPath: KeyPath<SemanticColorScheme, UIColor>) -> UIColor {
-        return UIColor { _ in
-            ThemeState.shared.colors[keyPath: keyPath]
+        return UIColor { traits in
+            ThemeState.shared.colors(resolvingWith: traits)[keyPath: keyPath]
         }
     }
 }

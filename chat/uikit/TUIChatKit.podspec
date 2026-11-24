@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
     s.name             = 'TUIChatKit'
-    s.version          = '9.1.7825'
+    s.version          = '9.1.7826'
     s.summary          = 'AtomicX Chat Component'
     s.description      = 'Chat streaming component for AtomicX'
     s.homepage         = 'https://cloud.tencent.com/document/product/269'

@@ -1,6 +1,6 @@
 import Foundation
 
-enum ChatCallEventPublisher {
+public enum ChatCallEventPublisher {
     /// TUICallKit_Swift 的 ChatCallEventSubscriber 保持一致。
     static let startCallEventName = Notification.Name("tuicallkit.startCall")
     static let startJoinEventName = Notification.Name("tuicallkit.startJoin")
@@ -11,9 +11,9 @@ enum ChatCallEventPublisher {
     static let keyTimeout = "timeout"
     static let keyCallID = "callId"
 
-    static let defaultTimeoutSeconds = 30
+    public static let defaultTimeoutSeconds = 30
 
-    enum MediaType: String {
+    public enum MediaType: String {
         case audio
         case video
     }
@@ -24,7 +24,7 @@ enum ChatCallEventPublisher {
     ///   - mediaType: 媒体类型（语音/视频）
     ///   - chatGroupID: 群聊场景下的群 ID，单聊传 nil
     ///   - timeout: 信令超时时间（秒）
-    static func publishStartCall(
+    public static func publishStartCall(
         participantIDs: [String],
         mediaType: MediaType,
         chatGroupID: String? = nil,
