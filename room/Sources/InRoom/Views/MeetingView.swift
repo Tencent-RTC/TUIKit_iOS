@@ -109,6 +109,7 @@ public final class MeetingView: UIView {
     }
 
     private func enterRoom() {
+        RoomDataReporter.reportComponent()
         enteringView.setShown(true)
         switch behavior {
         case .createAndJoinRoom(let options):
