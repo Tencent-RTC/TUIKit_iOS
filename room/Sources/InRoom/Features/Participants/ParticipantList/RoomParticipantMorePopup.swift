@@ -5,14 +5,12 @@ import AtomicXCore
 final class RoomParticipantMorePopup: UIView {
 
     private weak var popup: RoomPopup?
-    private let roomID: String
     private let participantStore: RoomParticipantStore
 
     private let chatMuteRow = UIButton(type: .custom)
     private let shareRow = UIButton(type: .custom)
 
     init(roomID: String) {
-        self.roomID = roomID
         participantStore = RoomParticipantStore.create(roomID: roomID)
         super.init(frame: .zero)
         setupViews()

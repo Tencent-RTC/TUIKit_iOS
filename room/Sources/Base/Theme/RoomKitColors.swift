@@ -60,6 +60,10 @@ extension UIColor {
     public static let roomKitFgIcon = UIColor(argbHex: 0xFF3A393A)
     public static let roomKitToggleOff = UIColor(argbHex: 0xFFE5E5EA)
     public static let roomKitSharePlaceholderBg = UIColor(argbHex: 0xFFF4F4F4)
+    public static let roomKitCaptionOverlay = UIColor(argbHex: 0x94101218)
+    public static let roomKitCaptionBorder = UIColor(argbHex: 0x14FFFFFF)
+    public static let roomKitCaptionName = UIColor(argbHex: 0xEBFFFFFF)
+    public static let roomKitCaptionTranslation = UIColor(argbHex: 0x9EFFFFFF)
 }
 
 extension UIColor {

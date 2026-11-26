@@ -3,11 +3,8 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-protocol MeetingToolBarTitleDisplaying: AnyObject {
+protocol MeetingToolBarPopupItem: AnyObject {
     var showsTitle: Bool { get set }
-}
-
-protocol MeetingToolBarPopupItem: MeetingToolBarTitleDisplaying {
     var routerContext: RouterContext? { get set }
     var onRequestDismiss: (() -> Void)? { get set }
 }
@@ -36,6 +33,7 @@ final class MeetingToolBar: UIView {
     private let partButton: RoomParticipantButton
     private let screenShareButton: RoomScreenShareButton
     private let recordingButton: RoomRecordingButton
+    private let captionButton: CaptionButton
     private let settingsButton = RoomSettingsButton()
 
     private let stack = UIStackView()
@@ -61,6 +59,7 @@ final class MeetingToolBar: UIView {
         self.partButton = RoomParticipantButton(roomID: roomID)
         self.screenShareButton = RoomScreenShareButton(roomID: roomID)
         self.recordingButton = RoomRecordingButton(roomID: roomID)
+        self.captionButton = CaptionButton(roomID: roomID)
         super.init(frame: .zero)
         setupViews()
         setupConstraints()
@@ -71,6 +70,14 @@ final class MeetingToolBar: UIView {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func showTranscript() {
+        captionButton.showTranscript(in: self)
+    }
+
+    func stopTranscription() {
+        captionButton.stopTranscription()
     }
 
     private func setupViews() {
@@ -119,6 +126,7 @@ final class MeetingToolBar: UIView {
             partButton,
             screenShareButton,
         ]
+        buttons.append(captionButton)
         if recordingButton.isAvailable { buttons.append(recordingButton) }
         buttons.append(settingsButton)
         return buttons
@@ -162,9 +170,11 @@ final class MeetingToolBar: UIView {
     private func wireFeatureButtons() {
         screenShareButton.routerContext = routerContext
         recordingButton.routerContext = routerContext
+        captionButton.routerContext = routerContext
         settingsButton.routerContext = routerContext
         screenShareButton.onRequestDismiss = { [weak self] in self?.dismissMorePopup() }
         recordingButton.onRequestDismiss = { [weak self] in self?.dismissMorePopup() }
+        captionButton.onRequestDismiss = { [weak self] in self?.dismissMorePopup() }
         settingsButton.onRequestDismiss = { [weak self] in self?.dismissMorePopup() }
     }
 }
@@ -211,7 +221,7 @@ private extension MeetingToolBar {
 
     private func makeOverflowItems() -> [UIView] {
         guard needsMoreButton else { return [] }
-        var items: [UIView] = []
+        var items: [UIView] = [CaptionButton(roomID: roomID)]
         if recordingButton.isAvailable {
             items.append(RoomRecordingButton(roomID: roomID))
         }
@@ -224,7 +234,7 @@ private extension MeetingToolBar {
         grid.axis = .vertical
         grid.alignment = .fill
         grid.spacing = Self.menuRowSpacing
-        items.forEach { ($0 as? MeetingToolBarTitleDisplaying)?.showsTitle = true }
+        items.forEach { ($0 as? MeetingToolBarPopupItem)?.showsTitle = true }
         var index = 0
         while index < items.count {
             let rowItems = Array(items[index..<min(index + Self.menuColumnCount, items.count)])

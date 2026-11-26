@@ -31,7 +31,7 @@ public final class RoomQuickStartView: UIView {
     private let cameraSwitch = UISwitch()
 
     private let submitButton = UIButton(type: .custom)
-    private let enteringView = RoomLoadingView()
+    private let enteringView = MeetingLoadingView()
 
     public init() {
         super.init(frame: .zero)
@@ -242,7 +242,7 @@ public final class RoomQuickStartView: UIView {
     private func startMeeting(roomName: String, isMicrophoneOn: Bool, isSpeakerOn: Bool, isCameraOn: Bool) {
         guard !isPushing else { return }
         isPushing = true
-        enteringView.setShown(true)
+        enteringView.show()
         generateUnusedRoomID { [weak self] roomID in
             guard let self else { return }
             let finalName = roomName.isEmpty ? roomID : roomName

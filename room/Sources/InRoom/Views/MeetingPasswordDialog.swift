@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-final class RoomPasswordDialog: UIViewController {
+final class MeetingPasswordDialog: UIViewController {
 
     static func present(
         in host: UIView,
@@ -10,7 +10,7 @@ final class RoomPasswordDialog: UIViewController {
         onCancel: @escaping () -> Void
     ) {
         guard let presenter = viewController(from: host) else { return }
-        let dialog = RoomPasswordDialog(wrongPassword: wrongPassword, onSubmit: onSubmit, onCancel: onCancel)
+        let dialog = MeetingPasswordDialog(wrongPassword: wrongPassword, onSubmit: onSubmit, onCancel: onCancel)
         dialog.modalPresentationStyle = .overFullScreen
         dialog.modalTransitionStyle = .crossDissolve
         presenter.present(dialog, animated: true) { dialog.startEditing() }
@@ -70,62 +70,62 @@ final class RoomPasswordDialog: UIViewController {
         contentStack.addArrangedSubview(fieldRow)
         contentStack.addArrangedSubview(errorLabel)
         contentStack.addArrangedSubview(makeActions())
-        contentStack.setCustomSpacing(Self.titleBottomSpacing, after: titleLabel)
-        contentStack.setCustomSpacing(Self.noErrorSpacing, after: fieldRow)
-        contentStack.setCustomSpacing(Self.footerSpacing, after: errorLabel)
+        contentStack.setCustomSpacing(20, after: titleLabel)
+        contentStack.setCustomSpacing(16, after: fieldRow)
+        contentStack.setCustomSpacing(16, after: errorLabel)
 
         fieldRow.addSubview(field)
         fieldRow.addSubview(eyeButton)
 
         cardView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.leading.greaterThanOrEqualToSuperview().offset(Self.maskInset)
-            $0.trailing.lessThanOrEqualToSuperview().offset(-Self.maskInset)
-            $0.width.lessThanOrEqualTo(Self.cardMaxWidth)
+            $0.leading.greaterThanOrEqualToSuperview().offset(20)
+            $0.trailing.lessThanOrEqualToSuperview().offset(-20)
+            $0.width.lessThanOrEqualTo(420)
         }
         cardCenterY = cardView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         cardCenterY?.isActive = true
 
         contentStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(Self.cardInset)
+            $0.edges.equalToSuperview().inset(36)
         }
 
         fieldRow.snp.makeConstraints {
-            $0.height.equalTo(Self.fieldHeight)
+            $0.height.equalTo(44)
         }
         field.snp.makeConstraints {
-            $0.leading.equalToSuperview().offset(Self.fieldHorizontalInset)
-            $0.trailing.equalToSuperview().offset(-Self.fieldHorizontalInset)
+            $0.leading.equalToSuperview().offset(44)
+            $0.trailing.equalToSuperview().offset(-44)
             $0.top.bottom.equalToSuperview()
         }
         eyeButton.snp.makeConstraints {
-            $0.size.equalTo(Self.eyeSize)
-            $0.trailing.equalToSuperview().offset(-Self.eyeTrailing)
+            $0.size.equalTo(32)
+            $0.trailing.equalToSuperview().offset(-10)
             $0.centerY.equalToSuperview()
         }
     }
 
     private func setupStyles() {
         cardView.backgroundColor = UIColor.roomKitBgSurface
-        cardView.layer.cornerRadius = Self.cardCorner
+        cardView.layer.cornerRadius = 24
         cardView.clipsToBounds = true
 
         titleLabel.text = .joinPasswordTitle
-        titleLabel.font = .systemFont(ofSize: Self.titleFontSize, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
         titleLabel.textColor = UIColor.roomKitFgPrimary
         titleLabel.textAlignment = .center
 
-        fieldRow.layer.cornerRadius = Self.fieldCorner
-        fieldRow.layer.borderWidth = Self.fieldBorderWidth
+        fieldRow.layer.cornerRadius = 12
+        fieldRow.layer.borderWidth = 1.5
         fieldRow.backgroundColor = UIColor.roomKitBgSurface
 
         field.isSecureTextEntry = true
         field.keyboardType = .numberPad
         field.textAlignment = .center
         field.textColor = UIColor.roomKitFgPrimary
-        field.font = .monospacedDigitSystemFont(ofSize: Self.fieldFontSize, weight: .regular)
+        field.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
         var textAttributes = field.defaultTextAttributes
-        textAttributes[.kern] = Self.fieldKern
+        textAttributes[.kern] = 1.8
         field.defaultTextAttributes = textAttributes
         field.attributedPlaceholder = NSAttributedString(
             string: .joinPasswordPlaceholder,
@@ -133,7 +133,7 @@ final class RoomPasswordDialog: UIViewController {
         )
         field.inputAccessoryView = makeDoneToolbar()
 
-        errorLabel.font = .systemFont(ofSize: Self.errorFontSize)
+        errorLabel.font = .systemFont(ofSize: 11)
         errorLabel.textColor = UIColor.roomKitDanger
         errorLabel.textAlignment = .center
         errorLabel.numberOfLines = 0
@@ -142,10 +142,10 @@ final class RoomPasswordDialog: UIViewController {
         cancelButton.setTitle(.commonCancel, for: .normal)
         confirmButton.setTitle(.joinConfirm, for: .normal)
         [cancelButton, confirmButton].forEach { button in
-            button.titleLabel?.font = .systemFont(ofSize: Self.buttonFontSize, weight: .semibold)
-            button.layer.cornerRadius = Self.buttonCorner
+            button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+            button.layer.cornerRadius = 12
             button.clipsToBounds = true
-            button.snp.makeConstraints { $0.height.equalTo(Self.buttonHeight) }
+            button.snp.makeConstraints { $0.height.equalTo(42) }
         }
         cancelButton.backgroundColor = UIColor.roomKitBgHover
         cancelButton.setTitleColor(UIColor.roomKitFgPrimary, for: .normal)
@@ -167,7 +167,7 @@ final class RoomPasswordDialog: UIViewController {
                 self.showError(.joinPasswordPlaceholder)
                 return
             }
-            guard password.count == Self.passwordMaxLength else {
+            guard password.count == 6 else {
                 self.showError(.joinPasswordPlaceholder)
                 return
             }
@@ -194,14 +194,14 @@ final class RoomPasswordDialog: UIViewController {
     private func showError(_ message: String) {
         errorLabel.text = message
         errorLabel.isHidden = false
-        contentStack.setCustomSpacing(Self.errorTopSpacing, after: fieldRow)
+        contentStack.setCustomSpacing(8, after: fieldRow)
         refreshBorder()
     }
 
     private func clearError() {
         guard !errorLabel.isHidden else { return }
         errorLabel.isHidden = true
-        contentStack.setCustomSpacing(Self.noErrorSpacing, after: fieldRow)
+        contentStack.setCustomSpacing(16, after: fieldRow)
         refreshBorder()
     }
 
@@ -215,8 +215,8 @@ final class RoomPasswordDialog: UIViewController {
     }
 
     @objc private func handleEditingChanged() {
-        if let text = field.text, text.count > Self.passwordMaxLength {
-            field.text = String(text.prefix(Self.passwordMaxLength))
+        if let text = field.text, text.count > 6 {
+            field.text = String(text.prefix(6))
         }
         clearError()
     }
@@ -254,7 +254,7 @@ final class RoomPasswordDialog: UIViewController {
         let actions = UIStackView(arrangedSubviews: [cancelButton, confirmButton])
         actions.axis = .horizontal
         actions.distribution = .fillEqually
-        actions.spacing = Self.buttonSpacing
+        actions.spacing = 10
         return actions
     }
 
@@ -276,35 +276,6 @@ final class RoomPasswordDialog: UIViewController {
         }
         return nil
     }
-
-    private static let cardMaxWidth: CGFloat = 420
-    private static let cardInset: CGFloat = 36
-    private static let cardCorner: CGFloat = 24
-    private static let maskInset: CGFloat = 20
-
-    private static let titleFontSize: CGFloat = 17
-    private static let titleBottomSpacing: CGFloat = 20
-
-    private static let fieldHeight: CGFloat = 44
-    private static let fieldCorner: CGFloat = 12
-    private static let fieldBorderWidth: CGFloat = 1.5
-    private static let fieldFontSize: CGFloat = 15
-    private static let fieldKern: CGFloat = 15 * 0.12
-    private static let fieldHorizontalInset: CGFloat = 44
-    private static let passwordMaxLength = 6
-
-    private static let eyeSize: CGFloat = 32
-    private static let eyeTrailing: CGFloat = 10
-
-    private static let errorFontSize: CGFloat = 11
-    private static let errorTopSpacing: CGFloat = 8
-    private static let footerSpacing: CGFloat = 16
-    private static let noErrorSpacing: CGFloat = 16
-
-    private static let buttonHeight: CGFloat = 42
-    private static let buttonSpacing: CGFloat = 10
-    private static let buttonFontSize: CGFloat = 13
-    private static let buttonCorner: CGFloat = 12
 }
 
 private final class EyeToggleButton: UIControl {

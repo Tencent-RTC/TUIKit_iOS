@@ -3,7 +3,7 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-final class RoomRecordingButton: UIControl, MeetingToolBarTitleDisplaying {
+final class RoomRecordingButton: UIControl {
 
     var onRequestDismiss: (() -> Void)?
 

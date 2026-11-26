@@ -25,11 +25,12 @@ final class RoomParticipantListView: UIView {
 
     private let titleText = UILabel()
     private let searchInput = UITextField()
-    private let searchEmptyView = UIView()
-    private let searchEmptyImageView = UIImageView()
-    private let searchEmptyTitleLabel = UILabel()
-    private let searchEmptyDescLabel = UILabel()
-    private let searchEmptyClearButton = UIButton(type: .system)
+    private let emptyView = UIView()
+    private let emptyImageView = UIImageView()
+    private let emptyTitleLabel = UILabel()
+    private let emptyDescLabel = UILabel()
+    private let clearButton = UIButton(type: .system)
+    private let joinedHeader = RoomParticipantSectionView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let footer = UIStackView()
     private let muteAllMicrophoneButton = UIButton(type: .custom)
@@ -39,14 +40,8 @@ final class RoomParticipantListView: UIView {
     private var roomID: String
     private var participants: [RoomParticipant] = []
     private var keyword: String = ""
-    private var joinedCollapsed = false
-    private var screenSharerID: String?
-
-    private enum Row: Equatable {
-        case section(title: String, count: Int)
-        case participant(RoomParticipant, isSelf: Bool, isActionable: Bool)
-    }
-    private var rows: [Row] = []
+    private var isCollapsed = false
+    private var displayedParticipants: [RoomParticipant] = []
 
     init(roomID: String) {
         self.roomID = roomID
@@ -65,8 +60,9 @@ final class RoomParticipantListView: UIView {
     private func setupViews() {
         addSubview(titleText)
         addSubview(searchInput)
+        addSubview(joinedHeader)
         addSubview(tableView)
-        addSubview(searchEmptyView)
+        addSubview(emptyView)
         addSubview(footer)
         footer.addArrangedSubview(muteAllMicrophoneButton)
         footer.addArrangedSubview(muteAllCameraButton)
@@ -85,12 +81,17 @@ final class RoomParticipantListView: UIView {
             $0.trailing.equalToSuperview().offset(-16)
             $0.height.equalTo(32)
         }
-        tableView.snp.makeConstraints {
+        joinedHeader.snp.makeConstraints {
             $0.top.equalTo(searchInput.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(28)
+        }
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(joinedHeader.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(footer.snp.top).offset(-10)
         }
-        searchEmptyView.snp.makeConstraints {
+        emptyView.snp.makeConstraints {
             $0.top.equalTo(searchInput.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(footer.snp.top).offset(-10)
@@ -145,38 +146,39 @@ final class RoomParticipantListView: UIView {
 
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
+        tableView.rowHeight = 50
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 16, right: 0)
         tableView.dataSource = self
 
-        searchEmptyView.isHidden = true
-        searchEmptyImageView.image = RoomKitResources.image(named: "roomkit_ill_participant_search_empty")
-        searchEmptyImageView.contentMode = .scaleAspectFit
-        searchEmptyTitleLabel.text = .participantsSearchEmpty
-        searchEmptyTitleLabel.font = .systemFont(ofSize: 13, weight: .semibold)
-        searchEmptyTitleLabel.textColor = UIColor.roomKitFgPrimary
-        searchEmptyTitleLabel.textAlignment = .center
-        searchEmptyDescLabel.font = .systemFont(ofSize: 11)
-        searchEmptyDescLabel.textColor = UIColor.roomKitFgTertiary
-        searchEmptyDescLabel.textAlignment = .center
-        searchEmptyDescLabel.numberOfLines = 0
-        searchEmptyClearButton.setTitle(.participantsClearSearch, for: .normal)
-        searchEmptyClearButton.setTitleColor(UIColor.roomKitFgPrimary, for: .normal)
-        searchEmptyClearButton.titleLabel?.font = .systemFont(ofSize: 11, weight: .medium)
-        searchEmptyClearButton.backgroundColor = UIColor.white
-        searchEmptyClearButton.layer.cornerRadius = 15
-        searchEmptyClearButton.layer.borderWidth = 1
-        searchEmptyClearButton.layer.borderColor = UIColor.roomKitBorder.cgColor
-        searchEmptyClearButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
-        searchEmptyClearButton.snp.makeConstraints { $0.height.equalTo(30) }
+        emptyView.isHidden = true
+        emptyImageView.image = RoomKitResources.image(named: "roomkit_ill_participant_search_empty")
+        emptyImageView.contentMode = .scaleAspectFit
+        emptyTitleLabel.text = .participantsSearchEmpty
+        emptyTitleLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        emptyTitleLabel.textColor = UIColor.roomKitFgPrimary
+        emptyTitleLabel.textAlignment = .center
+        emptyDescLabel.font = .systemFont(ofSize: 11)
+        emptyDescLabel.textColor = UIColor.roomKitFgTertiary
+        emptyDescLabel.textAlignment = .center
+        emptyDescLabel.numberOfLines = 0
+        clearButton.setTitle(.participantsClearSearch, for: .normal)
+        clearButton.setTitleColor(UIColor.roomKitFgPrimary, for: .normal)
+        clearButton.titleLabel?.font = .systemFont(ofSize: 11, weight: .medium)
+        clearButton.backgroundColor = UIColor.white
+        clearButton.layer.cornerRadius = 15
+        clearButton.layer.borderWidth = 1
+        clearButton.layer.borderColor = UIColor.roomKitBorder.cgColor
+        clearButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
+        clearButton.snp.makeConstraints { $0.height.equalTo(30) }
 
         let emptyStack = UIStackView(arrangedSubviews: [
-            searchEmptyImageView, searchEmptyTitleLabel, searchEmptyDescLabel, searchEmptyClearButton,
+            emptyImageView, emptyTitleLabel, emptyDescLabel, clearButton,
         ])
         emptyStack.axis = .vertical
         emptyStack.alignment = .center
         emptyStack.spacing = 4
-        emptyStack.setCustomSpacing(16, after: searchEmptyDescLabel)
-        searchEmptyView.addSubview(emptyStack)
+        emptyStack.setCustomSpacing(16, after: emptyDescLabel)
+        emptyView.addSubview(emptyStack)
         emptyStack.snp.makeConstraints {
             $0.centerY.equalToSuperview()
             $0.leading.greaterThanOrEqualToSuperview().offset(20)
@@ -185,13 +187,12 @@ final class RoomParticipantListView: UIView {
         }
         tableView.delegate = self
         tableView.register(
-            RoomParticipantSectionCell.self,
-            forCellReuseIdentifier: RoomParticipantSectionCell.reuseIdentifier
-        )
-        tableView.register(
             RoomParticipantListCell.self,
             forCellReuseIdentifier: RoomParticipantListCell.reuseIdentifier
         )
+
+        joinedHeader.setTitle(.participantsJoined)
+        joinedHeader.updateCollapsed(isCollapsed)
 
         footer.spacing = 8
         footer.distribution = .fillEqually
@@ -219,20 +220,25 @@ final class RoomParticipantListView: UIView {
 
     private func setupBindings() {
         searchInput.addTarget(self, action: #selector(searchTextChanged), for: .editingChanged)
-        searchEmptyClearButton.addTarget(self, action: #selector(clearSearch), for: .touchUpInside)
+        clearButton.addTarget(self, action: #selector(clearSearch), for: .touchUpInside)
 
         muteAllMicrophoneButton.addTarget(self, action: #selector(toggleAllMicrophones), for: .touchUpInside)
         muteAllCameraButton.addTarget(self, action: #selector(toggleAllCameras), for: .touchUpInside)
         moreButton.addTarget(self, action: #selector(showMorePopup), for: .touchUpInside)
+        joinedHeader.onTap = { [weak self] in
+            guard let self else { return }
+            isCollapsed.toggle()
+            joinedHeader.updateCollapsed(isCollapsed)
+            updateList()
+        }
 
-        let store = RoomParticipantStore.create(roomID: roomID)
-        store.state.subscribe(StatePublisherSelector(keyPath: \RoomParticipantState.participantList))
+        let participantStore = RoomParticipantStore.create(roomID: roomID)
+        participantStore.state.subscribe(StatePublisherSelector(keyPath: \RoomParticipantState.participantList))
             .receive(on: RunLoop.main)
             .sink { [weak self] participants in
                 guard let self else { return }
                 self.participants = participants
                 self.updateList()
-                self.updateTitle(count: participants.count)
             }
             .store(in: &cancellableSet)
 
@@ -240,11 +246,13 @@ final class RoomParticipantListView: UIView {
             .receive(on: RunLoop.main)
             .sink { [weak self] room in
                 guard let self, let room, room.roomID == self.roomID else { return }
+                self.updateTitle(count: room.participantCount)
+                self.joinedHeader.updateCount(room.participantCount)
                 self.updateFooter(room: room)
             }
             .store(in: &cancellableSet)
 
-        store.state.subscribe(StatePublisherSelector(keyPath: \RoomParticipantState.localParticipant))
+        participantStore.state.subscribe(StatePublisherSelector(keyPath: \RoomParticipantState.localParticipant))
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self,
@@ -254,12 +262,6 @@ final class RoomParticipantListView: UIView {
             }
             .store(in: &cancellableSet)
 
-        store.state.subscribe(StatePublisherSelector(keyPath: \RoomParticipantState.participantWithScreen))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] screenParticipant in
-                self?.screenSharerID = screenParticipant?.userID
-            }
-            .store(in: &cancellableSet)
     }
 
     private func updateTitle(count: Int) {
@@ -269,53 +271,56 @@ final class RoomParticipantListView: UIView {
     }
 
     private func updateList() {
-        let filtered = keyword.isEmpty
-            ? participants
-            : participants.filter { $0.displayName.localizedCaseInsensitiveContains(keyword) }
+        let filtered = filteredParticipants()
+        updateSearchEmptyState(for: filtered)
+        displayedParticipants = isCollapsed ? [] : filtered
+        tableView.reloadData()
+    }
+
+    private func filteredParticipants() -> [RoomParticipant] {
+        guard !keyword.isEmpty else { return participants }
+        return participants.filter { $0.displayName.localizedCaseInsensitiveContains(keyword) }
+    }
+
+    private func updateSearchEmptyState(for filtered: [RoomParticipant]) {
         let showEmpty = filtered.isEmpty && !keyword.isEmpty
-        searchEmptyView.isHidden = !showEmpty
+        emptyView.isHidden = !showEmpty
+        joinedHeader.isHidden = showEmpty
         tableView.isHidden = showEmpty
         if showEmpty {
-            let text = String(format: .participantsSearchEmptyDesc, keyword)
-            let attributed = NSMutableAttributedString(
-                string: text,
-                attributes: [
-                    .font: UIFont.systemFont(ofSize: 11),
-                    .foregroundColor: UIColor.roomKitFgTertiary,
-                ]
+            updateSearchEmptyDescription()
+        }
+    }
+
+    private func updateSearchEmptyDescription() {
+        let text = String(format: .participantsSearchEmptyDesc, keyword)
+        let attributed = NSMutableAttributedString(
+            string: text,
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 11),
+                .foregroundColor: UIColor.roomKitFgTertiary,
+            ]
+        )
+        if let range = text.range(of: keyword) {
+            attributed.addAttributes(
+                [
+                    .font: UIFont.systemFont(ofSize: 11, weight: .semibold),
+                    .foregroundColor: UIColor.roomKitFgPrimary,
+                ],
+                range: NSRange(range, in: text)
             )
-            if let range = text.range(of: keyword) {
-                attributed.addAttributes(
-                    [
-                        .font: UIFont.systemFont(ofSize: 11, weight: .semibold),
-                        .foregroundColor: UIColor.roomKitFgPrimary,
-                    ],
-                    range: NSRange(range, in: text)
-                )
-            }
-            searchEmptyDescLabel.attributedText = attributed
         }
-        let localUserID = LoginStore.shared.state.value.loginUserInfo?.userID ?? ""
-        let localRole = participants.first { $0.userID == localUserID }?.role
-        var next: [Row] = [.section(title: .participantsJoined, count: filtered.count)]
-        if !joinedCollapsed {
-            filtered.forEach { participant in
-                let isSelf = participant.userID == localUserID
-                let isActionable = isSelf || (localRole?.canManage(participant.role) ?? false)
-                next.append(.participant(participant, isSelf: isSelf, isActionable: isActionable))
-            }
-        }
-        let previousRows = rows
-        rows = next
-        guard previousRows.count == next.count else {
-            tableView.reloadData()
-            return
-        }
-        let changedRows = zip(previousRows, next).enumerated().compactMap { index, rows in
-            rows.0 == rows.1 ? nil : IndexPath(row: index, section: 0)
-        }
-        guard !changedRows.isEmpty else { return }
-        tableView.reloadRows(at: changedRows, with: .none)
+        emptyDescLabel.attributedText = attributed
+    }
+
+    private func isSelf(_ participant: RoomParticipant) -> Bool {
+        participant.userID == LoginStore.shared.state.value.loginUserInfo?.userID
+    }
+
+    private func canAction(on participant: RoomParticipant) -> Bool {
+        if isSelf(participant) { return true }
+        let localRole = RoomParticipantStore.create(roomID: roomID).state.value.localParticipant?.role
+        return localRole?.canManage(participant.role) ?? false
     }
 
     private func updateFooter(room: RoomInfo) {
@@ -377,52 +382,31 @@ final class RoomParticipantListView: UIView {
         popup.show(room: room, in: self)
     }
 
-    private func showActionPopup(participant: RoomParticipant) {
-        let popup = RoomParticipantActionPopup(roomID: roomID)
-        popup.show(target: participant, in: self)
-    }
 }
 
 extension RoomParticipantListView: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        rows.count
-    }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if case .section = rows[indexPath.row] { return 28 }
-        return 50
+        displayedParticipants.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch rows[indexPath.row] {
-        case let .section(title, count):
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: RoomParticipantSectionCell.reuseIdentifier,
-                for: indexPath
-            ) as! RoomParticipantSectionCell
-            cell.bind(title: title, count: count, collapsed: joinedCollapsed)
-            cell.onToggle = { [weak self] in
-                guard let self else { return }
-                joinedCollapsed.toggle()
-                updateList()
-            }
-            return cell
-        case let .participant(value, isSelf, isActionable):
-            let cell = tableView.dequeueReusableCell(
-                withIdentifier: RoomParticipantListCell.reuseIdentifier,
-                for: indexPath
-            ) as! RoomParticipantListCell
-            cell.selectionStyle = isActionable ? .default : .none
-            cell.bind(participant: value, isSelf: isSelf, isSharing: value.userID == screenSharerID)
-            return cell
-        }
+        let participant = displayedParticipants[indexPath.row]
+        let cell = tableView.dequeueReusableCell(
+            withIdentifier: RoomParticipantListCell.reuseIdentifier,
+            for: indexPath
+        ) as! RoomParticipantListCell
+        cell.selectionStyle = canAction(on: participant) ? .default : .none
+        cell.bind(participant: participant)
+        return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard case let .participant(value, _, _) = rows[indexPath.row] else { return }
-        showActionPopup(participant: value)
+        let participant = displayedParticipants[indexPath.row]
+        guard canAction(on: participant) else { return }
+        let popup = RoomParticipantActionPopup(roomID: roomID)
+        popup.show(target: participant, in: self)
     }
 }
 
@@ -444,21 +428,20 @@ private extension String {
     static var participantsCamOnAllDone: String { RoomKitResources.localizedString("roomkit.participants.cam_on_all_done") }
 }
 
-final class RoomParticipantSectionCell: UITableViewCell {
+private final class RoomParticipantSectionView: UIView {
 
-    static let reuseIdentifier = "RoomParticipantSectionCell"
-
-    var onToggle: (() -> Void)?
+    var onTap: (() -> Void)?
 
     private let titleText = UILabel()
     private let countText = UILabel()
     private let chevron = UIImageView()
 
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setupViews()
         setupConstraints()
         setupStyles()
+        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap)))
     }
 
     @available(*, unavailable)
@@ -467,9 +450,9 @@ final class RoomParticipantSectionCell: UITableViewCell {
     }
 
     private func setupViews() {
-        contentView.addSubview(titleText)
-        contentView.addSubview(countText)
-        contentView.addSubview(chevron)
+        addSubview(titleText)
+        addSubview(countText)
+        addSubview(chevron)
     }
 
     private func setupConstraints() {
@@ -490,7 +473,6 @@ final class RoomParticipantSectionCell: UITableViewCell {
     }
 
     private func setupStyles() {
-        selectionStyle = .none
         backgroundColor = .clear
         titleText.font = .boldSystemFont(ofSize: 11)
         titleText.textColor = UIColor.roomKitFgSecondary
@@ -500,18 +482,22 @@ final class RoomParticipantSectionCell: UITableViewCell {
         chevron.image = RoomKitResources.image(named: "roomkit_icon_chevron_right_tertiary")
     }
 
-    func bind(title: String, count: Int, collapsed: Bool) {
+    func setTitle(_ title: String) {
         titleText.text = title
-        countText.text = "(\(count))"
+    }
+
+    func updateCollapsed(_ collapsed: Bool) {
         UIView.performWithoutAnimation {
             chevron.transform = collapsed ? .identity : CGAffineTransform(rotationAngle: .pi / 2)
         }
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        if selected {
-            onToggle?()
-        }
+    func updateCount(_ count: Int) {
+        countText.text = "(\(count))"
+        countText.isHidden = count == 0
+    }
+
+    @objc private func handleTap() {
+        onTap?()
     }
 }

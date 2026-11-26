@@ -1208,6 +1208,57 @@
         }
       }
     },
+    "roomkit.main.screen_share_banned_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "温馨提示"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Friendly reminder"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_banned_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如需体验该功能请联系我们"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please contact us to experience this feature"
+          }
+        }
+      }
+    },
+    "roomkit.main.screen_share_banned_contact": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "联系我们"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contact us"
+          }
+        }
+      }
+    },
     "roomkit.main.screen_share_live": {
       "extractionState": "manual",
       "localizations": {
@@ -3688,6 +3739,167 @@
             "value": "Settings"
           }
         }
+      }
+    },
+    "roomkit_caption_copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "已复制转写" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Transcript copied" } }
+      }
+    },
+    "roomkit_caption_copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "复制转写" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Copy transcript" } }
+      }
+    },
+    "roomkit_caption_language_en": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "English(英语)" } },
+        "en": { "stringUnit": { "state": "translated", "value": "English(English)" } }
+      }
+    },
+    "roomkit_caption_language_ja": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "日本語(日语)" } },
+        "en": { "stringUnit": { "state": "translated", "value": "日本語(Japanese)" } }
+      }
+    },
+    "roomkit_caption_language_ko": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "한국어(韩语)" } },
+        "en": { "stringUnit": { "state": "translated", "value": "한국어(Korean)" } }
+      }
+    },
+    "roomkit_caption_language_zh": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "中文" } },
+        "en": { "stringUnit": { "state": "translated", "value": "中文(Chinese)" } }
+      }
+    },
+    "roomkit_caption_enable_bilingual": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "开启双语字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Bilingual captions" } }
+      }
+    },
+    "roomkit_caption_jump_latest": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "回到最新" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Back to latest" } }
+      }
+    },
+    "roomkit_caption_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无转写内容" } },
+        "en": { "stringUnit": { "state": "translated", "value": "No transcript yet" } }
+      }
+    },
+    "roomkit_caption_search_native": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "搜索字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Search captions" } }
+      }
+    },
+    "roomkit_caption_settings_native": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "字幕设置" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Caption settings" } }
+      }
+    },
+    "roomkit_caption_source_language": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "识别语言" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Source language" } }
+      }
+    },
+    "roomkit_caption_view_full": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "查看完整字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "View full transcript" } }
+      }
+    },
+    "roomkit_caption_close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "关闭字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Turn off captions" } }
+      }
+    },
+    "roomkit_caption_entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Captions" } }
+      }
+    },
+    "roomkit_caption_full_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "完整字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Full transcript" } }
+      }
+    },
+    "roomkit_caption_search": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "搜索发言人或内容" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Search speaker or content" } }
+      }
+    },
+    "roomkit_caption_settings": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "字幕设置" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Caption settings" } }
+      }
+    },
+    "roomkit_transcription_empty_hint": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "发言后将自动显示在这里" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Speech will appear here as people talk" } }
+      }
+    },
+    "roomkit_transcription_no_match": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "没有找到匹配的转写" } },
+        "en": { "stringUnit": { "state": "translated", "value": "No matching transcript" } }
+      }
+    },
+    "roomkit_caption_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "暂无转写内容" } },
+        "en": { "stringUnit": { "state": "translated", "value": "No transcript yet" } }
+      }
+    },
+    "roomkit_caption_back_latest": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "回到最新" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Back to latest" } }
+      }
+    },
+    "roomkit_caption_bilingual": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": { "stringUnit": { "state": "translated", "value": "开启双语字幕" } },
+        "en": { "stringUnit": { "state": "translated", "value": "Bilingual captions" } }
       }
     }
   },

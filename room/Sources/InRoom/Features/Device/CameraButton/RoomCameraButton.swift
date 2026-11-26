@@ -51,7 +51,6 @@ final class RoomCameraButton: UIControl {
         super.didMoveToWindow()
         guard window != nil else { return }
         applyTheme()
-        refreshPermission()
     }
 
     override func layoutSubviews() {
@@ -89,11 +88,10 @@ final class RoomCameraButton: UIControl {
         addTarget(self, action: #selector(handleTap), for: .touchUpInside)
         observeCameraStatus()
         observeRoomDisabled()
-        refreshPermission()
-        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.refreshPermission() }
+        RoomDevicePermission.cameraPermissionGranted
+            .sink { [weak self] _ in self?.hasPermission = true }
             .store(in: &cancellableSet)
+        hasPermission = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
     }
 }
 
@@ -126,10 +124,6 @@ extension RoomCameraButton {
             .store(in: &cancellableSet)
     }
 
-    private func refreshPermission() {
-        hasPermission = AVCaptureDevice.authorizationStatus(for: .video) == .authorized
-    }
-
     private func applyTheme() {
         backgroundColor = UIColor.roomKitBgHover
     }
@@ -157,7 +151,6 @@ extension RoomCameraButton {
         } else {
             if isRoomDisabled {
                 RoomToast.show(.deviceAllCamDisabled)
-                return
             } else {
                 RoomDevicePermission.requestCameraPermission { granted in
                     guard granted else {

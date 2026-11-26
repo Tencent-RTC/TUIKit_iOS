@@ -15,7 +15,7 @@ public struct RoomScreenShareError: Error {
 public final class RoomScreenShareLauncher {
 
     public static let shared = RoomScreenShareLauncher()
-    private var appGroup = ""
+    private var appGroup: String?
     private var preferredExtension = ""
 
     private let deviceStore = DeviceStore.shared
@@ -31,14 +31,14 @@ public final class RoomScreenShareLauncher {
         )
     }
 
-    public func configure(appGroup: String, preferredExtension: String) {
+    public func configure(appGroup: String? = nil, preferredExtension: String) {
         self.appGroup = appGroup
         self.preferredExtension = preferredExtension
     }
 
     public func start() throws {
         guard #available(iOS 12.0, *) else { return }
-        guard !appGroup.isEmpty, !preferredExtension.isEmpty else {
+        guard !preferredExtension.isEmpty else {
             throw RoomScreenShareError.notConfigured
         }
         let picker = RPSystemBroadcastPickerView(frame: CGRect(x: 0, y: 0, width: 44, height: 44))
@@ -60,7 +60,6 @@ public final class RoomScreenShareLauncher {
     @objc private func handleCapturedDidChange() {
         guard #available(iOS 11.0, *) else { return }
         let captured = UIScreen.main.isCaptured
-        NSLog("[ScreenShare] capturedDidChange isCaptured=%d isCapturing=%d", captured, isCapturing)
         guard captured else {
             scheduleStop()
             return
@@ -69,8 +68,7 @@ public final class RoomScreenShareLauncher {
         stopWorkItem = nil
         guard !isCapturing else { return }
         isCapturing = true
-        NSLog("[ScreenShare] startScreenShare appGroup=%@", appGroup)
-        deviceStore.startScreenShare(appGroup: appGroup)
+        deviceStore.startScreenShare(appGroup: appGroup ?? "")
     }
 
     private func scheduleStop() {

@@ -6,7 +6,6 @@ import AtomicXCore
 final class RoomParticipantActionPopup: UIView {
 
     private weak var popup: RoomPopup?
-    private let roomID: String
     private let participantStore: RoomParticipantStore
     private weak var presenter: UIViewController?
 
@@ -14,12 +13,11 @@ final class RoomParticipantActionPopup: UIView {
     private let stack = UIStackView()
     private var cancellableSet = Set<AnyCancellable>()
     private var targetUserID: String = ""
-    private var renderedTarget: RoomParticipant?
-    private var renderedLocalRole: ParticipantRole?
-    private var renderedChatMuted = false
+    private var lastRenderedTarget: RoomParticipant?
+    private var lastRenderedLocalRole: ParticipantRole?
+    private var lastRenderedChatMuted = false
 
     init(roomID: String) {
-        self.roomID = roomID
         participantStore = RoomParticipantStore.create(roomID: roomID)
         super.init(frame: .zero)
         setupViews()
@@ -100,10 +98,10 @@ final class RoomParticipantActionPopup: UIView {
         guard let local = state.localParticipant,
               let target = state.participantList.first(where: { $0.userID == targetUserID }) else { return }
         let chatMuted = state.messageDisabledUserList.contains { $0.userID == target.userID }
-        if target == renderedTarget, local.role == renderedLocalRole, chatMuted == renderedChatMuted { return }
-        renderedTarget = target
-        renderedLocalRole = local.role
-        renderedChatMuted = chatMuted
+        if target == lastRenderedTarget, local.role == lastRenderedLocalRole, chatMuted == lastRenderedChatMuted { return }
+        lastRenderedTarget = target
+        lastRenderedLocalRole = local.role
+        lastRenderedChatMuted = chatMuted
         stack.arrangedSubviews.forEach {
             stack.removeArrangedSubview($0)
             $0.removeFromSuperview()
@@ -334,7 +332,11 @@ final class RoomParticipantActionPopup: UIView {
                 store.updateParticipantNameCard(
                     userID: target.userID,
                     nameCard: name,
-                    completion: nil
+                    completion: { result in
+                        if case .failure(let error) = result {
+                            ErrorLocalized.showError(code: error.code, message: error.message)
+                        }
+                    }
                 )
             }
             .secondaryAction(.commonCancel)
@@ -352,11 +354,16 @@ final class RoomParticipantActionPopup: UIView {
                     if case .success = result {
                         RoomToast.show(RoomKitResources.localizedFormat("roomkit.participants.transfer_owner_done", target.displayName))
                     }
+                    if case .failure(let error) = result {
+                        ErrorLocalized.showError(code: error.code, message: error.message)
+                    }
                 }
             }
             .secondaryAction(.commonCancel)
             .show()
-        dismissDialogWhenInvalid(dialog) { self.isLocalOwner() && self.isTargetManageable() }
+        dismissDialogWhenInvalid(dialog) {
+            self.participantStore.state.value.localParticipant?.role == .owner && self.isTargetManageable()
+        }
     }
 
     private func showKickDialog(target: RoomParticipant) {
@@ -372,16 +379,15 @@ final class RoomParticipantActionPopup: UIView {
                         if case .success = result {
                             RoomToast.show(RoomKitResources.localizedFormat("roomkit.participants.kick_done", displayName))
                         }
+                        if case .failure(let error) = result {
+                            ErrorLocalized.showError(code: error.code, message: error.message)
+                        }
                     }
                 )
             }
             .secondaryAction(.commonCancel)
             .show()
         dismissDialogWhenInvalid(dialog) { self.isTargetManageable() }
-    }
-
-    private func isLocalOwner() -> Bool {
-        participantStore.state.value.localParticipant?.role == .owner
     }
 
     private func dismissDialogWhenInvalid(_ dialog: RoomDialog, isValid: @escaping () -> Bool) {
@@ -498,17 +504,6 @@ final class RoomParticipantActionRow: UIControl {
 
     @objc private func handleTap() {
         onTap?()
-    }
-}
-
-extension ParticipantRole {
-
-    func canManage(_ target: ParticipantRole) -> Bool {
-        switch self {
-        case .owner: return true
-        case .admin: return target == .generalUser
-        case .generalUser: return false
-        }
     }
 }
 

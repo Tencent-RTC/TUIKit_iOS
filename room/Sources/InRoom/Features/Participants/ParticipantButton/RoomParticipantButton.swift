@@ -81,8 +81,10 @@ final class RoomParticipantButton: UIControl {
     }
 
     private func observeParticipants() {
-        RoomParticipantStore.create(roomID: roomID).state
-            .subscribe(StatePublisherSelector(projector: { $0.participantList.count }))
+        RoomStore.shared.state
+            .subscribe(StatePublisherSelector(projector: { [roomID] state in
+                state.currentRoom?.roomID == roomID ? state.currentRoom?.participantCount : nil
+            }))
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] in self?.count = $0 }

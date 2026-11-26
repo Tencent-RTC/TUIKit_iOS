@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-final class RoomSettingsButton: UIControl, MeetingToolBarTitleDisplaying {
+final class RoomSettingsButton: UIControl {
 
     var onRequestDismiss: (() -> Void)?
 

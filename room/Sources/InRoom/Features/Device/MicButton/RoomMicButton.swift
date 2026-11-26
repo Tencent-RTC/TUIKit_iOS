@@ -10,7 +10,7 @@ final class RoomMicButton: UIControl {
     private static let localVolumeKey = ""
 
     private let roomID: String
-    private var isMicOn = false {
+    private var isMicrophoneOn = false {
         didSet { applyIcon() }
     }
     private var isRoomDisabled = false {
@@ -64,7 +64,6 @@ final class RoomMicButton: UIControl {
         super.didMoveToWindow()
         guard window != nil else { return }
         applyTheme()
-        refreshPermission()
     }
 
     override func layoutSubviews() {
@@ -107,11 +106,14 @@ final class RoomMicButton: UIControl {
         observeMicrophoneStatus()
         observeSpeakingVolume()
         observeRoomDisabled()
-        refreshPermission()
-        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.refreshPermission() }
+        RoomDevicePermission.microphonePermissionGranted
+            .sink { [weak self] _ in self?.hasPermission = true }
             .store(in: &cancellableSet)
+        if #available(iOS 17.0, *) {
+            hasPermission = AVAudioApplication.shared.recordPermission == .granted
+        } else {
+            hasPermission = AVAudioSession.sharedInstance().recordPermission == .granted
+        }
     }
 }
 
@@ -122,7 +124,7 @@ extension RoomMicButton {
             .subscribe(StatePublisherSelector(projector: { $0.localParticipant?.microphoneStatus == .on }))
             .removeDuplicates()
             .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.isMicOn = $0 }
+            .sink { [weak self] in self?.isMicrophoneOn = $0 }
             .store(in: &cancellableSet)
     }
 
@@ -137,8 +139,8 @@ extension RoomMicButton {
                 .removeDuplicates()
         )
         .receive(on: RunLoop.main)
-        .sink { [weak self] speakingUsers, isMicOn in
-            self?.micVolume = isMicOn ? (speakingUsers[Self.localVolumeKey] ?? 0) : nil
+        .sink { [weak self] speakingUsers, isMicrophoneOn in
+            self?.micVolume = isMicrophoneOn ? (speakingUsers[Self.localVolumeKey] ?? 0) : nil
         }
         .store(in: &cancellableSet)
     }
@@ -161,20 +163,12 @@ extension RoomMicButton {
             .store(in: &cancellableSet)
     }
 
-    private func refreshPermission() {
-        if #available(iOS 17.0, *) {
-            hasPermission = AVAudioApplication.shared.recordPermission == .granted
-        } else {
-            hasPermission = AVAudioSession.sharedInstance().recordPermission == .granted
-        }
-    }
-
     private func applyTheme() {
         backgroundColor = UIColor.roomKitBgHover
     }
 
     private func applyIcon() {
-        if isMicOn {
+        if isMicrophoneOn {
             iconView.image = RoomKitResources.image(named: "roomkit_icon_microphone")
             alpha = 1
             return
@@ -191,7 +185,7 @@ extension RoomMicButton {
 extension RoomMicButton {
 
     @objc private func handleTap() {
-        if isMicOn {
+        if isMicrophoneOn {
             RoomParticipantStore.create(roomID: roomID).muteMicrophone()
         } else {
             if isRoomDisabled {
