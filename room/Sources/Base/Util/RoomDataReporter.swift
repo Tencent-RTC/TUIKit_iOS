@@ -16,7 +16,7 @@ class RoomDataReporter {
     static func reportComponent() {
         let jsonStr = """
             {
-                "api":"setFramework",
+                "api":"LoginModule.setFramework",
                 "params":{
                     "framework":\(frameworkValue),
                     "component":\(componentValue),
