@@ -3,7 +3,7 @@ import SnapKit
 import Combine
 import AtomicXCore
 
-final class RoomScreenShareButton: UIControl, MeetingToolBarTitleDisplaying {
+final class RoomScreenShareButton: UIControl {
 
     var onRequestDismiss: (() -> Void)?
 
@@ -178,6 +178,11 @@ extension RoomScreenShareButton {
             return
         }
         guard let presenter else { return }
+        let bannedFeatureIds = UserDefaults.standard.stringArray(forKey: "rtcube_module_permission.bannedFeatureIds") ?? []
+        if bannedFeatureIds.contains("screen_share") {
+            showScreenShareBannedAlert(in: presenter)
+            return
+        }
         var dialog: RoomDialog?
         dialog = RoomDialog.Builder(in: presenter)
             .title(.screenShareAlertTitle)
@@ -191,6 +196,18 @@ extension RoomScreenShareButton {
                 } catch {
                     NSLog("[ScreenShare] start failed: \(error)")
                 }
+            }
+            .show()
+    }
+
+    private func showScreenShareBannedAlert(in presenter: UIViewController) {
+        RoomDialog.Builder(in: presenter)
+            .title(.screenShareBannedTitle)
+            .message(.screenShareBannedMessage)
+            .secondaryAction(.commonCancel) {}
+            .primaryAction(.screenShareBannedContact) {
+                guard let url = URL(string: "https://im.cloud.tencent.com/s/cWSPGIIM62CC/cFUPGIIM62CF") else { return }
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
             .show()
     }
@@ -230,6 +247,9 @@ extension String {
     fileprivate static var screenShareAlertTitle: String { RoomKitResources.localizedString("roomkit.main.screen_share_alert_title") }
     fileprivate static var screenShareAlertMessage: String { RoomKitResources.localizedString("roomkit.main.screen_share_alert_message") }
     fileprivate static var screenShareAlertContinue: String { RoomKitResources.localizedString("roomkit.main.screen_share_alert_continue") }
+    fileprivate static var screenShareBannedTitle: String { RoomKitResources.localizedString("roomkit.main.screen_share_banned_title") }
+    fileprivate static var screenShareBannedMessage: String { RoomKitResources.localizedString("roomkit.main.screen_share_banned_message") }
+    fileprivate static var screenShareBannedContact: String { RoomKitResources.localizedString("roomkit.main.screen_share_banned_contact") }
     fileprivate static var screenShareStopTitle: String { RoomKitResources.localizedString("roomkit.main.screen_share_stop_title") }
     fileprivate static var screenShareStopMessage: String { RoomKitResources.localizedString("roomkit.main.screen_share_stop_message") }
     fileprivate static var screenShareStopConfirm: String { RoomKitResources.localizedString("roomkit.main.screen_share_stop_confirm") }

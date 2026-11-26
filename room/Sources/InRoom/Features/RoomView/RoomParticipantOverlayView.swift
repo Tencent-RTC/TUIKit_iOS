@@ -21,8 +21,7 @@ final class RoomParticipantOverlayView: UIView {
     private let nameLabel = UILabel()
     private let localBadge = UIView()
     private let localBadgeLabel = UILabel()
-    private let roleBadge = UIView()
-    private let roleBadgeIcon = UIImageView()
+    private let roleBadge = UIImageView()
     private let speakingBorder = UIView()
 
     private let netMark: UIView = {
@@ -61,7 +60,6 @@ final class RoomParticipantOverlayView: UIView {
         super.layoutSubviews()
         footer.layer.cornerRadius = footer.bounds.height / 2
         localBadge.layer.cornerRadius = localBadge.bounds.height / 2
-        roleBadge.layer.cornerRadius = roleBadge.bounds.height / 2
         screenStatusContainer.layer.cornerRadius = screenStatusContainer.bounds.height / 2
         updateBadges()
     }
@@ -77,7 +75,6 @@ final class RoomParticipantOverlayView: UIView {
         footerStack.addArrangedSubview(localBadge)
         footer.addSubview(footerStack)
         localBadge.addSubview(localBadgeLabel)
-        roleBadge.addSubview(roleBadgeIcon)
 
         addSubview(avatar)
         addSubview(screenStatusContainer)
@@ -132,7 +129,7 @@ final class RoomParticipantOverlayView: UIView {
             $0.width.greaterThanOrEqualTo(16)
         }
         roleBadge.snp.makeConstraints {
-            $0.size.equalTo(16)
+            $0.size.equalTo(14)
         }
         flipButton.snp.makeConstraints {
             $0.top.leading.equalToSuperview().offset(8)
@@ -142,11 +139,6 @@ final class RoomParticipantOverlayView: UIView {
             $0.leading.trailing.equalToSuperview().inset(4)
             $0.centerY.equalToSuperview()
         }
-        roleBadgeIcon.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.size.equalTo(11)
-        }
-        roleBadgeIcon.setContentCompressionResistancePriority(.required, for: .horizontal)
         speakingBorder.snp.makeConstraints { $0.edges.equalToSuperview() }
 
         netMark.snp.makeConstraints {
@@ -184,13 +176,10 @@ final class RoomParticipantOverlayView: UIView {
         }
         localBadgeLabel.font = .systemFont(ofSize: 10, weight: .medium)
         localBadgeLabel.textAlignment = .center
-        roleBadgeIcon.contentMode = .scaleAspectFit
+        roleBadge.contentMode = .scaleAspectFit
 
-        flipButton.setImage(RoomKitResources.image(named: "roomkit_icon_flip_camera"), for: .normal)
+        flipButton.setImage(RoomKitResources.image(named: "roomkit_icon_flip_camera_button"), for: .normal)
         flipButton.imageView?.contentMode = .scaleAspectFit
-        flipButton.backgroundColor = UIColor.roomKitBgOnMedia
-        flipButton.layer.cornerRadius = 28 / 2
-        flipButton.imageEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
         flipButton.isHidden = true
         flipButton.accessibilityLabel = .roomViewFlipCamera
         flipButton.addTarget(self, action: #selector(handleFlipTap), for: .touchUpInside)
@@ -232,17 +221,8 @@ final class RoomParticipantOverlayView: UIView {
         roleBadge.isHidden = !(hasPrivilegedRole && bounds.width >= 112)
         localBadge.backgroundColor = UIColor.roomKitBgPressOnMedia
         flipButton.isHidden = !(isLocal && isCameraOn)
-        if role == .owner {
-            roleBadge.backgroundColor = UIColor.roomKitAccent
-            roleBadge.accessibilityLabel = .roomViewOwner
-        } else {
-            roleBadge.backgroundColor = UIColor.roomKitWarning
-            roleBadge.accessibilityLabel = .roomViewAdmin
-        }
-        let iconSize = role == .owner ? 12 : 11
-        let iconName = role == .owner ? "roomkit_icon_host_role_roomview" : "roomkit_icon_role_user_roomview"
-        roleBadgeIcon.image = RoomKitResources.image(named: iconName)
-        roleBadgeIcon.snp.updateConstraints { $0.size.equalTo(iconSize) }
+        let iconName = role == .owner ? "roomkit_icon_role_owner" : "roomkit_icon_role_admin"
+        roleBadge.image = RoomKitResources.image(named: iconName)
     }
 }
 
@@ -267,8 +247,7 @@ extension RoomParticipantOverlayView {
         speakingBorder.isHidden = true
         localBadge.isHidden = true
         roleBadge.isHidden = true
-        roleBadgeIcon.image = nil
-        roleBadge.accessibilityLabel = nil
+        roleBadge.image = nil
     }
 
     func bind(participant: RoomParticipant,

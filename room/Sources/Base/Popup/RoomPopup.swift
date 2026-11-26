@@ -67,7 +67,7 @@ public final class RoomPopup: UIView {
         panelView.addSubview(handleArea)
         panelView.addSubview(contentView)
 
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleContentTap))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleContentTap(_:)))
         tap.cancelsTouchesInView = false
         panelView.addGestureRecognizer(tap)
     }
@@ -112,7 +112,7 @@ public final class RoomPopup: UIView {
     }
 
     private func setupBindings() {
-        dimmingView.addTarget(self, action: #selector(handleMaskTap), for: .touchUpInside)
+        dimmingView.addTarget(self, action: #selector(handleMaskTap), for: .touchDown)
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         pan.delegate = self
         panelView.addGestureRecognizer(pan)
@@ -209,7 +209,12 @@ extension RoomPopup {
         dismissByUser(.mask)
     }
 
-    @objc private func handleContentTap() {
+    @objc private func handleContentTap(_ gesture: UITapGestureRecognizer) {
+        var touchedView = panelView.hitTest(gesture.location(in: panelView), with: nil)
+        while let view = touchedView {
+            if view is UITextField || view is UITextView { return }
+            touchedView = view.superview
+        }
         endEditing(true)
     }
 

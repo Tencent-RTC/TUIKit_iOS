@@ -124,15 +124,15 @@ final class RoomParticipantListCell: UITableViewCell {
         cameraStatus.contentMode = .scaleAspectFit
     }
 
-    func bind(participant: RoomParticipant, isSelf: Bool, isSharing: Bool) {
+    func bind(participant: RoomParticipant) {
         let displayName = participant.displayName
         avatar.url = participant.avatarURL
         avatar.text = displayName
         nameText.text = displayName
-        selfTag.isHidden = !isSelf
+        selfTag.isHidden = participant.userID != LoginStore.shared.state.value.loginUserInfo?.userID
         ownerTag.isHidden = participant.role != .owner
         adminTag.isHidden = participant.role != .admin
-        sharingTag.isHidden = !isSharing
+        sharingTag.isHidden = participant.screenShareStatus != .on
         let microphoneOn = participant.microphoneStatus == .on
         let cameraOn = participant.cameraStatus == .on
         microphoneStatus.image = RoomKitResources.image(named: microphoneOn ? "roomkit_icon_microphone" : "roomkit_icon_microphone_off")
